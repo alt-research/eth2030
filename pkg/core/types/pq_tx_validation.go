@@ -43,7 +43,7 @@ const (
 	PQSPHINCSPSigSize   = SPHINCSPlusSigSize
 )
 
-// Gas cost table for PQ signature verification (per EIP-8051 draft).
+// Project-local gas estimates for PQ transaction signature verification.
 const (
 	PQGasMLDSA65 uint64 = 4500
 	PQGasFalcon  uint64 = 6000

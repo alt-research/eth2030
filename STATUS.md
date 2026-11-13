@@ -1,3 +1,9 @@
+## Track 4 validation-frame proof boundary (2026-11-14)
+
+- The former validation-frame prover committed to calldata and a constant; it did not prove EVM execution, state, or EIP-8141 `APPROVE`. The old verifier accepted a proof without binding it to a block, and the node and payload builder discarded the returned proof while keeping the original block. Those paths did not establish execution validity.
+- The legacy STARK validation-frame prover now returns `ErrFrameProofUnavailable`. The VM requires an explicit block-bound execution-statement provider to generate and verify a frame proof and identifies only `VERIFY` frames. No real provider is installed; node startup explicitly rejects `StarkValidationFrames=true` instead of advertising unavailable proof generation. Frame calldata is not stripped.
+- Tests exercise missing providers, disabled node configuration, no-VERIFY blocks, rejection of an unbound legacy proof, cross-block proof substitution, tampering and provider failure. `go test ./...`, targeted prover/VM/node/payload race tests, and `go build ./...` passed in `pkg`, with Go test cache reused where applicable. The block-bound test provider is a simulated test double, not a STARK or a proof of EVM execution. A real provider, statement format, proof transport and consensus adoption remain open.
+
 ## Track 4 binary materialization and state rollback (2026-11-13)
 
 - Added an explicit-error conversion of a complete `MemoryStateDB` including dirty storage to an EIP-7864 draft BLAKE3 tree. It checks code hashes and header constraints and does not mutate the source. Tests compare its root to committed-state migration, exercise snapshot/revert, and materialize, persist and read back an actual transaction execution result. This is a full in-memory rebuild, not a binary `StateDB` or fork activation.

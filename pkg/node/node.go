@@ -36,8 +36,8 @@ import (
 	dasnetwork "github.com/eth2030/eth2030/das/network"
 	dasvalidator "github.com/eth2030/eth2030/das/validator"
 	"github.com/eth2030/eth2030/engine"
-	"github.com/eth2030/eth2030/focil"
 	"github.com/eth2030/eth2030/eth"
+	"github.com/eth2030/eth2030/focil"
 	"github.com/eth2030/eth2030/light"
 	"github.com/eth2030/eth2030/metrics"
 	nodebackend "github.com/eth2030/eth2030/node/backend"
@@ -272,6 +272,9 @@ func New(config *Config) (*Node, error) {
 	}
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
+	}
+	if config.StarkValidationFrames {
+		return nil, proofs.ErrFrameProofUnavailable
 	}
 
 	// GAP-7.2: select BLS signature backend based on config.
@@ -563,11 +566,6 @@ func New(config *Config) (*Node, error) {
 		}
 		slog.Info("AA proof circuit ready", "constraints", circuit.ConstraintCount())
 	}()
-
-	// Create STARK validation frame prover when enabled.
-	if config.StarkValidationFrames {
-		n.starkFrameProver = proofs.NewSTARKValidationFrameProver()
-	}
 
 	// Log EP-3 configuration.
 	slog.Info("EP-3 post-quantum config",

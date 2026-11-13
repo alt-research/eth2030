@@ -4,7 +4,7 @@
 
 Package `payload` defines every Engine API payload type (V1 through V5) and the supporting infrastructure for constructing, caching, processing, and validating execution payloads. It covers the full lifecycle from `PayloadAttributes` received via `engine_forkchoiceUpdatedV*` through async block building to the final payload returned by `engine_getPayload*`.
 
-Validation is split into two complementary layers: `PayloadProcessor` performs intrinsic header checks (base-fee formula, gas limits, timestamp ordering) and drives state-transition processing; `PayloadValidator` performs structural integrity checks on every field in isolation, including RLP-based block hash recomputation, blob gas accounting, and parent beacon block root verification. An optional STARK prover may replace validation frames in built payloads (US-PQ-5b).
+Validation is split into two complementary layers: `PayloadProcessor` performs intrinsic header checks (base-fee formula, gas limits, timestamp ordering) and drives state-transition processing; `PayloadValidator` performs structural integrity checks on every field in isolation, including RLP-based block hash recomputation, blob gas accounting, and parent beacon block root verification. Validation-frame proof generation is experimental and unavailable without a block-bound execution proof provider. The payload remains unchanged when no provider is available.
 
 ## Functionality
 

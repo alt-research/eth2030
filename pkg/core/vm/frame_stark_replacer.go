@@ -1,8 +1,3 @@
-// frame_stark_replacer.go replaces validation frame calldata with STARK proofs.
-// This enables block compression by proving frame execution validity without
-// retaining the full calldata.
-//
-// Part of the EL roadmap: proof aggregation and mandatory 3-of-5 proofs (K+).
 package vm
 
 import (
@@ -10,63 +5,74 @@ import (
 	"github.com/eth2030/eth2030/proofs"
 )
 
-// ReplaceValidationFrames proves that all validation frames in a block
-// executed correctly. Returns the original block and the STARK proof.
-// If no frame txs exist, proof is nil. If proving fails, the original
-// block is returned unchanged with a nil proof.
-func ReplaceValidationFrames(
-	block *types.Block,
-	prover proofs.ValidationFrameProver,
-) (*types.Block, *proofs.STARKProofData, error) {
-	var frameDatas [][]byte
+// BlockValidationFrameProver must prove and verify the actual execution and
+// approvals of the VERIFY frames against the supplied block and its trusted
+// pre-state. A bare calldata digest is not an execution proof. The provider is
+// responsible for binding the proof to all required public inputs and state.
+type BlockValidationFrameProver interface {
+	proofs.ValidationFrameProver
+	ProveBlockValidationFrames(block *types.Block) (*proofs.STARKProofData, error)
+	VerifyBlockValidationFrames(block *types.Block, proof *proofs.STARKProofData) bool
+}
+
+func inspectVerifyFrames(block *types.Block) (hasVerify, valid bool) {
+	if block == nil {
+		return false, false
+	}
 	for _, tx := range block.Transactions() {
-		if tx.Type() == types.FrameTxType {
-			frames := tx.Frames()
-			for _, f := range frames {
-				frameDatas = append(frameDatas, f.Data)
+		if tx == nil {
+			return false, false
+		}
+		if tx.Type() != types.FrameTxType {
+			continue
+		}
+		for _, frame := range tx.Frames() {
+			if frame.Mode == types.ModeVerify {
+				hasVerify = true
 			}
 		}
 	}
+	return hasVerify, true
+}
 
-	if len(frameDatas) == 0 {
+// ReplaceValidationFrames currently returns the unmodified block. It may
+// return a proof only from an explicitly configured block-bound provider; it
+// does not strip calldata or make an experimental proof consensus authoritative.
+func ReplaceValidationFrames(block *types.Block, prover proofs.ValidationFrameProver) (*types.Block, *proofs.STARKProofData, error) {
+	hasVerify, valid := inspectVerifyFrames(block)
+	if !valid {
+		return block, nil, proofs.ErrFrameProofUnavailable
+	}
+	if !hasVerify {
 		return block, nil, nil
 	}
-
-	proof, err := prover.ProveAllValidationFrames(frameDatas)
+	bound, ok := prover.(BlockValidationFrameProver)
+	if !ok {
+		return block, nil, proofs.ErrFrameProofUnavailable
+	}
+	proof, err := bound.ProveBlockValidationFrames(block)
 	if err != nil {
-		return block, nil, nil
+		return block, nil, err
 	}
-
+	if proof == nil || !bound.VerifyBlockValidationFrames(block, proof) {
+		return block, nil, proofs.ErrFrameProofUnavailable
+	}
 	return block, proof, nil
 }
 
-// VerifyBlockFrameProof verifies the STARK proof covering all validation frames
-// in a block (the import-side counterpart to ReplaceValidationFrames).
-//
-// Returns true when:
-//   - The block has no VERIFY frame txs and proof is nil.
-//   - The block has VERIFY frame txs and prover.Verify(proof) returns true.
-//
-// Returns false when:
-//   - The block has frame txs but proof is nil.
-//   - prover.Verify returns false.
-func VerifyBlockFrameProof(
-	block *types.Block,
-	proof *proofs.STARKProofData,
-	prover proofs.ValidationFrameProver,
-) bool {
-	hasFrames := false
-	for _, tx := range block.Transactions() {
-		if tx.Type() == types.FrameTxType && len(tx.Frames()) > 0 {
-			hasFrames = true
-			break
-		}
+// VerifyBlockFrameProof requires a provider that verifies the block-bound
+// execution statement. Legacy proof-only verifiers cannot authenticate it.
+func VerifyBlockFrameProof(block *types.Block, proof *proofs.STARKProofData, prover proofs.ValidationFrameProver) bool {
+	hasVerify, valid := inspectVerifyFrames(block)
+	if !valid {
+		return false
 	}
-	if !hasFrames {
+	if !hasVerify {
 		return proof == nil
 	}
 	if proof == nil {
 		return false
 	}
-	return prover.Verify(proof)
+	bound, ok := prover.(BlockValidationFrameProver)
+	return ok && bound.VerifyBlockValidationFrames(block, proof)
 }

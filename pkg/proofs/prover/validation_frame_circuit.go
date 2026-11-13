@@ -12,9 +12,10 @@ import (
 
 // Validation frame circuit errors.
 var (
-	ErrFrameReverted   = errors.New("validation_frame: frame reverted")
-	ErrFrameNilOutput  = errors.New("validation_frame: nil output")
-	ErrFrameEmptyBatch = errors.New("validation_frame: empty batch")
+	ErrFrameReverted         = errors.New("validation_frame: frame reverted")
+	ErrFrameNilOutput        = errors.New("validation_frame: nil output")
+	ErrFrameEmptyBatch       = errors.New("validation_frame: empty batch")
+	ErrFrameProofUnavailable = errors.New("validation_frame: no execution-statement proof provider configured")
 )
 
 // ValidationFrameProver proves that validation frames executed correctly.
@@ -68,78 +69,30 @@ func (s *StubValidationFrameProver) Verify(proof *STARKProofData) bool {
 	return proof != nil
 }
 
-// STARKValidationFrameProver uses the full STARK prover for frame proofs.
-type STARKValidationFrameProver struct {
-	prover *STARKProver
-}
+// STARKValidationFrameProver is retained for API compatibility. The former
+// trace committed to calldata and a constant, not EVM execution or APPROVE.
+// No execution-statement prover is supplied by this package.
+type STARKValidationFrameProver struct{}
 
-// NewSTARKValidationFrameProver creates a new STARK-based validation frame prover.
 func NewSTARKValidationFrameProver() *STARKValidationFrameProver {
-	return &STARKValidationFrameProver{
-		prover: NewSTARKProver(),
-	}
+	return &STARKValidationFrameProver{}
 }
-
-// ProveValidationFrame proves that a single validation frame executed correctly.
-func (p *STARKValidationFrameProver) ProveValidationFrame(frameCalldata, output []byte) (*STARKProofData, error) {
+func (*STARKValidationFrameProver) ProveValidationFrame(_ []byte, output []byte) (*STARKProofData, error) {
 	if output == nil {
 		return nil, ErrFrameNilOutput
 	}
 	if len(output) == 0 || output[0] == 0 {
 		return nil, ErrFrameReverted
 	}
-
-	// Build trace: 1 row with [calldata_hash_hi, calldata_hash_lo, output_nonzero].
-	calldataHash := sha256.Sum256(frameCalldata)
-	hi := NewFieldElement(0)
-	hi.Value.SetBytes(calldataHash[:16])
-	lo := NewFieldElement(0)
-	lo.Value.SetBytes(calldataHash[16:])
-	outputNZ := NewFieldElement(1)
-
-	trace := [][]FieldElement{{hi, lo, outputNZ}}
-
-	// Constraint: column 2 (output_nonzero) must equal 1.
-	constraint := STARKConstraint{
-		Degree:       1,
-		Coefficients: []FieldElement{NewFieldElement(0), NewFieldElement(0), NewFieldElement(1)},
-	}
-
-	return p.prover.GenerateSTARKProof(trace, []STARKConstraint{constraint})
+	return nil, ErrFrameProofUnavailable
 }
-
-// ProveAllValidationFrames proves a batch of validation frames in a single STARK proof.
-func (p *STARKValidationFrameProver) ProveAllValidationFrames(frames [][]byte) (*STARKProofData, error) {
+func (*STARKValidationFrameProver) ProveAllValidationFrames(frames [][]byte) (*STARKProofData, error) {
 	if len(frames) == 0 {
 		return nil, ErrFrameEmptyBatch
 	}
-
-	// Build multi-row trace: one row per frame.
-	trace := make([][]FieldElement, len(frames))
-	for i, frame := range frames {
-		calldataHash := sha256.Sum256(frame)
-		hi := NewFieldElement(0)
-		hi.Value.SetBytes(calldataHash[:16])
-		lo := NewFieldElement(0)
-		lo.Value.SetBytes(calldataHash[16:])
-		outputNZ := NewFieldElement(1)
-		trace[i] = []FieldElement{hi, lo, outputNZ}
-	}
-
-	// Constraint: column 2 must equal 1 for all rows.
-	constraint := STARKConstraint{
-		Degree:       1,
-		Coefficients: []FieldElement{NewFieldElement(0), NewFieldElement(0), NewFieldElement(1)},
-	}
-
-	return p.prover.GenerateSTARKProof(trace, []STARKConstraint{constraint})
+	return nil, ErrFrameProofUnavailable
 }
-
-// Verify verifies a validation frame STARK proof.
-func (p *STARKValidationFrameProver) Verify(proof *STARKProofData) bool {
-	ok, err := p.prover.VerifySTARKProof(proof, nil)
-	return err == nil && ok
-}
+func (*STARKValidationFrameProver) Verify(*STARKProofData) bool { return false }
 
 // ValidationFrameProofSize returns the approximate serialized proof size.
 func ValidationFrameProofSize(proof *STARKProofData) int {

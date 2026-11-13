@@ -70,61 +70,12 @@ func TestReplaceValidationFrames_NoFrameTxs(t *testing.T) {
 	}
 }
 
-func TestReplaceValidationFrames_WithFrameTxs(t *testing.T) {
-	txs := []*types.Transaction{
-		makeLegacyTx(),
-		makeFrameTx([]byte{0xAA, 0xBB}),
-		makeFrameTx([]byte{0xCC, 0xDD}),
-	}
-	block := makeTestBlock(txs)
-	stub := &proofs.StubValidationFrameProver{}
-
-	result, proof, err := ReplaceValidationFrames(block, stub)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if proof == nil {
-		t.Fatal("expected non-nil proof for block with frame txs")
-	}
-	if result != block {
-		t.Fatal("expected same block returned")
-	}
-}
-
-func TestReplaceValidationFrames_ProverError(t *testing.T) {
-	txs := []*types.Transaction{
-		makeFrameTx([]byte{0xAA}),
-	}
-	block := makeTestBlock(txs)
-	ep := &errorProver{}
-
-	result, proof, err := ReplaceValidationFrames(block, ep)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if proof != nil {
-		t.Fatal("expected nil proof when prover fails")
-	}
-	if result != block {
-		t.Fatal("expected original block returned")
-	}
-}
-
-func TestReplaceValidationFrames_BlockUnchanged(t *testing.T) {
-	txs := []*types.Transaction{
-		makeFrameTx([]byte{0xAA, 0xBB}),
-		makeLegacyTx(),
-	}
-	block := makeTestBlock(txs)
-	hashBefore := block.Hash()
-	stub := &proofs.StubValidationFrameProver{}
-
-	result, _, err := ReplaceValidationFrames(block, stub)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	hashAfter := result.Hash()
-	if hashBefore != hashAfter {
-		t.Fatalf("block hash changed: before=%x after=%x", hashBefore, hashAfter)
+func TestReplaceValidationFrames_RejectsLegacyProvers(t *testing.T) {
+	block := makeTestBlock([]*types.Transaction{makeFrameTx([]byte{0xaa})})
+	for _, prover := range []proofs.ValidationFrameProver{&proofs.StubValidationFrameProver{}, &errorProver{}, proofs.NewSTARKValidationFrameProver(), nil} {
+		result, proof, err := ReplaceValidationFrames(block, prover)
+		if result != block || proof != nil || !errors.Is(err, proofs.ErrFrameProofUnavailable) {
+			t.Fatalf("legacy prover accepted: %v", err)
+		}
 	}
 }

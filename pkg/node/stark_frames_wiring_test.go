@@ -1,6 +1,8 @@
 package node
 
 import (
+	"errors"
+	"github.com/eth2030/eth2030/proofs"
 	"testing"
 )
 
@@ -50,14 +52,12 @@ func TestStarkFrames_ProverNilByDefault(t *testing.T) {
 	}
 }
 
-// TestStarkFrames_ProverCreatedWhenEnabled verifies prover is created when StarkValidationFrames=true.
-func TestStarkFrames_ProverCreatedWhenEnabled(t *testing.T) {
+// Enabling frame proofs must fail until a real statement-bound provider exists.
+func TestStarkFrames_EnabledRequiresProvider(t *testing.T) {
 	cfg := makeTestConfig(t)
 	cfg.StarkValidationFrames = true
-	n := newTestNode(t, &cfg)
-
-	if n.starkFrameProver == nil {
-		t.Fatal("starkFrameProver should be non-nil when StarkValidationFrames=true")
+	if _, err := New(&cfg); !errors.Is(err, proofs.ErrFrameProofUnavailable) {
+		t.Fatalf("enabled without provider: %v", err)
 	}
 }
 
@@ -79,36 +79,6 @@ func TestStarkFrames_AggregatorStartStop(t *testing.T) {
 
 	if !n.starkAgg.IsRunning() {
 		t.Fatal("aggregator should be running after Start()")
-	}
-
-	if err := n.Stop(); err != nil {
-		t.Fatalf("Stop() error: %v", err)
-	}
-
-	if n.starkAgg.IsRunning() {
-		t.Fatal("aggregator should not be running after Stop()")
-	}
-}
-
-// TestStarkFrames_NodeLifecycle is an e2e test verifying the full lifecycle with StarkValidationFrames=true.
-func TestStarkFrames_NodeLifecycle(t *testing.T) {
-	cfg := makeTestConfig(t)
-	cfg.StarkValidationFrames = true
-
-	n, err := New(&cfg)
-	if err != nil {
-		t.Fatalf("New() error: %v", err)
-	}
-
-	if err := n.Start(); err != nil {
-		t.Fatalf("Start() error: %v", err)
-	}
-
-	if !n.starkAgg.IsRunning() {
-		t.Fatal("aggregator should be running after Start()")
-	}
-	if n.starkFrameProver == nil {
-		t.Fatal("starkFrameProver should be non-nil with StarkValidationFrames=true")
 	}
 
 	if err := n.Stop(); err != nil {

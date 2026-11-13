@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/crypto/pqc"
 )
 
@@ -88,28 +89,38 @@ func TestVerifyPQAttestation(t *testing.T) {
 }
 
 func TestVerifyClassicFallback(t *testing.T) {
-	// Create an attestation with only a classic (ECDSA-style) signature.
-	att := &PQAttestation{
-		Slot:             50,
-		CommitteeIndex:   2,
-		BeaconBlockRoot:  types.HexToHash("0x1234"),
-		SourceEpoch:      1,
-		TargetEpoch:      2,
-		ValidatorIndex:   7,
-		ClassicSignature: make([]byte, 65),
-	}
-	// Fill with non-zero bytes.
-	for i := range att.ClassicSignature {
-		att.ClassicSignature[i] = byte(i + 1)
-	}
-
-	verifier := NewPQAttestationVerifier(DefaultPQAttestationConfig())
-	ok, err := verifier.VerifyAttestation(att)
+	key, err := crypto.GenerateKey()
 	if err != nil {
-		t.Fatalf("VerifyAttestation: %v", err)
+		t.Fatal(err)
 	}
-	if !ok {
-		t.Error("VerifyAttestation should accept classic fallback signature")
+	att := &PQAttestation{
+		Slot: 50, CommitteeIndex: 2, BeaconBlockRoot: types.Hash{1},
+		SourceEpoch: 1, TargetEpoch: 2, ValidatorIndex: 7,
+	}
+	att.ClassicSignature, err = crypto.Sign(attestationMessage(att.Slot, att.CommitteeIndex, att.BeaconBlockRoot, att.SourceEpoch, att.TargetEpoch), key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, _ := NewPQAttestationVerifier(nil).VerifyAttestation(att); ok {
+		t.Fatal("accepted a classic signature without an authorized key lookup")
+	}
+	config := DefaultPQAttestationConfig()
+	config.ClassicSigner = func(slot, committee, validator uint64) (types.Address, bool) {
+		return crypto.PubkeyToAddress(key.PublicKey), slot == 50 && committee == 2 && validator == 7
+	}
+	verifier := NewPQAttestationVerifier(config)
+	if ok, err := verifier.VerifyAttestation(att); !ok || err != nil {
+		t.Fatalf("valid classic signature: %v", err)
+	}
+	bad := *att
+	bad.ValidatorIndex++
+	if ok, _ := verifier.VerifyAttestation(&bad); ok {
+		t.Fatal("accepted an unauthorized validator index")
+	}
+	bad = *att
+	bad.BeaconBlockRoot[0] ^= 1
+	if ok, _ := verifier.VerifyAttestation(&bad); ok {
+		t.Fatal("accepted an altered classic signing message")
 	}
 }
 

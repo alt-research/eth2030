@@ -27,6 +27,10 @@ type PQAttestationConfig struct {
 	// FallbackToClassic allows classic (ECDSA) signatures when PQ is unavailable.
 	FallbackToClassic bool
 
+	// ClassicSigner resolves the authorized ECDSA address at the attested
+	// slot and committee. Classic fallback requires a resolver.
+	ClassicSigner func(slot, committee, validator uint64) (types.Address, bool)
+
 	// MinPQValidators is the minimum number of validators that must use PQ
 	// signatures before the network enforces PQ-only mode.
 	MinPQValidators int
@@ -107,21 +111,10 @@ func (v *PQAttestationVerifier) VerifyAttestation(att *PQAttestation) (bool, err
 		}
 	}
 
-	// Try classic verification as fallback.
 	if hasClassic && v.config.FallbackToClassic {
-		if len(att.ClassicSignature) == 65 {
-			// Check that classic sig is not all zeros.
-			allZero := true
-			for _, b := range att.ClassicSignature {
-				if b != 0 {
-					allZero = false
-					break
-				}
-			}
-			if !allZero {
-				v.verified.Add(1)
-				return true, nil
-			}
+		if verifyClassicAttestation(att, v.config.ClassicSigner) {
+			v.verified.Add(1)
+			return true, nil
 		}
 		v.failed.Add(1)
 		return false, ErrPQAttInvalidClassicSig
@@ -129,6 +122,19 @@ func (v *PQAttestationVerifier) VerifyAttestation(att *PQAttestation) (bool, err
 
 	v.failed.Add(1)
 	return false, ErrPQAttNoSignature
+}
+
+func verifyClassicAttestation(att *PQAttestation, lookup func(uint64, uint64, uint64) (types.Address, bool)) bool {
+	if lookup == nil || len(att.ClassicSignature) != 65 {
+		return false
+	}
+	expected, ok := lookup(att.Slot, att.CommitteeIndex, att.ValidatorIndex)
+	if !ok || expected.IsZero() {
+		return false
+	}
+	message := attestationMessage(att.Slot, att.CommitteeIndex, att.BeaconBlockRoot, att.SourceEpoch, att.TargetEpoch)
+	pubkey, err := crypto.SigToPub(message, att.ClassicSignature)
+	return err == nil && crypto.PubkeyToAddress(*pubkey) == expected
 }
 
 // Stats returns the number of verified and failed attestation checks.
@@ -247,31 +253,16 @@ func (v *PQAttestationVerifier) LeanAvailablePQAttestors(slot uint64, allValidat
 	return SelectLeanPQAttestors(allValidators, cfg.LeanAvailableChainValidators, slot, epochSeed)
 }
 
-// STARKAggregateVerify uses STARK-based batch verification for PQ attestations.
-// This is more efficient than individual verification for large batches (N > 4).
+// STARKAggregateVerify verifies all PQ signatures and updates the verifier counters.
 func (v *PQAttestationVerifier) STARKAggregateVerify(attestations []PQAttestation) (*STARKSignatureAggregation, error) {
-	if len(attestations) == 0 {
+	if len(attestations) == 0 || !v.config.UsePQSignatures {
 		return nil, ErrPQAttNoSignature
 	}
-
-	// For small batches, individual verification may be more efficient.
-	// The crossover point is ~4 signatures (4 * 50k = 200k = STARK verify cost).
-	if len(attestations) <= 4 {
-		// Verify individually first.
-		for _, att := range attestations {
-			valid, err := v.VerifyAttestation(&att)
-			if err != nil || !valid {
-				return nil, ErrPQAttInvalidPQSig
-			}
-		}
-	}
-
-	// Use STARK aggregation for the batch.
 	result, err := BatchVerifyPQAttestations(attestations)
 	if err != nil {
+		v.failed.Add(uint64(len(attestations)))
 		return nil, err
 	}
-
 	v.verified.Add(uint64(len(attestations)))
 	return result, nil
 }

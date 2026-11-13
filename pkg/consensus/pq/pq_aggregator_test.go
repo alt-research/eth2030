@@ -142,19 +142,19 @@ func TestAggregatorEndToEnd(t *testing.T) {
 		t.Fatalf("CollectSignatures: %v", err)
 	}
 
-	result, err := agg.ProduceAggregate(bundles)
+	if result, err := agg.ProduceAggregate(bundles); result != nil || err != ErrAggregatorXMSSUnsupported {
+		t.Fatalf("XMSS bundles entered the ML-DSA verifier: %v", err)
+	}
+	valid, err := agg.aggregator.Aggregate(signTestAttestations(t, 2))
 	if err != nil {
-		t.Fatalf("ProduceAggregate: %v", err)
+		t.Fatal(err)
 	}
-	if result == nil {
-		t.Fatal("ProduceAggregate returned nil")
+	if err := agg.PropagateAggregate(valid); err != nil {
+		t.Fatal(err)
 	}
-	if result.NumValidators != 3 {
-		t.Errorf("NumValidators: got %d, want 3", result.NumValidators)
-	}
-
-	if err := agg.PropagateAggregate(result); err != nil {
-		t.Fatalf("PropagateAggregate: %v", err)
+	valid.Signatures[1].PQSignature[0] ^= 1
+	if err := agg.PropagateAggregate(valid); err != ErrSTARKAggVerifyFailed {
+		t.Fatalf("propagated an invalid batch: %v", err)
 	}
 }
 

@@ -1,185 +1,94 @@
 package pq
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto/pqc"
+	"github.com/eth2030/eth2030/proofs"
 )
 
-func makeTestPQAttestation(slot uint64, validatorIdx uint64) PQAttestation {
-	var blockRoot types.Hash
-	blockRoot[0] = byte(slot)
-	blockRoot[1] = byte(validatorIdx)
-
-	return PQAttestation{
-		Slot:            slot,
-		CommitteeIndex:  0,
-		BeaconBlockRoot: blockRoot,
-		SourceEpoch:     slot / 32,
-		TargetEpoch:     slot/32 + 1,
-		PQSignature:     []byte("dilithium-sig-placeholder-" + string(rune('A'+validatorIdx))),
-		PQPublicKey:     []byte("dilithium-pk-placeholder-" + string(rune('A'+validatorIdx))),
-		ValidatorIndex:  validatorIdx,
+func signTestAttestations(t *testing.T, count int) []PQAttestation {
+	t.Helper()
+	signer := pqc.NewMLDSASigner()
+	result := make([]PQAttestation, count)
+	for i := range result {
+		key, err := signer.GenerateKey()
+		if err != nil {
+			t.Fatal(err)
+		}
+		a := PQAttestation{
+			Slot: 42, CommitteeIndex: 2, BeaconBlockRoot: types.Hash{1},
+			SourceEpoch: 3, TargetEpoch: 4, ValidatorIndex: uint64(i),
+			PQPublicKey: key.PublicKey,
+		}
+		a.PQSignature, err = signer.Sign(key, attestationMessage(a.Slot, a.CommitteeIndex, a.BeaconBlockRoot, a.SourceEpoch, a.TargetEpoch))
+		if err != nil {
+			t.Fatal(err)
+		}
+		result[i] = a
 	}
+	return result
 }
 
-func TestSTARKSignatureAggregation(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-
-	attestations := []PQAttestation{
-		makeTestPQAttestation(100, 0),
-		makeTestPQAttestation(100, 1),
-		makeTestPQAttestation(100, 2),
-	}
-
-	result, err := agg.Aggregate(attestations)
+func TestPQAggregationVerifiesEverySignatureAndMetadata(t *testing.T) {
+	input := signTestAttestations(t, 6)
+	aggregator := NewSTARKSignatureAggregator()
+	verifier := NewPQAttestationVerifier(nil)
+	result, err := verifier.STARKAggregateVerify(input)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if result.NumValidators != 3 {
-		t.Errorf("expected 3 validators, got %d", result.NumValidators)
+	if result.NumValidators != 6 || result.AggregateProof != nil || result.GasSavings() != 0 {
+		t.Fatalf("unexpected batch metadata: count %d, proof %v, estimated savings %d", result.NumValidators, result.AggregateProof != nil, result.GasSavings())
 	}
-	if result.Slot != 100 {
-		t.Errorf("expected slot 100, got %d", result.Slot)
+	if valid, err := aggregator.Verify(result); err != nil || !valid {
+		t.Fatalf("valid signed batch: %v", err)
 	}
-	if result.AggregateProof == nil {
-		t.Error("aggregate proof should not be nil")
+	input[5].PQSignature[0] ^= 1
+	if valid, err := aggregator.Verify(result); err != nil || !valid {
+		t.Fatalf("source mutation changed the result: %v", err)
 	}
-
-	var zeroHash types.Hash
-	if result.CommitteeRoot == zeroHash {
-		t.Error("committee root should not be zero")
+	if _, err := verifier.STARKAggregateVerify(input); err != ErrSTARKAggVerifyFailed {
+		t.Fatalf("accepted invalid signature beyond the old four-entry threshold: %v", err)
 	}
-}
-
-func TestSTARKSignatureAggregationVerify(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-
-	attestations := []PQAttestation{
-		makeTestPQAttestation(200, 0),
-		makeTestPQAttestation(200, 1),
+	verified, failed := verifier.Stats()
+	if verified != 6 || failed != 6 {
+		t.Fatalf("batch counters = %d, %d", verified, failed)
 	}
 
-	result, err := agg.Aggregate(attestations)
-	if err != nil {
-		t.Fatal(err)
+	for _, test := range []struct {
+		name   string
+		change func(*STARKSignatureAggregation)
+	}{
+		{"proof-only", func(a *STARKSignatureAggregation) { a.AggregateProof = &proofs.STARKProofData{} }},
+		{"mixed message", func(a *STARKSignatureAggregation) { a.Signatures[5].BeaconBlockRoot[0] ^= 1 }},
+		{"mixed committee", func(a *STARKSignatureAggregation) { a.Signatures[5].CommitteeIndex++ }},
+		{"duplicate validator", func(a *STARKSignatureAggregation) { a.Signatures[5].ValidatorIndex = a.Signatures[0].ValidatorIndex }},
+		{"duplicate public key", func(a *STARKSignatureAggregation) {
+			a.Signatures[5].PQPublicKey = a.Signatures[0].PQPublicKey
+			a.Signatures[5].PQSignature = a.Signatures[0].PQSignature
+		}},
+		{"forged count", func(a *STARKSignatureAggregation) { a.NumValidators++ }},
+		{"forged epoch", func(a *STARKSignatureAggregation) { a.TargetEpoch++ }},
+		{"forged committee root", func(a *STARKSignatureAggregation) { a.CommitteeRoot[0] ^= 1 }},
+		{"forged signature", func(a *STARKSignatureAggregation) {
+			a.Signatures[5].PQSignature = bytes.Clone(a.Signatures[5].PQSignature)
+			a.Signatures[5].PQSignature[0] ^= 1
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			bad := *result
+			bad.Signatures = append([]PQAttestation{}, result.Signatures...)
+			test.change(&bad)
+			if ok, err := aggregator.Verify(&bad); ok || err == nil {
+				t.Fatal("accepted altered batch")
+			}
+		})
 	}
-
-	valid, err := agg.Verify(result)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !valid {
-		t.Error("aggregation should be valid")
-	}
-}
-
-func TestSTARKSignatureAggregationEmpty(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-	_, err := agg.Aggregate(nil)
-	if err != ErrSTARKAggNoSigs {
-		t.Errorf("expected ErrSTARKAggNoSigs, got %v", err)
-	}
-}
-
-func TestSTARKSignatureAggregationVerifyNil(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-	_, err := agg.Verify(nil)
-	if err != ErrSTARKAggNilResult {
-		t.Errorf("expected ErrSTARKAggNilResult, got %v", err)
-	}
-}
-
-func TestSTARKSignatureAggregationGasSavings(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-
-	// 10 validators: individual = 500,000 gas, STARK = 200,000 gas
-	attestations := make([]PQAttestation, 10)
-	for i := 0; i < 10; i++ {
-		attestations[i] = makeTestPQAttestation(300, uint64(i))
-	}
-
-	result, err := agg.Aggregate(attestations)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	savings := result.GasSavings()
-	// 10 * 50,000 - 200,000 = 300,000
-	if savings != 300000 {
-		t.Errorf("expected gas savings 300000, got %d", savings)
-	}
-}
-
-func TestSTARKSignatureAggregationSmallSet(t *testing.T) {
-	// With small set (< 5), individual verification may be cheaper.
-	agg := NewSTARKSignatureAggregator()
-
-	attestations := []PQAttestation{
-		makeTestPQAttestation(400, 0),
-		makeTestPQAttestation(400, 1),
-		makeTestPQAttestation(400, 2),
-	}
-
-	result, err := agg.Aggregate(attestations)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// 3 * 50,000 = 150,000 < 200,000, so no savings.
-	if result.GasSavings() != 0 {
-		t.Errorf("expected 0 gas savings for small set, got %d", result.GasSavings())
-	}
-}
-
-func TestBatchVerifyPQAttestations(t *testing.T) {
-	attestations := []PQAttestation{
-		makeTestPQAttestation(500, 0),
-		makeTestPQAttestation(500, 1),
-		makeTestPQAttestation(500, 2),
-		makeTestPQAttestation(500, 3),
-		makeTestPQAttestation(500, 4),
-	}
-
-	result, err := BatchVerifyPQAttestations(attestations)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result.NumValidators != 5 {
-		t.Errorf("expected 5 validators, got %d", result.NumValidators)
-	}
-}
-
-func TestBatchVerifyPQAttestationsEmpty(t *testing.T) {
-	_, err := BatchVerifyPQAttestations(nil)
-	if err != ErrSTARKAggNoSigs {
-		t.Errorf("expected ErrSTARKAggNoSigs, got %v", err)
-	}
-}
-
-func TestAggregationStats(t *testing.T) {
-	agg := NewSTARKSignatureAggregator()
-
-	attestations := []PQAttestation{
-		makeTestPQAttestation(600, 0),
-		makeTestPQAttestation(600, 1),
-	}
-
-	result, err := agg.Aggregate(attestations)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	stats := result.Stats()
-	if stats.NumSignatures != 2 {
-		t.Errorf("expected 2 signatures, got %d", stats.NumSignatures)
-	}
-	if stats.ProofSizeBytes <= 0 {
-		t.Error("proof size should be positive")
-	}
-	if stats.Slot != 600 {
-		t.Errorf("expected slot 600, got %d", stats.Slot)
+	if _, err := BatchVerifyPQAttestations(nil); err != ErrSTARKAggNoSigs {
+		t.Fatalf("empty batch: %v", err)
 	}
 }
 

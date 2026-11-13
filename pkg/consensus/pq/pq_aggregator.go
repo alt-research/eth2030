@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 )
 
@@ -31,7 +30,8 @@ const (
 
 // PQ aggregator errors.
 var (
-	ErrAggregatorNoBundles = errors.New("pq_aggregator: no signature bundles")
+	ErrAggregatorNoBundles       = errors.New("pq_aggregator: no signature bundles")
+	ErrAggregatorXMSSUnsupported = errors.New("pq_aggregator: XMSS statement verifier unavailable")
 )
 
 // PQAggregatorDuty describes an aggregator's assignment for a specific slot.
@@ -186,51 +186,22 @@ func (a *DefaultPQAggregator) CollectSignatures(slot uint64, validators []uint64
 	return result, nil
 }
 
-// ProduceAggregate creates a STARK aggregate from the collected bundles.
-// Each XMSSSignatureBundle is converted to a PQAttestation and fed into the
-// STARKSignatureAggregator.
+// ProduceAggregate requires an XMSS verifier before these bundles can be used.
 func (a *DefaultPQAggregator) ProduceAggregate(bundles []XMSSSignatureBundle) (*STARKSignatureAggregation, error) {
 	if len(bundles) == 0 {
 		return nil, ErrAggregatorNoBundles
 	}
-
-	attestations := make([]PQAttestation, len(bundles))
-	for i, b := range bundles {
-		// Ensure PQSignature is at least 32 bytes (STARK constraint: non-zero sig hash).
-		sig := b.Signature
-		if len(sig) < 32 {
-			padded := make([]byte, 32)
-			copy(padded, sig)
-			sig = padded
-		}
-		// Ensure PQPublicKey is at least 1 byte.
-		pk := b.PublicKey
-		if len(pk) == 0 {
-			pk = []byte{0x00}
-		}
-		// Use a non-zero block root so the attestation is distinguishable.
-		var blockRoot types.Hash
-		blockRoot[0] = byte(b.ValidatorIndex + 1)
-		attestations[i] = PQAttestation{
-			Slot:            0,
-			CommitteeIndex:  0,
-			BeaconBlockRoot: blockRoot,
-			SourceEpoch:     0,
-			TargetEpoch:     1,
-			ValidatorIndex:  b.ValidatorIndex,
-			PQSignature:     sig,
-			PQPublicKey:     pk,
-		}
-	}
-
-	return a.aggregator.Aggregate(attestations)
+	return nil, ErrAggregatorXMSSUnsupported
 }
 
-// PropagateAggregate broadcasts the finished STARK aggregate on the
-// "pq_agg_result" P2P topic (LEAN-3.4) so proposers and peers can verify it.
+// PropagateAggregate checks the signed batch before broadcasting its
+// original attestations on the "pq_agg_result" topic.
 func (a *DefaultPQAggregator) PropagateAggregate(agg *STARKSignatureAggregation) error {
 	if agg == nil {
 		return ErrSTARKAggNilResult
+	}
+	if _, err := a.aggregator.Verify(agg); err != nil {
+		return err
 	}
 	if a.Publisher != nil {
 		data, err := json.Marshal(agg)

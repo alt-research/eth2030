@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"slices"
 
 	"github.com/eth2030/eth2030/core/types"
 )
@@ -169,12 +170,22 @@ func (t *BinaryTrie) UpdateLeafMetadata(stem []byte, subindex int, epoch uint64)
 
 // Get retrieves a value by its full 32-byte key.
 func (t *BinaryTrie) Get(key []byte) ([]byte, error) {
-	return t.root.Get(key, nil)
+	if len(key) != HashSize {
+		return nil, ErrInvalidKeyLength
+	}
+	value, err := t.root.Get(key, nil)
+	return slices.Clone(value), err
 }
 
 // Put inserts or updates a key-value pair.
 func (t *BinaryTrie) Put(key, value []byte) error {
-	root, err := t.root.Insert(key, value, nil, 0)
+	if len(key) != HashSize {
+		return ErrInvalidKeyLength
+	}
+	if len(value) != HashSize {
+		return ErrInvalidValueLength
+	}
+	root, err := t.root.Insert(key, slices.Clone(value), nil, 0)
 	if err != nil {
 		return err
 	}
@@ -184,6 +195,9 @@ func (t *BinaryTrie) Put(key, value []byte) error {
 
 // Delete removes a key by setting it to zero.
 func (t *BinaryTrie) Delete(key []byte) error {
+	if len(key) != HashSize {
+		return ErrInvalidKeyLength
+	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(key, zeroVal[:], nil, 0)
 	if err != nil {
@@ -195,6 +209,9 @@ func (t *BinaryTrie) Delete(key []byte) error {
 
 // Hash returns the root hash of the trie.
 func (t *BinaryTrie) Hash() types.Hash {
+	if t.hashFunc == HashFunctionBlake3 {
+		return NewBinaryHasherBlake3(0).Hash(t.root)
+	}
 	return t.root.Hash()
 }
 
@@ -203,13 +220,13 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 	var (
 		values [][]byte
 		err    error
-		key    = GetBinaryTreeKey(addr, zero[:])
+		key    = t.accountKey(addr)
 	)
 	switch r := t.root.(type) {
 	case *InternalNode:
 		values, err = r.GetValuesAtStem(key[:StemSize], nil)
 	case *StemNode:
-		values = r.Values
+		values, err = r.GetValuesAtStem(key[:StemSize], nil)
 	case Empty:
 		return nil, nil
 	default:
@@ -232,6 +249,9 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 		return nil, nil
 	}
 
+	if len(values[BasicDataLeafKey]) != HashSize {
+		return nil, ErrInvalidValueLength
+	}
 	acc := &types.Account{
 		Balance: new(big.Int),
 	}
@@ -246,11 +266,16 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 
 // UpdateAccount updates the account information for the given address.
 func (t *BinaryTrie) UpdateAccount(addr types.Address, acc *types.Account, codeLen int) error {
+	if t.hashFunc == HashFunctionBlake3 {
+		if acc == nil || acc.Balance == nil || acc.Balance.Sign() < 0 || acc.Balance.BitLen() > 128 || codeLen < 0 || codeLen > 0xffffff || len(acc.CodeHash) != HashSize {
+			return ErrInvalidValueLength
+		}
+	}
 	var (
 		err       error
 		basicData [HashSize]byte
 		values    = make([][]byte, StemNodeWidth)
-		stem      = GetBinaryTreeKey(addr, zero[:])
+		stem      = t.accountKey(addr)
 	)
 	binary.BigEndian.PutUint32(basicData[BasicDataCodeSizeOffset-1:], uint32(codeLen))
 	binary.BigEndian.PutUint64(basicData[BasicDataNonceOffset:], acc.Nonce)
@@ -263,18 +288,35 @@ func (t *BinaryTrie) UpdateAccount(addr types.Address, acc *types.Account, codeL
 	values[BasicDataLeafKey] = basicData[:]
 	values[CodeHashLeafKey] = acc.CodeHash[:]
 
+	if t.hashFunc == HashFunctionBlake3 {
+		if len(values[CodeHashLeafKey]) != HashSize {
+			return ErrInvalidValueLength
+		}
+		if err := t.Put(stem, values[BasicDataLeafKey]); err != nil {
+			return err
+		}
+		codeKey := GetTreeKeyForCodeHash(addr)
+		return t.Put(codeKey[:], values[CodeHashLeafKey])
+	}
 	t.root, err = t.root.InsertValuesAtStem(stem, values, nil, 0)
 	return err
 }
 
 // GetStorage returns the value for a storage slot.
 func (t *BinaryTrie) GetStorage(addr types.Address, key []byte) ([]byte, error) {
-	return t.root.Get(GetBinaryTreeKeyStorageSlot(addr, key), nil)
+	k, err := t.storageKey(addr, key)
+	if err != nil {
+		return nil, err
+	}
+	return t.Get(k)
 }
 
 // UpdateStorage sets a storage slot value.
 func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) error {
-	k := GetBinaryTreeKeyStorageSlot(address, key)
+	k, err := t.storageKey(address, key)
+	if err != nil {
+		return err
+	}
 	var v [HashSize]byte
 	if len(value) >= HashSize {
 		copy(v[:], value[:HashSize])
@@ -291,7 +333,10 @@ func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) err
 
 // DeleteStorage removes a storage slot value by zeroing it.
 func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
-	k := GetBinaryTreeKeyStorageSlot(addr, key)
+	k, err := t.storageKey(addr, key)
+	if err != nil {
+		return err
+	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(k, zeroVal[:], nil, 0)
 	if err != nil {
@@ -304,6 +349,15 @@ func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
 // UpdateContractCode updates the contract code into the trie.
 func (t *BinaryTrie) UpdateContractCode(addr types.Address, code []byte) error {
 	chunks := ChunkifyCode(code)
+	if t.hashFunc == HashFunctionBlake3 {
+		for i, chunk := range chunks {
+			key := GetTreeKeyForCodeChunk(addr, uint64(i))
+			if err := t.Put(key[:], chunk[:]); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	var (
 		values [][]byte
 		key    []byte
@@ -340,10 +394,28 @@ func (t *BinaryTrie) UpdateStem(key []byte, values [][]byte) error {
 
 // Copy creates a deep copy of the trie.
 func (t *BinaryTrie) Copy() *BinaryTrie {
-	return &BinaryTrie{root: t.root.Copy()}
+	return &BinaryTrie{root: t.root.Copy(), hashFunc: t.hashFunc}
 }
 
 // Root returns the root node (for testing and iteration).
 func (t *BinaryTrie) Root() BinaryNode {
 	return t.root
+}
+
+func (t *BinaryTrie) accountKey(addr types.Address) []byte {
+	if t.hashFunc == HashFunctionBlake3 {
+		key := GetTreeKeyForBasicData(addr)
+		return key[:]
+	}
+	return GetBinaryTreeKey(addr, zero[:])
+}
+func (t *BinaryTrie) storageKey(addr types.Address, slot []byte) ([]byte, error) {
+	if len(slot) != HashSize {
+		return nil, ErrInvalidKeyLength
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		key := GetTreeKeyForStorageSlot(addr, new(big.Int).SetBytes(slot))
+		return key[:], nil
+	}
+	return GetBinaryTreeKeyStorageSlot(addr, slot), nil
 }

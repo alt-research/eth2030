@@ -43,8 +43,8 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 
 - [ ] Establish provider and wire-format compatibility with independent tests.
 - [ ] Test the actual EIP-7932 registry and EIP-8051 precompile contracts against pinned specifications.
-- [ ] Correct binary trie proof authentication and test multi-value stems and exclusion.
-- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864.
+- [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
+- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864. (BLAKE3 roots, state keys and structured proofs advanced; persistence and adoption remain.)
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification.
 - [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
 

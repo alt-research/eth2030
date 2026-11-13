@@ -217,13 +217,9 @@ func (bt *StemNode) HashBlake3() types.Hash {
 		}
 	}
 
-	h := blake3.New(32, nil)
-	h.Write(bt.Stem)
-	h.Write([]byte{0})
-	h.Write(data[0][:])
-	var out [32]byte
-	h.Sum(out[:0])
-	return types.BytesToHash(out[:])
+	var prefix [32]byte
+	copy(prefix[:31], bt.Stem)
+	return hashBLAKE3(prefix[:], data[0][:])
 }
 
 // UpdateLeafMetadata writes the given epoch into the reserved metadata slot

@@ -430,7 +430,50 @@ func TestProofVerifierMultiValueAndForgedExclusion(t *testing.T) {
 		t.Fatal("accepted forged divergent stem")
 	}
 	sameStem := makeKey(0x10, 3)
-	if _, err := BuildExclusionProof(trie, sameStem[:]); err != ErrUnsupportedExclusion {
-		t.Fatalf("missing suffix: %v", err)
+	suffixProof, err := BuildExclusionProof(trie, sameStem[:])
+	if err != nil || !verifier.VerifyExclusion(suffixProof) {
+		t.Fatalf("missing suffix proof: %v", err)
+	}
+	suffixProof.Key = first
+	if verifier.VerifyExclusion(suffixProof) {
+		t.Fatal("accepted missing suffix proof for present key")
+	}
+}
+
+func TestBlake3Proofs(t *testing.T) {
+	trie := NewWithHashFunc(HashFunctionBlake3)
+	a, b, c := makeKey(0x10, 1), makeKey(0x10, 9), makeKey(0x90, 2)
+	v := makeVal(42)
+	for _, key := range [][32]byte{a, b, c} {
+		if err := trie.Put(key[:], v[:]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	root := trie.Hash()
+	verifier := NewBlake3ProofVerifier(root[:])
+	inclusion, err := BuildInclusionProof(trie, a[:])
+	if err != nil || !verifier.VerifyInclusion(inclusion) {
+		t.Fatalf("inclusion: %v", err)
+	}
+	if NewProofVerifier(root[:]).VerifyInclusion(inclusion) {
+		t.Fatal("SHA-256 verifier accepted BLAKE3 proof")
+	}
+	missing := makeKey(0x10, 3)
+	suffix, err := BuildExclusionProof(trie, missing[:])
+	if err != nil || !verifier.VerifyExclusion(suffix) {
+		t.Fatalf("suffix exclusion: %v", err)
+	}
+	suffix.ValueSiblings[0][0] ^= 1
+	if verifier.VerifyExclusion(suffix) {
+		t.Fatal("accepted tampered suffix")
+	}
+	other := makeKey(0x20, 1)
+	divergent, err := BuildExclusionProof(trie, other[:])
+	if err != nil || !verifier.VerifyExclusion(divergent) {
+		t.Fatalf("stem exclusion: %v", err)
+	}
+	divergent.DivergentStem[0] ^= 1
+	if verifier.VerifyExclusion(divergent) {
+		t.Fatal("accepted modified divergent stem")
 	}
 }

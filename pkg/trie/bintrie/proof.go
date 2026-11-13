@@ -31,6 +31,9 @@ type Proof struct {
 // Prove constructs a Merkle proof for the given key.
 // Returns nil if the key is not found (exclusion proof not supported here).
 func (t *BinaryTrie) Prove(key []byte) (*Proof, error) {
+	if t.hashFunc != HashFunctionSHA256 {
+		return nil, ErrUnsupportedProofHash
+	}
 	if len(key) != HashSize {
 		return nil, errors.New("key must be 32 bytes")
 	}

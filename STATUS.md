@@ -1,7 +1,15 @@
+## Track 4 BLAKE3 binary trie progress (2026-11-13)
+
+- `NewWithHashFunc(HashFunctionBlake3)` now computes BLAKE3 roots using the pinned EIP-7864 zero-pair rule. Copies retain the hash selection, and ordinary reads and writes do not expose caller-owned value buffers.
+- The structured inclusion and exclusion proof builder supports SHA-256 and BLAKE3, including multiple values and absent suffixes in a stem. Callers must select `NewBlake3ProofVerifier` for BLAKE3 roots. The older `Prove` API rejects BLAKE3; it remains a separate legacy proof format.
+- BLAKE3 account, storage and code-chunk operations use the EIP-7864 tree-key helpers. Account updates retain existing storage and reject out-of-range header values. Tests compare the root to a separately computed BLAKE3 construction, exercise state key readback, and reject tampered proofs.
+- This is experimental and does not establish persistence, restart recovery, migration or node/consensus adoption. Existing SHA-256 roots and BLAKE3 roots are different formats. The pinned draft says its BLAKE3 choice is provisional.
+- EIP-7932/8051 conformance and the STARK, lattice commitment and aggregation migrations remain open; see the Track 4 checklist. Validation: `go test ./trie/... ./crypto/pqc ./core/state` and `go build ./...` in `pkg` passed; full-module tests and external vectors were not run.
+
 ## Track 4 proof verification progress (2026-11-13)
 
 - Authenticated divergent stems in the standalone SHA-256 binary trie exclusion verifier and added suffix-tree siblings to inclusion proofs, allowing proofs for stems with multiple values. The proof representation changes: divergent proofs now require the value subtree root; multi-value inclusion proofs require eight sibling hashes.
-- Added regression coverage for a forged divergent stem, modified suffix sibling, multi-value inclusion, and unsupported same-stem exclusion. Proof generation explicitly rejects non-SHA-256 tries and same-stem suffix exclusion; this is not an EIP-7864 BLAKE3 proof implementation.
+- Added regression coverage for a forged divergent stem, modified suffix sibling, multi-value inclusion, and unsupported same-stem exclusion. At that commit, proof generation rejected non-SHA-256 tries and same-stem suffix exclusion; the follow-up above adds both.
 - The historical Dilithium3, Falcon-512, and SPHINCS+ signer identifiers already use ML-DSA-65, FN-DSA-512, and SLH-DSA-SHA2-128f providers respectively. These names do not establish compatibility with historical scheme encodings. The pinned EIP-8051 specifies ML-DSA-44 precompiles, not the project PQ transaction gas table; EIP-7932 registry/precompile and EIP-8051 conformance remain to be tested and implemented as applicable.
 - Track 4 remains open: EIP-7864 uses BLAKE3 in the pinned draft, and proof, persistence, migration, and state integration are not validated end-to-end. STARK, lattice commitment, and aggregation protocol migrations remain open; no interchangeable provider or statement was established in the audit.
 - Validation: `go test ./trie/... ./crypto/pqc` and `go build ./...` from `pkg` passed. The full module test suite and cross-client vectors were not run.

@@ -402,7 +402,7 @@ func trimLeadingZeros(b []byte) []byte {
 	return []byte{}
 }
 
-func (s *MemoryStateDB) Commit() (types.Hash, error) {
+func (s *MemoryStateDB) finalizeStorage() {
 	// Flush dirty storage to committed storage.
 	for _, obj := range s.stateObjects {
 		for key, val := range obj.dirtyStorage {
@@ -414,6 +414,10 @@ func (s *MemoryStateDB) Commit() (types.Hash, error) {
 		}
 		obj.dirtyStorage = make(map[types.Hash]types.Hash)
 	}
+}
+
+func (s *MemoryStateDB) Commit() (types.Hash, error) {
+	s.finalizeStorage()
 
 	if len(s.stateObjects) == 0 {
 		return types.EmptyRootHash, nil

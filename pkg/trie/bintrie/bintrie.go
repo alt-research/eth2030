@@ -259,8 +259,9 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 		return nil, nil
 	}
 
-	// Check for deleted accounts (nonce=0, basic data zero, code hash zero)
-	if bytes.Equal(values[BasicDataLeafKey], zero[:]) && len(values) > 10 && len(values[10]) > 0 && bytes.Equal(values[CodeHashLeafKey], zero[:]) {
+	// A pair of zero leaves shadows a deleted account in the binary overlay.
+	if bytes.Equal(values[BasicDataLeafKey], zero[:]) && bytes.Equal(values[CodeHashLeafKey], zero[:]) &&
+		(t.hashFunc == HashFunctionBlake3 || len(values) > 10 && len(values[10]) > 0) {
 		return nil, nil
 	}
 

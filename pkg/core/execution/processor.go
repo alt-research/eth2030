@@ -153,6 +153,13 @@ func (p *StateProcessor) SetGetHash(fn vm.GetHashFunc) {
 	p.getHash = fn
 }
 
+// WithGetHash sets the ancestry of an execution without mutating the shared processor.
+func (p *StateProcessor) WithGetHash(fn vm.GetHashFunc) StateProcessor {
+	processor := *p
+	processor.getHash = fn
+	return processor
+}
+
 // SetSlasher wires a corconfig.PaymasterSlasher into the processor. When set, the
 // processor will call SlashOnBadSettlement whenever a frame tx paymaster
 // fails to cover gas after execution (AA-1.3).
@@ -164,6 +171,46 @@ func (p *StateProcessor) SetSlasher(s corconfig.PaymasterSlasher) {
 // When set, PostOp is called on the validator after each successful AA tx (EIP-7701).
 func (p *StateProcessor) SetPaymasterValidator(v eips.PaymasterValidator) {
 	p.paymasterValidator = v
+}
+
+// PrepareBlockState activates the experimental overlay and runs conversion
+// before system calls and user transactions.
+func PrepareBlockState(config *corconfig.ChainConfig, time uint64, current state.StateDB) (state.StateDB, error) {
+	if config == nil || config.BinaryOverlayTime == nil || time < *config.BinaryOverlayTime {
+		return current, nil
+	}
+	if config.BinaryConversionTime != nil && (*config.BinaryConversionTime < *config.BinaryOverlayTime || config.BinaryConversionStride <= 0) {
+		return nil, state.ErrBinaryConversionStride
+	}
+	overlay, ok := current.(*state.BinaryOverlayState)
+	if ok {
+		overlay = overlay.Dup().(*state.BinaryOverlayState)
+	} else {
+		memory, ok := current.(*state.MemoryStateDB)
+		if !ok {
+			return nil, state.ErrBinaryOverlayState
+		}
+		var err error
+		overlay, err = state.NewBinaryOverlayState(memory)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if config.BinaryConversionTime != nil && time >= *config.BinaryConversionTime {
+		if err := overlay.Convert(config.BinaryConversionStride); err != nil {
+			return nil, err
+		}
+	}
+	return overlay, nil
+}
+
+// FinalizeOverlayState folds EVM writes into the binary root for this block.
+func FinalizeOverlayState(current state.StateDB) error {
+	if overlay, ok := current.(*state.BinaryOverlayState); ok {
+		_, err := overlay.Commit()
+		return err
+	}
+	return nil
 }
 
 // Process executes all transactions in a block sequentially and returns the receipts.

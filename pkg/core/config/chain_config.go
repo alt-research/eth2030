@@ -57,6 +57,13 @@ type ChainConfig struct {
 	// PQDraft configures the pinned PQ drafts on a private chain.
 	PQDraft *PQDraftConfig `json:",omitempty"`
 
+	// BinaryOverlayTime activates the pinned BLAKE3 overlay on a private chain.
+	// BinaryConversionTime and BinaryConversionStride optionally schedule its
+	// ordered conversion before transactions.
+	BinaryOverlayTime      *uint64 `json:",omitempty"`
+	BinaryConversionTime   *uint64 `json:",omitempty"`
+	BinaryConversionStride int     `json:",omitempty"`
+
 	// BPO (Blob Parameter Optimization) fork timestamps for blob schedule upgrades.
 	BPO1Time *uint64
 	BPO2Time *uint64

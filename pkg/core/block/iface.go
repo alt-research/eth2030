@@ -27,5 +27,27 @@ type BlockchainReader interface {
 	GetHashFn() func(uint64) types.Hash
 }
 
+// AncestorHashFn resolves BLOCKHASH against the parent branch of a block.
+// The closure belongs to one execution and caches headers as it walks back.
+func AncestorHashFn(parent types.Hash, number uint64, lookup func(types.Hash, uint64) *types.Header) func(uint64) types.Hash {
+	head := number
+	hashes := map[uint64]types.Hash{number: parent}
+	return func(target uint64) types.Hash {
+		if target > head || head-target >= 256 {
+			return types.Hash{}
+		}
+		for number > target {
+			header := lookup(parent, number)
+			if header == nil || header.Hash() != parent {
+				break
+			}
+			number--
+			parent = header.ParentHash
+			hashes[number] = parent
+		}
+		return hashes[target]
+	}
+}
+
 // Compile-time checks.
 var _ Validator = (*BlockValidator)(nil)

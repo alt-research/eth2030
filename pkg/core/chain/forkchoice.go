@@ -38,15 +38,17 @@ type ForkChoice struct {
 }
 
 // NewForkChoice creates a new ForkChoice tracker backed by the given blockchain.
-// It initializes head, safe, and finalized to the current blockchain head.
+// It starts with the blockchain head and restored safe and finalized blocks.
 func NewForkChoice(bc *Blockchain) *ForkChoice {
 	head := bc.CurrentBlock()
-	return &ForkChoice{
-		bc:        bc,
-		head:      head,
-		safe:      head,
-		finalized: head,
+	safe, finalized := bc.CurrentSafeBlock(), bc.CurrentFinalBlock()
+	if finalized == nil {
+		finalized = bc.Genesis()
 	}
+	if safe == nil {
+		safe = finalized
+	}
+	return &ForkChoice{bc: bc, head: head, safe: safe, finalized: finalized}
 }
 
 // Head returns the current head block.
@@ -101,6 +103,10 @@ func (fc *ForkChoice) ForkchoiceUpdate(headHash, safeHash, finalizedHash types.H
 		if finalizedBlock == nil {
 			return fmt.Errorf("%w: %v", ErrFinalizedBlockUnknown, finalizedHash)
 		}
+	}
+
+	if finalizedBlock.NumberU64() < fc.finalized.NumberU64() || !fc.isAncestor(fc.finalized, finalizedBlock) {
+		return fmt.Errorf("%w: finalized block would move backwards or to a different branch", ErrInvalidFinalizedChain)
 	}
 
 	// Look up the safe block. A zero hash means "no safe block yet".

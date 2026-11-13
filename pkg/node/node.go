@@ -384,7 +384,8 @@ func New(config *Config) (*Node, error) {
 	// Wire the ancient store (freezer) for finalized block cold storage.
 	// Only opened when a persistent data directory is configured, because the
 	// freezer writes append-only flat files that require a real filesystem.
-	if config.DataDir != "" {
+	// The experimental overlay restores state from live block bodies on startup.
+	if config.DataDir != "" && (chainConfig == nil || chainConfig.BinaryOverlayTime == nil) {
 		as, err := rawdb.NewAncientStore(rawdb.AncientStoreConfig{
 			DataDir: config.ResolvePath("ancient"),
 		})

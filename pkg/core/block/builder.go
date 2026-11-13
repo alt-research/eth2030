@@ -228,10 +228,19 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		}
 	}
 	if statedb == nil {
+		if b.chain != nil && b.config != nil && b.config.BinaryOverlayTime != nil {
+			return nil, nil, fmt.Errorf("binary overlay parent %s: %w", parent.Hash(), ErrUnknownParent)
+		}
 		// Fallback: create an empty state (useful for testing).
 		statedb = state.NewMemoryStateDB()
 	}
 
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	getHash := b.getHashFn(parent)
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
 	// Determine if BAL tracking is active for this block.
@@ -343,7 +352,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 
 			snap := statedb.Snapshot()
-			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
+			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
 			if applyErr != nil {
 				statedb.RevertToSnapshot(snap)
 				continue
@@ -475,7 +484,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
 		gpBefore := gp.Gas()
-		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
+		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
 			statedb.RevertToSnapshot(snap)
@@ -619,13 +628,16 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 	}
 	body := &types.Body{Transactions: txs, Withdrawals: withdrawals}
 
-	requests, err := execution.FinalizeBlockExecution(b.config, b.getHashFn(), statedb, header, withdrawals, receipts, blockBAL)
+	requests, err := execution.FinalizeBlockExecution(b.config, getHash, statedb, header, withdrawals, receipts, blockBAL)
 	if err != nil {
 		return nil, nil, err
 	}
 	if pragueActive {
 		hash := types.ComputeRequestsHash(requests)
 		header.RequestsHash = &hash
+	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
 	}
 	header.Root = statedb.GetRoot()
 
@@ -676,6 +688,12 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		statedb = state.NewMemoryStateDB()
 	}
 
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	getHash := b.getHashFn(parent)
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
 	// Determine if BAL tracking is active for this block.
@@ -822,7 +840,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
-		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
+		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
 			statedb.RevertToSnapshot(snap)
@@ -901,13 +919,16 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	header.TxHash = deriveTxsRoot(txs)
 	header.ReceiptHash = deriveReceiptsRoot(receipts)
 
-	requests, err := execution.FinalizeBlockExecution(b.config, b.getHashFn(), statedb, header, nil, receipts, blockBAL)
+	requests, err := execution.FinalizeBlockExecution(b.config, getHash, statedb, header, nil, receipts, blockBAL)
 	if err != nil {
 		return nil, nil, err
 	}
 	if b.config != nil && b.config.IsPrague(header.Time) {
 		hash := types.ComputeRequestsHash(requests)
 		header.RequestsHash = &hash
+	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
 	}
 	header.Root = statedb.GetRoot()
 
@@ -944,9 +965,17 @@ func (b *BlockBuilder) SetState(statedb state.StateDB) {
 
 // getHashFn returns the BLOCKHASH lookup function from the chain, or nil if
 // the builder was created without a chain (standalone/test mode).
-func (b *BlockBuilder) getHashFn() func(uint64) types.Hash {
+func (b *BlockBuilder) getHashFn(parent *types.Header) func(uint64) types.Hash {
 	if b.chain == nil {
 		return nil
+	}
+	if b.config != nil && b.config.BinaryOverlayTime != nil {
+		return AncestorHashFn(parent.Hash(), parent.Number.Uint64(), func(hash types.Hash, _ uint64) *types.Header {
+			if block := b.chain.GetBlock(hash); block != nil {
+				return block.Header()
+			}
+			return nil
+		})
 	}
 	return b.chain.GetHashFn()
 }

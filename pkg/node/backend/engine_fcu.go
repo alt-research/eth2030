@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/eth2030/eth2030/core/block"
+	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -50,6 +51,25 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	headHash := headBlock.Hash()
+	overlayConfigured := bc.Config() != nil && bc.Config().BinaryOverlayTime != nil
+	if overlayConfigured {
+		b.overlayFCUMu.Lock()
+		defer b.overlayFCUMu.Unlock()
+
+		if err := chain.NewForkChoice(bc).ForkchoiceUpdate(headHash, fcState.SafeBlockHash, fcState.FinalizedBlockHash); err != nil {
+			return payload.ForkchoiceUpdatedResult{}, fmt.Errorf("%w: %v", engine.ErrInvalidForkchoiceState, err)
+		}
+		if fcState.FinalizedBlockHash != (types.Hash{}) {
+			bc.SetFinalized(bc.GetBlock(fcState.FinalizedBlockHash))
+		}
+		if fcState.SafeBlockHash != (types.Hash{}) {
+			bc.SetSafe(bc.GetBlock(fcState.SafeBlockHash))
+		}
+		if pool := b.node.TxPool(); pool != nil {
+			pool.SetForkRules(bc.Config(), headBlock.Time())
+			pool.Reset(bc.State())
+		}
+	}
 	payloadStatus := payload.PayloadStatusV1{
 		Status:          engine.StatusValid,
 		LatestValidHash: &headHash,
@@ -112,13 +132,15 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	// Step 5: push slow work to background goroutine.
-	b.sendPostFCUWork(postFCUWork{
-		fcState:    fcState,
-		headBlock:  headBlock,
-		finalBlock: finalBlock,
-		safeBlock:  safeBlock,
-		hasAttrs:   attrs != nil,
-	})
+	if !overlayConfigured {
+		b.sendPostFCUWork(postFCUWork{
+			fcState:    fcState,
+			headBlock:  headBlock,
+			finalBlock: finalBlock,
+			safeBlock:  safeBlock,
+			hasAttrs:   attrs != nil,
+		})
+	}
 
 	// Step 6: store triple in FCU cache.
 	b.fcuCacheMu.Lock()

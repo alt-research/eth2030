@@ -79,6 +79,7 @@ type EngineBackend struct {
 	builder      *block.BlockBuilder
 	buildMu      sync.Mutex
 
+	overlayFCUMu  sync.Mutex
 	fcMu          sync.RWMutex
 	safeHash      types.Hash
 	finalizedHash types.Hash

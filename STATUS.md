@@ -1,3 +1,11 @@
+## Track 4 private-chain binary overlay execution (2026-11-14)
+
+- A private genesis can set `binaryOverlayTime`, `binaryConversionTime`, and `binaryConversionStride`. At activation the execution path starts with an empty BLAKE3 overlay and a frozen snapshot of the parent MPT state. Conversion uses the pinned EIP-7748 order before system calls and transactions. EVM journal writes determine the binary root, including explicit zero storage leaves and transaction-scoped original storage values.
+- The node Engine backend builds and imports overlay payloads and applies forkchoice to the selected branch. Header roots are verified during execution and replay. Restart restores the canonical state and conversion cursor by replaying live blocks. The experimental profile retains full state in memory and retains live block bodies for replay.
+- Tests compare two Engine payload roots with separately constructed trie roots. A signed-transaction FileDB test exercises storage clears, branch-specific BLOCKHASH, forged roots, reorg, rewind, restart and missing ancestry. State tests cover snapshot rollback, code shrink, account deletion and atomic in-memory commit failure. Mutation runs confirmed that dropping explicit zero leaves or resolving BLOCKHASH on the canonical branch is detected.
+- Validation passed in `pkg` with `go test ./...`, `go build ./...`, and targeted `go test -race` for the state, chain, and node overlay and forkchoice tests.
+- The published consensus layout, EIP-4762 witness gas, durable per-block state checkpoints and scalable state access remain open. Existing opcode-level witness gas helpers are separate from this profile. The PQ committee source and application-specific STARK, lattice and aggregation protocols remain open.
+
 ## Track 4 consensus attestation verification (2026-11-14)
 
 - Replaced the PQ attestation hash-trace shortcut with individual ML-DSA verification for all batch sizes and lean modes. The batch enforces a shared signing statement, unique indices and keys, authenticated metadata and committee commitment, and copies the original signed data. Gas savings are zero for this path. Legacy trace-only proofs are rejected.

@@ -49,7 +49,9 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [x] Exercise EIP-7932/8051 through an opt-in private-chain fork with distinct addresses, state-backed public keys, and account access charging.
 - [ ] Confirm canonical fork addresses and key registry rules for EIP-7932/8051. The pinned drafts both assign 0x12, which the pinned EIP-7997 factory uses.
 - [x] Implement the EIP-7748 ordered conversion step, zero-override protection, and resumable cursor for the pinned BLAKE3 overlay.
-- [ ] Implement the EIP-7864 fork path. This includes the EIP-7612 frozen MPT overlay, EIP-4762 access accounting, overlay execution and restart, and scheduling the conversion before block transactions. The offline snapshot covers a separate conversion workflow. See the completion audit in docs/CODEBASE_AUDIT.md §VII for draft-version differences.
+- [x] Exercise the pinned BLAKE3 overlay on an opt-in chain through block construction, import, Engine API payload construction, reorg, rewind, and restart by replay. Apply ordered conversion before transactions and preserve explicit zero overrides.
+- [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add durable per-block checkpoints and a scalable frozen-state reader with crash recovery. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
+- [ ] Connect the PQ attestation verifier to the node's authenticated committee and key source.
 - [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
 - [x] Verify every PQ attestation in the consensus batch, bind publication and classic fallback to authorized keys, and reject XMSS relabeling.
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)

@@ -1,3 +1,9 @@
+## Track 4 binary trie persistence progress (2026-11-13)
+
+- Added experimental content-addressed node persistence for SHA-256 and BLAKE3 trees. `Persist` returns a root only after node writes succeed; root publication and durability are controlled by the caller. `OpenPersisted` eagerly authenticates node hashes and stem paths, rejects corrupt or missing data, and restores a mutable trie.
+- A file-database test closes and reopens the database, checks values and inclusion proofs, persists an update, reads the original root, and rejects node corruption. A failed node write does not return a root.
+- Validation: `go test ./trie/... ./core/rawdb ./core/state`, `go test -race ./trie/bintrie`, and `go build ./...` passed in `pkg`. The node format is local, eager loading is not suitable for production-scale state, and no node lifecycle, canonical root publication, atomic fork migration or crash-injection test has been added. Existing migration tooling targets a different experimental trie, not EIP-7864 state. Track 4 remains open.
+
 ## Track 4 BLAKE3 binary trie progress (2026-11-13)
 
 - `NewWithHashFunc(HashFunctionBlake3)` now computes BLAKE3 roots using the pinned EIP-7864 zero-pair rule. Copies retain the hash selection, and ordinary reads and writes do not expose caller-owned value buffers.

@@ -7,9 +7,11 @@ import (
 
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/pqc"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
 
 // newTransferTx creates a simple transfer transaction.
@@ -780,5 +782,63 @@ func TestApplyPipelinePQTransaction(t *testing.T) {
 				t.Fatal("verified sender did not fund the transfer")
 			}
 		})
+	}
+}
+
+func TestExecutionStateBinaryMaterialization(t *testing.T) {
+	cfg := *config.TestConfig
+	header := newTestHeader()
+	from, to := types.Address{0x11}, types.Address{0x22}
+	db := state.NewMemoryStateDB()
+	db.AddBalance(from, big.NewInt(10_000_000))
+	before, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshot := db.Snapshot()
+	tx := newTransferTx(0, to, big.NewInt(100), 100_000, big.NewInt(10))
+	tx.SetSender(from)
+	receipt, _, err := ApplyTransaction(&cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if receipt.Status != types.ReceiptStatusSuccessful {
+		t.Fatalf("receipt status %d", receipt.Status)
+	}
+	after, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after.Hash() == before.Hash() {
+		t.Fatal("execution did not change binary root")
+	}
+	destination, err := after.GetAccount(to)
+	if err != nil || destination == nil || destination.Balance.Cmp(big.NewInt(100)) != 0 {
+		t.Fatalf("recipient: %+v %v", destination, err)
+	}
+	source, err := after.GetAccount(from)
+	if err != nil || source == nil || source.Nonce != 1 || source.Balance.Cmp(db.GetBalance(from)) != 0 {
+		t.Fatalf("sender: %+v %v", source, err)
+	}
+	store := rawdb.NewMemoryDB()
+	root, err := after.Persist(store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	restored, err := bintrie.OpenPersisted(store, bintrie.HashFunctionBlake3, root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dest2, err := restored.GetAccount(to)
+	if err != nil || dest2 == nil || dest2.Balance.Cmp(big.NewInt(100)) != 0 {
+		t.Fatalf("persisted recipient: %+v %v", dest2, err)
+	}
+	db.RevertToSnapshot(snapshot)
+	reverted, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reverted.Hash() != before.Hash() {
+		t.Fatal("snapshot revert did not restore pre-execution root")
 	}
 }

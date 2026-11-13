@@ -1,6 +1,7 @@
 package state
 
 import (
+	"bytes"
 	"math/big"
 	"sort"
 
@@ -67,6 +68,8 @@ func (s *MemoryStateDB) getOrNewStateObject(addr types.Address) *stateObject {
 		return obj
 	}
 	obj := newStateObject()
+	// Implicit creation is state-changing and must be undone by snapshots.
+	s.journal.append(createAccountChange{addr: addr})
 	s.stateObjects[addr] = obj
 	return obj
 }
@@ -113,7 +116,7 @@ func (s *MemoryStateDB) SetNonce(addr types.Address, nonce uint64) {
 
 func (s *MemoryStateDB) GetCode(addr types.Address) []byte {
 	if obj := s.getStateObject(addr); obj != nil {
-		return obj.code
+		return bytes.Clone(obj.code)
 	}
 	return nil
 }
@@ -124,8 +127,8 @@ func (s *MemoryStateDB) SetCode(addr types.Address, code []byte) {
 	prevHash := make([]byte, len(obj.account.CodeHash))
 	copy(prevHash, obj.account.CodeHash)
 	s.journal.append(codeChange{addr: addr, prevCode: prevCode, prevHash: prevHash})
-	obj.code = code
-	obj.account.CodeHash = crypto.Keccak256(code)
+	obj.code = bytes.Clone(code)
+	obj.account.CodeHash = crypto.Keccak256(obj.code)
 }
 
 func (s *MemoryStateDB) GetCodeHash(addr types.Address) types.Hash {

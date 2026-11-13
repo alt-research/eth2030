@@ -1,4 +1,4 @@
-// EIP-7932 Algorithm Registry: maps algorithm type IDs to post-quantum
+// Project PQ algorithm registry: maps local algorithm type IDs to post-quantum
 // verification functions, gas costs, and metadata. Provides a unified
 // dispatch interface for verifying PQ signatures across the Ethereum protocol
 // (transactions, attestations, withdrawals) with algorithm agility.
@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-// AlgorithmType identifies a post-quantum algorithm in the EIP-7932 registry.
+// AlgorithmType identifies a post-quantum algorithm in the local registry.
 type AlgorithmType uint8
 
 const (
@@ -42,7 +42,7 @@ type AlgorithmDescriptor struct {
 	VerifyFn   VerifyFunc
 }
 
-// PQ algorithm gas costs per EIP-8051.
+// Project-specific gas estimates. EIP-8051 does not specify this table.
 const (
 	GasCostMLDSA44   uint64 = 3500
 	GasCostMLDSA65   uint64 = 4500
@@ -188,7 +188,7 @@ func (r *PQAlgorithmRegistry) Size() int {
 // For PQ schemes this is generally not possible (unlike ECDSA), so this
 // returns the algorithm type and a best-effort extraction from the signature
 // if the scheme supports it, or an error otherwise.
-// Per EIP-7932 SIGRECOVER, lattice-based schemes do not support recovery;
+// These local lattice-based schemes do not support public-key recovery;
 // the public key must be transmitted alongside the signature.
 func (r *PQAlgorithmRegistry) RecoverPublicKey(algType AlgorithmType, msg, sig []byte) ([]byte, error) {
 	r.mu.RLock()

@@ -730,3 +730,55 @@ func TestApplyTransactionAuthenticatesPQSender(t *testing.T) {
 		})
 	}
 }
+
+func TestApplyPipelinePQTransaction(t *testing.T) {
+	cfg := *config.MainnetConfig
+	fork := uint64(0)
+	cfg.IPlusTime = &fork
+	cfg.TerminalTotalDifficulty = big.NewInt(0)
+	header := &types.Header{Number: big.NewInt(24_000_000), Time: 1_800_000_000, GasLimit: 30_000_000, Difficulty: new(big.Int), BaseFee: big.NewInt(1)}
+	for _, tc := range []struct {
+		name         string
+		alg, sigType uint8
+	}{
+		{"ML-DSA-65", pqc.PipelineAlgMLDSA65, types.PQSigDilithium},
+		{"FN-DSA-512", pqc.PipelineAlgFalcon512, types.PQSigFalcon},
+		{"SLH-DSA", pqc.PipelineAlgSPHINCS, types.PQSigSPHINCS},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			signer := pqc.NewPQSigningPipeline()
+			pk, sk, err := signer.GenerateKey(tc.alg)
+			if err != nil {
+				t.Fatal(err)
+			}
+			to := types.Address{0x42}
+			pq := types.NewPQTransaction(cfg.ChainID, 0, &to, big.NewInt(100), 300_000, big.NewInt(10), nil)
+			sig, key, err := signer.SignTransaction(pq, tc.alg, sk, pk)
+			if err != nil {
+				t.Fatal(err)
+			}
+			pq.SignWithPQ(tc.sigType, key, sig)
+			encoded, err := pq.EncodePQ()
+			if err != nil {
+				t.Fatal(err)
+			}
+			pq, err = types.DecodePQTransaction(encoded)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := types.NewPQTxPool(types.NewPQTxValidator(), 1).AcceptPQTx(pq); err != nil {
+				t.Fatalf("pool validation: %v", err)
+			}
+			from := types.PQPubKeyToAddress(pk)
+			db := state.NewMemoryStateDB()
+			db.AddBalance(from, big.NewInt(100_000_000))
+			tx := types.NewTransaction(pq)
+			if _, _, err := ApplyTransaction(&cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit)); err != nil {
+				t.Fatal(err)
+			}
+			if db.GetBalance(to).Cmp(big.NewInt(100)) != 0 || tx.Sender() == nil || *tx.Sender() != from {
+				t.Fatal("verified sender did not fund the transfer")
+			}
+		})
+	}
+}

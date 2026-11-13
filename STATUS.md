@@ -1,3 +1,11 @@
+## Track 4 PQ signing pipeline progress (2026-11-13)
+
+- Replaced the pipeline's fabricated public key with provider-derived ML-DSA-65 and SLH-DSA public keys. FN-DSA callers must now supply the matching public key; the provider does not expose public-key derivation from the serialized private key. A supplied key is checked against the signature.
+- Default pipeline signatures use the same algorithm-bound transaction signing hash and sender derivation as native validation. The experimental direct mode retains its legacy message format and is not accepted by native transaction validation. Previously generated pipeline signatures use the retired default message format and require re-signing.
+- Tests sign, encode, decode and validate all three provider formats, reject changed fields and algorithms, and execute transfers through the existing PQ pool validator and state processor. The pinned EIP-7932 draft address derivation test covers its 0xff compatibility case; this does not implement its registry or precompile. Local PQ gas estimates are not EIP-8051 precompile gas.
+- Validation: `go test ./crypto/pqc ./core/types ./txpool/... ./core/execution`, targeted race tests for the pipeline and processor, and `go build ./...` passed in `pkg`.
+- The pinned EIP-7932 and EIP-8051 drafts both assign address 0x12; EIP-8051 also assigns 0x13, while the active Prague profile reserves 0x0b–0x11 for BLS and uses the existing native profile. The versioned EIP-6404 codec follows a different published EIP-7932 revision with selector 0x00, whereas the pinned draft uses 0xff. These conflicts require an explicit fork/spec decision before consensus activation; EIP-7932/8051 conformance remains open.
+
 ## Track 4 binary trie persistence progress (2026-11-13)
 
 - Added experimental content-addressed node persistence for SHA-256 and BLAKE3 trees. `Persist` returns a root only after node writes succeed; root publication and durability are controlled by the caller. `OpenPersisted` eagerly authenticates node hashes and stem paths, rejects corrupt or missing data, and restores a mutable trie.

@@ -1,11 +1,13 @@
 package pqc
 
 import (
+	"bytes"
 	"math/big"
 	"sync"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
+	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 // helper to create a sample PQ transaction for testing.
@@ -136,7 +138,7 @@ func TestPipelineFalconSignVerifyRoundtrip(t *testing.T) {
 	}
 
 	tx := pipelineTestTx()
-	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 	if err != nil {
 		t.Fatalf("SignTransaction: %v", err)
 	}
@@ -176,14 +178,12 @@ func TestPipelineSPHINCSSignVerifyRoundtrip(t *testing.T) {
 		t.Error("SPHINCS+ derived public key is empty")
 	}
 
-	// NOTE: The underlying SPHINCSSigner has a known padding/unpadding
-	// inconsistency that causes the sign/verify roundtrip to fail. This
-	// test verifies that signing produces valid output structure. Full
-	// verification depends on the upstream SPHINCS+ fix.
-	tx.SignWithPQ(types.PQSigSPHINCS, pk, sig)
-	if tx.PQSignatureType != types.PQSigSPHINCS {
-		t.Errorf("PQSignatureType: got %d, want %d", tx.PQSignatureType, types.PQSigSPHINCS)
+	tx.SignWithPQ(types.PQSigSPHINCS, derivedPK, sig)
+	valid, _, err := p.VerifyTransaction(tx)
+	if err != nil || !valid {
+		t.Fatalf("SPHINCS verify: %v", err)
 	}
+
 }
 
 // --- Address Derivation ---
@@ -270,7 +270,7 @@ func TestPipelineCrossAlgorithmRejection(t *testing.T) {
 	p := NewPQSigningPipeline()
 
 	// Generate Falcon key.
-	_, sk, err := p.GenerateKey(PipelineAlgFalcon512)
+	pk, sk, err := p.GenerateKey(PipelineAlgFalcon512)
 	if err != nil {
 		t.Fatalf("GenerateKey Falcon: %v", err)
 	}
@@ -283,7 +283,7 @@ func TestPipelineCrossAlgorithmRejection(t *testing.T) {
 
 	// Sign with Falcon.
 	tx := pipelineTestTx()
-	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 	if err != nil {
 		t.Fatalf("SignTransaction: %v", err)
 	}
@@ -317,7 +317,7 @@ func TestPipelineBatchVerifyTransactions(t *testing.T) {
 			big.NewInt(1), uint64(i), &to, big.NewInt(100), 21000, big.NewInt(10),
 			[]byte{byte(i)},
 		)
-		sig, _, serr := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+		sig, _, serr := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 		if serr != nil {
 			t.Fatalf("SignTransaction[%d]: %v", i, serr)
 		}
@@ -369,7 +369,7 @@ func TestPipelineConcurrentSignVerify(t *testing.T) {
 				big.NewInt(1), uint64(idx), &to, big.NewInt(100), 21000, big.NewInt(10),
 				[]byte{byte(idx)},
 			)
-			sig, _, serr := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+			sig, _, serr := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 			if serr != nil {
 				errs <- serr
 				return
@@ -459,7 +459,7 @@ func TestPipelineTxEncodeDecodeVerify(t *testing.T) {
 	}
 
 	tx := pipelineTestTx()
-	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 	if err != nil {
 		t.Fatalf("SignTransaction: %v", err)
 	}
@@ -583,7 +583,7 @@ func TestPipelineDirectModeFalcon(t *testing.T) {
 	}
 
 	tx := pipelineTestTx()
-	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk)
+	sig, _, err := p.SignTransaction(tx, PipelineAlgFalcon512, sk, pk)
 	if err != nil {
 		t.Fatalf("SignTransaction (direct mode): %v", err)
 	}
@@ -595,5 +595,105 @@ func TestPipelineDirectModeFalcon(t *testing.T) {
 	}
 	if !valid {
 		t.Error("direct mode verification failed")
+	}
+}
+
+// The default pipeline output must be usable by the same verifier as the
+// transaction pool and execution processor, after a wire-format round trip.
+func TestPipelineSignaturesPassNativeValidation(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		alg, sigType uint8
+	}{
+		{"ML-DSA-65", PipelineAlgMLDSA65, types.PQSigDilithium},
+		{"FN-DSA-512", PipelineAlgFalcon512, types.PQSigFalcon},
+		{"SLH-DSA-SHA2-128f", PipelineAlgSPHINCS, types.PQSigSPHINCS},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p := NewPQSigningPipeline()
+			pk, sk, err := p.GenerateKey(tc.alg)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tx := pipelineTestTx()
+			var sig, actualPK []byte
+			if tc.alg == PipelineAlgFalcon512 {
+				sig, actualPK, err = p.SignTransaction(tx, tc.alg, sk, pk)
+			} else {
+				sig, actualPK, err = p.SignTransaction(tx, tc.alg, sk)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(actualPK, pk) {
+				t.Fatal("derived public key differs from generated key")
+			}
+			tx.SignWithPQ(tc.sigType, actualPK, sig)
+			encoded, err := tx.EncodePQ()
+			if err != nil {
+				t.Fatal(err)
+			}
+			decoded, err := types.DecodePQTransaction(encoded)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := types.ValidatePQTransactionSignature(decoded); err != nil {
+				t.Fatalf("native validation: %v", err)
+			}
+			valid, address, err := p.VerifyTransaction(decoded)
+			if err != nil || !valid || address != types.PQPubKeyToAddress(pk) {
+				t.Fatalf("pipeline verification: %v, %v, %x", valid, err, address)
+			}
+			decoded.Nonce++
+			if err := types.ValidatePQTransactionSignature(decoded); err == nil {
+				t.Fatal("accepted altered transaction")
+			}
+			decoded.Nonce--
+			decoded.PQSignatureType = (tc.sigType + 1) % 3
+			if err := types.ValidatePQTransactionSignature(decoded); err == nil {
+				t.Fatal("accepted altered algorithm")
+			}
+		})
+	}
+}
+
+func TestPipelineFalconRequiresMatchingPublicKey(t *testing.T) {
+	p := NewPQSigningPipeline()
+	pk, sk, err := p.GenerateKey(PipelineAlgFalcon512)
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, _, err := p.GenerateKey(PipelineAlgFalcon512)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := p.SignTransaction(pipelineTestTx(), PipelineAlgFalcon512, sk); err == nil {
+		t.Fatal("accepted missing public key")
+	}
+	if _, _, err := p.SignTransaction(pipelineTestTx(), PipelineAlgFalcon512, sk, other); err == nil {
+		t.Fatal("accepted mismatched public key")
+	}
+	if _, got, err := p.SignTransaction(pipelineTestTx(), PipelineAlgFalcon512, sk, pk); err != nil || !bytes.Equal(got, pk) {
+		t.Fatalf("matching key failed: %v", err)
+	}
+}
+
+func TestPinnedEIP7932AddressDerivation(t *testing.T) {
+	pub := make([]byte, 65)
+	pub[0] = 4
+	for i := 1; i < len(pub); i++ {
+		pub[i] = byte(i)
+	}
+	for _, alg := range []byte{0, 0xd1, 0xff} {
+		input := append([]byte{alg}, pub...)
+		if alg == 0xff {
+			input = pub[1:]
+		}
+		digest := gethcrypto.Keccak256(input)
+		var expected types.Address
+		copy(expected[:], digest[12:])
+		if got := PipelineDeriveAddress(alg, pub); got != expected {
+			t.Fatalf("algorithm %x: got %x want %x", alg, got, expected)
+		}
 	}
 }

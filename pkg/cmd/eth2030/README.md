@@ -79,3 +79,22 @@ cd pkg && go build -o eth2030 ./cmd/eth2030/
 ---
 
 Parent: [`cmd`](../)
+
+## Offline binary state migration
+
+```sh
+eth2030 binary-migrate -source /path/to/flat-state -destination /path/to/binary-state \
+  -source-root 0x<32-byte-mpt-root> -batch-size 1000
+```
+
+The source must be an existing FileDB containing committed TrieStateDB account,
+storage and code tables. Supply its trusted MPT root. Both databases are locked
+for the duration of the command. The command prints the source root, binary root,
+account count and completion flag as JSON.
+
+Use `-max-batches 1` to stop after one durable checkpoint. Run the same command
+again to resume. This is a full offline conversion of a quiescent source. The
+current native node keeps its execution state in memory, and its `chaindata`
+directory alone does not contain these flat state tables. The command produces
+a binary snapshot for inspection and recovery. Fork transitions use the
+separate overlay and conversion rules referenced by EIP-7864.

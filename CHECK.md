@@ -34,18 +34,20 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 
 ### Track 4 — I* / PQ direction
 
-- [ ] PQC suite: real implementations for Dilithium3, Falcon-512, SPHINCS+ (ML-DSA-65 is real).
-- [ ] EIP-7932 PQ registry and EIP-8051 PQ gas costs: add tests. (Pinned-draft SIGRECOVER, gas/envelope and injected PQ registry adapters tested in isolation; expanded-key SHAKE and Keccak verification tested through EVM calls; fork activation remains.)
+- [x] PQC suite: real implementations for Dilithium3, padded Falcon-512, and SPHINCS+-SHA2-128f-simple, alongside ML-DSA-65. Historical Falcon and SPHINCS+ require CGO.
+- [x] EIP-7932 draft PQ registry and EIP-8051 draft gas and expanded-key validation tests through explicit EVM registration.
 - [ ] EIP-7864 Binary Merkle Trie: continue toward complete.
 - [ ] Remaining STARK / lattice / aggregation protocol migrations (CODEBASE_AUDIT §VII).
 
 #### Track 4 implementation checklist (2026-11-13)
 
-- [ ] Establish provider and wire-format compatibility with independent tests. (Default pipeline passes native validation and execution; round-3 Dilithium3 is exposed separately and tested against its provider; Falcon-512 and SPHINCS+ historical wire formats remain open.)
+- [x] Expose the historical signature formats explicitly and test interoperability, malformed inputs, and the no-CGO boundary.
 - [x] Test the pinned EIP-7932 registry and both expanded-key EIP-8051 precompile variants through explicitly registered EVM calls.
 - [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
 - [x] Match EIP-7864 Python reference roots for basic insertion and a state embedding with storage and code boundaries.
-- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864. (BLAKE3 roots, proofs, state mutation, persistence, checkpointed migration and memory-state materialization advanced; scalable migration, full StateDB and node adoption remain.)
+- [x] Expose resumable offline migration through the client command and read its output back from a reopened FileDB.
+- [ ] Resolve EIP-7932 and EIP-8051 fork addresses and wire state-backed PQ key lookup. The fixed drafts both assign 0x12, which EIP-7997 reserves for its factory.
+- [ ] Implement the EIP-7864 fork path. This includes the EIP-7612 frozen MPT overlay, EIP-4762 access accounting, overlay execution and restart, and EIP-7748 ordered, per-block conversion when scheduled. The offline snapshot does not implement that transition.
 - [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)
 - [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.

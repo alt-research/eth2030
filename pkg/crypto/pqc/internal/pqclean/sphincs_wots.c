@@ -1,0 +1,1 @@
+#include "sphincs/wots.c"

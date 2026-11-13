@@ -1,3 +1,12 @@
+## Track 4 historical signers and migration command (2026-11-14)
+
+- Added explicit Round 3 Falcon-padded-512 and Round 3.1 SPHINCS+-SHA2-128f-simple signing APIs using the pinned PQClean clean implementations. Existing transaction IDs continue to select ML-DSA-65, FN-DSA and SLH-DSA. The historical Falcon and SPHINCS+ APIs require CGO and report unavailability without it.
+- A standalone PQClean C executable produced the historical wire vectors. Tests accept them, sign using their serialized private keys, reject changed messages, altered signatures, truncated fields and cross-format verification, and exercise key generation. Falcon also verifies case 0 from the pinned EIP-8052 assets and rejects nonzero padding.
+- Added `eth2030 binary-migrate` for an existing committed flat-state FileDB, with a trusted MPT source root and durable checkpoints. The command integration test checks source locking, partial conversion, a second invocation that resumes, and balance, storage and code readback from the reopened destination.
+- Track 4 review still finds two consensus integration areas and one provider migration open. EIP-7932/8051 need a fork address assignment compatible with EIP-7997 and a state-backed key lookup. EIP-7864 delegates activation to EIP-7612 and access events to EIP-4762, with later conversion under EIP-7748. The offline command implements snapshot conversion. STARK frame and aggregate verification still need a real provider, a concrete public statement and a transport format. Experimental blob openings are authenticated Merkle paths, while the local deterministic lattice scheme remains experimental.
+
+- Validation: full `go test ./...` and `go build ./...` passed in `pkg`. Targeted migration and historical signature race tests passed. A no-CGO build and the tests for the unavailable providers, Dilithium3 and offline migration also passed.
+
 ## Track 4 expanded-key verification and reference roots (2026-11-14)
 
 - Implemented the pinned EIP-8051 expanded-key SHAKE and Keccak verifiers. They enforce canonical field encodings, hint ordering and padding, the strict coefficient norm bound, and the challenge hash. Explicit constructors bind the verifiers to the precompile and EIP-7932 registry adapter. EIP-7932, EIP-8051, and EIP-7997 assign overlapping uses to address 0x12, so the tests configure the two draft precompile maps separately.

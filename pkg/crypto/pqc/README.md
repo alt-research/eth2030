@@ -32,6 +32,21 @@ The `PQSigner` API wraps CIRCL ML-DSA and SLH-DSA, and go-fn-dsa FN-DSA-512. CIR
 
 The size constants derive from the public providers. Existing historical identifiers select ML-DSA-65, the prospective go-fn-dsa FN-DSA-512 format, and SLH-DSA-SHA2-128f; they do not establish wire compatibility with round-3 Dilithium3, Falcon-512, or SPHINCS+. The SLH-DSA wrapper is checked against a public NIST ACVP deterministic-signature case. These identifiers are not the pinned EIP-7932 registry identifiers.
 
+## Historical wire formats
+
+Use `Dilithium3Round3`, `Falcon512Round3`, and
+`SPHINCSPlusSHA2128fRound3` to select the historical formats explicitly.
+Falcon uses the padded 666-byte encoding. SPHINCS+ uses the SHA2-128f-simple
+parameter set from round 3.1. Falcon and SPHINCS+ require CGO and use the pinned
+[PQClean provider](internal/pqclean/README.md).
+
+The checked fixtures include signatures produced by a standalone C program
+built from the pinned PQClean source. The Falcon test also uses case 0 from the
+fixed EIP-8052 SHAKE hash-to-point and core assets. The asset stores the original
+message followed by a signed-message signature body beginning with tag 0x29.
+The fixture replaces that framing with the detached Falcon tag 0x39, the
+40-byte salt, the compressed body, and zero padding to 666 bytes.
+
 ## Usage
 
 ```go

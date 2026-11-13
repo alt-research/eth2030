@@ -515,3 +515,33 @@ func TestEIP4762GasConstants(t *testing.T) {
 		t.Errorf("CodeChunkSize = %d, want 31", CodeChunkSize)
 	}
 }
+
+func TestEIP4762StorageGasUsesFullSlotWidth(t *testing.T) {
+	sender, target := types.Address{19: 0xaa}, types.Address{19: 0xbb}
+	cases := []struct {
+		name              string
+		first, high, last byte
+		gas               uint64
+	}{
+		{"same leaf", 64, 0, 64, 2100},
+		{"adjacent leaf", 64, 0, 65, 2300},
+		{"distinct high bits", 64, 1, 64, 4200},
+		{"distinct inline and main storage", 0, 1, 0, 4200},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			evm, _ := newVerkleEVM(sender, target)
+			const startGas = 100_000
+			contract := NewContract(sender, target, new(big.Int), startGas)
+			contract.Code = []byte{byte(PUSH1), tc.first, byte(SLOAD), byte(POP), byte(PUSH9), tc.high}
+			contract.Code = append(contract.Code, make([]byte, 7)...)
+			contract.Code = append(contract.Code, tc.last, byte(SLOAD), byte(STOP))
+			if _, err := evm.Run(contract, nil); err != nil {
+				t.Fatal(err)
+			}
+			if used, want := startGas-contract.Gas, tc.gas+2*GasPush+GasQuickStep; used != want {
+				t.Fatalf("used %d gas, want %d", used, want)
+			}
+		})
+	}
+}

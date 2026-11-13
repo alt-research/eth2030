@@ -1,7 +1,10 @@
 package vm
 
 import (
+	"encoding/binary"
+
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
 
 // WitnessGasTracker maintains the four sets specified by EIP-4762 for tracking
@@ -17,12 +20,12 @@ type WitnessGasTracker struct {
 
 type witnessSubtreeKey struct {
 	addr   types.Address
-	subKey uint64
+	subKey types.Hash
 }
 
 type witnessLeafKey struct {
 	addr    types.Address
-	subKey  uint64
+	subKey  types.Hash
 	leafKey uint8
 }
 
@@ -40,6 +43,12 @@ func NewWitnessGasTracker() *WitnessGasTracker {
 // (address, subKey, leafKey). It returns the gas to charge. If the subtree
 // or leaf has already been accessed, no gas is charged for that component.
 func (t *WitnessGasTracker) TouchAccessEvent(addr types.Address, subKey uint64, leafKey uint8) uint64 {
+	var index types.Hash
+	binary.BigEndian.PutUint64(index[24:], subKey)
+	return t.touchAccess(addr, index, leafKey)
+}
+
+func (t *WitnessGasTracker) touchAccess(addr types.Address, subKey types.Hash, leafKey uint8) uint64 {
 	var gas uint64
 
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
@@ -62,6 +71,12 @@ func (t *WitnessGasTracker) TouchAccessEvent(addr types.Address, subKey uint64, 
 // event gas. The fill parameter indicates whether the slot was previously
 // empty (None), triggering the extra CHUNK_FILL_COST.
 func (t *WitnessGasTracker) TouchWriteEvent(addr types.Address, subKey uint64, leafKey uint8, fill bool) uint64 {
+	var index types.Hash
+	binary.BigEndian.PutUint64(index[24:], subKey)
+	return t.touchWrite(addr, index, leafKey, fill)
+}
+
+func (t *WitnessGasTracker) touchWrite(addr types.Address, subKey types.Hash, leafKey uint8, fill bool) uint64 {
 	var gas uint64
 
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
@@ -154,10 +169,9 @@ func gasSloadEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, me
 	if evm.witnessGas == nil {
 		return 0, nil
 	}
-	loc := stack.Back(0)
-	storageKey := loc.Uint64()
-	treeKey, subKey := GetStorageSlotTreeKeys(storageKey)
-	return evm.witnessGas.TouchAccessEvent(contract.Address, treeKey, subKey), nil
+	key := bigToHash(stack.Back(0))
+	treeIndex, leaf := bintrie.StorageIndex(key[:])
+	return evm.witnessGas.touchAccess(contract.Address, types.BytesToHash(treeIndex.Bytes()), leaf), nil
 }
 
 // gasSstoreEIP4762 calculates witness-based gas for SSTORE under EIP-4762.
@@ -170,15 +184,14 @@ func gasSstoreEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 		return gas, nil
 	}
 
-	loc := stack.Back(0)
-	storageKey := loc.Uint64()
-	treeKey, subKey := GetStorageSlotTreeKeys(storageKey)
+	key := bigToHash(stack.Back(0))
+	treeIndex, leaf := bintrie.StorageIndex(key[:])
+	stem := types.BytesToHash(treeIndex.Bytes())
 
 	// Access event.
-	gas = safeAdd(gas, evm.witnessGas.TouchAccessEvent(contract.Address, treeKey, subKey))
+	gas = safeAdd(gas, evm.witnessGas.touchAccess(contract.Address, stem, leaf))
 
 	// Determine if this is a fill (writing to a previously-empty slot).
-	key := bigToHash(loc)
 	fill := false
 	if evm.StateDB != nil {
 		committed := evm.StateDB.GetCommittedState(contract.Address, key)
@@ -186,7 +199,7 @@ func gasSstoreEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 	}
 
 	// Write event.
-	gas = safeAdd(gas, evm.witnessGas.TouchWriteEvent(contract.Address, treeKey, subKey, fill))
+	gas = safeAdd(gas, evm.witnessGas.touchWrite(contract.Address, stem, leaf, fill))
 	return gas, nil
 }
 

@@ -4,6 +4,7 @@
 - The node Engine backend builds and imports overlay payloads and applies forkchoice to the selected branch. Header roots are verified during execution and replay. Restart restores the canonical state and conversion cursor by replaying live blocks. The experimental profile retains full state in memory and retains live block bodies for replay.
 - Tests compare two Engine payload roots with separately constructed trie roots. A signed-transaction FileDB test exercises storage clears, branch-specific BLOCKHASH, forged roots, reorg, rewind, restart and missing ancestry. State tests cover snapshot rollback, code shrink, account deletion and atomic in-memory commit failure. Mutation runs confirmed that dropping explicit zero leaves or resolving BLOCKHASH on the canonical branch is detected.
 - Validation passed in `pkg` with `go test ./...`, `go build ./...`, and targeted `go test -race` for the state, chain, and node overlay and forkchoice tests.
+- The EIP-4762 opcode helper now uses the full storage key for access and edit events. Bytecode tests assert exact gas for repeated slots, adjacent slots in one stem, and slots that differ above bit 63.
 - The published consensus layout, EIP-4762 witness gas, durable per-block state checkpoints and scalable state access remain open. Existing opcode-level witness gas helpers are separate from this profile. The PQ committee source and application-specific STARK, lattice and aggregation protocols remain open.
 
 ## Track 4 consensus attestation verification (2026-11-14)

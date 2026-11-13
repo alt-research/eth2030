@@ -50,6 +50,7 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [ ] Confirm canonical fork addresses and key registry rules for EIP-7932/8051. The pinned drafts both assign 0x12, which the pinned EIP-7997 factory uses.
 - [x] Implement the EIP-7748 ordered conversion step, zero-override protection, and resumable cursor for the pinned BLAKE3 overlay.
 - [x] Exercise the pinned BLAKE3 overlay on an opt-in chain through block construction, import, Engine API payload construction, reorg, rewind, and restart by replay. Apply ordered conversion before transactions and preserve explicit zero overrides.
+- [x] Preserve all 256 bits of EVM storage keys when tracking EIP-4762 storage access and edit events. Test branch and leaf gas for repeated, adjacent, and high-bit-distinct slots.
 - [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add durable per-block checkpoints and a scalable frozen-state reader with crash recovery. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
 - [ ] Connect the PQ attestation verifier to the node's authenticated committee and key source.
 - [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.

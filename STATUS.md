@@ -1,3 +1,9 @@
+## Track 4 committed-state binary migration progress (2026-11-13)
+
+- Added an offline `TrieStateDB` flat-table migration to the draft EIP-7864 BLAKE3 trie. Address and storage-slot preimages are present in these project-specific tables. Before writing binary nodes, the migration reconstructs the account MPT against a caller-provided trusted root, validates each account storage root and code hash, and rejects malformed or out-of-range data.
+- File-database tests commit accounts with code and storage, migrate, close and reopen the binary database, then read accounts, inline and non-inline storage, code chunks and BLAKE3 inclusion proofs. Wrong source root, altered storage and altered code are rejected before binary node writes.
+- Validation: `go test ./core/state/... ./trie/... ./core/rawdb`, `go test -race ./core/state -run TestMigrateCommittedToBinary`, and `go build ./...` passed in `pkg`. This path requires a quiescent source and keeps the converted tree in memory. It does not publish the root, provide a durable checkpoint, run during fork transition, or wire binary state to the node. Generic MPTs with only hashed keys do not provide address and slot preimages. The older `trie/migrate` utilities target a different legacy tree.
+
 ## Track 4 aggregation verification boundaries (2026-11-13)
 
 - The previous `STARKAggregator` regenerated a trace commitment from state root, block hash and type; it neither bound the input proof bytes nor retained or verified the outer proof. It could therefore report validity without proving an execution statement. It now requires an explicit `STARKAggregateProvider`, retains its proof bytes, binds all ordered input fields with length delimiters, and asks the provider to verify the result. No production provider or concrete recursive statement is configured.

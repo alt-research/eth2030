@@ -1,6 +1,6 @@
 # trie/migrate — MPT-to-binary-trie migration
 
-Converts an existing Merkle Patricia Trie (MPT) state into a binary Merkle trie (EIP-7864), with batch processing, parallel address-space splitting, crash-recovery checkpointing, and gas accounting.
+Experimental migration utilities for a legacy `mpt.BinaryTrie`. These utilities do not produce an EIP-7864 state tree or a production migration checkpoint.
 
 [← trie](../README.md)
 
@@ -8,7 +8,7 @@ Converts an existing Merkle Patricia Trie (MPT) state into a binary Merkle trie 
 
 `MigrateFromMPT` is the simple one-shot converter: it iterates all key-value pairs from the source MPT, rehashes each key with Keccak256 (matching binary trie key derivation), and inserts them into a new `mpt.BinaryTrie`.
 
-`MPTToBinaryTrieMigrator` provides the production migrator. It collects all MPT pairs once, then exposes `MigrateBatch()` which processes one batch per call, charges gas via a `GasAccountant`, and saves a `MigrationCheckpoint` after each batch for crash recovery. The migrator is composed of:
+`MPTToBinaryTrieMigrator` is an experimental migrator for that legacy tree. It collects all MPT pairs once, then exposes `MigrateBatch()` which processes one batch per call, charges gas via a `GasAccountant`, and saves a `MigrationCheckpoint` after each batch for crash recovery. The migrator is composed of:
 
 - `BatchConverter` — inserts up to `batchSize` pairs per call into the destination trie.
 - `AddressSpaceSplitter` — divides the 256-bit key space into N equal ranges for parallel migration workers.
@@ -16,7 +16,9 @@ Converts an existing Merkle Patricia Trie (MPT) state into a binary Merkle trie 
 - `MigrationCheckpointer` — stores a stack of `MigrationCheckpoint` values with `Latest()` for resume.
 - `GasAccountant` — tracks read/write/proof costs against a gas budget.
 
-`OverlayMigrator` (`overlay.go`) and `MigrationPlanner` (`migration_planner.go`) provide overlay-based incremental migration and planning primitives.
+`OverlayMigrator` (`overlay.go`) and `MigrationPlanner` (`migration_planner.go`) provide experimental overlay and planning primitives.
+
+For the project's committed `TrieStateDB` flat tables, `state.MigrateCommittedToBinary` separately builds a draft EIP-7864 BLAKE3 tree using account addresses and storage-slot preimages. It verifies the trusted account root, each storage root and code hash before persisting binary nodes. It requires a quiescent source, does not publish or activate the resulting root, and does not supply a scalable, checkpointed fork migration. A generic MPT with only hashed keys cannot supply the required address and slot preimages.
 
 ## Functionality
 

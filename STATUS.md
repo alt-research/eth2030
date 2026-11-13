@@ -1,3 +1,11 @@
+## Track 4 proof verification progress (2026-11-13)
+
+- Authenticated divergent stems in the standalone SHA-256 binary trie exclusion verifier and added suffix-tree siblings to inclusion proofs, allowing proofs for stems with multiple values. The proof representation changes: divergent proofs now require the value subtree root; multi-value inclusion proofs require eight sibling hashes.
+- Added regression coverage for a forged divergent stem, modified suffix sibling, multi-value inclusion, and unsupported same-stem exclusion. Proof generation explicitly rejects non-SHA-256 tries and same-stem suffix exclusion; this is not an EIP-7864 BLAKE3 proof implementation.
+- The historical Dilithium3, Falcon-512, and SPHINCS+ signer identifiers already use ML-DSA-65, FN-DSA-512, and SLH-DSA-SHA2-128f providers respectively. These names do not establish compatibility with historical scheme encodings. The pinned EIP-8051 specifies ML-DSA-44 precompiles, not the project PQ transaction gas table; EIP-7932 registry/precompile and EIP-8051 conformance remain to be tested and implemented as applicable.
+- Track 4 remains open: EIP-7864 uses BLAKE3 in the pinned draft, and proof, persistence, migration, and state integration are not validated end-to-end. STARK, lattice commitment, and aggregation protocol migrations remain open; no interchangeable provider or statement was established in the audit.
+- Validation: `go test ./trie/... ./crypto/pqc` and `go build ./...` from `pkg` passed. The full module test suite and cross-client vectors were not run.
+
 # Project Status
 
 ## Hegotá Track 2 Closure (2026-11-12)

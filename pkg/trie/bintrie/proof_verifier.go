@@ -14,13 +14,15 @@ import (
 
 // Proof verifier errors.
 var (
-	ErrNilProof           = errors.New("proof_verifier: nil proof")
-	ErrInvalidKeyLength   = errors.New("proof_verifier: key must be 32 bytes")
-	ErrInvalidValueLength = errors.New("proof_verifier: value must be 32 bytes")
-	ErrKeyNotFound        = errors.New("proof_verifier: key not found in trie")
-	ErrKeyExists          = errors.New("proof_verifier: key exists in trie (cannot build exclusion proof)")
-	ErrEmptyRoot          = errors.New("proof_verifier: empty root hash")
-	ErrProofPathEmpty     = errors.New("proof_verifier: proof path has no siblings")
+	ErrNilProof             = errors.New("proof_verifier: nil proof")
+	ErrInvalidKeyLength     = errors.New("proof_verifier: key must be 32 bytes")
+	ErrInvalidValueLength   = errors.New("proof_verifier: value must be 32 bytes")
+	ErrKeyNotFound          = errors.New("proof_verifier: key not found in trie")
+	ErrKeyExists            = errors.New("proof_verifier: key exists in trie (cannot build exclusion proof)")
+	ErrEmptyRoot            = errors.New("proof_verifier: empty root hash")
+	ErrUnsupportedExclusion = errors.New("proof_verifier: suffix exclusion is unsupported")
+	ErrUnsupportedProofHash = errors.New("proof_verifier: only SHA-256 proofs are supported")
+	ErrProofPathEmpty       = errors.New("proof_verifier: proof path has no siblings")
 )
 
 // ProofPath is an ordered sequence of sibling hashes along a path from the
@@ -48,6 +50,8 @@ type InclusionProof struct {
 	Path ProofPath
 	// StemHash is the hash of the StemNode containing this key.
 	StemHash types.Hash
+	// ValueSiblings are the eight suffix-tree siblings, leaf first.
+	ValueSiblings [8]types.Hash
 }
 
 // ExclusionProof proves that a key does NOT exist in the trie.
@@ -63,6 +67,8 @@ type ExclusionProof struct {
 	DivergentStem []byte
 	// DivergentStemHash is the hash of the divergent stem node, if any.
 	DivergentStemHash types.Hash
+	// DivergentValuesRoot binds DivergentStem to its authenticated node hash.
+	DivergentValuesRoot types.Hash
 	// EmptyAtPath is true if the path ends at an empty node.
 	EmptyAtPath bool
 }
@@ -95,14 +101,14 @@ func (pv *ProofVerifier) VerifyInclusion(proof *InclusionProof) bool {
 	if proof == nil {
 		return false
 	}
-	if pv.root == (types.Hash{}) {
+	if pv.root == (types.Hash{}) || len(proof.Path.Siblings) > StemSize*8 {
 		return false
 	}
 
 	// Recompute the stem node hash from key and value.
 	stem := proof.Key[:StemSize]
 	leafIdx := proof.Key[StemSize]
-	stemHash := computeStemLeafHash(stem, leafIdx, proof.Value[:])
+	stemHash := stemProofHash(stem, leafIdx, proof.Value[:], proof.ValueSiblings)
 
 	// If the proof has a stored stem hash, it must match our computation.
 	if proof.StemHash != (types.Hash{}) && proof.StemHash != stemHash {
@@ -128,7 +134,7 @@ func (pv *ProofVerifier) VerifyExclusion(proof *ExclusionProof) bool {
 	if proof == nil {
 		return false
 	}
-	if pv.root == (types.Hash{}) {
+	if pv.root == (types.Hash{}) || len(proof.Path.Siblings) > StemSize*8 {
 		return false
 	}
 
@@ -144,7 +150,15 @@ func (pv *ProofVerifier) VerifyExclusion(proof *ExclusionProof) bool {
 			// The stem matches -- this is NOT an exclusion proof.
 			return false
 		}
-		current = proof.DivergentStemHash
+		for depth := range len(proof.Path.Siblings) {
+			if getBit(stem, depth) != getBit(proof.DivergentStem, depth) {
+				return false
+			}
+		}
+		current = hashStem(proof.DivergentStem, proof.DivergentValuesRoot)
+		if current != proof.DivergentStemHash {
+			return false
+		}
 	} else {
 		return false
 	}
@@ -164,6 +178,10 @@ func (pv *ProofVerifier) VerifyExclusion(proof *ExclusionProof) bool {
 func BuildInclusionProof(trie *BinaryTrie, key []byte) (*InclusionProof, error) {
 	if len(key) != HashSize {
 		return nil, ErrInvalidKeyLength
+	}
+
+	if trie.hashFunc != HashFunctionSHA256 {
+		return nil, ErrUnsupportedProofHash
 	}
 
 	// Verify the key exists.
@@ -188,6 +206,7 @@ func BuildInclusionProof(trie *BinaryTrie, key []byte) (*InclusionProof, error) 
 	}
 	if stemNode != nil {
 		proof.StemHash = stemNode.Hash()
+		proof.ValueSiblings, _ = stemValueProof(stemNode, key[StemSize])
 	}
 
 	return proof, nil
@@ -200,6 +219,10 @@ func BuildExclusionProof(trie *BinaryTrie, key []byte) (*ExclusionProof, error) 
 		return nil, ErrInvalidKeyLength
 	}
 
+	if trie.hashFunc != HashFunctionSHA256 {
+		return nil, ErrUnsupportedProofHash
+	}
+
 	// Verify the key does NOT exist.
 	val, err := trie.Get(key)
 	if err != nil {
@@ -210,6 +233,11 @@ func BuildExclusionProof(trie *BinaryTrie, key []byte) (*ExclusionProof, error) 
 	}
 
 	siblings, divergentStem := collectExclusionSiblings(trie.root, key[:StemSize], 0)
+	// A matching stem with an absent suffix needs a suffix-tree exclusion proof.
+	_, matchingStem := collectVerifierSiblings(trie.root, key[:StemSize], 0)
+	if matchingStem != nil {
+		return nil, ErrUnsupportedExclusion
+	}
 
 	proof := &ExclusionProof{
 		Path: ProofPath{Siblings: siblings},
@@ -220,6 +248,7 @@ func BuildExclusionProof(trie *BinaryTrie, key []byte) (*ExclusionProof, error) 
 		proof.DivergentStem = make([]byte, len(divergentStem.Stem))
 		copy(proof.DivergentStem, divergentStem.Stem)
 		proof.DivergentStemHash = divergentStem.Hash()
+		_, proof.DivergentValuesRoot = stemValueProof(divergentStem, 0)
 		proof.EmptyAtPath = false
 	} else {
 		proof.EmptyAtPath = true
@@ -334,32 +363,46 @@ func hashPair(current, sibling types.Hash, bit byte) types.Hash {
 	return types.BytesToHash(h.Sum(nil))
 }
 
-// computeStemLeafHash computes the expected hash of a StemNode containing
-// a single known leaf value. This mirrors the StemNode.Hash() logic.
-func computeStemLeafHash(stem []byte, leafIdx byte, value []byte) types.Hash {
-	var data [StemNodeWidth]types.Hash
-	if value != nil {
-		h := sha256.Sum256(value)
-		data[leafIdx] = types.BytesToHash(h[:])
-	}
-
-	h := sha256.New()
-	for level := 1; level <= 8; level++ {
-		for i := range StemNodeWidth / (1 << level) {
-			h.Reset()
-			if data[i*2] == (types.Hash{}) && data[i*2+1] == (types.Hash{}) {
-				data[i] = types.Hash{}
-				continue
-			}
-			h.Write(data[i*2][:])
-			h.Write(data[i*2+1][:])
-			data[i] = types.BytesToHash(h.Sum(nil))
+// stemValueProof computes a suffix opening and the complete value subtree root.
+func stemValueProof(node *StemNode, index byte) ([8]types.Hash, types.Hash) {
+	var nodes [StemNodeWidth]types.Hash
+	for i, value := range node.Values {
+		if value != nil {
+			nodes[i] = sha256.Sum256(value)
 		}
 	}
-
-	h.Reset()
-	h.Write(stem)
-	h.Write([]byte{0})
-	h.Write(data[0][:])
-	return types.BytesToHash(h.Sum(nil))
+	var siblings [8]types.Hash
+	pos, width := int(index), StemNodeWidth
+	for level := range 8 {
+		siblings[level] = nodes[pos^1]
+		for i := 0; i < width; i += 2 {
+			nodes[i/2] = hashValuePair(nodes[i], nodes[i+1])
+		}
+		pos /= 2
+		width /= 2
+	}
+	return siblings, nodes[0]
+}
+func hashValuePair(left, right types.Hash) types.Hash {
+	if left == (types.Hash{}) && right == (types.Hash{}) {
+		return types.Hash{}
+	}
+	return hashPair(left, right, 0)
+}
+func hashStem(stem []byte, root types.Hash) types.Hash {
+	var input [64]byte
+	copy(input[:31], stem)
+	copy(input[32:], root[:])
+	return sha256.Sum256(input[:])
+}
+func stemProofHash(stem []byte, index byte, value []byte, siblings [8]types.Hash) types.Hash {
+	current := types.Hash(sha256.Sum256(value))
+	for level, sibling := range siblings {
+		if (index>>level)&1 == 0 {
+			current = hashValuePair(current, sibling)
+		} else {
+			current = hashValuePair(sibling, current)
+		}
+	}
+	return hashStem(stem, current)
 }

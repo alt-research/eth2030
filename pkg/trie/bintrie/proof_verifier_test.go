@@ -396,3 +396,41 @@ func TestProofVerifierExclusionFakeProofReject(t *testing.T) {
 		t.Fatal("exclusion proof with matching stem should be rejected")
 	}
 }
+
+func TestProofVerifierMultiValueAndForgedExclusion(t *testing.T) {
+	trie := New()
+	first := makeKey(0x10, 1)
+	second := makeKey(0x10, 200)
+	firstValue, secondValue := makeVal(1), makeVal(2)
+	if err := trie.Put(first[:], firstValue[:]); err != nil {
+		t.Fatal(err)
+	}
+	if err := trie.Put(second[:], secondValue[:]); err != nil {
+		t.Fatal(err)
+	}
+	root := trie.Hash()
+	verifier := NewProofVerifier(root[:])
+	proof, err := BuildInclusionProof(trie, first[:])
+	if err != nil || !verifier.VerifyInclusion(proof) {
+		t.Fatalf("multi-value proof failed: %v", err)
+	}
+	proof.ValueSiblings[0][0] ^= 1
+	if verifier.VerifyInclusion(proof) {
+		t.Fatal("accepted modified suffix sibling")
+	}
+	missing := makeKey(0x80, 1)
+	exclusion, err := BuildExclusionProof(trie, missing[:])
+	if err != nil || !verifier.VerifyExclusion(exclusion) {
+		t.Fatalf("exclusion failed: %v", err)
+	}
+	// The previous verifier accepted the existing node hash with an invented stem.
+	exclusion.Key = first
+	exclusion.DivergentStem[0] ^= 0x20
+	if verifier.VerifyExclusion(exclusion) {
+		t.Fatal("accepted forged divergent stem")
+	}
+	sameStem := makeKey(0x10, 3)
+	if _, err := BuildExclusionProof(trie, sameStem[:]); err != ErrUnsupportedExclusion {
+		t.Fatalf("missing suffix: %v", err)
+	}
+}

@@ -39,6 +39,15 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [ ] EIP-7864 Binary Merkle Trie: continue toward complete.
 - [ ] Remaining STARK / lattice / aggregation protocol migrations (CODEBASE_AUDIT §VII).
 
+#### Track 4 implementation checklist (2026-11-13)
+
+- [ ] Establish provider and wire-format compatibility with independent tests.
+- [ ] Test the actual EIP-7932 registry and EIP-8051 precompile contracts against pinned specifications.
+- [ ] Correct binary trie proof authentication and test multi-value stems and exclusion.
+- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864.
+- [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification.
+- [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
+
 ### Track 5 — eiptest framework (incremental)
 
 - [ ] T5.1: opportunistic migration of `pkg/`-root E2E scenarios as files are touched.

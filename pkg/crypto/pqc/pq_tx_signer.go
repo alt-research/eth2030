@@ -91,7 +91,7 @@ func (s *PQTxSigner) Scheme() PQSignatureType {
 
 // GenerateKey generates a new PQ key pair for the signer's scheme.
 // For Falcon-512 and SPHINCS+, uses the real lattice/hash-based key generation.
-// For Dilithium3, uses the DilithiumSigner (stub with matching Sign/Verify).
+// The historical Dilithium3 identifier uses the ML-DSA-65 provider.
 func (s *PQTxSigner) GenerateKey() (*PQPrivateKey, *PQPublicKey, error) {
 	s.mu.RLock()
 	scheme := s.scheme

@@ -1,3 +1,10 @@
+## Track 4 aggregation verification boundaries (2026-11-13)
+
+- The previous `STARKAggregator` regenerated a trace commitment from state root, block hash and type; it neither bound the input proof bytes nor retained or verified the outer proof. It could therefore report validity without proving an execution statement. It now requires an explicit `STARKAggregateProvider`, retains its proof bytes, binds all ordered input fields with length delimiters, and asks the provider to verify the result. No production provider or concrete recursive statement is configured.
+- `BatchAggregator.VerifyBatch` now requires an individual execution proof verifier before setting `Verified`; a Merkle commitment alone is not proof validation. Verification state resets on each call. The legacy recursive STARK interface does not include complete public statements and now returns an error instead of asserting that digest aggregation proves inner validity.
+- Execution-proof commitment hashing is domain-separated and length-delimited, changing prior aggregate roots; old roots must be recomputed. Regression tests use a deliberately simulated provider to check dispatch, artifact and input tampering, missing providers and invalid input; they do not demonstrate a real STARK or recursive verification.
+- Validation: `go test ./proofs/... ./txpool/stark ./node`, targeted `go test -race ./proofs`, and `go build ./...` passed in `pkg`. Mempool STARK gossip remains experimental and advisory; its local trace does not prove transaction validity. The real STARK, lattice commitment and aggregation protocol migrations remain open.
+
 ## Track 4 PQ signing pipeline progress (2026-11-13)
 
 - Replaced the pipeline's fabricated public key with provider-derived ML-DSA-65 and SLH-DSA public keys. FN-DSA callers must now supply the matching public key; the provider does not expose public-key derivation from the serialized private key. A supplied key is checked against the signature.

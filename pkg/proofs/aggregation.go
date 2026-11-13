@@ -13,9 +13,10 @@ import (
 
 // Aggregation errors.
 var (
-	ErrBatchEmpty    = errors.New("proofs: no proofs in batch")
-	ErrBatchFull     = errors.New("proofs: batch is full")
-	ErrVerifyTimeout = errors.New("proofs: verification timed out")
+	ErrBatchEmpty            = errors.New("proofs: no proofs in batch")
+	ErrBatchFull             = errors.New("proofs: batch is full")
+	ErrProofVerifierRequired = errors.New("proofs: individual execution proof verifier required")
+	ErrVerifyTimeout         = errors.New("proofs: verification timed out")
 )
 
 // AggregationConfig controls batched proof aggregation behavior.
@@ -56,19 +57,20 @@ type ProofBatch struct {
 
 // BatchAggregator manages batched proof collection and verification.
 // It wraps an underlying ProofAggregator (e.g., SimpleAggregator) and adds
-// batching, statistics, and optional parallel verification.
+// batching and statistics. Verification requires an explicit proof verifier.
 type BatchAggregator struct {
-	mu       sync.Mutex
-	config   AggregationConfig
-	inner    ProofAggregator
-	pending  []ExecutionProof
-	batched  atomic.Uint64
-	verified atomic.Uint64
-	failed   atomic.Uint64
+	mu          sync.Mutex
+	config      AggregationConfig
+	inner       ProofAggregator
+	verifyProof func(ExecutionProof) (bool, error)
+	pending     []ExecutionProof
+	batched     atomic.Uint64
+	verified    atomic.Uint64
+	failed      atomic.Uint64
 }
 
 // NewBatchAggregator creates a new BatchAggregator with the given configuration
-// and an underlying ProofAggregator for individual proof verification.
+// and an underlying ProofAggregator for aggregate verification.
 func NewBatchAggregator(config AggregationConfig, inner ProofAggregator) *BatchAggregator {
 	if inner == nil {
 		inner = NewSimpleAggregator()
@@ -78,6 +80,14 @@ func NewBatchAggregator(config AggregationConfig, inner ProofAggregator) *BatchA
 		inner:   inner,
 		pending: make([]ExecutionProof, 0, config.MaxProofs),
 	}
+}
+
+// SetExecutionProofVerifier configures validation of each execution proof and
+// its public statement. A Merkle aggregate alone is not proof verification.
+func (ba *BatchAggregator) SetExecutionProofVerifier(verify func(ExecutionProof) (bool, error)) {
+	ba.mu.Lock()
+	defer ba.mu.Unlock()
+	ba.verifyProof = verify
 }
 
 // AddProof adds an execution proof to the current batch.
@@ -130,6 +140,9 @@ func (ba *BatchAggregator) VerifyBatch(batch *ProofBatch) (bool, error) {
 		return false, ErrBatchEmpty
 	}
 
+	batch.Verified = false
+	batch.VerifiedAt = time.Time{}
+
 	// Recompute aggregate hash to detect tampering.
 	var hashInput []byte
 	for i := range batch.Proofs {
@@ -142,7 +155,27 @@ func (ba *BatchAggregator) VerifyBatch(batch *ProofBatch) (bool, error) {
 		return false, nil
 	}
 
-	// Verify all proofs via the inner aggregator.
+	ba.mu.Lock()
+	verify := ba.verifyProof
+	ba.mu.Unlock()
+	if verify == nil {
+		ba.failed.Add(uint64(len(batch.Proofs)))
+		return false, ErrProofVerifierRequired
+	}
+	for _, proof := range batch.Proofs {
+		proof.ProofData = append([]byte(nil), proof.ProofData...)
+		valid, err := verify(proof)
+		if err != nil {
+			ba.failed.Add(uint64(len(batch.Proofs)))
+			return false, err
+		}
+		if !valid {
+			ba.failed.Add(uint64(len(batch.Proofs)))
+			return false, nil
+		}
+	}
+
+	// Verify the aggregate commitment or provider proof.
 	agg, err := ba.inner.Aggregate(batch.Proofs)
 	if err != nil {
 		ba.failed.Add(uint64(len(batch.Proofs)))

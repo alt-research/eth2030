@@ -43,8 +43,10 @@ type ProofAggregator interface {
 
 Two aggregator implementations are provided:
 
-- `SimpleAggregator` — computes a Merkle root over SHA-256 leaf hashes of each proof using SSZ merkleization.
-- `STARKAggregator` — converts proofs into an algebraic execution trace and produces a STARK proof over the trace, using `STARKProver`.
+- `SimpleAggregator` — commits to proof artifacts with an SSZ Merkle root. Its verification checks the commitment only, not proof validity.
+- `STARKAggregator` — requires an explicitly configured `STARKAggregateProvider` that proves and verifies the concrete execution statements. The aggregate contains the provider proof and a length-delimited commitment to the ordered inputs. No STARK provider is configured by default.
+
+`BatchAggregator.VerifyBatch` also requires `SetExecutionProofVerifier` to validate each proof and its public statement. The legacy recursive STARK composition interface has no complete public statement and therefore returns an error instead of treating a digest as a proof. These interfaces do not implement an EIP-8025 proof system or configure a provider by themselves.
 
 ### Mandatory 3-of-5 Proof System
 

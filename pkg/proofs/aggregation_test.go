@@ -7,6 +7,13 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
+// The test verifier is a stub; these tests exercise batch control flow only.
+func newTestBatchAggregator(config AggregationConfig, inner ProofAggregator) *BatchAggregator {
+	ba := NewBatchAggregator(config, inner)
+	ba.SetExecutionProofVerifier(func(ExecutionProof) (bool, error) { return true, nil })
+	return ba
+}
+
 func TestDefaultAggregationConfig(t *testing.T) {
 	cfg := DefaultAggregationConfig()
 
@@ -22,7 +29,7 @@ func TestDefaultAggregationConfig(t *testing.T) {
 }
 
 func TestBatchAggregatorAddProof(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	p := ExecutionProof{
 		StateRoot: types.HexToHash("0x1111111111111111111111111111111111111111111111111111111111111111"),
@@ -41,7 +48,7 @@ func TestBatchAggregatorAddProof(t *testing.T) {
 func TestBatchAggregatorAddProofFull(t *testing.T) {
 	cfg := DefaultAggregationConfig()
 	cfg.MaxProofs = 2
-	ba := NewBatchAggregator(cfg, nil)
+	ba := newTestBatchAggregator(cfg, nil)
 
 	p := ExecutionProof{
 		StateRoot: types.Hash{0x01},
@@ -61,7 +68,7 @@ func TestBatchAggregatorAddProofFull(t *testing.T) {
 }
 
 func TestBatchAggregatorAggregateBatch(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	proofs := makeTestProofs(3)
 	for _, p := range proofs {
@@ -87,7 +94,7 @@ func TestBatchAggregatorAggregateBatch(t *testing.T) {
 }
 
 func TestBatchAggregatorAggregateBatchEmpty(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	_, err := ba.AggregateBatch()
 	if err != ErrBatchEmpty {
@@ -96,7 +103,7 @@ func TestBatchAggregatorAggregateBatchEmpty(t *testing.T) {
 }
 
 func TestBatchAggregatorVerifyBatch(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 
 	proofs := makeTestProofs(4)
 	for _, p := range proofs {
@@ -121,7 +128,7 @@ func TestBatchAggregatorVerifyBatch(t *testing.T) {
 }
 
 func TestBatchAggregatorVerifyBatchTampered(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 
 	proofs := makeTestProofs(3)
 	for _, p := range proofs {
@@ -143,7 +150,7 @@ func TestBatchAggregatorVerifyBatchTampered(t *testing.T) {
 }
 
 func TestBatchAggregatorVerifyBatchNil(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	_, err := ba.VerifyBatch(nil)
 	if err != ErrBatchEmpty {
@@ -152,7 +159,7 @@ func TestBatchAggregatorVerifyBatchNil(t *testing.T) {
 }
 
 func TestBatchAggregatorStats(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 
 	// Initial stats should be zero.
 	batched, verified, failed := ba.Stats()
@@ -196,8 +203,8 @@ func TestBatchAggregatorStats(t *testing.T) {
 }
 
 func TestBatchAggregatorDeterministicHash(t *testing.T) {
-	ba1 := NewBatchAggregator(DefaultAggregationConfig(), nil)
-	ba2 := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba1 := newTestBatchAggregator(DefaultAggregationConfig(), nil)
+	ba2 := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	proofs := makeTestProofs(4)
 	for _, p := range proofs {
@@ -214,7 +221,7 @@ func TestBatchAggregatorDeterministicHash(t *testing.T) {
 }
 
 func TestBatchAggregatorClearsPending(t *testing.T) {
-	ba := NewBatchAggregator(DefaultAggregationConfig(), nil)
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), nil)
 
 	proofs := makeTestProofs(3)
 	for _, p := range proofs {
@@ -233,7 +240,7 @@ func TestBatchAggregatorClearsPending(t *testing.T) {
 func TestBatchAggregatorAllProofTypesRoundTrip(t *testing.T) {
 	// Round-trip test: aggregate 5 proofs (one of each type + extra ZKSNARK),
 	// then verify the batch.
-	ba := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+	ba := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 
 	t.Run("aggregate all types", func(t *testing.T) {
 		proofTypes := []ProofType{ZKSNARK, ZKSTARK, IPA, KZG, ZKSNARK}
@@ -274,7 +281,7 @@ func TestBatchAggregatorAllProofTypesRoundTrip(t *testing.T) {
 	})
 
 	t.Run("tampered single proof in batch", func(t *testing.T) {
-		ba2 := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+		ba2 := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 		for i := 0; i < 5; i++ {
 			ba2.AddProof(ExecutionProof{
 				StateRoot: types.Hash{byte(i + 1)},
@@ -297,7 +304,7 @@ func TestBatchAggregatorAllProofTypesRoundTrip(t *testing.T) {
 	})
 
 	t.Run("empty batch fails", func(t *testing.T) {
-		ba3 := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+		ba3 := newTestBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
 		_, err := ba3.AggregateBatch()
 		if err != ErrBatchEmpty {
 			t.Errorf("expected ErrBatchEmpty, got %v", err)
@@ -330,5 +337,34 @@ func TestValidateAggregatedProof(t *testing.T) {
 	batch.AggregateHash = types.Hash{0x01}
 	if err := ValidateAggregatedProof(batch); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestBatchAggregatorRequiresProofValidation(t *testing.T) {
+	ba := NewBatchAggregator(DefaultAggregationConfig(), NewSimpleAggregator())
+	if err := ba.AddProof(ExecutionProof{ProofData: []byte("invalid")}); err != nil {
+		t.Fatal(err)
+	}
+	batch, err := ba.AggregateBatch()
+	if err != nil {
+		t.Fatal(err)
+	}
+	batch.Verified = true
+	ok, err := ba.VerifyBatch(batch)
+	if ok || err != ErrProofVerifierRequired || batch.Verified {
+		t.Fatalf("accepted unverified proof: %v, %v", ok, err)
+	}
+	ba.SetExecutionProofVerifier(func(ExecutionProof) (bool, error) { return false, nil })
+	ok, err = ba.VerifyBatch(batch)
+	if ok || err != nil || batch.Verified {
+		t.Fatalf("accepted rejected proof: %v, %v", ok, err)
+	}
+}
+
+func TestExecutionProofHashSeparatesFields(t *testing.T) {
+	a := ExecutionProof{ProofData: []byte("ab"), ProverID: "c"}
+	b := ExecutionProof{ProofData: []byte("a"), ProverID: "bc"}
+	if hashProof(&a) == hashProof(&b) {
+		t.Fatal("proof data and prover ID are ambiguously encoded")
 	}
 }

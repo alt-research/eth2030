@@ -1,10 +1,10 @@
 package proofs
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/ssz"
@@ -85,9 +85,15 @@ func (a *SimpleAggregator) Verify(proof *AggregatedProof) (bool, error) {
 // hashProof hashes an ExecutionProof into a 32-byte leaf.
 func hashProof(p *ExecutionProof) [32]byte {
 	h := sha256.New()
+	h.Write([]byte("eth2030-execution-proof-v2"))
 	h.Write(p.StateRoot[:])
 	h.Write(p.BlockHash[:])
+	var length [8]byte
+	binary.BigEndian.PutUint64(length[:], uint64(len(p.ProofData)))
+	h.Write(length[:])
 	h.Write(p.ProofData)
+	binary.BigEndian.PutUint64(length[:], uint64(len(p.ProverID)))
+	h.Write(length[:])
 	h.Write([]byte(p.ProverID))
 	var typeBuf [4]byte
 	binary.LittleEndian.PutUint32(typeBuf[:], uint32(p.Type))
@@ -97,51 +103,54 @@ func hashProof(p *ExecutionProof) [32]byte {
 	return result
 }
 
-// STARKAggregator aggregates proofs using STARK proofs.
-type STARKAggregator struct {
-	prover *STARKProver
+// STARKAggregateProvider proves and verifies the validity of the ordered
+// execution proofs, bound to the canonical aggregate root. Implementations
+// must verify the individual execution statements, not just their hashes.
+type STARKAggregateProvider interface {
+	Prove(proofs []ExecutionProof, root types.Hash) ([]byte, error)
+	Verify(proofs []ExecutionProof, root types.Hash, aggregateProof []byte) (bool, error)
 }
 
-// NewSTARKAggregator creates a new STARK-based proof aggregator.
-func NewSTARKAggregator() *STARKAggregator {
-	return &STARKAggregator{
-		prover: NewSTARKProver(),
-	}
+var ErrSTARKAggregateNoProvider = errors.New("proofs: STARK aggregation provider is not configured")
+
+// STARKAggregator requires an explicit provider. No local placeholder prover
+// is installed by default.
+type STARKAggregator struct{ provider STARKAggregateProvider }
+
+func NewSTARKAggregator() *STARKAggregator { return &STARKAggregator{} }
+
+// NewSTARKAggregatorWithProvider configures the provider for the concrete
+// aggregation statement and proof format selected by the caller.
+func NewSTARKAggregatorWithProvider(provider STARKAggregateProvider) *STARKAggregator {
+	return &STARKAggregator{provider: provider}
 }
 
-// Aggregate combines multiple execution proofs into a STARK-aggregated proof.
 func (sa *STARKAggregator) Aggregate(proofs []ExecutionProof) (*AggregatedProof, error) {
 	if len(proofs) == 0 {
 		return nil, ErrNoProofs
 	}
-
-	// Build execution trace from proof data.
-	trace := make([][]FieldElement, len(proofs))
-	for i, p := range proofs {
-		trace[i] = proofToTraceRow(p)
+	if sa == nil || sa.provider == nil {
+		return nil, ErrSTARKAggregateNoProvider
 	}
-
-	constraints := []STARKConstraint{
-		{Degree: 1, Coefficients: []FieldElement{NewFieldElement(1)}},
-	}
-
-	starkProof, err := sa.prover.GenerateSTARKProof(trace, constraints)
+	frozen := cloneExecutionProofs(proofs)
+	root := starkAggregateRoot(frozen)
+	artifact, err := sa.provider.Prove(cloneExecutionProofs(frozen), root)
 	if err != nil {
 		return nil, err
 	}
-
-	// Derive aggregate root from STARK proof commitment.
-	var aggregateRoot types.Hash
-	copy(aggregateRoot[:], starkProof.TraceCommitment[:])
-
-	return &AggregatedProof{
-		Proofs:        proofs,
-		AggregateRoot: aggregateRoot,
-		Valid:         true,
-	}, nil
+	if len(artifact) == 0 {
+		return nil, ErrProofInvalid
+	}
+	valid, err := sa.provider.Verify(cloneExecutionProofs(frozen), root, bytes.Clone(artifact))
+	if err != nil {
+		return nil, err
+	}
+	if !valid {
+		return nil, ErrProofInvalid
+	}
+	return &AggregatedProof{Proofs: frozen, AggregateRoot: root, AggregateProof: bytes.Clone(artifact), Valid: true}, nil
 }
 
-// Verify checks the validity of a STARK-aggregated proof.
 func (sa *STARKAggregator) Verify(proof *AggregatedProof) (bool, error) {
 	if proof == nil {
 		return false, ErrNilProof
@@ -149,36 +158,49 @@ func (sa *STARKAggregator) Verify(proof *AggregatedProof) (bool, error) {
 	if len(proof.Proofs) == 0 {
 		return false, ErrNoProofs
 	}
-
-	// Re-aggregate and compare roots.
-	trace := make([][]FieldElement, len(proof.Proofs))
-	for i, p := range proof.Proofs {
-		trace[i] = proofToTraceRow(p)
+	if sa == nil || sa.provider == nil {
+		return false, ErrSTARKAggregateNoProvider
 	}
-
-	constraints := []STARKConstraint{
-		{Degree: 1, Coefficients: []FieldElement{NewFieldElement(1)}},
+	if len(proof.AggregateProof) == 0 {
+		return false, ErrProofInvalid
 	}
-
-	starkProof, err := sa.prover.GenerateSTARKProof(trace, constraints)
-	if err != nil {
-		return false, err
+	frozen := cloneExecutionProofs(proof.Proofs)
+	root := starkAggregateRoot(frozen)
+	if root != proof.AggregateRoot {
+		return false, nil
 	}
-
-	var expectedRoot types.Hash
-	copy(expectedRoot[:], starkProof.TraceCommitment[:])
-
-	return expectedRoot == proof.AggregateRoot, nil
+	return sa.provider.Verify(frozen, root, bytes.Clone(proof.AggregateProof))
 }
 
-// proofToTraceRow converts an execution proof into a STARK trace row.
-func proofToTraceRow(p ExecutionProof) []FieldElement {
-	row := make([]FieldElement, 3)
-	// Column 0: hash of state root.
-	row[0] = FieldElement{Value: new(big.Int).SetBytes(p.StateRoot[:])}
-	// Column 1: hash of block hash.
-	row[1] = FieldElement{Value: new(big.Int).SetBytes(p.BlockHash[:])}
-	// Column 2: proof type.
-	row[2] = NewFieldElement(int64(p.Type))
-	return row
+func cloneExecutionProofs(proofs []ExecutionProof) []ExecutionProof {
+	out := make([]ExecutionProof, len(proofs))
+	for i, proof := range proofs {
+		out[i] = proof
+		out[i].ProofData = bytes.Clone(proof.ProofData)
+	}
+	return out
+}
+
+// starkAggregateRoot binds ordered fields with unambiguous lengths. This is a
+// local artifact identifier, not a claim that its inputs are valid proofs.
+func starkAggregateRoot(proofs []ExecutionProof) types.Hash {
+	h := sha256.New()
+	h.Write([]byte("eth2030-stark-aggregate-v1"))
+	var n [8]byte
+	binary.BigEndian.PutUint64(n[:], uint64(len(proofs)))
+	h.Write(n[:])
+	for _, proof := range proofs {
+		h.Write(proof.StateRoot[:])
+		h.Write(proof.BlockHash[:])
+		h.Write([]byte{byte(proof.Type)})
+		binary.BigEndian.PutUint64(n[:], uint64(len(proof.ProofData)))
+		h.Write(n[:])
+		h.Write(proof.ProofData)
+		binary.BigEndian.PutUint64(n[:], uint64(len(proof.ProverID)))
+		h.Write(n[:])
+		h.Write([]byte(proof.ProverID))
+	}
+	var root types.Hash
+	copy(root[:], h.Sum(nil))
+	return root
 }

@@ -29,7 +29,7 @@ func TestPQAttestationGossipVerifiesAfterDecoding(t *testing.T) {
 	if decoded.ValidatorIndex != 19 || !bytes.Equal(keys.PublicKey, decoded.PQPublicKey) {
 		t.Fatal("decoded validator or public key differs")
 	}
-	verifier := NewPQAttestationVerifier(nil)
+	verifier := NewPQAttestationVerifier(testPQAttestationConfig(*att))
 	if ok, err := verifier.VerifyAttestation(decoded); err != nil || !ok {
 		t.Fatalf("verify gossip attestation = %t, %v", ok, err)
 	}

@@ -3,6 +3,7 @@ package state
 import (
 	"bytes"
 	"math/big"
+	"slices"
 	"sort"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -588,33 +589,15 @@ func (s *MemoryStateDB) Copy() *MemoryStateDB {
 	}
 
 	for addr, obj := range s.stateObjects {
-		newObj := &stateObject{
-			account: types.Account{
-				Nonce:    obj.account.Nonce,
-				Balance:  new(big.Int).Set(obj.account.Balance),
-				Root:     obj.account.Root,
-				CodeHash: make([]byte, len(obj.account.CodeHash)),
-			},
-			code:             make([]byte, len(obj.code)),
-			dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
-			committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
-			selfDestructed:   obj.selfDestructed,
-		}
-		copy(newObj.account.CodeHash, obj.account.CodeHash)
-		copy(newObj.code, obj.code)
-		for k, v := range obj.dirtyStorage {
-			newObj.dirtyStorage[k] = v
-		}
-		for k, v := range obj.committedStorage {
-			newObj.committedStorage[k] = v
-		}
-		cp.stateObjects[addr] = newObj
+		cp.stateObjects[addr] = copyMemoryStateObject(obj)
 	}
 
 	for txHash, logs := range s.logs {
 		cpLogs := make([]*types.Log, len(logs))
 		for i, log := range logs {
 			cpLog := *log
+			cpLog.Topics = slices.Clone(log.Topics)
+			cpLog.Data = bytes.Clone(log.Data)
 			cpLogs[i] = &cpLog
 		}
 		cp.logs[txHash] = cpLogs
@@ -629,6 +612,33 @@ func (s *MemoryStateDB) Copy() *MemoryStateDB {
 	}
 
 	return cp
+}
+
+func copyMemoryStateObject(obj *stateObject) *stateObject {
+	if obj == nil {
+		return nil
+	}
+	newObj := &stateObject{
+		account: types.Account{
+			Nonce:    obj.account.Nonce,
+			Balance:  new(big.Int).Set(obj.account.Balance),
+			Root:     obj.account.Root,
+			CodeHash: make([]byte, len(obj.account.CodeHash)),
+		},
+		code:             make([]byte, len(obj.code)),
+		dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
+		committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
+		selfDestructed:   obj.selfDestructed,
+	}
+	copy(newObj.account.CodeHash, obj.account.CodeHash)
+	copy(newObj.code, obj.code)
+	for k, v := range obj.dirtyStorage {
+		newObj.dirtyStorage[k] = v
+	}
+	for k, v := range obj.committedStorage {
+		newObj.committedStorage[k] = v
+	}
+	return newObj
 }
 
 // Merge applies all state changes from src into this MemoryStateDB.

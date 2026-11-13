@@ -156,6 +156,10 @@ func (b *EngineBackend) forkchoiceUpdated(
 		return payload.ForkchoiceUpdatedResult{PayloadStatus: payloadStatus}, nil
 	}
 
+	if attrs.Timestamp <= headBlock.Time() {
+		return payload.ForkchoiceUpdatedResult{}, engine.ErrInvalidPayloadAttributes
+	}
+
 	// Step 7a: check if we can quickly obtain the parent state.
 	const stateThreshold = 32
 	if !bc.CanQuicklyGetState(headBlock, stateThreshold) {
@@ -193,6 +197,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Convert engine withdrawals to core types.
 	var withdrawals []*types.Withdrawal
 	for _, w := range attrs.Withdrawals {
+		if w == nil {
+			return payload.ForkchoiceUpdatedResult{}, engine.ErrInvalidPayloadAttributes
+		}
 		withdrawals = append(withdrawals, &types.Withdrawal{
 			Index:          w.Index,
 			ValidatorIndex: w.ValidatorIndex,
@@ -213,7 +220,10 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	// Generate payload ID.
-	payloadID := generatePayloadID(parentHeader.Hash(), buildAttrs)
+	payloadID, err := generatePayloadID(parentHeader.Hash(), buildAttrs, slot)
+	if err != nil {
+		return payload.ForkchoiceUpdatedResult{}, fmt.Errorf("derive payload ID: %w", err)
+	}
 
 	// Idempotency check.
 	b.mu.Lock()
@@ -265,9 +275,8 @@ func (b *EngineBackend) forkchoiceUpdated(
 		b.buildMu.Lock()
 		defer b.buildMu.Unlock()
 
-		if statedb != nil {
-			b.builder.SetState(statedb)
-		}
+		b.builder.SetState(statedb)
+		defer b.builder.SetState(nil)
 
 		slog.Debug("engine_forkchoiceUpdated: calling BuildBlock",
 			"parentNum", parentHeader.Number,

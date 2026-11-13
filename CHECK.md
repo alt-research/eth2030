@@ -58,6 +58,15 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)
 - [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
 
+#### Track 4 bug review
+
+- [x] Verify overlay state copying, canonical lookup, replay retention, and database error handling.
+- [x] Verify Engine payload identity and forkchoice behavior with the binary overlay.
+- [x] Verify both binary trie proof APIs bind the complete key and leaf.
+- [x] Verify PQ attestation authorization and aggregation inputs.
+- [x] Enforce execution proof batch ownership, size limits, and verification deadlines.
+- [x] Run regressions, affected race tests, and the local build.
+
 ### Track 5 — eiptest framework (incremental)
 
 - [ ] T5.1: opportunistic migration of `pkg/`-root E2E scenarios as files are touched.

@@ -1,8 +1,11 @@
 package proofs
 
 import (
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -64,6 +67,7 @@ type BatchAggregator struct {
 	inner       ProofAggregator
 	verifyProof func(ExecutionProof) (bool, error)
 	pending     []ExecutionProof
+	active      chan struct{}
 	batched     atomic.Uint64
 	verified    atomic.Uint64
 	failed      atomic.Uint64
@@ -75,10 +79,22 @@ func NewBatchAggregator(config AggregationConfig, inner ProofAggregator) *BatchA
 	if inner == nil {
 		inner = NewSimpleAggregator()
 	}
+	defaults := DefaultAggregationConfig()
+	if config.MaxProofs <= 0 {
+		config.MaxProofs = defaults.MaxProofs
+	}
+	if config.VerificationTimeout <= 0 {
+		config.VerificationTimeout = defaults.VerificationTimeout
+	}
+	workers := 1
+	if config.ParallelVerify {
+		workers = min(config.MaxProofs, runtime.GOMAXPROCS(0))
+	}
 	return &BatchAggregator{
 		config:  config,
 		inner:   inner,
 		pending: make([]ExecutionProof, 0, config.MaxProofs),
+		active:  make(chan struct{}, workers),
 	}
 }
 
@@ -99,6 +115,7 @@ func (ba *BatchAggregator) AddProof(p ExecutionProof) error {
 		return ErrBatchFull
 	}
 
+	p.ProofData = bytes.Clone(p.ProofData)
 	ba.pending = append(ba.pending, p)
 	return nil
 }
@@ -136,12 +153,17 @@ func (ba *BatchAggregator) AggregateBatch() (*ProofBatch, error) {
 // All proofs must pass individual verification for the batch to be valid.
 // If ParallelVerify is enabled, proofs are verified concurrently.
 func (ba *BatchAggregator) VerifyBatch(batch *ProofBatch) (bool, error) {
-	if batch == nil || len(batch.Proofs) == 0 {
+	if batch == nil {
 		return false, ErrBatchEmpty
 	}
-
 	batch.Verified = false
 	batch.VerifiedAt = time.Time{}
+	if len(batch.Proofs) == 0 {
+		return false, ErrBatchEmpty
+	}
+	if len(batch.Proofs) > ba.config.MaxProofs {
+		return false, ErrBatchFull
+	}
 
 	// Recompute aggregate hash to detect tampering.
 	var hashInput []byte
@@ -162,34 +184,55 @@ func (ba *BatchAggregator) VerifyBatch(batch *ProofBatch) (bool, error) {
 		ba.failed.Add(uint64(len(batch.Proofs)))
 		return false, ErrProofVerifierRequired
 	}
-	for _, proof := range batch.Proofs {
-		proof.ProofData = append([]byte(nil), proof.ProofData...)
-		valid, err := verify(proof)
+	ctx, cancel := context.WithTimeout(context.Background(), ba.config.VerificationTimeout)
+	defer cancel()
+	proofs := cloneExecutionProofs(batch.Proofs)
+	jobs := make(chan ExecutionProof, len(proofs))
+	for _, proof := range proofs {
+		jobs <- proof
+	}
+	close(jobs)
+	results := make(chan proofCheck, len(proofs))
+	for range min(cap(ba.active), len(proofs)) {
+		go func() {
+			for proof := range jobs {
+				results <- ba.checkProof(ctx, func() (bool, error) {
+					proof.ProofData = bytes.Clone(proof.ProofData)
+					return verify(proof)
+				})
+				if ctx.Err() != nil {
+					return
+				}
+			}
+		}()
+	}
+
+	for range proofs {
+		select {
+		case result := <-results:
+			if !result.valid || result.err != nil {
+				ba.failed.Add(uint64(len(proofs)))
+				return false, result.err
+			}
+		case <-ctx.Done():
+			ba.failed.Add(uint64(len(proofs)))
+			return false, ErrVerifyTimeout
+		}
+	}
+
+	result := ba.checkProof(ctx, func() (bool, error) {
+		aggregate, err := ba.inner.Aggregate(proofs)
 		if err != nil {
-			ba.failed.Add(uint64(len(batch.Proofs)))
 			return false, err
 		}
-		if !valid {
-			ba.failed.Add(uint64(len(batch.Proofs)))
-			return false, nil
+		if ctx.Err() != nil {
+			return false, ErrVerifyTimeout
 		}
-	}
-
-	// Verify the aggregate commitment or provider proof.
-	agg, err := ba.inner.Aggregate(batch.Proofs)
-	if err != nil {
-		ba.failed.Add(uint64(len(batch.Proofs)))
-		return false, err
-	}
-
-	valid, err := ba.inner.Verify(agg)
-	if err != nil {
-		ba.failed.Add(uint64(len(batch.Proofs)))
-		return false, err
-	}
-	if !valid {
-		ba.failed.Add(uint64(len(batch.Proofs)))
-		return false, nil
+		return ba.inner.Verify(aggregate)
+	})
+	if !result.valid || result.err != nil {
+		ba.failed.Add(uint64(len(proofs)))
+		return false, result.err
 	}
 
 	batch.Verified = true
@@ -197,6 +240,38 @@ func (ba *BatchAggregator) VerifyBatch(batch *ProofBatch) (bool, error) {
 	ba.verified.Add(uint64(len(batch.Proofs)))
 
 	return true, nil
+}
+
+type proofCheck struct {
+	valid bool
+	err   error
+}
+
+func (ba *BatchAggregator) checkProof(ctx context.Context, check func() (bool, error)) proofCheck {
+	select {
+	case ba.active <- struct{}{}:
+	case <-ctx.Done():
+		return proofCheck{err: ErrVerifyTimeout}
+	}
+	if ctx.Err() != nil {
+		<-ba.active
+		return proofCheck{err: ErrVerifyTimeout}
+	}
+	done := make(chan proofCheck, 1)
+	go func() {
+		// A provider with no context keeps its slot until it returns.
+		defer func() { <-ba.active }()
+		valid, err := check()
+		done <- proofCheck{valid, err}
+	}()
+	select {
+	case result := <-done:
+		if deadline, _ := ctx.Deadline(); ctx.Err() == nil && time.Now().Before(deadline) {
+			return result
+		}
+	case <-ctx.Done():
+	}
+	return proofCheck{err: ErrVerifyTimeout}
 }
 
 // ValidateAggregatedProof checks that a ProofBatch is well-formed:

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/subtle"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,7 +14,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"encoding/hex"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine/backendapi"
@@ -33,7 +33,7 @@ type EngineAPI struct {
 	blobValidator   *blobval.BlobValidator
 	// bidObserver, when set, receives every accepted builder bid (EIP-7732
 	// node-side auction wiring).
-	bidObserver func(*SignedExecutionPayloadBid) error
+	bidObserver     func(*SignedExecutionPayloadBid) error
 	server          *http.Server
 	listener        net.Listener
 	ethHandler      http.Handler // optional: handles non-engine_ methods (eth_, web3_, net_)
@@ -131,25 +131,11 @@ func (api *EngineAPI) ForkchoiceUpdatedV3(
 	payloadAttributes *PayloadAttributesV3,
 ) (ForkchoiceUpdatedResult, error) {
 	if payloadAttributes != nil {
-		// Validate timestamp is non-zero.
-		if payloadAttributes.Timestamp == 0 {
-			return ForkchoiceUpdatedResult{}, ErrInvalidPayloadAttributes
-		}
-		// Validate parentBeaconBlockRoot is provided (V3 requires it).
-		if payloadAttributes.ParentBeaconBlockRoot == (types.Hash{}) {
-			return ForkchoiceUpdatedResult{}, ErrInvalidPayloadAttributes
-		}
-		// Validate timestamp progression: new payload must be strictly after the
-		// FCU head block. Use the head block's own timestamp (not the canonical
-		// chain head) so that fork-choice updates to non-canonical heads are
-		// validated correctly during reorgs.
 		headTimestamp := api.backend.GetBlockTimestamp(state.HeadBlockHash)
-		if headTimestamp == 0 {
-			// FCU head not yet known; fall back to global canonical head.
-			headTimestamp = api.backend.GetHeadTimestamp()
-		}
-		if headTimestamp > 0 && payloadAttributes.Timestamp <= headTimestamp {
-			return ForkchoiceUpdatedResult{}, ErrInvalidPayloadAttributes
+		if payloadAttributes.Timestamp == 0 || payloadAttributes.ParentBeaconBlockRoot == (types.Hash{}) ||
+			payloadAttributes.Timestamp <= headTimestamp {
+			result, err := api.backend.ForkchoiceUpdated(state, nil)
+			return forkchoiceAttributeError(result, err, ErrInvalidPayloadAttributes)
 		}
 	}
 	return api.backend.ForkchoiceUpdated(state, payloadAttributes)
@@ -362,17 +348,19 @@ func (api *EngineAPI) ForkchoiceUpdatedV4(
 	state ForkchoiceStateV1,
 	payloadAttributes *PayloadAttributesV4,
 ) (ForkchoiceUpdatedResult, error) {
-	// If payload attributes are provided, validate the timestamp.
-	if payloadAttributes != nil {
-		if !api.backend.IsAmsterdam(payloadAttributes.Timestamp) {
-			// Per spec: forkchoice state update must NOT be rolled back,
-			// but we still return the error. The backend handles the state update
-			// before attribute validation in the full implementation.
-			// For now, delegate entirely to the backend which handles ordering.
-			return ForkchoiceUpdatedResult{}, ErrUnsupportedFork
-		}
+	if payloadAttributes != nil && !api.backend.IsAmsterdam(payloadAttributes.Timestamp) {
+		result, err := api.backend.ForkchoiceUpdatedV4(state, nil)
+		return forkchoiceAttributeError(result, err, ErrUnsupportedFork)
 	}
 	return api.backend.ForkchoiceUpdatedV4(state, payloadAttributes)
+}
+
+// Invalid attributes may prevent building, after the valid forkchoice is applied.
+func forkchoiceAttributeError(result ForkchoiceUpdatedResult, err, attributeErr error) (ForkchoiceUpdatedResult, error) {
+	if err != nil || result.PayloadStatus.Status != StatusValid {
+		return result, err
+	}
+	return ForkchoiceUpdatedResult{}, attributeErr
 }
 
 // ExchangeCapabilities returns the list of Engine API methods this node supports.
@@ -655,7 +643,6 @@ func validateBlobHashes(payload *ExecutionPayloadV3, expected []types.Hash) erro
 	}
 	return nil
 }
-
 
 // decodeHexParam decodes a 0x-hex JSON string parameter into raw bytes.
 func decodeHexParam(raw json.RawMessage) ([]byte, error) {

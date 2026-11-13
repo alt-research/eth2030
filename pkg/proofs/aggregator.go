@@ -54,7 +54,7 @@ func (a *SimpleAggregator) Aggregate(proofs []ExecutionProof) (*AggregatedProof,
 	copy(aggregateRoot[:], root[:])
 
 	return &AggregatedProof{
-		Proofs:        proofs,
+		Proofs:        cloneExecutionProofs(proofs),
 		AggregateRoot: aggregateRoot,
 		Valid:         true,
 	}, nil

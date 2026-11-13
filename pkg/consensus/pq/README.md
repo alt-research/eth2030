@@ -30,7 +30,7 @@ config fields without a circular import.
 
 | Name | Description |
 |------|-------------|
-| `PQAttestationConfig` | `UsePQSignatures`, `FallbackToClassic`, `MinPQValidators` |
+| `PQAttestationConfig` | `UsePQSignatures`, `FallbackToClassic`, `PQSigner`, `ClassicSigner`, `MinPQValidators` |
 | `PQAttestationVerifier` | Verifies PQ+classic signatures; tracks verified/failed counts |
 | `PQAttestation` | Attestation with Dilithium PQ sig + optional classic ECDSA sig |
 | `PQChainConfig` | `SecurityLevel`, `PQThresholdPercent`, `TransitionEpoch`, `SlotsPerEpoch` |
@@ -59,6 +59,7 @@ config fields without a circular import.
 import "github.com/eth2030/eth2030/consensus/pq"
 
 cfg := pq.DefaultPQAttestationConfig()
+cfg.PQSigner = lookupCommitteeKey
 verifier := pq.NewPQAttestationVerifier(cfg)
 
 att, _ := pq.CreatePQAttestation(slot, committeeIdx, blockRoot,

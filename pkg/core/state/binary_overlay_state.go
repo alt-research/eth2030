@@ -1,9 +1,12 @@
 package state
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"maps"
 	"math/big"
+	"slices"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/trie/bintrie"
@@ -52,11 +55,34 @@ func NewBinaryOverlayState(source *MemoryStateDB) (*BinaryOverlayState, error) {
 }
 
 func (s *BinaryOverlayState) Dup() StateDB {
+	memory := s.MemoryStateDB.Copy()
+	memory.txHash, memory.txIndex = s.txHash, s.txIndex
+	memory.journal.entries = slices.Clone(s.journal.entries)
+	memory.journal.snapshots = maps.Clone(s.journal.snapshots)
+	memory.journal.nextID = s.journal.nextID
+	for i, entry := range memory.journal.entries {
+		switch change := entry.(type) {
+		case createAccountChange:
+			change.prev = copyMemoryStateObject(change.prev)
+			memory.journal.entries[i] = change
+		case balanceChange:
+			change.prev = new(big.Int).Set(change.prev)
+			memory.journal.entries[i] = change
+		case codeChange:
+			change.prevCode = bytes.Clone(change.prevCode)
+			change.prevHash = bytes.Clone(change.prevHash)
+			memory.journal.entries[i] = change
+		case selfDestructChange:
+			change.prevBalance = new(big.Int).Set(change.prevBalance)
+			memory.journal.entries[i] = change
+		}
+	}
 	return &BinaryOverlayState{
-		MemoryStateDB: s.MemoryStateDB.Copy(),
+		MemoryStateDB: memory,
 		tree:          s.tree.Copy(),
 		conversion:    s.conversion.Copy(),
 		converted:     s.converted,
+		originalSlots: maps.Clone(s.originalSlots),
 	}
 }
 
@@ -74,6 +100,18 @@ func (s *BinaryOverlayState) GetCommittedState(address types.Address, key types.
 		return value
 	}
 	return s.GetState(address, key)
+}
+
+func (s *BinaryOverlayState) CreateAccount(address types.Address) {
+	if previous := s.getStateObject(address); s.originalSlots != nil && previous != nil {
+		for key, value := range mergeStorage(previous) {
+			slot := binaryOverlaySlot{address, key}
+			if _, exists := s.originalSlots[slot]; !exists {
+				s.originalSlots[slot] = value
+			}
+		}
+	}
+	s.MemoryStateDB.CreateAccount(address)
 }
 
 func (s *BinaryOverlayState) SetState(address types.Address, key, value types.Hash) {

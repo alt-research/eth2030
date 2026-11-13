@@ -132,3 +132,64 @@ func TestBinaryOverlayStorageOriginalIsTransactionScoped(t *testing.T) {
 		t.Fatal("reverted transaction changed the committed slot")
 	}
 }
+
+func TestBinaryOverlayDupPreservesPendingWritesAndSnapshots(t *testing.T) {
+	s, err := NewBinaryOverlayState(NewMemoryStateDB())
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr, key := types.Address{19: 1}, types.Hash{31: 9}
+	first, second := types.Hash{31: 1}, types.Hash{31: 2}
+	s.SetTxContext(types.Hash{31: 7}, 0)
+	s.SetState(addr, key, first)
+	s.AddLog(&types.Log{Address: addr, Topics: []types.Hash{key}, Data: []byte{1}})
+	snap := s.Snapshot()
+	s.CreateAccount(addr)
+	s.SetState(addr, key, second)
+
+	branch := s.Dup().(*BinaryOverlayState)
+	if branch.GetCommittedState(addr, key) != (types.Hash{}) {
+		t.Fatal("duplicate lost the transaction's original storage value")
+	}
+	branch.GetLogs(types.Hash{31: 7})[0].Data[0] = 9
+	if s.GetLogs(types.Hash{31: 7})[0].Data[0] != 1 {
+		t.Fatal("duplicate shares mutable logs")
+	}
+	branch.RevertToSnapshot(snap)
+	if branch.GetState(addr, key) != first || s.GetState(addr, key) != second {
+		t.Fatal("duplicated snapshot failed to restore only its own state")
+	}
+	want := bintrie.NewWithHashFunc(bintrie.HashFunctionBlake3)
+	account := &types.Account{Balance: new(big.Int), CodeHash: types.EmptyCodeHash.Bytes()}
+	if err := want.UpdateAccount(addr, account, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := want.UpdateStorage(addr, key[:], first[:]); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := branch.Commit(); err != nil || got != want.Hash() {
+		t.Fatalf("duplicate root = %s, want %s, err %v", got, want.Hash(), err)
+	}
+	if got, err := s.Commit(); err != nil || got == branch.GetRoot() {
+		t.Fatalf("source root = %s, err %v", got, err)
+	}
+}
+
+func TestBinaryOverlayRevertedRecreationPreservesOriginalSlot(t *testing.T) {
+	mem := NewMemoryStateDB()
+	addr, slot := types.Address{19: 1}, types.Hash{31: 2}
+	old, replacement := types.Hash{31: 3}, types.Hash{31: 4}
+	mem.SetState(addr, slot, old)
+	s, err := NewBinaryOverlayState(mem)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.SetTxContext(types.Hash{31: 5}, 0)
+	snap := s.Snapshot()
+	s.CreateAccount(addr)
+	s.SetState(addr, slot, replacement)
+	s.RevertToSnapshot(snap)
+	if got := s.GetCommittedState(addr, slot); got != old {
+		t.Fatalf("original slot after reverting account recreation = %s, want %s", got, old)
+	}
+}

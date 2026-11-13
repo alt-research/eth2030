@@ -78,6 +78,7 @@ func TestProveMultipleEntries(t *testing.T) {
 		types.HexToHash("0000000000000000000000000000000000000000000000000000000000000001"),
 		types.HexToHash("8000000000000000000000000000000000000000000000000000000000000001"),
 		types.HexToHash("0100000000000000000000000000000000000000000000000000000000000001"),
+		types.HexToHash("0000000000000000000000000000000000000000000000000000000000000002"),
 	}
 	val := types.HexToHash("deadbeef00000000000000000000000000000000000000000000000000000000")
 
@@ -103,10 +104,7 @@ func TestProveMultipleEntries(t *testing.T) {
 
 		// Verify the proof against the root
 		if !VerifyProof(root, proof) {
-			// This is expected for partial proofs -- the full stem
-			// sibling collection is a simplified stub.
-			// Just ensure no panics occur.
-			t.Logf("Note: VerifyProof for %x returned false (expected for simplified proof)", k)
+			t.Fatalf("VerifyProof rejected key %x from the trie", k)
 		}
 	}
 }
@@ -148,5 +146,26 @@ func TestComputeStemHash(t *testing.T) {
 	hash4 := computeStemHash(stem, 0, nil)
 	if hash1 == hash4 {
 		t.Fatal("nil value should produce different hash")
+	}
+}
+
+func TestVerifyProofBindsKeyAndBoundsPath(t *testing.T) {
+	tree := New()
+	key, value := types.Hash{31: 1}, types.Hash{31: 2}
+	if err := tree.Put(key[:], value[:]); err != nil {
+		t.Fatal(err)
+	}
+	proof, err := tree.Prove(key[:])
+	if err != nil || !VerifyProof(tree.Hash(), proof) {
+		t.Fatalf("valid proof: %v", err)
+	}
+	proof.Key[31]++
+	if VerifyProof(tree.Hash(), proof) {
+		t.Fatal("proof verified for a different key suffix")
+	}
+	proof.Key[31]--
+	proof.Siblings = make([]types.Hash, StemSize*8+1)
+	if VerifyProof(tree.Hash(), proof) {
+		t.Fatal("oversized path verified")
 	}
 }

@@ -165,6 +165,9 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		return nil, ErrNoGenesis
 	}
 	overlayConfigured := config != nil && config.BinaryOverlayTime != nil
+	if overlayConfigured && db == nil {
+		return nil, errors.New("binary overlay requires a block database")
+	}
 	if overlayConfigured && *config.BinaryOverlayTime <= genesis.Time() {
 		return nil, errors.New("binary overlay activation must follow genesis")
 	}
@@ -258,12 +261,26 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 
 	// Check if chain already exists in rawdb (e.g. after restart).
 	existing, err := rawdb.ReadCanonicalHash(db, 0)
+	if overlayConfigured {
+		if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
+			return nil, fmt.Errorf("read binary overlay genesis: %w", err)
+		}
+		if err == nil && existing != hash {
+			return nil, fmt.Errorf("binary overlay genesis %s does not match database genesis %s: %w", hash, existing, ErrInvalidChain)
+		}
+	}
 	if err != nil || existing != hash {
 		// Fresh start: persist genesis and set head pointers.
-		bc.writeBlock(genesis)
-		rawdb.WriteCanonicalHash(db, genesis.NumberU64(), hash)
-		rawdb.WriteHeadBlockHash(db, hash)
-		rawdb.WriteHeadHeaderHash(db, hash)
+		if overlayConfigured {
+			if err := bc.persistOverlayBlock(genesis, nil, true); err != nil {
+				return nil, fmt.Errorf("persist binary overlay genesis: %w", err)
+			}
+		} else {
+			bc.writeBlock(genesis)
+			rawdb.WriteCanonicalHash(db, genesis.NumberU64(), hash)
+			rawdb.WriteHeadBlockHash(db, hash)
+			rawdb.WriteHeadHeaderHash(db, hash)
+		}
 	}
 
 	if overlayConfigured && err == nil && existing == hash {
@@ -751,8 +768,12 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	// insertMu guarantees only one goroutine is here at a time, so headNum
 	// captured in Phase 1 is still valid for the canonical check below.
 	isCanonical := num > headNum
-	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+	overlayConfigured := bc.config != nil && bc.config.BinaryOverlayTime != nil
+	if overlayConfigured {
 		isCanonical = header.ParentHash == headHash
+		if err := bc.persistOverlayBlock(blk, receipts, isCanonical); err != nil {
+			return fmt.Errorf("persist binary overlay block %d: %w", num, err)
+		}
 	}
 	if isCanonical {
 		// Commit state to backing store: flushes dirty accounts/storage to DB
@@ -777,12 +798,14 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 		bc.memSC.protect(hash)
 
 		// Persist block, receipts, and chain indices to rawdb.
-		bc.writeBlock(blk)
-		bc.writeReceipts(num, hash, receipts)
-		bc.writeTxLookups(txs, num)
-		rawdb.WriteCanonicalHash(bc.db, num, hash)
-		rawdb.WriteHeadBlockHash(bc.db, hash)
-		rawdb.WriteHeadHeaderHash(bc.db, hash)
+		if !overlayConfigured {
+			bc.writeBlock(blk)
+			bc.writeReceipts(num, hash, receipts)
+			bc.writeTxLookups(txs, num)
+			rawdb.WriteCanonicalHash(bc.db, num, hash)
+			rawdb.WriteHeadBlockHash(bc.db, hash)
+			rawdb.WriteHeadHeaderHash(bc.db, hash)
+		}
 	} else {
 		// Side block: cache state and persist block body only; no DB commit.
 		// Populate both sc and memSC so that if this block later becomes
@@ -791,7 +814,9 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 		// is small enough for Dup() to be fast in typical reorg scenarios.
 		bc.sc.put(hash, num, statedb)
 		bc.memSC.put(hash, num, statedb)
-		bc.writeBlock(blk)
+		if !overlayConfigured {
+			bc.writeBlock(blk)
+		}
 	}
 
 	// Cache receipts under rcMu (independent of bc.mu; fast operation).
@@ -821,12 +846,14 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	bc.blockCache[hash] = blk
 	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
 
-	// Build tx lookup index.
-	for i, tx := range txs {
-		bc.txLookup[tx.Hash()] = TxLookupEntry{
-			BlockHash:   hash,
-			BlockNumber: num,
-			TxIndex:     uint64(i),
+	// The overlay's transaction index always points to the canonical chain.
+	if isCanonical || !overlayConfigured {
+		for i, tx := range txs {
+			bc.txLookup[tx.Hash()] = TxLookupEntry{
+				BlockHash:   hash,
+				BlockNumber: num,
+				TxIndex:     uint64(i),
+			}
 		}
 	}
 
@@ -1407,6 +1434,56 @@ func (bc *Blockchain) writeBlock(blk *types.Block) {
 	rawdb.WriteBody(bc.db, num, hash, bodyData)
 }
 
+// persistOverlayBlock keeps a block replayable before exposing its head or caches.
+func (bc *Blockchain) persistOverlayBlock(blk *types.Block, receipts []*types.Receipt, canonical bool) error {
+	header, err := blk.Header().EncodeRLP()
+	if err != nil {
+		return err
+	}
+	body, err := encodeBlockBody(blk.Body())
+	if err != nil {
+		return err
+	}
+	batch := bc.db.NewBatch()
+	num, hash := blk.NumberU64(), blk.Hash()
+	if err := rawdb.WriteHeader(batch, num, hash, header); err != nil {
+		return err
+	}
+	if err := rawdb.WriteBody(batch, num, hash, body); err != nil {
+		return err
+	}
+	if len(receipts) > 0 {
+		var encoded []byte
+		for _, receipt := range receipts {
+			data, err := receipt.EncodeRLP()
+			if err != nil {
+				return err
+			}
+			encoded = append(encoded, data...)
+		}
+		if err := rawdb.WriteReceipts(batch, num, hash, encoded); err != nil {
+			return err
+		}
+	}
+	if canonical {
+		for _, tx := range blk.Transactions() {
+			if err := rawdb.WriteTxLookup(batch, tx.Hash(), num); err != nil {
+				return err
+			}
+		}
+		if err := rawdb.WriteCanonicalHash(batch, num, hash); err != nil {
+			return err
+		}
+		if err := rawdb.WriteHeadBlockHash(batch, hash); err != nil {
+			return err
+		}
+		if err := rawdb.WriteHeadHeaderHash(batch, hash); err != nil {
+			return err
+		}
+	}
+	return batch.Write()
+}
+
 // readBlock retrieves a block from rawdb by looking up the block number
 // from the header hash, then reading and decoding header and body.
 // If the header data has been migrated to AncientStore, it falls back there.
@@ -1437,6 +1514,9 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 	// Read body.
 	bodyData, err := rawdb.ReadBody(bc.db, num, hash)
 	if err != nil || len(bodyData) == 0 {
+		if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+			return nil
+		}
 		// Body may have been migrated to AncientStore; try there.
 		if bc.ancientStore != nil {
 			bodyData, err = bc.ancientStore.ReadBody(num)
@@ -1451,6 +1531,9 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 	}
 	body, err := decodeBlockBody(bodyData)
 	if err != nil {
+		if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+			return nil
+		}
 		// If body decode fails, return header-only block.
 		return types.NewBlock(header, nil)
 	}
@@ -1682,7 +1765,7 @@ func (bc *Blockchain) Reorg(newHead *types.Block) error {
 		return bc.reorgOverlay(newHead)
 	}
 	bc.mu.Lock()
-	chain, baseState, err := bc.reorg(newHead, true)
+	chain, baseState, err := bc.reorg(newHead)
 	bc.mu.Unlock()
 	if err != nil {
 		return err
@@ -1742,6 +1825,9 @@ func (bc *Blockchain) Reorg(newHead *types.Block) error {
 
 // reorgOverlay resolves the previously imported state before publishing the new head.
 func (bc *Blockchain) reorgOverlay(newHead *types.Block) error {
+	if newHead == nil {
+		return ErrBlockNotFound
+	}
 	stored := bc.GetBlock(newHead.Hash())
 	if stored == nil {
 		return ErrBlockNotFound
@@ -1755,19 +1841,105 @@ func (bc *Blockchain) reorgOverlay(newHead *types.Block) error {
 	}
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
-	if _, _, err := bc.reorg(stored, false); err != nil {
+	if err := bc.publishOverlayHead(stored); err != nil {
 		return err
 	}
 	bc.sc.put(stored.Hash(), stored.NumberU64(), statedb)
 	bc.memSC.put(stored.Hash(), stored.NumberU64(), statedb)
+	bc.sc.protect(stored.Hash())
+	bc.memSC.protect(stored.Hash())
 	bc.currentState = statedb
+	return nil
+}
+
+// publishOverlayHead updates only the changed segment. The caller holds bc.mu.
+func (bc *Blockchain) publishOverlayHead(head *types.Block) error {
+	var incoming, outgoing []*types.Block
+	cursor := head
+	for bc.canonCache[cursor.NumberU64()] != cursor.Hash() {
+		incoming = append(incoming, cursor)
+		if cursor.NumberU64() == 0 {
+			return ErrBlockNotFound
+		}
+		parent := bc.blockCache[cursor.ParentHash()]
+		if parent == nil {
+			parent = bc.readBlock(cursor.ParentHash())
+		}
+		if parent == nil || parent.Hash() != cursor.ParentHash() || parent.NumberU64() != cursor.NumberU64()-1 {
+			return ErrBlockNotFound
+		}
+		cursor = parent
+	}
+
+	batch := bc.db.NewBatch()
+	for n := bc.currentBlock.NumberU64(); n > cursor.NumberU64(); n-- {
+		hash := bc.canonCache[n]
+		old := bc.blockCache[hash]
+		if old == nil {
+			old = bc.readBlock(hash)
+		}
+		if old == nil {
+			return ErrBlockNotFound
+		}
+		outgoing = append(outgoing, old)
+		if err := rawdb.DeleteCanonicalHash(batch, n); err != nil {
+			return err
+		}
+		for _, tx := range old.Transactions() {
+			if err := rawdb.DeleteTxLookup(batch, tx.Hash()); err != nil {
+				return err
+			}
+		}
+	}
+	for i := len(incoming) - 1; i >= 0; i-- {
+		blk := incoming[i]
+		if err := rawdb.WriteCanonicalHash(batch, blk.NumberU64(), blk.Hash()); err != nil {
+			return err
+		}
+		for _, tx := range blk.Transactions() {
+			if err := rawdb.WriteTxLookup(batch, tx.Hash(), blk.NumberU64()); err != nil {
+				return err
+			}
+		}
+	}
+	if err := rawdb.WriteHeadBlockHash(batch, head.Hash()); err != nil {
+		return err
+	}
+	if err := rawdb.WriteHeadHeaderHash(batch, head.Hash()); err != nil {
+		return err
+	}
+	if err := batch.Write(); err != nil {
+		return err
+	}
+
+	bc.hc.mu.Lock()
+	defer bc.hc.mu.Unlock()
+	for _, blk := range outgoing {
+		delete(bc.canonCache, blk.NumberU64())
+		delete(bc.hc.headers, blk.NumberU64())
+		delete(bc.hc.headersByHash, blk.Hash())
+		for _, tx := range blk.Transactions() {
+			delete(bc.txLookup, tx.Hash())
+		}
+	}
+	for i := len(incoming) - 1; i >= 0; i-- {
+		blk := incoming[i]
+		bc.canonCache[blk.NumberU64()] = blk.Hash()
+		header := blk.Header()
+		bc.hc.headers[blk.NumberU64()] = header
+		bc.hc.headersByHash[blk.Hash()] = header
+	}
+	bc.currentBlock = head
+	bc.hc.currentHeader = head.Header()
+	metrics.ReorgsDetected.Inc()
+	metrics.ChainHeight.Set(int64(head.NumberU64()))
 	return nil
 }
 
 // reorg performs the canonical-chain bookkeeping for a reorg while bc.mu is
 // held. It returns the ancestor block chain and base state needed for
 // re-execution so that the caller can run the expensive part outside the lock.
-func (bc *Blockchain) reorg(newHead *types.Block, needsReplay bool) ([]*types.Block, state.StateDB, error) {
+func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB, error) {
 	prevHead := bc.currentBlock
 	metrics.ReorgsDetected.Inc()
 	blockchainLog.Info("block_reorganized",
@@ -1892,11 +2064,8 @@ func (bc *Blockchain) reorg(newHead *types.Block, needsReplay bool) ([]*types.Bl
 	// collectAncestorsLocked checks memSC first; if the state for newHead was
 	// cached during insertBlock, chain is nil and no re-execution is needed.
 	// blockCache access is safe here because bc.mu is still held.
-	if needsReplay {
-		chain, baseState := bc.collectAncestorsLocked(newHead)
-		return chain, baseState, nil
-	}
-	return nil, nil, nil
+	chain, baseState := bc.collectAncestorsLocked(newHead)
+	return chain, baseState, nil
 }
 
 // ChainLength returns the length of the canonical chain (genesis = 1).
@@ -2040,6 +2209,10 @@ func (bc *Blockchain) PruneHistory(retention uint64) (uint64, error) {
 	defer bc.mu.Unlock()
 
 	if bc.currentBlock == nil {
+		return 0, nil
+	}
+	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+		// This profile replays from genesis on startup and needs every body.
 		return 0, nil
 	}
 	head := bc.currentBlock.NumberU64()

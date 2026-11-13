@@ -368,3 +368,89 @@ func TestExecutionProofHashSeparatesFields(t *testing.T) {
 		t.Fatal("proof data and prover ID are ambiguously encoded")
 	}
 }
+
+func TestBatchAggregatorOwnsProofBytesAndClearsFailedStatus(t *testing.T) {
+	proof := makeTestProofs(1)[0]
+	originalByte := proof.ProofData[0]
+	cfg := DefaultAggregationConfig()
+	cfg.MaxProofs = 1
+	batchAggregator := NewBatchAggregator(cfg, nil)
+	batchAggregator.SetExecutionProofVerifier(func(candidate ExecutionProof) (bool, error) {
+		return candidate.ProofData[0] == originalByte, nil
+	})
+	if err := batchAggregator.AddProof(proof); err != nil {
+		t.Fatal(err)
+	}
+	proof.ProofData[0] ^= 1
+	batch, err := batchAggregator.AggregateBatch()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := batchAggregator.VerifyBatch(batch); !ok || err != nil || batch.VerifiedAt.IsZero() {
+		t.Fatalf("original submitted proof was lost: %v, %v", ok, err)
+	}
+	batch.Proofs = append(batch.Proofs, proof)
+	if ok, err := batchAggregator.VerifyBatch(batch); ok || err != ErrBatchFull || batch.Verified || !batch.VerifiedAt.IsZero() {
+		t.Fatalf("oversized batch kept validity or returned the wrong error: %v, %v", ok, err)
+	}
+	batch.Proofs = nil
+	batch.Verified = true
+	batch.VerifiedAt = time.Now()
+	if ok, err := batchAggregator.VerifyBatch(batch); ok || err != ErrBatchEmpty || batch.Verified || !batch.VerifiedAt.IsZero() {
+		t.Fatalf("empty batch kept validity or returned the wrong error: %v, %v", ok, err)
+	}
+}
+
+func TestBatchAggregatorTimeoutRetainsProviderSlot(t *testing.T) {
+	cfg := DefaultAggregationConfig()
+	cfg.ParallelVerify = false
+	cfg.VerificationTimeout = 150 * time.Millisecond
+	ba := NewBatchAggregator(cfg, nil)
+	started := make(chan struct{}, 2)
+	release := make(chan struct{})
+	defer close(release)
+	ba.SetExecutionProofVerifier(func(ExecutionProof) (bool, error) {
+		started <- struct{}{}
+		<-release
+		return true, nil
+	})
+	makeBatch := func() *ProofBatch {
+		t.Helper()
+		if err := ba.AddProof(makeTestProofs(1)[0]); err != nil {
+			t.Fatal(err)
+		}
+		batch, err := ba.AggregateBatch()
+		if err != nil {
+			t.Fatal(err)
+		}
+		return batch
+	}
+	checkTimeout := func(batch *ProofBatch) {
+		t.Helper()
+		done := make(chan error, 1)
+		go func() {
+			_, err := ba.VerifyBatch(batch)
+			done <- err
+		}()
+		select {
+		case err := <-done:
+			if err != ErrVerifyTimeout || batch.Verified {
+				t.Fatalf("blocked verifier result: %v", err)
+			}
+		case <-time.After(2 * time.Second):
+			t.Fatal("provider held the caller beyond its timeout")
+		}
+	}
+	checkTimeout(makeBatch())
+	select {
+	case <-started:
+	default:
+		t.Fatal("test provider did not start")
+	}
+	checkTimeout(makeBatch())
+	select {
+	case <-started:
+		t.Fatal("timed out provider released its worker slot before returning")
+	default:
+	}
+}

@@ -166,7 +166,12 @@ func TestNewPayloadV4_UnsupportedFork(t *testing.T) {
 func TestForkchoiceUpdatedV3_TimestampProgression(t *testing.T) {
 	// Validate that timestamp must be greater than the head block timestamp.
 	backend := &mockBackend{
-		headTimestamp: 1700000000, // head block timestamp
+		blockTimestampFn: func(hash types.Hash) uint64 {
+			if hash == types.HexToHash("0x1111") {
+				return 1700000000
+			}
+			return 0
+		},
 	}
 	api := NewEngineAPI(backend)
 

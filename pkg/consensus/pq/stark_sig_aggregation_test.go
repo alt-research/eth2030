@@ -35,7 +35,7 @@ func signTestAttestations(t *testing.T, count int) []PQAttestation {
 func TestPQAggregationVerifiesEverySignatureAndMetadata(t *testing.T) {
 	input := signTestAttestations(t, 6)
 	aggregator := NewSTARKSignatureAggregator()
-	verifier := NewPQAttestationVerifier(nil)
+	verifier := NewPQAttestationVerifier(testPQAttestationConfig(input...))
 	result, err := verifier.STARKAggregateVerify(input)
 	if err != nil {
 		t.Fatal(err)
@@ -140,5 +140,17 @@ func TestAggregateCount(t *testing.T) {
 	agg := &STARKSignatureAggregation{NumValidators: 42}
 	if agg.AggregateCount() != 42 {
 		t.Errorf("expected count 42, got %d", agg.AggregateCount())
+	}
+}
+
+func TestMerklePQAggregationChecksSignedInputs(t *testing.T) {
+	input := signTestAttestations(t, 2)
+	result, err := MerkleAggregatePQAttestations(input)
+	if err != nil || result.NumValidators != 2 || result.Slot != input[0].Slot {
+		t.Fatalf("valid signed batch: %v", err)
+	}
+	input[1].PQSignature[0] ^= 1
+	if _, err := MerkleAggregatePQAttestations(input); err != ErrSTARKAggVerifyFailed {
+		t.Fatalf("invalid signed batch: %v", err)
 	}
 }

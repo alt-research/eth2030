@@ -136,6 +136,12 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	side := build(sideParent, conversion+1, tx)
 	insert(side)
 	checkBlockHash(side, sideActivation.Hash())
+	if entry, ok := bc.GetTxLookupEntry(tx.Hash()); !ok || entry.BlockHash != active.Hash() {
+		t.Fatalf("side-chain import replaced canonical transaction lookup: %+v", entry)
+	}
+	if pruned, err := bc.PruneHistory(0); err != nil || pruned != 0 {
+		t.Fatalf("overlay history must stay replayable: pruned %d, err %v", pruned, err)
+	}
 	if err := bc.Reorg(sideParent); err != nil {
 		t.Fatal(err)
 	}
@@ -163,6 +169,9 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	checkStorage(bc.CurrentBlock(), types.Hash{})
 	checkBlockHash(bc.CurrentBlock(), empty.Hash())
 	checkBlockHash(side, sideActivation.Hash())
+	if receipts := bc.GetReceipts(side.Hash()); len(receipts) != 1 || receipts[0].TxHash != tx.Hash() {
+		t.Fatalf("side-chain receipt was lost on restart: %+v", receipts)
+	}
 	// Advance several conversion units. The cleared slot stays cleared when
 	// the cursor finally reaches the old contract storage.
 	parent = bc.CurrentBlock()
@@ -180,13 +189,12 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	}
 	checkStorage(bc.CurrentBlock(), types.Hash{31: 44})
 
-	// Restart must reject a missing ancestor even if the new canonical
-	// head contains no transactions.
-	if err := rawdb.DeleteHeader(db, empty.NumberU64(), empty.Hash()); err != nil {
+	// Restart must reject a missing body even for an empty canonical block.
+	if err := rawdb.DeleteBody(db, empty.NumberU64(), empty.Hash()); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := NewBlockchain(&cfg, genesis, state.NewTrieStateDBFromMemory(rawdb.NewMemoryDB(), mem.Copy()), db); !errors.Is(err, ErrBlockNotFound) {
-		t.Fatalf("missing ancestor on restart: %v", err)
+		t.Fatalf("missing body on restart: %v", err)
 	}
 }
 
@@ -219,5 +227,84 @@ func TestBinaryOverlayFirstChildOfTrieGenesis(t *testing.T) {
 	}
 	if child.Root() != (types.Hash{}) || !bytes.Equal(bc.State().GetCode(addr), mem.GetCode(addr)) {
 		t.Fatal("empty overlay failed to preserve frozen genesis code")
+	}
+}
+
+var errOverlayBatchWrite = errors.New("injected overlay batch write failure")
+
+type overlayFailDB struct {
+	rawdb.Database
+	fail bool
+}
+
+func (db *overlayFailDB) NewBatch() rawdb.Batch {
+	return overlayFailBatch{Batch: db.Database.NewBatch(), fail: db.fail}
+}
+
+type overlayFailBatch struct {
+	rawdb.Batch
+	fail bool
+}
+
+func (b overlayFailBatch) Write() error {
+	if b.fail {
+		return errOverlayBatchWrite
+	}
+	return b.Batch.Write()
+}
+
+func TestBinaryOverlayFailedPublicationCanRetry(t *testing.T) {
+	cfg := *config.TestConfig
+	cfg.ShanghaiTime, cfg.CancunTime, cfg.PragueTime, cfg.AmsterdamTime = nil, nil, nil, nil
+	activation := uint64(1)
+	cfg.BinaryOverlayTime = &activation
+	mem := state.NewMemoryStateDB()
+	genesis := types.NewBlock(&types.Header{
+		Number: new(big.Int), Difficulty: new(big.Int), GasLimit: 30_000_000,
+		BaseFee: big.NewInt(7), Root: mem.GetRoot(), UncleHash: block.EmptyUncleHash,
+	}, &types.Body{})
+	db := &overlayFailDB{Database: rawdb.NewMemoryDB()}
+	bc, err := NewBlockchain(&cfg, genesis, mem, db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	build := func(time uint64) *types.Block {
+		t.Helper()
+		blk, _, err := block.NewBlockBuilder(&cfg, bc, nil).BuildBlock(genesis.Header(), &block.BuildBlockAttributes{Timestamp: time, GasLimit: genesis.GasLimit()})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return blk
+	}
+	child := build(1)
+	db.fail = true
+	if err := bc.InsertBlock(child); !errors.Is(err, errOverlayBatchWrite) {
+		t.Fatalf("failed import: %v", err)
+	}
+	if bc.GetBlock(child.Hash()) != nil || bc.CurrentBlock().Hash() != genesis.Hash() {
+		t.Fatal("failed import published a block or changed the head")
+	}
+	db.fail = false
+	if err := bc.InsertBlock(child); err != nil {
+		t.Fatal(err)
+	}
+	side := build(2)
+	if err := bc.InsertBlock(side); err != nil {
+		t.Fatal(err)
+	}
+	db.fail = true
+	if err := bc.Reorg(side); !errors.Is(err, errOverlayBatchWrite) {
+		t.Fatalf("failed reorg: %v", err)
+	}
+	head, err := rawdb.ReadHeadBlockHash(db)
+	if err != nil || head != child.Hash() || bc.CurrentBlock().Hash() != head || bc.GetBlockByNumber(1).Hash() != head {
+		t.Fatalf("failed reorg changed the head: disk %s, memory %s, err %v", head, bc.CurrentBlock().Hash(), err)
+	}
+	db.fail = false
+	if err := bc.Reorg(side); err != nil {
+		t.Fatal(err)
+	}
+	if bc.GetBlockByNumber(1).Hash() != side.Hash() {
+		t.Fatal("reorg retry did not publish the side branch")
 	}
 }

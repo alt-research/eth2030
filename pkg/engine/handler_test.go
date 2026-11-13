@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -265,6 +266,7 @@ func TestHandler_EngineErrorToRPC(t *testing.T) {
 	}{
 		{ErrUnknownPayload, UnknownPayloadCode},
 		{ErrInvalidForkchoiceState, InvalidForkchoiceStateCode},
+		{fmt.Errorf("overlay forkchoice: %w", ErrInvalidForkchoiceState), InvalidForkchoiceStateCode},
 		{ErrInvalidPayloadAttributes, InvalidPayloadAttributeCode},
 		{ErrInvalidParams, InvalidParamsCode},
 		{ErrTooLargeRequest, TooLargeRequestCode},

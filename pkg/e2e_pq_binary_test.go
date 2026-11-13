@@ -131,7 +131,6 @@ func TestE2E_PQBinary_PQBlobCommitment(t *testing.T) {
 // TestE2E_PQBinary_PQAttestationCycle tests PQ attestation creation,
 // verification, and counter tracking.
 func TestE2E_PQBinary_PQAttestationCycle(t *testing.T) {
-	verifier := consensus.NewPQAttestationVerifier(consensus.DefaultPQAttestationConfig())
 	root := e2e.DeterministicHash(42)
 	keys, err := pqc.GenerateDilithiumKey()
 	if err != nil {
@@ -141,6 +140,11 @@ func TestE2E_PQBinary_PQAttestationCycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreatePQAttestation: %v", err)
 	}
+	config := consensus.DefaultPQAttestationConfig()
+	config.PQSigner = func(slot, committee, validator uint64) ([]byte, bool) {
+		return keys.PublicKey, slot == 10 && committee == 0 && validator == 5
+	}
+	verifier := consensus.NewPQAttestationVerifier(config)
 	if valid, err := verifier.VerifyAttestation(att); !valid || err != nil {
 		t.Fatalf("VerifyAttestation = %v, %v", valid, err)
 	}

@@ -6,7 +6,6 @@
 package pq
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -227,8 +226,7 @@ func (a *DefaultPQAggregator) PropagateAggregate(agg *STARKSignatureAggregation)
 			return ErrAggregatorCommittee
 		}
 		for _, att := range agg.Signatures {
-			expected, ok := lookup(att.Slot, att.CommitteeIndex, att.ValidatorIndex)
-			if !ok || !bytes.Equal(expected, att.PQPublicKey) {
+			if !authorizedPQSigner(&att, lookup) {
 				return ErrAggregatorCommittee
 			}
 		}

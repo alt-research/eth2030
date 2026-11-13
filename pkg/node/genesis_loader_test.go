@@ -2,6 +2,7 @@ package node
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -503,12 +504,12 @@ func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
 	n := newTestNode(t, &cfg)
 	bc := n.Blockchain()
 	funded := types.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
-	build := func(parent *types.Block, at uint64) *payload.ExecutionPayloadV4 {
+	build := func(parent *types.Block, at uint64, beacon byte) *payload.ExecutionPayloadV4 {
 		t.Helper()
 		attrs := new(payload.PayloadAttributesV4)
 		attrs.Timestamp = at
 		attrs.Withdrawals = []*payload.Withdrawal{}
-		attrs.ParentBeaconBlockRoot = types.Hash{31: byte(at + 10)}
+		attrs.ParentBeaconBlockRoot = types.Hash{31: beacon}
 		update, err := n.engBackend.ForkchoiceUpdatedV4(payload.ForkchoiceStateV1{HeadBlockHash: parent.Hash()}, attrs)
 		if err != nil || update.PayloadStatus.Status != engine.StatusValid || update.PayloadID == nil {
 			t.Fatalf("forkchoice: %+v, %v", update, err)
@@ -520,7 +521,7 @@ func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
 		return result.ExecutionPayload
 	}
 
-	first := build(bc.Genesis(), 1)
+	first := build(bc.Genesis(), 1, 11)
 	parent := bc.GetBlock(first.BlockHash)
 	if parent == nil || first.StateRoot != parent.Root() || first.StateRoot == bc.Genesis().Root() {
 		t.Fatal("Engine did not publish and import the overlay state root")
@@ -533,7 +534,7 @@ func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
 	if balance.Sign() == 0 {
 		t.Fatal("first child cannot read the frozen genesis balance")
 	}
-	converted := build(parent, 2)
+	converted := build(parent, 2, 12)
 	if converted.StateRoot == first.StateRoot {
 		t.Fatal("Engine did not apply the first conversion unit")
 	}
@@ -575,15 +576,24 @@ func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
 		t.Fatalf("conversion changed the logical balance: %v", err)
 	}
 
-	other := build(parent, 3)
+	other := build(parent, 2, 13)
 	if other.BlockHash == converted.BlockHash || other.StateRoot == converted.StateRoot {
 		t.Fatal("competing payloads did not produce independent overlays")
 	}
 	headOnly := payload.ForkchoiceStateV1{HeadBlockHash: converted.BlockHash}
+	invalid := new(payload.PayloadAttributesV4)
+	invalid.Timestamp = converted.Timestamp
+	if _, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, invalid); !errors.Is(err, engine.ErrInvalidPayloadAttributes) {
+		t.Fatalf("invalid build timestamp: %v", err)
+	}
+	if bc.CurrentBlock().Hash() != converted.BlockHash {
+		t.Fatal("invalid build attributes rolled back a valid forkchoice")
+	}
+	headOnly.HeadBlockHash = other.BlockHash
 	if update, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, nil); err != nil || update.PayloadStatus.Status != engine.StatusValid {
 		t.Fatalf("forkchoice reorg: %+v, %v", update, err)
 	}
-	if bc.CurrentBlock().Hash() != converted.BlockHash || bc.State().GetRoot() != converted.StateRoot {
+	if bc.CurrentBlock().Hash() != other.BlockHash || bc.State().GetRoot() != other.StateRoot {
 		t.Fatal("Engine forkchoice did not select the side block and its overlay")
 	}
 }

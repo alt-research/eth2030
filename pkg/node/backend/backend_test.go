@@ -110,7 +110,10 @@ func TestGeneratePayloadID(t *testing.T) {
 		Random:       types.Hash{0x03},
 	}
 
-	id := generatePayloadID(parentHash, attrs)
+	id, err := generatePayloadID(parentHash, attrs, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if id == (payload.PayloadID{}) {
 		t.Error("generatePayloadID returned zero ID")
 	}

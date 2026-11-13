@@ -3,6 +3,7 @@ package rawdb
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -934,5 +935,57 @@ func TestFileDB_IteratorSorted(t *testing.T) {
 		if got[i] != sorted[i] {
 			t.Fatalf("position %d: want %q, got %q", i, sorted[i], got[i])
 		}
+	}
+}
+
+func TestFileDBBatchReplaysAfterMaterializationFailure(t *testing.T) {
+	dir := t.TempDir()
+	db, err := NewFileDB(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldKey, newKey := []byte("old"), []byte("new")
+	if err := db.Put(oldKey, []byte("before")); err != nil {
+		t.Fatal(err)
+	}
+	// Block one of the data files after the first operation of the batch.
+	// A commit must survive as a whole when the durable WAL is replayed.
+	blocker := db.keyPath(newKey) + ".tmp"
+	if err := os.Mkdir(blocker, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	batch := db.NewBatch()
+	if err := batch.Delete(oldKey); err != nil {
+		t.Fatal(err)
+	}
+	if err := batch.Put(newKey, []byte("after")); err != nil {
+		t.Fatal(err)
+	}
+	if err := batch.Write(); err != nil {
+		t.Fatalf("durable WAL commit was reported as failed: %v", err)
+	}
+	if err := db.Put([]byte("later"), []byte("value")); err == nil {
+		t.Fatal("expected the materialization error before accepting a new write")
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(blocker); err != nil {
+		t.Fatal(err)
+	}
+
+	db, err = NewFileDB(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, err := db.Get(oldKey); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("deleted key still exists: %v", err)
+	}
+	if got, err := db.Get(newKey); err != nil || string(got) != "after" {
+		t.Fatalf("replayed value = %q, %v", got, err)
+	}
+	if _, err := db.Get([]byte("later")); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("failed write was committed: %v", err)
 	}
 }

@@ -1,6 +1,7 @@
 package pq
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"math/rand"
@@ -26,6 +27,9 @@ type PQAttestationConfig struct {
 
 	// FallbackToClassic allows classic (ECDSA) signatures when PQ is unavailable.
 	FallbackToClassic bool
+
+	// PQSigner resolves the authorized ML-DSA key for this validator duty.
+	PQSigner CommitteeKeyLookup
 
 	// ClassicSigner resolves the authorized ECDSA address at the attested
 	// slot and committee. Classic fallback requires a resolver.
@@ -72,8 +76,9 @@ func NewPQAttestationVerifier(config *PQAttestationConfig) *PQAttestationVerifie
 	if config == nil {
 		config = DefaultPQAttestationConfig()
 	}
+	snapshot := *config
 	return &PQAttestationVerifier{
-		config: config,
+		config: &snapshot,
 	}
 }
 
@@ -82,25 +87,19 @@ func NewPQAttestationVerifier(config *PQAttestationConfig) *PQAttestationVerifie
 // If ClassicSignature is present and fallback is enabled, it is checked as well.
 // Returns an error if no valid signature is found.
 func (v *PQAttestationVerifier) VerifyAttestation(att *PQAttestation) (bool, error) {
-	if att == nil {
+	if err := ValidatePQAttestation(att); err != nil {
 		v.failed.Add(1)
-		return false, ErrPQAttNoSignature
+		return false, err
 	}
-
 	hasPQ := len(att.PQSignature) > 0
 	hasClassic := len(att.ClassicSignature) > 0
-
-	if !hasPQ && !hasClassic {
-		v.failed.Add(1)
-		return false, ErrPQAttNoSignature
-	}
 
 	// Try PQ verification first.
 	if hasPQ && v.config.UsePQSignatures {
 		// Compute the attestation signing message and verify with the real
 		// public key and message via VerifyDilithium.
 		msg := attestationMessage(att.Slot, att.CommitteeIndex, att.BeaconBlockRoot, att.SourceEpoch, att.TargetEpoch)
-		if pqc.VerifyDilithium(att.PQPublicKey, msg, att.PQSignature) {
+		if authorizedPQSigner(att, v.config.PQSigner) && pqc.VerifyDilithium(att.PQPublicKey, msg, att.PQSignature) {
 			v.verified.Add(1)
 			return true, nil
 		}
@@ -122,6 +121,14 @@ func (v *PQAttestationVerifier) VerifyAttestation(att *PQAttestation) (bool, err
 
 	v.failed.Add(1)
 	return false, ErrPQAttNoSignature
+}
+
+func authorizedPQSigner(att *PQAttestation, lookup CommitteeKeyLookup) bool {
+	if lookup == nil {
+		return false
+	}
+	key, ok := lookup(att.Slot, att.CommitteeIndex, att.ValidatorIndex)
+	return ok && bytes.Equal(key, att.PQPublicKey)
 }
 
 func verifyClassicAttestation(att *PQAttestation, lookup func(uint64, uint64, uint64) (types.Address, bool)) bool {
@@ -205,7 +212,7 @@ func CreatePQAttestation(
 		SourceEpoch:     sourceEpoch,
 		TargetEpoch:     targetEpoch,
 		PQSignature:     sig,
-		PQPublicKey:     pqKey.PublicKey,
+		PQPublicKey:     bytes.Clone(pqKey.PublicKey),
 		ValidatorIndex:  validatorIndex,
 	}, nil
 }
@@ -214,6 +221,9 @@ func CreatePQAttestation(
 // available chain PQ attestation. The selection uses a keccak256-based seed
 // derived from the slot and epoch seed, then applies Fisher-Yates shuffle.
 func SelectLeanPQAttestors(validators []uint64, count int, slot uint64, epochSeed types.Hash) []uint64 {
+	if count <= 0 {
+		return nil
+	}
 	if count >= len(validators) {
 		out := make([]uint64, len(validators))
 		copy(out, validators)
@@ -257,6 +267,12 @@ func (v *PQAttestationVerifier) LeanAvailablePQAttestors(slot uint64, allValidat
 func (v *PQAttestationVerifier) STARKAggregateVerify(attestations []PQAttestation) (*STARKSignatureAggregation, error) {
 	if len(attestations) == 0 || !v.config.UsePQSignatures {
 		return nil, ErrPQAttNoSignature
+	}
+	for i := range attestations {
+		if !authorizedPQSigner(&attestations[i], v.config.PQSigner) {
+			v.failed.Add(uint64(len(attestations)))
+			return nil, ErrAggregatorCommittee
+		}
 	}
 	result, err := BatchVerifyPQAttestations(attestations)
 	if err != nil {

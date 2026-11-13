@@ -78,7 +78,7 @@ func TestVerifyPQAttestation(t *testing.T) {
 		t.Fatalf("CreatePQAttestation: %v", err)
 	}
 
-	verifier := NewPQAttestationVerifier(DefaultPQAttestationConfig())
+	verifier := NewPQAttestationVerifier(testPQAttestationConfig(*att))
 	ok, err := verifier.VerifyAttestation(att)
 	if err != nil {
 		t.Fatalf("VerifyAttestation: %v", err)
@@ -162,7 +162,7 @@ func TestVerifyTamperedPQSig(t *testing.T) {
 	}
 
 	// Disable classic fallback so tampered PQ sig must fail.
-	cfg := DefaultPQAttestationConfig()
+	cfg := testPQAttestationConfig(*att)
 	cfg.FallbackToClassic = false
 	verifier := NewPQAttestationVerifier(cfg)
 
@@ -176,7 +176,15 @@ func TestVerifyTamperedPQSig(t *testing.T) {
 }
 
 func TestVerifierStats(t *testing.T) {
-	verifier := NewPQAttestationVerifier(DefaultPQAttestationConfig())
+	pqKey, err := pqc.GenerateDilithiumKey()
+	if err != nil {
+		t.Fatal(err)
+	}
+	att, err := CreatePQAttestation(1, 0, types.Hash{1}, 0, 1, 0, pqKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	verifier := NewPQAttestationVerifier(testPQAttestationConfig(*att))
 
 	// Initial stats should be zero.
 	v, f := verifier.Stats()
@@ -185,8 +193,6 @@ func TestVerifierStats(t *testing.T) {
 	}
 
 	// Verify a valid PQ attestation.
-	pqKey, _ := pqc.GenerateDilithiumKey()
-	att, _ := CreatePQAttestation(1, 0, types.Hash{}, 0, 1, 0, pqKey)
 	verifier.VerifyAttestation(att)
 
 	v, f = verifier.Stats()
@@ -257,5 +263,39 @@ func TestValidatePQAttestation(t *testing.T) {
 	}
 	if err := ValidatePQAttestation(badEpoch); err == nil {
 		t.Error("expected error for target before source")
+	}
+}
+
+func testPQAttestationConfig(attestations ...PQAttestation) *PQAttestationConfig {
+	cfg := DefaultPQAttestationConfig()
+	cfg.PQSigner = func(slot, committee, validator uint64) ([]byte, bool) {
+		for _, att := range attestations {
+			if slot == att.Slot && committee == att.CommitteeIndex && validator == att.ValidatorIndex {
+				return att.PQPublicKey, true
+			}
+		}
+		return nil, false
+	}
+	return cfg
+}
+
+func TestPQVerificationRequiresAuthorizedCommitteeKey(t *testing.T) {
+	input := signTestAttestations(t, 2)
+	verifier := NewPQAttestationVerifier(testPQAttestationConfig(input[0]))
+	if ok, err := verifier.VerifyAttestation(&input[0]); !ok || err != nil {
+		t.Fatalf("authorized signature: %v", err)
+	}
+	if ok, _ := NewPQAttestationVerifier(nil).VerifyAttestation(&input[0]); ok {
+		t.Fatal("accepted an attestation without a trusted key source")
+	}
+	if ok, _ := verifier.VerifyAttestation(&input[1]); ok {
+		t.Fatal("accepted a signed attestation for an unauthorized validator")
+	}
+	input[1].ValidatorIndex = input[0].ValidatorIndex
+	if ok, _ := verifier.VerifyAttestation(&input[1]); ok {
+		t.Fatal("accepted another public key at the authorized validator index")
+	}
+	if _, err := verifier.STARKAggregateVerify(input[1:]); err != ErrAggregatorCommittee {
+		t.Fatalf("unauthorized batch: %v", err)
 	}
 }

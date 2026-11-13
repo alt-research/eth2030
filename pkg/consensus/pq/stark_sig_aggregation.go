@@ -95,6 +95,9 @@ func verifiedAttestationKeys(attestations []PQAttestation) ([][]byte, error) {
 	keys := make(map[string]struct{}, len(attestations))
 	pubkeys := make([][]byte, 0, len(attestations))
 	for _, att := range attestations {
+		if ValidatePQAttestation(&att) != nil {
+			return nil, ErrSTARKAggVerifyFailed
+		}
 		if att.Slot != first.Slot || att.CommitteeIndex != first.CommitteeIndex ||
 			att.SourceEpoch != first.SourceEpoch || att.TargetEpoch != first.TargetEpoch ||
 			att.BeaconBlockRoot != first.BeaconBlockRoot {
@@ -184,14 +187,15 @@ type MerklePQAggregation struct {
 }
 
 // MerkleAggregatePQAttestations computes a SHA-256 Merkle tree over the
-// attestation public key hashes and returns the root. No STARK proof is produced.
+// verified attestation public keys and returns the root. The caller checks
+// the keys against the authorized committee.
 func MerkleAggregatePQAttestations(attestations []PQAttestation) (*MerklePQAggregation, error) {
 	if len(attestations) == 0 {
 		return nil, ErrSTARKAggNoSigs
 	}
-	pubkeys := make([][]byte, len(attestations))
-	for i, att := range attestations {
-		pubkeys[i] = att.PQPublicKey
+	pubkeys, err := verifiedAttestationKeys(attestations)
+	if err != nil {
+		return nil, err
 	}
 	root := computeCommitteeRoot(pubkeys)
 	return &MerklePQAggregation{

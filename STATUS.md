@@ -1,3 +1,13 @@
+## Track 4 correctness review (2026-11-14)
+
+- Private binary overlay imports and reorgs publish database batches before changing canonical pointers. Side branches retain receipts, canonical transaction lookup follows forkchoice, and startup rejects missing bodies or a mismatched genesis. FileDB commits its WAL before materializing data files and can replay a full batch after a materialization failure.
+- Overlay copies preserve pending writes, snapshots, original slot values, and independent log data. The legacy SHA-256 trie proof API verifies the entire key and suffix proof. Legacy proofs that omit required suffix siblings must be rebuilt for stems with multiple leaves.
+- Engine payload IDs commit to all build attributes and the requested slot. The RPC layer keeps valid forkchoice updates when payload attributes fail validation and maps wrapped errors to their Engine API codes.
+- PQ attestation verification requires a trusted committee-key lookup for individual and batched ML-DSA signatures. Merkle batches verify their input signatures. Execution proof batches own submitted bytes, enforce size limits and deadlines, and clear stale verification flags.
+- Regressions exercise signed transactions on both branches, rejected batch writes and retries, FileDB WAL recovery, distinct Engine roots for the same parent and timestamp, suffix-proof verification, real ML-DSA committee authorization, and proof-provider deadlines.
+- Validation passed with `go test ./...`, `go build ./...`, targeted race tests, and no-CGO PQ signer and precompile tests in `pkg`.
+- The production EIP-7864 layout and full witness gas, canonical PQ precompile assignments, node committee provider, and production STARK, lattice and recursive aggregation protocols remain open.
+
 ## Track 4 private-chain binary overlay execution (2026-11-14)
 
 - A private genesis can set `binaryOverlayTime`, `binaryConversionTime`, and `binaryConversionStride`. At activation the execution path starts with an empty BLAKE3 overlay and a frozen snapshot of the parent MPT state. Conversion uses the pinned EIP-7748 order before system calls and transactions. EVM journal writes determine the binary root, including explicit zero storage leaves and transaction-scoped original storage values.

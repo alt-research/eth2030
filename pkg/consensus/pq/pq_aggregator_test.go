@@ -1,6 +1,7 @@
 package pq
 
 import (
+	"encoding/json"
 	"testing"
 )
 
@@ -161,4 +162,52 @@ func TestAggregatorEndToEnd(t *testing.T) {
 // TestPQAggregatorInterface verifies DefaultPQAggregator satisfies the PQAggregator interface.
 func TestPQAggregatorInterface(t *testing.T) {
 	var _ PQAggregator = (*DefaultPQAggregator)(nil)
+}
+
+type captureAggregatePublisher struct {
+	topic string
+	body  []byte
+	count int
+}
+
+func (p *captureAggregatePublisher) Publish(topic string, body []byte) error {
+	p.topic, p.body = topic, body
+	p.count++
+	return nil
+}
+
+func TestPQAggregatorPublishesOnlyAuthorizedSignedBatches(t *testing.T) {
+	aggregator := NewDefaultPQAggregator()
+	publisher := new(captureAggregatePublisher)
+	aggregator.SetPublisher(publisher)
+	attestations := signTestAttestations(t, 2)
+	batch, err := aggregator.aggregator.Aggregate(attestations)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := aggregator.PropagateAggregate(batch); err != ErrAggregatorCommittee || publisher.count != 0 {
+		t.Fatalf("published without committee state: %v", err)
+	}
+	aggregator.SetCommitteeKeyLookup(func(slot, committee, validator uint64) ([]byte, bool) {
+		return attestations[0].PQPublicKey, true
+	})
+	if err := aggregator.PropagateAggregate(batch); err != ErrAggregatorCommittee || publisher.count != 0 {
+		t.Fatalf("published valid signature under the wrong committee key: %v", err)
+	}
+	aggregator.SetCommitteeKeyLookup(func(slot, committee, validator uint64) ([]byte, bool) {
+		if slot != attestations[0].Slot || committee != attestations[0].CommitteeIndex || validator >= uint64(len(attestations)) {
+			return nil, false
+		}
+		return attestations[validator].PQPublicKey, true
+	})
+	if err := aggregator.PropagateAggregate(batch); err != nil || publisher.count != 1 || publisher.topic != topicPQAggResult {
+		t.Fatalf("publication = %s/%d: %v", publisher.topic, publisher.count, err)
+	}
+	var received STARKSignatureAggregation
+	if err := json.Unmarshal(publisher.body, &received); err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := aggregator.aggregator.Verify(&received); !ok || err != nil {
+		t.Fatalf("published payload did not retain valid signatures: %v", err)
+	}
 }

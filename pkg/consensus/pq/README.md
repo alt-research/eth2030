@@ -13,7 +13,8 @@ Package `pq` provides two related post-quantum capabilities:
    `CreatePQAttestation` signs using a `pqc.DilithiumKeyPair`.
    `STARKAggregateVerify` verifies each ML-DSA signature and returns the signed
    attestations and their committee commitment. Committee membership must be
-   checked by the consensus consumer.
+   checked by the consensus consumer. Network publication requires a configured
+   committee key resolver.
 
 2. **PQ chain security** (`pq_chain_security.go`): `PQChainValidator` enforces
    SHA-3-based block hashing and tracks per-epoch PQ key registration ratios.

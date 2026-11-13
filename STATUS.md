@@ -1,8 +1,8 @@
 ## Track 4 consensus attestation verification (2026-11-14)
 
 - Replaced the PQ attestation hash-trace shortcut with individual ML-DSA verification for all batch sizes and lean modes. The batch enforces a shared signing statement, unique indices and keys, authenticated metadata and committee commitment, and copies the original signed data. Gas savings are zero for this path. Legacy trace-only proofs are rejected.
-- XMSS bundles now return an explicit unavailable-verifier error instead of being relabeled as ML-DSA. Propagation verifies the supplied batch. Classic fallback recovers the ECDSA signer and requires a trusted slot/committee/validator key lookup.
-- Tests use actual ML-DSA and ECDSA signatures. They reject an invalid sixth signature, duplicate signer identity, inconsistent statements, wrong batch metadata, and an unauthorized classic signer. Temporarily removing signature verification caused the invalid-sixth-signature test to fail. Full `go test ./...`, targeted consensus and conversion race tests, and builds with and without CGO passed. A real recursive proof and consensus-state membership checks remain open.
+- XMSS bundles now return an explicit unavailable-verifier error instead of being relabeled as ML-DSA. Propagation verifies the supplied batch and requires an authorized committee key lookup for network publication. Classic fallback recovers the ECDSA signer and requires a trusted slot/committee/validator key lookup.
+- Tests use actual ML-DSA and ECDSA signatures. They reject an invalid sixth signature, duplicate signer identity, inconsistent statements, wrong batch metadata, and an unauthorized classic signer. Temporarily removing signature verification caused the invalid-sixth-signature test to fail. Full `go test ./...`, targeted consensus and conversion race tests, and builds with and without CGO passed. A real recursive proof and production consensus-state lookup wiring remain open.
 
 ## Track 4 ordered binary overlay conversion (2026-11-14)
 

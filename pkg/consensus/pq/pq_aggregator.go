@@ -6,6 +6,7 @@
 package pq
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,6 +33,7 @@ const (
 var (
 	ErrAggregatorNoBundles       = errors.New("pq_aggregator: no signature bundles")
 	ErrAggregatorXMSSUnsupported = errors.New("pq_aggregator: XMSS statement verifier unavailable")
+	ErrAggregatorCommittee       = errors.New("pq_aggregator: no authorized committee key for attestation")
 )
 
 // PQAggregatorDuty describes an aggregator's assignment for a specific slot.
@@ -126,6 +128,9 @@ func binary64FromBytes(b []byte) uint64 {
 		uint64(b[4])<<24 | uint64(b[5])<<16 | uint64(b[6])<<8 | uint64(b[7])
 }
 
+// CommitteeKeyLookup resolves an authorized ML-DSA key for the specified duty.
+type CommitteeKeyLookup func(slot, committee, validator uint64) ([]byte, bool)
+
 // DefaultPQAggregator is a concrete PQ aggregator implementation.
 // Set Publisher to enable real P2P broadcast; if nil, operations are local-only.
 type DefaultPQAggregator struct {
@@ -133,7 +138,8 @@ type DefaultPQAggregator struct {
 	collected  []XMSSSignatureBundle
 	mu         sync.Mutex
 	// Publisher is the gossip backend used for P2P broadcast (LEAN-3.3/3.4).
-	Publisher AggGossipPublisher
+	Publisher     AggGossipPublisher
+	committeeKeys CommitteeKeyLookup
 }
 
 // NewDefaultPQAggregator creates a new DefaultPQAggregator without a P2P publisher.
@@ -153,6 +159,13 @@ func (a *DefaultPQAggregator) SetPublisher(pub AggGossipPublisher) {
 	a.Publisher = pub
 }
 
+// SetCommitteeKeyLookup configures the consensus membership check for publishing.
+func (a *DefaultPQAggregator) SetCommitteeKeyLookup(lookup CommitteeKeyLookup) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.committeeKeys = lookup
+}
+
 // AddSignatureBundle adds a received bundle to the collection set.
 func (a *DefaultPQAggregator) AddSignatureBundle(bundle XMSSSignatureBundle) error {
 	a.mu.Lock()
@@ -167,13 +180,16 @@ func (a *DefaultPQAggregator) AddSignatureBundle(bundle XMSSSignatureBundle) err
 // and return whatever has been accumulated via AddSignatureBundle.
 func (a *DefaultPQAggregator) CollectSignatures(slot uint64, validators []uint64) ([]XMSSSignatureBundle, error) {
 	// Broadcast the collection request so remote validators can respond.
-	if a.Publisher != nil {
+	a.mu.Lock()
+	publisher := a.Publisher
+	a.mu.Unlock()
+	if publisher != nil {
 		req := AggregateRequest{Slot: slot, Validators: validators}
 		data, err := json.Marshal(req)
 		if err != nil {
 			return nil, fmt.Errorf("pq_aggregator: marshal aggregate request: %w", err)
 		}
-		if err := a.Publisher.Publish(topicPQAggRequest, data); err != nil {
+		if err := publisher.Publish(topicPQAggRequest, data); err != nil {
 			// Non-fatal: log and continue with locally collected bundles.
 			_ = err
 		}
@@ -203,12 +219,24 @@ func (a *DefaultPQAggregator) PropagateAggregate(agg *STARKSignatureAggregation)
 	if _, err := a.aggregator.Verify(agg); err != nil {
 		return err
 	}
-	if a.Publisher != nil {
+	a.mu.Lock()
+	publisher, lookup := a.Publisher, a.committeeKeys
+	a.mu.Unlock()
+	if publisher != nil {
+		if lookup == nil {
+			return ErrAggregatorCommittee
+		}
+		for _, att := range agg.Signatures {
+			expected, ok := lookup(att.Slot, att.CommitteeIndex, att.ValidatorIndex)
+			if !ok || !bytes.Equal(expected, att.PQPublicKey) {
+				return ErrAggregatorCommittee
+			}
+		}
 		data, err := json.Marshal(agg)
 		if err != nil {
 			return fmt.Errorf("pq_aggregator: marshal stark aggregate: %w", err)
 		}
-		if err := a.Publisher.Publish(topicPQAggResult, data); err != nil {
+		if err := publisher.Publish(topicPQAggResult, data); err != nil {
 			return fmt.Errorf("pq_aggregator: publish pq_agg_result: %w", err)
 		}
 	}

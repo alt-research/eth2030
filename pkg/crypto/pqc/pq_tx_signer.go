@@ -16,11 +16,11 @@ import (
 type PQSignatureType uint8
 
 const (
-	// SigDilithium3 is CRYSTALS-Dilithium at NIST level 3.
+	// SigDilithium3 is the historical identifier for ML-DSA-65.
 	SigDilithium3 PQSignatureType = 0
-	// SigFalcon512 is Falcon at NIST level 1.
+	// SigFalcon512 is the historical identifier for the selected FN-DSA-512 provider.
 	SigFalcon512 PQSignatureType = 1
-	// SigSPHINCS128 is SPHINCS+-128 (stateless hash-based, NIST level 1).
+	// SigSPHINCS128 is the historical identifier for SLH-DSA-SHA2-128f.
 	SigSPHINCS128 PQSignatureType = 2
 )
 
@@ -47,12 +47,13 @@ func SignatureSizeForType(st PQSignatureType) (int, error) {
 
 // Errors returned by PQTxSigner operations.
 var (
-	ErrUnsupportedScheme = errors.New("pq_tx_signer: unsupported PQ scheme")
-	ErrNilTransaction    = errors.New("pq_tx_signer: nil transaction")
-	ErrNilKey            = errors.New("pq_tx_signer: nil key")
-	ErrSchemeMismatch    = errors.New("pq_tx_signer: key scheme does not match signer")
-	ErrInvalidSignature  = errors.New("pq_tx_signer: invalid signature")
-	ErrBatchLenMismatch  = errors.New("pq_tx_signer: batch length mismatch")
+	ErrUnsupportedScheme     = errors.New("pq_tx_signer: unsupported PQ scheme")
+	ErrNilTransaction        = errors.New("pq_tx_signer: nil transaction")
+	ErrNilKey                = errors.New("pq_tx_signer: nil key")
+	ErrSchemeMismatch        = errors.New("pq_tx_signer: key scheme does not match signer")
+	ErrInvalidSignature      = errors.New("pq_tx_signer: invalid signature")
+	ErrInvalidSigningPayload = errors.New("pq_tx_signer: invalid signing payload")
+	ErrBatchLenMismatch      = errors.New("pq_tx_signer: batch length mismatch")
 )
 
 // PQPrivateKey holds a post-quantum private key with its scheme identifier.
@@ -153,9 +154,15 @@ func (s *PQTxSigner) SignTransaction(tx *types.Transaction, key *PQPrivateKey) (
 		unsigned := *pq
 		unsigned.PQSignatureType = uint8(scheme)
 		digest := unsigned.SigningHash()
+		if digest == (types.Hash{}) {
+			return nil, ErrInvalidSigningPayload
+		}
 		return signHash(scheme, key.Raw, digest[:])
 	}
 	txHash := hashTransaction(tx)
+	if txHash == (types.Hash{}) {
+		return nil, ErrInvalidSigningPayload
+	}
 	return signHash(scheme, key.Raw, txHash[:])
 }
 
@@ -182,6 +189,9 @@ func (s *PQTxSigner) VerifyTransaction(tx *types.Transaction, sig []byte, pubkey
 	}
 
 	txHash := hashTransaction(tx)
+	if txHash == (types.Hash{}) {
+		return false, ErrInvalidSigningPayload
+	}
 	return verifyHash(scheme, pubkey.Raw, txHash[:], sig), nil
 }
 

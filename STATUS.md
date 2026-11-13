@@ -1,3 +1,10 @@
+## Track 4 PQ provider and signing hardening (2026-11-13)
+
+- Added cross-provider tests for the ML-DSA-65 and FN-DSA-512 wrappers, including tampered signatures. The historical Dilithium3 identifier does not accept a genuine round-3 Dilithium3 signature. The SLH-DSA-SHA2-128f signer reproduces a public NIST ACVP deterministic signature, and rejects a modified signature. These results do not establish compatibility with historical Falcon or SPHINCS+ encodings.
+- PQ signer registration and lookup now copy descriptors; the configurable transaction validator uses copy-on-write when replacing a verifier. This prevents external mutation of installed entries and races between registration and verification. The consensus transaction verifier continues to use its fixed providers.
+- PQ transaction signing and encoding now reject negative unsigned integer fields rather than authenticating or serializing their absolute value. Both signer paths and the transaction validators reject invalid signing payloads. Existing valid nonnegative transaction encodings are unchanged.
+- Validation: `go test ./core/types ./crypto/pqc ./core/execution ./txpool/... ./core/vm`, targeted PQ race tests, and `go build ./...` passed in `pkg`. Expanded-key EIP-8051 verification, legacy algorithm interoperability and activation remain open; these tests do not certify those implementations.
+
 ## Track 4 checkpointed binary migration (2026-11-13)
 
 - Added an experimental account-batched migration checkpoint keyed by the trusted source MPT root. Each invocation reconstructs the source account root, validates copied account storage and code, opens the previous authenticated binary root, writes the updated nodes, and only then advances the checkpoint. The intermediate root is not published as canonical.

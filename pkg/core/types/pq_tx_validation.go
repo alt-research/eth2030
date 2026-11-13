@@ -225,6 +225,9 @@ func (v *PQTxValidator) ValidatePQSignature(tx *PQTransaction) error {
 
 	// Compute the signing message from the transaction hash.
 	txHash := tx.SigningHash()
+	if txHash == (Hash{}) {
+		return ErrPQValidateVerifyFailed
+	}
 	if !entry.Verify(tx.PQPublicKey, txHash[:], tx.PQSignature) {
 		return ErrPQValidateVerifyFailed
 	}

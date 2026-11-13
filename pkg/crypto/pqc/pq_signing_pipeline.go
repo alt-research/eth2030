@@ -101,7 +101,8 @@ func (p *PQSigningPipeline) RegisterSigner(entry *PipelineSignerEntry) error {
 	if _, exists := p.signers[entry.AlgID]; exists {
 		return fmt.Errorf("%w: %d", ErrPipelineAlgExists, entry.AlgID)
 	}
-	p.signers[entry.AlgID] = entry
+	copyEntry := *entry
+	p.signers[entry.AlgID] = &copyEntry
 	return nil
 }
 
@@ -233,7 +234,8 @@ func (p *PQSigningPipeline) GetSigner(algID uint8) (*PipelineSignerEntry, error)
 	if !exists {
 		return nil, fmt.Errorf("%w: %d", ErrPipelineAlgNotFound, algID)
 	}
-	return entry, nil
+	copyEntry := *entry
+	return &copyEntry, nil
 }
 
 func (p *PQSigningPipeline) RegisteredAlgorithms() []uint8 {

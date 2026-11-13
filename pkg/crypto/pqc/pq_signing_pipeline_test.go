@@ -697,3 +697,20 @@ func TestPinnedEIP7932AddressDerivation(t *testing.T) {
 		}
 	}
 }
+
+func TestPipelineSignerRegistrationIsIsolated(t *testing.T) {
+	p := NewPQSigningPipelineEmpty()
+	entry := &PipelineSignerEntry{AlgID: 99, GasCost: 123, SignFn: func(_, _ []byte) ([]byte, error) { return []byte{1}, nil }, VerifyFn: func(_, _, _ []byte) bool { return true }}
+	if err := p.RegisterSigner(entry); err != nil {
+		t.Fatal(err)
+	}
+	entry.GasCost = 456
+	returned, err := p.GetSigner(99)
+	if err != nil {
+		t.Fatal(err)
+	}
+	returned.GasCost = 789
+	if gas, err := p.EstimateGas(99); err != nil || gas != 123 {
+		t.Fatalf("registration mutated: %d %v", gas, err)
+	}
+}

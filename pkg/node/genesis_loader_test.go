@@ -435,3 +435,45 @@ func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestGenesisLoadsExplicitPQDraftProfile(t *testing.T) {
+	var genesis map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(88), &genesis); err != nil {
+		t.Fatal(err)
+	}
+	genesis["config"].(map[string]any)["pqDraft"] = map[string]any{
+		"time":       100,
+		"sigRecover": "0x0000000000000000000000000000000000007001",
+		"mldsa":      "0x0000000000000000000000000000000000007002",
+		"mldsaEth":   "0x0000000000000000000000000000000000007003",
+	}
+	data, err := json.Marshal(genesis)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "genesis.json")
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	spec, err := loadGenesisFile(&Config{GenesisPath: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pq := spec.Config.PQDraft
+	if pq == nil || pq.Time == nil || *pq.Time != 100 ||
+		pq.SigRecover != (types.Address{18: 0x70, 19: 1}) ||
+		pq.MLDSA != (types.Address{18: 0x70, 19: 2}) ||
+		pq.MLDSAETH != (types.Address{18: 0x70, 19: 3}) {
+		t.Fatalf("unexpected PQ draft configuration: %+v", pq)
+	}
+}
+
+func TestGenesisRejectsAmbiguousPQDraftAddress(t *testing.T) {
+	for _, value := range []string{"0x7001", "0x100000000000000000000000000000000000007001", "0x000000000000000000000000000000000000700z"} {
+		var draft pqDraftJSON
+		input := []byte(`{"sigRecover":"` + value + `"}`)
+		if err := json.Unmarshal(input, &draft); err == nil {
+			t.Fatalf("accepted ambiguous address %q", value)
+		}
+	}
+}

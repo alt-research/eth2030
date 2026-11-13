@@ -637,8 +637,8 @@ func calcWithdrawalsRoot(ws []*types.Withdrawal) types.Hash {
 	return t.Hash()
 }
 
-// configureBlockEVM installs the same fork rules for user and system calls.
-func configureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) map[types.Address]vm.PrecompiledContract {
+// ConfigureBlockEVM installs the same fork rules for execution and simulation.
+func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) (map[types.Address]vm.PrecompiledContract, error) {
 	// Select the correct jump table based on fork rules.
 	var precompileAddrs map[types.Address]vm.PrecompiledContract
 	if config != nil {
@@ -663,11 +663,26 @@ func configureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		}
 		evm.SetJumpTable(vm.SelectJumpTable(forkRules))
 		precompileAddrs = vm.SelectPrecompiles(forkRules)
-		evm.SetPrecompiles(precompileAddrs)
 		evm.SetForkRules(forkRules)
+		if pq := config.PQDraft; pq != nil && pq.Time != nil && header.Time >= *pq.Time {
+			if !rules.IsBerlin {
+				return nil, errors.New("PQ draft activation requires Berlin account access accounting")
+			}
+			var err error
+			precompileAddrs, err = evm.PQDraftPrecompiles(
+				precompileAddrs, pq.SigRecover, pq.MLDSA, pq.MLDSAETH,
+				eips.FactoryAddress, eips.BeaconRootAddress, eips.HistoryStorageAddress,
+				types.WithdrawalRequestAddress, types.ConsolidationRequestAddress,
+				types.SystemAddress, types.DepositContractAddress, config.DepositContractAddress,
+			)
+			if err != nil {
+				return nil, err
+			}
+		}
+		evm.SetPrecompiles(precompileAddrs)
 	}
 
-	return precompileAddrs
+	return precompileAddrs, nil
 }
 
 // ProcessWithRequests exposes the execution outputs including EIP-7685 requests.
@@ -1029,6 +1044,28 @@ func intrinsicGasGlamst(data []byte, isCreate bool, hasValue bool, toExists bool
 // when non-nil, the tracker is injected into the EVM so opcodes record
 // storage reads, storage changes, and address touches during execution.
 func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	// Create EVM
+	blockCtx := vm.BlockContext{
+		GetHash:     getHash,
+		BlockNumber: header.Number,
+		Time:        header.Time,
+		Coinbase:    header.Coinbase,
+		GasLimit:    header.GasLimit,
+		BaseFee:     header.BaseFee,
+		PrevRandao:  header.MixDigest,
+	}
+	txCtx := vm.TxContext{
+		Origin:     msg.From,
+		GasPrice:   msg.GasPrice,
+		BlobHashes: msg.BlobHashes,
+	}
+	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
+
+	precompileAddrs, err := ConfigureBlockEVM(config, header, evm)
+	if err != nil {
+		return nil, err
+	}
+
 	// Validate and consume gas from the pool
 	if err := gp.SubGas(msg.GasLimit); err != nil {
 		return nil, err
@@ -1189,23 +1226,6 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 
 	gasLeft := msg.GasLimit - igas
 
-	// Create EVM
-	blockCtx := vm.BlockContext{
-		GetHash:     getHash,
-		BlockNumber: header.Number,
-		Time:        header.Time,
-		Coinbase:    header.Coinbase,
-		GasLimit:    header.GasLimit,
-		BaseFee:     header.BaseFee,
-		PrevRandao:  header.MixDigest,
-	}
-	txCtx := vm.TxContext{
-		Origin:     msg.From,
-		GasPrice:   gasPrice,
-		BlobHashes: msg.BlobHashes,
-	}
-	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
-
 	// EIP-7928: inject BAL tracker so opcodes record state accesses.
 	if len(balTracker) > 0 && balTracker[0] != nil {
 		evm.SetBALTracker(balTracker[0], 0)
@@ -1227,7 +1247,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		evm.SetInitialReservoir(reservoir)
 	}
 
-	precompileAddrs := configureBlockEVM(config, header, evm)
+	evm.TxContext.GasPrice = gasPrice
 
 	// Pre-warm EIP-2930 access list: mark sender, destination, coinbase, and precompiles as warm.
 	statedb.AddAddressToAccessList(msg.From)

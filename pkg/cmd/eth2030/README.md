@@ -98,3 +98,31 @@ current native node keeps its execution state in memory, and its `chaindata`
 directory alone does not contain these flat state tables. The command produces
 a binary snapshot for inspection and recovery. Fork transitions use the
 separate overlay and conversion rules referenced by EIP-7864.
+
+## Private-chain PQ draft profile
+
+Set `config.pqDraft` in genesis to enable the pinned EIP-7932 and EIP-8051
+verifiers at a chosen timestamp. The profile requires Berlin and three distinct,
+unoccupied addresses. For example, a private chain can use the following
+configuration.
+
+```json
+{
+  "time": 1000,
+  "sigRecover": "0x0000000000000000000000000000000000007001",
+  "mldsa": "0x0000000000000000000000000000000000007002",
+  "mldsaEth": "0x0000000000000000000000000000000000007003"
+}
+```
+
+For recovery, allocate code `0x00 || expandedPublicKey` at the address formed
+by the last 20 bytes of Keccak256 of that key. The leading STOP makes the
+account inert when called. The registry checks the key hash and the signature.
+Recovery charges the draft base and algorithm gas plus a Berlin or Glamsterdam
+cold or warm account access and 1926 gas for copying the code. The direct
+verifiers charge the pinned draft's 4500 gas and take the key in calldata.
+
+The private profile addresses and key account encoding are ETH2030 choices.
+The pinned drafts overlap at address `0x12`, also occupied by the pinned
+EIP-7997 factory. Reserved addresses and active precompile collisions are
+rejected. Normal network configurations have no PQ draft profile.

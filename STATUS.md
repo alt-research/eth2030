@@ -1,3 +1,10 @@
+## Track 4 private-chain PQ execution profile (2026-11-14)
+
+- Wired explicitly addressed EIP-7932/8051 draft precompiles into transaction execution, system calls, and RPC simulation at a configured genesis timestamp. The private profile reads expanded keys from STOP-prefixed code at their key-hash address, charges cold or warm access plus copy gas, and records the account in the BAL. Direct verification keeps the 4500-gas draft cost.
+- Both independent SHAKE and Keccak signatures pass through the transaction execution path. Tests exercise activation, malformed and absent key state, exact access gas, reserved and duplicate addresses, RPC simulation, and genesis address parsing. Replacing the cold access cost with the warm cost caused both positive-path gas tests to fail.
+- Full `go test ./...`, the targeted execution and node race tests, and local builds with and without CGO passed.
+- The addresses, key account format and lookup surcharge are private-chain choices. Canonical fork assignments and registry semantics remain open. Binary overlay execution, EIP-4762 accounting, EIP-7748 conversion, and production proof provider adoption remain open.
+
 ## Track 4 historical signers and migration command (2026-11-14)
 
 - Added explicit Round 3 Falcon-padded-512 and Round 3.1 SPHINCS+-SHA2-128f-simple signing APIs using the pinned PQClean clean implementations. Existing transaction IDs continue to select ML-DSA-65, FN-DSA and SLH-DSA. The historical Falcon and SPHINCS+ APIs require CGO and report unavailability without it.

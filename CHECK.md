@@ -46,7 +46,8 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
 - [x] Match EIP-7864 Python reference roots for basic insertion and a state embedding with storage and code boundaries.
 - [x] Expose resumable offline migration through the client command and read its output back from a reopened FileDB.
-- [ ] Resolve EIP-7932 and EIP-8051 fork addresses and wire state-backed PQ key lookup. The fixed drafts both assign 0x12, which EIP-7997 reserves for its factory.
+- [x] Exercise EIP-7932/8051 through an opt-in private-chain fork with distinct addresses, state-backed public keys, and account access charging.
+- [ ] Confirm canonical fork addresses and key registry rules for EIP-7932/8051. The pinned drafts both assign 0x12, which the pinned EIP-7997 factory uses.
 - [ ] Implement the EIP-7864 fork path. This includes the EIP-7612 frozen MPT overlay, EIP-4762 access accounting, overlay execution and restart, and EIP-7748 ordered, per-block conversion when scheduled. The offline snapshot covers a separate conversion workflow. See the completion audit in docs/CODEBASE_AUDIT.md §VII for draft-version differences.
 - [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)

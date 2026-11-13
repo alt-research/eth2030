@@ -127,7 +127,9 @@ func callRequestQueue(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb s
 	}
 	txContext := vm.TxContext{Origin: types.SystemAddress, GasPrice: new(big.Int)}
 	evm := vm.NewEVMWithState(blockContext, txContext, vm.Config{}, statedb)
-	configureBlockEVM(cfg, header, evm)
+	if _, err := ConfigureBlockEVM(cfg, header, evm); err != nil {
+		return nil, err
+	}
 	if tracker != nil {
 		tracker.RecordAddressTouch(address)
 		evm.SetBALTracker(tracker, 0)

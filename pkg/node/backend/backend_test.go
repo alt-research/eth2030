@@ -147,3 +147,33 @@ func TestEngineBackendProcessInclusionListRejectsUnsupportedStorage(t *testing.T
 // - TestEngineBackendIsAmsterdam
 // - TestEngineBackendGetHeadTimestamp
 // - TestEngineBackendGetPayloadNotFound
+
+func TestRPCBackendEVMCallUsesPQDraftActivation(t *testing.T) {
+	activation := uint64(10)
+	target := types.Address{18: 0x70, 19: 1}
+	for _, timestamp := range []uint64{activation - 1, activation} {
+		cfg := *coreconfig.TestConfig
+		cfg.PQDraft = &coreconfig.PQDraftConfig{
+			Time: &activation, SigRecover: target,
+			MLDSA: types.Address{18: 0x70, 19: 2}, MLDSAETH: types.Address{18: 0x70, 19: 3},
+		}
+		db := state.NewMemoryStateDB()
+		genesis := types.NewBlock(&types.Header{Number: new(big.Int), GasLimit: 30_000_000, Time: timestamp, Root: db.GetRoot()}, &types.Body{})
+		bc, err := chain.NewBlockchain(&cfg, genesis, db, rawdb.NewMemoryDB())
+		if err != nil {
+			t.Fatal(err)
+		}
+		backend := NewRPCBackend(&mockNodeDeps{blockchain: bc, config: &Config{}}, nil).(*RPCBackend)
+		out, gas, err := backend.EVMCall(types.Address{}, &target, nil, 5000, nil, rpc.LatestBlockNumber)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if timestamp < activation {
+			if len(out) != 0 || gas != 5000 {
+				t.Fatalf("before activation = %x, gas %d", out, gas)
+			}
+		} else if len(out) != 32 || types.BytesToHash(out) != (types.Hash{}) || gas != 2000 {
+			t.Fatalf("at activation = %x, gas %d", out, gas)
+		}
+	}
+}

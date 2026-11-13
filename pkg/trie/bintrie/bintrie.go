@@ -219,6 +219,9 @@ func (t *BinaryTrie) Delete(key []byte) error {
 	return nil
 }
 
+// IsDraftBlake3 reports whether the tree uses the pinned EIP-7864 encoding.
+func (t *BinaryTrie) IsDraftBlake3() bool { return t.hashFunc == HashFunctionBlake3 }
+
 // Hash returns the root hash of the trie.
 func (t *BinaryTrie) Hash() types.Hash {
 	if t.hashFunc == HashFunctionBlake3 {

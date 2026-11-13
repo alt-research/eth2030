@@ -1,3 +1,9 @@
+## Track 4 ordered binary overlay conversion (2026-11-14)
+
+- Added a pinned EIP-7748 conversion step for a frozen memory-state snapshot and pinned EIP-7864 BLAKE3 overlay. It iterates in MPT hash-key order, converts storage before account headers and code, and charges a unit for each slot or account. Existing overlay values, including explicit zero, take precedence. Cursor copies support independent branches and checkpoint recovery verifies the frozen MPT root and reopens the overlay.
+- Tests cover ordered conversion, exact stride, wrong roots and cursors, branch isolation, explicit zero and live value preservation, and FileDB reopen inside a partially converted account. Reversing either sort or overwriting zero makes the corresponding test fail.
+- The node still needs a binary-overlay StateDB, execution and access gas wiring, durable block-to-checkpoint publication, and per-block conversion scheduling.
+
 ## Track 4 private-chain PQ execution profile (2026-11-14)
 
 - Wired explicitly addressed EIP-7932/8051 draft precompiles into transaction execution, system calls, and RPC simulation at a configured genesis timestamp. The private profile reads expanded keys from STOP-prefixed code at their key-hash address, charges cold or warm access plus copy gas, and records the account in the BAL. Direct verification keeps the 4500-gas draft cost.

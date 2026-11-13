@@ -65,6 +65,10 @@ func TestMigrateCommittedToBinaryReopen(t *testing.T) {
 			t.Fatalf("storage %x: %x, %v", tc.slot, value, err)
 		}
 	}
+	loadedCode, err := restored.GetContractCode(addr)
+	if err != nil || !bytes.Equal(loadedCode, code) {
+		t.Fatalf("contract code readback: %v", err)
+	}
 	chunks := bintrie.ChunkifyCode(code)
 	for _, i := range []int{0, 127, 128, len(chunks) - 1} {
 		key := bintrie.GetTreeKeyForCodeChunk(addr, uint64(i))

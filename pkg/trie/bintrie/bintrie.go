@@ -17,6 +17,7 @@ import (
 	"slices"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 )
 
 // Key encoding constants matching the go-ethereum reference.
@@ -116,6 +117,9 @@ func NewBinaryNode() BinaryNode {
 
 var errInvalidRootType = errors.New("invalid root type")
 
+// ErrDraftStateHashFunction indicates an operation requires a BLAKE3 draft trie.
+var ErrDraftStateHashFunction = errors.New("bintrie: draft state operation requires BLAKE3")
+
 // BinaryTrie is the primary trie structure implementing EIP-7864.
 type BinaryTrie struct {
 	root     BinaryNode
@@ -193,10 +197,18 @@ func (t *BinaryTrie) Put(key, value []byte) error {
 	return nil
 }
 
-// Delete removes a key by setting it to zero.
+// Delete removes a draft BLAKE3 leaf; legacy SHA-256 trees store zero.
 func (t *BinaryTrie) Delete(key []byte) error {
 	if len(key) != HashSize {
 		return ErrInvalidKeyLength
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		root, err := deleteDraftNode(t.root, key, 0)
+		if err != nil {
+			return err
+		}
+		t.root = root
+		return nil
 	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(key, zeroVal[:], nil, 0)
@@ -259,7 +271,7 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 	var balance [16]byte
 	copy(balance[:], values[BasicDataLeafKey][BasicDataBalanceOffset:])
 	acc.Balance.SetBytes(balance[:])
-	acc.CodeHash = values[CodeHashLeafKey]
+	acc.CodeHash = slices.Clone(values[CodeHashLeafKey])
 
 	return acc, nil
 }
@@ -317,11 +329,17 @@ func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) err
 	if err != nil {
 		return err
 	}
+	if t.hashFunc == HashFunctionBlake3 && len(value) > HashSize {
+		return ErrInvalidValueLength
+	}
 	var v [HashSize]byte
 	if len(value) >= HashSize {
 		copy(v[:], value[:HashSize])
 	} else {
 		copy(v[HashSize-len(value):], value[:])
+	}
+	if t.hashFunc == HashFunctionBlake3 && v == ([HashSize]byte{}) {
+		return t.Delete(k)
 	}
 	root, err := t.root.Insert(k, v[:], nil, 0)
 	if err != nil {
@@ -331,11 +349,14 @@ func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) err
 	return nil
 }
 
-// DeleteStorage removes a storage slot value by zeroing it.
+// DeleteStorage removes a draft storage leaf; legacy SHA-256 trees store zero.
 func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
 	k, err := t.storageKey(addr, key)
 	if err != nil {
 		return err
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		return t.Delete(k)
 	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(k, zeroVal[:], nil, 0)
@@ -346,7 +367,8 @@ func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
 	return nil
 }
 
-// UpdateContractCode updates the contract code into the trie.
+// UpdateContractCode writes code chunks without updating the account header or removing old chunks.
+// Use ReplaceContractCode for an existing BLAKE3 account.
 func (t *BinaryTrie) UpdateContractCode(addr types.Address, code []byte) error {
 	chunks := ChunkifyCode(code)
 	if t.hashFunc == HashFunctionBlake3 {
@@ -418,4 +440,149 @@ func (t *BinaryTrie) storageKey(addr types.Address, slot []byte) ([]byte, error)
 		return key[:], nil
 	}
 	return GetBinaryTreeKeyStorageSlot(addr, slot), nil
+}
+
+// deleteDraftNode removes an EIP-7864 leaf and maintains minimal stem paths.
+func deleteDraftNode(node BinaryNode, key []byte, depth int) (BinaryNode, error) {
+	switch n := node.(type) {
+	case nil, Empty:
+		return Empty{}, nil
+	case *StemNode:
+		if !bytes.Equal(n.Stem, key[:StemSize]) || n.Values[key[StemSize]] == nil {
+			return n, nil
+		}
+		n.Values[key[StemSize]] = nil
+		for _, value := range n.Values {
+			if value != nil {
+				return n, nil
+			}
+		}
+		return Empty{}, nil
+	case *InternalNode:
+		if depth >= StemSize*8 {
+			return nil, ErrInvalidStoredNode
+		}
+		var err error
+		if getBit(key, depth) == 0 {
+			n.left, err = deleteDraftNode(n.left, key, depth+1)
+		} else {
+			n.right, err = deleteDraftNode(n.right, key, depth+1)
+		}
+		if err != nil {
+			return nil, err
+		}
+		leftEmpty := n.left == nil || IsEmptyNode(n.left)
+		rightEmpty := n.right == nil || IsEmptyNode(n.right)
+		if leftEmpty && rightEmpty {
+			return Empty{}, nil
+		}
+		if leftEmpty {
+			if stem, ok := n.right.(*StemNode); ok {
+				stem.depth = depth
+				return stem, nil
+			}
+		}
+		if rightEmpty {
+			if stem, ok := n.left.(*StemNode); ok {
+				stem.depth = depth
+				return stem, nil
+			}
+		}
+		return n, nil
+	default:
+		return nil, ErrInvalidStoredNode
+	}
+}
+
+// ReplaceContractCode atomically updates code, code hash and code size for an
+// existing BLAKE3 account and removes obsolete chunks. It does not publish a root.
+func (t *BinaryTrie) ReplaceContractCode(addr types.Address, code []byte) error {
+	if t.hashFunc != HashFunctionBlake3 {
+		return ErrDraftStateHashFunction
+	}
+	if len(code) > 0xffffff {
+		return ErrInvalidValueLength
+	}
+	account, err := t.GetAccount(addr)
+	if err != nil {
+		return err
+	}
+	if account == nil {
+		return ErrKeyNotFound
+	}
+	basic, err := t.Get(t.accountKey(addr))
+	if err != nil {
+		return err
+	}
+	if len(basic) != HashSize {
+		return ErrInvalidValueLength
+	}
+	oldSize := int(basic[5])<<16 | int(basic[6])<<8 | int(basic[7])
+	oldChunks, newChunks := (oldSize+StemSize-1)/StemSize, (len(code)+StemSize-1)/StemSize
+	next := t.Copy()
+	if err := next.UpdateContractCode(addr, code); err != nil {
+		return err
+	}
+	for i := newChunks; i < oldChunks; i++ {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		if err := next.Delete(key[:]); err != nil {
+			return err
+		}
+	}
+	account.CodeHash = crypto.Keccak256(code)
+	if err := next.UpdateAccount(addr, account, len(code)); err != nil {
+		return err
+	}
+	t.root = next.root
+	return nil
+}
+
+// GetContractCode reconstructs and authenticates an account's code chunks.
+func (t *BinaryTrie) GetContractCode(addr types.Address) ([]byte, error) {
+	if t.hashFunc != HashFunctionBlake3 {
+		return nil, ErrDraftStateHashFunction
+	}
+	account, err := t.GetAccount(addr)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		return nil, ErrKeyNotFound
+	}
+	basic, err := t.Get(t.accountKey(addr))
+	if err != nil {
+		return nil, err
+	}
+	if len(basic) != HashSize || len(account.CodeHash) != HashSize {
+		return nil, ErrInvalidValueLength
+	}
+	size := int(basic[5])<<16 | int(basic[6])<<8 | int(basic[7])
+	result := make([]byte, 0, (size+StemSize-1)/StemSize*StemSize)
+	for i := 0; i < (size+StemSize-1)/StemSize; i++ {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		chunk, err := t.Get(key[:])
+		if err != nil {
+			return nil, err
+		}
+		if len(chunk) != HashSize {
+			return nil, ErrKeyNotFound
+		}
+		result = append(result, chunk[1:]...)
+	}
+	result = result[:size]
+	if !bytes.Equal(crypto.Keccak256(result), account.CodeHash) {
+		return nil, ErrInvalidStoredNode
+	}
+	chunks := ChunkifyCode(result)
+	for i, expected := range chunks {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		chunk, err := t.Get(key[:])
+		if err != nil {
+			return nil, err
+		}
+		if !bytes.Equal(chunk, expected[:]) {
+			return nil, ErrInvalidStoredNode
+		}
+	}
+	return result, nil
 }

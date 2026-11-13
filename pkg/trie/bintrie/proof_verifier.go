@@ -146,8 +146,11 @@ func (pv *ProofVerifier) VerifyExclusion(proof *ExclusionProof) bool {
 	if proof == nil {
 		return false
 	}
-	if pv.root == (types.Hash{}) || len(proof.Path.Siblings) > StemSize*8 {
+	if len(proof.Path.Siblings) > StemSize*8 {
 		return false
+	}
+	if pv.root == (types.Hash{}) {
+		return proof.EmptyAtPath && !proof.MissingSuffix && len(proof.Path.Siblings) == 0 && len(proof.DivergentStem) == 0 && proof.DivergentStemHash == (types.Hash{}) && proof.DivergentValuesRoot == (types.Hash{})
 	}
 
 	stem := proof.Key[:StemSize]

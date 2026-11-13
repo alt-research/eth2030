@@ -291,8 +291,12 @@ func TestProofVerifierEmptyRootHash(t *testing.T) {
 	}
 
 	exProof := &ExclusionProof{EmptyAtPath: true}
+	if !pv.VerifyExclusion(exProof) {
+		t.Fatal("empty tree should prove any key absent")
+	}
+	exProof.Path.Siblings = []types.Hash{{1}}
 	if pv.VerifyExclusion(exProof) {
-		t.Fatal("empty root should not verify exclusion proof")
+		t.Fatal("empty root accepted nonempty proof path")
 	}
 }
 

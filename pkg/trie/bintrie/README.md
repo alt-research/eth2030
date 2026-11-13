@@ -10,7 +10,7 @@ The binary trie organises state under 32-byte keys. The first 31 bytes form a **
 
 The legacy `GetBinaryTreeKey` helpers use SHA-256 and are not the pinned EIP-7864 key derivation. The BLAKE3 state APIs use `GetTreeKeyForBasicData`, `GetTreeKeyForCodeHash`, `GetTreeKeyForStorageSlot`, and `GetTreeKeyForCodeChunk`, which use the draft BLAKE3 and little-endian tree-index rules.
 
-`BinaryTrie` exposes high-level account and storage APIs (`GetAccount`, `UpdateAccount`, `GetStorage`, `UpdateStorage`, `UpdateContractCode`) that encode/decode the `BasicDataLeaf` format (version, code size, nonce, balance) and manage code chunking via `ChunkifyCode` (which returns `[][32]byte` per spec).
+`BinaryTrie` exposes account and storage APIs. For BLAKE3 trees, zero storage updates and `Delete` remove leaves and maintain minimal stem paths. `ReplaceContractCode` updates an existing account's code size and hash and removes obsolete chunks; `GetContractCode` reconstructs and authenticates code and chunk metadata. `UpdateContractCode` is a low-level chunk writer and does not remove stale chunks or update headers. This is not yet a full `StateDB` implementation.
 
 Structured proofs in `proof_verifier.go` support SHA-256 and BLAKE3; select `NewBlake3ProofVerifier` for BLAKE3. `proof.go` is a separate legacy SHA-256-only proof API. Epoch metadata for state expiry is written via `UpdateLeafMetadata`. An `EpochUpdater` in `epoch_updater.go` performs batch expiry updates.
 
@@ -33,7 +33,7 @@ Structured proofs in `proof_verifier.go` support SHA-256 and BLAKE3; select `New
 
 - `New()` / `NewWithHashFunc(hashFunc)` / `Get(key)` / `Put(key, value)` / `Delete(key)` / `Hash()` / `Persist(store)` / `OpenPersisted(store, hashFunc, root)`
 - `GetAccount(addr)` / `UpdateAccount(addr, acc, codeLen)` / `GetStorage(addr, key)` / `UpdateStorage(addr, key, value)` / `DeleteStorage(addr, key)`
-- `UpdateContractCode(addr, code)` / `UpdateStem(key, values)` / `UpdateLeafMetadata(stem, subindex, epoch)`
+- `GetContractCode(addr)` / `ReplaceContractCode(addr, code)` / `UpdateContractCode(addr, code)` / `UpdateStem(key, values)` / `UpdateLeafMetadata(stem, subindex, epoch)`
 - `GetBinaryTreeKey(addr, key)` / `GetBinaryTreeKeyBasicData(addr)` / `GetBinaryTreeKeyCodeHash(addr)` / `GetBinaryTreeKeyStorageSlot(addr, key)` / `StorageIndex(storageKey)`
 - `ChunkifyCode(code)` (returns `[][32]byte`) / `PackBasicDataLeaf` / `UnpackBasicDataLeaf`
 

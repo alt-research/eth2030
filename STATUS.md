@@ -1,3 +1,9 @@
+## Track 4 binary trie state operations (2026-11-13)
+
+- Draft BLAKE3 storage deletion now removes absent leaves and restores minimal stem paths; zero-valued storage writes remove the slot. Legacy SHA-256 behavior is retained. Empty-root exclusion proofs are accepted for an empty path.
+- Added atomic-in-memory replacement of an existing account's code, updating code size and hash and removing obsolete chunks. Code readback reconstructs and checks the hash and chunk metadata. `UpdateContractCode` remains a lower-level chunk writer, not a full account update. `GetAccount` no longer exposes its stored code-hash slice.
+- Tests check delete/reinsert roots against freshly built trees, zero storage, code shrinking across stems, persisted code readback, corrupted chunk metadata and migration code reconstruction. `go test ./trie/... ./core/state/... ./core/execution`, targeted trie/state race tests, and `go build ./...` passed in `pkg`. These operations are not a complete `StateDB` and are not activated in the node.
+
 ## Track 4 EIP-8051 draft envelope and registry tests (2026-11-13)
 
 - Added isolated draft precompile gas and input-envelope handling for both proposed ML-DSA variants: 4500 gas, a 32-byte message, 2420-byte signature and 20512-byte expanded key. A valid-length call requires an explicitly supplied verifier; no cryptographic provider or fork address is configured by default.

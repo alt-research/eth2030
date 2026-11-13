@@ -1,3 +1,8 @@
+## Track 4 EIP-7932 pinned-draft SIGRECOVER (2026-11-13)
+
+- Added an isolated `EIP7932DraftSigRecover` precompile and immutable-at-construction algorithm registry for the pinned `refs/EIPs` draft. It implements the draft's secp256k1 selector `0xff`, signature validation and recovery, address compatibility rule, base gas and signing-data penalty. Additional algorithms require explicit registration; none of the project-local PQ identifiers are silently treated as EIP algorithms.
+- Tests reproduce the pinned `assets/eip-7932/precompile_test_cases.py` cases, exercise EVM precompile gas dispatch and insufficient gas, reject high-S signatures and invalid registry entries, and check a simulated additional algorithm. `go test ./core/vm ./core/types ./crypto/pqc ./core/execution`, a targeted VM race test, and `go build ./...` passed in `pkg`. This implementation is not registered in a fork or on the network, and is not the later EIP-7932 revision used by the existing SSZ codec. EIP-8051 expanded-key verification, gas, activation and cross-version/address reconciliation remain open.
+
 ## Track 4 committed-state binary migration progress (2026-11-13)
 
 - Added an offline `TrieStateDB` flat-table migration to the draft EIP-7864 BLAKE3 trie. Address and storage-slot preimages are present in these project-specific tables. Before writing binary nodes, the migration reconstructs the account MPT against a caller-provided trusted root, validates each account storage root and code hash, and rejects malformed or out-of-range data.

@@ -35,7 +35,7 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 ### Track 4 — I* / PQ direction
 
 - [ ] PQC suite: real implementations for Dilithium3, Falcon-512, SPHINCS+ (ML-DSA-65 is real).
-- [ ] EIP-7932 PQ registry and EIP-8051 PQ gas costs: add tests.
+- [ ] EIP-7932 PQ registry and EIP-8051 PQ gas costs: add tests. (Pinned-draft secp256k1 SIGRECOVER and registry tests added in isolation; PQ algorithms, EIP-8051 and fork activation remain.)
 - [ ] EIP-7864 Binary Merkle Trie: continue toward complete.
 - [ ] Remaining STARK / lattice / aggregation protocol migrations (CODEBASE_AUDIT §VII).
 

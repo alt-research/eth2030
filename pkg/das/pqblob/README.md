@@ -20,7 +20,7 @@ pipeline, providing a single validation entry point for DAS samplers.
 
 **Types**
 - `PQBlobCommitment` — 64-byte lattice Merkle digest with chunk/data metadata
-- `PQBlobProof` — per-chunk lattice witness (96 bytes) linking chunk to commitment
+- `PQBlobProof` — ordered per-chunk Merkle authentication path (96 bytes) linking chunk to commitment
 - `PQBlobProofV2` — extended proof carrying a PQ signature over the Merkle root
 - `PQBlobSignature` — serializable PQ signature over a commitment digest
 - `PQBlobSigner` — wraps a `pqc.PQSigner` with key management
@@ -30,10 +30,10 @@ pipeline, providing a single validation entry point for DAS samplers.
 - `PQBlobValidator` — unified DAS validation entry point
 
 **Functions**
-- `CommitBlob(data []byte) (*PQBlobCommitment, error)` — lattice Merkle commitment
+- `CommitBlob(data []byte) (*PQBlobCommitment, error)` — ordered Merkle commitment
 - `VerifyBlobCommitment(commitment, data)` — recompute and compare commitment
-- `GenerateBlobProof(data, index)` — per-chunk lattice witness
-- `VerifyBlobProof(proof, commitment)` — verify lattice witness
+- `GenerateBlobProof(data, index)` — ordered per-chunk Merkle authentication path
+- `VerifyBlobProof(proof, commitment)` — verify chunk inclusion and the original blob length
 - `BatchVerifyProofs(proofs, commitments)` — parallel batch verification
 - `ValidatePQBlob`, `ValidatePQBlobProof` — structural validation
 - `SignBlobCommitment(commitment, signer)` — produce `PQBlobSignature`
@@ -59,3 +59,10 @@ err = validator.ValidateBlobCommitment(blobData, commitment.Digest[:])
 ```
 
 [← das](../README.md)
+
+
+The experimental commitment binds the chunk order and byte length with the
+domain `eth2030-pq-blob-merkle-v1`. Proofs contain an ordered list of sibling
+hashes. The signed wrapper serializes its path with version byte 1 and verifies
+the complete path and digest. Regenerate legacy commitments and witnesses
+before using the new format. EIP-4844 and PeerDAS continue to use KZG.

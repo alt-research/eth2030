@@ -3,6 +3,8 @@ package pqblob
 import (
 	"bytes"
 	"testing"
+
+	"github.com/eth2030/eth2030/crypto/pqc"
 )
 
 func TestPQBlobValidatorNew(t *testing.T) {
@@ -308,7 +310,7 @@ func TestPQBlobValidatorSerializeChunkProof(t *testing.T) {
 		t.Fatalf("GenerateBlobProof: %v", err)
 	}
 	serialized := serializeChunkProof(proof)
-	wantLen := 4 + 32 + PQProofSize + PQCommitmentSize
+	wantLen := 1 + 4 + 32 + PQCommitmentSize + len(proof.Siblings)*32
 	if len(serialized) != wantLen {
 		t.Fatalf("length: got %d, want %d", len(serialized), wantLen)
 	}
@@ -366,4 +368,39 @@ func pqvMakeBlob(size, mod int) []byte {
 		blob[i] = byte(i % mod)
 	}
 	return blob
+}
+
+func TestPQBlobValidatorChecksCompleteMerkleProof(t *testing.T) {
+	validator := NewPQBlobValidator(PQAlgSPHINCS)
+	blob := pqvMakeBlob(95, 251)
+	commitment, err := CommitBlob(blob)
+	if err != nil {
+		t.Fatal(err)
+	}
+	proof, err := validator.GenerateCommitmentProof(blob)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(proof.PublicKey) != pqc.SPHINCSSignerPKSize || len(proof.Signature) != pqc.SPHINCSSignerSigSize {
+		t.Fatal("SPHINCS proof used a different signing scheme")
+	}
+	if err := validator.ValidateBlobProof(blob, proof, commitment.Digest[:]); err != nil {
+		t.Fatal(err)
+	}
+	for _, digest := range [][]byte{commitment.Digest[:1], append(bytes.Clone(commitment.Digest[:]), 0)} {
+		if err := validator.ValidateBlobCommitment(blob, digest); err != ErrPQValidatorMismatch {
+			t.Fatalf("invalid digest length %d: %v", len(digest), err)
+		}
+	}
+	bad := *proof
+	bad.MerkleProof = bytes.Clone(proof.MerkleProof)
+	bad.MerkleProof[len(bad.MerkleProof)-1] ^= 1
+	if err := validator.ValidateBlobProof(blob, &bad, commitment.Digest[:]); err != ErrPQValidatorProofInvalid {
+		t.Fatalf("invalid path: %v", err)
+	}
+	bad = *proof
+	bad.Algorithm = PQAlgDilithium
+	if err := validator.ValidateBlobProof(blob, &bad, commitment.Digest[:]); err != ErrPQValidatorProofInvalid {
+		t.Fatalf("invalid algorithm: %v", err)
+	}
 }

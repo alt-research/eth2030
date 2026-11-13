@@ -34,58 +34,66 @@ func MigrateCommittedToBinary(source rawdb.Database, expectedRoot types.Hash, de
 		if len(key) != len(dbPrefixAccount)+len(types.Address{}) {
 			return types.Hash{}, ErrBinaryMigrationSource
 		}
-		var address types.Address
+		address := types.Address{}
 		copy(address[:], key[len(dbPrefixAccount):])
-		var account rlpAccount
-		if err := rlp.DecodeBytes(body, &account); err != nil || account.Balance == nil || len(account.Root) != 32 || len(account.CodeHash) != 32 {
-			return types.Hash{}, fmt.Errorf("%w: invalid account %x", ErrBinaryMigrationSource, address)
-		}
 		if err := mpt.Put(crypto.Keccak256(address[:]), body); err != nil {
 			return types.Hash{}, err
 		}
-		var code []byte
-		if !bytes.Equal(account.CodeHash, types.EmptyCodeHash[:]) {
-			var err error
-			code, err = source.Get(codeDBKey(account.CodeHash))
-			if err != nil || !bytes.Equal(crypto.Keccak256(code), account.CodeHash) {
-				return types.Hash{}, fmt.Errorf("%w: missing or invalid code for %x", ErrBinaryMigrationSource, address)
-			}
-		}
-		stateAccount := &types.Account{Nonce: account.Nonce, Balance: account.Balance, CodeHash: account.CodeHash}
-		if err := binary.UpdateAccount(address, stateAccount, len(code)); err != nil {
-			return types.Hash{}, fmt.Errorf("binary migration: account %x: %w", address, err)
-		}
-		if err := binary.UpdateContractCode(address, code); err != nil {
+		if err := migrateBinaryAccount(source, address, body, binary); err != nil {
 			return types.Hash{}, err
-		}
-		slots := source.NewIterator(storageDBPrefix(address))
-		obj := newStateObject()
-		for slots.Next() {
-			sk, value := slots.Key(), slots.Value()
-			if len(sk) != len(dbPrefixStorage)+len(address)+32 || len(value) != 32 {
-				slots.Release()
-				return types.Hash{}, fmt.Errorf("%w: invalid storage for %x", ErrBinaryMigrationSource, address)
-			}
-			var slot, val types.Hash
-			copy(slot[:], sk[len(dbPrefixStorage)+len(address):])
-			copy(val[:], value)
-			if val == (types.Hash{}) {
-				continue
-			}
-			obj.committedStorage[slot] = val
-			if err := binary.UpdateStorage(address, slot[:], val[:]); err != nil {
-				slots.Release()
-				return types.Hash{}, err
-			}
-		}
-		slots.Release()
-		actualStorageRoot := computeStorageRoot(obj)
-		if !bytes.Equal(actualStorageRoot[:], account.Root) {
-			return types.Hash{}, fmt.Errorf("%w: storage root for %x", ErrBinaryMigrationSource, address)
 		}
 	}
 	if mpt.Hash() != expectedRoot {
 		return types.Hash{}, ErrBinaryMigrationSource
 	}
 	return binary.Persist(dest)
+}
+
+// migrateBinaryAccount validates and copies one complete account and its slots.
+func migrateBinaryAccount(source rawdb.Database, address types.Address, body []byte, binary *bintrie.BinaryTrie) error {
+	var account rlpAccount
+	if err := rlp.DecodeBytes(body, &account); err != nil || account.Balance == nil || len(account.Root) != 32 || len(account.CodeHash) != 32 {
+		return fmt.Errorf("%w: invalid account %x", ErrBinaryMigrationSource, address)
+	}
+	var code []byte
+	if !bytes.Equal(account.CodeHash, types.EmptyCodeHash[:]) {
+		var err error
+		code, err = source.Get(codeDBKey(account.CodeHash))
+		if err != nil || !bytes.Equal(crypto.Keccak256(code), account.CodeHash) {
+			return fmt.Errorf("%w: missing or invalid code for %x", ErrBinaryMigrationSource, address)
+		}
+	}
+	stateAccount := &types.Account{Nonce: account.Nonce, Balance: account.Balance, CodeHash: account.CodeHash}
+	if err := binary.UpdateAccount(address, stateAccount, len(code)); err != nil {
+		return fmt.Errorf("binary migration: account %x: %w", address, err)
+	}
+	if err := binary.UpdateContractCode(address, code); err != nil {
+		return err
+	}
+	slots := source.NewIterator(storageDBPrefix(address))
+	obj := newStateObject()
+	for slots.Next() {
+		sk, value := slots.Key(), slots.Value()
+		if len(sk) != len(dbPrefixStorage)+len(address)+32 || len(value) != 32 {
+			slots.Release()
+			return fmt.Errorf("%w: invalid storage for %x", ErrBinaryMigrationSource, address)
+		}
+		var slot, val types.Hash
+		copy(slot[:], sk[len(dbPrefixStorage)+len(address):])
+		copy(val[:], value)
+		if val == (types.Hash{}) {
+			continue
+		}
+		obj.committedStorage[slot] = val
+		if err := binary.UpdateStorage(address, slot[:], val[:]); err != nil {
+			slots.Release()
+			return err
+		}
+	}
+	slots.Release()
+	actualStorageRoot := computeStorageRoot(obj)
+	if !bytes.Equal(actualStorageRoot[:], account.Root) {
+		return fmt.Errorf("%w: storage root for %x", ErrBinaryMigrationSource, address)
+	}
+	return nil
 }

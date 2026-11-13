@@ -18,7 +18,7 @@ Experimental migration utilities for a legacy `mpt.BinaryTrie`. These utilities 
 
 `OverlayMigrator` (`overlay.go`) and `MigrationPlanner` (`migration_planner.go`) provide experimental overlay and planning primitives.
 
-For the project's committed `TrieStateDB` flat tables, `state.MigrateCommittedToBinary` separately builds a draft EIP-7864 BLAKE3 tree using account addresses and storage-slot preimages. It verifies the trusted account root, each storage root and code hash before persisting binary nodes. It requires a quiescent source, does not publish or activate the resulting root, and does not supply a scalable, checkpointed fork migration. A generic MPT with only hashed keys cannot supply the required address and slot preimages.
+For the project's committed `TrieStateDB` flat tables, `state.MigrateCommittedToBinary` separately builds a draft EIP-7864 BLAKE3 tree using account addresses and storage-slot preimages. It verifies the trusted account root, each storage root and code hash before persisting binary nodes. It requires a quiescent source and does not publish or activate the resulting root. `state.MigrateCommittedBinaryBatch` adds an experimental durable checkpoint: nodes are written before checkpoint advancement, and resume reloads the saved root. Each batch rescans the account MPT and eagerly reloads and rewrites the binary tree, so it is not a scalable fork migration. Durability and exclusive access depend on the caller and database; crash injection and node integration remain unverified. A generic MPT with only hashed keys cannot supply the required address and slot preimages.
 
 ## Functionality
 

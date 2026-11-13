@@ -44,7 +44,7 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [ ] Establish provider and wire-format compatibility with independent tests. (Default pipeline now passes native validation and execution; historical algorithm format compatibility remains open.)
 - [ ] Test the actual EIP-7932 registry and EIP-8051 precompile contracts against pinned specifications.
 - [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
-- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864. (BLAKE3 roots, proofs, state mutation, persistence and offline committed-state migration advanced; full StateDB, atomic fork migration and node adoption remain.)
+- [ ] Reconcile binary trie hashing, migration, persistence and consumer integration with EIP-7864. (BLAKE3 roots, proofs, state mutation, persistence and checkpointed offline migration advanced; scalable migration, full StateDB and node adoption remain.)
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate provider boundary and fail-closed batch verification added; no production STARK provider is configured.)
 - [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
 

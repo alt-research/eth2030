@@ -1,3 +1,9 @@
+## Track 4 checkpointed binary migration (2026-11-13)
+
+- Added an experimental account-batched migration checkpoint keyed by the trusted source MPT root. Each invocation reconstructs the source account root, validates copied account storage and code, opens the previous authenticated binary root, writes the updated nodes, and only then advances the checkpoint. The intermediate root is not published as canonical.
+- A file-database test covers zero-address cursor handling, a simulated checkpoint-write failure, clean close/reopen between batches, retry, completion and equality with the independently run one-shot migration. Tests also reject changed source state, malformed checkpoints and missing checkpoint nodes; empty state and repeated completion are covered.
+- Validation: `go test ./core/state/... ./core/rawdb ./trie/... ./core/execution`, targeted migration race tests, and `go build ./...` passed in `pkg`. The caller must stop concurrent source and destination writers and use a database with suitable durability. No process-kill or power-loss injection was run. Each batch rescans the complete source account trie, eagerly reloads and rewrites the target tree, and retains that tree in memory. This is not a scalable migration, fork transition, or node activation.
+
 ## Track 4 binary trie state operations (2026-11-13)
 
 - Draft BLAKE3 storage deletion now removes absent leaves and restores minimal stem paths; zero-valued storage writes remove the slot. Legacy SHA-256 behavior is retained. Empty-root exclusion proofs are accepted for an empty path.

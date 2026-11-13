@@ -275,9 +275,39 @@ The encrypted-mempool key reconstruction now uses TNO Shamir with the existing p
 
 Experimental proposer election uses curve25519-voi ECVRF-EDWARDS25519-SHA512-ELL2 with 80-byte proofs. It derives the 32-byte proposer score from the library output. The pinned Ethereum consensus specification uses BLS verification for RANDAO reveals. [ECVRF provider](https://pkg.go.dev/github.com/oasisprotocol/curve25519-voi/primitives/ed25519/extra/ecvrf) · [Consensus RANDAO specification](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#randao)
 
-STARK generation and its application-specific aggregation still use the existing experimental code. The node constructs the STARK mempool aggregator and can enable validation-frame proof generation. Neither Geth nor the inspected Lighthouse path supplies an interchangeable prover. The public Winterfell and Plonky3 APIs require a concrete algebraic statement, prover and verifier configuration, and a new artifact format for these consumers. The local BN254 Poseidon2 hash also differs from the small-field permutation used by LeanSig. [Node construction](../pkg/node/node.go) · [Winterfell](https://github.com/meta/winterfell) · [Plonky3](https://github.com/Plonky3/Plonky3)
+The mempool STARK path still produces advisory traces. Frame proof generation
+and recursive aggregation require a provider that proves the actual execution
+statement. The node rejects the frame-proof option until that provider exists.
+Neither Geth nor the inspected Lighthouse path provides an interchangeable
+prover. Winterfell and Plonky3 require a concrete algebraic statement,
+prover/verifier configuration, and an artifact format for each application.
+The BN254 Poseidon2 hash also differs from LeanSig's small-field permutation.
+[Node construction](../pkg/node/node.go) · [Winterfell](https://github.com/meta/winterfell) · [Plonky3](https://github.com/Plonky3/Plonky3)
 
-The project-specific lattice blob commitments and PQ aggregation still have no equivalent in the inspected Ethereum client paths. Ethereum's blob and cell commitments use the KZG protocol described above.
+The experimental blob path now verifies ordered Merkle openings and binds the
+original blob length. The separate deterministic lattice scheme validates the
+complete blob and opening for each batch entry. Ethereum's blob and cell
+commitments use the EIP-4844 and PeerDAS KZG paths. There is no specified
+interchangeable lattice or PQ aggregation protocol in the inspected client
+references.
+
+### Track 4 completion audit (2026-11-14)
+
+| Work item | Verified in this branch | Remaining acceptance condition |
+|---|---|---|
+| Historical PQ signatures | Round 3 Dilithium3, Falcon-padded-512, and SPHINCS+-SHA2-128f-simple key generation, signing, and verification. Falcon passes the fixed EIP-8052 asset and rejects nonzero padding. The CGO variants are selected through explicit APIs. | Existing transaction IDs retain their separate ML-DSA-65, FN-DSA, and SLH-DSA encodings. Any new transaction use of the historical formats requires a new wire assignment. |
+| EIP-7932 / EIP-8051 | Pinned draft recovery and both expanded-key verification variants, exercised through EVM static calls and the registry adapter with known answers and malformed inputs. | The pinned EIP-7932 and EIP-8051 both claim address 0x12, which this branch also uses for the pinned EIP-7997 factory. Resolve the fork address assignment and specify the state-backed key lookup, including access charging. Verify activation before and after the configured fork. |
+| EIP-7864 state | Pinned BLAKE3 reference roots, trie mutation and proofs, persisted recovery, and resumable offline conversion via `eth2030 binary-migrate`. | Implement a frozen MPT plus binary overlay with explicit zero overrides, EIP-4762 access accounting, and the subsequent EIP-7748 conversion with storage-slot and account-data ordering. Wire the overlay to block building, validation, reorg, and restart. Confirm which EIP revision defines the consensus key layout. |
+| STARK and aggregation | Provider boundaries require statement-bound verification. Generic mempool ticks remain advisory. | Implement an application-specific prover/verifier and versioned artifact format for the actual frame approvals and ordered execution proofs, then verify through production consumers with independent vectors. |
+| Lattice commitment | Complete deterministic local opening checks and authenticated experimental Merkle blob paths. | Choose and specify the production commitment and opening protocol, its wire version, and the adoption path. Standard blob consensus uses KZG. |
+
+The repository's pinned EIP-7864 draft uses a 31-byte stem derived from
+the address and tree index. The published draft reviewed on 2026-11-14
+introduces explicit state-type prefixes and different storage key derivation.
+The published EIP-7997 factory also differs from this branch's fixed 0x12
+revision. The tests and offline snapshot format are tied to the checked-in
+revisions. [Published EIP-7864](https://eips.ethereum.org/EIPS/eip-7864)
+· [Published EIP-7997](https://eips.ethereum.org/EIPS/eip-7997)
 
 ---
 

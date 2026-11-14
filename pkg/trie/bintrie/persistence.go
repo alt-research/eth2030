@@ -26,6 +26,19 @@ func storedNodeKey(hashFunc string, hash types.Hash) []byte {
 // writes succeed. Publication of the returned root is the caller's responsibility.
 // This local storage format is not an EIP-7864 wire format.
 func (t *BinaryTrie) Persist(store NodeStore) (types.Hash, error) {
+	return t.persist(store, nil)
+}
+
+// PersistIncremental skips subtrees whose nodes were published atomically by
+// this method. has must query committed storage and never include staged writes.
+func (t *BinaryTrie) PersistIncremental(store NodeStore, has func([]byte) (bool, error)) (types.Hash, error) {
+	if !t.IsDraftBlake3() || has == nil {
+		return types.Hash{}, ErrInvalidStoredNode
+	}
+	return t.persist(store, has)
+}
+
+func (t *BinaryTrie) persist(store NodeStore, has func([]byte) (bool, error)) (types.Hash, error) {
 	if store == nil || (t.hashFunc != HashFunctionBlake3 && t.hashFunc != HashFunctionSHA256) {
 		return types.Hash{}, ErrInvalidStoredNode
 	}
@@ -34,9 +47,20 @@ func (t *BinaryTrie) Persist(store NodeStore) (types.Hash, error) {
 		if node == nil {
 			return types.Hash{}, nil
 		}
-		switch n := node.(type) {
-		case Empty:
+		if IsEmptyNode(node) {
 			return types.Hash{}, nil
+		}
+		if has != nil {
+			hash := draftHash(node)
+			if hash == (types.Hash{}) {
+				return types.Hash{}, ErrInvalidStoredNode
+			}
+			present, err := has(storedNodeKey(t.hashFunc, hash))
+			if err != nil || present {
+				return hash, err
+			}
+		}
+		switch n := node.(type) {
 		case *InternalNode:
 			if depth >= StemSize*8 {
 				return types.Hash{}, ErrInvalidStoredNode
@@ -148,6 +172,16 @@ func OpenPersisted(store NodeStore, hashFunc string, root types.Hash) (*BinaryTr
 		}
 		if actual != hash {
 			return nil, ErrInvalidStoredNode
+		}
+		if hashFunc == HashFunctionBlake3 {
+			memo := new(draftNodeHash)
+			memo.get(func() types.Hash { return actual })
+			switch n := node.(type) {
+			case *StemNode:
+				n.draft = memo
+			case *InternalNode:
+				n.draft = memo
+			}
 		}
 		return node, nil
 	}

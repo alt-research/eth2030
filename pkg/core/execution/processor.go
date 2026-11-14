@@ -684,6 +684,37 @@ func calcWithdrawalsRoot(ws []*types.Withdrawal) types.Hash {
 	return t.Hash()
 }
 
+// ValidatePQDraftSchedule checks the active profile at its start and whenever
+// the configured precompile set changes. It can run without execution state.
+func ValidatePQDraftSchedule(config *corconfig.ChainConfig) error {
+	if config == nil || config.PQDraft == nil || config.PQDraft.Time == nil {
+		return nil
+	}
+	pq := config.PQDraft
+	for _, time := range []*uint64{pq.Time, config.PragueTime, config.GlamsterdanTime, config.IPlusTime, config.LegacyNativeBLSUntil} {
+		if time == nil || *time < *pq.Time {
+			continue
+		}
+		rules := config.Rules(new(big.Int), config.IsMerge(), *time)
+		base := vm.SelectPrecompiles(vm.ForkRules{
+			IsPrague: rules.IsPrague, IsGlamsterdan: rules.IsGlamsterdan,
+			IsIPlus: rules.IsIPlus, LegacyNativeBLS: rules.LegacyNativeBLS,
+		})
+		if err := vm.ValidatePQDraftAddresses(base, pq.SigRecover, pq.MLDSA, pq.MLDSAETH, pqDraftReservedAddresses(config)...); err != nil {
+			return fmt.Errorf("PQ draft at timestamp %d: %w", *time, err)
+		}
+	}
+	return nil
+}
+
+func pqDraftReservedAddresses(config *corconfig.ChainConfig) []types.Address {
+	return []types.Address{
+		eips.FactoryAddress, eips.BeaconRootAddress, eips.HistoryStorageAddress,
+		types.WithdrawalRequestAddress, types.ConsolidationRequestAddress,
+		types.SystemAddress, types.DepositContractAddress, config.DepositContractAddress,
+	}
+}
+
 // ConfigureBlockEVM installs the same fork rules for execution and simulation.
 func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) (map[types.Address]vm.PrecompiledContract, error) {
 	// Select the correct jump table based on fork rules.
@@ -718,9 +749,7 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 			var err error
 			precompileAddrs, err = evm.PQDraftPrecompiles(
 				precompileAddrs, pq.SigRecover, pq.MLDSA, pq.MLDSAETH,
-				eips.FactoryAddress, eips.BeaconRootAddress, eips.HistoryStorageAddress,
-				types.WithdrawalRequestAddress, types.ConsolidationRequestAddress,
-				types.SystemAddress, types.DepositContractAddress, config.DepositContractAddress,
+				pqDraftReservedAddresses(config)...,
 			)
 			if err != nil {
 				return nil, err

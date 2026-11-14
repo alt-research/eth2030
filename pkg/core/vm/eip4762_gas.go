@@ -16,6 +16,38 @@ type WitnessGasTracker struct {
 	accessedLeaves   map[witnessLeafKey]bool
 	editedSubtrees   map[witnessSubtreeKey]bool
 	editedLeaves     map[witnessLeafKey]bool
+	pending          []witnessEvent
+	staging          bool
+}
+
+type witnessEvent struct {
+	key    witnessLeafKey
+	branch bool
+	edit   bool
+}
+
+// Dynamic gas calculation can discover accesses before the EVM knows
+// whether the instruction can pay for them.
+func (t *WitnessGasTracker) finishGasCalculation(paid bool) {
+	if !paid {
+		for _, event := range t.pending {
+			key := event.key
+			if event.branch {
+				branch := witnessSubtreeKey{key.addr, key.subKey}
+				if event.edit {
+					delete(t.editedSubtrees, branch)
+				} else {
+					delete(t.accessedSubtrees, branch)
+				}
+			} else if event.edit {
+				delete(t.editedLeaves, key)
+			} else {
+				delete(t.accessedLeaves, key)
+			}
+		}
+	}
+	t.pending = t.pending[:0]
+	t.staging = false
 }
 
 type witnessSubtreeKey struct {
@@ -54,12 +86,18 @@ func (t *WitnessGasTracker) touchAccess(addr types.Address, subKey types.Hash, l
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
 	if !t.accessedSubtrees[sk] {
 		t.accessedSubtrees[sk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: witnessLeafKey{addr: addr, subKey: subKey}, branch: true})
+		}
 		gas = safeAdd(gas, WitnessBranchCost)
 	}
 
 	lk := witnessLeafKey{addr: addr, subKey: subKey, leafKey: leafKey}
 	if !t.accessedLeaves[lk] {
 		t.accessedLeaves[lk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: lk})
+		}
 		gas = safeAdd(gas, WitnessChunkCost)
 	}
 
@@ -82,12 +120,18 @@ func (t *WitnessGasTracker) touchWrite(addr types.Address, subKey types.Hash, le
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
 	if !t.editedSubtrees[sk] {
 		t.editedSubtrees[sk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: witnessLeafKey{addr: addr, subKey: subKey}, branch: true, edit: true})
+		}
 		gas = safeAdd(gas, SubtreeEditCost)
 	}
 
 	lk := witnessLeafKey{addr: addr, subKey: subKey, leafKey: leafKey}
 	if !t.editedLeaves[lk] {
 		t.editedLeaves[lk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: lk, edit: true})
+		}
 		gas = safeAdd(gas, ChunkEditCost)
 		if fill {
 			gas = safeAdd(gas, ChunkFillCost)
@@ -193,9 +237,12 @@ func gasSstoreEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 
 	// Determine if this is a fill (writing to a previously-empty slot).
 	fill := false
-	if evm.StateDB != nil {
-		committed := evm.StateDB.GetCommittedState(contract.Address, key)
-		fill = isZeroHash(committed)
+	if slots, ok := evm.StateDB.(interface {
+		HasStorageLeaf(types.Address, types.Hash) bool
+	}); ok {
+		fill = !slots.HasStorageLeaf(contract.Address, key)
+	} else if evm.StateDB != nil {
+		fill = evm.StateDB.GetCommittedState(contract.Address, key).IsZero()
 	}
 
 	// Write event.
@@ -240,6 +287,9 @@ func gasExtCodeCopyEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 
 	// Charge per code chunk accessed.
 	if evm.witnessGas != nil && size > 0 {
+		if !stack.Back(2).IsUint64() {
+			return gas, nil
+		}
 		codeOffset := stack.Back(2).Uint64()
 		var codeSize uint64
 		if evm.StateDB != nil {
@@ -364,13 +414,10 @@ func gasCodeChunksAccess(evm *EVM, addr types.Address, codeOffset, readSize, cod
 	}
 
 	// Clamp the range to codeSize.
-	endByte := codeOffset + readSize
-	if endByte > codeSize {
-		endByte = codeSize
-	}
 	if codeOffset >= codeSize {
 		return 0
 	}
+	endByte := codeOffset + min(readSize, codeSize-codeOffset)
 
 	firstChunk := codeOffset / CodeChunkSize
 	lastChunk := (endByte - 1) / CodeChunkSize
@@ -381,14 +428,4 @@ func gasCodeChunksAccess(evm *EVM, addr types.Address, codeOffset, readSize, cod
 		gas = safeAdd(gas, evm.witnessGas.TouchAccessEvent(addr, treeKey, subKey))
 	}
 	return gas
-}
-
-// isZeroHash returns true if all bytes in h are zero.
-func isZeroHash(h types.Hash) bool {
-	for _, b := range h {
-		if b != 0 {
-			return false
-		}
-	}
-	return true
 }

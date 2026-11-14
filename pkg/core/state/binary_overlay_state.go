@@ -124,6 +124,21 @@ func (s *BinaryOverlayState) SetState(address types.Address, key, value types.Ha
 	s.MemoryStateDB.SetState(address, key, value)
 }
 
+// HasStorageLeaf distinguishes an explicitly written zero from an absent
+// storage leaf for witness gas. Frozen MPT storage only contains nonzero slots.
+func (s *BinaryOverlayState) HasStorageLeaf(address types.Address, key types.Hash) bool {
+	if object := s.getStateObject(address); object != nil {
+		if _, dirty := object.dirtyStorage[key]; dirty {
+			return true
+		}
+		if !object.committedStorage[key].IsZero() {
+			return true
+		}
+	}
+	value, err := s.tree.GetStorage(address, key[:])
+	return err == nil && value != nil
+}
+
 func (s *BinaryOverlayState) Convert(stride int) error {
 	if s.converted {
 		return nil
@@ -134,6 +149,28 @@ func (s *BinaryOverlayState) Convert(stride int) error {
 	}
 	s.tree, s.converted = tree, complete
 	return nil
+}
+
+// Checkpoint reports the finalized overlay root and the next conversion unit.
+func (s *BinaryOverlayState) Checkpoint() BinaryConversionCheckpoint {
+	return BinaryConversionCheckpoint{
+		FrozenRoot: s.conversion.frozenRoot, OverlayRoot: s.GetRoot(),
+		Account: uint64(s.conversion.account), Slot: uint64(s.conversion.slot),
+	}
+}
+
+// PersistCheckpoint stages the tree nodes before returning the cursor.
+func (s *BinaryOverlayState) PersistCheckpoint(store bintrie.NodeStore, has func([]byte) (bool, error)) (BinaryConversionCheckpoint, error) {
+	if len(s.journal.entries) != 0 {
+		return BinaryConversionCheckpoint{}, ErrBinaryConversionCheckpoint
+	}
+	root, err := s.tree.PersistIncremental(store, has)
+	if err != nil {
+		return BinaryConversionCheckpoint{}, err
+	}
+	checkpoint := s.Checkpoint()
+	checkpoint.OverlayRoot = root
+	return checkpoint, nil
 }
 
 // GetRoot returns the last finalized overlay root.

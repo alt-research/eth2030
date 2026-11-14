@@ -17,6 +17,7 @@ type StemNode struct {
 	Stem   []byte   // stem path to reach this group of values
 	Values [][]byte // all values, indexed by the last byte of the key
 	depth  int      // depth of the node in the trie
+	draft  *draftNodeHash
 }
 
 // Get retrieves the value for the given key.

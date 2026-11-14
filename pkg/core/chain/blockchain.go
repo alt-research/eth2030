@@ -164,6 +164,9 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 	if genesis == nil {
 		return nil, ErrNoGenesis
 	}
+	if err := execution.ValidatePQDraftSchedule(config); err != nil {
+		return nil, err
+	}
 	overlayConfigured := config != nil && config.BinaryOverlayTime != nil
 	if overlayConfigured && db == nil {
 		return nil, errors.New("binary overlay requires a block database")
@@ -272,7 +275,7 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 	if err != nil || existing != hash {
 		// Fresh start: persist genesis and set head pointers.
 		if overlayConfigured {
-			if err := bc.persistOverlayBlock(genesis, nil, true); err != nil {
+			if err := bc.persistOverlayBlock(genesis, nil, nil, true); err != nil {
 				return nil, fmt.Errorf("persist binary overlay genesis: %w", err)
 			}
 		} else {
@@ -318,6 +321,9 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 			}
 			if replayed.GetRoot() != head.Root() {
 				return nil, block.ErrInvalidStateRoot
+			}
+			if err := bc.verifyOverlayCheckpoint(head, replayed); err != nil {
+				return nil, fmt.Errorf("verify overlay head checkpoint: %w", err)
 			}
 			bc.currentState, bc.currentBlock = replayed, head
 			bc.hc.currentHeader = head.Header()
@@ -771,7 +777,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	overlayConfigured := bc.config != nil && bc.config.BinaryOverlayTime != nil
 	if overlayConfigured {
 		isCanonical = header.ParentHash == headHash
-		if err := bc.persistOverlayBlock(blk, receipts, isCanonical); err != nil {
+		if err := bc.persistOverlayBlock(blk, receipts, statedb, isCanonical); err != nil {
 			return fmt.Errorf("persist binary overlay block %d: %w", num, err)
 		}
 	}
@@ -1435,7 +1441,7 @@ func (bc *Blockchain) writeBlock(blk *types.Block) {
 }
 
 // persistOverlayBlock keeps a block replayable before exposing its head or caches.
-func (bc *Blockchain) persistOverlayBlock(blk *types.Block, receipts []*types.Receipt, canonical bool) error {
+func (bc *Blockchain) persistOverlayBlock(blk *types.Block, receipts []*types.Receipt, statedb state.StateDB, canonical bool) error {
 	header, err := blk.Header().EncodeRLP()
 	if err != nil {
 		return err
@@ -1462,6 +1468,11 @@ func (bc *Blockchain) persistOverlayBlock(blk *types.Block, receipts []*types.Re
 			encoded = append(encoded, data...)
 		}
 		if err := rawdb.WriteReceipts(batch, num, hash, encoded); err != nil {
+			return err
+		}
+	}
+	if overlay, ok := statedb.(*state.BinaryOverlayState); ok {
+		if err := writeOverlayCheckpoint(bc.db, batch, blk, overlay); err != nil {
 			return err
 		}
 	}
@@ -1838,6 +1849,9 @@ func (bc *Blockchain) reorgOverlay(newHead *types.Block) error {
 	}
 	if statedb.GetRoot() != stored.Root() {
 		return ErrBinaryOverlayRoot
+	}
+	if err := bc.verifyOverlayCheckpoint(stored, statedb); err != nil {
+		return err
 	}
 	bc.mu.Lock()
 	defer bc.mu.Unlock()

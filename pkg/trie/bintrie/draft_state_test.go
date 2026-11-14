@@ -135,3 +135,37 @@ func TestDraftReplaceCodeAndPersist(t *testing.T) {
 		t.Fatal("accepted invalid code chunk metadata")
 	}
 }
+
+func TestDraftCopiesShareOnlyImmutablePaths(t *testing.T) {
+	tree := NewWithHashFunc(HashFunctionBlake3)
+	left, adjacent, right := types.Hash{31: 1}, types.Hash{31: 2}, types.Hash{0: 0x80}
+	value := types.Hash{31: 3}
+	for _, key := range []types.Hash{left, right} {
+		if err := tree.Put(key[:], value[:]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	root := tree.Hash()
+	fork := tree.Copy()
+	if err := fork.Put(adjacent[:], value[:]); err != nil {
+		t.Fatal(err)
+	}
+	if err := fork.Delete(right[:]); err != nil {
+		t.Fatal(err)
+	}
+	if tree.Hash() != root || fork.Hash() == root {
+		t.Fatal("branch writes modified a shared root or retained a stale hash")
+	}
+	if got, err := tree.Get(adjacent[:]); err != nil || got != nil {
+		t.Fatalf("new branch leaf leaked to source: %x, %v", got, err)
+	}
+	if got, err := tree.Get(right[:]); err != nil || len(got) != HashSize || got[31] != 3 {
+		t.Fatalf("branch deletion leaked to source: %x, %v", got, err)
+	}
+	if _, err := tree.Root().Insert(left[:], right[:], nil, 0); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := tree.Get(left[:]); err != nil || len(got) != HashSize || got[31] != 3 || tree.Hash() != root {
+		t.Fatal("mutating an exported root changed the live tree")
+	}
+}

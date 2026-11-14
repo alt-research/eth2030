@@ -1,3 +1,12 @@
+## Track 4 overlay checkpoints and witness accounting (2026-11-14)
+
+- The private overlay atomically persists changed binary nodes, the frozen root, and the conversion cursor with each imported block. Restart and forkchoice validate an available checkpoint against the reconstructed state. Existing replay-only databases can still open.
+- BLAKE3 branches share immutable trie paths and memoized node hashes. Checkpoint publication skips previously committed subtrees. The logical execution state and frozen conversion data remain memory-backed, and startup still replays blocks.
+- Witness gas helpers distinguish an explicit zero storage leaf from an absent leaf, drop tentative events for unaffordable opcodes, and clamp code ranges without overflow. Witness gas is still separate from the private overlay's active fork rules.
+- Startup rejects private PQ draft addresses that conflict with the current or a later configured precompile set. The published EIP-7932 and EIP-8051 still share address 0x12.
+- The full Go test suite, local build, and targeted race tests passed. The regression suite checks corrupted cursors and nodes, batch rollback, legacy replay, changed-path writes, exact witness gas, and a future PQ address collision.
+- Open work includes the published binary key layout, complete EIP-4762 transaction and opcode integration, scalable frozen-state access and direct state recovery, node committee provenance, and production STARK, lattice and recursive aggregation protocols.
+
 ## Track 4 correctness review (2026-11-14)
 
 - Private binary overlay imports and reorgs publish database batches before changing canonical pointers. Side branches retain receipts, canonical transaction lookup follows forkchoice, and startup rejects missing bodies or a mismatched genesis. FileDB commits its WAL before materializing data files and can replay a full batch after a materialization failure.

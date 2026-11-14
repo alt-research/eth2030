@@ -51,12 +51,21 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [x] Implement the EIP-7748 ordered conversion step, zero-override protection, and resumable cursor for the pinned BLAKE3 overlay.
 - [x] Exercise the pinned BLAKE3 overlay on an opt-in chain through block construction, import, Engine API payload construction, reorg, rewind, and restart by replay. Apply ordered conversion before transactions and preserve explicit zero overrides.
 - [x] Preserve all 256 bits of EVM storage keys when tracking EIP-4762 storage access and edit events. Test branch and leaf gas for repeated, adjacent, and high-bit-distinct slots.
-- [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add durable per-block checkpoints and a scalable frozen-state reader with crash recovery. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
+- [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add a scalable frozen-state reader and restore the execution state directly from durable checkpoints. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
 - [ ] Connect the PQ attestation verifier to the node's authenticated committee and key source.
 - [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
 - [x] Verify every PQ attestation in the consensus batch, bind publication and classic fallback to authorized keys, and reject XMSS relabeling.
 - [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)
-- [ ] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
+- [x] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
+
+#### Track 4 overlay checkpoint follow-up
+
+- [x] Persist the binary root and conversion cursor with each imported overlay block.
+- [x] Validate checkpoints across forkchoice, restart, write failure, and older replay-only databases.
+- [x] Share immutable BLAKE3 nodes across branches and write only changed paths.
+- [x] Distinguish zero storage leaves from absent leaves for witness gas and discard events for unpaid opcodes.
+- [x] Reject private PQ address collisions across scheduled precompile forks before opening a chain.
+- [x] Cross-check the public drafts and record outstanding protocol and adoption requirements.
 
 #### Track 4 bug review
 

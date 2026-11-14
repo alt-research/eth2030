@@ -13,6 +13,31 @@ var (
 	ErrPQDraftState   = errors.New("PQ draft precompiles require world state")
 )
 
+// ValidatePQDraftAddresses checks a private profile against the active
+// precompile and system-contract addresses.
+func ValidatePQDraftAddresses(base map[types.Address]PrecompiledContract, recover, nist, eth types.Address, reserved ...types.Address) error {
+	addresses := [3]types.Address{recover, nist, eth}
+	for i, address := range addresses {
+		if address.IsZero() {
+			return ErrPQDraftAddress
+		}
+		if _, found := base[address]; found {
+			return fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
+		}
+		for _, used := range addresses[:i] {
+			if used == address {
+				return fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
+			}
+		}
+		for _, used := range reserved {
+			if used == address {
+				return fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
+			}
+		}
+	}
+	return nil
+}
+
 // PQDraftPrecompiles installs the explicitly addressed private-chain profile.
 // Key accounts hold STOP followed by the raw expanded public key. The account
 // address is the last 20 bytes of Keccak256 of the key.
@@ -20,24 +45,8 @@ func (evm *EVM) PQDraftPrecompiles(base map[types.Address]PrecompiledContract, r
 	if evm.StateDB == nil {
 		return nil, ErrPQDraftState
 	}
-	addresses := [3]types.Address{recover, nist, eth}
-	for i, address := range addresses {
-		if address.IsZero() {
-			return nil, ErrPQDraftAddress
-		}
-		if _, found := base[address]; found {
-			return nil, fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
-		}
-		for _, used := range addresses[:i] {
-			if used == address {
-				return nil, fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
-			}
-		}
-		for _, used := range reserved {
-			if used == address {
-				return nil, fmt.Errorf("%w: %s", ErrPQDraftAddress, address)
-			}
-		}
+	if err := ValidatePQDraftAddresses(base, recover, nist, eth, reserved...); err != nil {
+		return nil, err
 	}
 	lookup := func(id [20]byte) ([]byte, error) {
 		address := types.Address(id)

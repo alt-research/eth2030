@@ -189,6 +189,10 @@ func (t *BinaryTrie) Put(key, value []byte) error {
 	if len(value) != HashSize {
 		return ErrInvalidValueLength
 	}
+	if t.hashFunc == HashFunctionBlake3 {
+		t.root = putDraftNode(t.root, key, slices.Clone(value), 0)
+		return nil
+	}
 	root, err := t.root.Insert(key, slices.Clone(value), nil, 0)
 	if err != nil {
 		return err
@@ -203,11 +207,7 @@ func (t *BinaryTrie) Delete(key []byte) error {
 		return ErrInvalidKeyLength
 	}
 	if t.hashFunc == HashFunctionBlake3 {
-		root, err := deleteDraftNode(t.root, key, 0)
-		if err != nil {
-			return err
-		}
-		t.root = root
+		t.root = deleteDraftNode(t.root, key, 0)
 		return nil
 	}
 	var zeroVal [HashSize]byte
@@ -225,7 +225,7 @@ func (t *BinaryTrie) IsDraftBlake3() bool { return t.hashFunc == HashFunctionBla
 // Hash returns the root hash of the trie.
 func (t *BinaryTrie) Hash() types.Hash {
 	if t.hashFunc == HashFunctionBlake3 {
-		return NewBinaryHasherBlake3(0).Hash(t.root)
+		return draftHash(t.root)
 	}
 	return t.root.Hash()
 }
@@ -342,8 +342,11 @@ func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) err
 	} else {
 		copy(v[HashSize-len(value):], value[:])
 	}
-	if t.hashFunc == HashFunctionBlake3 && v == ([HashSize]byte{}) {
-		return t.Delete(k)
+	if t.hashFunc == HashFunctionBlake3 {
+		if v == ([HashSize]byte{}) {
+			return t.Delete(k)
+		}
+		return t.Put(k, v[:])
 	}
 	root, err := t.root.Insert(k, v[:], nil, 0)
 	if err != nil {
@@ -413,18 +416,44 @@ func (t *BinaryTrie) UpdateContractCode(addr types.Address, code []byte) error {
 
 // UpdateStem updates the values for a given stem key.
 func (t *BinaryTrie) UpdateStem(key []byte, values [][]byte) error {
+	if t.hashFunc == HashFunctionBlake3 {
+		if len(key) < StemSize || len(values) != StemNodeWidth {
+			return ErrInvalidKeyLength
+		}
+		for _, value := range values {
+			if value != nil && len(value) != HashSize {
+				return ErrInvalidValueLength
+			}
+		}
+		var fullKey [HashSize]byte
+		copy(fullKey[:StemSize], key[:StemSize])
+		for index, value := range values {
+			if value == nil {
+				continue
+			}
+			fullKey[StemSize] = byte(index)
+			t.root = putDraftNode(t.root, fullKey[:], slices.Clone(value), 0)
+		}
+		return nil
+	}
 	var err error
 	t.root, err = t.root.InsertValuesAtStem(key, values, nil, 0)
 	return err
 }
 
-// Copy creates a deep copy of the trie.
+// Copy creates an independently mutable trie.
 func (t *BinaryTrie) Copy() *BinaryTrie {
+	if t.hashFunc == HashFunctionBlake3 {
+		return &BinaryTrie{root: t.root, hashFunc: t.hashFunc}
+	}
 	return &BinaryTrie{root: t.root.Copy(), hashFunc: t.hashFunc}
 }
 
 // Root returns the root node (for testing and iteration).
 func (t *BinaryTrie) Root() BinaryNode {
+	if t.hashFunc == HashFunctionBlake3 {
+		return t.root.Copy()
+	}
 	return t.root
 }
 
@@ -444,58 +473,6 @@ func (t *BinaryTrie) storageKey(addr types.Address, slot []byte) ([]byte, error)
 		return key[:], nil
 	}
 	return GetBinaryTreeKeyStorageSlot(addr, slot), nil
-}
-
-// deleteDraftNode removes an EIP-7864 leaf and maintains minimal stem paths.
-func deleteDraftNode(node BinaryNode, key []byte, depth int) (BinaryNode, error) {
-	switch n := node.(type) {
-	case nil, Empty:
-		return Empty{}, nil
-	case *StemNode:
-		if !bytes.Equal(n.Stem, key[:StemSize]) || n.Values[key[StemSize]] == nil {
-			return n, nil
-		}
-		n.Values[key[StemSize]] = nil
-		for _, value := range n.Values {
-			if value != nil {
-				return n, nil
-			}
-		}
-		return Empty{}, nil
-	case *InternalNode:
-		if depth >= StemSize*8 {
-			return nil, ErrInvalidStoredNode
-		}
-		var err error
-		if getBit(key, depth) == 0 {
-			n.left, err = deleteDraftNode(n.left, key, depth+1)
-		} else {
-			n.right, err = deleteDraftNode(n.right, key, depth+1)
-		}
-		if err != nil {
-			return nil, err
-		}
-		leftEmpty := n.left == nil || IsEmptyNode(n.left)
-		rightEmpty := n.right == nil || IsEmptyNode(n.right)
-		if leftEmpty && rightEmpty {
-			return Empty{}, nil
-		}
-		if leftEmpty {
-			if stem, ok := n.right.(*StemNode); ok {
-				stem.depth = depth
-				return stem, nil
-			}
-		}
-		if rightEmpty {
-			if stem, ok := n.left.(*StemNode); ok {
-				stem.depth = depth
-				return stem, nil
-			}
-		}
-		return n, nil
-	default:
-		return nil, ErrInvalidStoredNode
-	}
 }
 
 // ReplaceContractCode atomically updates code, code hash and code size for an

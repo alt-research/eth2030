@@ -2,6 +2,7 @@ package chain
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"math/big"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto"
 )
 
@@ -136,6 +138,46 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	side := build(sideParent, conversion+1, tx)
 	insert(side)
 	checkBlockHash(side, sideActivation.Hash())
+	for _, blk := range []*types.Block{active, side} {
+		data, err := db.Get(overlayCheckpointKey(blk.Hash()))
+		if err != nil || len(data) != 81 || types.BytesToHash(data[33:65]) != blk.Root() {
+			t.Fatalf("block %s checkpoint: %x, %v", blk.Hash(), data, err)
+		}
+		if account, slot := binary.BigEndian.Uint64(data[65:73]), binary.BigEndian.Uint64(data[73:81]); account+slot == 0 {
+			t.Fatal("conversion cursor did not advance")
+		}
+	}
+	sideRecord, err := db.Get(overlayCheckpointKey(side.Hash()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	corrupt := bytes.Clone(sideRecord)
+	corrupt[len(corrupt)-1] ^= 1
+	if err := db.Put(overlayCheckpointKey(side.Hash()), corrupt); err != nil {
+		t.Fatal(err)
+	}
+	if err := bc.Reorg(side); !errors.Is(err, state.ErrBinaryConversionCheckpoint) || bc.CurrentBlock().Hash() != active.Hash() {
+		t.Fatalf("corrupt side cursor changed the head: %v", err)
+	}
+	if err := db.Put(overlayCheckpointKey(side.Hash()), sideRecord); err != nil {
+		t.Fatal(err)
+	}
+	nodeKey := append([]byte(overlayNodePrefix+"eth2030:binary-trie:v1:blake3:"), side.Root().Bytes()...)
+	node, err := db.Get(nodeKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	broken := bytes.Clone(node)
+	broken[len(broken)-1] ^= 1
+	if err := db.Put(nodeKey, broken); err != nil {
+		t.Fatal(err)
+	}
+	if err := bc.Reorg(side); err == nil || bc.CurrentBlock().Hash() != active.Hash() {
+		t.Fatalf("corrupt binary nodes changed the head: %v", err)
+	}
+	if err := db.Put(nodeKey, node); err != nil {
+		t.Fatal(err)
+	}
 	if entry, ok := bc.GetTxLookupEntry(tx.Hash()); !ok || entry.BlockHash != active.Hash() {
 		t.Fatalf("side-chain import replaced canonical transaction lookup: %+v", entry)
 	}
@@ -162,6 +204,26 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	bc, err = NewBlockchain(&cfg, genesis, state.NewTrieStateDBFromMemory(rawdb.NewMemoryDB(), mem.Copy()), db)
 	if err != nil {
 		t.Fatal(err)
+	}
+	headRecord, err := db.Get(overlayCheckpointKey(active.Hash()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	corrupt = bytes.Clone(headRecord)
+	corrupt[1] ^= 1
+	if err := db.Put(overlayCheckpointKey(active.Hash()), corrupt); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := NewBlockchain(&cfg, genesis, mem.Copy(), db); !errors.Is(err, state.ErrBinaryConversionCheckpoint) {
+		t.Fatalf("restart accepted a different frozen root: %v", err)
+	}
+	// A replay-only database from before this format has no checkpoint.
+	if err := db.Delete(overlayCheckpointKey(active.Hash())); err != nil {
+		t.Fatal(err)
+	}
+	bc, err = NewBlockchain(&cfg, genesis, mem.Copy(), db)
+	if err != nil {
+		t.Fatalf("restart without a legacy checkpoint: %v", err)
 	}
 	if bc.CurrentBlock().Hash() != active.Hash() {
 		t.Fatalf("reopened head = %s, want %s", bc.CurrentBlock().Hash(), active.Hash())
@@ -257,8 +319,9 @@ func TestBinaryOverlayFailedPublicationCanRetry(t *testing.T) {
 	cfg := *config.TestConfig
 	cfg.ShanghaiTime, cfg.CancunTime, cfg.PragueTime, cfg.AmsterdamTime = nil, nil, nil, nil
 	activation := uint64(1)
-	cfg.BinaryOverlayTime = &activation
+	cfg.BinaryOverlayTime, cfg.BinaryConversionTime, cfg.BinaryConversionStride = &activation, &activation, 1
 	mem := state.NewMemoryStateDB()
+	mem.AddBalance(types.Address{19: 9}, big.NewInt(100))
 	genesis := types.NewBlock(&types.Header{
 		Number: new(big.Int), Difficulty: new(big.Int), GasLimit: 30_000_000,
 		BaseFee: big.NewInt(7), Root: mem.GetRoot(), UncleHash: block.EmptyUncleHash,
@@ -284,6 +347,15 @@ func TestBinaryOverlayFailedPublicationCanRetry(t *testing.T) {
 	if bc.GetBlock(child.Hash()) != nil || bc.CurrentBlock().Hash() != genesis.Hash() {
 		t.Fatal("failed import published a block or changed the head")
 	}
+	if _, err := db.Get(overlayCheckpointKey(child.Hash())); !errors.Is(err, rawdb.ErrNotFound) {
+		t.Fatalf("failed import published the checkpoint: %v", err)
+	}
+	nodes := db.NewIterator([]byte(overlayNodePrefix))
+	hasNodes := nodes.Next()
+	nodes.Release()
+	if hasNodes {
+		t.Fatal("failed import published binary nodes")
+	}
 	db.fail = false
 	if err := bc.InsertBlock(child); err != nil {
 		t.Fatal(err)
@@ -306,5 +378,28 @@ func TestBinaryOverlayFailedPublicationCanRetry(t *testing.T) {
 	}
 	if bc.GetBlockByNumber(1).Hash() != side.Hash() {
 		t.Fatal("reorg retry did not publish the side branch")
+	}
+}
+
+func TestPQDraftRejectsFutureForkCollisionAtStartup(t *testing.T) {
+	cfg := *config.TestConfig
+	activation, iplus := uint64(2), uint64(20)
+	cfg.IPlusTime = &iplus
+	cfg.PQDraft = &config.PQDraftConfig{
+		Time: &activation, SigRecover: types.Address{18: 2, 19: 0x10},
+		MLDSA: types.Address{18: 0x70, 19: 2}, MLDSAETH: types.Address{18: 0x70, 19: 3},
+	}
+	mem := state.NewMemoryStateDB()
+	genesis := types.NewBlock(&types.Header{Number: new(big.Int), Root: mem.GetRoot()}, &types.Body{})
+	db := rawdb.NewMemoryDB()
+	if _, err := NewBlockchain(&cfg, genesis, mem, db); !errors.Is(err, vm.ErrPQDraftAddress) {
+		t.Fatalf("future I+ collision: %v", err)
+	}
+	if _, err := rawdb.ReadCanonicalHash(db, 0); !errors.Is(err, rawdb.ErrNotFound) {
+		t.Fatalf("rejected configuration wrote a genesis record: %v", err)
+	}
+	cfg.PQDraft.SigRecover = types.Address{18: 0x70, 19: 1}
+	if _, err := NewBlockchain(&cfg, genesis, mem, db); err != nil {
+		t.Fatalf("valid private profile: %v", err)
 	}
 }

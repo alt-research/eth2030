@@ -133,3 +133,37 @@ func TestPersistLegacySHAAndMissingNode(t *testing.T) {
 		t.Fatal("accepted root under wrong hash function")
 	}
 }
+
+func TestPersistIncrementalWritesOnlyChangedPath(t *testing.T) {
+	tree := NewWithHashFunc(HashFunctionBlake3)
+	db := rawdb.NewMemoryDB()
+	left, right := makeKey(0, 1), makeKey(0x80, 1)
+	value := makeVal(7)
+	for _, key := range [][32]byte{left, right} {
+		if err := tree.Put(key[:], value[:]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	first, err := tree.PersistIncremental(db, db.Has)
+	if err != nil || db.Len() != 3 {
+		t.Fatalf("first write: %d nodes, err %v", db.Len(), err)
+	}
+	fork := tree.Copy()
+	value[31]++
+	if err := fork.Put(right[:], value[:]); err != nil {
+		t.Fatal(err)
+	}
+	second, err := fork.PersistIncremental(db, db.Has)
+	if err != nil || first == second || db.Len() != 5 {
+		t.Fatalf("fork write: %d nodes, err %v", db.Len(), err)
+	}
+	for _, root := range []types.Hash{first, second} {
+		loaded, err := OpenPersisted(db, HashFunctionBlake3, root)
+		if err != nil || loaded.Hash() != root {
+			t.Fatalf("reopen root %s: %v", root, err)
+		}
+	}
+	if _, err := fork.PersistIncremental(failingNodeStore{}, db.Has); err != nil {
+		t.Fatalf("republishing an existing root tried to write a node: %v", err)
+	}
+}

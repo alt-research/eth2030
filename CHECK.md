@@ -1,5 +1,17 @@
 # Lean4 Verification Check-list
 
+## Consensus Client Follow-up (2026-11-16)
+
+See [Consensus client iteration after Track 4](docs/cl-iteration-roadmap.md)
+for branch policy, dependencies and observable acceptance criteria.
+
+- [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
+- [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
+- [ ] Implement the native Bogotá Engine contract and verify a nonempty FOCIL list carrying a sponsored Frame transaction through independent CL/EL pairs.
+- [ ] Verify full and snap late join and restart against independent source clients.
+- [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
+- [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.
+
 ## Roadmap Homepage Integration (2026-11-13)
 
 - [x] Promote the approved prototype to a detailed roadmap page and share its progress model with the homepage.

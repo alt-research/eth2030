@@ -1,3 +1,8 @@
+## Consensus client iteration plan (2026-11-16)
+
+- Audited EL master after PR #55 and compared the local Lighthouse integration with upstream stable and unstable. The [iteration plan](docs/cl-iteration-roadmap.md) prioritizes Gloas/Amsterdam regression evidence and the missing Heze/Bogotá Engine contract, including nonempty inclusion lists and a sponsored Frame transaction.
+- The plan keeps upstream Lighthouse as the release CL and specifies separate acceptance for late join, timing, proof providers and native consensus research. This update records the plan and source audit.
+
 ## Track 4 integration with master (2026-11-16)
 
 - Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.

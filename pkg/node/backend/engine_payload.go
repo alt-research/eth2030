@@ -1,8 +1,6 @@
 package backend
 
 import (
-	"crypto/rand"
-	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -14,9 +12,11 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/crypto/bls"
 	"github.com/eth2030/eth2030/engine/payload"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/rlp"
 )
 
 // GetPayloadByID retrieves a previously requested payload by its ID.
@@ -429,28 +429,18 @@ func (b *EngineBackend) computeBlobsV2(hashes []types.Hash) []*payload.BlobAndPr
 	return result
 }
 
-func generatePayloadID(parentHash types.Hash, attrs *block.BuildBlockAttributes) payload.PayloadID {
-	var buf [8]byte
-	copy(buf[:], parentHash[:8])
-	var tsBytes [8]byte
-	binary.BigEndian.PutUint64(tsBytes[:], attrs.Timestamp)
-	for i := range buf {
-		buf[i] ^= tsBytes[i]
+func generatePayloadID(parentHash types.Hash, attrs *block.BuildBlockAttributes, slot uint64) (payload.PayloadID, error) {
+	data, err := rlp.EncodeToBytes([]any{
+		parentHash, attrs.Timestamp, attrs.FeeRecipient, attrs.Random,
+		attrs.Withdrawals, attrs.BeaconRoot, attrs.GasLimit, attrs.InclusionListTxs, slot,
+	})
+	if err != nil {
+		return payload.PayloadID{}, err
 	}
-	for i := 0; i < 8; i++ {
-		buf[i] ^= attrs.FeeRecipient[i]
-	}
-	for i := 0; i < 8; i++ {
-		buf[i] ^= attrs.Random[8+i]
-	}
-
+	hash := crypto.Keccak256Hash(data)
 	var id payload.PayloadID
-	copy(id[:], buf[:])
-
-	if id == (payload.PayloadID{}) {
-		rand.Read(id[:])
-	}
-	return id
+	copy(id[:], hash[:len(id)])
+	return id, nil
 }
 
 func encodeTxsRLP(txs []*types.Transaction) [][]byte {

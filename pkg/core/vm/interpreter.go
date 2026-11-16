@@ -382,11 +382,21 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 		// Dynamic gas: includes memory expansion cost + operation-specific costs.
 		// This is charged BEFORE memory is actually resized.
 		if operation.dynamicGas != nil {
+			if evm.witnessGas != nil {
+				evm.witnessGas.staging = true
+			}
 			cost, err := operation.dynamicGas(evm, contract, stack, mem, memorySize)
+			paid := err == nil && contract.UseGas(cost)
+			if evm.witnessGas != nil {
+				evm.witnessGas.finishGasCalculation(paid)
+				if !paid {
+					contract.Gas = 0
+				}
+			}
 			if err != nil {
 				return nil, fmt.Errorf("%w: %v", ErrOutOfGas, err)
 			}
-			if !contract.UseGas(cost) {
+			if !paid {
 				return nil, ErrOutOfGas
 			}
 		}

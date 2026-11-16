@@ -278,19 +278,37 @@ func TestBatchBlobVerify_BlobsWithIsolation(t *testing.T) {
 	}
 }
 
-func TestBatchBlobVerify_DeriveRandomScalars(t *testing.T) {
-	scheme, _ := newBatchTestScheme()
-	data := []byte("scalar test")
-	c, _, _ := scheme.Commit(data)
-
-	scalars := deriveRandomScalars([]*LatticeCommitment{c, c})
-	if len(scalars) != 2 {
-		t.Fatalf("expected 2 scalars, got %d", len(scalars))
+func TestBatchBlobVerifyBindsDataAndCommitment(t *testing.T) {
+	scheme, verifier := newBatchTestScheme()
+	data := []byte("canonical blob")
+	commitment, opening, err := scheme.Commit(data)
+	if err != nil {
+		t.Fatal(err)
 	}
-	// Scalars should be in [1, q).
-	for i, s := range scalars {
-		if s < 1 || s >= PolyQ {
-			t.Fatalf("scalar %d out of range: %d", i, s)
+	test := func(c *LatticeCommitment, o *LatticeOpening, blob []byte, want bool) {
+		t.Helper()
+		ok, err := verifier.BatchVerify([]*LatticeCommitment{c}, []*LatticeOpening{o}, [][]byte{blob})
+		if err != nil || ok != want {
+			t.Fatalf("verification = %v, want %v, error %v", ok, want, err)
 		}
+	}
+	test(commitment, opening, data, true)
+	test(commitment, opening, []byte("different blob"), false)
+	badCommitment := *commitment
+	badCommitment.Hash[0] ^= 1
+	test(&badCommitment, opening, data, false)
+	badOpening := *opening
+	badOpening.Secret[0] = nil
+	test(commitment, &badOpening, data, false)
+	if _, err := scheme.Open([]byte("different blob"), commitment); err != ErrLatticeVerifyFail {
+		t.Fatalf("opening for wrong blob: %v", err)
+	}
+	serialized, err := scheme.CommitToBlob(data)
+	if err != nil || !scheme.VerifyBlob(serialized, data) {
+		t.Fatalf("valid serialized opening: %v", err)
+	}
+	serialized.Proof[0] ^= 1
+	if scheme.VerifyBlob(serialized, data) {
+		t.Fatal("accepted altered serialized vector")
 	}
 }

@@ -339,55 +339,15 @@ func TestRecursiveSimpleAggregateableInterface(t *testing.T) {
 	}
 }
 
-func TestComposeWithSTARK(t *testing.T) {
+func TestComposeWithSTARKRequiresStatementsAndProvider(t *testing.T) {
 	rp := NewRecursiveProver(MaxTreeDepth)
-
-	proofs := []AggregateableProof{
-		&SimpleAggregateable{Data: []byte("proof-1"), Kind: ZKSNARK},
-		&SimpleAggregateable{Data: []byte("proof-2"), Kind: ZKSTARK},
-		&SimpleAggregateable{Data: []byte("proof-3"), Kind: ZKSNARK},
+	inputs := []AggregateableProof{&SimpleAggregateable{Data: []byte("unverified"), Kind: ZKSNARK}}
+	if _, err := rp.ComposeWithSTARK(inputs); err != ErrSTARKAggregateNoProvider {
+		t.Fatalf("got %v", err)
 	}
-
-	comp, err := rp.ComposeWithSTARK(proofs)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if comp.OuterProof == nil {
-		t.Error("outer proof should not be nil")
-	}
-	if len(comp.InnerProofs) != 3 {
-		t.Errorf("expected 3 inner proofs, got %d", len(comp.InnerProofs))
-	}
-	if len(comp.PublicInputs) != 3 {
-		t.Errorf("expected 3 public inputs, got %d", len(comp.PublicInputs))
-	}
-
-	var zero [32]byte
-	if comp.CompositionHash == zero {
-		t.Error("composition hash should not be zero")
-	}
-}
-
-func TestVerifyComposition(t *testing.T) {
-	rp := NewRecursiveProver(MaxTreeDepth)
-
-	proofs := []AggregateableProof{
-		&SimpleAggregateable{Data: []byte("proof-a"), Kind: ZKSNARK},
-		&SimpleAggregateable{Data: []byte("proof-b"), Kind: ZKSTARK},
-	}
-
-	comp, err := rp.ComposeWithSTARK(proofs)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	valid, err := rp.VerifyComposition(comp)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !valid {
-		t.Error("composition should be valid")
+	comp := &RecursiveComposition{OuterProof: &STARKProofData{}}
+	if ok, err := rp.VerifyComposition(comp); ok || err != ErrSTARKAggregateNoProvider {
+		t.Fatalf("got %v, %v", ok, err)
 	}
 }
 

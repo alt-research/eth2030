@@ -1,17 +1,6 @@
-// batch_blob_verify.go implements batch verification for post-quantum lattice
-// blob commitments. Batch verification uses a random linear combination
-// technique to verify multiple commitment-opening pairs simultaneously,
-// amortizing the verification cost.
-//
-// When a batch fails, the verifier performs failure isolation to identify
-// which specific commitment(s) are invalid.
 package pqc
 
-import (
-	"crypto/sha256"
-	"encoding/binary"
-	"errors"
-)
+import "errors"
 
 // Batch verification errors.
 var (
@@ -40,8 +29,7 @@ func NewLatticeBatchVerifier(scheme *LatticeCommitScheme) *LatticeBatchVerifier 
 	return &LatticeBatchVerifier{scheme: scheme}
 }
 
-// BatchVerify verifies multiple commitments against their openings and data
-// using a random linear combination. Returns true if all are valid.
+// BatchVerify verifies each complete opening against its commitment and blob.
 func (bv *LatticeBatchVerifier) BatchVerify(
 	commitments []*LatticeCommitment,
 	openings []*LatticeOpening,
@@ -53,42 +41,13 @@ func (bv *LatticeBatchVerifier) BatchVerify(
 	if len(commitments) != len(openings) || len(commitments) != len(blobs) {
 		return false, ErrBatchVerifyMismatch
 	}
-
-	// Derive random scalars for the linear combination.
-	// The scalars are derived from a hash of all commitments to prevent
-	// an adversary from choosing commitments that cancel in the combination.
-	scalars := deriveRandomScalars(commitments)
-
-	// Compute the random linear combination of commitments and re-derived values.
-	// If sum(r_i * c_i) == sum(r_i * (A*s_i + e_i + m_i)), all are valid.
-	for k := 0; k < LatticeK; k++ {
-		lhsAcc := NewPoly()
-		rhsAcc := NewPoly()
-
-		for i := range commitments {
-			if commitments[i] == nil || openings[i] == nil || blobs[i] == nil {
-				return false, ErrBatchVerifyNilEntry
-			}
-
-			scalar := scalars[i]
-
-			// LHS: r_i * c_i[k]
-			lhsTerm := commitments[i].CommitVec[k].ScalarMul(scalar)
-			lhsAcc = lhsAcc.Add(lhsTerm)
-
-			// RHS: r_i * (A*s + e + m)[k]
-			recomputed := NewPoly()
-			for j := 0; j < LatticeK; j++ {
-				product := bv.scheme.matrixA[k][j].MulNTT(openings[i].Secret[j])
-				recomputed = recomputed.Add(product)
-			}
-			recomputed = recomputed.Add(openings[i].Error[k])
-			recomputed = recomputed.Add(openings[i].MessagePoly[k])
-			rhsTerm := recomputed.ScalarMul(scalar)
-			rhsAcc = rhsAcc.Add(rhsTerm)
+	for i := range commitments {
+		if commitments[i] == nil || openings[i] == nil || blobs[i] == nil {
+			return false, ErrBatchVerifyNilEntry
 		}
-
-		if !lhsAcc.Equal(rhsAcc) {
+	}
+	for i := range commitments {
+		if !bv.scheme.Verify(commitments[i], openings[i], blobs[i]) {
 			return false, nil
 		}
 	}
@@ -189,31 +148,4 @@ func (bv *LatticeBatchVerifier) BatchVerifyBlobsWithIsolation(
 	}
 	result.FailedIndices = failed
 	return result, nil
-}
-
-// deriveRandomScalars generates pseudo-random scalars from a hash of all
-// commitments. Each scalar is a small value in [1, q) to ensure the random
-// linear combination is non-trivial.
-func deriveRandomScalars(commitments []*LatticeCommitment) []int16 {
-	// Build a transcript of all commitment hashes.
-	h := sha256.New()
-	h.Write([]byte("batch-verify-v1"))
-	for _, c := range commitments {
-		if c != nil {
-			h.Write(c.Hash[:])
-		}
-	}
-	seed := h.Sum(nil)
-
-	scalars := make([]int16, len(commitments))
-	for i := range commitments {
-		// Derive scalar: SHA256(seed || index), take 2 bytes mod (q-1) + 1.
-		var idxBuf [4]byte
-		binary.BigEndian.PutUint32(idxBuf[:], uint32(i))
-		sh := sha256.Sum256(append(seed, idxBuf[:]...))
-		val := uint16(sh[0]) | (uint16(sh[1]) << 8)
-		scalar := int16(val%uint16(PolyQ-1)) + 1 // in [1, q)
-		scalars[i] = scalar
-	}
-	return scalars
 }

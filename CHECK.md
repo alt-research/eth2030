@@ -116,10 +116,53 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 
 ### Track 4 — I* / PQ direction
 
-- [ ] PQC suite: real implementations for Dilithium3, Falcon-512, SPHINCS+ (ML-DSA-65 is real).
-- [ ] EIP-7932 PQ registry and EIP-8051 PQ gas costs: add tests.
+- [x] PQC suite: real implementations for Dilithium3, padded Falcon-512, and SPHINCS+-SHA2-128f-simple, alongside ML-DSA-65. Historical Falcon and SPHINCS+ require CGO.
+- [x] EIP-7932 draft PQ registry and EIP-8051 draft gas and expanded-key validation tests through explicit EVM registration.
 - [ ] EIP-7864 Binary Merkle Trie: continue toward complete.
 - [ ] Remaining STARK / lattice / aggregation protocol migrations (CODEBASE_AUDIT §VII).
+
+#### Track 4 implementation checklist (2026-11-13)
+
+- [x] Expose the historical signature formats explicitly and test interoperability, malformed inputs, and the no-CGO boundary.
+- [x] Test the pinned EIP-7932 registry and both expanded-key EIP-8051 precompile variants through explicitly registered EVM calls.
+- [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
+- [x] Match EIP-7864 Python reference roots for basic insertion and a state embedding with storage and code boundaries.
+- [x] Expose resumable offline migration through the client command and read its output back from a reopened FileDB.
+- [x] Exercise EIP-7932/8051 through an opt-in private-chain fork with distinct addresses, state-backed public keys, and account access charging.
+- [ ] Confirm canonical fork addresses and key registry rules for EIP-7932/8051. The pinned drafts both assign 0x12, which the pinned EIP-7997 factory uses.
+- [x] Implement the EIP-7748 ordered conversion step, zero-override protection, and resumable cursor for the pinned BLAKE3 overlay.
+- [x] Exercise the pinned BLAKE3 overlay on an opt-in chain through block construction, import, Engine API payload construction, reorg, rewind, and restart by replay. Apply ordered conversion before transactions and preserve explicit zero overrides.
+- [x] Preserve all 256 bits of EVM storage keys when tracking EIP-4762 storage access and edit events. Test branch and leaf gas for repeated, adjacent, and high-bit-distinct slots.
+- [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add a scalable frozen-state reader and restore the execution state directly from durable checkpoints. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
+- [ ] Connect the PQ attestation verifier to the node's authenticated committee and key source.
+- [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
+- [x] Verify every PQ attestation in the consensus batch, bind publication and classic fallback to authorized keys, and reject XMSS relabeling.
+- [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)
+- [x] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
+
+#### Track 4 overlay checkpoint follow-up
+
+- [x] Persist the binary root and conversion cursor with each imported overlay block.
+- [x] Validate checkpoints across forkchoice, restart, write failure, and older replay-only databases.
+- [x] Share immutable BLAKE3 nodes across branches and write only changed paths.
+- [x] Distinguish zero storage leaves from absent leaves for witness gas and discard events for unpaid opcodes.
+- [x] Reject private PQ address collisions across scheduled precompile forks before opening a chain.
+- [x] Cross-check the public drafts and record outstanding protocol and adoption requirements.
+
+#### Track 4 integration and devnet verification
+
+- [x] Exercise signed PQ transactions through JSON-RPC, block construction, independent Engine import, and persisted state readback.
+- [x] Check both EIP-8051 variants and the EIP-7932 registry through the activated private profile.
+- [x] Run a fresh Kurtosis devnet with the Track 4 image and compare execution and beacon-chain observations.
+
+#### Track 4 bug review
+
+- [x] Verify overlay state copying, canonical lookup, replay retention, and database error handling.
+- [x] Verify Engine payload identity and forkchoice behavior with the binary overlay.
+- [x] Verify both binary trie proof APIs bind the complete key and leaf.
+- [x] Verify PQ attestation authorization and aggregation inputs.
+- [x] Enforce execution proof batch ownership, size limits, and verification deadlines.
+- [x] Run regressions, affected race tests, and the local build.
 
 ### Track 5 — eiptest framework (incremental)
 

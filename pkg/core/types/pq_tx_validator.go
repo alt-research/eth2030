@@ -122,7 +122,9 @@ func (v *PQTxValidatorReal) RegisterSigner(sigType uint8, verify PQRealVerifyFun
 	v.mu.Lock()
 	defer v.mu.Unlock()
 	if entry, ok := v.signers[sigType]; ok {
-		entry.Verify = verify
+		updated := *entry
+		updated.Verify = verify
+		v.signers[sigType] = &updated
 	}
 }
 
@@ -165,6 +167,9 @@ func (v *PQTxValidatorReal) ValidatePQSignatureReal(tx *PQTransaction) error {
 
 	// Compute signing message: hash of the unsigned transaction fields.
 	msg := tx.SigningHash()
+	if msg == (Hash{}) {
+		return ErrPQRealVerifyFailed
+	}
 
 	if !entry.Verify(tx.PQPublicKey, msg[:], tx.PQSignature) {
 		return ErrPQRealVerifyFailed
@@ -277,7 +282,11 @@ func (v *PQTxValidatorReal) GetSignerEntry(sigType uint8) (*PQRealSignerEntry, b
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 	entry, ok := v.signers[sigType]
-	return entry, ok
+	if !ok {
+		return nil, false
+	}
+	copyEntry := *entry
+	return &copyEntry, true
 }
 
 func pqDefaultVerifyMLDSA(pk, msg, sig []byte) bool {

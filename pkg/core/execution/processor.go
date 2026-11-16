@@ -153,6 +153,13 @@ func (p *StateProcessor) SetGetHash(fn vm.GetHashFunc) {
 	p.getHash = fn
 }
 
+// WithGetHash sets the ancestry of an execution without mutating the shared processor.
+func (p *StateProcessor) WithGetHash(fn vm.GetHashFunc) StateProcessor {
+	processor := *p
+	processor.getHash = fn
+	return processor
+}
+
 // SetSlasher wires a corconfig.PaymasterSlasher into the processor. When set, the
 // processor will call SlashOnBadSettlement whenever a frame tx paymaster
 // fails to cover gas after execution (AA-1.3).
@@ -164,6 +171,46 @@ func (p *StateProcessor) SetSlasher(s corconfig.PaymasterSlasher) {
 // When set, PostOp is called on the validator after each successful AA tx (EIP-7701).
 func (p *StateProcessor) SetPaymasterValidator(v eips.PaymasterValidator) {
 	p.paymasterValidator = v
+}
+
+// PrepareBlockState activates the experimental overlay and runs conversion
+// before system calls and user transactions.
+func PrepareBlockState(config *corconfig.ChainConfig, time uint64, current state.StateDB) (state.StateDB, error) {
+	if config == nil || config.BinaryOverlayTime == nil || time < *config.BinaryOverlayTime {
+		return current, nil
+	}
+	if config.BinaryConversionTime != nil && (*config.BinaryConversionTime < *config.BinaryOverlayTime || config.BinaryConversionStride <= 0) {
+		return nil, state.ErrBinaryConversionStride
+	}
+	overlay, ok := current.(*state.BinaryOverlayState)
+	if ok {
+		overlay = overlay.Dup().(*state.BinaryOverlayState)
+	} else {
+		memory, ok := current.(*state.MemoryStateDB)
+		if !ok {
+			return nil, state.ErrBinaryOverlayState
+		}
+		var err error
+		overlay, err = state.NewBinaryOverlayState(memory)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if config.BinaryConversionTime != nil && time >= *config.BinaryConversionTime {
+		if err := overlay.Convert(config.BinaryConversionStride); err != nil {
+			return nil, err
+		}
+	}
+	return overlay, nil
+}
+
+// FinalizeOverlayState folds EVM writes into the binary root for this block.
+func FinalizeOverlayState(current state.StateDB) error {
+	if overlay, ok := current.(*state.BinaryOverlayState); ok {
+		_, err := overlay.Commit()
+		return err
+	}
+	return nil
 }
 
 // Process executes all transactions in a block sequentially and returns the receipts.
@@ -637,8 +684,39 @@ func calcWithdrawalsRoot(ws []*types.Withdrawal) types.Hash {
 	return t.Hash()
 }
 
-// configureBlockEVM installs the same fork rules for user and system calls.
-func configureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) map[types.Address]vm.PrecompiledContract {
+// ValidatePQDraftSchedule checks the active profile at its start and whenever
+// the configured precompile set changes. It can run without execution state.
+func ValidatePQDraftSchedule(config *corconfig.ChainConfig) error {
+	if config == nil || config.PQDraft == nil || config.PQDraft.Time == nil {
+		return nil
+	}
+	pq := config.PQDraft
+	for _, time := range []*uint64{pq.Time, config.PragueTime, config.GlamsterdanTime, config.IPlusTime, config.LegacyNativeBLSUntil} {
+		if time == nil || *time < *pq.Time {
+			continue
+		}
+		rules := config.Rules(new(big.Int), config.IsMerge(), *time)
+		base := vm.SelectPrecompiles(vm.ForkRules{
+			IsPrague: rules.IsPrague, IsGlamsterdan: rules.IsGlamsterdan,
+			IsIPlus: rules.IsIPlus, LegacyNativeBLS: rules.LegacyNativeBLS,
+		})
+		if err := vm.ValidatePQDraftAddresses(base, pq.SigRecover, pq.MLDSA, pq.MLDSAETH, pqDraftReservedAddresses(config)...); err != nil {
+			return fmt.Errorf("PQ draft at timestamp %d: %w", *time, err)
+		}
+	}
+	return nil
+}
+
+func pqDraftReservedAddresses(config *corconfig.ChainConfig) []types.Address {
+	return []types.Address{
+		eips.FactoryAddress, eips.BeaconRootAddress, eips.HistoryStorageAddress,
+		types.WithdrawalRequestAddress, types.ConsolidationRequestAddress,
+		types.SystemAddress, types.DepositContractAddress, config.DepositContractAddress,
+	}
+}
+
+// ConfigureBlockEVM installs the same fork rules for execution and simulation.
+func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) (map[types.Address]vm.PrecompiledContract, error) {
 	// Select the correct jump table based on fork rules.
 	var precompileAddrs map[types.Address]vm.PrecompiledContract
 	if config != nil {
@@ -663,11 +741,24 @@ func configureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		}
 		evm.SetJumpTable(vm.SelectJumpTable(forkRules))
 		precompileAddrs = vm.SelectPrecompiles(forkRules)
-		evm.SetPrecompiles(precompileAddrs)
 		evm.SetForkRules(forkRules)
+		if pq := config.PQDraft; pq != nil && pq.Time != nil && header.Time >= *pq.Time {
+			if !rules.IsBerlin {
+				return nil, errors.New("PQ draft activation requires Berlin account access accounting")
+			}
+			var err error
+			precompileAddrs, err = evm.PQDraftPrecompiles(
+				precompileAddrs, pq.SigRecover, pq.MLDSA, pq.MLDSAETH,
+				pqDraftReservedAddresses(config)...,
+			)
+			if err != nil {
+				return nil, err
+			}
+		}
+		evm.SetPrecompiles(precompileAddrs)
 	}
 
-	return precompileAddrs
+	return precompileAddrs, nil
 }
 
 // ProcessWithRequests exposes the execution outputs including EIP-7685 requests.
@@ -1038,6 +1129,28 @@ func intrinsicGasGlamst(data []byte, isCreate bool, hasValue bool, toExists bool
 // when non-nil, the tracker is injected into the EVM so opcodes record
 // storage reads, storage changes, and address touches during execution.
 func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	// Create EVM
+	blockCtx := vm.BlockContext{
+		GetHash:     getHash,
+		BlockNumber: header.Number,
+		Time:        header.Time,
+		Coinbase:    header.Coinbase,
+		GasLimit:    header.GasLimit,
+		BaseFee:     header.BaseFee,
+		PrevRandao:  header.MixDigest,
+	}
+	txCtx := vm.TxContext{
+		Origin:     msg.From,
+		GasPrice:   msg.GasPrice,
+		BlobHashes: msg.BlobHashes,
+	}
+	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
+
+	precompileAddrs, err := ConfigureBlockEVM(config, header, evm)
+	if err != nil {
+		return nil, err
+	}
+
 	// Validate and consume gas from the pool
 	if err := gp.SubGas(msg.GasLimit); err != nil {
 		return nil, err
@@ -1198,23 +1311,6 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 
 	gasLeft := msg.GasLimit - igas
 
-	// Create EVM
-	blockCtx := vm.BlockContext{
-		GetHash:     getHash,
-		BlockNumber: header.Number,
-		Time:        header.Time,
-		Coinbase:    header.Coinbase,
-		GasLimit:    header.GasLimit,
-		BaseFee:     header.BaseFee,
-		PrevRandao:  header.MixDigest,
-	}
-	txCtx := vm.TxContext{
-		Origin:     msg.From,
-		GasPrice:   gasPrice,
-		BlobHashes: msg.BlobHashes,
-	}
-	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
-
 	// EIP-7928: inject BAL tracker so opcodes record state accesses.
 	if len(balTracker) > 0 && balTracker[0] != nil {
 		evm.SetBALTracker(balTracker[0], 0)
@@ -1236,7 +1332,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		evm.SetInitialReservoir(reservoir)
 	}
 
-	precompileAddrs := configureBlockEVM(config, header, evm)
+	evm.TxContext.GasPrice = gasPrice
 
 	// Pre-warm EIP-2930 access list: mark sender, destination, coinbase, and precompiles as warm.
 	statedb.AddAddressToAccessList(msg.From)

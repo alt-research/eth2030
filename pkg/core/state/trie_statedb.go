@@ -3,6 +3,7 @@ package state
 
 import (
 	"fmt"
+	"maps"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/rawdb"
@@ -66,10 +67,11 @@ const (
 // proportional to the working set of a single block rather than growing with
 // chain history.
 type TrieStateDB struct {
-	mem       *MemoryStateDB             // dirty write buffer for the current block
-	db        rawdb.Database             // persistent backing store
-	gcMode    string                     // GCModeArchive or GCModeFull
-	recreated map[types.Address]struct{} // accounts reset by CreateAccount this block
+	mem                *MemoryStateDB             // dirty write buffer for the current block
+	db                 rawdb.Database             // persistent backing store
+	gcMode             string                     // GCModeArchive or GCModeFull
+	recreated          map[types.Address]struct{} // accounts reset by CreateAccount this block
+	recreatedSnapshots map[int]map[types.Address]struct{}
 
 	// frozenAccounts is a read-only snapshot of every account RLP in the DB
 	// as it was at the end of the most recent Commit(). buildStateTrie() uses
@@ -250,6 +252,9 @@ func (t *TrieStateDB) loadFromDB(addr types.Address) {
 // slot index is used instead of the live DB to prevent contamination from
 // concurrent InsertBlock commits.
 func (t *TrieStateDB) loadSlotFromDB(addr types.Address, obj *stateObject, slot types.Hash) types.Hash {
+	if _, recreated := t.recreated[addr]; recreated {
+		return types.Hash{}
+	}
 	if t.persistedStorage != nil {
 		slots, ok := t.persistedStorage[addr]
 		if !ok {
@@ -299,6 +304,23 @@ func (t *TrieStateDB) computeStorageRootFromDB(addr types.Address, obj *stateObj
 	persisted := t.persistedStorage[addr]
 	if obj.dbStorageRoot == (types.Hash{}) {
 		persisted = nil
+	} else if t.persistedStorage == nil {
+		// A freshly reopened database has no in-memory index yet.
+		persisted = make(map[types.Hash]types.Hash)
+		iter := t.db.NewIterator(storageDBPrefix(addr))
+		for iter.Next() {
+			key, value := iter.Key(), iter.Value()
+			if len(key) != len(dbPrefixStorage)+20+32 || len(value) != 32 {
+				continue
+			}
+			var slot, stored types.Hash
+			copy(slot[:], key[len(dbPrefixStorage)+20:])
+			copy(stored[:], value)
+			if stored != (types.Hash{}) {
+				persisted[slot] = stored
+			}
+		}
+		iter.Release()
 	}
 	for slot, dbVal := range persisted {
 		seen[slot] = true
@@ -340,6 +362,12 @@ func (t *TrieStateDB) CreateAccount(addr types.Address) {
 	t.cachedRoot = types.Hash{}
 	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
+	if _, err := t.db.Get(accountDBKey(addr)); err == nil {
+		if t.recreated == nil {
+			t.recreated = make(map[types.Address]struct{})
+		}
+		t.recreated[addr] = struct{}{}
+	}
 	t.mem.CreateAccount(addr)
 }
 
@@ -471,13 +499,28 @@ func (t *TrieStateDB) Empty(addr types.Address) bool {
 // --- StateDB interface: snapshot/revert ---
 
 func (t *TrieStateDB) Snapshot() int {
-	return t.mem.Snapshot()
+	id := t.mem.Snapshot()
+	if t.recreatedSnapshots == nil {
+		t.recreatedSnapshots = make(map[int]map[types.Address]struct{})
+	}
+	t.recreatedSnapshots[id] = maps.Clone(t.recreated)
+	return id
 }
 
 func (t *TrieStateDB) RevertToSnapshot(id int) {
+	recreated, ok := t.recreatedSnapshots[id]
+	if !ok {
+		return
+	}
 	t.cachedRoot = types.Hash{}
 	t.commitRoot = types.Hash{}
 	t.mem.RevertToSnapshot(id)
+	t.recreated = maps.Clone(recreated)
+	for snapshotID := range t.recreatedSnapshots {
+		if snapshotID >= id {
+			delete(t.recreatedSnapshots, snapshotID)
+		}
+	}
 }
 
 // --- StateDB interface: logs ---
@@ -696,6 +739,30 @@ func (t *TrieStateDB) buildStateTrie() *trie.Trie {
 // Commit flushes the dirty buffer to the DB, resets the buffer, and returns
 // the new state root. After a successful Commit, Dup() is O(1).
 func (t *TrieStateDB) Commit() (types.Hash, error) {
+	if t.persistedStorage == nil {
+		// Populate the complete pre-commit index when adopting an existing DB.
+		t.persistedStorage = make(map[types.Address]map[types.Hash]types.Hash)
+		iter := t.db.NewIterator(dbPrefixStorage)
+		for iter.Next() {
+			key, value := iter.Key(), iter.Value()
+			if len(key) != len(dbPrefixStorage)+20+32 || len(value) != 32 {
+				continue
+			}
+			var addr types.Address
+			var slot, stored types.Hash
+			copy(addr[:], key[len(dbPrefixStorage):len(dbPrefixStorage)+20])
+			copy(slot[:], key[len(dbPrefixStorage)+20:])
+			copy(stored[:], value)
+			if stored == (types.Hash{}) {
+				continue
+			}
+			if t.persistedStorage[addr] == nil {
+				t.persistedStorage[addr] = make(map[types.Hash]types.Hash)
+			}
+			t.persistedStorage[addr][slot] = stored
+		}
+		iter.Release()
+	}
 	// Recompute recreation from the current overlay, so a reverted CREATE
 	// cannot leave a stale purge flag that erases the restored storage.
 	t.recreated = nil
@@ -821,23 +888,9 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 		}
 	}
 
-	// Write only the dirty storage slots captured before the flush.
-	// Zero-value slots are deleted from DB; non-zero are upserted.
-	for _, ds := range dirtySlots {
-		if ds.val == (types.Hash{}) {
-			if err := batch.Delete(storageDBKey(ds.addr, ds.slot)); err != nil {
-				return types.Hash{}, fmt.Errorf("delete slot %s[%s]: %w", ds.addr.Hex(), ds.slot.Hex(), err)
-			}
-		} else {
-			if err := batch.Put(storageDBKey(ds.addr, ds.slot), ds.val[:]); err != nil {
-				return types.Hash{}, fmt.Errorf("put slot %s[%s]: %w", ds.addr.Hex(), ds.slot.Hex(), err)
-			}
-		}
-	}
-
 	// For accounts reset by CreateAccount, purge ALL stale DB storage.
-	// The new account's dirty slots were captured above and will be written;
-	// any remaining DB slots belong to the old incarnation and must be removed.
+	// Purge old slots before applying the new account's dirty slots so an
+	// overwrite of a previously existing key is retained.
 	for addr := range t.recreated {
 		obj, ok := t.mem.stateObjects[addr]
 		if !ok || obj.selfDestructed {
@@ -851,6 +904,20 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 			}
 		}
 		iter.Release()
+	}
+
+	// Write only the dirty storage slots captured before the flush.
+	// Zero-value slots are deleted from DB; non-zero are upserted.
+	for _, ds := range dirtySlots {
+		if ds.val == (types.Hash{}) {
+			if err := batch.Delete(storageDBKey(ds.addr, ds.slot)); err != nil {
+				return types.Hash{}, fmt.Errorf("delete slot %s[%s]: %w", ds.addr.Hex(), ds.slot.Hex(), err)
+			}
+		} else {
+			if err := batch.Put(storageDBKey(ds.addr, ds.slot), ds.val[:]); err != nil {
+				return types.Hash{}, fmt.Errorf("put slot %s[%s]: %w", ds.addr.Hex(), ds.slot.Hex(), err)
+			}
+		}
 	}
 
 	if err := batch.Write(); err != nil {
@@ -984,6 +1051,7 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 	// Reset dirty buffer and recreated tracking: memory drops to near-zero.
 	t.mem = NewMemoryStateDB()
 	t.recreated = nil
+	t.recreatedSnapshots = nil
 
 	// Cache the root so repeated GetRoot() calls after this Commit are O(1).
 	t.commitRoot = root

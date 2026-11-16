@@ -128,7 +128,8 @@ type Config struct {
 	// LeanAvailableChainValidators is the per-slot PQ attestor count [256,1024] (default 512).
 	LeanAvailableChainValidators int // --lean-available-validators
 
-	// StarkValidationFrames enables STARK proof sealing for VERIFY frame transactions (US-PQ-5b).
+	// StarkValidationFrames requests experimental VERIFY-frame proofs. Node creation
+	// currently rejects this option because no execution-statement provider is configured.
 	StarkValidationFrames bool // --stark-validation-frames
 
 	// SlotDuration selects the slot timing: "4s" or "6s" (default "6s", LEAN-1.1).

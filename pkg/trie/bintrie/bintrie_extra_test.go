@@ -2,6 +2,7 @@ package bintrie
 
 import (
 	"bytes"
+	"math/big"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -217,5 +218,41 @@ func TestBinaryTrie_Root_ConsistencyWithHash(t *testing.T) {
 	trieHash := trie.Hash()
 	if rootHash != trieHash {
 		t.Fatalf("Root().Hash() %x != trie.Hash() %x", rootHash, trieHash)
+	}
+}
+
+func TestBlake3StateKeysPreserveAccountAndStorage(t *testing.T) {
+	trie := NewWithHashFunc(HashFunctionBlake3)
+	addr := types.HexToAddress("1234")
+	var slot, value [32]byte
+	slot[31], value[31] = 3, 42
+	account := &types.Account{Balance: big.NewInt(99), Nonce: 7, CodeHash: make([]byte, 32)}
+	if err := trie.UpdateStorage(addr, slot[:], value[:]); err != nil {
+		t.Fatal(err)
+	}
+	if err := trie.UpdateAccount(addr, account, 0); err != nil {
+		t.Fatal(err)
+	}
+	key := GetTreeKeyForStorageSlot(addr, big.NewInt(3))
+	raw, err := trie.Get(key[:])
+	if err != nil || !bytes.Equal(raw, value[:]) {
+		t.Fatalf("storage lost or wrong key: %x %v", raw, err)
+	}
+	got, err := trie.GetAccount(addr)
+	if err != nil || got == nil || got.Nonce != 7 || got.Balance.Cmp(big.NewInt(99)) != 0 {
+		t.Fatalf("account: %+v %v", got, err)
+	}
+	if missing, err := trie.GetAccount(types.HexToAddress("5678")); err != nil || missing != nil {
+		t.Fatalf("unexpected account: %+v %v", missing, err)
+	}
+	code := []byte{0x60, 0x01, 0x00}
+	if err := trie.UpdateContractCode(addr, code); err != nil {
+		t.Fatal(err)
+	}
+	chunkKey := GetTreeKeyForCodeChunk(addr, 0)
+	chunk, err := trie.Get(chunkKey[:])
+	expectedChunk := ChunkifyCode(code)[0]
+	if err != nil || !bytes.Equal(chunk, expectedChunk[:]) {
+		t.Fatalf("code chunk: %x %v", chunk, err)
 	}
 }

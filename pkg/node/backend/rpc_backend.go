@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/execution"
 	coregas "github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -150,13 +151,29 @@ func (b *RPCBackend) StateAt(root types.Hash) (state.StateDB, error) {
 	return bc.StateAtRoot(root)
 }
 
+func (b *RPCBackend) StateAtHeader(header *types.Header) (state.StateDB, error) {
+	bc := b.node.Blockchain()
+	if bc == nil {
+		return nil, fmt.Errorf("blockchain not available")
+	}
+	if cfg := bc.Config(); cfg != nil && cfg.BinaryOverlayTime != nil {
+		hash := header.Hash()
+		blk := bc.GetBlock(hash)
+		if blk == nil {
+			return nil, fmt.Errorf("block %s not found", hash)
+		}
+		return bc.StateAtBlock(blk)
+	}
+	return bc.StateAtRoot(header.Root)
+}
+
 func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, blockNumber rpc.BlockNumber) (*trie.AccountProof, error) {
 	header := b.HeaderByNumber(blockNumber)
 	if header == nil {
 		return nil, fmt.Errorf("block not found")
 	}
 
-	statedb, err := b.StateAt(header.Root)
+	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +320,7 @@ func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte,
 		return nil, 0, fmt.Errorf("block not found")
 	}
 
-	statedb, err := b.StateAt(header.Root)
+	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, 0, fmt.Errorf("state not found: %w", err)
 	}
@@ -329,35 +346,21 @@ func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte,
 
 	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
 
-	if chainCfg := bc.Config(); chainCfg != nil {
-		rules := chainCfg.Rules(header.Number, chainCfg.IsMerge(), header.Time)
-		forkRules := vm.ForkRules{
-			IsGlamsterdan:    rules.IsGlamsterdan,
-			IsPrague:         rules.IsPrague,
-			IsCancun:         rules.IsCancun,
-			IsShanghai:       rules.IsShanghai,
-			IsMerge:          rules.IsMerge,
-			IsLondon:         rules.IsLondon,
-			IsBerlin:         rules.IsBerlin,
-			IsIstanbul:       rules.IsIstanbul,
-			IsConstantinople: rules.IsConstantinople,
-			IsByzantium:      rules.IsByzantium,
-			IsHomestead:      rules.IsHomestead,
-			IsEIP158:         rules.IsEIP158,
-			IsEIP7708:        rules.IsEIP7708,
-			IsEIP7954:        rules.IsEIP7954,
-			IsIPlus:          rules.IsIPlus,
-			LegacyNativeBLS:  rules.LegacyNativeBLS,
-		}
-		evm.SetJumpTable(vm.SelectJumpTable(forkRules))
-		evm.SetPrecompiles(vm.SelectPrecompiles(forkRules))
-		evm.SetForkRules(forkRules)
+	active, err := execution.ConfigureBlockEVM(bc.Config(), header, evm)
+	if err != nil {
+		return nil, 0, err
+	}
+	statedb.AddAddressToAccessList(from)
+	statedb.AddAddressToAccessList(header.Coinbase)
+	for address := range active {
+		statedb.AddAddressToAccessList(address)
 	}
 
 	if to == nil {
 		return nil, gas, nil
 	}
 
+	statedb.AddAddressToAccessList(*to)
 	ret, gasLeft, err := evm.Call(from, *to, data, gas, value)
 	return ret, gasLeft, err
 }

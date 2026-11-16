@@ -15,7 +15,7 @@ func storageFailure(err error) error {
 	if err == nil {
 		return nil
 	}
-	return fmt.Errorf("%w: %v", ErrStorageFailure, err)
+	return fmt.Errorf("%w: %w", ErrStorageFailure, err)
 }
 
 func validatedKey(hash types.Hash) []byte { return append([]byte("validated-block/"), hash[:]...) }

@@ -99,7 +99,8 @@ const (
 	// EIP-4762: code chunk size for witness gas accounting.
 	CodeChunkSize uint64 = 31
 
-	// Post-quantum signature verification gas costs (EIP-8051).
+	// Project-local post-quantum signature verification gas estimates.
+	// EIP-8051 draft precompiles have a separate fixed gas cost.
 	// These mirror the gas costs in the PQ algorithm registry (pkg/crypto/pqc/)
 	// but are defined here for EVM gas table lookups.
 	GasPQVerifyMLDSA44   uint64 = 3500

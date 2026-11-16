@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"errors"
+	"math"
 	"math/big"
 	"testing"
 
@@ -513,5 +515,90 @@ func TestEIP4762GasConstants(t *testing.T) {
 	}
 	if CodeChunkSize != 31 {
 		t.Errorf("CodeChunkSize = %d, want 31", CodeChunkSize)
+	}
+}
+
+func TestEIP4762StorageGasUsesFullSlotWidth(t *testing.T) {
+	sender, target := types.Address{19: 0xaa}, types.Address{19: 0xbb}
+	cases := []struct {
+		name              string
+		first, high, last byte
+		gas               uint64
+	}{
+		{"same leaf", 64, 0, 64, 2100},
+		{"adjacent leaf", 64, 0, 65, 2300},
+		{"distinct high bits", 64, 1, 64, 4200},
+		{"distinct inline and main storage", 0, 1, 0, 4200},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			evm, _ := newVerkleEVM(sender, target)
+			const startGas = 100_000
+			contract := NewContract(sender, target, new(big.Int), startGas)
+			contract.Code = []byte{byte(PUSH1), tc.first, byte(SLOAD), byte(POP), byte(PUSH9), tc.high}
+			contract.Code = append(contract.Code, make([]byte, 7)...)
+			contract.Code = append(contract.Code, tc.last, byte(SLOAD), byte(STOP))
+			if _, err := evm.Run(contract, nil); err != nil {
+				t.Fatal(err)
+			}
+			if used, want := startGas-contract.Gas, tc.gas+2*GasPush+GasQuickStep; used != want {
+				t.Fatalf("used %d gas, want %d", used, want)
+			}
+		})
+	}
+}
+
+func TestEIP4762UnpaidStorageWriteLeavesNoWitness(t *testing.T) {
+	sender, target := types.Address{19: 1}, types.Address{19: 2}
+	evm, db := newVerkleEVM(sender, target)
+	run := func(gas uint64) (*Contract, error) {
+		contract := NewContract(sender, target, new(big.Int), gas)
+		contract.Code = []byte{byte(PUSH1), 1, byte(PUSH1), 0, byte(SSTORE), byte(STOP)}
+		_, err := evm.Run(contract, nil)
+		return contract, err
+	}
+	const coldWrite = 11906
+	failed, err := run(coldWrite - 1)
+	if !errors.Is(err, ErrOutOfGas) || failed.Gas != 0 || !db.GetState(target, types.Hash{}).IsZero() {
+		t.Fatalf("unpaid write: gas %d, err %v", failed.Gas, err)
+	}
+	paid, err := run(coldWrite)
+	if err != nil || paid.Gas != 0 || db.GetState(target, types.Hash{}) != (types.Hash{31: 1}) {
+		t.Fatalf("second write did not pay full witness gas: gas %d, err %v", paid.Gas, err)
+	}
+}
+
+func TestEIP4762ExplicitZeroIsAlreadyFilled(t *testing.T) {
+	sender, target := types.Address{19: 1}, types.Address{19: 2}
+	frozen := state.NewMemoryStateDB()
+	frozen.SetState(target, types.Hash{31: 1}, types.Hash{31: 3})
+	overlay, err := state.NewBinaryOverlayState(frozen)
+	if err != nil {
+		t.Fatal(err)
+	}
+	overlay.SetState(target, types.Hash{}, types.Hash{})
+	if _, err := overlay.Commit(); err != nil {
+		t.Fatal(err)
+	}
+	evm, _ := newVerkleEVM(sender, target)
+	evm.StateDB = overlay
+	contract := NewContract(sender, target, new(big.Int), 5706)
+	contract.Code = []byte{byte(PUSH1), 7, byte(PUSH1), 0, byte(SSTORE), byte(STOP)}
+	if _, err := evm.Run(contract, nil); err != nil || contract.Gas != 0 {
+		t.Fatalf("overwrite of explicit zero: gas %d, err %v", contract.Gas, err)
+	}
+	evm.SetWitnessGasTracker(NewWitnessGasTracker())
+	contract = NewContract(sender, target, new(big.Int), 5706)
+	contract.Code = []byte{byte(PUSH1), 0, byte(PUSH1), 1, byte(SSTORE), byte(STOP)}
+	if _, err := evm.Run(contract, nil); err != nil || overlay.GetRefund() != 0 {
+		t.Fatalf("clear inherited a legacy SSTORE refund: refund %d, err %v", overlay.GetRefund(), err)
+	}
+}
+
+func TestEIP4762CodeChunkRangeClampsWithoutOverflow(t *testing.T) {
+	sender, target := types.Address{19: 1}, types.Address{19: 2}
+	evm, _ := newVerkleEVM(sender, target)
+	if got := gasCodeChunksAccess(evm, target, 31, math.MaxUint64, 64); got != 2300 {
+		t.Fatalf("copying from offset 31 into end-of-code: witness gas %d, want 2300", got)
 	}
 }

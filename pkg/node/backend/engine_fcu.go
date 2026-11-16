@@ -3,10 +3,10 @@ package backend
 import (
 	"errors"
 	"fmt"
-	"github.com/eth2030/eth2030/core/chain"
 	"log/slog"
 
 	"github.com/eth2030/eth2030/core/block"
+	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -104,6 +104,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Convert engine withdrawals to core types.
 	var withdrawals []*types.Withdrawal
 	for _, w := range attrs.Withdrawals {
+		if w == nil {
+			return payload.ForkchoiceUpdatedResult{}, engine.ErrInvalidPayloadAttributes
+		}
 		withdrawals = append(withdrawals, &types.Withdrawal{
 			Index:          w.Index,
 			ValidatorIndex: w.ValidatorIndex,
@@ -124,7 +127,10 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	// Generate payload ID.
-	payloadID := generatePayloadID(parentHeader.Hash(), buildAttrs)
+	payloadID, err := generatePayloadID(parentHeader.Hash(), buildAttrs, slot)
+	if err != nil {
+		return payload.ForkchoiceUpdatedResult{}, fmt.Errorf("derive payload ID: %w", err)
+	}
 
 	// Idempotency check.
 	b.mu.Lock()
@@ -176,9 +182,8 @@ func (b *EngineBackend) forkchoiceUpdated(
 		b.buildMu.Lock()
 		defer b.buildMu.Unlock()
 
-		if statedb != nil {
-			b.builder.SetState(statedb)
-		}
+		b.builder.SetState(statedb)
+		defer b.builder.SetState(nil)
 
 		slog.Debug("engine_forkchoiceUpdated: calling BuildBlock",
 			"parentNum", parentHeader.Number,

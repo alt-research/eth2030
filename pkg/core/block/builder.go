@@ -229,8 +229,16 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		}
 	}
 	if statedb == nil {
+		if b.chain != nil && b.config != nil && b.config.BinaryOverlayTime != nil {
+			return nil, nil, fmt.Errorf("binary overlay parent %s: %w", parent.Hash(), ErrUnknownParent)
+		}
 		// Fallback: create an empty state (useful for testing).
 		statedb = state.NewMemoryStateDB()
+	}
+
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
@@ -628,6 +636,9 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		hash := types.ComputeRequestsHash(requests)
 		header.RequestsHash = &hash
 	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
+	}
 	header.Root = statedb.GetRoot()
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
@@ -676,6 +687,11 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	statedb := b.state
 	if statedb == nil {
 		statedb = state.NewMemoryStateDB()
+	}
+
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
@@ -911,6 +927,9 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		hash := types.ComputeRequestsHash(requests)
 		header.RequestsHash = &hash
 	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
+	}
 	header.Root = statedb.GetRoot()
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
@@ -946,9 +965,17 @@ func (b *BlockBuilder) SetState(statedb state.StateDB) {
 
 // getHashFn returns the BLOCKHASH lookup function from the chain, or nil if
 // the builder was created without a chain (standalone/test mode).
-func (b *BlockBuilder) getHashFn() func(uint64) types.Hash {
+func (b *BlockBuilder) getHashFn(parent *types.Header) func(uint64) types.Hash {
 	if b.chain == nil {
 		return nil
+	}
+	if b.config != nil && b.config.BinaryOverlayTime != nil {
+		return AncestorHashFn(parent.Hash(), parent.Number.Uint64(), func(hash types.Hash, _ uint64) *types.Header {
+			if block := b.chain.GetBlock(hash); block != nil {
+				return block.Header()
+			}
+			return nil
+		})
 	}
 	return b.chain.GetHashFn()
 }
@@ -1093,5 +1120,5 @@ func (b *BlockBuilder) getHashFnForParent(parent *types.Header) func(uint64) typ
 	}); ok {
 		return chain.BranchHashFn(parent)
 	}
-	return b.getHashFn()
+	return b.getHashFn(parent)
 }

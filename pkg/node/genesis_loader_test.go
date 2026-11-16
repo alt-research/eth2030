@@ -2,11 +2,16 @@ package node
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/engine"
+	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
 
 // minimalGenesisJSON builds a small genesis.json payload for testing.
@@ -433,5 +438,162 @@ func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 		if fork.active(fork.at-1) || !fork.active(fork.at) {
 			t.Fatalf("fork did not switch at %d", fork.at)
 		}
+	}
+}
+
+func TestGenesisLoadsExplicitPQDraftProfile(t *testing.T) {
+	var genesis map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(88), &genesis); err != nil {
+		t.Fatal(err)
+	}
+	genesis["config"].(map[string]any)["pqDraft"] = map[string]any{
+		"time":       100,
+		"sigRecover": "0x0000000000000000000000000000000000007001",
+		"mldsa":      "0x0000000000000000000000000000000000007002",
+		"mldsaEth":   "0x0000000000000000000000000000000000007003",
+	}
+	data, err := json.Marshal(genesis)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "genesis.json")
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	spec, err := loadGenesisFile(&Config{GenesisPath: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pq := spec.Config.PQDraft
+	if pq == nil || pq.Time == nil || *pq.Time != 100 ||
+		pq.SigRecover != (types.Address{18: 0x70, 19: 1}) ||
+		pq.MLDSA != (types.Address{18: 0x70, 19: 2}) ||
+		pq.MLDSAETH != (types.Address{18: 0x70, 19: 3}) {
+		t.Fatalf("unexpected PQ draft configuration: %+v", pq)
+	}
+}
+
+func TestGenesisRejectsAmbiguousPQDraftAddress(t *testing.T) {
+	for _, value := range []string{"0x7001", "0x100000000000000000000000000000000000007001", "0x000000000000000000000000000000000000700z"} {
+		var draft pqDraftJSON
+		input := []byte(`{"sigRecover":"` + value + `"}`)
+		if err := json.Unmarshal(input, &draft); err == nil {
+			t.Fatalf("accepted ambiguous address %q", value)
+		}
+	}
+}
+
+func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
+	var genesis map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(88), &genesis); err != nil {
+		t.Fatal(err)
+	}
+	spec := genesis["config"].(map[string]any)
+	spec["binaryOverlayTime"] = 1
+	spec["binaryConversionTime"] = 2
+	spec["binaryConversionStride"] = 1
+	data, err := json.Marshal(genesis)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := makeTestConfig(t)
+	cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
+	if err := os.WriteFile(cfg.GenesisPath, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	n := newTestNode(t, &cfg)
+	bc := n.Blockchain()
+	funded := types.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
+	build := func(parent *types.Block, at uint64, beacon byte) *payload.ExecutionPayloadV4 {
+		t.Helper()
+		attrs := new(payload.PayloadAttributesV4)
+		attrs.Timestamp = at
+		attrs.Withdrawals = []*payload.Withdrawal{}
+		attrs.ParentBeaconBlockRoot = types.Hash{31: beacon}
+		update, err := n.engBackend.ForkchoiceUpdatedV4(payload.ForkchoiceStateV1{HeadBlockHash: parent.Hash()}, attrs)
+		if err != nil || update.PayloadStatus.Status != engine.StatusValid || update.PayloadID == nil {
+			t.Fatalf("forkchoice: %+v, %v", update, err)
+		}
+		result, err := n.engBackend.GetPayloadByID(*update.PayloadID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return result.ExecutionPayload
+	}
+
+	first := build(bc.Genesis(), 1, 11)
+	parent := bc.GetBlock(first.BlockHash)
+	if parent == nil || first.StateRoot != parent.Root() || first.StateRoot == bc.Genesis().Root() {
+		t.Fatal("Engine did not publish and import the overlay state root")
+	}
+	before, err := bc.StateAtBlock(parent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	balance := before.GetBalance(funded)
+	if balance.Sign() == 0 {
+		t.Fatal("first child cannot read the frozen genesis balance")
+	}
+	converted := build(parent, 2, 12)
+	if converted.StateRoot == first.StateRoot {
+		t.Fatal("Engine did not apply the first conversion unit")
+	}
+	// Reconstruct the expected root from the two rounds of system writes
+	// and the one frozen account selected by the conversion stride.
+	want := bintrie.NewWithHashFunc(bintrie.HashFunctionBlake3)
+	updateAccount := func(address types.Address) {
+		t.Helper()
+		account := &types.Account{Balance: before.GetBalance(address), CodeHash: types.EmptyCodeHash.Bytes()}
+		if err := want.UpdateAccount(address, account, 0); err != nil {
+			t.Fatal(err)
+		}
+	}
+	updateStorage := func(address types.Address, slot uint64, value types.Hash) {
+		t.Helper()
+		key := eips.Uint64ToHash(slot)
+		if err := want.UpdateStorage(address, key[:], value[:]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	updateAccount(eips.BeaconRootAddress)
+	updateAccount(eips.HistoryStorageAddress)
+	updateStorage(eips.BeaconRootAddress, 1, eips.Uint64ToHash(1))
+	updateStorage(eips.BeaconRootAddress, 1+eips.BeaconHistoryBufferLength, types.Hash{31: 11})
+	updateStorage(eips.HistoryStorageAddress, 0, bc.Genesis().Hash())
+	if first.StateRoot != want.Hash() {
+		t.Fatalf("first Engine root = %s, want %s", first.StateRoot, want.Hash())
+	}
+	updateAccount(funded)
+	updateStorage(eips.BeaconRootAddress, 2, eips.Uint64ToHash(2))
+	updateStorage(eips.BeaconRootAddress, 2+eips.BeaconHistoryBufferLength, types.Hash{31: 12})
+	updateStorage(eips.HistoryStorageAddress, 1, parent.Hash())
+	blk := bc.GetBlock(converted.BlockHash)
+	if blk == nil || blk.Root() != want.Hash() || converted.StateRoot != want.Hash() {
+		t.Fatalf("second Engine root = %s, want %s", converted.StateRoot, want.Hash())
+	}
+	after, err := bc.StateAtBlock(blk)
+	if err != nil || after.GetBalance(funded).Cmp(balance) != 0 {
+		t.Fatalf("conversion changed the logical balance: %v", err)
+	}
+
+	other := build(parent, 2, 13)
+	if other.BlockHash == converted.BlockHash || other.StateRoot == converted.StateRoot {
+		t.Fatal("competing payloads did not produce independent overlays")
+	}
+	headOnly := payload.ForkchoiceStateV1{HeadBlockHash: converted.BlockHash}
+	invalid := new(payload.PayloadAttributesV4)
+	invalid.Timestamp = converted.Timestamp
+	if _, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, invalid); !errors.Is(err, engine.ErrInvalidPayloadAttributes) {
+		t.Fatalf("invalid build timestamp: %v", err)
+	}
+	if bc.CurrentBlock().Hash() != converted.BlockHash {
+		t.Fatal("invalid build attributes rolled back a valid forkchoice")
+	}
+	headOnly.HeadBlockHash = other.BlockHash
+	if update, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, nil); err != nil || update.PayloadStatus.Status != engine.StatusValid {
+		t.Fatalf("forkchoice reorg: %+v, %v", update, err)
+	}
+	if bc.CurrentBlock().Hash() != other.BlockHash || bc.State().GetRoot() != other.StateRoot {
+		t.Fatal("Engine forkchoice did not select the side block and its overlay")
 	}
 }

@@ -1,3 +1,170 @@
+## Track 4 integration with master (2026-11-16)
+
+- Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.
+- The optional native consensus verifier resolves ML-DSA keys from its configured validator registry. Full Go tests, local build, vet, and targeted race tests passed during merge reconciliation.
+
+## Track 4 integration and devnet verification (2026-11-16)
+
+- Added a two-node HTTP integration test for the private profile. It checks Geth-compatible genesis hashing, Engine authentication, pre-fork gating, both EIP-8051 variants and state-backed EIP-7932 recovery, and rejects wrong-chain and corrupted signatures. ML-DSA, FN-DSA and SLH-DSA transactions enter real payloads and are validated by an independent EL. The test selects competing branches, checks canonical receipts, and reopens FileDB to read historical and current state.
+- Fixed empty genesis byte strings, PQ transaction hash consistency with the signed wire envelope, pool admission before I+ and for wrong chain IDs, and sender and effective gas price reconstruction for persisted PQ receipts. Block-scoped RPC reads now resolve overlay state by block hash, including for historical blocks after restart.
+- Added a two-pair Kurtosis profile and an executable verifier. The `eth2030-track4-89cfff9` run used EL revision `89cfff9`. Both ELs and both Lighthouse Beacon APIs verified the PQ payload at slot 5 with block hash `0x2eb74b1df29b3e729ee174772f334fcb5d0ef592a75fc8e9f513771e029cf53d`. After restarting EL 2, historical slots at execution blocks 1 and 5 returned 44 and zero, the old receipt retained its sender and gas price, and the two ELs agreed again at block 11.
+- A preceding run of the same private profile reached finalized beacon epoch 2. Both ELs returned the finalized execution block 59, which matched the Lighthouse finalized payload.
+- Full Go tests, local build, targeted race tests and no-CGO integration tests passed. The private profile exercises pinned EIPs and keeps the production proof, committee and witness-gas work open.
+
+## Track 4 overlay checkpoints and witness accounting (2026-11-14)
+
+- The private overlay atomically persists changed binary nodes, the frozen root, and the conversion cursor with each imported block. Restart and forkchoice validate an available checkpoint against the reconstructed state. Existing replay-only databases can still open.
+- BLAKE3 branches share immutable trie paths and memoized node hashes. Checkpoint publication skips previously committed subtrees. The logical execution state and frozen conversion data remain memory-backed, and startup still replays blocks.
+- Witness gas helpers distinguish an explicit zero storage leaf from an absent leaf, drop tentative events for unaffordable opcodes, and clamp code ranges without overflow. Witness gas is still separate from the private overlay's active fork rules.
+- Startup rejects private PQ draft addresses that conflict with the current or a later configured precompile set. The published EIP-7932 and EIP-8051 still share address 0x12.
+- The full Go test suite, local build, and targeted race tests passed. The regression suite checks corrupted cursors and nodes, batch rollback, legacy replay, changed-path writes, exact witness gas, and a future PQ address collision.
+- Open work includes the published binary key layout, complete EIP-4762 transaction and opcode integration, scalable frozen-state access and direct state recovery, node committee provenance, and production STARK, lattice and recursive aggregation protocols.
+
+## Track 4 correctness review (2026-11-14)
+
+- Private binary overlay imports and reorgs publish database batches before changing canonical pointers. Side branches retain receipts, canonical transaction lookup follows forkchoice, and startup rejects missing bodies or a mismatched genesis. FileDB commits its WAL before materializing data files and can replay a full batch after a materialization failure.
+- Overlay copies preserve pending writes, snapshots, original slot values, and independent log data. The legacy SHA-256 trie proof API verifies the entire key and suffix proof. Legacy proofs that omit required suffix siblings must be rebuilt for stems with multiple leaves.
+- Engine payload IDs commit to all build attributes and the requested slot. The RPC layer keeps valid forkchoice updates when payload attributes fail validation and maps wrapped errors to their Engine API codes.
+- PQ attestation verification requires a trusted committee-key lookup for individual and batched ML-DSA signatures. Merkle batches verify their input signatures. Execution proof batches own submitted bytes, enforce size limits and deadlines, and clear stale verification flags.
+- Regressions exercise signed transactions on both branches, rejected batch writes and retries, FileDB WAL recovery, distinct Engine roots for the same parent and timestamp, suffix-proof verification, real ML-DSA committee authorization, and proof-provider deadlines.
+- Validation passed with `go test ./...`, `go build ./...`, targeted race tests, and no-CGO PQ signer and precompile tests in `pkg`.
+- The production EIP-7864 layout and full witness gas, canonical PQ precompile assignments, node committee provider, and production STARK, lattice and recursive aggregation protocols remain open.
+
+## Track 4 private-chain binary overlay execution (2026-11-14)
+
+- A private genesis can set `binaryOverlayTime`, `binaryConversionTime`, and `binaryConversionStride`. At activation the execution path starts with an empty BLAKE3 overlay and a frozen snapshot of the parent MPT state. Conversion uses the pinned EIP-7748 order before system calls and transactions. EVM journal writes determine the binary root, including explicit zero storage leaves and transaction-scoped original storage values.
+- The node Engine backend builds and imports overlay payloads and applies forkchoice to the selected branch. Header roots are verified during execution and replay. Restart restores the canonical state and conversion cursor by replaying live blocks. The experimental profile retains full state in memory and retains live block bodies for replay.
+- Tests compare two Engine payload roots with separately constructed trie roots. A signed-transaction FileDB test exercises storage clears, branch-specific BLOCKHASH, forged roots, reorg, rewind, restart and missing ancestry. State tests cover snapshot rollback, code shrink, account deletion and atomic in-memory commit failure. Mutation runs confirmed that dropping explicit zero leaves or resolving BLOCKHASH on the canonical branch is detected.
+- Validation passed in `pkg` with `go test ./...`, `go build ./...`, and targeted `go test -race` for the state, chain, and node overlay and forkchoice tests.
+- The EIP-4762 opcode helper now uses the full storage key for access and edit events. Bytecode tests assert exact gas for repeated slots, adjacent slots in one stem, and slots that differ above bit 63.
+- The published consensus layout, EIP-4762 witness gas, durable per-block state checkpoints and scalable state access remain open. Existing opcode-level witness gas helpers are separate from this profile. The PQ committee source and application-specific STARK, lattice and aggregation protocols remain open.
+
+## Track 4 consensus attestation verification (2026-11-14)
+
+- Replaced the PQ attestation hash-trace shortcut with individual ML-DSA verification for all batch sizes and lean modes. The batch enforces a shared signing statement, unique indices and keys, authenticated metadata and committee commitment, and copies the original signed data. Gas savings are zero for this path. Legacy trace-only proofs are rejected.
+- XMSS bundles now return an explicit unavailable-verifier error instead of being relabeled as ML-DSA. Propagation verifies the supplied batch and requires an authorized committee key lookup for network publication. Classic fallback recovers the ECDSA signer and requires a trusted slot/committee/validator key lookup.
+- Tests use actual ML-DSA and ECDSA signatures. They reject an invalid sixth signature, duplicate signer identity, inconsistent statements, wrong batch metadata, and an unauthorized classic signer. Temporarily removing signature verification caused the invalid-sixth-signature test to fail. Full `go test ./...`, targeted consensus and conversion race tests, and builds with and without CGO passed. A real recursive proof and production consensus-state lookup wiring remain open.
+
+## Track 4 ordered binary overlay conversion (2026-11-14)
+
+- Added a pinned EIP-7748 conversion step for a frozen memory-state snapshot and pinned EIP-7864 BLAKE3 overlay. It iterates in MPT hash-key order, converts storage before account headers and code, and charges a unit for each slot or account. Existing overlay values, including explicit zero, take precedence. Cursor copies support independent branches and checkpoint recovery verifies the frozen MPT root and reopens the overlay.
+- Tests cover ordered conversion, exact stride, wrong roots and cursors, branch isolation, explicit zero and live value preservation, and FileDB reopen inside a partially converted account. Reversing either sort or overwriting zero makes the corresponding test fail.
+- The node still needs a binary-overlay StateDB, execution and access gas wiring, durable block-to-checkpoint publication, and per-block conversion scheduling.
+
+## Track 4 private-chain PQ execution profile (2026-11-14)
+
+- Wired explicitly addressed EIP-7932/8051 draft precompiles into transaction execution, system calls, and RPC simulation at a configured genesis timestamp. The private profile reads expanded keys from STOP-prefixed code at their key-hash address, charges cold or warm access plus copy gas, and records the account in the BAL. Direct verification keeps the 4500-gas draft cost.
+- Both independent SHAKE and Keccak signatures pass through the transaction execution path. Tests exercise activation, malformed and absent key state, exact access gas, reserved and duplicate addresses, RPC simulation, and genesis address parsing. Replacing the cold access cost with the warm cost caused both positive-path gas tests to fail.
+- Full `go test ./...`, the targeted execution and node race tests, and local builds with and without CGO passed.
+- The addresses, key account format and lookup surcharge are private-chain choices. Canonical fork assignments and registry semantics remain open. Binary overlay execution, EIP-4762 accounting, EIP-7748 conversion, and production proof provider adoption remain open.
+
+## Track 4 historical signers and migration command (2026-11-14)
+
+- Added explicit Round 3 Falcon-padded-512 and Round 3.1 SPHINCS+-SHA2-128f-simple signing APIs using the pinned PQClean clean implementations. Existing transaction IDs continue to select ML-DSA-65, FN-DSA and SLH-DSA. The historical Falcon and SPHINCS+ APIs require CGO and report unavailability without it.
+- A standalone PQClean C executable produced the historical wire vectors. Tests accept them, sign using their serialized private keys, reject changed messages, altered signatures, truncated fields and cross-format verification, and exercise key generation. Falcon also verifies case 0 from the pinned EIP-8052 assets and rejects nonzero padding.
+- Added `eth2030 binary-migrate` for an existing committed flat-state FileDB, with a trusted MPT source root and durable checkpoints. The command integration test checks source locking, partial conversion, a second invocation that resumes, and balance, storage and code readback from the reopened destination.
+- Track 4 review still finds two consensus integration areas and one provider migration open. EIP-7932/8051 need a fork address assignment compatible with EIP-7997 and a state-backed key lookup. EIP-7864 delegates activation to EIP-7612 and access events to EIP-4762, with later conversion under EIP-7748. The offline command implements snapshot conversion. STARK frame and aggregate verification still need a real provider, a concrete public statement and a transport format. Experimental blob openings are authenticated Merkle paths, while the local deterministic lattice scheme remains experimental.
+
+- Validation: full `go test ./...` and `go build ./...` passed in `pkg`. Targeted migration and historical signature race tests passed. A no-CGO build and the tests for the unavailable providers, Dilithium3 and offline migration also passed.
+
+## Track 4 expanded-key verification and reference roots (2026-11-14)
+
+- Implemented the pinned EIP-8051 expanded-key SHAKE and Keccak verifiers. They enforce canonical field encodings, hint ordering and padding, the strict coefficient norm bound, and the challenge hash. Explicit constructors bind the verifiers to the precompile and EIP-7932 registry adapter. EIP-7932, EIP-8051, and EIP-7997 assign overlapping uses to address 0x12, so the tests configure the two draft precompile maps separately.
+- The expanded-key known answers use the EIP's 32-byte tr and raw message with independent ZKNOX polynomial and signing code. The generator and reference revisions are in the VM testdata directory. Both variants pass through EVM STATICCALL with exact gas. The tests reject modified messages, signatures, keys, noncanonical coefficients, wrong variants, and out-of-order hints. Temporary mutations confirmed that removing the field range checks, accepting reordered hints, or relaxing the positive norm boundary causes the corresponding tests to fail.
+- EIP-7864 tests pin insertion roots from the linked Python reference and a full state embedding generated with the pinned draft's storage offset. The state vector includes inline and main storage, the largest storage slot, and PUSH32 data across chunks. The persisted tree reopens at the independent root and a modified code-chunk opening is rejected.
+- Replaced experimental blob witnesses with ordered Merkle paths, binding original byte length, chunk position, and all siblings. The signed wrapper checks the entire digest, the serialized path, and the configured algorithm, and uses SLH-DSA for its SPHINCS selector. This changes the experimental commitment format and requires regeneration. EIP-4844 and PeerDAS retain KZG.
+- The experimental deterministic lattice verifier now checks the full commitment, opening, and data for each batch entry, and compares the serialized vector on the blob path. The prior linear batch equation ignored the supplied blob. These checks preserve the local commitment encoding.
+- Added an explicit round-3 Dilithium3 signer using CIRCL mode3. Tests cover both directions of wire interoperability, exact deterministic signing, invalid key and signature lengths, and rejection by the ML-DSA-65 transaction provider. Historical Falcon and SPHINCS+ formats, node binary-state activation, and real STARK/lattice/aggregation migration remain open.
+
+- Validation: full `go test ./...`, targeted race tests for the draft verifiers, reference roots, signing and blob verification, and `go build ./...` passed in `pkg`.
+
+## Track 4 validation-frame proof boundary (2026-11-14)
+
+- The former validation-frame prover committed to calldata and a constant; it did not prove EVM execution, state, or EIP-8141 `APPROVE`. The old verifier accepted a proof without binding it to a block, and the node and payload builder discarded the returned proof while keeping the original block. Those paths did not establish execution validity.
+- The legacy STARK validation-frame prover now returns `ErrFrameProofUnavailable`. The VM requires an explicit block-bound execution-statement provider to generate and verify a frame proof and identifies only `VERIFY` frames. No real provider is installed; node startup explicitly rejects `StarkValidationFrames=true` instead of advertising unavailable proof generation. Frame calldata is not stripped.
+- Tests exercise missing providers, disabled node configuration, no-VERIFY blocks, rejection of an unbound legacy proof, cross-block proof substitution, tampering and provider failure. `go test ./...`, targeted prover/VM/node/payload race tests, and `go build ./...` passed in `pkg`, with Go test cache reused where applicable. The block-bound test provider is a simulated test double, not a STARK or a proof of EVM execution. A real provider, statement format, proof transport and consensus adoption remain open.
+
+## Track 4 binary materialization and state rollback (2026-11-13)
+
+- Added an explicit-error conversion of a complete `MemoryStateDB` including dirty storage to an EIP-7864 draft BLAKE3 tree. It checks code hashes and header constraints and does not mutate the source. Tests compare its root to committed-state migration, exercise snapshot/revert, and materialize, persist and read back an actual transaction execution result. This is a full in-memory rebuild, not a binary `StateDB` or fork activation.
+- Fixed implicit account creation so reverting a memory-state snapshot removes the newly created account. Fixed `TrieStateDB` cached-root invalidation on account/storage mutation and rollback, and snapshot tracking of account recreation. Recreated accounts no longer expose or hash old slots, and stale slot deletion now precedes new writes. On a freshly reopened database, storage-root computation scans untouched slots until the complete persisted index is initialized at commit. Tests reopen committed state and validate it through binary migration.
+- Memory-state code reads and writes now copy byte slices, preventing external mutation from making stored code disagree with its hash. Existing valid-state roots and transaction encodings do not intentionally change; the rollback and recreated-account fixes correct previously inconsistent state.
+- Validation: `go test ./...`, targeted state/execution race tests, and `go build ./...` passed in `pkg`; the final full-suite run reused Go test cache where applicable. No cross-client binary-state vectors or fork integration were exercised. Node adoption, production-scale state, crash recovery and the remaining cryptographic provider migrations remain open.
+
+## Track 4 PQ provider and signing hardening (2026-11-13)
+
+- Added cross-provider tests for the ML-DSA-65 and FN-DSA-512 wrappers, including tampered signatures. The historical Dilithium3 identifier does not accept a genuine round-3 Dilithium3 signature. The SLH-DSA-SHA2-128f signer reproduces a public NIST ACVP deterministic signature, and rejects a modified signature. These results do not establish compatibility with historical Falcon or SPHINCS+ encodings.
+- PQ signer registration and lookup now copy descriptors; the configurable transaction validator uses copy-on-write when replacing a verifier. This prevents external mutation of installed entries and races between registration and verification. The consensus transaction verifier continues to use its fixed providers.
+- PQ transaction signing and encoding now reject negative unsigned integer fields rather than authenticating or serializing their absolute value. Both signer paths and the transaction validators reject invalid signing payloads. Existing valid nonnegative transaction encodings are unchanged.
+- Validation: `go test ./core/types ./crypto/pqc ./core/execution ./txpool/... ./core/vm`, targeted PQ race tests, and `go build ./...` passed in `pkg`. Expanded-key EIP-8051 verification, legacy algorithm interoperability and activation remain open; these tests do not certify those implementations.
+
+## Track 4 checkpointed binary migration (2026-11-13)
+
+- Added an experimental account-batched migration checkpoint keyed by the trusted source MPT root. Each invocation reconstructs the source account root, validates copied account storage and code, opens the previous authenticated binary root, writes the updated nodes, and only then advances the checkpoint. The intermediate root is not published as canonical.
+- A file-database test covers zero-address cursor handling, a simulated checkpoint-write failure, clean close/reopen between batches, retry, completion and equality with the independently run one-shot migration. Tests also reject changed source state, malformed checkpoints and missing checkpoint nodes; empty state and repeated completion are covered.
+- Validation: `go test ./core/state/... ./core/rawdb ./trie/... ./core/execution`, targeted migration race tests, and `go build ./...` passed in `pkg`. The caller must stop concurrent source and destination writers and use a database with suitable durability. No process-kill or power-loss injection was run. Each batch rescans the complete source account trie, eagerly reloads and rewrites the target tree, and retains that tree in memory. This is not a scalable migration, fork transition, or node activation.
+
+## Track 4 binary trie state operations (2026-11-13)
+
+- Draft BLAKE3 storage deletion now removes absent leaves and restores minimal stem paths; zero-valued storage writes remove the slot. Legacy SHA-256 behavior is retained. Empty-root exclusion proofs are accepted for an empty path.
+- Added atomic-in-memory replacement of an existing account's code, updating code size and hash and removing obsolete chunks. Code readback reconstructs and checks the hash and chunk metadata. `UpdateContractCode` remains a lower-level chunk writer, not a full account update. `GetAccount` no longer exposes its stored code-hash slice.
+- Tests check delete/reinsert roots against freshly built trees, zero storage, code shrinking across stems, persisted code readback, corrupted chunk metadata and migration code reconstruction. `go test ./trie/... ./core/state/... ./core/execution`, targeted trie/state race tests, and `go build ./...` passed in `pkg`. These operations are not a complete `StateDB` and are not activated in the node.
+
+## Track 4 EIP-8051 draft envelope and registry tests (2026-11-13)
+
+- Added isolated draft precompile gas and input-envelope handling for both proposed ML-DSA variants: 4500 gas, a 32-byte message, 2420-byte signature and 20512-byte expanded key. A valid-length call requires an explicitly supplied verifier; no cryptographic provider or fork address is configured by default.
+- Added optional EIP-7932 registry adapters for the draft `0xd1` and `0xd2` signature-info layouts. They require injected key lookup and verifier, validate the returned key hash and 32-byte payload hash, and use the draft's provisional 3000 gas penalty. Tests exercise dispatch, 6000 total gas, input boundaries, missing providers and tampering with simulated callbacks; they do not prove ML-DSA or ML-DSA-ETH conformance.
+- The pinned EIP asset case 0 uses a 1312-byte compact key and 33-byte message. Despite its `Dilithium2` file heading, the NIST case verifies with the current FIPS ML-DSA-44 provider and not its round-3 Dilithium2 provider; the EVM case verifies with neither. These cases are not direct vectors for the specified expanded-key precompile ABI. The EVM variant and expanded-key cryptographic checks remain unimplemented.
+- Validation: `go test ./core/vm ./core/types ./crypto/pqc ./core/execution`, a targeted VM race test, and `go build ./...` passed in `pkg`. Replaced two tests that copied gas constants into a fake lookup with a comparison against the actual `vm.GasPQVerify` function. That function currently has no production call sites and its local table is not EIP-8051's precompile schedule. Draft address and revision conflicts, actual precompile activation and end-to-end PQ verification remain open.
+
+## Track 4 EIP-7932 pinned-draft SIGRECOVER (2026-11-13)
+
+- Added an isolated `EIP7932DraftSigRecover` precompile and immutable-at-construction algorithm registry for the pinned `refs/EIPs` draft. It implements the draft's secp256k1 selector `0xff`, signature validation and recovery, address compatibility rule, base gas and signing-data penalty. Additional algorithms require explicit registration; none of the project-local PQ identifiers are silently treated as EIP algorithms.
+- Tests reproduce the pinned `assets/eip-7932/precompile_test_cases.py` cases, exercise EVM precompile gas dispatch and insufficient gas, reject high-S signatures and invalid registry entries, and check a simulated additional algorithm. `go test ./core/vm ./core/types ./crypto/pqc ./core/execution`, a targeted VM race test, and `go build ./...` passed in `pkg`. This implementation is not registered in a fork or on the network, and is not the later EIP-7932 revision used by the existing SSZ codec. EIP-8051 expanded-key verification, gas, activation and cross-version/address reconciliation remain open.
+
+## Track 4 committed-state binary migration progress (2026-11-13)
+
+- Added an offline `TrieStateDB` flat-table migration to the draft EIP-7864 BLAKE3 trie. Address and storage-slot preimages are present in these project-specific tables. Before writing binary nodes, the migration reconstructs the account MPT against a caller-provided trusted root, validates each account storage root and code hash, and rejects malformed or out-of-range data.
+- File-database tests commit accounts with code and storage, migrate, close and reopen the binary database, then read accounts, inline and non-inline storage, code chunks and BLAKE3 inclusion proofs. Wrong source root, altered storage and altered code are rejected before binary node writes.
+- Validation: `go test ./core/state/... ./trie/... ./core/rawdb`, `go test -race ./core/state -run TestMigrateCommittedToBinary`, and `go build ./...` passed in `pkg`. This path requires a quiescent source and keeps the converted tree in memory. It does not publish the root, provide a durable checkpoint, run during fork transition, or wire binary state to the node. Generic MPTs with only hashed keys do not provide address and slot preimages. The older `trie/migrate` utilities target a different legacy tree.
+
+## Track 4 aggregation verification boundaries (2026-11-13)
+
+- The previous `STARKAggregator` regenerated a trace commitment from state root, block hash and type; it neither bound the input proof bytes nor retained or verified the outer proof. It could therefore report validity without proving an execution statement. It now requires an explicit `STARKAggregateProvider`, retains its proof bytes, binds all ordered input fields with length delimiters, and asks the provider to verify the result. No production provider or concrete recursive statement is configured.
+- `BatchAggregator.VerifyBatch` now requires an individual execution proof verifier before setting `Verified`; a Merkle commitment alone is not proof validation. Verification state resets on each call. The legacy recursive STARK interface does not include complete public statements and now returns an error instead of asserting that digest aggregation proves inner validity.
+- Execution-proof commitment hashing is domain-separated and length-delimited, changing prior aggregate roots; old roots must be recomputed. Regression tests use a deliberately simulated provider to check dispatch, artifact and input tampering, missing providers and invalid input; they do not demonstrate a real STARK or recursive verification.
+- Validation: `go test ./proofs/... ./txpool/stark ./node`, targeted `go test -race ./proofs`, and `go build ./...` passed in `pkg`. Mempool STARK gossip remains experimental and advisory; its local trace does not prove transaction validity. The real STARK, lattice commitment and aggregation protocol migrations remain open.
+
+## Track 4 PQ signing pipeline progress (2026-11-13)
+
+- Replaced the pipeline's fabricated public key with provider-derived ML-DSA-65 and SLH-DSA public keys. FN-DSA callers must now supply the matching public key; the provider does not expose public-key derivation from the serialized private key. A supplied key is checked against the signature.
+- Default pipeline signatures use the same algorithm-bound transaction signing hash and sender derivation as native validation. The experimental direct mode retains its legacy message format and is not accepted by native transaction validation. Previously generated pipeline signatures use the retired default message format and require re-signing.
+- Tests sign, encode, decode and validate all three provider formats, reject changed fields and algorithms, and execute transfers through the existing PQ pool validator and state processor. The pinned EIP-7932 draft address derivation test covers its 0xff compatibility case; this does not implement its registry or precompile. Local PQ gas estimates are not EIP-8051 precompile gas.
+- Validation: `go test ./crypto/pqc ./core/types ./txpool/... ./core/execution`, targeted race tests for the pipeline and processor, and `go build ./...` passed in `pkg`.
+- The pinned EIP-7932 and EIP-8051 drafts both assign address 0x12; EIP-8051 also assigns 0x13, while the active Prague profile reserves 0x0b–0x11 for BLS and uses the existing native profile. The versioned EIP-6404 codec follows a different published EIP-7932 revision with selector 0x00, whereas the pinned draft uses 0xff. These conflicts require an explicit fork/spec decision before consensus activation; EIP-7932/8051 conformance remains open.
+
+## Track 4 binary trie persistence progress (2026-11-13)
+
+- Added experimental content-addressed node persistence for SHA-256 and BLAKE3 trees. `Persist` returns a root only after node writes succeed; root publication and durability are controlled by the caller. `OpenPersisted` eagerly authenticates node hashes and stem paths, rejects corrupt or missing data, and restores a mutable trie.
+- A file-database test closes and reopens the database, checks values and inclusion proofs, persists an update, reads the original root, and rejects node corruption. A failed node write does not return a root.
+- Validation: `go test ./trie/... ./core/rawdb ./core/state`, `go test -race ./trie/bintrie`, and `go build ./...` passed in `pkg`. The node format is local, eager loading is not suitable for production-scale state, and no node lifecycle, canonical root publication, atomic fork migration or crash-injection test has been added. Existing migration tooling targets a different experimental trie, not EIP-7864 state. Track 4 remains open.
+
+## Track 4 BLAKE3 binary trie progress (2026-11-13)
+
+- `NewWithHashFunc(HashFunctionBlake3)` now computes BLAKE3 roots using the pinned EIP-7864 zero-pair rule. Copies retain the hash selection, and ordinary reads and writes do not expose caller-owned value buffers.
+- The structured inclusion and exclusion proof builder supports SHA-256 and BLAKE3, including multiple values and absent suffixes in a stem. Callers must select `NewBlake3ProofVerifier` for BLAKE3 roots. The older `Prove` API rejects BLAKE3; it remains a separate legacy proof format.
+- BLAKE3 account, storage and code-chunk operations use the EIP-7864 tree-key helpers. Account updates retain existing storage and reject out-of-range header values. Tests compare the root to a separately computed BLAKE3 construction, exercise state key readback, and reject tampered proofs.
+- This is experimental and does not establish persistence, restart recovery, migration or node/consensus adoption. Existing SHA-256 roots and BLAKE3 roots are different formats. The pinned draft says its BLAKE3 choice is provisional.
+- EIP-7932/8051 conformance and the STARK, lattice commitment and aggregation migrations remain open; see the Track 4 checklist. Validation: `go test ./trie/... ./crypto/pqc ./core/state` and `go build ./...` in `pkg` passed; full-module tests and external vectors were not run.
+
+## Track 4 proof verification progress (2026-11-13)
+
+- Authenticated divergent stems in the standalone SHA-256 binary trie exclusion verifier and added suffix-tree siblings to inclusion proofs, allowing proofs for stems with multiple values. The proof representation changes: divergent proofs now require the value subtree root; multi-value inclusion proofs require eight sibling hashes.
+- Added regression coverage for a forged divergent stem, modified suffix sibling, multi-value inclusion, and unsupported same-stem exclusion. At that commit, proof generation rejected non-SHA-256 tries and same-stem suffix exclusion; the follow-up above adds both.
+- The historical Dilithium3, Falcon-512, and SPHINCS+ signer identifiers already use ML-DSA-65, FN-DSA-512, and SLH-DSA-SHA2-128f providers respectively. These names do not establish compatibility with historical scheme encodings. The pinned EIP-8051 specifies ML-DSA-44 precompiles, not the project PQ transaction gas table; EIP-7932 registry/precompile and EIP-8051 conformance remain to be tested and implemented as applicable.
+- Track 4 remains open: EIP-7864 uses BLAKE3 in the pinned draft, and proof, persistence, migration, and state integration are not validated end-to-end. STARK, lattice commitment, and aggregation protocol migrations remain open; no interchangeable provider or statement was established in the audit.
+- Validation: `go test ./trie/... ./crypto/pqc` and `go build ./...` from `pkg` passed. The full module test suite and cross-client vectors were not run.
+
 # Project Status
 
 ## README Link and Quick Start Audit (2026-11-13)

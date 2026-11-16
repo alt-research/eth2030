@@ -106,6 +106,11 @@ func NewFileDB(dir string) (*FileDB, error) {
 		releaseLock(lockFd)
 		return nil, fmt.Errorf("filedb: open wal: %w", err)
 	}
+	if err := syncDir(dir); err != nil {
+		walFile.Close()
+		releaseLock(lockFd)
+		return nil, fmt.Errorf("filedb: sync WAL directory: %w", err)
+	}
 	db.walFile = walFile
 
 	return db, nil
@@ -556,3 +561,11 @@ func (b *fileBatch) Reset() {
 
 // Compile-time interface checks.
 var _ Database = (*FileDB)(nil)
+
+func syncDir(path string) error {
+	dir, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	return errors.Join(dir.Sync(), dir.Close())
+}

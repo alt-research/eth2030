@@ -1,7 +1,9 @@
 package state
 
 import (
+	"bytes"
 	"math/big"
+	"slices"
 	"sort"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -77,6 +79,8 @@ func (s *MemoryStateDB) getOrNewStateObject(addr types.Address) *stateObject {
 	}
 	s.journal.append(createAccountChange{addr: addr, prev: s.stateObjects[addr]})
 	obj := newStateObject()
+	// Implicit creation is state-changing and must be undone by snapshots.
+	s.journal.append(createAccountChange{addr: addr})
 	s.stateObjects[addr] = obj
 	return obj
 }
@@ -123,7 +127,7 @@ func (s *MemoryStateDB) SetNonce(addr types.Address, nonce uint64) {
 
 func (s *MemoryStateDB) GetCode(addr types.Address) []byte {
 	if obj := s.getLiveStateObject(addr); obj != nil {
-		return obj.code
+		return bytes.Clone(obj.code)
 	}
 	return nil
 }
@@ -134,8 +138,8 @@ func (s *MemoryStateDB) SetCode(addr types.Address, code []byte) {
 	prevHash := make([]byte, len(obj.account.CodeHash))
 	copy(prevHash, obj.account.CodeHash)
 	s.journal.append(codeChange{addr: addr, prevCode: prevCode, prevHash: prevHash})
-	obj.code = code
-	obj.account.CodeHash = crypto.Keccak256(code)
+	obj.code = bytes.Clone(code)
+	obj.account.CodeHash = crypto.Keccak256(obj.code)
 }
 
 func (s *MemoryStateDB) GetCodeHash(addr types.Address) types.Hash {
@@ -410,13 +414,7 @@ func trimLeadingZeros(b []byte) []byte {
 	return []byte{}
 }
 
-func (s *MemoryStateDB) Commit() (types.Hash, error) {
-	for addr, obj := range s.stateObjects {
-		if obj.selfDestructed {
-			delete(s.stateObjects, addr)
-		}
-	}
-	s.journal = newJournal()
+func (s *MemoryStateDB) finalizeStorage() {
 	// Flush dirty storage to committed storage.
 	for _, obj := range s.stateObjects {
 		for key, val := range obj.dirtyStorage {
@@ -428,6 +426,16 @@ func (s *MemoryStateDB) Commit() (types.Hash, error) {
 		}
 		obj.dirtyStorage = make(map[types.Hash]types.Hash)
 	}
+}
+
+func (s *MemoryStateDB) Commit() (types.Hash, error) {
+	for addr, obj := range s.stateObjects {
+		if obj.selfDestructed {
+			delete(s.stateObjects, addr)
+		}
+	}
+	s.journal = newJournal()
+	s.finalizeStorage()
 
 	if len(s.stateObjects) == 0 {
 		return types.EmptyRootHash, nil
@@ -600,37 +608,15 @@ func (s *MemoryStateDB) Copy() *MemoryStateDB {
 	}
 
 	for addr, obj := range s.stateObjects {
-		newObj := &stateObject{
-			account: types.Account{
-				Nonce:    obj.account.Nonce,
-				Balance:  new(big.Int).Set(obj.account.Balance),
-				Root:     obj.account.Root,
-				CodeHash: make([]byte, len(obj.account.CodeHash)),
-			},
-			code:             make([]byte, len(obj.code)),
-			dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
-			committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
-			selfDestructed:   obj.selfDestructed,
-			deleted:          obj.deleted,
-			dbStorageRoot:    obj.dbStorageRoot,
-		}
-		copy(newObj.account.CodeHash, obj.account.CodeHash)
-		copy(newObj.code, obj.code)
-		for k, v := range obj.dirtyStorage {
-			newObj.dirtyStorage[k] = v
-		}
-		for k, v := range obj.committedStorage {
-			newObj.committedStorage[k] = v
-		}
-		cp.stateObjects[addr] = newObj
+		cp.stateObjects[addr] = copyMemoryStateObject(obj)
 	}
 
 	for txHash, logs := range s.logs {
 		cpLogs := make([]*types.Log, len(logs))
 		for i, log := range logs {
 			cpLog := *log
-			cpLog.Data = append([]byte(nil), log.Data...)
-			cpLog.Topics = append([]types.Hash(nil), log.Topics...)
+			cpLog.Topics = slices.Clone(log.Topics)
+			cpLog.Data = bytes.Clone(log.Data)
 			cpLogs[i] = &cpLog
 		}
 		cp.logs[txHash] = cpLogs
@@ -645,6 +631,35 @@ func (s *MemoryStateDB) Copy() *MemoryStateDB {
 	}
 
 	return cp
+}
+
+func copyMemoryStateObject(obj *stateObject) *stateObject {
+	if obj == nil {
+		return nil
+	}
+	newObj := &stateObject{
+		account: types.Account{
+			Nonce:    obj.account.Nonce,
+			Balance:  new(big.Int).Set(obj.account.Balance),
+			Root:     obj.account.Root,
+			CodeHash: make([]byte, len(obj.account.CodeHash)),
+		},
+		code:             make([]byte, len(obj.code)),
+		dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
+		committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
+		selfDestructed:   obj.selfDestructed,
+		deleted:          obj.deleted,
+		dbStorageRoot:    obj.dbStorageRoot,
+	}
+	copy(newObj.account.CodeHash, obj.account.CodeHash)
+	copy(newObj.code, obj.code)
+	for k, v := range obj.dirtyStorage {
+		newObj.dirtyStorage[k] = v
+	}
+	for k, v := range obj.committedStorage {
+		newObj.committedStorage[k] = v
+	}
+	return newObj
 }
 
 // Merge applies all state changes from src into this MemoryStateDB.

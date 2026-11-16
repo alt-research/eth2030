@@ -100,6 +100,11 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 		return fmt.Errorf("%w: forkchoice head state root mismatch", ErrStateNotFound)
 	}
 	if oldHead.Hash() != headHash {
+		if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+			if err := bc.verifyOverlayCheckpoint(head, st); err != nil {
+				return storageFailure(err)
+			}
+		}
 		root, err := st.Commit()
 		if err != nil {
 			return storageFailure(err)

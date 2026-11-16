@@ -284,7 +284,7 @@ func (d *DbgAPI) storageRangeAt(req *rpctypes.Request) *rpctypes.Response {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := d.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(d.backend, header)
 	if err != nil {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "state not available: "+err.Error())
 	}
@@ -388,7 +388,7 @@ func (d *DbgAPI) dumpBlock(req *rpctypes.Request) *rpctypes.Response {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := d.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(d.backend, header)
 	if err != nil {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "state not available: "+err.Error())
 	}

@@ -32,6 +32,9 @@ func main() {
 
 // run is the actual entry point, returning an exit code.
 func run(args []string) int {
+	if len(args) > 0 && args[0] == "binary-migrate" {
+		return runBinaryMigration(args[1:], os.Stdout, os.Stderr)
+	}
 	cfg, exit, code := parseFlags(args)
 	if exit {
 		return code

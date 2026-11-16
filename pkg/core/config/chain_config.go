@@ -54,6 +54,16 @@ type ChainConfig struct {
 	// layout before the given timestamp. Nil selects the Ethereum layout.
 	LegacyNativeBLSUntil *uint64 `json:",omitempty"`
 
+	// PQDraft configures the pinned PQ drafts on a private chain.
+	PQDraft *PQDraftConfig `json:",omitempty"`
+
+	// BinaryOverlayTime activates the pinned BLAKE3 overlay on a private chain.
+	// BinaryConversionTime and BinaryConversionStride optionally schedule its
+	// ordered conversion before transactions.
+	BinaryOverlayTime      *uint64 `json:",omitempty"`
+	BinaryConversionTime   *uint64 `json:",omitempty"`
+	BinaryConversionStride int     `json:",omitempty"`
+
 	// BPO (Blob Parameter Optimization) fork timestamps for blob schedule upgrades.
 	BPO1Time *uint64
 	BPO2Time *uint64
@@ -68,6 +78,15 @@ type ChainConfig struct {
 	// This field is derived from EIP7864FinalHashTime but can be set directly
 	// for testing.
 	BinaryTreeHashFunc string
+}
+
+// PQDraftConfig selects private-chain addresses for the conflicting draft
+// contracts. A nil Time keeps the extension inactive.
+type PQDraftConfig struct {
+	Time       *uint64       `json:"time"`
+	SigRecover types.Address `json:"sigRecover"`
+	MLDSA      types.Address `json:"mldsa"`
+	MLDSAETH   types.Address `json:"mldsaEth"`
 }
 
 // Block-number fork checks

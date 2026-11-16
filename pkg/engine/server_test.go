@@ -57,6 +57,7 @@ type mockBackend struct {
 	getPayloadV4ByIDFn func(id PayloadID) (*GetPayloadV4Response, error)
 	getPayloadV6ByIDFn func(id PayloadID) (*GetPayloadV6Response, error)
 	headTimestamp      uint64
+	blockTimestampFn   func(types.Hash) uint64
 	isCancunFn         func(timestamp uint64) bool
 	isPragueFn         func(timestamp uint64) bool
 	isAmsterdamFn      func(timestamp uint64) bool
@@ -126,7 +127,10 @@ func (m *mockBackend) GetHeadTimestamp() uint64 {
 	return m.headTimestamp
 }
 
-func (m *mockBackend) GetBlockTimestamp(_ types.Hash) uint64 {
+func (m *mockBackend) GetBlockTimestamp(hash types.Hash) uint64 {
+	if m.blockTimestampFn != nil {
+		return m.blockTimestampFn(hash)
+	}
 	return 0
 }
 
@@ -972,5 +976,36 @@ func makeTestPayloadV3(blockHash types.Hash, blockNumber uint64) ExecutionPayloa
 		},
 		BlobGasUsed:   0,
 		ExcessBlobGas: 0,
+	}
+}
+
+func TestForkchoiceAppliesHeadBeforeRejectingAttributes(t *testing.T) {
+	head := types.Hash{1}
+	state := ForkchoiceStateV1{HeadBlockHash: head}
+	var applied types.Hash
+	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
+		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
+			if attrs != nil {
+				t.Fatal("invalid V3 attributes reached the payload builder")
+			}
+			applied = state.HeadBlockHash
+			return ForkchoiceUpdatedResult{PayloadStatus: PayloadStatusV1{Status: StatusValid}}, nil
+		},
+		forkchoiceUpdV4Fn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV4) (ForkchoiceUpdatedResult, error) {
+			if attrs != nil {
+				t.Fatal("unsupported V4 attributes reached the payload builder")
+			}
+			applied = state.HeadBlockHash
+			return ForkchoiceUpdatedResult{PayloadStatus: PayloadStatusV1{Status: StatusValid}}, nil
+		},
+	}
+	api := NewEngineAPI(backend)
+	if _, err := api.ForkchoiceUpdatedV3(state, new(PayloadAttributesV3)); err != ErrInvalidPayloadAttributes || applied != head {
+		t.Fatalf("V3 head %s, err %v", applied, err)
+	}
+	applied = types.Hash{}
+	if _, err := api.ForkchoiceUpdatedV4(state, new(PayloadAttributesV4)); err != ErrUnsupportedFork || applied != head {
+		t.Fatalf("V4 head %s, err %v", applied, err)
 	}
 }

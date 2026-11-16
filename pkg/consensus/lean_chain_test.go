@@ -150,54 +150,15 @@ func TestLeanAvailablePQAttestors(t *testing.T) {
 	}
 }
 
-func TestLeanAvailableAggregation(t *testing.T) {
-	// Create attestations with dummy data.
-	attestations := make([]PQAttestation, 10)
-	for i := range attestations {
-		attestations[i] = PQAttestation{
-			Slot:            100,
-			CommitteeIndex:  0,
-			BeaconBlockRoot: types.Hash{0x01, 0x02},
-			SourceEpoch:     3,
-			TargetEpoch:     4,
-			PQSignature:     []byte{0x01, 0x02, 0x03},
-			PQPublicKey:     []byte{byte(i), 0xAA, 0xBB},
-			ValidatorIndex:  uint64(i),
+func TestLeanAvailableAggregationRejectsUnverifiedAttestations(t *testing.T) {
+	attestations := []PQAttestation{{Slot: 100, PQSignature: []byte{1}, PQPublicKey: []byte{2}}}
+	aggregator := NewSTARKSignatureAggregator()
+	for _, lean := range []bool{false, true} {
+		cfg := DefaultConfig()
+		cfg.LeanAvailableChainMode = lean
+		if result, err := aggregator.AggregateWithConfig(attestations, toLeanCfg(cfg)); result != nil || err == nil {
+			t.Fatalf("accepted invalid attestation with lean mode %v", lean)
 		}
-	}
-
-	agg := NewSTARKSignatureAggregator()
-
-	// Lean mode on: should not use STARK prover, MerkleRoot set in CommitteeRoot.
-	cfg := DefaultConfig()
-	cfg.LeanAvailableChainMode = true
-	result, err := agg.AggregateWithConfig(attestations, toLeanCfg(cfg))
-	if err != nil {
-		t.Fatalf("lean aggregation failed: %v", err)
-	}
-	if result.AggregateProof != nil {
-		t.Fatal("lean mode should not produce STARK proof")
-	}
-	emptyHash := types.Hash{}
-	if result.CommitteeRoot == emptyHash {
-		t.Fatal("lean mode should set CommitteeRoot")
-	}
-	if result.NumValidators != 10 {
-		t.Fatalf("NumValidators = %d, want 10", result.NumValidators)
-	}
-	if result.Slot != 100 {
-		t.Fatalf("Slot = %d, want 100", result.Slot)
-	}
-
-	// Lean mode off: should use regular STARK aggregation.
-	cfgOff := DefaultConfig()
-	cfgOff.LeanAvailableChainMode = false
-	resultFull, err := agg.AggregateWithConfig(attestations, toLeanCfg(cfgOff))
-	if err != nil {
-		t.Fatalf("full aggregation failed: %v", err)
-	}
-	if resultFull.AggregateProof == nil {
-		t.Fatal("full mode should produce STARK proof")
 	}
 }
 

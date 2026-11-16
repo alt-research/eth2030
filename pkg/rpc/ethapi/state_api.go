@@ -5,6 +5,7 @@ package ethapi
 import (
 	"encoding/json"
 	"fmt"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -85,7 +86,7 @@ func (s *StateAPI) getStorageAt(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := s.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(s.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, "state unavailable: "+err.Error())
 	}
@@ -119,7 +120,7 @@ func (s *StateAPI) getCode(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := s.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(s.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, "state unavailable: "+err.Error())
 	}
@@ -225,7 +226,7 @@ func (s *StateAPI) getBalance(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := s.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(s.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, "state unavailable: "+err.Error())
 	}
@@ -261,7 +262,7 @@ func (s *StateAPI) getTransactionCount(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := s.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(s.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, "state unavailable: "+err.Error())
 	}

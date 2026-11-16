@@ -199,3 +199,40 @@ Key flags supported by eth2030-geth for Kurtosis compatibility:
 
 - **Prysm container**: `gcr.io/prysmaticlabs/prysm/beacon-chain:latest` may have exec issues in some environments. Use Lighthouse as the primary CL.
 - **Assertoor quick timeout**: 30s is not enough for full stability checks — extend to 120s+ for thorough validation.
+
+## Track 4 private devnet
+
+Build the Track 4 image and start two ETH2030/Lighthouse pairs. Use a fresh
+enclave name. The prerequisites are Docker, Kurtosis, Go, jq, gzip, the pinned
+`refs/ethereum-package` checkout, and a local `eth2030cl:local` Lighthouse image.
+
+```bash
+KURTOSIS_PACKAGE=/absolute/path/to/refs/ethereum-package \
+  ./scripts/run-track4.sh eth2030-track4
+./scripts/verify-track4.sh eth2030-track4
+```
+
+The launcher adds the same test allocation to the generated EL and CL
+genesis. The EL wrapper keeps that genesis state and sets private fork times
+for EIP-7932/8051 recovery and the pinned EIP-7864 BLAKE3 overlay at genesis
+plus 12 seconds. EIP-7748 conversion starts 12 seconds later and advances one
+unit per block. I+ runs from genesis in this profile. The prefunded ML-DSA key
+is a public test fixture.
+
+The verifier checks known-answer and negative signature cases over
+`eth_call`, submits a signed PQ transaction, and compares the canonical
+receipt, storage value and state root from both ELs. It fetches the
+corresponding block from both Beacon APIs and checks the execution payload,
+raw transaction bytes and non-optimistic status. Each missing result or
+mismatch fails verification.
+
+```bash
+go -C ../.. test ./node -run '^TestTrack4IndependentEngineAndRPC$' -count=1
+```
+
+The local integration test runs the same EIP vectors across the activation
+boundary. It also drives independent authenticated Engine HTTP handlers,
+imports the three supported PQ transaction formats, switches competing
+branches and reopens a verifier's FileDB to check persisted receipts and
+storage. The live profile has no production STARK, lattice, PQ committee or
+witness-gas provider configuration.

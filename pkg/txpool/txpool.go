@@ -222,6 +222,9 @@ func (l *txSortedList) Ready(baseNonce uint64) []*types.Transaction {
 // TxPool implements a transaction pool for pending and queued transactions.
 type TxPool struct {
 	config      Config
+	chainID     *big.Int
+	pqForkKnown bool
+	pqActive    bool
 	state       StateReader
 	codeReader  FrameStateReader     // optional: enables VERIFY frame code check (AA-3.1)
 	baseFee     *big.Int             // current base fee, nil if unknown
@@ -267,6 +270,12 @@ func (pool *TxPool) SetForkRules(cfg *config.ChainConfig, time uint64) {
 	pool.config.IsPrague = cfg.IsPrague(time)
 	pool.config.IsGlamsterdan = cfg.IsGlamsterdan(time)
 	pool.config.IsOsaka = cfg.IsOsaka(time)
+	pool.pqForkKnown = cfg != nil
+	pool.pqActive = cfg != nil && cfg.IsMerge() && cfg.IsIPlus(time)
+	pool.chainID = nil
+	if cfg != nil && cfg.ChainID != nil {
+		pool.chainID = new(big.Int).Set(cfg.ChainID)
+	}
 }
 
 // SuggestGasPrice returns a fee suggestion for the desired speed tier.
@@ -570,6 +579,12 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 	}
 
 	if pq, ok := tx.Inner().(*types.PQTransaction); ok {
+		if pool.pqForkKnown && !pool.pqActive {
+			return errors.New("PQ transactions require I+ fork")
+		}
+		if pool.chainID != nil && (pq.ChainID == nil || pq.ChainID.Cmp(pool.chainID) != 0) {
+			return errors.New("PQ transaction chain ID mismatch")
+		}
 		if err := types.ValidatePQTransactionSignature(pq); err != nil {
 			return err
 		}

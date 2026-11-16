@@ -647,7 +647,7 @@ func NewVerkleJumpTable() JumpTable {
 	tbl := NewGlamsterdanJumpTable()
 
 	tbl[SLOAD] = &operation{execute: opSload, constantGas: 0, dynamicGas: gasSloadEIP4762, minStack: 1, maxStack: 1024}
-	tbl[SSTORE] = &operation{execute: opSstore, constantGas: 0, dynamicGas: gasSstoreEIP4762, minStack: 2, maxStack: 1024, writes: true}
+	tbl[SSTORE] = &operation{execute: opSstoreGlamst, constantGas: 0, dynamicGas: gasSstoreEIP4762, minStack: 2, maxStack: 1024, writes: true}
 	tbl[BALANCE] = &operation{execute: opBalance, constantGas: 0, dynamicGas: gasBalanceEIP4762, minStack: 1, maxStack: 1024}
 	tbl[EXTCODESIZE] = &operation{execute: opExtcodesize, constantGas: 0, dynamicGas: gasExtCodeSizeEIP4762, minStack: 1, maxStack: 1024}
 	tbl[EXTCODECOPY] = &operation{execute: opExtcodecopy, constantGas: 0, dynamicGas: gasExtCodeCopyEIP4762, minStack: 4, maxStack: 1024, memorySize: memoryExtcodecopy}

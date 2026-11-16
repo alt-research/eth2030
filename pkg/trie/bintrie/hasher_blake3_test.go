@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
+	"lukechampine.com/blake3"
 )
 
 // BLAKE3 known test vectors.
@@ -35,9 +36,9 @@ func TestBlake3Hasher_KnownVector(t *testing.T) {
 	left := types.Hash{}
 	right := types.Hash{}
 	result := hashBLAKE3(left[:], right[:])
-	// Result must be non-zero (two zero inputs hash to a non-zero output).
-	if result == (types.Hash{}) {
-		t.Error("hashBLAKE3(zero, zero) returned zero hash")
+	// EIP-7864 defines the all-zero 64-byte input as the zero hash.
+	if result != (types.Hash{}) {
+		t.Error("hashBLAKE3(zero, zero) must be zero")
 	}
 
 	// Determinism check.
@@ -91,5 +92,56 @@ func TestHashFunctionBlake3Constant(t *testing.T) {
 	}
 	if HashFunctionBlake3 == HashFunctionSHA256 {
 		t.Error("Blake3 and SHA256 constants must differ")
+	}
+}
+
+// This reference follows EIP-7864's zero-pair rule independently of the trie hasher.
+func TestBlake3TrieRootAndCopy(t *testing.T) {
+	trie := NewWithHashFunc(HashFunctionBlake3)
+	var a, b [32]byte
+	a[0], a[31], b[0], b[31] = 0x10, 2, 0x90, 7
+	var va, vb [32]byte
+	va[0], vb[0] = 3, 4
+	if err := trie.Put(a[:], va[:]); err != nil {
+		t.Fatal(err)
+	}
+	if err := trie.Put(b[:], vb[:]); err != nil {
+		t.Fatal(err)
+	}
+	pair := func(left, right types.Hash) types.Hash {
+		if left == (types.Hash{}) && right == (types.Hash{}) {
+			return types.Hash{}
+		}
+		var input [64]byte
+		copy(input[:32], left[:])
+		copy(input[32:], right[:])
+		return blake3.Sum256(input[:])
+	}
+	stemRoot := func(key, value [32]byte) types.Hash {
+		var nodes [256]types.Hash
+		nodes[key[31]] = blake3.Sum256(value[:])
+		for width := 256; width > 1; width /= 2 {
+			for i := 0; i < width; i += 2 {
+				nodes[i/2] = pair(nodes[i], nodes[i+1])
+			}
+		}
+		var prefix types.Hash
+		copy(prefix[:31], key[:31])
+		return pair(prefix, nodes[0])
+	}
+	want := pair(stemRoot(a, va), stemRoot(b, vb))
+	if got := trie.Hash(); got != want {
+		t.Fatalf("BLAKE3 root got %x want %x", got, want)
+	}
+	clone := trie.Copy()
+	if got := clone.Hash(); got != want {
+		t.Fatalf("copy root got %x want %x", got, want)
+	}
+	va[1] = 9
+	if err := clone.Put(a[:], va[:]); err != nil {
+		t.Fatal(err)
+	}
+	if trie.Hash() != want || clone.Hash() == want {
+		t.Fatal("copy mutation changed original or failed to update root")
 	}
 }

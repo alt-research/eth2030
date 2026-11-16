@@ -1,10 +1,12 @@
 package node
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/big"
 	"os"
+	"strings"
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/types"
@@ -45,18 +47,44 @@ type chainConfigJSON struct {
 
 	TerminalTotalDifficulty *bigIntJSON `json:"terminalTotalDifficulty"`
 
-	ShanghaiTime         *uint64 `json:"shanghaiTime"`
-	CancunTime           *uint64 `json:"cancunTime"`
-	PragueTime           *uint64 `json:"pragueTime"`
-	AmsterdamTime        *uint64 `json:"amsterdamTime"`
-	GlamsterdanTime      *uint64 `json:"glamsterdanTime"`
-	HogotaTime           *uint64 `json:"hogotaTime"`
-	SSZBlockTime         *uint64 `json:"sszBlockTime"`
-	IPlusTime            *uint64 `json:"iPlusTime"`
-	OsakaTime            *uint64 `json:"osakaTime"`
-	BPO1Time             *uint64 `json:"bpo1Time"`
-	BPO2Time             *uint64 `json:"bpo2Time"`
-	EIP7864FinalHashTime *uint64 `json:"eip7864FinalHashTime"`
+	ShanghaiTime           *uint64      `json:"shanghaiTime"`
+	CancunTime             *uint64      `json:"cancunTime"`
+	PragueTime             *uint64      `json:"pragueTime"`
+	AmsterdamTime          *uint64      `json:"amsterdamTime"`
+	GlamsterdanTime        *uint64      `json:"glamsterdanTime"`
+	HogotaTime             *uint64      `json:"hogotaTime"`
+	SSZBlockTime           *uint64      `json:"sszBlockTime"`
+	IPlusTime              *uint64      `json:"iPlusTime"`
+	OsakaTime              *uint64      `json:"osakaTime"`
+	BPO1Time               *uint64      `json:"bpo1Time"`
+	BPO2Time               *uint64      `json:"bpo2Time"`
+	PQDraft                *pqDraftJSON `json:"pqDraft"`
+	BinaryOverlayTime      *uint64      `json:"binaryOverlayTime"`
+	BinaryConversionTime   *uint64      `json:"binaryConversionTime"`
+	BinaryConversionStride int          `json:"binaryConversionStride"`
+	EIP7864FinalHashTime   *uint64      `json:"eip7864FinalHashTime"`
+}
+
+type pqDraftJSON struct {
+	Time       *uint64            `json:"time"`
+	SigRecover pqDraftAddressJSON `json:"sigRecover"`
+	MLDSA      pqDraftAddressJSON `json:"mldsa"`
+	MLDSAETH   pqDraftAddressJSON `json:"mldsaEth"`
+}
+
+type pqDraftAddressJSON types.Address
+
+func (a *pqDraftAddressJSON) UnmarshalJSON(data []byte) error {
+	var value string
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	raw, err := hex.DecodeString(strings.TrimPrefix(value, "0x"))
+	if err != nil || len(raw) != len(types.Address{}) {
+		return fmt.Errorf("pqDraft: expected an exact 20-byte hex address")
+	}
+	copy(a[:], raw)
+	return nil
 }
 
 // allocAccountJSON is an account in the genesis alloc.
@@ -179,11 +207,9 @@ func (h *hexBytes) UnmarshalJSON(data []byte) error {
 		*h = []byte(s)
 		return nil
 	}
-	b := make([]byte, (len(s)-2)/2)
-	if _, err := fmt.Sscanf(s[2:], "%x", &b); err != nil {
-		// fallback: just use the string
-		*h = []byte(s)
-		return nil
+	b, err := hex.DecodeString(s[2:])
+	if err != nil {
+		return fmt.Errorf("invalid genesis hex bytes: %w", err)
 	}
 	*h = b
 	return nil
@@ -253,6 +279,15 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 	chainCfg.BPO1Time = gj.Config.BPO1Time
 	chainCfg.BPO2Time = gj.Config.BPO2Time
 	chainCfg.EIP7864FinalHashTime = gj.Config.EIP7864FinalHashTime
+	chainCfg.BinaryOverlayTime = gj.Config.BinaryOverlayTime
+	chainCfg.BinaryConversionTime = gj.Config.BinaryConversionTime
+	chainCfg.BinaryConversionStride = gj.Config.BinaryConversionStride
+	if draft := gj.Config.PQDraft; draft != nil {
+		chainCfg.PQDraft = &coreconfig.PQDraftConfig{
+			Time: draft.Time, SigRecover: types.Address(draft.SigRecover),
+			MLDSA: types.Address(draft.MLDSA), MLDSAETH: types.Address(draft.MLDSAETH),
+		}
+	}
 
 	// Apply fork override timestamps from CLI flags.
 	applyForkOverrides(chainCfg, cfg)

@@ -5,6 +5,7 @@ package ethapi
 import (
 	"errors"
 	"fmt"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -90,7 +91,7 @@ func (b *EthAPIBackend) GetBalance(addr types.Address, blockNum BlockNumber) (*b
 	if header == nil {
 		return nil, ErrAPIBackendNoBlock
 	}
-	statedb, err := b.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(b.backend, header)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
@@ -107,7 +108,7 @@ func (b *EthAPIBackend) GetCode(addr types.Address, blockNum BlockNumber) ([]byt
 	if header == nil {
 		return nil, ErrAPIBackendNoBlock
 	}
-	statedb, err := b.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(b.backend, header)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
@@ -121,7 +122,7 @@ func (b *EthAPIBackend) GetStorageAt(addr types.Address, key types.Hash, blockNu
 	if header == nil {
 		return types.Hash{}, ErrAPIBackendNoBlock
 	}
-	statedb, err := b.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(b.backend, header)
 	if err != nil {
 		return types.Hash{}, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
@@ -241,7 +242,7 @@ func (b *EthAPIBackend) GetNonce(addr types.Address, blockNum BlockNumber) (uint
 	if header == nil {
 		return 0, ErrAPIBackendNoBlock
 	}
-	statedb, err := b.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(b.backend, header)
 	if err != nil {
 		return 0, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}

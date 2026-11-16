@@ -2,6 +2,7 @@ package types_test
 
 import (
 	"math/big"
+	"sync"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -427,4 +428,42 @@ func TestPQTxValidatorRealGasOrdering(t *testing.T) {
 	if types.PQGasCostFalcon >= types.PQGasCostSPHINCS {
 		t.Fatal("Falcon < SPHINCS expected")
 	}
+}
+
+func TestPQValidatorSignerEntryIsIsolated(t *testing.T) {
+	v := types.NewPQTxValidatorReal()
+	v.RegisterSigner(types.PQSigTypeMLDSA, func(_, _, _ []byte) bool { return true })
+	entry, ok := v.GetSignerEntry(types.PQSigTypeMLDSA)
+	if !ok {
+		t.Fatal("missing signer")
+	}
+	entry.Verify = func(_, _, _ []byte) bool { return false }
+	tx := newTestPQTx()
+	tx.SignWithPQ(types.PQSigTypeMLDSA, make([]byte, types.DilithiumPubKeySize), make([]byte, types.DilithiumSigSize))
+	if err := v.ValidatePQSignatureReal(tx); err != nil {
+		t.Fatalf("mutating returned entry changed verifier: %v", err)
+	}
+	tx.ChainID = big.NewInt(-1)
+	if err := v.ValidatePQSignatureReal(tx); err != types.ErrPQRealVerifyFailed {
+		t.Fatalf("accepted unencodable signing message: %v", err)
+	}
+}
+
+func TestPQValidatorConcurrentRegistrationAndVerification(t *testing.T) {
+	v := types.NewPQTxValidatorReal()
+	tx := newTestPQTx()
+	tx.SignWithPQ(types.PQSigTypeMLDSA, make([]byte, types.DilithiumPubKeySize), make([]byte, types.DilithiumSigSize))
+	var wg sync.WaitGroup
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < 200; j++ {
+				v.RegisterSigner(types.PQSigTypeMLDSA, func(_, _, _ []byte) bool { return true })
+				_ = v.ValidatePQSignatureReal(tx)
+				_, _ = v.GetSignerEntry(types.PQSigTypeMLDSA)
+			}
+		}()
+	}
+	wg.Wait()
 }

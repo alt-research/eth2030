@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -709,18 +710,18 @@ func (api *EngineAPI) handleGetBlobsV3(params []json.RawMessage) (any, *jsonrpcE
 }
 
 func engineErrorToRPC(err error) *jsonrpcError {
-	switch err {
-	case ErrUnknownPayload:
+	switch {
+	case errors.Is(err, ErrUnknownPayload):
 		return &jsonrpcError{Code: UnknownPayloadCode, Message: err.Error()}
-	case ErrInvalidForkchoiceState:
+	case errors.Is(err, ErrInvalidForkchoiceState):
 		return &jsonrpcError{Code: InvalidForkchoiceStateCode, Message: err.Error()}
-	case ErrInvalidPayloadAttributes:
+	case errors.Is(err, ErrInvalidPayloadAttributes):
 		return &jsonrpcError{Code: InvalidPayloadAttributeCode, Message: err.Error()}
-	case ErrInvalidParams:
+	case errors.Is(err, ErrInvalidParams):
 		return &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
-	case ErrTooLargeRequest:
+	case errors.Is(err, ErrTooLargeRequest):
 		return &jsonrpcError{Code: TooLargeRequestCode, Message: err.Error()}
-	case ErrUnsupportedFork:
+	case errors.Is(err, ErrUnsupportedFork):
 		return &jsonrpcError{Code: UnsupportedForkCode, Message: err.Error()}
 	default:
 		return &jsonrpcError{Code: internalErrorCode, Message: err.Error()}

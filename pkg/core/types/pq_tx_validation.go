@@ -43,7 +43,7 @@ const (
 	PQSPHINCSPSigSize   = SPHINCSPlusSigSize
 )
 
-// Gas cost table for PQ signature verification (per EIP-8051 draft).
+// Project-local gas estimates for PQ transaction signature verification.
 const (
 	PQGasMLDSA65 uint64 = 4500
 	PQGasFalcon  uint64 = 6000
@@ -225,6 +225,9 @@ func (v *PQTxValidator) ValidatePQSignature(tx *PQTransaction) error {
 
 	// Compute the signing message from the transaction hash.
 	txHash := tx.SigningHash()
+	if txHash == (Hash{}) {
+		return ErrPQValidateVerifyFailed
+	}
 	if !entry.Verify(tx.PQPublicKey, txHash[:], tx.PQSignature) {
 		return ErrPQValidateVerifyFailed
 	}

@@ -27,9 +27,10 @@ responses with Merkle authentication paths.
 - `VerifySTARKProof(proof, publicInputs) (bool, error)`
 - `(*STARKProofData).ProofSize() int`
 
-**AA validation circuit (`validation_frame_circuit.go`)**
+**Validation-frame proof boundary (`validation_frame_circuit.go`)**
 
-- Gnark-circuit-based validation frame for AA operations
+- `STARKValidationFrameProver` returns `ErrFrameProofUnavailable`: the prior trace did not prove EVM execution or `APPROVE`.
+- `StubValidationFrameProver` is a test double and does not prove validity. The VM requires a separately configured block-bound provider and does not accept this stub for block proof verification.
 
 **Prover pool types and functions**
 

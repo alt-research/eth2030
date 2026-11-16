@@ -44,7 +44,9 @@ type ExecutionProof struct {
 type AggregatedProof struct {
 	Proofs        []ExecutionProof
 	AggregateRoot types.Hash
-	Valid         bool
+	// AggregateProof is the provider-specific proof over the ordered inputs.
+	AggregateProof []byte
+	Valid          bool
 }
 
 // STARKAggregatedProof holds STARK-based aggregated proofs.

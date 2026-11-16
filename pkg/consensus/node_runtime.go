@@ -104,7 +104,14 @@ func NewNodeRuntime(cfg NativeConfig, domain types.Hash, genesis time.Time, chec
 	}
 	cfg.Validators = registry
 	scheduler := slot.NewQuickSlotScheduler(&slot.QuickSlotConfig{SlotDuration: time.Duration(cfg.SlotMillis) * time.Millisecond, SlotsPerEpoch: cfg.SlotsPerEpoch}, genesis)
-	return &NodeRuntime{config: cfg, domain: nativeDomain(domain, cfg), scheduler: scheduler, verifier: pq.NewPQAttestationVerifier(&pq.PQAttestationConfig{UsePQSignatures: true}), blocks: map[types.Hash]nativeBlock{checkpoint: {slot: checkpointSlot}}, justified: map[types.Hash]bool{checkpoint: true}, votes: make(map[nativeLink]map[uint64]bool), votedTargets: make(map[uint64]map[uint64]types.Hash), seen: make(map[uint64]map[uint64]types.Hash), status: NativeStatus{JustifiedRoot: checkpoint, FinalizedRoot: checkpoint, JustifiedSlot: checkpointSlot, FinalizedSlot: checkpointSlot}, onSlot: onSlot, onFinalized: onFinalized}, nil
+	verifier := pq.NewPQAttestationVerifier(&pq.PQAttestationConfig{
+		UsePQSignatures: true,
+		PQSigner: func(_, committee, validator uint64) ([]byte, bool) {
+			key, registered := registry[validator]
+			return key, committee == 0 && registered
+		},
+	})
+	return &NodeRuntime{config: cfg, domain: nativeDomain(domain, cfg), scheduler: scheduler, verifier: verifier, blocks: map[types.Hash]nativeBlock{checkpoint: {slot: checkpointSlot}}, justified: map[types.Hash]bool{checkpoint: true}, votes: make(map[nativeLink]map[uint64]bool), votedTargets: make(map[uint64]map[uint64]types.Hash), seen: make(map[uint64]map[uint64]types.Hash), status: NativeStatus{JustifiedRoot: checkpoint, FinalizedRoot: checkpoint, JustifiedSlot: checkpointSlot, FinalizedSlot: checkpointSlot}, onSlot: onSlot, onFinalized: onFinalized}, nil
 }
 func (r *NodeRuntime) Start() {
 	r.mu.Lock()

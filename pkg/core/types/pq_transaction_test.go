@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"math/big"
 	"testing"
+
+	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 func TestNewPQTransaction(t *testing.T) {
@@ -54,6 +56,13 @@ func TestPQTransactionHash(t *testing.T) {
 	}
 	if h1 != h2 {
 		t.Error("hash should be deterministic")
+	}
+	raw, err := tx.EncodePQ()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := Hash(gethcrypto.Keccak256Hash(raw)); h1 != want || NewTransaction(tx).Hash() != want {
+		t.Fatalf("transaction hash %s, want signed envelope hash %s", h1, want)
 	}
 }
 

@@ -28,7 +28,8 @@ for work ownership, dependencies and acceptance criteria. The
 - [x] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
 - [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
-- [ ] Complete Lighthouse Heze duties, list retrieval, bid validation and inclusion satisfaction handling and the ETH2030 Bogotá Engine contract. Prove compulsory inclusion with an ordinary transaction and verify the execution-valid omission case.
+- [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
+- [ ] Force live inclusion-list gossip loss and observe successful Req/Resp recovery. Verify deferred satisfaction through forkchoice with an independent EL.
 - [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
 - [ ] Update the Dora inclusion-list consumer and verify committee positions and historical display against the pinned CL schema.
 - [ ] Verify full and snap late join and restart against independent source clients.

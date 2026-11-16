@@ -1,3 +1,9 @@
+## Devnet host memory incident (2026-11-16)
+
+- Before the 19:05 CST reboot, 16 ETH devnet enclaves had 92 EL, beacon and validator containers running without per-container memory limits. At 19:01 CST, the kernel OOM process table attributed about 31.2 GiB of anonymous resident memory to 60 Lighthouse, 24 ETH2030 and eight Geth processes. System activity records showed the 8 GiB swap essentially full from 18:40 onward.
+- The kernel repeatedly invoked the global OOM killer starting at 18:52 CST. At 18:57 and 18:59 the allocations that triggered it came from validator containers in two ETH devnets. Several terminated processes were developer tools. The next boot recorded a reset-pin event and unclean filesystem recovery. This establishes devnet memory pressure as a major contributor and leaves the immediate cause of the reset undetermined.
+- Docker showed zero running EL, beacon or validator containers after reboot. The Docker and kernel records remain available for inspection.
+
 ## Bogotá Engine and Heze inclusion recovery (2026-11-16)
 
 - Published Lighthouse `eth2030` at `dd48a965e` over upstream unstable `7a9d14115`. Heze sends the parent-dependent timely inclusion-list view in `engine_newPayloadV6`. An execution-valid envelope with unmet inclusion requirements remains execution-valid in fork choice, and the rejection of its payload extension survives database reload. The linked ETH2030 branch is `fyInALT/eth2030:feat/bogota-inclusion-list-wire` at `42e7ada9`. The upstream Gloas database-invariants test passed on the runtime revision `dd7263111`. The test-only follow-up applies both V6 outcomes to the same payload hash on separate harnesses and asserts the proposer decision before and after fork-choice reload.

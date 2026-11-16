@@ -6,8 +6,15 @@ See [Consensus client iteration after Track 4](docs/cl-iteration-roadmap.md)
 for branch policy, dependencies and observable acceptance criteria.
 
 - [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
+- [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.
+- [x] Verify official Lighthouse v8.3.3 against two ETH2030 ELs on the private Fulu profile.
+- [x] Verify the pinned upstream Lighthouse unstable image against two ETH2030 ELs on the private Fulu profile.
+- [x] Audit the March Lighthouse patches against current source, specifications, and Dora consumers.
+- [x] Verify a self-built Gloas envelope and its matching execution block on both node pairs after a live fork transition.
+- [ ] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
-- [ ] Implement the native Bogotá Engine contract and verify a nonempty FOCIL list carrying a sponsored Frame transaction through independent CL/EL pairs.
+- [ ] Complete Lighthouse Heze duties, bid and inclusion satisfaction handling and the ETH2030 Bogotá Engine contract. Verify a nonempty FOCIL list carrying a sponsored Frame transaction through independent CL/EL pairs.
+- [ ] Update the Dora inclusion-list consumer and verify committee positions and historical display against the pinned CL schema.
 - [ ] Verify full and snap late join and restart against independent source clients.
 - [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
 - [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.

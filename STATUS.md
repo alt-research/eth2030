@@ -1,3 +1,10 @@
+## Lighthouse baseline update and historical patch audit (2026-11-16)
+
+- Merged upstream unstable `1a704e58f` into Lighthouse branch `integrate/unstable-20261116` at `f85fa05b6`. It includes the `v8.3.3` stable release and has one documentation symlink beyond upstream. Formatting, compile checks, a release container build, 40 Engine API tests, 14 blob-fetch tests, and 30 inclusion list tests passed.
+- Official stable, pinned official unstable, and the integration build each validated a live Track 4 PQ transaction with two ETH2030 ELs and two Lighthouse beacon nodes at Fulu. Both official images finalized epoch 2 with matching execution hashes across both ELs and both CLs. The [baseline verification](docs/cl-iteration-roadmap.md#lighthouse-baseline-verification) records the image IDs, source revisions and matching execution blocks.
+- The integration build crossed from Fulu to Gloas and served the same signed envelope and execution block on both pairs at slot 34. At Gloas genesis, generator `6.2.8` resolved the SSZ decode error seen with `5.3.5`. The next blocker is the native EL genesis header. Adding the empty BAL hash and slot zero to the EL header reproduced the exact execution hash both CLs expect.
+- The Heze path still needs VC list signing and publication, proposer bid bits, the V6 envelope import, and forkchoice consumption of inclusion satisfaction. The EL needs the matching Bogotá RPCs, and Dora needs to move from the March inclusion-list endpoint to the current event and committee model.
+
 ## Consensus client iteration plan (2026-11-16)
 
 - Audited EL master after PR #55 and compared the local Lighthouse integration with upstream stable and unstable. The [iteration plan](docs/cl-iteration-roadmap.md) prioritizes Gloas/Amsterdam regression evidence and the missing Heze/Bogotá Engine contract, including nonempty inclusion lists and a sponsored Frame transaction.

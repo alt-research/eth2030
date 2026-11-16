@@ -5,6 +5,8 @@
 See the [Lighthouse and Hegotá implementation plan](docs/lighthouse-hegota-implementation-plan.md)
 for work ownership, dependencies and acceptance criteria. The
 [consensus client roadmap](docs/cl-iteration-roadmap.md) covers later milestones.
+The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the audited revisions,
+implementation gaps and acceptance criteria.
 
 - [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
 - [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
@@ -31,6 +33,7 @@ for work ownership, dependencies and acceptance criteria. The
 - [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
 - [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
 - [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
+- [ ] Retain pending Bogotá inclusion-list inputs and evaluate them on deferred FCU validation in the EL.
 - [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
 - [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
 - [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
@@ -47,6 +50,10 @@ for work ownership, dependencies and acceptance criteria. The
 - [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
 - [x] Check Frame blob commitment ordering through the CL historical payload verification path.
 - [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
+- [ ] Integrate upstream Lighthouse `e723ca55f` and rerun the Gloas light-client fork-boundary regression.
+- [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
+- [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
+- [ ] Verify Req/Resp recovery through alternate peers, partial responses and competing dependent roots.
 
 ## Pinned EIP-8141 Migration
 

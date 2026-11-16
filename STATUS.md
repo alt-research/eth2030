@@ -1,3 +1,13 @@
+## Lighthouse CL gap audit (2026-11-17)
+
+- The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the published Lighthouse
+  `1bf89a4fc` baseline, upstream `e723ca55f`, and the companion EL and Dora revisions.
+- The EL still needs to retain Bogotá lists for deferred FCU validation. The pinned
+  Frame transaction format has encoding coverage but is rejected at mempool admission
+  and execution. The audit records the real-client acceptance tests for both paths.
+- Targeted EL Frame and Bogotá V6 tests passed during the audit. Prior capped devnet
+  runs provide the live CL evidence.
+
 ## Heze consensus validation (2026-11-16)
 
 - Lighthouse `1bf89a4fc` includes upstream `ca9dff457`. The beacon store and slasher redb tests reopened a copy of an uncleanly closed database. The regular Lighthouse release image built and started its version command.

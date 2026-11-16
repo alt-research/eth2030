@@ -37,6 +37,13 @@ for work ownership, dependencies and acceptance criteria. The
 - [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
 - [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.
 
+## Heze CL follow-up
+
+- [ ] Recheck the current upstream Lighthouse revision and its database regressions before updating the development branch.
+- [ ] Record deferred Engine inclusion verdicts against the exact execution payload, including updates from an empty beacon head.
+- [ ] Recover signed lists advertised by embedded self-build bids when gossip delivery is missing.
+- [ ] Verify the improvements against the production network and Engine paths with bounded resources.
+
 ## Pinned EIP-8141 Migration
 
 - [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.

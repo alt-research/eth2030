@@ -15,6 +15,8 @@ for work ownership, dependencies and acceptance criteria. The
 - [x] Audit the March Lighthouse patches against current source, specifications, and Dora consumers.
 - [x] Verify a self-built Gloas envelope and its matching execution block on both node pairs after a live fork transition.
 - [x] Publish the Lighthouse `eth2030` branch and test the Heze self-build inclusion-list snapshot.
+- [x] Integrate the upstream update at `8104a2467` and port Heze proposer-side gossip checks and local Frame hash verification.
+- [x] Verify validator-driven Heze inclusion-list production against the native EL's Bogotá list response in the two-pair devnet.
 - [ ] Reproduce Fulu finality and the Gloas transition using the published CL branch and a pinned current EL image. Freeze the cross-client Frame and Bogotá wire fixtures.
 - [ ] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.

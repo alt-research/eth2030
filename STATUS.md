@@ -1,3 +1,10 @@
+## Lighthouse migration implementation (2026-11-16)
+
+- Integrated upstream unstable `8104a2467` and fast-forwarded the fork's `eth2030` branch to `4e1167314`. Ported the Heze gossip check for missing timely list bits and added EIP-8141 local hash verification for historical and optimistically imported envelopes. Lighthouse compilation, lint and targeted Engine, gossip, historical envelope, signer and Heze HTTP tests passed.
+- Wired Heze validator duties, candidate retrieval from the EL, signing and publication. The first live run exposed a missing BN duties endpoint. After adding the route, both BNs returned all 256 epoch 2 duties with the same dependent root and emitted the same nonempty signed list at slot 64. Its transaction bytes hashed to the submitted transaction `0x41ce93275b4289fb67a7af188e6f1db1cbb5de74950b06332b34d40d1687751c`. Both BNs returned nonempty bid bits at slot 65 and both ELs returned the same successful receipt. The two-node mempools were connected in this run.
+- The paired run also passed the Fulu Track 4 verifier. The earlier migration image served matching Gloas envelopes and EL state roots on both pairs at slot 34. The EL companion commit `e1df4b17` returns the Bogotá transaction array and excludes EIP-4844 transactions from committee selection. Its Engine, EIP and node backend tests and build passed.
+- Bogotá V6 validation and persisted fork-choice satisfaction, peer list retrieval, a controlled compulsory-inclusion case and sponsored Frame interop remain open.
+
 ## Lighthouse legacy branch integration audit (2026-11-16)
 
 - The [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md) maps all 68 old Lighthouse commits outside `eth2030` to their current call sites and work packages. A whole-branch trial merge reported 76 conflicts. Both historical EL feature tips are already ancestors of `origin/master`.

@@ -17,8 +17,15 @@ for work ownership, dependencies and acceptance criteria. The
 - [x] Publish the Lighthouse `eth2030` branch and test the Heze self-build inclusion-list snapshot.
 - [x] Integrate the upstream update at `8104a2467` and port Heze proposer-side gossip checks and local Frame hash verification.
 - [x] Verify validator-driven Heze inclusion-list production against the native EL's Bogotá list response in the two-pair devnet.
+- [x] Implement native Bogotá V6 validation and persist the execution-valid inclusion-unsatisfied decision in Lighthouse fork choice.
+- [x] Implement Heze inclusion-list peer recovery and test request/response framing, authenticated previous-slot import, and stream termination.
+- [x] Prove ordinary transaction inclusion on two unpeered ELs and verify the same-parent Engine build with and without list delivery.
+- [x] Commit EIP-7843 slot numbers to Amsterdam execution headers and match Geth genesis hashing, native payload import, and restart readback.
+- [x] Merge upstream Lighthouse `7a9d14115`, run its Gloas database-invariants test, and verify the published fork ref.
+- [x] Verify finalized Fulu Track 4 history and the same PQ transaction receipt after restarting one live EL.
+- [x] Add the repeatable Heze devnet profile and verifier for a finalized ordinary transaction delivered through FOCIL.
 - [ ] Reproduce Fulu finality and the Gloas transition using the published CL branch and a pinned current EL image. Freeze the cross-client Frame and Bogotá wire fixtures.
-- [ ] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
+- [x] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
 - [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
 - [ ] Complete Lighthouse Heze duties, list retrieval, bid validation and inclusion satisfaction handling and the ETH2030 Bogotá Engine contract. Prove compulsory inclusion with an ordinary transaction and verify the execution-valid omission case.

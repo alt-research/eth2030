@@ -1,3 +1,8 @@
+## Lighthouse and Hegotá implementation plan (2026-11-16)
+
+- Recorded the published Lighthouse `eth2030` branch at `3e3978d4e` and the verified local-build inclusion-list snapshot change in `6e5317104`.
+- The [implementation plan](docs/lighthouse-hegota-implementation-plan.md) pins the initial Frame, Heze and Bogotá references, specifies CL/EL ownership, and lists the separate Frame, ordinary FOCIL and combined sponsored-Frame acceptance cases. The current update records planning and source verification.
+
 ## Lighthouse baseline update and historical patch audit (2026-11-16)
 
 - Merged upstream unstable `1a704e58f` into Lighthouse branch `integrate/unstable-20261116` at `f85fa05b6`. It includes the `v8.3.3` stable release and has one documentation symlink beyond upstream. Formatting, compile checks, a release container build, 40 Engine API tests, 14 blob-fetch tests, and 30 inclusion list tests passed.

@@ -2,18 +2,24 @@
 
 ## Consensus Client Follow-up (2026-11-16)
 
-See [Consensus client iteration after Track 4](docs/cl-iteration-roadmap.md)
-for branch policy, dependencies and observable acceptance criteria.
+See the [Lighthouse and Hegotá implementation plan](docs/lighthouse-hegota-implementation-plan.md)
+for work ownership, dependencies and acceptance criteria. The
+[consensus client roadmap](docs/cl-iteration-roadmap.md) covers later milestones.
 
+- [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
 - [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
 - [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.
 - [x] Verify official Lighthouse v8.3.3 against two ETH2030 ELs on the private Fulu profile.
 - [x] Verify the pinned upstream Lighthouse unstable image against two ETH2030 ELs on the private Fulu profile.
 - [x] Audit the March Lighthouse patches against current source, specifications, and Dora consumers.
 - [x] Verify a self-built Gloas envelope and its matching execution block on both node pairs after a live fork transition.
+- [x] Publish the Lighthouse `eth2030` branch and test the Heze self-build inclusion-list snapshot.
+- [ ] Reproduce Fulu finality and the Gloas transition using the published CL branch and a pinned current EL image. Freeze the cross-client Frame and Bogotá wire fixtures.
 - [ ] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
-- [ ] Complete Lighthouse Heze duties, bid and inclusion satisfaction handling and the ETH2030 Bogotá Engine contract. Verify a nonempty FOCIL list carrying a sponsored Frame transaction through independent CL/EL pairs.
+- [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
+- [ ] Complete Lighthouse Heze duties, list retrieval, bid validation and inclusion satisfaction handling and the ETH2030 Bogotá Engine contract. Prove compulsory inclusion with an ordinary transaction and verify the execution-valid omission case.
+- [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
 - [ ] Update the Dora inclusion-list consumer and verify committee positions and historical display against the pinned CL schema.
 - [ ] Verify full and snap late join and restart against independent source clients.
 - [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.

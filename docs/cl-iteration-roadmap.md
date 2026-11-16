@@ -4,6 +4,10 @@ This plan is based on ETH2030 master `ad35748` and the Lighthouse revisions
 below, inspected on 2026-11-16.
 [Track 4 merge and CI](https://github.com/alt-research/eth2030/pull/55)
 
+The [Lighthouse and Hegotá implementation plan](lighthouse-hegota-implementation-plan.md)
+records the published `eth2030` development branch, Frame transaction
+work, and the cross-client acceptance matrix.
+
 ## Decision and first milestone
 
 Keep Lighthouse as the release CL and use the native Go 3SF/PQ observer
@@ -94,7 +98,10 @@ revisions for fork devnets. The current stable release is `v8.3.3`
 (`57c2abc13`). The integration update `f85fa05b6` on
 `integrate/unstable-20261116` merges the 20 upstream commits since
 `25b9b7541`, including stable, at upstream unstable revision `1a704e58f`.
-The integration tree differs from upstream by one documentation symlink.
+That baseline integration tree differs from upstream by one documentation
+symlink. The published `eth2030` branch at `3e3978d4e` also carries the
+Heze self-build change that keeps the bid bits and Engine transactions
+in the same list view.
 The earlier `feat/fix-native-aa` branch has 69 commits absent from this
 upstream tip. The patch audit below identifies the behavior to carry
 forward from that prototype.
@@ -112,7 +119,7 @@ scenarios.
 | Gloas PTC, execution forkchoice, envelope availability, storage and fork-boundary fixes | Use the upstream implementations. Keep the March skipped-slot, pending data, fork-boundary and restart cases as regression inputs. The Gloas Beacon API reads an envelope with `GET /eth/v1/beacon/execution_payload_envelopes/{block_id}`. Dora `6f702f2` reads execution data by the bid hash from the EL and has no caller for the March `/blocks/{block_id}/envelope` route. |
 | FOCIL types, gossip, committee selection and list store | Use the upstream code keyed by slot, dependent root and validator. March wire data used `inclusion_list_committee_root`. The current message uses `dependent_root` and hex transaction strings. At `1a704e58f` the network supports gossip and has no `InclusionListsByIndices` request/response. Implement the draft request with `slot`, `dependent_root` and the committee bitvector. |
 | VC `InclusionListService`, scheduling and `6552c7124` default broadcast | Upstream polls Heze duties and publishes accepted signed lists from its Beacon API to gossip. At the pinned revision there is no production caller taking a duty through EL list acquisition, validator signing and publication. Restore that behavior using the upstream API and signing domain. Test delivery between independent beacon nodes and retry with a redundant BN. |
-| Heze proposer and verifier, including the old `INCLUSION_LIST_UNSATISFIED` result | Upstream prepares payload attributes from its list store. Local Heze builds start with all bid bits clear, and the envelope import constructs `NewPayloadRequest::Gloas`. The Engine V6 client exists, but normal import never constructs its request and the status conversion drops `inclusionListSatisfied`. Implement the Heze bid, validation and forkchoice paths using Bogotá's separate execution status and satisfaction Boolean. |
+| Heze proposer and verifier, including the old `INCLUSION_LIST_UNSATISFIED` result | Upstream prepares payload attributes from its list store. Fork commit `6e5317104` attaches bid bits from the same list view to local Heze builds. Envelope import still constructs `NewPayloadRequest::Gloas`. The Engine V6 client exists, but normal import never constructs its request and the status conversion drops `inclusionListSatisfied`. Complete incoming bid checks and the validation and forkchoice paths using Bogotá's separate execution status and satisfaction Boolean. |
 | Gloas and Heze light-client shortcuts | Use upstream Gloas headers with the execution block hash proof. The selected revision returns `HezeNotImplemented` for Heze. Schedule Heze light-client work when its schema and proof vectors are available. |
 | Explorer inclusion-list reads | Dora calls the removed `/blocks/{block_id}/inclusion_lists` endpoint and calculates committee positions from response order. Move its indexer to Lighthouse's `inclusion_list` event and resolve positions by committee, slot and dependent root. Cover missing, duplicated and equivocated lists and persist the events needed to reconstruct historical views. |
 
@@ -176,8 +183,9 @@ Implement the contract in this order.
    to the candidate context. Include slot, parent, target gas and list
    content when identifying builds. Keep committee authorization, gossip,
    and the subjective set of timely lists in the CL. Connect VC duties to
-   signing and publication, derive Heze bid bits from the lists used, and
-   apply the draft's inclusivity checks during block and bid handling.
+   signing and publication, retain the self-build bid bits from the lists
+   used, and apply the draft's inclusivity checks during block and bid
+   handling.
 3. Implement `newPayloadV6` and `PayloadStatusV2` in the native EL.
    Compute inclusion satisfaction independently of execution validity.
    Retain the list for accepted payloads and use it on the applicable

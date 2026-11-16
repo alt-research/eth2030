@@ -4,6 +4,31 @@ This plan is based on ETH2030 master `ad35748` and the Lighthouse revisions
 below, inspected on 2026-11-16. The acceptance checks describe future work.
 [Track 4 merge and CI](https://github.com/alt-research/eth2030/pull/55)
 
+## Decision and first milestone
+
+Keep Lighthouse as the release CL and use the native Go 3SF/PQ observer
+for research. The next milestone is a **nonempty Heze inclusion list that
+changes what the proposer builds and what the attesters vote for**. In
+parallel, establish a reproducible Gloas/Amsterdam baseline.
+
+| Order | Deliverable | Acceptance evidence |
+|---|---|---|
+| 1 | Pin the Lighthouse reference and Engine contract fixtures. | Record client revisions and image digests, genesis and fork settings, and actual Engine requests and responses. |
+| 2 | Complete the Bogotá Engine methods in the native EL. | The EL returns the expected list shape, retains transactions from V5 payload attributes, and returns separate execution validity and inclusion satisfaction in V6. |
+| 3 | Run the nonempty-list devnet on independently driven EL/CL pairs. | Follow an ordinary transaction and a sponsored Frame transaction from committee selection to canonical receipt. Read the sponsor's balance and observe the CL's decision when a valid payload omits a required transaction. |
+| Parallel | Verify Gloas/Amsterdam behavior and recovery. | Read back external builder payment, PTC behavior, BAL agreement, blob data availability, and late-join or restart state. |
+
+## Evidence available today
+
+| Verified scope | Next evidence gap |
+|---|---|
+| PR #55 merged with six GitHub CI checks passing. | Run the pinned EL/CL pair with the new Heze Engine contract. |
+| The live Track 4 profile exercised Fulu, private PQ authentication, binary overlay conversion, and historic state readback after EL restart. | Exercise a nonempty FOCIL list at Heze. |
+| Earlier full-feature testing observed Gloas bid activity, nonempty Amsterdam BALs, and Heze activation. | Observe external payment and PTC outcomes, blob data columns, and the effect of inclusion satisfaction on CL voting. |
+| Track 3 exercised CL-driven synchronization and the native observer in integration tests. | Repeat the late-join test with an independent client and retain a research-only comparison of native observer outcomes. |
+
+[Track 4 devnet record](../STATUS.md#track-4-integration-and-devnet-verification-2026-11-16) · [Earlier full-feature run](../STATUS.md#full-feature-devnet-interop-after-bal-enforcement-2026-11-12) · [Track 3 verification](track3-node.md#verification-and-boundaries)
+
 ## Client direction
 
 Use upstream Lighthouse as the production CL codebase and retain an ETH2030
@@ -91,8 +116,9 @@ Implement the contract in this order.
    revalidation path. Include the list context when caching satisfaction
    because different CL callers can evaluate the same execution block
    against different lists. Return execution validity and list
-   satisfaction as separate fields. Apply the draft's treatment of undecodable transactions
-   and transactions that become invalid on the selected parent.
+   satisfaction as separate fields. Apply the draft's treatment of
+   undecodable transactions and transactions that become invalid on
+   the selected parent.
 4. Verify the complete flow in two independently driven CL/EL pairs.
    Produce a signed, nonempty list carrying a transaction seen by the
    committee EL and absent from the proposer EL's pool. Observe the same

@@ -24,12 +24,14 @@ for work ownership, dependencies and acceptance criteria. The
 - [x] Merge upstream Lighthouse `7a9d14115`, run its Gloas database-invariants test, and verify the published fork ref.
 - [x] Verify finalized Fulu Track 4 history and the same PQ transaction receipt after restarting one live EL.
 - [x] Add the repeatable Heze devnet profile and verifier for a finalized ordinary transaction delivered through FOCIL.
-- [ ] Reproduce Fulu finality and the Gloas transition using the published CL branch and a pinned current EL image. Freeze the cross-client Frame and Bogotá wire fixtures.
+- [x] Reproduce a finalized Fulu checkpoint and the Gloas transition with a published Lighthouse source, the current receiver fixture, and a pinned ETH2030 image.
+- [ ] Freeze cross-client Frame and Bogotá wire fixtures.
 - [x] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
 - [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
 - [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
 - [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
-- [ ] Force live inclusion-list gossip loss and observe successful Req/Resp recovery. Verify deferred satisfaction through forkchoice with an independent EL.
+- [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
+- [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
 - [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
 - [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
 - [ ] Update Dora epoch statistics to decode current Gloas and Heze BeaconState SSZ.
@@ -39,10 +41,12 @@ for work ownership, dependencies and acceptance criteria. The
 
 ## Heze CL follow-up
 
-- [ ] Recheck the current upstream Lighthouse revision and its database regressions before updating the development branch.
-- [ ] Record deferred Engine inclusion verdicts against the exact execution payload, including updates from an empty beacon head.
-- [ ] Recover signed lists advertised by embedded self-build bids when gossip delivery is missing.
-- [ ] Verify the improvements against the production network and Engine paths with bounded resources.
+- [x] Merge upstream Lighthouse `ca9dff457` and verify both database restart regressions and the local release build.
+- [x] Bind deferred Bogotá Engine verdicts to the executed beacon ancestor, including an empty head and fork-choice reload.
+- [x] Recover signed lists advertised by embedded self-build bids with gossip delivery deliberately dropped in a capped devnet.
+- [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
+- [x] Check Frame blob commitment ordering through the CL historical payload verification path.
+- [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
 
 ## Pinned EIP-8141 Migration
 

@@ -67,6 +67,12 @@ gap against current code before starting — parts of the 2026-03 gap analysis a
 - [x] Reject private PQ address collisions across scheduled precompile forks before opening a chain.
 - [x] Cross-check the public drafts and record outstanding protocol and adoption requirements.
 
+#### Track 4 integration and devnet verification
+
+- [x] Exercise signed PQ transactions through JSON-RPC, block construction, independent Engine import, and persisted state readback.
+- [x] Check both EIP-8051 variants and the EIP-7932 registry through the activated private profile.
+- [x] Run a fresh Kurtosis devnet with the Track 4 image and compare execution and beacon-chain observations.
+
 #### Track 4 bug review
 
 - [x] Verify overlay state copying, canonical lookup, replay retention, and database error handling.

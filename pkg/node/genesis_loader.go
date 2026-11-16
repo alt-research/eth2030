@@ -207,11 +207,9 @@ func (h *hexBytes) UnmarshalJSON(data []byte) error {
 		*h = []byte(s)
 		return nil
 	}
-	b := make([]byte, (len(s)-2)/2)
-	if _, err := fmt.Sscanf(s[2:], "%x", &b); err != nil {
-		// fallback: just use the string
-		*h = []byte(s)
-		return nil
+	b, err := hex.DecodeString(s[2:])
+	if err != nil {
+		return fmt.Errorf("invalid genesis hex bytes: %w", err)
 	}
 	*h = b
 	return nil

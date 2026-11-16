@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/binary"
 	"errors"
 	"math/big"
 
@@ -140,40 +139,17 @@ func (tx *PQTransaction) SigningHash() Hash {
 	return digest
 }
 
-// Hash computes the Keccak-256 hash of the transaction.
+// Hash computes Keccak-256 of the signed typed transaction envelope.
 func (tx *PQTransaction) Hash() Hash {
+	encoded, err := tx.EncodePQ()
+	if err != nil {
+		return Hash{}
+	}
 	d := sha3.NewLegacyKeccak256()
-
-	// Hash all fields in deterministic order.
-	if tx.ChainID != nil {
-		d.Write(tx.ChainID.Bytes())
-	}
-	var nonceBuf [8]byte
-	binary.BigEndian.PutUint64(nonceBuf[:], tx.Nonce)
-	d.Write(nonceBuf[:])
-
-	if tx.To != nil {
-		d.Write(tx.To[:])
-	}
-	if tx.Value != nil {
-		d.Write(tx.Value.Bytes())
-	}
-	var gasBuf [8]byte
-	binary.BigEndian.PutUint64(gasBuf[:], tx.Gas)
-	d.Write(gasBuf[:])
-
-	if tx.GasPrice != nil {
-		d.Write(tx.GasPrice.Bytes())
-	}
-	d.Write(tx.Data)
-	d.Write([]byte{tx.PQSignatureType})
-	d.Write(tx.PQSignature)
-	d.Write(tx.PQPublicKey)
-	d.Write(tx.ClassicSignature)
-
-	var h Hash
-	copy(h[:], d.Sum(nil))
-	return h
+	d.Write(encoded)
+	var hash Hash
+	d.Sum(hash[:0])
+	return hash
 }
 
 // Type returns the PQ transaction type byte.

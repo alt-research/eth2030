@@ -12,6 +12,18 @@ import (
 	"github.com/eth2030/eth2030/trie"
 )
 
+// StateAtHeader opens the state of a specific block when the backend retains
+// block-scoped state. A private overlay root alone does not identify its
+// frozen pre-state or the conversion cursor.
+func StateAtHeader(backend Backend, header *types.Header) (state.StateDB, error) {
+	if byHeader, ok := backend.(interface {
+		StateAtHeader(*types.Header) (state.StateDB, error)
+	}); ok {
+		return byHeader.StateAtHeader(header)
+	}
+	return backend.StateAt(header.Root)
+}
+
 // Backend provides access to chain data for the JSON-RPC API.
 // This interface decouples the RPC layer from the chain implementation,
 // following go-ethereum's ethapi.Backend pattern.

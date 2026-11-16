@@ -1,3 +1,10 @@
+## Track 4 integration and devnet verification (2026-11-16)
+
+- Added a two-node HTTP integration test for the private profile. It checks Geth-compatible genesis hashing, Engine authentication, pre-fork gating, both EIP-8051 variants and state-backed EIP-7932 recovery, and rejects wrong-chain and corrupted signatures. ML-DSA, FN-DSA and SLH-DSA transactions enter real payloads and are validated by an independent EL. The test selects competing branches, checks canonical receipts, and reopens FileDB to read historical and current state.
+- Fixed empty genesis byte strings, PQ transaction hash consistency with the signed wire envelope, pool admission before I+ and for wrong chain IDs, and sender and effective gas price reconstruction for persisted PQ receipts. Block-scoped RPC reads now resolve overlay state by block hash, including for historical blocks after restart.
+- Added a two-pair Kurtosis profile and an executable verifier. The live run observed the same successful PQ receipt, state root and raw transaction bytes on both ELs and both Lighthouse Beacon APIs. Lighthouse marked the execution payload verified.
+- Full Go tests, local build, targeted race tests and no-CGO integration tests passed. The private profile exercises pinned EIPs and keeps the production proof, committee and witness-gas work open.
+
 ## Track 4 overlay checkpoints and witness accounting (2026-11-14)
 
 - The private overlay atomically persists changed binary nodes, the frozen root, and the conversion cursor with each imported block. Restart and forkchoice validate an available checkpoint against the reconstructed state. Existing replay-only databases can still open.

@@ -1664,6 +1664,11 @@ func decodeBlockBody(data []byte) (*types.Body, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decoding tx: %w", err)
 		}
+		// A stored block has already been validated. Restore the sender
+		// from its PQ envelope for callers that only read the block body.
+		if pq, ok := tx.Inner().(*types.PQTransaction); ok {
+			tx.SetSender(types.PQPubKeyToAddress(pq.PQPublicKey))
+		}
 		txs = append(txs, tx)
 	}
 	if err := s.ListEnd(); err != nil {
@@ -2339,7 +2344,12 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 		r.BlockNumber = new(big.Int).SetUint64(num)
 		r.TransactionIndex = uint(i)
 		if i < len(txs) {
-			r.TxHash = txs[i].Hash()
+			tx := txs[i]
+			r.TxHash = tx.Hash()
+			if tx.Type() == types.PQTransactionType {
+				// The private PQ envelope has a single fixed gas price.
+				r.EffectiveGasPrice = tx.GasPrice()
+			}
 		}
 		if i == 0 {
 			r.GasUsed = r.CumulativeGasUsed

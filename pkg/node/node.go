@@ -477,6 +477,9 @@ func New(config *Config) (*Node, error) {
 		poolCfg.PriceHistoryBlocks = config.TxpoolPriceHistory
 	}
 	n.txPool = txpool.New(poolCfg, bc.State())
+	if bc.Config() != nil {
+		n.txPool.SetForkRules(bc.Config(), bc.CurrentBlock().Time())
+	}
 
 	// Initialize tx journal for pending tx persistence across restarts.
 	// Journal replay must happen after n.txPool is initialized.

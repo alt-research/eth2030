@@ -194,13 +194,20 @@ func TestHexBytes_Valid(t *testing.T) {
 
 func TestHexBytes_Empty(t *testing.T) {
 	var hb hexBytes
-	// "0x" with empty payload: Sscanf on empty string fails, falls back to raw string bytes.
 	if err := json.Unmarshal([]byte(`"0x"`), &hb); err != nil {
-		t.Fatalf("unmarshal '0x': %v", err)
+		t.Fatalf("unmarshal empty hex data: %v", err)
 	}
-	// Result is the fallback raw string "0x".
-	if string(hb) != "0x" {
-		t.Errorf("got %q, want \"0x\" (fallback)", string(hb))
+	if len(hb) != 0 {
+		t.Fatalf("empty hex data decoded to %x", hb)
+	}
+}
+
+func TestHexBytes_RejectsMalformedHex(t *testing.T) {
+	for _, input := range []string{`"0x1"`, `"0xgg"`} {
+		var hb hexBytes
+		if err := json.Unmarshal([]byte(input), &hb); err == nil {
+			t.Fatalf("accepted malformed hex data %s", input)
+		}
 	}
 }
 

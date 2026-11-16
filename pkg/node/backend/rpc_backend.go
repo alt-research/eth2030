@@ -141,13 +141,29 @@ func (b *RPCBackend) StateAt(root types.Hash) (state.StateDB, error) {
 	return bc.StateAtRoot(root)
 }
 
+func (b *RPCBackend) StateAtHeader(header *types.Header) (state.StateDB, error) {
+	bc := b.node.Blockchain()
+	if bc == nil {
+		return nil, fmt.Errorf("blockchain not available")
+	}
+	if cfg := bc.Config(); cfg != nil && cfg.BinaryOverlayTime != nil {
+		hash := header.Hash()
+		blk := bc.GetBlock(hash)
+		if blk == nil {
+			return nil, fmt.Errorf("block %s not found", hash)
+		}
+		return bc.StateAtBlock(blk)
+	}
+	return bc.StateAtRoot(header.Root)
+}
+
 func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, blockNumber rpc.BlockNumber) (*trie.AccountProof, error) {
 	header := b.HeaderByNumber(blockNumber)
 	if header == nil {
 		return nil, fmt.Errorf("block not found")
 	}
 
-	statedb, err := b.StateAt(header.Root)
+	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +298,7 @@ func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte,
 		return nil, 0, fmt.Errorf("block not found")
 	}
 
-	statedb, err := b.StateAt(header.Root)
+	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, 0, fmt.Errorf("state not found: %w", err)
 	}

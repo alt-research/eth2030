@@ -7,6 +7,7 @@ for work ownership, dependencies and acceptance criteria. The
 [consensus client roadmap](docs/cl-iteration-roadmap.md) covers later milestones.
 
 - [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
+- [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
 - [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
 - [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.
 - [x] Verify official Lighthouse v8.3.3 against two ETH2030 ELs on the private Fulu profile.

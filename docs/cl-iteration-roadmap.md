@@ -7,6 +7,8 @@ below, inspected on 2026-11-16.
 The [Lighthouse and Hegotá implementation plan](lighthouse-hegota-implementation-plan.md)
 records the published `eth2030` development branch, Frame transaction
 work, and the cross-client acceptance matrix.
+The [legacy branch integration plan](lighthouse-legacy-branch-merge-plan.md)
+maps the historical commits and backend entry points to the porting work.
 
 ## Decision and first milestone
 

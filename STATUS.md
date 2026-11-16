@@ -1,3 +1,9 @@
+## Lighthouse legacy branch integration audit (2026-11-16)
+
+- The [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md) maps all 68 old Lighthouse commits outside `eth2030` to their current call sites and work packages. A whole-branch trial merge reported 76 conflicts. Both historical EL feature tips are already ancestors of `origin/master`.
+- Traced the live Engine from node startup to `pkg/node/backend`. That backend already forwards canonical inclusion-list attributes to the builder, while the legacy Engine backend has a separate global list and status enum. Documented the actual V6, gas target, and Frame blob changes and the corresponding node tests.
+- The existing focused Engine, FOCIL and node backend tests passed. The update records the migration plan and source findings.
+
 ## Lighthouse and Hegotá implementation plan (2026-11-16)
 
 - Recorded the published Lighthouse `eth2030` branch at `3e3978d4e` and the verified local-build inclusion-list snapshot change in `6e5317104`.

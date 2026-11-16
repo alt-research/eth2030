@@ -6,6 +6,10 @@ devnet. Hegotá includes EIP-7805 FOCIL and EIP-8141 Frame transactions.
 Heze is the consensus-layer fork and Bogotá is the execution-layer fork.
 [Hegotá meta EIP](https://eips.ethereum.org/EIPS/eip-8081)
 
+The [legacy branch integration plan](lighthouse-legacy-branch-merge-plan.md)
+maps the old commits to their current production call sites, PRs,
+and regression tests.
+
 ## Development baseline
 
 | Component | Reference and evidence |
@@ -134,7 +138,7 @@ payloads instead of relying on an EL-assisted fallback.
 | Interface | Implementation and first regression |
 |---|---|
 | `engine_getInclusionListV1` | ETH2030 returns the draft's JSON array of transaction hex strings. Check empty and nonempty mempools, the 8 KiB aggregate byte budget, zero-length rejection and blob filtering. Lighthouse retrieves the actual list used for the assigned duty. |
-| `engine_forkchoiceUpdatedV5` | Decode the canonical camelCase attributes with hex quantities, `targetGasLimit` and `inclusionListTransactions`. If old profiles still use the snake_case adapter, exercise its actual callers and preserve supported values. Distinct build contexts with different parents, slots, gas targets or lists must select the correct payload. Keep the optional custody parameter and return `PayloadStatusV2` according to the draft. |
+| `engine_forkchoiceUpdatedV5` | Decode the canonical camelCase attributes with hex quantities, `targetGasLimit` and `inclusionListTransactions`. Reuse the canonical list-to-builder path and its payload identity. Thread the caller's gas target into that path. If old profiles still use the snake_case adapter, exercise its actual callers and preserve supported values. Keep the optional custody parameter and return `PayloadStatusV2` according to the draft. |
 | `engine_getPayloadV6` | Verify the inherited Amsterdam response against the payload ID from V5 forkchoice. Trace the built transaction order, BAL and commitments into the proposed block. |
 | `engine_newPayloadV6` | Add dispatch, capability and fork validation on the EL. Route real Heze envelopes through V6 on the CL, including the appropriate list view. Encode and consume `inclusionListSatisfied` independently of execution validity. Cover Amsterdam V5 and Bogotá V6 on both sides of activation. |
 

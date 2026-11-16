@@ -1,3 +1,8 @@
+## Track 4 integration with master (2026-11-16)
+
+- Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.
+- The optional native consensus verifier resolves ML-DSA keys from its configured validator registry. Full Go tests, local build, vet, and targeted race tests passed during merge reconciliation.
+
 ## Track 4 integration and devnet verification (2026-11-16)
 
 - Added a two-node HTTP integration test for the private profile. It checks Geth-compatible genesis hashing, Engine authentication, pre-fork gating, both EIP-8051 variants and state-backed EIP-7932 recovery, and rejects wrong-chain and corrupted signatures. ML-DSA, FN-DSA and SLH-DSA transactions enter real payloads and are validated by an independent EL. The test selects competing branches, checks canonical receipts, and reopens FileDB to read historical and current state.
@@ -162,6 +167,122 @@
 
 # Project Status
 
+## README Link and Quick Start Audit (2026-11-13)
+
+- Updated the GitHub Pages URL, clone commands, badges, and release links. Fixed the fixture and devnet setup commands, documented the Go version required by the module, and directed readers to local devnet setup while the public endpoints are unavailable.
+
+## Homepage Hero Actions (2026-11-13)
+
+- Redesigned the Roadmap, GitHub and Docs actions as equal-sized responsive cards with consistent icons, descriptions, focus states and reduced-motion support.
+- Validation: production site build and export checks passed. Browser checks confirmed equal dimensions and valid destinations at 1440px, 390px and 320px, without horizontal overflow; the Roadmap action has a visible keyboard focus state. Changes remain local and unpublished.
+
+## Homepage Roadmap Entry (2026-11-13)
+
+- Added direct Roadmap links to the homepage hero and footer. The site build and export checks passed; browser verification confirmed the hero link is visible at mobile width and opens `/roadmap/`.
+
+## Roadmap Homepage Integration (2026-11-13)
+
+- Promoted the six-card roadmap prototype to `/roadmap/` and integrated a compact six-card summary into the homepage. The homepage displays non-complete tracker entries only, with direct links to the corresponding detailed card; the detailed page retains the full node and status display.
+- Both views use the same fork mapping and tracker-count calculation. Percentages are the share of mapped entries historically labelled complete, not independent conformance or readiness measurements.
+- Validation: site build and export assertions passed, including all six links, filtering of complete entries and matching homepage/detail percentages. Tracker verification checked 371 paths without missing files or blocking discrepancies. Browser checks covered 1440px/390px layouts, card sizes, anchors and console errors; local Go build passed. This branch builds on the unmerged website refresh PR #52 and is not deployed.
+
+## EF Roadmap Prototype Card Alignment (2026-11-13)
+
+- Made all six roadmap cards equal in height and width within each responsive layout, preserved chronological reading order, aligned card footers, and allowed content to expand the shared grid height instead of being clipped.
+- Validation: production site build and export checks passed. Browser checks at 1440px, 1024px, 390px and 320px confirmed matching card dimensions, reading order, and no card or page overflow. This remains a local prototype.
+
+## EF Roadmap Prototype Density and Percentage (2026-11-13)
+
+- Made the six local prototype cards more compact, with responsive three-column layout, visible status ratios, animated percent rings and condensed EIP rows. Each percentage is the count of mapped entries labelled `complete` divided by all mapped tracker entries, rounded to the nearest whole percent; the unmapped EF node is excluded. Historical labels are not independent conformance or production-readiness measurements.
+- Validation: site production build and export checks passed; 371 tracker paths checked; browser checks recomputed all six ratios from displayed entries, including zero-complete cases, verified no detail links or console errors, and checked 1440px/390px layouts and reduced motion. This remains a local prototype.
+
+## EF Roadmap Prototype Visual Revision (2026-11-12)
+
+- Revised the local-only six-card prototype to use the existing dark, purple/cyan, glitch and matrix visual language. Cards now display all mapped nodes, individual tracker labels and status distributions inline, with no EIP detail-page navigation. An EF node without a tracker mapping is marked explicitly; the EIP-8077 association remains tentative.
+- Status distribution bars count historical tracker labels and are not implementation-completion percentages. The prototype retains this limitation and the EF draft-roadmap attribution.
+- Validation: production site build and export checks passed; 371 tracker paths verified; browser checks confirmed six cards, all 51 mapped entries and their counts, no detail links, no console errors, 1440px/390px layout, and reduced-motion behavior. Not published.
+
+## EF Roadmap Six-Card Prototype (2026-11-12)
+
+- Added a local-only `/roadmap-prototype/` view using the EF-maintained November 2 Strawmap as its source. Six interactive fork cards open mapped tracker entries grouped by roadmap node, with source, code/test references and explicit historical-status limits.
+- The original drawing places leanVM PQ proofs in I* and ethp2p unification in L*, while the older tracker classifies them differently; the prototype follows the drawing and calls out the discrepancy. Longer-term items remain outside these six cards.
+- Validation: static site build and export checks, tracker path verification (371 paths, no missing), local Go build, and browser checks of all six cards, grouped entries and 390px/1440px layouts passed. This is a review prototype, not a deployed page or a new full conformance audit.
+
+## Website Account and Content Refresh (2026-11-12)
+
+- Updated site repository links, clone instructions and issue contacts to `alt-research/eth2030`; aligned legal pages and deployment CNAME with the configured `eth2030.altllm.ai` domain. Updated the Go minimum to match `pkg/go.mod`.
+- Refreshed selected EIP tracker gaps and evidence against the current source and records; updated the traceability matrix for the checked items, retained the historical roadmap date, and described the remaining snap-sync and native-observer limitations. Tracker labels and percentages are explicitly historical estimates, not conformance claims.
+- Validation: site production build and Go module build passed; exported-page checks passed; tracker verification found zero missing paths across 371 references and no blocking discrepancies; desktop and mobile local browser checks found no horizontal overflow. The Google Analytics measurement ID was not changed because a replacement was not supplied. The live site will update after the change is deployed.
+
+## Track 3 Remaining Acceptance Design (2026-11-12)
+
+- Recorded specific crash boundaries, proof-binding and reuse evidence, independent state/proof readback, memory scaling, real-client interoperability, and mutation gates in [the remaining-work acceptance design](docs/track3-remaining-acceptance.md). These gates are requirements, not completed test results.
+- Re-ran the current node, state-sync, beacon-sync and snap package race suites and the Go module build successfully. Docker and Kurtosis executables, the local ETH2030 and Lighthouse images, and an `ethereum/client-go` image are available; their presence is not an interoperability test.
+
+## Track 3 Completed Snapshot Recovery (2026-11-12)
+
+- A CL-selected pivot can reuse a completely downloaded snapshot persisted before a crash or interrupted adoption. The node revalidates the account/storage roots and code, heals trie nodes, and checks the current finalized target before adoption. Offline restart succeeds when the required ancestry and trie nodes are available; corrupted leaves and missing trie nodes without peers are rejected.
+- This recovers complete snapshots only. Interrupted range progress is not durable and moving-pivot continuation remains open.
+- Downloaded bytecode is also saved independently in hash-verified batches and reused after restart or pivot changes. Corrupt cached code is rejected and fetched again; this does not persist account or storage range progress.
+
+## Track 3 Snapshot Assembly Follow-up (2026-11-12)
+
+- Snapshot validation and trie-node reconstruction now use a streaming trie; node and snapshot writes flush in bounded batches, and the completion marker remains last. Tests compare trie roots with the native MPT and inject failures after partial writes.
+- The affected-package race run exposed a separate speculative-state cache race. Cache appends are now serialized and cache readers receive a slice copy; a concurrent regression checks that no results are lost.
+- The full downloaded snapshot, sorted hashes, execution overlays, serving snapshot and FileDB index still scale with state size. This reduces peak intermediate allocation but does not complete bounded-memory snap sync.
+
+## Track 3 Snap Peer Failover (2026-11-12)
+
+- One fixed-pivot scheduler can now continue across connected snap peers without throwing away ranges already downloaded in the same attempt. Peers share storage roots only after account-range verification against the same pivot; a root mismatch is rejected even if concurrent verification races with pivot initialization.
+- Tests cover proof-verified account roots consumed by a second peer, request-preserving transport failover, cancellation, and the existing two-node snap bootstrap. This is not durable resume or moving-pivot range reuse.
+- Auditing a possible bounded-memory trie builder revealed that the existing `StackTrie` retains inserted nodes until finalization and discarded node-writer errors. Its documentation now states the actual memory behavior, and `Commit` propagates write failures; it is not yet a bounded-memory replacement for snap assembly.
+
+## Track 3 Sync Scalability Follow-up (2026-11-12)
+
+- A completed snap pivot can now be adopted after finalized advances only after verifying hash-linked, height-contiguous ancestry against the current CL target and checking that the target did not change during verification. Conflicting branches and malformed ancestry fail closed.
+- Storage pagination retries preserve the last verified origin, and completed storage tasks are traversed linearly instead of rescanning the entire task list. Regression tests cover interrupted pages, advancing finality, conflicting finality, concurrent target replacement, and invalid heights.
+- This is partial progress, not production snap completion: moving-pivot range reuse, bounded-memory state assembly and serving, bounded-memory database storage, and real-client/mainnet-scale validation remain open.
+
+## Forkchoice Missing-Ancestor Follow-up (2026-11-12)
+
+- Rechecked `0084028` and found that old-canonical ancestry traversal could terminate at a missing block body without finding a common ancestor, then publish a reorg without fully removing old transaction indices. `ApplyForkchoice` now rejects that case before committing state or metadata.
+- `TestForkchoiceRejectsMissingOldBranchBody` reproduces a missing intermediate canonical body and verifies the proposed reorg fails without changing the head. The test passed with the race detector; affected-package race and local build checks were run separately.
+- This follow-up does not close the production snap limitations recorded below: moving-pivot continuation and bounded-memory assembly remain open.
+
+## Track 3 Corrective Review (2026-11-12)
+
+Reviewed `fc1f70f` through specification, production callers, wire messages, persisted state, restart and adversarial tests. The previous Track 3 completion claim was too broad. Detailed findings and regressions: [Track 3 review](docs/track3-review.md).
+
+- Fixed synchronous FCU validation/publication, candidate staging, validation provenance, missing-body handling, canonical index cleanup, branch-specific `BLOCKHASH`, failed-recovery target preservation and genesis mismatch handling. Backend shutdown now joins actual work instead of unused queue loops; partially constructed nodes release their database locks.
+- Fixed FileDB's mixed-transaction recovery window by committing WAL before materializing files and fencing failed writes. Added failure injection that previously recovered a new head with an old finalized checkpoint.
+- Fixed per-transaction original storage, reversible account creation/deletion/recreation, adopted committed-storage persistence, mutation-invalidated trie roots, and snap/trie RPC proofs. Added a complete multi-transaction comparison with Geth, including the missing per-transaction `Finalise` in the Geth adapter itself. State/proof comparisons include independent verification and values requiring multi-byte RLP encoding.
+- Replaced the native node's private plaintext handshake with standard RLPx, canonical Hello, capability negotiation, reserved message offsets, persistent identity and timestamp-aware fork IDs. Corrected eth/68 pooled-transaction/receipt envelopes and eth/70 bloom-free receipts. Added direct interoperability checks against Geth's RLPx, RLP and ForkID implementations.
+- Corrected the design overreach in the native lane: `--native-consensus` now enables a research observer and never replaces external CL authority. Votes use a chain/timing/registry domain, per-source-target quorums, duplicate handling, retryable callback failures and CL re-anchoring. Normal future/unavailable observations do not disconnect EL sync peers.
+- Broader race checks exposed and fixed gossip/anonymous-transport counter races and discovery test-counter races. Five temporary behavior mutations were detected by their intended regressions.
+- Validation passed on Go 1.26.10: full uncached Go suite; affected-package and complete P2P subtree race suites; integration, blst and goethkzg variants; vet; full build; native executable build with goethkzg. Final changed packages were rechecked after the last edits. Pinned Geth-backed EF vectors passed with 36,264 valid outcomes, zero failures/skips and 20 existing legacy outcomes. Five final-source behavior mutations were each detected by their intended regression.
+- **Still open:** production moving-pivot continuation and bounded-memory snap assembly. The original real-snap Track 3 checkbox is reopened. The observer is not an autonomous consensus client. No mainnet-scale qualification or complete native-consensus claim is made.
+
+
+## Track 3 Node Sync and Native Consensus (2026-11-12)
+
+> Historical implementation record for `fc1f70f`; the corrective review above supersedes its authority and completion claims.
+
+Implemented on `feat/track3-node`, from `master` at `9fde8aa` (PR #50 merged). See [architecture, operation and scope](docs/track3-node.md).
+
+- Replaced the node's no-op snap writers and local-only download path with real correlated `eth` requests and `snap/1` clients. Account/storage range proofs are checked against the pivot and storage roots; bytecodes and reconstructed state are hash-verified before a persistent completion marker permits adoption. Hashed state supports ordinary address/slot reads without preimages. The healer follows authenticated account/storage trie references and fails exhausted work.
+- Authenticated Engine forkchoice updates now schedule a cancellable CL-driven execution sync worker. Snap bootstrap uses only the CL's finalized hash, retains the 256-parent `BLOCKHASH` window, stages subsequent execution, and publishes the complete forkchoice atomically. Advancing heads do not repeatedly cancel the finalized snapshot. `eth_syncing` reflects pending/completed work. Full and snap startup restore the persisted chain by validated replay; node shutdown joins workers.
+- Added explicit `--native-consensus` configuration for the research 3SF/PQ lane: quick-slot scheduling, real ML-DSA-65 verification bound to configured validator identities and chain/source/target fields, quorum justification and source finalization, opt-in `ncs/1` TCP vote delivery, execution checkpoint updates, and lifecycle/restart integration. External Engine forkchoice is rejected in native mode; the default remains external CL control. Signing keys and automated proposal/signing duties remain outside this runtime.
+- End-to-end tests use real TCP nodes and JWT-authenticated Engine HTTP calls, wait for peers after SYNCING, assert the RPC sync-status transition, compare state roots/code/storage and post-pivot execution, and reopen databases. Native-consensus tests deliver real signed votes between nodes, verify finalized execution checkpoints and restart state, and verify shutdown. Negative tests cover incomplete/gapped state, wrong roots, tampered trie nodes, exhausted retries, cancellation, superseded targets, signature identity substitution and cross-chain replay.
+- These tests exposed and fixed pre-existing canonical header/body wire encoding errors, missing EIP-7928 BAL header commitment, and loss of the storage-root cache when copying dirty state. The BAL execution-rejection regression now recomputes the advertised block hash after tampering so it still reaches execution validation. Amsterdam hashes now include the BAL; old development-chain data using the previous hash encoding requires a fresh chain or resynchronization.
+- Verification: Go 1.26.10 full uncached suite, affected race suites (node/backend, consensus, chain/state/types, eth, snap/ethproto, beacon/healer/statesync, trie and RPC), integration/blst/goethkzg CI variants, vet and local build passed. The native executable also built with the Docker image's `goethkzg` tag. Pinned EF vectors at `81862e4` passed: 36,264 valid outcomes, zero failures/skips, 20 existing legacy outcomes. The EF run used a temporary Go overlay only to point the test fixture lookup at the existing read-only checkout; production sources and reference repositories were unchanged.
+- Boundaries: fixed-pivot snapshot assembly/serving materializes state in memory; moving-pivot range reuse, mainnet-scale resource qualification and snap/2 are not implemented. Native consensus is an opt-in research lane, not a mainnet fork activation. No existing worktree or running devnet was modified.
+
+## PR #50 CI Repair and Master Merge (2026-11-12)
+
+- Merged `origin/master` at `c8fd3a1` (PR #49 merge, including fix `4903084`), importing the EIP-7928 fork-boundary regression fix and formatting corrections. Resolved the `STATUS.md` conflict by retaining both Track 2 and PR #49 records.
+- Applied `gofmt` to the seven remaining Track 2 files reported by the CI formatting check. No protocol behavior changed.
+- Validation: CI-matching Go 1.26.10 passed formatting, `go build -p 4 ./...`, `go vet -p 4 ./...`, `go test -p 4 -count=1 -timeout=15m ./...`, and `go test -p 4 -count=1 -timeout=15m -tags integration ./core ./p2p/...`. External EF fixtures are absent in the isolated worktree, so fixture-dependent tests skip locally; the dedicated remote CI job validates the pinned vectors.
+
 ## Hegotá Track 2 Closure (2026-11-12)
 
 Completed the Track 2 items on `feat/track2-hegota` (base: `feat/track1-glamsterdam`, PR #49).
@@ -173,6 +294,12 @@ Completed the Track 2 items on `feat/track2-hegota` (base: `feat/track1-glamster
 - **SSZ fork activation (EIP-6404/7807/7916)**: `SSZBlockTime` chain-config fork (fork schedule, ordering, genesis loader); header-only SSZ projection `SSZBlockHash`; `engine_getPayloadV7` returns the SSZ payload encoding plus its hash tree root when active; `engine_newPayloadV7` validates the SSZ binding (decode, hash match, field cross-check) before executing through the Amsterdam path; capabilities advertised. eiptest drives the full V7 surface on an SSZ-active sim: SSZ binding accepted, tampered binding INVALID.
 - Verification: full uncached `go test ./...` green (207 packages), `go vet` clean.
 - **Devnet node verification** (`full-feature-eth2030`, 3x EL + 3x Lighthouse 8.4.0-rc.0, rebuilt with the Track 2 code): fulu@slot 32, gloas@slot 64 with Amsterdam BAL enforcement, and heze@slot 96 all activated cleanly — blocks progressed past 115 with spamoor transfers landing; every post-Amsterdam block processed with `amsterdamActive:true` and nonempty `balEntries` (43); zero WARN/ERROR across all six nodes. The FOCIL gossip subscription, 8141 payer billing, 7495/8025 code, and SSZ fork plumbing (inert without a scheduled SSZBlockTime) run in production without interop regressions.
+
+## PR #49 CI Repair (2026-11-12)
+
+- Reproduced both failures from CI run `43086199969`: nine Go files failed `gofmt`, and `TestBAL_HashValidationAcrossFork` still expected post-Amsterdam headers without a BAL commitment to pass.
+- Applied `gofmt` to the nine reported files. Aligned the integration test with EIP-7928's mandatory header commitment, covering absent/present hashes immediately before, exactly at, and immediately after activation. Invalid cases assert `ErrInvalidBlockAccessList`; production validation remains unchanged.
+- Validation: Go 1.26.10 (matching CI) and Go 1.27.3 passed formatting, `go build -p 4 ./...`, `go vet -p 4 ./...`, `go test -p 4 -count=1 -timeout=15m ./...`, and `go test -p 4 -count=1 -timeout=15m -tags integration ./core ./p2p/...`. The isolated worktree has no external EF fixtures, so those fixture-dependent tests skip locally; the dedicated remote CI job checks the pinned vectors.
 
 ## Full-Feature Devnet Interop After BAL Enforcement (2026-11-12)
 

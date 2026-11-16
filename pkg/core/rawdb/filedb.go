@@ -37,14 +37,14 @@ const (
 // interface. It is safe for concurrent use from multiple goroutines within
 // a single process. Cross-process safety is provided by a file lock.
 type FileDB struct {
-	mu       sync.RWMutex
-	dir      string            // root directory
-	dataDir  string            // dir + "/data"
-	index    map[string][]byte // in-memory cache of all key-value pairs
-	walFile  *os.File          // write-ahead log file handle
-	lockFd   int               // file descriptor for LOCK file
-	closed   bool
-	writeErr error // a WAL or materialization failure requires reopening the database
+	mu      sync.RWMutex
+	dir     string            // root directory
+	dataDir string            // dir + "/data"
+	index   map[string][]byte // in-memory cache of all key-value pairs
+	walFile *os.File          // write-ahead log file handle
+	lockFd  int               // file descriptor for LOCK file
+	failure error             // a failed write requires reopen/WAL recovery
+	closed  bool
 }
 
 // NewFileDB opens or creates a file-based key-value database at dir.
@@ -77,17 +77,28 @@ func NewFileDB(dir string) (*FileDB, error) {
 		return nil, fmt.Errorf("filedb: load index: %w", err)
 	}
 
-	// Replay committed WAL operations before opening the next WAL.
+	// Replay WAL to recover any uncommitted operations, then rebuild.
 	if err := db.replayWAL(); err != nil {
 		releaseLock(lockFd)
 		return nil, fmt.Errorf("filedb: replay wal: %w", err)
 	}
 
-	// Make recovered directory changes durable before discarding the WAL.
-	if err := syncDir(dataDir); err != nil {
+	// Make replayed renames durable before discarding the recovery journal.
+	directory, err := os.Open(dataDir)
+	if err != nil {
 		releaseLock(lockFd)
-		return nil, fmt.Errorf("filedb: sync recovered data directory: %w", err)
+		return nil, err
 	}
+	err = directory.Sync()
+	closeErr := directory.Close()
+	if err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		releaseLock(lockFd)
+		return nil, err
+	}
+
 	// Open WAL for new writes (truncate after successful replay).
 	walPath := filepath.Join(dir, "wal")
 	walFile, err := os.OpenFile(walPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0o644)
@@ -112,6 +123,9 @@ func (db *FileDB) Has(key []byte) (bool, error) {
 	if db.closed {
 		return false, errors.New("filedb: database closed")
 	}
+	if db.failure != nil {
+		return false, db.failure
+	}
 	_, ok := db.index[string(key)]
 	return ok, nil
 }
@@ -123,6 +137,9 @@ func (db *FileDB) Get(key []byte) ([]byte, error) {
 	if db.closed {
 		return nil, errors.New("filedb: database closed")
 	}
+	if db.failure != nil {
+		return nil, db.failure
+	}
 	val, ok := db.index[string(key)]
 	if !ok {
 		return nil, ErrNotFound
@@ -132,8 +149,8 @@ func (db *FileDB) Get(key []byte) ([]byte, error) {
 	return ret, nil
 }
 
-// Put stores a key-value pair and syncs the WAL before returning. Recovery
-// can finish materializing the data file if a filesystem write fails.
+// Put stores a key-value pair. The write is persisted to the WAL and data
+// directory before returning.
 func (db *FileDB) Put(key, value []byte) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
@@ -145,7 +162,7 @@ func (db *FileDB) Put(key, value []byte) error {
 
 // putLocked performs Put while the caller already holds db.mu.
 func (db *FileDB) putLocked(key, value []byte) error {
-	return db.applyLocked([]fileBatchOp{{key: key, value: value}})
+	return db.applyOpsLocked([]fileBatchOp{{key: key, value: value}})
 }
 
 // Delete removes a key. Returns nil even if the key does not exist.
@@ -160,7 +177,7 @@ func (db *FileDB) Delete(key []byte) error {
 
 // deleteLocked performs Delete while the caller already holds db.mu.
 func (db *FileDB) deleteLocked(key []byte) error {
-	return db.applyLocked([]fileBatchOp{{key: key, delete: true}})
+	return db.applyOpsLocked([]fileBatchOp{{key: key, delete: true}})
 }
 
 // Close closes the database, syncs the WAL, and releases the file lock.
@@ -369,18 +386,20 @@ func (db *FileDB) writeDataFile(key, value []byte) error {
 	path := db.keyPath(key)
 	tmpPath := path + ".tmp"
 
-	f, err := os.OpenFile(tmpPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	file, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
 	if err != nil {
-		return fmt.Errorf("filedb: open tmp: %w", err)
+		return fmt.Errorf("filedb: write tmp: %w", err)
 	}
-	_, writeErr := f.Write(value)
-	var syncErr error
-	if writeErr == nil {
-		syncErr = f.Sync()
+	_, err = file.Write(value)
+	if err == nil {
+		err = file.Sync()
 	}
-	if err := errors.Join(writeErr, syncErr, f.Close()); err != nil {
-		os.Remove(tmpPath)
-		return fmt.Errorf("filedb: persist tmp: %w", err)
+	closeErr := file.Close()
+	if err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		return fmt.Errorf("filedb: flush tmp: %w", err)
 	}
 	if err := os.Rename(tmpPath, path); err != nil {
 		os.Remove(tmpPath) // Best-effort cleanup.
@@ -476,44 +495,55 @@ func (b *fileBatch) Delete(key []byte) error {
 
 func (b *fileBatch) ValueSize() int { return b.size }
 
-// Write commits the batch to the WAL before changing any data files.
+// Write applies all buffered operations atomically. All WAL records for the
+// batch are written before the commit marker, so either all operations in
+// the batch are applied or none are (in case of a crash mid-write).
 func (b *fileBatch) Write() error {
 	b.db.mu.Lock()
 	defer b.db.mu.Unlock()
-	if b.db.closed {
-		return errors.New("filedb: database closed")
-	}
-	return b.db.applyLocked(b.ops)
+	return b.db.applyOpsLocked(b.ops)
 }
 
-func (db *FileDB) applyLocked(ops []fileBatchOp) (err error) {
-	if db.writeErr != nil {
-		return db.writeErr
+// Commit the WAL before materializing data files. Otherwise a crash after the
+// first rename but before the commit marker leaves uncommitted file contents
+// that replay cannot undo. Any write error fences this DB until recovery.
+func (db *FileDB) applyOpsLocked(ops []fileBatchOp) (err error) {
+	if db.closed {
+		return errors.New("filedb: database closed")
 	}
-	if len(ops) == 0 {
-		return nil
+	if db.failure != nil {
+		return db.failure
 	}
 	defer func() {
 		if err != nil {
-			db.writeErr = err
+			db.failure = fmt.Errorf("filedb: reopen required after write failure: %w", err)
 		}
 	}()
 	for _, op := range ops {
+		kind := walPut
 		if op.delete {
-			err = db.walWrite(walDelete, op.key, nil)
+			kind = walDelete
+		}
+		if err = db.walWrite(kind, op.key, op.value); err != nil {
+			return err
+		}
+	}
+	if err = db.walWriteCommit(); err != nil {
+		return err
+	}
+	for _, op := range ops {
+		if op.delete {
+			err = os.Remove(db.keyPath(op.key))
+			if os.IsNotExist(err) {
+				err = nil
+			}
 		} else {
-			err = db.walWrite(walPut, op.key, op.value)
+			err = db.writeDataFile(op.key, op.value)
 		}
 		if err != nil {
 			return err
 		}
 	}
-	if err := db.walWriteCommit(); err != nil {
-		return err
-	}
-
-	// The WAL is durable. Materialization can be retried on reopen after
-	// a disk error. The index changes as a unit while the lock is held.
 	for _, op := range ops {
 		if op.delete {
 			delete(db.index, string(op.key))
@@ -521,26 +551,7 @@ func (db *FileDB) applyLocked(ops []fileBatchOp) (err error) {
 			db.index[string(op.key)] = bytes.Clone(op.value)
 		}
 	}
-	for _, op := range ops {
-		if op.delete {
-			if err := os.Remove(db.keyPath(op.key)); err != nil && !os.IsNotExist(err) {
-				db.writeErr = fmt.Errorf("filedb: batch remove: %w", err)
-				break
-			}
-		} else if err := db.writeDataFile(op.key, op.value); err != nil {
-			db.writeErr = err
-			break
-		}
-	}
 	return nil
-}
-
-func syncDir(path string) error {
-	dir, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	return errors.Join(dir.Sync(), dir.Close())
 }
 
 func (b *fileBatch) Reset() {
@@ -550,3 +561,11 @@ func (b *fileBatch) Reset() {
 
 // Compile-time interface checks.
 var _ Database = (*FileDB)(nil)
+
+func syncDir(path string) error {
+	dir, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	return errors.Join(dir.Sync(), dir.Close())
+}

@@ -961,8 +961,8 @@ func TestFileDBBatchReplaysAfterMaterializationFailure(t *testing.T) {
 	if err := batch.Put(newKey, []byte("after")); err != nil {
 		t.Fatal(err)
 	}
-	if err := batch.Write(); err != nil {
-		t.Fatalf("durable WAL commit was reported as failed: %v", err)
+	if err := batch.Write(); err == nil {
+		t.Fatal("expected a materialization failure after the WAL commit")
 	}
 	if err := db.Put([]byte("later"), []byte("value")); err == nil {
 		t.Fatal("expected the materialization error before accepting a new write")

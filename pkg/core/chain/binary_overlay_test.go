@@ -221,9 +221,15 @@ func TestBinaryOverlayBuildImportReorgAndRestart(t *testing.T) {
 	if err := db.Delete(overlayCheckpointKey(active.Hash())); err != nil {
 		t.Fatal(err)
 	}
+	if err := db.Delete(validatedKey(active.Hash())); err != nil {
+		t.Fatal(err)
+	}
 	bc, err = NewBlockchain(&cfg, genesis, mem.Copy(), db)
 	if err != nil {
 		t.Fatalf("restart without a legacy checkpoint: %v", err)
+	}
+	if !bc.HasValidatedBlock(active.Hash()) {
+		t.Fatal("replayed legacy head did not acquire a validation marker")
 	}
 	if bc.CurrentBlock().Hash() != active.Hash() {
 		t.Fatalf("reopened head = %s, want %s", bc.CurrentBlock().Hash(), active.Hash())

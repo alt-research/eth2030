@@ -168,6 +168,15 @@ func NewTrieStateDBFromMemoryWithGCMode(db rawdb.Database, mem *MemoryStateDB, g
 	if gcMode != GCModeFull {
 		gcMode = GCModeArchive
 	}
+	// The adopted state may already have been committed in memory. Its
+	// committed slots still need their first write to this backing store.
+	for _, obj := range mem.stateObjects {
+		for slot, value := range obj.committedStorage {
+			if _, dirty := obj.dirtyStorage[slot]; !dirty {
+				obj.dirtyStorage[slot] = value
+			}
+		}
+	}
 	return &TrieStateDB{
 		mem:    mem,
 		db:     db,
@@ -293,7 +302,7 @@ func (t *TrieStateDB) computeStorageRootFromDB(addr types.Address, obj *stateObj
 	// Walk persisted slots for this address (O(K_addr), not O(N_total)).
 	// t.persistedStorage[addr] is nil for brand-new accounts — safe to range over nil map.
 	persisted := t.persistedStorage[addr]
-	if _, recreated := t.recreated[addr]; recreated {
+	if obj.dbStorageRoot == (types.Hash{}) {
 		persisted = nil
 	} else if t.persistedStorage == nil {
 		// A freshly reopened database has no in-memory index yet.
@@ -351,8 +360,8 @@ func (t *TrieStateDB) computeStorageRootFromDB(addr types.Address, obj *stateObj
 
 func (t *TrieStateDB) CreateAccount(addr types.Address) {
 	t.cachedRoot = types.Hash{}
-	// If the address has existing DB state, mark it so Commit() can purge
-	// stale storage slots that the new account does not overwrite.
+	t.commitRoot = types.Hash{}
+	t.loadFromDB(addr)
 	if _, err := t.db.Get(accountDBKey(addr)); err == nil {
 		if t.recreated == nil {
 			t.recreated = make(map[types.Address]struct{})
@@ -364,12 +373,14 @@ func (t *TrieStateDB) CreateAccount(addr types.Address) {
 
 func (t *TrieStateDB) SubBalance(addr types.Address, amount *big.Int) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	t.mem.SubBalance(addr, amount)
 }
 
 func (t *TrieStateDB) AddBalance(addr types.Address, amount *big.Int) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	t.mem.AddBalance(addr, amount)
 }
@@ -386,6 +397,7 @@ func (t *TrieStateDB) GetNonce(addr types.Address) uint64 {
 
 func (t *TrieStateDB) SetNonce(addr types.Address, nonce uint64) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	t.mem.SetNonce(addr, nonce)
 }
@@ -397,6 +409,7 @@ func (t *TrieStateDB) GetCode(addr types.Address) []byte {
 
 func (t *TrieStateDB) SetCode(addr types.Address, code []byte) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	t.mem.SetCode(addr, code)
 }
@@ -415,6 +428,7 @@ func (t *TrieStateDB) GetCodeSize(addr types.Address) int {
 
 func (t *TrieStateDB) SelfDestruct(addr types.Address) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	t.mem.SelfDestruct(addr)
 }
@@ -429,7 +443,7 @@ func (t *TrieStateDB) HasSelfDestructed(addr types.Address) bool {
 func (t *TrieStateDB) GetState(addr types.Address, key types.Hash) types.Hash {
 	t.loadFromDB(addr)
 	obj := t.mem.stateObjects[addr]
-	if obj == nil {
+	if obj == nil || obj.deleted {
 		return types.Hash{}
 	}
 	if val, ok := obj.dirtyStorage[key]; ok {
@@ -444,7 +458,7 @@ func (t *TrieStateDB) GetState(addr types.Address, key types.Hash) types.Hash {
 func (t *TrieStateDB) GetCommittedState(addr types.Address, key types.Hash) types.Hash {
 	t.loadFromDB(addr)
 	obj := t.mem.stateObjects[addr]
-	if obj == nil {
+	if obj == nil || obj.deleted {
 		return types.Hash{}
 	}
 	if val, ok := obj.committedStorage[key]; ok {
@@ -455,6 +469,7 @@ func (t *TrieStateDB) GetCommittedState(addr types.Address, key types.Hash) type
 
 func (t *TrieStateDB) SetState(addr types.Address, key types.Hash, value types.Hash) {
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.loadFromDB(addr)
 	obj := t.mem.stateObjects[addr]
 	if obj != nil {
@@ -498,6 +513,7 @@ func (t *TrieStateDB) RevertToSnapshot(id int) {
 		return
 	}
 	t.cachedRoot = types.Hash{}
+	t.commitRoot = types.Hash{}
 	t.mem.RevertToSnapshot(id)
 	t.recreated = maps.Clone(recreated)
 	for snapshotID := range t.recreatedSnapshots {
@@ -520,6 +536,8 @@ func (t *TrieStateDB) GetLogs(txHash types.Hash) []*types.Log {
 func (t *TrieStateDB) SetTxContext(txHash types.Hash, txIndex int) {
 	t.mem.SetTxContext(txHash, txIndex)
 }
+
+func (t *TrieStateDB) FinalizePreState() { t.mem.FinalizePreState() }
 
 // --- StateDB interface: refund counter ---
 
@@ -576,7 +594,7 @@ func (t *TrieStateDB) ClearTransientStorage() {
 func (t *TrieStateDB) StorageRoot(addr types.Address) types.Hash {
 	t.loadFromDB(addr)
 	obj := t.mem.stateObjects[addr]
-	if obj == nil {
+	if obj == nil || obj.deleted {
 		return types.EmptyRootHash
 	}
 	return t.computeStorageRootFromDB(addr, obj)
@@ -745,6 +763,24 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 		}
 		iter.Release()
 	}
+	// Recompute recreation from the current overlay, so a reverted CREATE
+	// cannot leave a stale purge flag that erases the restored storage.
+	t.recreated = nil
+	for addr, obj := range t.mem.stateObjects {
+		if obj.dbStorageRoot == (types.Hash{}) && !obj.selfDestructed {
+			exists, err := t.db.Has(accountDBKey(addr))
+			if err != nil {
+				return types.Hash{}, err
+			}
+			if exists {
+				if t.recreated == nil {
+					t.recreated = make(map[types.Address]struct{})
+				}
+				t.recreated[addr] = struct{}{}
+			}
+		}
+	}
+
 	// Capture ALL dirty storage slots BEFORE the dirty→committed flush so we
 	// know exactly which slots to write/delete in the DB.  We only write dirty
 	// slots — never the full committedStorage — to avoid the O(N_total) write
@@ -1073,3 +1109,5 @@ func (t *TrieStateDB) Dup() StateDB {
 
 // Verify interface compliance at compile time.
 var _ StateDB = (*TrieStateDB)(nil)
+
+func (t *TrieStateDB) FinalizeTransaction() { t.mem.FinalizeTransaction() }

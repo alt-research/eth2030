@@ -38,8 +38,9 @@ for work ownership, dependencies and acceptance criteria. The
 
 ## Pinned EIP-8141 Migration
 
-- [ ] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
-- [ ] Implement the canonical receipt format, execution and state-gas rules, atomic rollback, and the payer's escrow and settlement.
+- [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
+- [x] Match canonical receipt encoding, split gas readback after a FileDB reopen, and the fee-budget arithmetic.
+- [ ] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
 - [ ] Wire Bogotá activation, public-mempool policy, blob sidecars, Engine validation, and historical replay.
 - [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
 

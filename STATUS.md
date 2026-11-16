@@ -1,3 +1,10 @@
+## Pinned Frame encoding and inclusion history (2026-11-16)
+
+- ETH2030 branch `feat/frame-8141` at `67aef736` decodes the pinned seven-field EIP-8141 envelope and preserves the eight-field historical route. Independent vectors cover the transaction and signing hashes, secp256k1 and P-256 signatures, fee budgets and split-gas receipts. Typed receipts retain both gas dimensions and payer when reopened from FileDB and projected through RPC. Execution and mempool admission still reject the pinned frame type until its state transition is implemented.
+- Heze fixture commit `e628c770` adds 2 GiB budgets for each EL and beacon node and 1 GiB for each validator.
+- Lighthouse `5d4500270` serves the retained previous-slot view keyed by the proposal's block root and shuffling-dependent root. Its HTTP integration test verifies ordered committee positions and the first signed observation of an equivocating validator, ignores a list on another dependent root, and returns 404 after pruning.
+- Dora `353288d` stores these views by block root as part of importing Heze blocks and displays the actual bid bits by committee position. The SQLite restart test verifies fork separation and a persisted equivocation marker while preserving observations across empty retries. The explorer and Lighthouse image build locally.
+
 ## Devnet host memory incident (2026-11-16)
 
 - Before the 19:05 CST reboot, 16 ETH devnet enclaves had 92 EL, beacon and validator containers running without per-container memory limits. At 19:01 CST, the kernel OOM process table attributed about 31.2 GiB of anonymous resident memory to 60 Lighthouse, 24 ETH2030 and eight Geth processes. System activity records showed the 8 GiB swap essentially full from 18:40 onward.

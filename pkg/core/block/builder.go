@@ -39,6 +39,7 @@ type BuildBlockAttributes struct {
 	Withdrawals  []*types.Withdrawal
 	BeaconRoot   *types.Hash
 	GasLimit     uint64
+	SlotNumber   *uint64
 
 	// InclusionListTxs contains RLP-encoded transactions from inclusion lists
 	// that MUST be included in this block (EIP-7547/7805 FOCIL).
@@ -176,6 +177,10 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		MixDigest:  attrs.Random,
 		BaseFee:    gas.CalcBaseFee(parent),
 		UncleHash:  EmptyUncleHash,
+	}
+
+	if b.config != nil && b.config.IsAmsterdam(attrs.Timestamp) {
+		header.SlotNumber = attrs.SlotNumber
 	}
 
 	if attrs.BeaconRoot != nil {

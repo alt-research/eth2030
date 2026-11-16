@@ -43,6 +43,9 @@ type Header struct {
 	// EIP-7928: Block-level access list
 	BlockAccessListHash *Hash
 
+	// EIP-7843: beacon slot number.
+	SlotNumber *uint64
+
 	// EIP-7742: Uncoupled blob count (CL-driven target)
 	TargetBlobsPerBlock *uint64
 

@@ -140,6 +140,10 @@ func (b *EngineBackend) forkchoiceUpdated(
 		InclusionListTxs: inclusionListTxs,
 	}
 
+	if slot != 0 {
+		buildAttrs.SlotNumber = &slot
+	}
+
 	// Generate payload ID.
 	payloadID, err := generatePayloadID(parentHeader.Hash(), buildAttrs, slot)
 	if err != nil {

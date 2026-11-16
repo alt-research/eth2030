@@ -642,6 +642,13 @@ func NewPragueJumpTable() JumpTable {
 	return tbl
 }
 
+// NewAmsterdamJumpTable adds EIP-7843 to the Amsterdam execution rules.
+func NewAmsterdamJumpTable() JumpTable {
+	tbl := NewPragueJumpTable()
+	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
+	return tbl
+}
+
 // NewVerkleJumpTable returns the Verkle fork jump table.
 func NewVerkleJumpTable() JumpTable {
 	tbl := NewGlamsterdanJumpTable()
@@ -663,7 +670,7 @@ func NewVerkleJumpTable() JumpTable {
 
 // NewGlamsterdanJumpTable returns the Glamsterdan fork jump table.
 func NewGlamsterdanJumpTable() JumpTable {
-	tbl := NewPragueJumpTable()
+	tbl := NewAmsterdamJumpTable()
 
 	tbl[DIV] = &operation{execute: opDiv, constantGas: GasDivGlamsterdan, minStack: 2, maxStack: 1024}
 	tbl[SDIV] = &operation{execute: opSdiv, constantGas: GasSdivGlamsterdan, minStack: 2, maxStack: 1024}
@@ -685,7 +692,6 @@ func NewGlamsterdanJumpTable() JumpTable {
 	tbl[DELEGATECALL] = &operation{execute: opDelegateCall, constantGas: WarmStorageReadGlamst, dynamicGas: gasDelegateCallGlamst, minStack: 6, maxStack: 1024, memorySize: memoryDelegateCall}
 	tbl[SELFDESTRUCT] = &operation{execute: opSelfdestruct, constantGas: GasSelfdestruct, dynamicGas: gasSelfdestructGlamst, minStack: 1, maxStack: 1024, halts: true, writes: true}
 
-	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
 	tbl[CLZ] = &operation{execute: opCLZ, constantGas: GasFastStep, minStack: 1, maxStack: 1024}
 
 	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}

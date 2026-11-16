@@ -717,12 +717,16 @@ func pqDraftReservedAddresses(config *corconfig.ChainConfig) []types.Address {
 
 // ConfigureBlockEVM installs the same fork rules for execution and simulation.
 func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm *vm.EVM) (map[types.Address]vm.PrecompiledContract, error) {
+	if header.SlotNumber != nil {
+		evm.Context.SlotNumber = *header.SlotNumber
+	}
 	// Select the correct jump table based on fork rules.
 	var precompileAddrs map[types.Address]vm.PrecompiledContract
 	if config != nil {
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,
+			IsAmsterdam:      rules.IsAmsterdam,
 			IsPrague:         rules.IsPrague,
 			IsCancun:         rules.IsCancun,
 			IsShanghai:       rules.IsShanghai,

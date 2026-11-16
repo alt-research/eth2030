@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/eth2030/eth2030/core/block"
@@ -207,7 +209,7 @@ func (b *EngineBackend) ProcessBlock(
 			}, nil
 		}
 	}
-	return b.processBlockInternal(p, parentBeaconBlockRoot, nil, nil)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, nil, nil, nil)
 }
 
 // ProcessBlockV4 validates and executes a Prague payload with execution requests.
@@ -221,7 +223,7 @@ func (b *EngineBackend) ProcessBlockV4(
 		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 	}
 	rHash := types.ComputeWireRequestsHash(executionRequests)
-	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash, nil)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash, nil, nil)
 }
 
 // ProcessBlockV5 validates and executes a new Amsterdam payload with BAL.
@@ -240,7 +242,17 @@ func (b *EngineBackend) ProcessBlockV5(
 		message := err.Error()
 		return payload.PayloadStatusV1{Status: engine.StatusInvalid, ValidationError: &message}, nil
 	}
-	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash)
+	var slotNumber *uint64
+	if p.SlotNumber != "" {
+		slot, err := strconv.ParseUint(strings.TrimPrefix(p.SlotNumber, "0x"), 16, 64)
+		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != p.SlotNumber {
+			return payload.PayloadStatusV1{}, engine.ErrInvalidParams
+		}
+		if slot != 0 {
+			slotNumber = &slot
+		}
+	}
+	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash, slotNumber)
 }
 
 func (b *EngineBackend) processBlockInternal(
@@ -248,6 +260,7 @@ func (b *EngineBackend) processBlockInternal(
 	parentBeaconBlockRoot types.Hash,
 	requestsHash *types.Hash,
 	balHash *types.Hash,
+	slotNumber *uint64,
 ) (payload.PayloadStatusV1, error) {
 	if err := b.beginWork(); err != nil {
 		return payload.PayloadStatusV1{}, err
@@ -362,6 +375,7 @@ func (b *EngineBackend) processBlockInternal(
 	}
 
 	header.BlockAccessListHash = balHash
+	header.SlotNumber = slotNumber
 	block := types.NewBlock(header, &types.Body{Transactions: txs, Withdrawals: withdrawals})
 	if block.Hash() != p.BlockHash {
 		message := "payload block hash does not match reconstructed header"

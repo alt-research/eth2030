@@ -36,6 +36,13 @@ for work ownership, dependencies and acceptance criteria. The
 - [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
 - [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.
 
+## Pinned EIP-8141 Migration
+
+- [ ] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
+- [ ] Implement the canonical receipt format, execution and state-gas rules, atomic rollback, and the payer's escrow and settlement.
+- [ ] Wire Bogotá activation, public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
+
 ## Roadmap Homepage Integration (2026-11-13)
 
 - [x] Promote the approved prototype to a detailed roadmap page and share its progress model with the homepage.

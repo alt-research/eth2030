@@ -1,0 +1,27 @@
+participants:
+  - el_type: geth
+    el_image: eth2030:local
+    el_extra_params: ["--networkid=3151910", "--rpc.rate_limit=0", "--bootnodes="]
+    cl_type: lighthouse
+    cl_image: eth2030cl:local
+  - el_type: geth
+    el_image: eth2030:local
+    el_extra_params: ["--networkid=3151911", "--rpc.rate_limit=0", "--bootnodes="]
+    cl_type: lighthouse
+    cl_image: eth2030cl:local
+network_params:
+  network: kurtosis
+  seconds_per_slot: 3
+  genesis_delay: 50
+  electra_fork_epoch: 0
+  fulu_fork_epoch: 0
+  gloas_fork_epoch: 1
+  heze_fork_epoch: 2
+  num_validator_keys_per_node: 128
+  additional_preloaded_contracts:
+    "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf":
+      balance: 100ETH
+      nonce: 0
+      code: "0x"
+      storage: {}
+additional_services: []

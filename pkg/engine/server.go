@@ -237,9 +237,18 @@ func (api *EngineAPI) NewPayloadV5(
 	executionRequests [][]byte,
 ) (PayloadStatusV1, error) {
 	// Check that the timestamp falls within the Amsterdam fork.
-	if !api.backend.IsAmsterdam(payload.Timestamp) {
+	if !api.backend.IsAmsterdam(payload.Timestamp) || api.isBogota(payload.Timestamp) {
 		return PayloadStatusV1{}, ErrUnsupportedFork
 	}
+	return api.processAmsterdamPayload(payload, expectedBlobVersionedHashes, parentBeaconBlockRoot, executionRequests)
+}
+
+func (api *EngineAPI) processAmsterdamPayload(
+	payload ExecutionPayloadV5,
+	expectedBlobVersionedHashes []types.Hash,
+	parentBeaconBlockRoot types.Hash,
+	executionRequests [][]byte,
+) (PayloadStatusV1, error) {
 
 	// EIP-4788: parentBeaconBlockRoot must be provided.
 	if parentBeaconBlockRoot == (types.Hash{}) {
@@ -335,7 +344,10 @@ func (api *EngineAPI) NewPayloadV7(req NewPayloadV7Request) (PayloadStatusV1, er
 		errMsg := "ssz payload does not match the submitted payload fields"
 		return PayloadStatusV1{Status: StatusInvalid, ValidationError: &errMsg}, nil
 	}
-	return api.NewPayloadV5(
+	if !api.backend.IsAmsterdam(req.ExecutionPayload.Timestamp) {
+		return PayloadStatusV1{}, ErrUnsupportedFork
+	}
+	return api.processAmsterdamPayload(
 		req.ExecutionPayload,
 		req.BlobVersionedHashes,
 		req.ParentBeaconBlockRoot,
@@ -348,7 +360,7 @@ func (api *EngineAPI) ForkchoiceUpdatedV4(
 	state ForkchoiceStateV1,
 	payloadAttributes *PayloadAttributesV4,
 ) (ForkchoiceUpdatedResult, error) {
-	if payloadAttributes != nil && !api.backend.IsAmsterdam(payloadAttributes.Timestamp) {
+	if payloadAttributes != nil && (!api.backend.IsAmsterdam(payloadAttributes.Timestamp) || api.isBogota(payloadAttributes.Timestamp)) {
 		result, err := api.backend.ForkchoiceUpdatedV4(state, nil)
 		return forkchoiceAttributeError(result, err, ErrUnsupportedFork)
 	}
@@ -393,6 +405,9 @@ func (api *EngineAPI) ExchangeCapabilities(requested []string) []string {
 		"engine_getInclusionListV1",
 		"engine_getPayloadHeaderV1",
 		"engine_submitBlindedBlockV1",
+	}
+	if _, ok := api.backend.(bogotaBackend); ok {
+		supported = append(supported, "engine_newPayloadV6")
 	}
 	return supported
 }

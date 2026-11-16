@@ -53,6 +53,7 @@ type chainConfigJSON struct {
 	AmsterdamTime          *uint64      `json:"amsterdamTime"`
 	GlamsterdanTime        *uint64      `json:"glamsterdanTime"`
 	HogotaTime             *uint64      `json:"hogotaTime"`
+	BogotaTime             *uint64      `json:"bogotaTime"`
 	SSZBlockTime           *uint64      `json:"sszBlockTime"`
 	IPlusTime              *uint64      `json:"iPlusTime"`
 	OsakaTime              *uint64      `json:"osakaTime"`
@@ -273,6 +274,12 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 	chainCfg.AmsterdamTime = gj.Config.AmsterdamTime
 	chainCfg.GlamsterdanTime = gj.Config.GlamsterdanTime
 	chainCfg.HogotaTime = gj.Config.HogotaTime
+	if gj.Config.BogotaTime != nil {
+		if chainCfg.HogotaTime != nil && *chainCfg.HogotaTime != *gj.Config.BogotaTime {
+			return nil, fmt.Errorf("conflicting bogotaTime and hogotaTime in genesis")
+		}
+		chainCfg.HogotaTime = gj.Config.BogotaTime
+	}
 	chainCfg.SSZBlockTime = gj.Config.SSZBlockTime
 	chainCfg.IPlusTime = gj.Config.IPlusTime
 	chainCfg.OsakaTime = gj.Config.OsakaTime

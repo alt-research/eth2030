@@ -47,9 +47,11 @@ type EngineBackend struct {
 	builder      *block.BlockBuilder
 	buildMu      sync.Mutex
 
-	fcMu          sync.RWMutex
-	safeHash      types.Hash
-	finalizedHash types.Hash
+	fcMu             sync.RWMutex
+	safeHash         types.Hash
+	finalizedHash    types.Hash
+	inclusionResults map[types.Hash]bool
+	inclusionOrder   []types.Hash
 
 	workMu  sync.Mutex
 	closed  bool
@@ -79,11 +81,12 @@ func NewEngineBackend(node NodeDeps) *EngineBackend {
 		maxPayloads = defaultMaxPayloads
 	}
 	b := &EngineBackend{
-		node:        node,
-		payloads:    make(map[payload.PayloadID]*pendingPayload),
-		maxPayloads: maxPayloads,
-		builder:     builder,
-		blobCache:   make(map[types.Hash][]byte),
+		node:             node,
+		payloads:         make(map[payload.PayloadID]*pendingPayload),
+		maxPayloads:      maxPayloads,
+		builder:          builder,
+		blobCache:        make(map[types.Hash][]byte),
+		inclusionResults: make(map[types.Hash]bool),
 	}
 	return b
 }

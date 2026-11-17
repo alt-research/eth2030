@@ -70,8 +70,9 @@ STATUS.md after execution.
 ## Remaining promotion gates
 
 - Pin and qualify the canonical-paymaster runtime and withdrawal accounting.
-- Finalize sponsored Frame traffic through the current Lighthouse pair and retain
-  exact receipts, balances and historical readback after an EL restart.
+- The sponsored FOCIL/finality/restart gate passed on EL `1c20e3c7` and
+  Lighthouse `a05a56de`; see the [retained wire and settlement evidence](verification/frame-8141-20261118-final.json).
+  Fresh CL historical backfill remains a separate gate.
 - Exercise blob commitment ordering and Frame historical backfill through a fresh
   CL, including an independent compatible execution source.
 - Qualify upstream workload/explorer consumers against the signed envelope and

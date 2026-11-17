@@ -547,6 +547,10 @@ func TestCanonicalFrame8141DeployPrefixConsumesCurrentSenderNonce(t *testing.T) 
 	if db.GetNonce(sender) != 2 || receipt.FrameResults8141[0].GasUsed.State != 7650 || db.GetCodeSize(sender) != 5 {
 		t.Fatalf("deployment/approval nonce or state charge: nonce=%d, receipt=%+v", db.GetNonce(sender), receipt)
 	}
+	// Independent StateAccount RLP/StackTrie oracle generated with go-ethereum.
+	if root := db.GetRoot(); root != types.HexToHash("0xf51b379d6cdf16258d77fea404eb7f548028fffb2b52eb61d24df45c136a4583") {
+		t.Fatalf("deployed Frame post-state differs from Geth trie oracle: %s", root)
+	}
 }
 
 func TestCanonicalFrame8141ApprovalCannotWrapNonceAfterDefaultCalls(t *testing.T) {
@@ -564,5 +568,33 @@ func TestCanonicalFrame8141ApprovalCannotWrapNonceAfterDefaultCalls(t *testing.T
 	}
 	if db.GetRoot() != root || gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit {
 		t.Fatal("failed payment approval retained effects")
+	}
+}
+
+func TestCanonicalFrame8141ClippedTipUsesActualEscrowSettlement(t *testing.T) {
+	tx, db, cfg, header := frameExecutionFixture(t)
+	tx.Fees.MaxPriorityFeePerGas = big.NewInt(10)
+	tx.Frames = append(tx.Frames, types.Frame8141{Mode: types.ModeSender, Limits: types.FrameGasLimits{Execution: 100000}})
+	signFrameExecution(t, tx, false)
+	budget, err := tx.GasBudget()
+	if err != nil {
+		t.Fatal(err)
+	}
+	tx.Fees.MaxFee = new(big.Int).Add(new(big.Int).SetUint64(budget.MaxGas), big.NewInt(1))
+	before := new(big.Int).Set(db.GetBalance(tx.Sender))
+	receipt, used, err := ApplyTransaction(cfg, db, header, signFrameExecution(t, tx, false), new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	paid := new(big.Int).Sub(before, db.GetBalance(tx.Sender))
+	// The declared execution budget is mostly unused. The clipped escrow is
+	// entirely spent, with actual tip = max_fee - used_gas * base_fee.
+	wantTip := new(big.Int).Sub(tx.Fees.MaxFee, new(big.Int).SetUint64(used))
+	if paid.Cmp(tx.Fees.MaxFee) != 0 || db.GetBalance(header.Coinbase).Cmp(wantTip) != 0 {
+		t.Fatalf("clipped settlement: paid=%s tip=%s", paid, db.GetBalance(header.Coinbase))
+	}
+	rounded := new(big.Int).Mul(new(big.Int).SetUint64(used), receipt.EffectiveGasPrice)
+	if rounded.Cmp(paid) == 0 {
+		t.Fatal("fixture did not distinguish GASPRICE from actual settlement")
 	}
 }

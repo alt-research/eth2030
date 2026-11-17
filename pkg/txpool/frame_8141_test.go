@@ -277,3 +277,23 @@ func TestCanonicalFrame8141PoolUsesCanonicalHeadFees(t *testing.T) {
 		t.Fatal("admission ignored the production head fee context")
 	}
 }
+
+func TestCanonicalFrame8141PoolRequiresOneCombinedApproval(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	frame.Frames[0].Limits.Execution = 40000
+	library := types.Address{19: 0x90}
+	db.SetCode(library, []byte{0x60, 2, 0x5f, 0x5f, 0xaa})
+	// DELEGATECALL approves execution, then the root approves payment. Both
+	// effects are valid at consensus, but public self_verify requires scope 3.
+	code := []byte{0x5f, 0x5f, 0x5f, 0x5f, 0x73}
+	code = append(code, library[:]...)
+	code = append(code, 0x61, 0x75, 0x30, 0xf4, 0x50, 0x60, 1, 0x5f, 0x5f, 0xaa)
+	db.SetCode(frame.Sender, code)
+	root := db.GetRoot()
+	if err := pool.AddRemote(signPoolFrame(t, frame, 1)); err == nil {
+		t.Fatal("separate scopes were mistaken for the required combined approval")
+	}
+	if db.GetRoot() != root {
+		t.Fatal("rejected validation modified live state")
+	}
+}

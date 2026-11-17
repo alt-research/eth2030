@@ -14,8 +14,8 @@
   FCU and execution-sync guards.
 - The full Go suite, targeted race checks, local build and vet checks pass.
   Three behavioral mutations were each detected by their regression. Nine
-  Python controller/readback tests pass. The resource-capped live control
-  is prepared with Lighthouse `a05a56de`; live acceptance is still pending.
+  Python controller/readback tests pass. The resource-capped sponsored Frame
+  control passed on Lighthouse `a05a56de` with three native EL revisions.
   Controlled tests do not establish independent-client interoperability.
 - The first live launch used Heze at genesis and failed while decoding the
   generated beacon SSZ (`OffsetOutOfBounds`) on Lighthouse `a05a56de`.
@@ -33,8 +33,8 @@
   including block's blob base fee to RPC transaction formatting. Targeted
   regressions pass, including binary-overlay receipt parity. KZG admission
   now uses the production batch verifier, with a valid proof deliberately
-  assigned to the wrong final cell as a rejection case. The updated image
-  and retained signed-list trace are next.
+  assigned to the wrong final cell as a rejection case. The updated images
+  and retained signed-list traces passed the paired control.
 - EL `6d10283d` repeated the finalized sponsored Frame control with the raw
   transaction, original signed list, dependent root and payload bid retained.
   Both peers agreed on settlement and restart readback. Its enclave, labeled
@@ -42,8 +42,19 @@
 - A real CREATE deploy-prefix regression exposed an approval nonce rewrite:
   payment approval must increment the current account nonce after deployment,
   rather than reset it from the signed transaction nonce. Deployment and
-  overflow rollback regressions now pass. This final consensus corner-case
-  fix is being qualified separately from the retained `6d10283d` runtime.
+  overflow rollback regressions now pass. The final consensus corner-case
+  fix was qualified on the retained `1c20e3c7` runtime.
+- EL `1c20e3c7` passed the final paired control with Lighthouse `a05a56de`:
+  slot 65's original signed list delivered the Frame at slot 66, both pairs
+  finalized it, and the receiver returned identical historical data after
+  restart. Raw bytes, signed list, payload bid, receipts, balances, image IDs
+  and memory limits are retained in the [final run evidence](docs/verification/frame-8141-20261118-final.json).
+  The sponsor paid exactly 137949520800762 wei; sender balance was unchanged.
+- The four-account deploy-prefix post-state matches an independently encoded
+  go-ethereum StateAccount/StackTrie oracle. Clipped-budget tests reconcile
+  actual payer debit and proposer tip even when GASPRICE is only a lower bound.
+  Public self-verify now requires the actual combined APPROVE scope, rather
+  than treating separate successful scopes as a combined call.
 - Canonical-paymaster runtime/witness pinning and withdrawal accounting,
   fresh CL Frame history, service cutover and the remaining independent
   acceptance gates remain open.

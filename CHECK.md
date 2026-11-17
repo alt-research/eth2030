@@ -5,7 +5,8 @@
 - [x] Implement the pinned execution, state gas, approval and atomic rollback paths.
 - [x] Wire activation, generic public admission, payload import and receipt persistence.
 - [ ] Pin the canonical-paymaster runtime and witness convention and qualify withdrawal reservations.
-- [ ] Verify signatures, sponsorship, blob order, restart and CL backfill.
+- [x] Verify signatures, sponsorship, native blob order and EL restart.
+- [ ] Qualify fresh CL Frame backfill and independent-client history.
 - [ ] Qualify updated services and independent-client and state-sync gates.
 
 ## Next-stage promotion (2026-11-17)
@@ -13,9 +14,9 @@
 See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
 state, review scope and independent-client gates.
 
-- [ ] Prepare the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
-- [ ] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
-- [ ] Rebuild and qualify the patched EL/CL pair before promotion.
+- [x] Prepare and merge the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
+- [x] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
+- [x] Rebuild and qualify the patched EL/CL pair on finalized sponsored Frame traffic.
 - [ ] Finish the pinned Frame transition and run its live receipt and history gates.
 - [ ] Run the Track 3 independent late-join control and continue authenticated moving-pivot recovery.
 
@@ -64,7 +65,8 @@ implementation gaps and acceptance criteria.
 - [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
 - [x] Implement and test pending Bogotá inclusion-list retention and deferred FCU validation through the native EL HTTP API.
 - [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
-- [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
+- [x] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify EL restart.
+- [ ] Verify the same sponsored Frame through fresh-node late join.
 - [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
 - [ ] Update Dora epoch statistics to decode current Gloas and Heze BeaconState SSZ.
 - [ ] Verify full and snap late join and restart against independent source clients.
@@ -91,7 +93,9 @@ implementation gaps and acceptance criteria.
 - [x] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
 - [x] Wire Bogotá activation, generic public-mempool policy, blob sidecars, Engine validation, and historical replay.
 - [ ] Freeze the canonical-paymaster exception and delayed-withdrawal reservation rules against a deployable runtime.
-- [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
+- [x] Run finalized sponsored FOCIL and EL restart scenarios with reconciled receipts and balances.
+- [x] Run native blob-bearing build/import, reorg and disk replay with real KZG data.
+- [ ] Run live blob-bearing Frame history and independent late-join scenarios.
 
 ## Roadmap Homepage Integration (2026-11-13)
 

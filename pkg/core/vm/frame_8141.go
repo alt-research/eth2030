@@ -175,7 +175,7 @@ func (evm *EVM) approve8141(target types.Address, scope uint64) error {
 	if execution {
 		f.Approved = true
 	}
-	f.Scopes[f.Index] |= uint8(scope)
+	f.Scopes[f.Index] = uint8(scope)
 	return nil
 }
 

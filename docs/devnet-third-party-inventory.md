@@ -4,6 +4,8 @@ Inventory checked on 2026-11-17 against the 11 top-level and 40 feature YAML
 profiles on the CL roadmap branch, the companion Heze profile, the pinned
 ethereum-package source, the workspace Git checkouts and the historical run
 records. All workspace paths in this document are relative to `/projects/eth2030/`.
+The [fork and upstream adoption audit](devnet-fork-upstream-audit.md) records the
+current upstream alternatives and migration gates.
 
 ## Maintained forks and reference checkouts
 

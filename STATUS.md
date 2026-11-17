@@ -1,3 +1,16 @@
+## Devnet fork and upstream adoption audit (2026-11-17)
+
+- The [upstream adoption audit](docs/devnet-fork-upstream-audit.md) pins Lighthouse
+  stable, unstable and the upstream Heze devnet branch, plus upstream Dora, Go client,
+  Spamoor and ethereum-package candidates. It records the retirement gates for each
+  maintained fork.
+- The upstream Lighthouse Heze branch covers VC duties, immediate V6 verdicts and
+  Req/Resp serving. Deferred verdicts, embedded-bid recovery and local Frame blob
+  extraction still require the ETH2030 path for the audited profile.
+- Upstream Dora already ingests and persists inclusion lists. Its Heze codec has a
+  different SSZ layout from the current ETH2030 CL. Upstream Spamoor covers the
+  Bogotá Frame format, with scalar-nonce and receipt-failover differences to check.
+
 ## Devnet third-party inventory (2026-11-17)
 
 - The [devnet service inventory](docs/devnet-third-party-inventory.md) records the

@@ -10,6 +10,10 @@ implementation gaps and acceptance criteria.
 
 - [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
 - [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
+- [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
+- [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
+- [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
+- [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.
 - [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
 - [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
 - [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.

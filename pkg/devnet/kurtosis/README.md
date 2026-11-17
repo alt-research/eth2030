@@ -200,6 +200,34 @@ Key flags supported by eth2030-geth for Kurtosis compatibility:
 - **Prysm container**: `gcr.io/prysmaticlabs/prysm/beacon-chain:latest` may have exec issues in some environments. Use Lighthouse as the primary CL.
 - **Assertoor quick timeout**: 30s is not enough for full stability checks — extend to 120s+ for thorough validation.
 
+## Pinned Fulu control
+
+From the Kurtosis directory, run the dedicated controller with the
+initialized ethereum-package checkout at `c4a8e15d`:
+
+```sh
+./scripts/run-track4-control.py --output /tmp/eth2030-fulu-control
+```
+
+Pass `--package` when the pinned package is in a different worktree. The
+control uses Lighthouse v8.3.3 and genesis generator 5.3.5 by digest,
+verifies the memory limits on the two EL/BN/VC pairs, and waits for both ELs
+and Beacon APIs to agree on the finalized execution block. It then stops
+and starts one EL using its existing data, resolves its current RPC address
+and reads the same PQ receipt and historical storage. The output directory
+holds `evidence.json` and the launch and transaction verifier logs.
+The controller removes its own enclave on exit and stops the Kurtosis
+engine when it started that engine and the host has no other enclaves.
+
+`gloas-genesis.yaml` and `gloas-transition.yaml` are capped setup fixtures
+for the Gloas-at-genesis and scheduled transition scenarios. They use
+genesis generator 6.2.8. Build the paired ETH2030 EL and Lighthouse CL
+images from the recorded revisions before launching them. Use
+`./scripts/verify-gloas-control.py <enclave>` to verify the same envelope,
+execution header slot and BAL commitment on both pairs. This check covers
+self-build. The external builder, payment and data-availability acceptance
+cases are separate.
+
 ## Track 4 private devnet
 
 Build the Track 4 image and start two ETH2030/Lighthouse pairs. Use a fresh

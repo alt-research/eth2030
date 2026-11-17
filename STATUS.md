@@ -735,3 +735,11 @@ GitHub Pages is configured for GitHub Actions but currently binds `eth2030.altll
 - Lean 4 test driver is now configured in `formal/lean/lakefile.lean` with `Lean2030/Tests.lean`.
 - Added `.gitignore` entries for Lean outputs (`.lake`, `*.olean`, `*.ilean`) and linked the Lean VM strategy doc in README.
 - Next major deliverable: full `compile`→`runBytecode` refinement theorem and stronger instruction/stack invariants.
+
+## Scoped devnet controls
+
+- The controller, verifiers and fixtures are packaged directly against the
+  Track 4 master baseline. The shell syntax checks, six Python regressions,
+  profile and evidence checks, and independent Track 4 HTTP test passed.
+- The live fixture records identify the revisions used in each run. The
+  Gloas and Heze cases use the paired EL and CL revisions recorded there.

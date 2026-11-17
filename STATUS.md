@@ -928,3 +928,12 @@ GitHub Pages is configured for GitHub Actions but currently binds `eth2030.altll
   profile and evidence checks, and independent Track 4 HTTP test passed.
 - The live fixture records identify the revisions used in each run. The
   Gloas and Heze cases use the paired EL and CL revisions recorded there.
+
+## Pinned Frame codec review
+
+- The seven-field Frame codec and split-gas receipt encodings are packaged
+  against the current Bogotá master. Full Go tests, targeted codec and RPC
+  race tests, and the build passed.
+- The native transaction pool and executor still reject the pinned format.
+  Activation, execution, blob sidecars and historical import remain separate
+  acceptance gates. The Heze memory limits are reviewed independently.

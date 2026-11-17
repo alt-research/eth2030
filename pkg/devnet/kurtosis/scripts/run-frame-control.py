@@ -49,7 +49,9 @@ def main():
                             env={**os.environ, "KURTOSIS_PACKAGE": str(package), "SKIP_EL_IMAGE_BUILD": "1"})
         evidence["enclave_id"] = control.enclave_id(f"kt-{enclave}")
         evidence["nodes"] = control.collect_images(enclave)
-        evidence["result"] = verifier.verify(enclave, 900, frame_tool)
+        evidence["execution_source"] = control.run("docker", "image", "inspect", "eth2030:frame-control", "--format", '{{index .Config.Labels "commit"}}')
+        evidence["consensus_source"] = control.run("docker", "image", "inspect", "eth2030cl:frame-control", "--format", '{{index .Config.Labels "source_commit"}}')
+        evidence["result"] = verifier.verify(enclave, 900, frame_tool, args.output)
         result = evidence["result"]
         control.run("kurtosis", "service", "stop", enclave, control.EL[1], timeout=75)
         control.run("kurtosis", "service", "start", enclave, control.EL[1], timeout=75)

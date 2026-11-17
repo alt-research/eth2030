@@ -362,9 +362,15 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 	case 2:
 		value = new(big.Int).SetBytes(tx.Sender[:])
 	case 3:
-		value = new(big.Int).Set(tx.Fees.MaxPriorityFeePerGas)
+		value = new(big.Int)
+		if tx.Fees.MaxPriorityFeePerGas != nil {
+			value.Set(tx.Fees.MaxPriorityFeePerGas)
+		}
 	case 4:
-		value = new(big.Int).Set(tx.Fees.MaxFee)
+		value = new(big.Int)
+		if tx.Fees.MaxFee != nil {
+			value.Set(tx.Fees.MaxFee)
+		}
 	case 7:
 		value = new(big.Int).SetUint64(uint64(len(tx.BlobVersionedHashes)))
 	case 8:

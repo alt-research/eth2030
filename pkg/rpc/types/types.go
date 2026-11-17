@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -578,7 +579,7 @@ func FormatBlock(block *types.Block, fullTx bool) interface{} {
 	blockTS := header.Time
 	for i, tx := range txs {
 		idx := uint64(i)
-		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee)
+		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee, BlobBaseFeeForHeader(header))
 	}
 
 	// Withdrawals: always present (even empty) for post-Shanghai blocks.
@@ -665,7 +666,7 @@ func FormatHeader(h *types.Header) *RPCBlock {
 // blockTimestamp is the timestamp of the containing block (0 if unknown/pending).
 // baseFee is the block base fee per gas; used to compute the effective gasPrice
 // for EIP-1559 txs (type ≥ 2). Pass nil for pending txs or pre-London blocks.
-func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber *uint64, index *uint64, blockTimestamp uint64, baseFee *big.Int) *RPCTransaction {
+func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber *uint64, index *uint64, blockTimestamp uint64, baseFee *big.Int, blobFees ...*big.Int) *RPCTransaction {
 	// For EIP-1559+ txs, effective gasPrice = min(feeCap, baseFee + tip).
 	gasPrice := tx.GasPrice()
 	txType := tx.Type()
@@ -806,7 +807,11 @@ func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber
 		for i, hash := range frame.BlobVersionedHashes {
 			rpcTx.BlobVersionedHashes[i] = EncodeHash(hash)
 		}
-		if payment, err := frame.Payment(baseFee, big.NewInt(1)); err == nil {
+		blobFee := big.NewInt(1)
+		if len(blobFees) > 0 && blobFees[0] != nil {
+			blobFee = blobFees[0]
+		}
+		if payment, err := frame.Payment(baseFee, blobFee); err == nil {
 			rpcTx.GasPrice = EncodeBigInt(payment.GasPrice())
 		}
 	}
@@ -962,4 +967,12 @@ func FormatLog(log *types.Log) *RPCLog {
 		rpcLog.BlockTimestamp = &ts
 	}
 	return rpcLog
+}
+
+// BlobBaseFeeForHeader supplies the block context for Frame's total fee budget.
+func BlobBaseFeeForHeader(header *types.Header) *big.Int {
+	if header != nil && header.ExcessBlobGas != nil {
+		return gas.CalcBlobBaseFee(*header.ExcessBlobGas)
+	}
+	return big.NewInt(1)
 }

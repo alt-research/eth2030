@@ -22,6 +22,19 @@
   Cleanup removed its labeled containers and volumes and stopped its engine.
   The Frame control now uses the previously qualified Fulu genesis with
   scheduled Gloas/Heze transitions; the generator compatibility gate remains open.
+- The compatible live pair passed with native EL `88d9c118` and Lighthouse
+  `a05a56de`: a signed list at slot 66 delivered the sponsored Frame to the
+  isolated proposing EL at slot 67. Both pairs finalized it. The sponsor paid
+  exactly 137946955735149 wei; the sender balance stayed unchanged. The receiver
+  reopened the same receipt and historical storage after restart. Cleanup
+  reported zero remaining labeled containers and volumes and stopped the engine.
+- Follow-up review wires the production head's fee and gas-limit context into
+  pool admission, handles zero-valued Go fee metadata safely, and supplies the
+  including block's blob base fee to RPC transaction formatting. Targeted
+  regressions pass, including binary-overlay receipt parity. KZG admission
+  now uses the production batch verifier, with a valid proof deliberately
+  assigned to the wrong final cell as a rejection case. The updated image
+  and retained signed-list trace are next.
 - Canonical-paymaster runtime/witness pinning and withdrawal accounting,
   fresh CL Frame history, service cutover and the remaining independent
   acceptance gates remain open.

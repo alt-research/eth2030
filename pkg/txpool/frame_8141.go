@@ -75,7 +75,10 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 	if err != nil {
 		return err
 	}
-	reserved := new(big.Int).Set(frame.Fees.MaxFee)
+	reserved := new(big.Int)
+	if frame.Fees.MaxFee != nil {
+		reserved.Set(frame.Fees.MaxFee)
+	}
 	prefixEnd, _ := frame.ValidationPrefix8141(pool.frameTime)
 	nonCanonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0
 	for hash, pending := range pool.lookup.all {
@@ -90,7 +93,9 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 			return errors.New("one pending Frame transaction per sender")
 		}
 		if pool.lookup.framePayers[hash] == payer {
-			reserved.Add(reserved, other.Fees.MaxFee)
+			if other.Fees.MaxFee != nil {
+				reserved.Add(reserved, other.Fees.MaxFee)
+			}
 			if nonCanonicalPaymaster && other.Sender != payer {
 				return errors.New("non-canonical Frame paymaster already has a pending transaction")
 			}
@@ -139,6 +144,18 @@ func validateFrameBlobProofs8141(tx *types.Transaction) error {
 	kzg := bls.DefaultKZGBackend()
 	sidecar := tx.BlobSidecar()
 	for i, blob := range sidecar.Blobs {
+		if batch, ok := kzg.(interface {
+			VerifyBlobCellProofs([]byte, []byte, [][]byte) (bool, error)
+		}); ok {
+			valid, err := batch.VerifyBlobCellProofs(blob, sidecar.Commitments[i], sidecar.Proofs[i*types.FrameCellsPerBlob:(i+1)*types.FrameCellsPerBlob])
+			if err != nil {
+				return err
+			}
+			if !valid {
+				return errors.New("Frame blob has an invalid KZG cell-proof batch")
+			}
+			continue
+		}
 		cells, err := kzg.ComputeCells(blob)
 		if err != nil {
 			return err

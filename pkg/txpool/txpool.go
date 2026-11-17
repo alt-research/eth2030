@@ -264,6 +264,25 @@ func New(config Config, state StateReader) *TxPool {
 // suggestion engine. Call this once per block so SuggestGasPrice returns
 // up-to-date recommendations.
 func (pool *TxPool) RecordBlock(header *types.Header, txs []*types.Transaction) {
+	if header == nil {
+		return
+	}
+	pool.mu.Lock()
+	base := new(big.Int)
+	if header.BaseFee != nil {
+		base.Set(header.BaseFee)
+	}
+	blob := big.NewInt(1)
+	if header.ExcessBlobGas != nil {
+		blob = gas.CalcBlobBaseFee(*header.ExcessBlobGas)
+	}
+	changed := pool.baseFee == nil || pool.baseFee.Cmp(base) != 0 || pool.blobBaseFee == nil || pool.blobBaseFee.Cmp(blob) != 0 || pool.config.BlockGasLimit != header.GasLimit
+	pool.baseFee, pool.blobBaseFee = base, blob
+	pool.config.BlockGasLimit = header.GasLimit
+	if changed {
+		pool.revalidateFrames8141()
+	}
+	pool.mu.Unlock()
 	pool.suggestor.RecordBlockFromHeader(header, txs)
 }
 

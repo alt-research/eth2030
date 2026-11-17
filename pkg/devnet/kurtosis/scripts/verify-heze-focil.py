@@ -3,6 +3,8 @@
 
 import argparse
 import json
+from pathlib import Path
+import sys
 import queue
 import subprocess
 import threading
@@ -90,7 +92,7 @@ def frame_readback(execution, tx_hash):
             "state_root": block["stateRoot"], "payer_charge": str(expected_charge)}
 
 
-def verify(enclave, timeout, frame_tool=None):
+def verify(enclave, timeout, frame_tool=None, evidence_dir=None):
     el = [endpoint(enclave, f"el-{i}-geth-lighthouse", "rpc") for i in (1, 2)]
     bn = [endpoint(enclave, f"cl-{i}-lighthouse-geth", "http") for i in (1, 2)]
     deadline = time.time() + timeout
@@ -205,9 +207,19 @@ def verify(enclave, timeout, frame_tool=None):
                     return event
             return None
 
-        wait_for(matching_list, min(deadline, time.time() + 3))
+        signed_list = wait_for(matching_list, min(deadline, time.time() + 3))
         if int(block["proposer_index"]) != proposers[slot + 1] or receipt["status"] != "0x1":
             raise ValueError("unexpected proposer or unsuccessful inclusion")
+
+        inclusion = {"list_slot": slot, "proposal_slot": slot + 1,
+                     "committee_el": origin + 1, "proposer_el": target + 1,
+                     "transaction": tx_hash, "raw_transaction": raw,
+                     "signed_inclusion_list": signed_list, "payload_bid": bid,
+                     "block_hash": receipt["blockHash"]}
+        if evidence_dir is not None:
+            Path(evidence_dir, "inclusion.json").write_text(json.dumps(inclusion, indent=2) + "\n")
+        if frame_tool:
+            print(f"Frame {tx_hash} included at slot {slot + 1}; waiting for finality", file=sys.stderr, flush=True)
 
         def finalized_on_both_pairs():
             assert_isolated()
@@ -220,6 +232,7 @@ def verify(enclave, timeout, frame_tool=None):
 
         wait_for(finalized_on_both_pairs, deadline, interval=seconds_per_slot)
         result = {
+            **inclusion,
             "list_slot": slot, "proposal_slot": slot + 1, "proposer": proposers[slot + 1],
             "committee_el": origin + 1, "proposer_el": target + 1, "transaction": tx_hash,
             "block_hash": receipt["blockHash"], "finalized_on_both_pairs": True,

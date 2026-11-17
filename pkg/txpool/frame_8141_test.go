@@ -261,3 +261,19 @@ func TestCanonicalFrame8141CodedPaymasterExposureLimit(t *testing.T) {
 		t.Fatalf("coded sponsor reservation was not released: %v", err)
 	}
 }
+
+func TestCanonicalFrame8141PoolUsesCanonicalHeadFees(t *testing.T) {
+	pool, _, frame := framePoolFixture(t)
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(tx); err != nil {
+		t.Fatal(err)
+	}
+	// RecordBlock is the production FCU hook, not a test-only fee setter.
+	pool.RecordBlock(&types.Header{Number: big.NewInt(2), Time: 101, GasLimit: 30000000, BaseFee: big.NewInt(1000)}, nil)
+	if pool.Get(tx.Hash()) != nil {
+		t.Fatal("canonical head fee change retained an unfunded Frame")
+	}
+	if err := pool.AddRemote(tx); err == nil {
+		t.Fatal("admission ignored the production head fee context")
+	}
+}

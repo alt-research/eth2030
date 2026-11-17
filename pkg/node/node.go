@@ -485,6 +485,7 @@ func New(config *Config) (*Node, error) {
 		poolCfg.PriceHistoryBlocks = config.TxpoolPriceHistory
 	}
 	n.txPool = txpool.New(poolCfg, bc.State())
+	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
 	if bc.Config() != nil {
 		n.txPool.SetForkRules(bc.Config(), bc.CurrentBlock().Time())
 	}

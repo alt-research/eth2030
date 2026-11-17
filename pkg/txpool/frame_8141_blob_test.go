@@ -96,7 +96,7 @@ func TestCanonicalFrame8141BlobProofsAndWire(t *testing.T) {
 		{"missing cell proof", func(sc *types.BlobSidecarData) { sc.Proofs = sc.Proofs[:127] }},
 		{"wrong commitment", func(sc *types.BlobSidecarData) { sc.Commitments[0][0] ^= 1 }},
 		{"non field element", func(sc *types.BlobSidecarData) { sc.Blobs[0][0] = 255 }},
-		{"wrong final cell proof", func(sc *types.BlobSidecarData) { sc.Proofs[127][47] ^= 1 }},
+		{"wrong final cell proof", func(sc *types.BlobSidecarData) { sc.Proofs[127] = bytes.Clone(sc.Proofs[0]) }},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			sc := &types.BlobSidecarData{Blobs: [][]byte{bytes.Clone(blob)}, Commitments: [][]byte{bytes.Clone(commitment[:])}}

@@ -496,3 +496,37 @@ func (b *GoEthKZGBackend) RecoverCells(cellIDs []uint64, cells [][KZGBytesPerCel
 	}
 	return result, nil
 }
+
+// VerifyBlobCellProofs verifies all EIP-7594 cell proofs with one batch pairing
+// check. Network admission must not perform 128 independent pairing checks per
+// blob when the production backend can authenticate the complete extension.
+func (b *GoEthKZGBackend) VerifyBlobCellProofs(blob, commitment []byte, proofs [][]byte) (bool, error) {
+	if b.ctx == nil {
+		return false, ErrKZGBackendNotImplemented
+	}
+	if len(blob) != KZGBytesPerBlob {
+		return false, ErrKZGInvalidBlobSize
+	}
+	if len(commitment) != KZGBytesPerCommitment || len(proofs) != KZGCellsPerExtBlob {
+		return false, errors.New("invalid blob cell-proof batch shape")
+	}
+	var blobArray goethkzg.Blob
+	copy(blobArray[:], blob)
+	cells, err := b.ctx.ComputeCells(&blobArray, 0)
+	if err != nil {
+		return false, err
+	}
+	commitments := make([]goethkzg.KZGCommitment, len(cells))
+	indices := make([]uint64, len(cells))
+	batchProofs := make([]goethkzg.KZGProof, len(cells))
+	for i := range cells {
+		if len(proofs[i]) != KZGBytesPerProof {
+			return false, errors.New("invalid cell proof length")
+		}
+		copy(commitments[i][:], commitment)
+		indices[i] = uint64(i)
+		copy(batchProofs[i][:], proofs[i])
+	}
+	err = b.ctx.VerifyCellKZGProofBatch(commitments, indices, cells[:], batchProofs)
+	return err == nil, err
+}

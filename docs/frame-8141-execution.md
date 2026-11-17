@@ -20,9 +20,9 @@ The active native fork is `HogotaTime` / `bogotaTime`.
 | Settlement | Payment approval checks and escrows the total fee budget before consuming the sender nonce. Settlement returns unused funds and credits the actual capped tip. Block value uses the exact tip rather than multiplying the rounded GASPRICE by gas used. |
 | Block accounting | Builders reserve the Frame execution and state dimensions independently. Header gas uses the maximum of the cumulative dimensions; receipt cumulative gas remains the sum paid by transactions. Import uses the same accounting. |
 | Opcodes | APPROVE, TXPARAM, FRAMEDATALOAD, FRAMEDATACOPY, FRAMEPARAM, SIGPARAM and SIGDATACOPY use the pinned mappings. Future receipt reads and protocol-signature witness reads halt exceptionally. |
-| Public admission | A copied StateDB executes only the bounded validation prefix. Admission checks the exact approval scopes, trace dependencies, expiry, current nonce, fee budgets, both replacement bumps and per-payer max-fee exposure. Head/state/fee changes revalidate pending Frames. |
-| Blob networking | Blob-bearing Frames carry the EIP-7594 version-1 pooled wrapper. Shape, commitment hashes and every cell proof are checked. Block bodies retain the plain envelope. Full Transactions messages reject blob-bearing Frames. |
-| Receipts and RPC | Canonical receipts retain the payer, per-frame statuses, logs and both gas dimensions. Disk readback derives block-dependent fee/blob metadata. eth/70 pages retain Frame fields and pagination metadata. RPC exposes the seven-field transaction data. |
+| Public admission | A copied StateDB executes only the bounded validation prefix. Admission checks the exact approval scopes, trace dependencies, expiry, current nonce, fee budgets, both replacement bumps and per-payer max-fee exposure. Head/state/fee changes revalidate pending Frames. Node startup and production head recording supply the actual fee context. |
+| Blob networking | Blob-bearing Frames carry the EIP-7594 version-1 pooled wrapper. Shape, commitment hashes and every cell proof are checked. The production backend authenticates a blob's 128 cells with one batch verification. Block bodies retain the plain envelope. Full Transactions messages reject blob-bearing Frames. |
+| Receipts and RPC | Canonical receipts retain the payer, per-frame statuses, logs and both gas dimensions. Disk readback derives block-dependent fee/blob metadata. eth/70 pages retain Frame fields and pagination metadata. RPC exposes the seven-field transaction data and computes transaction gas price using the including block's blob base fee. |
 | Native Engine | HTTP regressions execute sponsored Frames through inclusion-list attributes, newPayloadV6, forkchoiceUpdatedV5 and node restart. A trusted genesis head can start Bogotá without a submitted payload/list record. |
 | Workload tool | `pkg/cmd/send-frame` signs the canonical envelope, supports a default-code sponsor and optionally creates a real blob sidecar. |
 
@@ -51,7 +51,7 @@ Behavioral regressions exercise real EVM bytecode and inspect state, gas,
 receipts, logs and balances. They cover sponsorship, sender-account creation,
 code deposit, state exhaustion, cross-frame refills, nested/delegate approvals,
 atomic rollback, introspection, transient isolation, signature restrictions,
-public-prefix simulation, replacement and exposure release.
+public-prefix simulation, replacement and exposure release. Cross-transaction slot originals and canonical receipts are checked on both memory and binary-overlay state backends.
 
 Integration tests build and import sponsored and blob-bearing blocks with real
 KZG data, switch canonical branches, reopen FileDB and run the production startup

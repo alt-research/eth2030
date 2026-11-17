@@ -436,3 +436,85 @@ func TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState(t *testing.T) {
 		t.Fatal("zero-value precompile call created unmetered state")
 	}
 }
+
+func TestCanonicalFrame8141ZeroFeeMetadata(t *testing.T) {
+	tx, db, cfg, header := frameExecutionFixture(t)
+	header.BaseFee = new(big.Int)
+	tx.Fees = types.FrameFeeBudget{}
+	target := types.Address{19: 0x90}
+	db.SetCode(target, []byte{0x60, 3, 0xb0, 0x60, 4, 0xb0, 0x01, 0x5f, 0x52, 0x60, 32, 0x5f, 0xa0, 0})
+	tx.Frames = append(tx.Frames, types.Frame8141{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: 10000}})
+	signFrameExecution(t, tx, false)
+	// Exercise the Go API's nil-as-zero fee convention before RLP normalization.
+	transaction := types.NewTransaction(tx)
+	db.SetTxContext(transaction.Hash(), 0)
+	receipt, _, err := ApplyTransaction(cfg, db, header, transaction, new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(receipt.Logs) != 1 || new(big.Int).SetBytes(receipt.Logs[0].Data).Sign() != 0 || db.Exist(header.Coinbase) {
+		t.Fatal("zero fee metadata panicked or created an empty beneficiary")
+	}
+}
+
+func TestCanonicalFrame8141BinaryOverlayAndTransactionOriginalSlots(t *testing.T) {
+	tx, initial, cfg, header := frameExecutionFixture(t)
+	target := types.Address{19: 0x90}
+	initial.SetCode(target, []byte{0x5f, 0x35, 0x5f, 0x55, 0})
+	tx.Frames = append(tx.Frames, types.Frame8141{Mode: types.ModeSender, Target: &target, Data: []byte{1}, Limits: types.FrameGasLimits{Execution: 30000, State: 97920}})
+	first := signFrameExecution(t, tx, false)
+	tx.Nonce = 1
+	tx.Frames[1].Limits.State = 0
+	tx.Frames[1].Data = nil
+	tx.Frames = append(tx.Frames, types.Frame8141{Mode: types.ModeSender, Target: &target, Data: []byte{1}, Limits: types.FrameGasLimits{Execution: 30000}})
+	second := signFrameExecution(t, tx, false)
+	run := func(db state.StateDB) (types.Hash, [][]byte) {
+		t.Helper()
+		var encoded [][]byte
+		for i, transaction := range []*types.Transaction{first, second} {
+			db.SetTxContext(transaction.Hash(), i)
+			receipt, _, err := ApplyTransaction(cfg, db, header, transaction, new(gaspool.GasPool).AddGas(header.GasLimit))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if i == 0 && receipt.FrameResults8141[1].GasUsed.State != 97920 {
+				t.Fatal("initial allocation was not charged")
+			}
+			if i == 1 && (receipt.FrameResults8141[1].GasUsed.State != 0 || receipt.FrameResults8141[2].GasUsed.State != 0) {
+				t.Fatal("a later transaction lost its nonzero original slot")
+			}
+			raw, err := receipt.EncodeRLP()
+			if err != nil {
+				t.Fatal(err)
+			}
+			encoded = append(encoded, raw)
+		}
+		if db.GetNonce(tx.Sender) != 2 || db.GetState(target, types.Hash{}).IsZero() {
+			t.Fatal("Frame effects missing from state backend")
+		}
+		root, err := db.Commit()
+		if err != nil {
+			t.Fatal(err)
+		}
+		return root, encoded
+	}
+	_, memoryReceipts := run(initial.Copy())
+	binary, err := state.NewBinaryOverlayState(initial.Copy())
+	if err != nil {
+		t.Fatal(err)
+	}
+	binaryRoot, binaryReceipts := run(binary)
+	replay, err := state.NewBinaryOverlayState(initial.Copy())
+	if err != nil {
+		t.Fatal(err)
+	}
+	replayRoot, _ := run(replay)
+	if binaryRoot != replayRoot || binaryRoot == (types.Hash{}) {
+		t.Fatal("binary Frame replay produced a different overlay root")
+	}
+	for i := range memoryReceipts {
+		if string(memoryReceipts[i]) != string(binaryReceipts[i]) {
+			t.Fatal("state backend changed canonical Frame gas or receipt")
+		}
+	}
+}

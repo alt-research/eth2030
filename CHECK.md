@@ -351,3 +351,8 @@ Recommended start order: Track 1 (ePBS PTC + fork-choice is the largest single P
 - [x] Verify site build, evidence paths and responsive presentation; update STATUS.md.
 - [x] Commit only files changed for this task.
 - [ ] Complete a full current-spec conformance and cross-client audit before claiming broader coverage.
+
+## Scoped devnet control review
+
+- [x] Prepare the controller and fixtures independently from the Frame codec.
+- [x] Verify the process lifecycle and evidence assertions on this review branch.

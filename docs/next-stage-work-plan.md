@@ -35,9 +35,9 @@ Prepare the following reviews in this order.
 
 | Review | Current head and readiness |
 | --- | --- |
-| Native Bogotá | `fyInALT:feat/bogota-deferred-validation` at `db91e7ef` is seven commits ahead and zero behind master. It can be submitted to master for review. The patched EL/CL live run and independent EL gate still need results before promotion. |
-| Devnet controls | Prepare a scoped branch from the Bogotá review base. The full control branch inherits the Frame codec. A temporary-index three-way application of the control delta `e628c770..2239039e` onto `db91e7ef` succeeded for 14 files with `CHECK.md` and `STATUS.md` excluded. Reconcile tracking entries separately. Applying the entire delta to master conflicts in the devnet README. Target master once the Bogotá dependency is present. |
-| Roadmap and review notes | The documentation branch has a clean apply to current master. The plan update `fb510fde` is local, beyond the pushed `82646274` head inspected in this audit. Publish the selected documentation head before opening a separate PR. Coordinate the devnet README edit with the controls review. |
+| Native Bogotá | The audited code tip `db91e7ef` is based on master. Review head `58c4b683` separates the tracking changes from the roadmap branch. The full Go suite and targeted race tests passed on the code tip. The patched EL/CL live run and independent EL gate remain open for promotion. |
+| Devnet controls | Review branch `feat/devnet-controls-pr` at `ab767645` applies the scoped controller, verifiers and evidence directly to Track 4 master. Its Fulu runbook and the Bogotá branch's Heze runbook occupy separate sections. Gloas and Heze evidence remains pinned to the paired EL and CL in each record. |
+| Roadmap and review notes | The documentation branch applies to master. It carries the audits and next-stage plan for separate review. |
 
 The older `feat/bogota-inclusion-list-wire` is an ancestor of
 `db91e7ef`. The Frame branch adds codecs and caps. The Frame integration

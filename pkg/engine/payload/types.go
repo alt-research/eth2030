@@ -120,6 +120,7 @@ type PayloadAttributesV3 struct {
 type PayloadAttributesV4 struct {
 	PayloadAttributesV3
 	SlotNumber                uint64   `json:"slotNumber"`
+	TargetGasLimit            uint64   `json:"targetGasLimit,omitempty"`
 	InclusionListTransactions [][]byte `json:"inclusionListTransactions,omitempty"` // EIP-7805 FOCIL
 }
 

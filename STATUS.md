@@ -3,6 +3,29 @@
 - Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.
 - The optional native consensus verifier resolves ML-DSA keys from its configured validator registry. Full Go tests, local build, vet, and targeted race tests passed during merge reconciliation.
 
+## Bogotá follow-up review
+
+- Malformed FCU V5 attributes now use the Bogotá fork-choice path.
+  Asynchronous execution sync also waits for an evaluated Bogotá list
+  view before publishing its head. Deferred FCU requests sync when an
+  accepted block's execution ancestry is unavailable.
+- Authenticated HTTP regressions cover malformed attributes for resolved
+  and unresolved heads and resumption after the staged block's parent
+  arrives. The affected Go packages, targeted race tests and native build passed.
+
+## Native Bogotá deferred validation (2026-11-17)
+
+- The native Engine retains known off-canonical V6 blocks and their list
+  input before returning ACCEPTED. FCU runs the existing execution path,
+  evaluates the retained view, and stores its independent verdict.
+- An authenticated HTTP integration test covers missing-parent SYNCING,
+  an altered header, two views of the same payload, restart between stage
+  and FCU, and restart after a negative verdict. A state-synced block with
+  no submitted view requires V6 reconciliation before selection.
+- Engine, backend and chain package tests passed. The deferred Bogotá and
+  Amsterdam HTTP restart tests passed with the race detector. The native
+  CLI compiled. The Lighthouse paired and independent-EL gates remain open.
+
 ## Track 4 integration and devnet verification (2026-11-16)
 
 - Added a two-node HTTP integration test for the private profile. It checks Geth-compatible genesis hashing, Engine authentication, pre-fork gating, both EIP-8051 variants and state-backed EIP-7932 recovery, and rejects wrong-chain and corrupted signatures. ML-DSA, FN-DSA and SLH-DSA transactions enter real payloads and are validated by an independent EL. The test selects competing branches, checks canonical receipts, and reopens FileDB to read historical and current state.

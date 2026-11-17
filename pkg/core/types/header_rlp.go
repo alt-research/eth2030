@@ -108,9 +108,10 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 
 	// anyFrom[i] is true when any optional field at or after position i is set.
 	// This mirrors go-ethereum's generated encoder logic.
-	anyFromCalldataExcess := hasCalldataExcess
+	anyFromSlot := h.SlotNumber != nil
+	anyFromCalldataExcess := hasCalldataExcess || (EIP7706HashFields && anyFromSlot)
 	anyFromCalldataUsed := hasCalldataUsed || anyFromCalldataExcess
-	anyFromBAL := hasBALHash || anyFromCalldataUsed
+	anyFromBAL := hasBALHash || anyFromCalldataUsed || anyFromSlot
 	anyFromRequests := hasRequestsHash || anyFromBAL
 	anyFromBeacon := hasBeaconRoot || anyFromRequests
 	anyFromExcessBlob := hasExcessBlobGas || anyFromBeacon
@@ -201,29 +202,30 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 	} else {
 		appendEmpty()
 	}
-	if !anyFromCalldataUsed {
-		return rlp.WrapList(payload), nil
+	// EIP-7706 experimental fields retain their layout when enabled.
+	if anyFromCalldataUsed {
+		if hasCalldataUsed {
+			if err := appendItem(*h.CalldataGasUsed); err != nil {
+				return nil, err
+			}
+		} else {
+			appendEmpty()
+		}
 	}
-
-	// EIP-7706: CalldataGasUsed (only when EIP7706HashFields is enabled)
-	if hasCalldataUsed {
-		if err := appendItem(*h.CalldataGasUsed); err != nil {
+	if anyFromCalldataExcess {
+		if hasCalldataExcess {
+			if err := appendItem(*h.CalldataExcessGas); err != nil {
+				return nil, err
+			}
+		} else {
+			appendEmpty()
+		}
+	}
+	// EIP-7843: append the slot even when its value is zero.
+	if anyFromSlot {
+		if err := appendItem(*h.SlotNumber); err != nil {
 			return nil, err
 		}
-	} else {
-		appendEmpty()
-	}
-	if !anyFromCalldataExcess {
-		return rlp.WrapList(payload), nil
-	}
-
-	// EIP-7706: CalldataExcessGas (only when EIP7706HashFields is enabled)
-	if hasCalldataExcess {
-		if err := appendItem(*h.CalldataExcessGas); err != nil {
-			return nil, err
-		}
-	} else {
-		appendEmpty()
 	}
 	return rlp.WrapList(payload), nil
 }
@@ -392,23 +394,28 @@ func DecodeHeaderRLP(data []byte) (*Header, error) {
 
 	// EIP-7706: CalldataGasUsed / CalldataExcessGas — only decoded when the
 	// EIP7706HashFields flag is enabled (off by default for Lighthouse compat).
-	if !EIP7706HashFields || s.AtListEnd() {
-		return finishHeader(s, h)
-	}
-	cgu, err := s.Uint64()
-	if err != nil {
-		return nil, err
-	}
-	h.CalldataGasUsed = &cgu
+	if EIP7706HashFields && !s.AtListEnd() {
+		cgu, err := s.Uint64()
+		if err != nil {
+			return nil, err
+		}
+		h.CalldataGasUsed = &cgu
 
-	if s.AtListEnd() {
-		return finishHeader(s, h)
+		if !s.AtListEnd() {
+			ceg, err := s.Uint64()
+			if err != nil {
+				return nil, err
+			}
+			h.CalldataExcessGas = &ceg
+		}
 	}
-	ceg, err := s.Uint64()
-	if err != nil {
-		return nil, err
+	if !s.AtListEnd() {
+		slot, err := s.Uint64()
+		if err != nil {
+			return nil, err
+		}
+		h.SlotNumber = &slot
 	}
-	h.CalldataExcessGas = &ceg
 
 	return finishHeader(s, h)
 }

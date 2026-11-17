@@ -127,6 +127,10 @@ type RPCBlock struct {
 	// that post-Shanghai empty blocks emit "withdrawals": [] instead of
 	// omitting the field entirely (which breaks EIP-4895 clients).
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
+
+	// Amsterdam header commitments.
+	SlotNumber          *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
 }
 
 // RPCAccessTuple is the JSON representation of an EIP-2930 access list entry.
@@ -287,6 +291,10 @@ type RPCBlockWithTxs struct {
 	// Withdrawals is nil for pre-Shanghai blocks and a (possibly empty) slice
 	// for post-Shanghai blocks (see RPCBlock.Withdrawals).
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
+
+	// Amsterdam header commitments.
+	SlotNumber          *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
 }
 
 // RPCWithdrawal is the JSON representation of a beacon-chain withdrawal.
@@ -523,6 +531,14 @@ func FormatBlock(block *types.Block, fullTx bool) interface{} {
 		s := EncodeHash(*header.RequestsHash)
 		result.RequestsHash = &s
 	}
+	if header.SlotNumber != nil {
+		slot := EncodeUint64(*header.SlotNumber)
+		result.SlotNumber = &slot
+	}
+	if header.BlockAccessListHash != nil {
+		hash := EncodeHash(*header.BlockAccessListHash)
+		result.BlockAccessListHash = &hash
+	}
 
 	txs := block.Transactions()
 	result.Transactions = make([]*RPCTransaction, len(txs))
@@ -602,6 +618,14 @@ func FormatHeader(h *types.Header) *RPCBlock {
 	if h.RequestsHash != nil {
 		s := EncodeHash(*h.RequestsHash)
 		block.RequestsHash = &s
+	}
+	if h.SlotNumber != nil {
+		slot := EncodeUint64(*h.SlotNumber)
+		block.SlotNumber = &slot
+	}
+	if h.BlockAccessListHash != nil {
+		hash := EncodeHash(*h.BlockAccessListHash)
+		block.BlockAccessListHash = &hash
 	}
 	return block
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/eth2030/eth2030/core/block"
@@ -47,14 +49,18 @@ type EngineBackend struct {
 	builder      *block.BlockBuilder
 	buildMu      sync.Mutex
 
-	fcMu          sync.RWMutex
-	safeHash      types.Hash
-	finalizedHash types.Hash
+	fcMu             sync.RWMutex
+	safeHash         types.Hash
+	finalizedHash    types.Hash
+	inclusionResults map[types.Hash]bool
+	inclusionOrder   []types.Hash
 
-	workMu  sync.Mutex
-	closed  bool
-	workers sync.WaitGroup
-	fcuMu   sync.Mutex
+	workMu          sync.Mutex
+	closed          bool
+	workers         sync.WaitGroup
+	fcuMu           sync.Mutex
+	bogotaMu        sync.Mutex
+	bogotaFinalized uint64
 
 	blobCache   map[types.Hash][]byte
 	blobCacheMu sync.RWMutex
@@ -79,11 +85,12 @@ func NewEngineBackend(node NodeDeps) *EngineBackend {
 		maxPayloads = defaultMaxPayloads
 	}
 	b := &EngineBackend{
-		node:        node,
-		payloads:    make(map[payload.PayloadID]*pendingPayload),
-		maxPayloads: maxPayloads,
-		builder:     builder,
-		blobCache:   make(map[types.Hash][]byte),
+		node:             node,
+		payloads:         make(map[payload.PayloadID]*pendingPayload),
+		maxPayloads:      maxPayloads,
+		builder:          builder,
+		blobCache:        make(map[types.Hash][]byte),
+		inclusionResults: make(map[types.Hash]bool),
 	}
 	return b
 }
@@ -204,7 +211,7 @@ func (b *EngineBackend) ProcessBlock(
 			}, nil
 		}
 	}
-	return b.processBlockInternal(p, parentBeaconBlockRoot, nil, nil)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, nil, nil, nil, nil)
 }
 
 // ProcessBlockV4 validates and executes a Prague payload with execution requests.
@@ -218,7 +225,7 @@ func (b *EngineBackend) ProcessBlockV4(
 		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 	}
 	rHash := types.ComputeWireRequestsHash(executionRequests)
-	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash, nil)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash, nil, nil, nil)
 }
 
 // ProcessBlockV5 validates and executes a new Amsterdam payload with BAL.
@@ -227,6 +234,15 @@ func (b *EngineBackend) ProcessBlockV5(
 	expectedBlobVersionedHashes []types.Hash,
 	parentBeaconBlockRoot types.Hash,
 	executionRequests [][]byte,
+) (payload.PayloadStatusV1, error) {
+	return b.processBlockV5(p, parentBeaconBlockRoot, executionRequests, nil)
+}
+
+func (b *EngineBackend) processBlockV5(
+	p *payload.ExecutionPayloadV5,
+	parentBeaconBlockRoot types.Hash,
+	executionRequests [][]byte,
+	stage func(*types.Block) (bool, error),
 ) (payload.PayloadStatusV1, error) {
 	if err := types.ValidateExecutionRequestsWire(executionRequests); err != nil {
 		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
@@ -237,7 +253,17 @@ func (b *EngineBackend) ProcessBlockV5(
 		message := err.Error()
 		return payload.PayloadStatusV1{Status: engine.StatusInvalid, ValidationError: &message}, nil
 	}
-	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash)
+	var slotNumber *uint64
+	if p.SlotNumber != "" {
+		slot, err := strconv.ParseUint(strings.TrimPrefix(p.SlotNumber, "0x"), 16, 64)
+		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != p.SlotNumber {
+			return payload.PayloadStatusV1{}, engine.ErrInvalidParams
+		}
+		if slot != 0 {
+			slotNumber = &slot
+		}
+	}
+	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash, slotNumber, stage)
 }
 
 func (b *EngineBackend) processBlockInternal(
@@ -245,6 +271,8 @@ func (b *EngineBackend) processBlockInternal(
 	parentBeaconBlockRoot types.Hash,
 	requestsHash *types.Hash,
 	balHash *types.Hash,
+	slotNumber *uint64,
+	stage func(*types.Block) (bool, error),
 ) (payload.PayloadStatusV1, error) {
 	if err := b.beginWork(); err != nil {
 		return payload.PayloadStatusV1{}, err
@@ -359,6 +387,7 @@ func (b *EngineBackend) processBlockInternal(
 	}
 
 	header.BlockAccessListHash = balHash
+	header.SlotNumber = slotNumber
 	block := types.NewBlock(header, &types.Body{Transactions: txs, Withdrawals: withdrawals})
 	if block.Hash() != p.BlockHash {
 		message := "payload block hash does not match reconstructed header"
@@ -375,6 +404,16 @@ func (b *EngineBackend) processBlockInternal(
 			"parentHash", p.ParentHash,
 		)
 		return payload.PayloadStatusV1{Status: engine.StatusSyncing}, nil
+	}
+
+	if stage != nil && !bc.HasValidatedBlock(block.Hash()) && p.ParentHash != b.GetHeadHash() {
+		deferred, err := stage(block)
+		if err != nil {
+			return payload.PayloadStatusV1{}, err
+		}
+		if deferred {
+			return payload.PayloadStatusV1{Status: engine.StatusAccepted}, nil
+		}
 	}
 
 	// Insert the block.

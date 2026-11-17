@@ -236,3 +236,26 @@ imports the three supported PQ transaction formats, switches competing
 branches and reopens a verifier's FileDB to check persisted receipts and
 storage. The live profile has no production STARK, lattice, PQ committee or
 witness-gas provider configuration.
+
+## Heze compulsory inclusion devnet
+
+Build the paired EL and Lighthouse development revisions with Bogotá Engine
+V6 support and tag them `eth2030:local` and `eth2030cl:local`. Use the pinned
+Ethereum Kurtosis package with a genesis generator that supports the Heze
+schedule and emits `bogotaTime` in the execution genesis.
+
+Run this from `pkg/devnet/kurtosis` with Docker, Kurtosis, Python 3 and Foundry
+`cast` installed.
+
+```bash
+kurtosis run ../../../refs/ethereum-package --enclave eth2030-heze-focil \
+  --args-file configs/heze-focil.yaml
+./scripts/verify-heze-focil.py eth2030-heze-focil
+```
+
+The pairs share a chain ID, disable EL bootstrapping and use distinct EL peer-network IDs. The verifier
+selects adjacent slots whose proposer belongs to one pair and captures a
+signed list from the other pair's committee. It submits the transaction
+with the public fixture key, verifies the proposing EL did not receive it
+through its mempool, and matches the signed list, bid hash and receipt.
+Both Beacon APIs must finalize the block and the EL receipts must agree.

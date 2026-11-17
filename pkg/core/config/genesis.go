@@ -3,6 +3,7 @@ package config
 import (
 	"math/big"
 
+	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
@@ -114,6 +115,14 @@ func (g *Genesis) ToBlock() *types.Block {
 	if g.Config != nil && g.Config.IsPrague(g.Timestamp) {
 		emptyReqHash := types.EmptyRequestsHash
 		head.RequestsHash = &emptyReqHash
+	}
+
+	// Amsterdam genesis has no transaction accesses and starts at beacon slot zero.
+	if g.Config != nil && g.Config.IsAmsterdam(g.Timestamp) {
+		balHash := bal.NewBlockAccessList().Hash()
+		slot := uint64(0)
+		head.BlockAccessListHash = &balHash
+		head.SlotNumber = &slot
 	}
 
 	// Glamsterdan / EIP-7706: calldata gas fields.

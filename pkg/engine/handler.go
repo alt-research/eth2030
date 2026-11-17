@@ -139,6 +139,8 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleNewPayloadV4(params)
 	case "engine_newPayloadV5":
 		return api.handleNewPayloadV5(params)
+	case "engine_newPayloadV6":
+		return api.handleNewPayloadV6(params)
 	case "engine_forkchoiceUpdatedV3":
 		return api.handleForkchoiceUpdatedV3(params)
 	case "engine_forkchoiceUpdatedV4":
@@ -512,6 +514,10 @@ func (api *EngineAPI) handleNewPayloadV7(params []json.RawMessage) (any, *jsonrp
 // bitarray param (Fulu/PeerDAS custody set, may be null) — accepted and
 // validated here, not yet consumed (see lighthouse_compat.go).
 func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, *jsonrpcError) {
+	return api.handleAmsterdamForkchoice(params, false)
+}
+
+func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota bool) (any, *jsonrpcError) {
 	if len(params) < 1 || len(params) > 3 {
 		return nil, &jsonrpcError{
 			Code:    InvalidParamsCode,
@@ -538,6 +544,11 @@ func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, 
 
 	var payloadAttributes *PayloadAttributesV4
 	if len(params) >= 2 {
+		if _, native := api.backend.(bogotaBackend); bogota && native && string(params[1]) != "null" {
+			if err := validateBogotaAttributes(params[1]); err != nil {
+				return api.forkchoiceUpdatedBogota(state, nil, ErrInvalidPayloadAttributes)
+			}
+		}
 		attrs, err := parsePayloadAttributes(params[1])
 		if err != nil {
 			return nil, &jsonrpcError{
@@ -548,6 +559,11 @@ func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, 
 		payloadAttributes = attrs
 	}
 
+	if bogota {
+		if _, native := api.backend.(bogotaBackend); native {
+			return api.forkchoiceUpdatedBogota(state, payloadAttributes, nil)
+		}
+	}
 	result, err := api.ForkchoiceUpdatedV4(state, payloadAttributes)
 	if err != nil {
 		return nil, engineErrorToRPC(err)
@@ -555,12 +571,8 @@ func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, 
 	return result, nil
 }
 
-// handleForkchoiceUpdatedV5 processes an engine_forkchoiceUpdatedV5 request
-// (Gloas). Wire shape matches V4: [state, payloadAttributes|null,
-// custodyColumns|null]; V5 payload attributes may carry inclusion list
-// transactions upstream (decoded best-effort, see lighthouse_compat.go).
 func (api *EngineAPI) handleForkchoiceUpdatedV5(params []json.RawMessage) (any, *jsonrpcError) {
-	return api.handleForkchoiceUpdatedV4(params)
+	return api.handleAmsterdamForkchoice(params, true)
 }
 
 // handleExchangeCapabilities processes an engine_exchangeCapabilities request.

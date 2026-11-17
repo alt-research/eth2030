@@ -310,20 +310,39 @@ func TestHandler_InclusionListV1(t *testing.T) {
 	}
 }
 
-// TestHandler_GetInclusionListV1 tests getting an inclusion list.
-func TestHandler_GetInclusionListV1(t *testing.T) {
-	api := newHandlerTestAPI()
+type inclusionListResponseBackend struct {
+	handlerMockBackend
+	transactions [][]byte
+}
 
-	result, rpcErr := api.handleGetInclusionListV1(nil)
-	if rpcErr != nil {
-		t.Fatalf("error: code=%d msg=%s", rpcErr.Code, rpcErr.Message)
+func (*inclusionListResponseBackend) ProcessInclusionList(*types.InclusionList) error { return nil }
+func (b *inclusionListResponseBackend) GetInclusionList() *types.InclusionList {
+	return &types.InclusionList{Transactions: b.transactions}
+}
+
+func TestHandler_GetInclusionListV1(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		transactions [][]byte
+		want         string
+	}{
+		{name: "empty", want: `[]`},
+		{name: "hex transactions in order", transactions: [][]byte{{2, 0xa1}, {0xc1}}, want: `["0x02a1","0xc1"]`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			api := NewEngineAPI(&inclusionListResponseBackend{transactions: tc.transactions})
+			var response struct {
+				Result json.RawMessage `json:"result"`
+				Error  *jsonrpcError   `json:"error"`
+			}
+			raw := api.HandleRequest([]byte(`{"jsonrpc":"2.0","method":"engine_getInclusionListV1","params":[],"id":1}`))
+			if err := json.Unmarshal(raw, &response); err != nil || response.Error != nil || string(response.Result) != tc.want {
+				t.Fatalf("response %s, want result %s, decode error %v", raw, tc.want, err)
+			}
+		})
 	}
-	resp, ok := result.(*GetInclusionListResponseV1)
-	if !ok {
-		t.Fatalf("result type: %T", result)
-	}
-	if len(resp.Transactions) != 0 {
-		t.Fatalf("want 0 transactions, got %d", len(resp.Transactions))
+	if _, err := newHandlerTestAPI().handleGetInclusionListV1([]json.RawMessage{json.RawMessage("null")}); err == nil || err.Code != InvalidParamsCode {
+		t.Fatalf("expected invalid params, got %v", err)
 	}
 }
 

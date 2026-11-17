@@ -440,6 +440,9 @@ func GetInclusionListFromPool(
 // be considered.
 func SelectTransactionsForInclusionList(pending []*types.Transaction, maxBytes int) (selected [][]byte, totalSize int) {
 	for _, tx := range pending {
+		if tx == nil || tx.Type() == types.BlobTxType {
+			continue
+		}
 		encoded, err := tx.EncodeRLP()
 		if err != nil {
 			continue

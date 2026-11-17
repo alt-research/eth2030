@@ -229,6 +229,10 @@ func copyHeader(h *Header) *Header {
 		bah := *h.BlockAccessListHash
 		cpy.BlockAccessListHash = &bah
 	}
+	if h.SlotNumber != nil {
+		slot := *h.SlotNumber
+		cpy.SlotNumber = &slot
+	}
 	if h.CalldataGasUsed != nil {
 		cgu := *h.CalldataGasUsed
 		cpy.CalldataGasUsed = &cgu

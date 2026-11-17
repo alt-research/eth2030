@@ -7,6 +7,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -14,12 +15,23 @@ import (
 	"github.com/eth2030/eth2030/engine/payload"
 )
 
+func (b *EngineBackend) requestForkchoiceSync(fcState payload.ForkchoiceStateV1) payload.ForkchoiceUpdatedResult {
+	if syncer, ok := b.node.(interface {
+		RequestExecutionSync(payload.ForkchoiceStateV1)
+	}); ok {
+		syncer.RequestExecutionSync(fcState)
+	}
+	return payload.ForkchoiceUpdatedResult{
+		PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing},
+	}
+}
+
 // ForkchoiceUpdated processes a forkchoice state update from the consensus layer.
 func (b *EngineBackend) ForkchoiceUpdated(
 	fcState payload.ForkchoiceStateV1,
 	attrs *payload.PayloadAttributesV3,
 ) (payload.ForkchoiceUpdatedResult, error) {
-	return b.forkchoiceUpdated(fcState, attrs, nil, 0)
+	return b.forkchoiceUpdated(fcState, attrs, nil, 0, 0)
 }
 
 func (b *EngineBackend) forkchoiceUpdated(
@@ -27,6 +39,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 	attrs *payload.PayloadAttributesV3,
 	inclusionListTxs [][]byte,
 	slot uint64,
+	targetGasLimit uint64,
 ) (payload.ForkchoiceUpdatedResult, error) {
 	bc := b.node.Blockchain()
 
@@ -45,16 +58,8 @@ func (b *EngineBackend) forkchoiceUpdated(
 	b.fcuMu.Lock()
 	defer b.fcuMu.Unlock()
 	headBlock := bc.GetBlock(fcState.HeadBlockHash)
-	syncing := func() (payload.ForkchoiceUpdatedResult, error) {
-		if syncer, ok := b.node.(interface {
-			RequestExecutionSync(payload.ForkchoiceStateV1)
-		}); ok {
-			syncer.RequestExecutionSync(fcState)
-		}
-		return payload.ForkchoiceUpdatedResult{PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing}}, nil
-	}
 	if headBlock == nil || !bc.HasValidatedBlock(fcState.HeadBlockHash) {
-		return syncing()
+		return b.requestForkchoiceSync(fcState), nil
 	}
 	var applyErr error
 	if coordinator, ok := b.node.(interface {
@@ -65,7 +70,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 		applyErr = bc.ApplyForkchoice(fcState.HeadBlockHash, fcState.SafeBlockHash, fcState.FinalizedBlockHash)
 	}
 	if errors.Is(applyErr, chain.ErrStateNotFound) {
-		return syncing()
+		return b.requestForkchoiceSync(fcState), nil
 	}
 	if errors.Is(applyErr, chain.ErrStorageFailure) {
 		return payload.ForkchoiceUpdatedResult{}, applyErr
@@ -116,14 +121,30 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	beaconRoot := attrs.ParentBeaconBlockRoot
+	gasLimit := parentHeader.GasLimit
+	if targetGasLimit != 0 {
+		gasLimit = gas.CalcGasLimit(parentHeader.GasLimit, targetGasLimit)
+		// The bound is exclusive (EIP-1559), including at the clamp edge.
+		delta := parentHeader.GasLimit / gas.GasLimitBoundDivisor
+		if delta > 0 && gasLimit > parentHeader.GasLimit && gasLimit-parentHeader.GasLimit >= delta {
+			gasLimit = parentHeader.GasLimit + delta - 1
+		}
+		if delta > 0 && gasLimit < parentHeader.GasLimit && parentHeader.GasLimit-gasLimit >= delta {
+			gasLimit = parentHeader.GasLimit - delta + 1
+		}
+	}
 	buildAttrs := &block.BuildBlockAttributes{
 		Timestamp:        attrs.Timestamp,
 		FeeRecipient:     attrs.SuggestedFeeRecipient,
 		Random:           attrs.PrevRandao,
 		Withdrawals:      withdrawals,
 		BeaconRoot:       &beaconRoot,
-		GasLimit:         parentHeader.GasLimit,
+		GasLimit:         gasLimit,
 		InclusionListTxs: inclusionListTxs,
+	}
+
+	if slot != 0 {
+		buildAttrs.SlotNumber = &slot
 	}
 
 	// Generate payload ID.
@@ -259,5 +280,5 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 	if attrs == nil {
 		return b.ForkchoiceUpdated(fcState, nil)
 	}
-	return b.forkchoiceUpdated(fcState, v3Attrs, attrs.InclusionListTransactions, attrs.SlotNumber)
+	return b.forkchoiceUpdated(fcState, v3Attrs, attrs.InclusionListTransactions, attrs.SlotNumber, attrs.TargetGasLimit)
 }

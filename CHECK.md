@@ -7,6 +7,13 @@
 - [x] Verify homepage filtering, matching percentages, links, responsive layout, and the site build.
 - [x] Update status and commit the integration without publishing.
 
+## Native Bogotá deferred validation
+
+- [x] Retain the exact V6 list and off-canonical block before returning ACCEPTED.
+- [x] Complete staged validation on FCU and keep the verdict across FileDB reopen.
+- [x] Check missing ancestry, hash validation, list replacement and unresolved synced views through Engine HTTP.
+- [ ] Verify the native path with Lighthouse and a compatible independent EL.
+
 ## Roadmap Prototype Card Alignment (2026-11-13)
 
 - [x] Keep the six roadmap phases in chronological reading order and equalize card dimensions without clipping content.

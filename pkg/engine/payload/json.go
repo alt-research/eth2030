@@ -422,6 +422,7 @@ func (p *PayloadAttributesV3) UnmarshalJSON(data []byte) error {
 type payloadAttributesV4JSON struct {
 	payloadAttributesV3JSON
 	SlotNumber                hexUint64  `json:"slotNumber"`
+	TargetGasLimit            hexUint64  `json:"targetGasLimit,omitempty"`
 	InclusionListTransactions []hexBytes `json:"inclusionListTransactions,omitempty"`
 }
 
@@ -429,6 +430,7 @@ func (p PayloadAttributesV4) MarshalJSON() ([]byte, error) {
 	return json.Marshal(payloadAttributesV4JSON{
 		payloadAttributesV3JSON:   p.PayloadAttributesV3.ToV3AttrsJSON(),
 		SlotNumber:                hexUint64(p.SlotNumber),
+		TargetGasLimit:            hexUint64(p.TargetGasLimit),
 		InclusionListTransactions: toHexBytesSlice(p.InclusionListTransactions),
 	})
 }
@@ -440,6 +442,7 @@ func (p *PayloadAttributesV4) UnmarshalJSON(data []byte) error {
 	}
 	p.PayloadAttributesV3.ApplyV3AttrsJSON(j.payloadAttributesV3JSON)
 	p.SlotNumber = uint64(j.SlotNumber)
+	p.TargetGasLimit = uint64(j.TargetGasLimit)
 	p.InclusionListTransactions = fromHexBytesSlice(j.InclusionListTransactions)
 	return nil
 }

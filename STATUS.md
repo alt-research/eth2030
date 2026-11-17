@@ -17,6 +17,11 @@
   Python controller/readback tests pass. The resource-capped live control
   is prepared with Lighthouse `a05a56de`; live acceptance is still pending.
   Controlled tests do not establish independent-client interoperability.
+- The first live launch used Heze at genesis and failed while decoding the
+  generated beacon SSZ (`OffsetOutOfBounds`) on Lighthouse `a05a56de`.
+  Cleanup removed its labeled containers and volumes and stopped its engine.
+  The Frame control now uses the previously qualified Fulu genesis with
+  scheduled Gloas/Heze transitions; the generator compatibility gate remains open.
 - Canonical-paymaster runtime/witness pinning and withdrawal accounting,
   fresh CL Frame history, service cutover and the remaining independent
   acceptance gates remain open.

@@ -1,5 +1,89 @@
 # Lean4 Verification Check-list
 
+## Next-stage promotion (2026-11-17)
+
+See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
+state, review scope and independent-client gates.
+
+- [ ] Prepare the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
+- [ ] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
+- [ ] Rebuild and qualify the patched EL/CL pair before promotion.
+- [ ] Finish the pinned Frame transition and run its live receipt and history gates.
+- [ ] Run the Track 3 independent late-join control and continue authenticated moving-pivot recovery.
+
+## Consensus Client Follow-up (2026-11-16)
+
+See the [Lighthouse and Hegotá implementation plan](docs/lighthouse-hegota-implementation-plan.md)
+for work ownership, dependencies and acceptance criteria. The
+[consensus client roadmap](docs/cl-iteration-roadmap.md) covers later milestones.
+The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the audited revisions,
+implementation gaps and acceptance criteria.
+
+- [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
+- [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
+- [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
+- [x] Assign duplicate mainline features and experimental ETH2030 features to their implementation owners in the [feature-level dispositions](docs/devnet-fork-upstream-audit.md#feature-level-disposition).
+- [x] Record the [implementation PR sequence](docs/devnet-upstream-implementation-plan.md#pr-sequence), control pins, verification gates and per-profile promotion.
+- [x] Freeze the capped Fulu control and verify finality, EL restart and enclave removal in [PR 1](docs/devnet-upstream-implementation-plan.md#1-freeze-the-control-and-make-failures-observable).
+- [x] Verify Gloas-at-genesis self-build and ordinary Heze compulsory inclusion on the merged clients, then remove both enclaves.
+- [ ] Run the scheduled Gloas, external builder, PTC and blob cases and the independent-client gates.
+- [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
+- [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
+- [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.
+- [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
+- [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
+- [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.
+- [x] Verify official Lighthouse v8.3.3 against two ETH2030 ELs on the private Fulu profile.
+- [x] Verify the pinned upstream Lighthouse unstable image against two ETH2030 ELs on the private Fulu profile.
+- [x] Audit the March Lighthouse patches against current source, specifications, and Dora consumers.
+- [x] Verify a self-built Gloas envelope and its matching execution block on both node pairs after a live fork transition.
+- [x] Publish the Lighthouse `eth2030` branch and test the Heze self-build inclusion-list snapshot.
+- [x] Integrate the upstream update at `8104a2467` and port Heze proposer-side gossip checks and local Frame hash verification.
+- [x] Verify validator-driven Heze inclusion-list production against the native EL's Bogotá list response in the two-pair devnet.
+- [x] Implement native Bogotá V6 validation and persist the execution-valid inclusion-unsatisfied decision in Lighthouse fork choice.
+- [x] Implement Heze inclusion-list peer recovery and test request/response framing, authenticated previous-slot import, and stream termination.
+- [x] Prove ordinary transaction inclusion on two unpeered ELs and verify the same-parent Engine build with and without list delivery.
+- [x] Commit EIP-7843 slot numbers to Amsterdam execution headers and match Geth genesis hashing, native payload import, and restart readback.
+- [x] Merge upstream Lighthouse `7a9d14115`, run its Gloas database-invariants test, and verify the published fork ref.
+- [x] Verify finalized Fulu Track 4 history and the same PQ transaction receipt after restarting one live EL.
+- [x] Add the repeatable Heze devnet profile and verifier for a finalized ordinary transaction delivered through FOCIL.
+- [x] Reproduce a finalized Fulu checkpoint and the Gloas transition with a published Lighthouse source, the current receiver fixture, and a pinned ETH2030 image.
+- [ ] Freeze cross-client Frame and Bogotá wire fixtures.
+- [x] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
+- [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
+- [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
+- [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
+- [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
+- [x] Implement and test pending Bogotá inclusion-list retention and deferred FCU validation through the native EL HTTP API.
+- [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
+- [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
+- [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
+- [ ] Update Dora epoch statistics to decode current Gloas and Heze BeaconState SSZ.
+- [ ] Verify full and snap late join and restart against independent source clients.
+- [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
+- [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.
+
+## Heze CL follow-up
+
+- [x] Merge upstream Lighthouse `ca9dff457` and verify both database restart regressions and the local release build.
+- [x] Bind deferred Bogotá Engine verdicts to the executed beacon ancestor, including an empty head and fork-choice reload.
+- [x] Recover signed lists advertised by embedded self-build bids with gossip delivery deliberately dropped in a capped devnet.
+- [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
+- [x] Check Frame blob commitment ordering through the CL historical payload verification path.
+- [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
+- [x] Integrate upstream Lighthouse `1bcdcbfa0` on the staging branch and pass the Gloas light-client fork-boundary regression.
+- [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
+- [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
+- [ ] Verify Req/Resp recovery through alternate peers, partial responses and competing dependent roots.
+
+## Pinned EIP-8141 Migration
+
+- [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
+- [x] Match canonical receipt encoding, split gas readback after a FileDB reopen, and the fee-budget arithmetic.
+- [ ] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
+- [ ] Wire Bogotá activation, public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
+
 ## Roadmap Homepage Integration (2026-11-13)
 
 - [x] Promote the approved prototype to a detailed roadmap page and share its progress model with the homepage.

@@ -1,3 +1,188 @@
+## ETH2030 PR readiness review (2026-11-17)
+
+- Upstream master is `ad35748f` with zero open upstream PRs at the
+  review snapshot. The [PR readiness review](docs/next-stage-work-plan.md#pr-readiness-on-the-current-eth2030-master)
+  identifies the Bogotá branch for direct review, scopes the devnet
+  controls to a 14-file delta on the Bogotá base, and records the
+  documentation candidate and Frame integration dependency.
+
+## Next-stage planning snapshot (2026-11-17)
+
+- The [next-stage work plan](docs/next-stage-work-plan.md) records upstream
+  ETH2030 master at `ad35748f`, the pushed integration branches, and the
+  exact binary revisions used for past live evidence.
+- Read-only merge simulation of Lighthouse `413541ba` and upstream
+  `3777cfd7` found a conflict in the FCU verdict area of
+  `beacon_chain.rs`. The plan scopes that reconciliation and the next
+  Gloas column regression.
+- P0 covers package review, patched-pair qualification and pinned Frame
+  execution. Independent Track 3 late join, moving-pivot recovery and
+  ordinary service adoption have parallel gates.
+
+## Follow-up review of the upstream integration
+
+- ETH2030 `db91e7ef` closes the malformed-attributes and background
+  execution-sync bypasses in Bogotá fork choice. A deferred payload with
+  missing parent data now returns SYNCING and can be retried when the
+  parent arrives. Native HTTP, race and package regressions passed.
+- Lighthouse `413541ba9` keeps Req/Resp requests distinct across dependent
+  roots and committee bitfields at the same slot. Both release network
+  tests and the Lighthouse build check passed.
+- Devnet controls `2239039e` verify process-group termination, retained
+  cleanup ownership, Fulu transaction readback after finality and signed
+  Gloas self-build lineage. All six Python tests passed. The preceding
+  live control evidence remains pinned to its original binaries.
+
+## Upstream adoption implementation (2026-11-17)
+
+- ETH2030 branch `feat/devnet-upstream-controls` at `9a52e0ae` records
+  the pinned Fulu control. Both pairs finalized the same execution block at
+  beacon slot 64. EL 2 reopened the original type-7 receipt and historical
+  storage. The controller removed its enclave and stopped its Kurtosis
+  engine, with zero remaining labeled containers and volumes.
+- Lighthouse staging branch `integrate/eth2030-upstream-1bcdcbfa` at
+  `bc56927f` passed `cargo check`, the Fulu-to-Gloas light-client regression,
+  and three Heze integration tests covering the proposer list snapshot,
+  the empty-head FCU ancestor, and verdict persistence. Its release build
+  produced `v8.4.0-rc.0-bc56927`, and the container reported that revision.
+- The ETH2030 native deferred-validation branch at `4b10a445` covers
+  missing-data SYNCING, off-canonical ACCEPTED, FileDB reopen before and
+  after FCU, and replacement of the submitted view. The native CLI built,
+  and the Amsterdam and Bogotá HTTP tests passed with the race detector.
+  Integration branch `b7944602` also passed the pinned Frame codec tests.
+- The paired `bc56927f` and `b7944602` images verified the same self-built
+  Gloas-at-genesis envelope, execution state, slot and BAL at slot 4.
+  The Heze control later finalized a transaction delivered from EL 1's
+  isolated mempool through its slot 64 list and EL 2's slot 65 proposal.
+  The Fulu, Gloas and Heze control evidence is on `929870c9`. Each
+  enclave was removed before starting the next. The independent deferred
+  EL gate remains open.
+- Upstream Spamoor `f0f83695` passes its Frame codec tests and matches the
+  ETH2030 base-envelopes' RLP and signing hash. Its scalar nonce upper
+  boundary still differs. The upstream Go codec's inclusion-list JSON
+  cases pass on its declared Go 1.25.2. Its released SSZ path decoded live
+  Gloas slot 32 and rejected the retained ETH2030 Heze slot 64 state.
+  The old Heze schema remains pinned for Dora. Service cutover,
+  pinned Frame execution and the newer package remain open.
+
+## Devnet upstream adoption implementation plan (2026-11-17)
+
+- The [implementation plan](docs/devnet-upstream-implementation-plan.md)
+  maps the audit to eight PR groups with source pins, code entry points,
+  verification and per-profile promotion conditions.
+- The native Bogotá work distinguishes the missing-data `SYNCING` path
+  from staging an eligible off-canonical `ACCEPTED` payload and completing
+  its verdict through FCU. The plan also separates upstream image swaps from
+  Heze/Frame execution, Dora migration and package qualification.
+
+## Devnet fork implementation ownership (2026-11-17)
+
+- The [feature-level disposition](docs/devnet-fork-upstream-audit.md#feature-level-disposition)
+  assigns overlapping released and maintained-mainline features to upstream
+  implementations. For experimental features it specifies the ETH2030 owner,
+  matching upstream architecture, local behavior to carry and retirement gate.
+- Lighthouse unstable moved to `1bcdcbfa0`. Its builder configuration and
+  metric changes leave the Heze implementation decisions in place. The audit
+  also records the two independent inclusion-list reads in the experimental
+  producer and the shared snapshot required by the ETH2030 self-build path.
+
+## Devnet fork and upstream adoption audit (2026-11-17)
+
+- The [upstream adoption audit](docs/devnet-fork-upstream-audit.md) pins Lighthouse
+  stable, unstable and the upstream Heze devnet branch, plus upstream Dora, Go client,
+  Spamoor and ethereum-package candidates. It records the retirement gates for each
+  maintained fork.
+- The upstream Lighthouse Heze branch covers VC duties, immediate V6 verdicts and
+  Req/Resp serving. Deferred verdicts, embedded-bid recovery and local Frame blob
+  extraction still require the ETH2030 path for the audited profile.
+- Upstream Dora already ingests and persists inclusion lists. Its Heze codec has a
+  different SSZ layout from the current ETH2030 CL. Upstream Spamoor covers the
+  Bogotá Frame format, with scalar-nonce and receipt-failover differences to check.
+
+## Devnet third-party inventory (2026-11-17)
+
+- The [devnet service inventory](docs/devnet-third-party-inventory.md) records the
+  maintained forks, nested source pins, upstream image services, profile choices and
+  prior run evidence. The checks covered 51 tracked profiles and the companion Heze
+  fixture.
+- Compared the Dora and Spamoor fork refs with the images selected by older profiles.
+  The two `v0.0.1` local tags lack a registry digest and a source revision label.
+- Documented the Assertoor quick-run result boundary and the dependency on the
+  fork-specific genesis generator. The verification used existing checkouts, images and
+  recorded results.
+
+## Lighthouse CL gap audit (2026-11-17)
+
+- The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the published Lighthouse
+  `1bf89a4fc` baseline, upstream `e723ca55f`, and the companion EL and Dora revisions.
+- The EL still needs to retain Bogotá lists for deferred FCU validation. The pinned
+  Frame transaction format has encoding coverage but is rejected at mempool admission
+  and execution. The audit records the real-client acceptance tests for both paths.
+- Targeted EL Frame and Bogotá V6 tests passed during the audit. Prior capped devnet
+  runs provide the live CL evidence.
+
+## Heze consensus validation (2026-11-16)
+
+- Lighthouse `1bf89a4fc` includes upstream `ca9dff457`. The beacon store and slasher redb tests reopened a copy of an uncleanly closed database. The regular Lighthouse release image built and started its version command.
+- The deferred Engine regression sends `engine_newPayloadV6`, receives `ACCEPTED`, and then sends `engine_forkchoiceUpdatedV5` from a beacon head on its empty node. The wire server returns `VALID,false` for the executed ancestor. Its execution validity and inclusion-list failure survive fork-choice reload. The test uses a controlled Engine HTTP server. Independent EL interoperability remains open.
+- In `eth2030-heze-cl-gossip-loss`, both peers verified Gloas slot 107 at root `0xdd454aca869b6709ac6610265dfc5ae68187170a20b9e4bab06363188a4c097c`. The same peers agreed on the finalized Fulu checkpoint at slot 64 and root `0x8498839b333daa3f611d309b8a8904b162110093aab9b5fe6c113d3b5d76866d`. The initial monitor required both conditions in the Gloas window. Separate queries captured the verified Gloas block and the finalized Fulu checkpoint.
+- The receiver's test image discarded the gossip for validator 98 at slot 133. The embedded self-build bid in slot 134 triggered Req/Resp and the receiver recovered the same signed list, including transaction `0x4e9a16ac2b5279ed7891f8cf73bddccab05c7bb3cb323849e53f092080c69800` and committee positions 1, 9. Recovery was late and did not make the list timely. Reopening the receiver preserved block `0x265a3e70bc3855c132807514c1d3613477f24b9e3a1806c0920ef02c87e80e0e` and the prior finalized checkpoint. The six-node suite used 2048 MB per beacon node or EL and 1024 MB per validator. It stopped after verification.
+- The CL historical envelope test accepts a Frame transaction referencing two distinct KZG commitments in order. It rejects reversed commitments and a changed payload hash. Live sponsored and blob-bearing Frame execution still depends on the EL.
+
+## Pinned Frame encoding and inclusion history (2026-11-16)
+
+- ETH2030 branch `feat/frame-8141` at `67aef736` decodes the pinned seven-field EIP-8141 envelope and preserves the eight-field historical route. Independent vectors cover the transaction and signing hashes, secp256k1 and P-256 signatures, fee budgets and split-gas receipts. Typed receipts retain both gas dimensions and payer when reopened from FileDB and projected through RPC. Execution and mempool admission still reject the pinned frame type until its state transition is implemented.
+- Heze fixture commit `e628c770` adds 2 GiB budgets for each EL and beacon node and 1 GiB for each validator.
+- Lighthouse `5d4500270` serves the retained previous-slot view keyed by the proposal's block root and shuffling-dependent root. Its HTTP integration test verifies ordered committee positions and the first signed observation of an equivocating validator, ignores a list on another dependent root, and returns 404 after pruning.
+- Dora `12a0198` stores views by block root and displays the bid bits by committee position. Its Go Beacon client at `79989d2` reads both bid message fields and falls back to the JSON API when the older Gloas or Heze block decoder fails on current SSZ. Dora retains the source JSON for historical blocks. Epoch statistics still need the current BeaconState SSZ layout.
+- The capped two-pair devnet `eth2030-heze-dora-capped-r5` finalized a compulsory transaction from slot 32 in the slot 33 block `0x3de7e15dc9873301bd04dc1cf0f00dbb0ba382aee4ac9cfa2395805609e26c40`. Lighthouse returned 404 after pruning the list. A restarted Dora rendered the bytes of transaction `0xf01e49efb5461bc3307110ee9ca0f38f619ba43606d071481c603df986c8fbcf` under committee positions 0 and 8. All six node memory caps were verified and the enclave stopped after verification.
+
+## Devnet host memory incident (2026-11-16)
+
+- Before the 19:05 CST reboot, 16 ETH devnet enclaves had 92 EL, beacon and validator containers running without per-container memory limits. At 19:01 CST, the kernel OOM process table attributed about 31.2 GiB of anonymous resident memory to 60 Lighthouse, 24 ETH2030 and eight Geth processes. System activity records showed the 8 GiB swap essentially full from 18:40 onward.
+- The kernel repeatedly invoked the global OOM killer starting at 18:52 CST. At 18:57 and 18:59 the allocations that triggered it came from validator containers in two ETH devnets. Several terminated processes were developer tools. The next boot recorded a reset-pin event and unclean filesystem recovery. This establishes devnet memory pressure as a major contributor and leaves the immediate cause of the reset undetermined.
+- Docker showed zero running EL, beacon or validator containers after reboot. The Docker and kernel records remain available for inspection.
+
+## Bogotá Engine and Heze inclusion recovery (2026-11-16)
+
+- Published Lighthouse `eth2030` at `dd48a965e` over upstream unstable `7a9d14115`. Heze sends the parent-dependent timely inclusion-list view in `engine_newPayloadV6`. An execution-valid envelope with unmet inclusion requirements remains execution-valid in fork choice, and the rejection of its payload extension survives database reload. The linked ETH2030 branch is `fyInALT/eth2030:feat/bogota-inclusion-list-wire` at `42e7ada9`. The upstream Gloas database-invariants test passed on the runtime revision `dd7263111`. The test-only follow-up applies both V6 outcomes to the same payload hash on separate harnesses and asserts the proposer decision before and after fork-choice reload.
+- Implemented Heze `InclusionListsByIndices` request and response, scoped by slot, dependent root, and committee bitfield. Signed responses pass the inclusion-list validation path. The tests verify SSZ/Snappy framing with fork context and previous-slot import, storage, and serving with termination. Lists first learned in the previous-slot recovery test are excluded from the timely view.
+- Two native ELs returned `VALID,true`, `VALID,false`, and `VALID,true` for the same Bogotá execution block as its list input changed. The latest paired run accepted V5 and rejected V6 at Gloas slot 63, then accepted V6 and rejected V5 at Bogotá slot 64. Both wrong-fork calls returned `-38005`. The V6 release image also passed the Fulu Track 4 regression on both pairs.
+- In `eth2030-bogota-isolated`, both ELs reported zero execution peers at submission and inclusion. The transaction `0xc6b8cfb159f79ae202333abe9d405a9bdd1c9dbaa452d6a424d7964193085842` was submitted to EL 2 at slot 74 and absent from EL 1's RPC. EL 1's Lighthouse saw the signed list, and validator 115 included the transaction at slot 75. Its receipt matched the finalized block `0xc92be1b65abbb0827e68bf25e244cfe7970f78440ad874f44fb04a3c3ecd0361`. In a separate same-parent Engine control, the transaction appeared only in the build with list delivery.
+- Amsterdam headers now commit to the EIP-7843 slot. The genesis hash matches Geth v1.17.10. The node integration rejects a slot-only mutation and confirms the canonical slot and `SLOTNUM` value after restarting the verifying EL. The separate `eth2030-amsterdam-direct` devnet started at Gloas genesis on two pairs and agreed at slot 7 on the execution hash, state root and BAL hash.
+- The updated Fulu control finalized on both pairs. After an EL restart, RPC reopened on a new Docker host port. Querying the new binding returned the same finalized history, canonical Track 4 receipt and state root as the other EL.
+- The Heze runbook includes an isolated-mempool fixture and a verifier that requires the proposer mempool negative check, the matching signed list, canonical inclusion in the next slot, and matching finalized observations from both pairs. With Lighthouse runtime `dd7263111` and native EL `db9f384b`, `eth2030-heze-noelpeer` delivered transaction `0x769c08305e1626c98ef18cbd7551dc899d97618c16791f9740830721ebe019f5` only to EL 1, recovered its signed slot 66 list on the other beacon node through gossip, and included it at slot 67. Both pairs finalized execution block `0x76ef95ef0fbd718cb917e8191975390157d048fe573b99be08f9f260e73fb901` with matching receipts and zero EL peers at the verifier checkpoints. The profile clears Kurtosis-injected EL bootnodes and keeps distinct EL network IDs after a control using network IDs alone observed intermittent execution peers.
+- The pinned EIP-8141 EL migration, sponsored and blob-bearing Frame interoperability, Dora's durable inclusion-list ingestion, and independent late-join acceptance are still open. The native decoder rejected an independently encoded seven-field Frame payload at RLP decode, before reaching execution. The Req/Resp regression exercises the protocol codec and service pipeline. Live recovery under deliberate gossip loss and an independent EL that exercises deferred satisfaction through forkchoice remain open.
+
+## Lighthouse migration implementation (2026-11-16)
+
+- Integrated upstream unstable `8104a2467` and fast-forwarded the fork's `eth2030` branch to `4e1167314`. Ported the Heze gossip check for missing timely list bits and added EIP-8141 local hash verification for historical and optimistically imported envelopes. Lighthouse compilation, lint and targeted Engine, gossip, historical envelope, signer and Heze HTTP tests passed.
+- Wired Heze validator duties, candidate retrieval from the EL, signing and publication. The first live run exposed a missing BN duties endpoint. After adding the route, both BNs returned all 256 epoch 2 duties with the same dependent root and emitted the same nonempty signed list at slot 64. Its transaction bytes hashed to the submitted transaction `0x41ce93275b4289fb67a7af188e6f1db1cbb5de74950b06332b34d40d1687751c`. Both BNs returned nonempty bid bits at slot 65 and both ELs returned the same successful receipt. The two-node mempools were connected in this run.
+- The paired run also passed the Fulu Track 4 verifier. The earlier migration image served matching Gloas envelopes and EL state roots on both pairs at slot 34. The EL companion commit `e1df4b17` returns the Bogotá transaction array and excludes EIP-4844 transactions from committee selection. Its Engine, EIP and node backend tests and build passed.
+
+## Lighthouse legacy branch integration audit (2026-11-16)
+
+- The [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md) maps all 68 old Lighthouse commits outside `eth2030` to their current call sites and work packages. A whole-branch trial merge reported 76 conflicts. Both historical EL feature tips are already ancestors of `origin/master`.
+- Traced the live Engine from node startup to `pkg/node/backend`. That backend already forwards canonical inclusion-list attributes to the builder, while the legacy Engine backend has a separate global list and status enum. Documented the actual V6, gas target, and Frame blob changes and the corresponding node tests.
+- The existing focused Engine, FOCIL and node backend tests passed. The update records the migration plan and source findings.
+
+## Lighthouse and Hegotá implementation plan (2026-11-16)
+
+- Recorded the published Lighthouse `eth2030` branch at `3e3978d4e` and the verified local-build inclusion-list snapshot change in `6e5317104`.
+- The [implementation plan](docs/lighthouse-hegota-implementation-plan.md) pins the initial Frame, Heze and Bogotá references, specifies CL/EL ownership, and lists the separate Frame, ordinary FOCIL and combined sponsored-Frame acceptance cases. The current update records planning and source verification.
+
+## Lighthouse baseline update and historical patch audit (2026-11-16)
+
+- Merged upstream unstable `1a704e58f` into Lighthouse branch `integrate/unstable-20261116` at `f85fa05b6`. It includes the `v8.3.3` stable release and has one documentation symlink beyond upstream. Formatting, compile checks, a release container build, 40 Engine API tests, 14 blob-fetch tests, and 30 inclusion list tests passed.
+- Official stable, pinned official unstable, and the integration build each validated a live Track 4 PQ transaction with two ETH2030 ELs and two Lighthouse beacon nodes at Fulu. Both official images finalized epoch 2 with matching execution hashes across both ELs and both CLs. The [baseline verification](docs/cl-iteration-roadmap.md#lighthouse-baseline-verification) records the image IDs, source revisions and matching execution blocks.
+- The integration build crossed from Fulu to Gloas and served the same signed envelope and execution block on both pairs at slot 34. At Gloas genesis, generator `6.2.8` resolved the SSZ decode error seen with `5.3.5`. The next blocker is the native EL genesis header. Adding the empty BAL hash and slot zero to the EL header reproduced the exact execution hash both CLs expect.
+- The Heze path still needs VC list signing and publication, proposer bid bits, the V6 envelope import, and forkchoice consumption of inclusion satisfaction. The EL needs the matching Bogotá RPCs, and Dora needs to move from the March inclusion-list endpoint to the current event and committee model.
+
+## Consensus client iteration plan (2026-11-16)
+
+- Audited EL master after PR #55 and compared the local Lighthouse integration with upstream stable and unstable. The [iteration plan](docs/cl-iteration-roadmap.md) prioritizes Gloas/Amsterdam regression evidence and the missing Heze/Bogotá Engine contract, including nonempty inclusion lists and a sponsored Frame transaction.
+- The plan keeps upstream Lighthouse as the release CL and specifies separate acceptance for late join, timing, proof providers and native consensus research. This update records the plan and source audit.
+
 ## Track 4 integration with master (2026-11-16)
 
 - Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.

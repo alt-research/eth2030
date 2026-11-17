@@ -1,3 +1,17 @@
+## Follow-up review of the upstream integration
+
+- ETH2030 `db91e7ef` closes the malformed-attributes and background
+  execution-sync bypasses in Bogotá fork choice. A deferred payload with
+  missing parent data now returns SYNCING and can be retried when the
+  parent arrives. Native HTTP, race and package regressions passed.
+- Lighthouse `413541ba9` keeps Req/Resp requests distinct across dependent
+  roots and committee bitfields at the same slot. Both release network
+  tests and the Lighthouse build check passed.
+- Devnet controls `2239039e` verify process-group termination, retained
+  cleanup ownership, Fulu transaction readback after finality and signed
+  Gloas self-build lineage. All six Python tests passed. The preceding
+  live control evidence remains pinned to its original binaries.
+
 ## Upstream adoption implementation (2026-11-17)
 
 - ETH2030 branch `feat/devnet-upstream-controls` at `9a52e0ae` records

@@ -56,7 +56,7 @@ func decodeRawTransaction(rawHex string) (*types.Transaction, []byte, error) {
 		return nil, nil, fmt.Errorf("empty transaction data")
 	}
 
-	tx, err := types.DecodeTxRLP(rawBytes)
+	tx, err := types.DecodePooledTransaction(rawBytes)
 	if err != nil {
 		return nil, nil, err
 	}

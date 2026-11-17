@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Canonical Frame execution
+
+- [x] Implement the pinned execution, state gas, approval and atomic rollback paths.
+- [x] Wire activation, generic public admission, payload import and receipt persistence.
+- [ ] Pin the canonical-paymaster runtime and witness convention and qualify withdrawal reservations.
+- [ ] Verify signatures, sponsorship, blob order, restart and CL backfill.
+- [ ] Qualify updated services and independent-client and state-sync gates.
+
 ## Next-stage promotion (2026-11-17)
 
 See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
@@ -80,8 +88,9 @@ implementation gaps and acceptance criteria.
 
 - [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
 - [x] Match canonical receipt encoding, split gas readback after a FileDB reopen, and the fee-budget arithmetic.
-- [ ] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
-- [ ] Wire Bogotá activation, public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [x] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
+- [x] Wire Bogotá activation, generic public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [ ] Freeze the canonical-paymaster exception and delayed-withdrawal reservation rules against a deployable runtime.
 - [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
 
 ## Roadmap Homepage Integration (2026-11-13)

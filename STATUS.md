@@ -1,3 +1,26 @@
+## Canonical Frame execution (2026-11-18)
+
+- Branch `feat/frame-8141-execution` extends merged master `cc567f93` in an
+  isolated worktree. The [execution record](docs/frame-8141-execution.md)
+  maps the pinned EIP to transition, journal, state-gas, admission, network,
+  receipt, Engine and workload paths.
+- Behavioral tests pass for sponsored settlement, sender creation, code
+  deposit, introspection, atomic rollback and cross-frame refills. Real KZG
+  sidecar validation and eth/70 receipt-page tests pass.
+- Build/import, same-height reorg, FileDB reopen and production startup
+  replay tests pass for sponsored and blob-bearing Frames. Native HTTP
+  tests pass for RPC admission, list construction, V6 import, FCU V5 and
+  receiver restart. The tests exposed and fixed the trusted-genesis Bogotá
+  FCU and execution-sync guards.
+- The full Go suite, targeted race checks, local build and vet checks pass.
+  Three behavioral mutations were each detected by their regression. Nine
+  Python controller/readback tests pass. The resource-capped live control
+  is prepared with Lighthouse `a05a56de`; live acceptance is still pending.
+  Controlled tests do not establish independent-client interoperability.
+- Canonical-paymaster runtime/witness pinning and withdrawal accounting,
+  fresh CL Frame history, service cutover and the remaining independent
+  acceptance gates remain open.
+
 ## ETH2030 PR readiness review (2026-11-17)
 
 - Upstream master is `ad35748f` with zero open upstream PRs at the

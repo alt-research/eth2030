@@ -1,3 +1,10 @@
+> Implementation update (2026-11-18): the isolated canonical Frame branch now
+> executes the pinned envelope through native state transition, admission,
+> networking, Engine and restart paths. See the
+> [execution record](frame-8141-execution.md) for verified behavior and the
+> remaining promotion gates. The dated review snapshots below retain their
+> original revisions and evidence boundaries.
+
 # ETH2030 next-stage work plan
 
 Snapshot checked on 2026-11-17. The next milestone is a reproducible

@@ -52,8 +52,8 @@ type FrameFeeBudget struct {
 }
 
 const (
-	FrameApproveExecution uint8 = 1 << iota
-	FrameApprovePayment
+	FrameApprovePayment uint8 = 1 << iota
+	FrameApproveExecution
 	FrameAtomicBatch
 )
 
@@ -72,9 +72,7 @@ const (
 )
 
 var (
-	// ErrFrame8141ExecutionUnavailable guards the newer wire format from the historical executor.
-	ErrFrame8141ExecutionUnavailable = errors.New("EIP-8141 frame execution unavailable for the seven-field format")
-	ErrFrame8141FeeBudget            = errors.New("EIP-8141 frame max fee does not cover the base fees")
+	ErrFrame8141FeeBudget = errors.New("EIP-8141 frame max fee does not cover the base fees")
 )
 
 // FrameGasBudget includes the two independent block reservations and the
@@ -179,6 +177,9 @@ func (tx *FrameTx8141) Validate() error {
 	if len(tx.Frames) == 0 || len(tx.Frames) > frame8141MaxFrames {
 		return fmt.Errorf("EIP-8141 frame count %d outside 1..%d", len(tx.Frames), frame8141MaxFrames)
 	}
+	if len(tx.BlobVersionedHashes) > FrameMaxBlobs {
+		return errors.New("EIP-8141 exceeds the EIP-7594 per-transaction blob limit")
+	}
 	for i, h := range tx.BlobVersionedHashes {
 		if h[0] != 1 {
 			return fmt.Errorf("EIP-8141 frame blob %d has invalid version", i)
@@ -209,6 +210,16 @@ func frameUint256(value *big.Int) bool {
 }
 
 func (tx *FrameTx8141) validateFrame(i int, frame Frame8141) error {
+	if frame.Target != nil && *frame.Target == FrameExpiryVerifier && frame.Mode == ModeVerify {
+		if frame.Flags != 0 || frame.Limits.State != 0 || len(frame.Data) != 8 {
+			return errors.New("EIP-8141 invalid expiry verifier frame")
+		}
+		for _, previous := range tx.Frames[:i] {
+			if previous.Target != nil && *previous.Target == FrameExpiryVerifier && previous.Mode == ModeVerify {
+				return errors.New("EIP-8141 multiple expiry verifier frames")
+			}
+		}
+	}
 	const approval = FrameApproveExecution | FrameApprovePayment
 	if frame.Mode > ModeSender || frame.Flags >= 8 {
 		return errors.New("invalid mode or flags")

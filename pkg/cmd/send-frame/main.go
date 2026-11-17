@@ -1,17 +1,16 @@
-// send-frame is a CLI tool for sending EIP-8141 frame transactions to an
-// Ethereum node. It deploys an APPROVE contract if needed, then constructs
-// and submits a type 0x06 frame transaction with VERIFY + SENDER frames.
-//
-// Usage:
-//
-//	go run ./cmd/send-frame --rpc http://localhost:8545 --key <hex-private-key>
+// send-frame signs and submits the seven-field EIP-8141 envelope pinned by
+// ETH2030. A codeless sender uses protocol signature validation; an optional
+// second key sponsors the transaction through a separate payment frame.
 package main
 
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -21,409 +20,270 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/rlp"
+	"github.com/eth2030/eth2030/crypto/bls"
+	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
-var (
-	rpcURL     = flag.String("rpc", "http://localhost:8545", "JSON-RPC URL")
-	privateKey = flag.String("key", "", "Hex-encoded private key (without 0x)")
-	sender     = flag.String("sender", "", "Sender address (0x...)")
-	approveAt  = flag.String("approve-contract", "", "Existing APPROVE contract address (skip deploy)")
-	dryRun     = flag.Bool("dry-run", false, "Encode and print but don't send")
-)
+type options struct {
+	rpc, key, sponsor, sender, to, data, value, blob string
+	execution, state                                 uint64
+	dry                                              bool
+}
 
 func main() {
+	var opts options
+	flag.StringVar(&opts.rpc, "rpc", "http://localhost:8545", "JSON-RPC URL")
+	flag.StringVar(&opts.key, "key", "", "Sender private key")
+	flag.StringVar(&opts.sponsor, "sponsor-key", "", "Optional funded sponsor private key")
+	flag.StringVar(&opts.sender, "sender", "", "Expected sender address (checked against key)")
+	flag.StringVar(&opts.to, "to", "", "Application target (defaults to sender)")
+	flag.StringVar(&opts.data, "data", "0x", "Application calldata")
+	flag.StringVar(&opts.value, "value", "0", "Application value in wei")
+	flag.StringVar(&opts.blob, "blob", "", "Optional 131072-byte blob file")
+	flag.Uint64Var(&opts.execution, "gas", 100000, "Application execution gas limit")
+	flag.Uint64Var(&opts.state, "state-gas", 200000, "Application state gas limit")
+	flag.BoolVar(&opts.dry, "dry-run", false, "Print the signed envelope without submitting it")
 	flag.Parse()
-
-	if *sender == "" {
-		fmt.Fprintln(os.Stderr, "Error: --sender is required")
-		os.Exit(1)
-	}
-
-	senderAddr := types.HexToAddress(*sender)
-
-	// Step 1: Deploy APPROVE contract if needed.
-	var approveAddr types.Address
-	if *approveAt != "" {
-		approveAddr = types.HexToAddress(*approveAt)
-		fmt.Printf("Using existing APPROVE contract: %s\n", approveAddr.Hex())
-	} else {
-		fmt.Println("Step 1: Deploy APPROVE contract (scope 2 = combined exec+payment)...")
-		// Runtime: PUSH1 0x02, PUSH1 0x00, PUSH1 0x00, APPROVE(0xaa), STOP
-		// = 60 02 60 00 60 00 aa 00
-		runtime := mustHex("600260006000aa00")
-		// Init code: PUSH1 8, PUSH1 12, PUSH1 0, CODECOPY, PUSH1 8, PUSH1 0, RETURN
-		init := mustHex("6008600c60003960086000f3")
-		deployCode := append(init, runtime...)
-
-		txHash, err := sendLegacyTx(senderAddr, nil, deployCode, 100000)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Deploy failed: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Printf("  Deploy tx: %s\n", txHash)
-
-		// Wait for receipt.
-		receipt, err := waitForReceipt(txHash, 30*time.Second)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Receipt failed: %v\n", err)
-			os.Exit(1)
-		}
-		ca, ok := receipt["contractAddress"].(string)
-		if !ok || ca == "" || ca == "0x0000000000000000000000000000000000000000" {
-			fmt.Fprintln(os.Stderr, "Deploy succeeded but no contract address in receipt")
-			os.Exit(1)
-		}
-		approveAddr = types.HexToAddress(ca)
-		fmt.Printf("  APPROVE contract deployed at: %s\n", approveAddr.Hex())
-
-		// Verify code.
-		code, _ := rpcCall("eth_getCode", []interface{}{approveAddr.Hex(), "latest"})
-		fmt.Printf("  Deployed code: %s\n", code)
-	}
-
-	// Step 2: Build and send frame transaction.
-	fmt.Println("\nStep 2: Build EIP-8141 frame transaction...")
-
-	chainID, err := getChainID()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get chain ID: %v\n", err)
-		os.Exit(1)
-	}
-
-	nonce, err := getNonce(senderAddr)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get nonce: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Build frames:
-	// Frame 0: VERIFY mode → calls APPROVE contract (scope 2)
-	// Frame 1: SENDER mode → simple call to sender (no-op)
-	frames := []types.Frame{
-		{
-			Mode:     types.ModeVerify,
-			Target:   &approveAddr,
-			GasLimit: 50000,
-			Data:     nil, // VERIFY data is elided in sig hash
-		},
-		{
-			Mode:     types.ModeSender,
-			Target:   &senderAddr, // call self (no-op)
-			GasLimit: 21000,
-			Data:     nil,
-		},
-	}
-
-	baseFee, err := getBaseFee()
-	if err != nil {
-		baseFee = big.NewInt(1_000_000_000) // fallback 1 Gwei
-	}
-	maxFee := new(big.Int).Mul(baseFee, big.NewInt(2))
-	maxPriority := big.NewInt(1_000_000_000) // 1 Gwei tip
-
-	frameTx := &types.FrameTx{
-		ChainID:              big.NewInt(int64(chainID)),
-		Nonce:                new(big.Int).SetUint64(nonce),
-		Sender:               senderAddr,
-		Frames:               frames,
-		MaxPriorityFeePerGas: maxPriority,
-		MaxFeePerGas:         maxFee,
-		MaxFeePerBlobGas:     new(big.Int),
-		BlobVersionedHashes:  nil,
-	}
-
-	// Encode.
-	encoded, err := encodeFrameTx(frameTx)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Encode failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("  Type: 0x06 (EIP-8141 Frame Transaction)\n")
-	fmt.Printf("  Sender: %s\n", senderAddr.Hex())
-	fmt.Printf("  Chain ID: %d\n", chainID)
-	fmt.Printf("  Nonce: %d\n", nonce)
-	fmt.Printf("  Frames: %d\n", len(frames))
-	fmt.Printf("    Frame 0: VERIFY → %s (gas: %d)\n", approveAddr.Hex(), frames[0].GasLimit)
-	fmt.Printf("    Frame 1: SENDER → %s (gas: %d)\n", senderAddr.Hex(), frames[1].GasLimit)
-	fmt.Printf("  Max fee: %s wei\n", maxFee.String())
-	fmt.Printf("  Raw tx: 0x%s\n", hex.EncodeToString(encoded))
-	fmt.Printf("  Size: %d bytes\n", len(encoded))
-
-	if *dryRun {
-		fmt.Println("\n[dry-run] Transaction not sent.")
-		return
-	}
-
-	// Send.
-	fmt.Println("\nStep 3: Send frame transaction...")
-	rawHex := "0x" + hex.EncodeToString(encoded)
-	result, err := rpcCall("eth_sendRawTransaction", []interface{}{rawHex})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Send failed: %v\n", err)
-		// Print the full error for debugging.
-		fmt.Fprintf(os.Stderr, "Raw tx hex: %s\n", rawHex)
-		os.Exit(1)
-	}
-	fmt.Printf("  Transaction hash: %s\n", result)
-
-	// Wait for receipt.
-	fmt.Println("\nStep 4: Wait for receipt...")
-	receipt, err := waitForReceipt(result, 60*time.Second)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Receipt failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	status, _ := receipt["status"].(string)
-	gasUsed, _ := receipt["gasUsed"].(string)
-	blockNum, _ := receipt["blockNumber"].(string)
-
-	statusStr := "REVERTED"
-	if status == "0x1" {
-		statusStr = "SUCCESS"
-	}
-	fmt.Printf("  Status: %s\n", statusStr)
-	fmt.Printf("  Gas used: %s\n", gasUsed)
-	fmt.Printf("  Block: %s\n", blockNum)
-
-	if status == "0x1" {
-		fmt.Println("\n✓ EIP-8141 frame transaction executed successfully!")
-	} else {
-		fmt.Println("\n✗ Frame transaction reverted.")
+	if err := run(opts); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-// encodeFrameTx produces 0x06 || RLP([chain_id, nonce, sender, frames, fees...])
-func encodeFrameTx(tx *types.FrameTx) ([]byte, error) {
-	// Encode frames as RLP list of [mode, target, gas_limit, data]
-	type rlpFrame struct {
-		Mode     uint8
-		Target   []byte
-		GasLimit uint64
-		Data     []byte
-	}
-	type rlpFrameTx struct {
-		ChainID              *big.Int
-		Nonce                *big.Int
-		Sender               [20]byte
-		Frames               []rlpFrame
-		MaxPriorityFeePerGas *big.Int
-		MaxFeePerGas         *big.Int
-		MaxFeePerBlobGas     *big.Int
-		BlobVersionedHashes  [][32]byte
-	}
+type rpcClient struct {
+	url    string
+	client http.Client
+}
 
-	var frames []rlpFrame
-	for _, f := range tx.Frames {
-		var target []byte
-		if f.Target != nil {
-			target = f.Target[:]
-		}
-		frames = append(frames, rlpFrame{
-			Mode:     f.Mode,
-			Target:   target,
-			GasLimit: f.GasLimit,
-			Data:     f.Data,
-		})
-	}
-
-	var hashes [][32]byte
-	for _, h := range tx.BlobVersionedHashes {
-		hashes = append(hashes, [32]byte(h))
-	}
-	if hashes == nil {
-		hashes = [][32]byte{}
-	}
-
-	payload := rlpFrameTx{
-		ChainID:              bigOrZero(tx.ChainID),
-		Nonce:                bigOrZero(tx.Nonce),
-		Sender:               [20]byte(tx.Sender),
-		Frames:               frames,
-		MaxPriorityFeePerGas: bigOrZero(tx.MaxPriorityFeePerGas),
-		MaxFeePerGas:         bigOrZero(tx.MaxFeePerGas),
-		MaxFeePerBlobGas:     bigOrZero(tx.MaxFeePerBlobGas),
-		BlobVersionedHashes:  hashes,
-	}
-
-	enc, err := rlp.EncodeToBytes(payload)
+func (rpc *rpcClient) call(ctx context.Context, method string, out any, params ...any) error {
+	request, err := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": method, "params": params})
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	result := make([]byte, 1+len(enc))
-	result[0] = 0x06
-	copy(result[1:], enc)
-	return result, nil
-}
-
-func bigOrZero(v *big.Int) *big.Int {
-	if v == nil {
-		return new(big.Int)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, rpc.url, bytes.NewReader(request))
+	if err != nil {
+		return err
 	}
-	return v
-}
-
-// --- RPC helpers ---
-
-func rpcCall(method string, params interface{}) (string, error) {
-	body := map[string]interface{}{
-		"jsonrpc": "2.0",
-		"method":  method,
-		"params":  params,
-		"id":      1,
-	}
-	data, _ := json.Marshal(body)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	req, _ := http.NewRequestWithContext(ctx, "POST", *rpcURL, bytes.NewReader(data))
 	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
+	response, err := rpc.client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("RPC request failed: %w", err)
+		return err
 	}
-	defer resp.Body.Close()
-
-	respBody, _ := io.ReadAll(resp.Body)
-
-	var result struct {
-		Result interface{} `json:"result"`
+	defer response.Body.Close()
+	var envelope struct {
+		Result json.RawMessage `json:"result"`
 		Error  *struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
+			Code    int
+			Message string
 		} `json:"error"`
 	}
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", fmt.Errorf("RPC response parse failed: %w (body: %s)", err, string(respBody))
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("%s HTTP status %d", method, response.StatusCode)
 	}
-	if result.Error != nil {
-		return "", fmt.Errorf("RPC error %d: %s", result.Error.Code, result.Error.Message)
+	if err := json.NewDecoder(io.LimitReader(response.Body, 4<<20)).Decode(&envelope); err != nil {
+		return err
 	}
-	if s, ok := result.Result.(string); ok {
-		return s, nil
+	if envelope.Error != nil {
+		return fmt.Errorf("%s: %d: %s", method, envelope.Error.Code, envelope.Error.Message)
 	}
-	return "", fmt.Errorf("unexpected RPC result type: %T", result.Result)
+	if len(envelope.Result) == 0 {
+		return errors.New("RPC result is missing")
+	}
+	return json.Unmarshal(envelope.Result, out)
 }
 
-func sendLegacyTx(from types.Address, to *types.Address, data []byte, gasLimit uint64) (string, error) {
-	var toHex interface{}
-	if to != nil {
-		toHex = to.Hex()
+func quantity(text string) (*big.Int, error) {
+	value, ok := new(big.Int).SetString(text, 0)
+	if !ok || value.Sign() < 0 {
+		return nil, fmt.Errorf("invalid unsigned quantity %q", text)
 	}
-	params := []interface{}{
-		map[string]interface{}{
-			"from": from.Hex(),
-			"to":   toHex,
-			"data": "0x" + hex.EncodeToString(data),
-			"gas":  fmt.Sprintf("0x%x", gasLimit),
-		},
-	}
-	return rpcCall("eth_sendTransaction", params)
+	return value, nil
 }
 
-func getChainID() (uint64, error) {
-	result, err := rpcCall("eth_chainId", []interface{}{})
+func keyFromHex(text string) (*ecdsa.PrivateKey, error) {
+	return gethcrypto.HexToECDSA(strings.TrimPrefix(text, "0x"))
+}
+
+func makeFrame(opts options, chainID *big.Int, nonce uint64, baseFee, blobFee *big.Int) (*types.Transaction, error) {
+	senderKey, err := keyFromHex(opts.key)
 	if err != nil {
-		return 0, err
+		return nil, fmt.Errorf("sender key: %w", err)
 	}
-	result = strings.TrimPrefix(result, "0x")
-	var id big.Int
-	id.SetString(result, 16)
-	return id.Uint64(), nil
-}
-
-func getNonce(addr types.Address) (uint64, error) {
-	result, err := rpcCall("eth_getTransactionCount", []interface{}{addr.Hex(), "latest"})
-	if err != nil {
-		return 0, err
+	sender := types.Address(gethcrypto.PubkeyToAddress(senderKey.PublicKey))
+	if opts.sender != "" && !strings.EqualFold(opts.sender, sender.Hex()) {
+		return nil, errors.New("sender does not match the signing key")
 	}
-	result = strings.TrimPrefix(result, "0x")
-	var n big.Int
-	n.SetString(result, 16)
-	return n.Uint64(), nil
-}
-
-func getBaseFee() (*big.Int, error) {
-	result, err := rpcCall("eth_getBlockByNumber", []interface{}{"latest", false})
-	if err != nil {
-		return nil, err
-	}
-	// result is not a string for this call, re-parse.
-	body := map[string]interface{}{
-		"jsonrpc": "2.0",
-		"method":  "eth_getBlockByNumber",
-		"params":  []interface{}{"latest", false},
-		"id":      1,
-	}
-	data, _ := json.Marshal(body)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	req, _ := http.NewRequestWithContext(ctx, "POST", *rpcURL, bytes.NewReader(data))
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	respBody, _ := io.ReadAll(resp.Body)
-
-	var block struct {
-		Result struct {
-			BaseFeePerGas string `json:"baseFeePerGas"`
-		} `json:"result"`
-	}
-	json.Unmarshal(respBody, &block)
-	_ = result
-	bf := new(big.Int)
-	bf.SetString(strings.TrimPrefix(block.Result.BaseFeePerGas, "0x"), 16)
-	return bf, nil
-}
-
-func waitForReceipt(txHash string, timeout time.Duration) (map[string]interface{}, error) {
-	deadline := time.Now().Add(timeout)
-	for time.Now().Before(deadline) {
-		body := map[string]interface{}{
-			"jsonrpc": "2.0",
-			"method":  "eth_getTransactionReceipt",
-			"params":  []interface{}{txHash},
-			"id":      1,
+	target := sender
+	if opts.to != "" {
+		targetBytes, err := hex.DecodeString(strings.TrimPrefix(opts.to, "0x"))
+		if err != nil || len(targetBytes) != 20 {
+			return nil, errors.New("target must be a 20-byte address")
 		}
-		data, _ := json.Marshal(body)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		req, _ := http.NewRequestWithContext(ctx, "POST", *rpcURL, bytes.NewReader(data))
-		req.Header.Set("Content-Type", "application/json")
-		resp, err := http.DefaultClient.Do(req)
-		cancel()
+		copy(target[:], targetBytes)
+	}
+	data, err := hex.DecodeString(strings.TrimPrefix(opts.data, "0x"))
+	if err != nil {
+		return nil, err
+	}
+	value, err := quantity(opts.value)
+	if err != nil {
+		return nil, err
+	}
+	frame := &types.FrameTx8141{ChainID: chainID, Nonce: nonce, Sender: sender,
+		Fees:   types.FrameFeeBudget{MaxFee: new(big.Int), MaxPriorityFeePerGas: big.NewInt(1_000_000_000)},
+		Frames: []types.Frame8141{{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000}}}}
+	keys := []*ecdsa.PrivateKey{senderKey}
+	if opts.sponsor != "" {
+		sponsorKey, err := keyFromHex(opts.sponsor)
 		if err != nil {
-			time.Sleep(2 * time.Second)
-			continue
+			return nil, fmt.Errorf("sponsor key: %w", err)
 		}
-		respBody, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
-
-		var result struct {
-			Result map[string]interface{} `json:"result"`
-		}
-		json.Unmarshal(respBody, &result)
-		if result.Result != nil {
-			return result.Result, nil
-		}
-		time.Sleep(2 * time.Second)
+		sponsor := types.Address(gethcrypto.PubkeyToAddress(sponsorKey.PublicKey))
+		frame.Frames[0].Flags = 2
+		frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &sponsor, Limits: types.FrameGasLimits{Execution: 4000, State: 183600}})
+		keys = append(keys, sponsorKey)
 	}
-	return nil, fmt.Errorf("timeout waiting for receipt")
+	frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: opts.execution, State: opts.state}, Value: value, Data: data})
+	var sidecar *types.BlobSidecarData
+	if opts.blob != "" {
+		blob, err := os.ReadFile(opts.blob)
+		if err != nil {
+			return nil, err
+		}
+		if len(blob) != types.FrameBytesPerBlob {
+			return nil, errors.New("blob must be exactly 131072 bytes")
+		}
+		kzg := bls.DefaultKZGBackend()
+		commitment, err := kzg.BlobToCommitment(blob)
+		if err != nil {
+			return nil, err
+		}
+		_, proofs, err := kzg.ComputeCellsAndProofs(blob)
+		if err != nil {
+			return nil, err
+		}
+		hash := sha256.Sum256(commitment[:])
+		hash[0] = 1
+		frame.BlobVersionedHashes = []types.Hash{types.Hash(hash)}
+		sidecar = &types.BlobSidecarData{Blobs: [][]byte{blob}, Commitments: [][]byte{commitment[:]}}
+		for _, proof := range proofs {
+			sidecar.Proofs = append(sidecar.Proofs, bytes.Clone(proof[:]))
+		}
+	}
+	frame.Signatures = make([]types.FrameSignature, len(keys))
+	for i, key := range keys {
+		frame.Signatures[i] = types.FrameSignature{Scheme: types.FrameSignatureSecp256k1, Signature: make([]byte, 65)}
+		address := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
+		if address != sender {
+			frame.Signatures[i].Signer = &address
+		}
+	}
+	budget, err := frame.GasBudget()
+	if err != nil {
+		return nil, err
+	}
+	price := new(big.Int).Add(new(big.Int).Mul(baseFee, big.NewInt(2)), frame.Fees.MaxPriorityFeePerGas)
+	frame.Fees.MaxFee.Mul(new(big.Int).SetUint64(budget.MaxGas), price)
+	frame.Fees.MaxFee.Add(frame.Fees.MaxFee, new(big.Int).Mul(new(big.Int).SetUint64(uint64(len(frame.BlobVersionedHashes))*131072*2), blobFee))
+	hash, err := frame.SigningHash()
+	if err != nil {
+		return nil, err
+	}
+	for i, key := range keys {
+		sig, err := gethcrypto.Sign(hash[:], key)
+		if err != nil {
+			return nil, err
+		}
+		frame.Signatures[i].Signature = append([]byte{sig[64]}, sig[:64]...)
+	}
+	if err := frame.Validate(); err != nil {
+		return nil, err
+	}
+	tx := types.NewTransaction(frame)
+	tx.SetBlobSidecar(sidecar)
+	return tx, nil
 }
 
-func mustHex(s string) []byte {
-	b, err := hex.DecodeString(s)
+func run(opts options) error {
+	key, err := keyFromHex(opts.key)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return b
+	sender := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
+	rpc := rpcClient{url: opts.rpc, client: http.Client{Timeout: 10 * time.Second}}
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+	defer cancel()
+	var chainText, nonceText string
+	if err := rpc.call(ctx, "eth_chainId", &chainText); err != nil {
+		return err
+	}
+	if err := rpc.call(ctx, "eth_getTransactionCount", &nonceText, sender.Hex(), "latest"); err != nil {
+		return err
+	}
+	chainID, err := quantity(chainText)
+	if err != nil {
+		return err
+	}
+	nonce, err := quantity(nonceText)
+	if err != nil || !nonce.IsUint64() {
+		return errors.New("invalid RPC nonce")
+	}
+	var head struct {
+		BaseFee       string `json:"baseFeePerGas"`
+		ExcessBlobGas string `json:"excessBlobGas"`
+	}
+	if err := rpc.call(ctx, "eth_getBlockByNumber", &head, "latest", false); err != nil {
+		return err
+	}
+	base, err := quantity(head.BaseFee)
+	if err != nil {
+		return err
+	}
+	blobFee := big.NewInt(1)
+	if head.ExcessBlobGas != "" {
+		excess, err := quantity(head.ExcessBlobGas)
+		if err != nil || !excess.IsUint64() {
+			return errors.New("invalid excess blob gas")
+		}
+		blobFee = gas.CalcBlobBaseFee(excess.Uint64())
+	}
+	tx, err := makeFrame(opts, chainID, nonce.Uint64(), base, blobFee)
+	if err != nil {
+		return err
+	}
+	raw, err := types.EncodePooledTransaction(tx)
+	if err != nil {
+		return err
+	}
+	report := map[string]any{"transaction": tx.Hash().Hex(), "sender": sender.Hex(), "raw": "0x" + hex.EncodeToString(raw)}
+	if opts.dry {
+		return json.NewEncoder(os.Stdout).Encode(report)
+	}
+	var hash string
+	if err := rpc.call(ctx, "eth_sendRawTransaction", &hash, report["raw"]); err != nil {
+		return err
+	}
+	if !strings.EqualFold(hash, tx.Hash().Hex()) {
+		return errors.New("RPC returned a different transaction hash")
+	}
+	for {
+		var receipt map[string]any
+		if err := rpc.call(ctx, "eth_getTransactionReceipt", &receipt, hash); err != nil {
+			return err
+		}
+		if receipt != nil {
+			if receipt["type"] != "0x6" || receipt["status"] != "0x1" {
+				return fmt.Errorf("unexpected Frame receipt: %v", receipt)
+			}
+			report["receipt"] = receipt
+			return json.NewEncoder(os.Stdout).Encode(report)
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(time.Second):
+		}
+	}
 }

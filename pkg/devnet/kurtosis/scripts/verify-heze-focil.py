@@ -60,7 +60,37 @@ def listen_for_lists(beacon, events):
         events.put(error)
 
 
-def verify(enclave, timeout):
+def frame_readback(execution, tx_hash):
+    receipt = rpc(execution, "eth_getTransactionReceipt", tx_hash)
+    if not receipt or receipt.get("type") != "0x6" or receipt.get("status") != "0x1":
+        raise ValueError("missing successful canonical Frame receipt")
+    frames = receipt.get("frameResults", [])
+    if len(frames) != 3 or any(frame["status"] != "0x1" for frame in frames):
+        raise ValueError("Frame execution did not complete all three frames")
+    if int(frames[2].get("stateGasUsed", "0x0"), 16) != 97920:
+        raise ValueError("Frame did not charge the expected new storage slot")
+    block = rpc(execution, "eth_getBlockByNumber", receipt["blockNumber"], False)
+    parent = hex(int(receipt["blockNumber"], 16) - 1)
+    sender = command("cast", "wallet", "address", "--private-key", FIXTURE_KEY)
+    payer = command("cast", "wallet", "address", "--private-key", "0x" + "0" * 63 + "2")
+    if receipt.get("payer", "").lower() != payer.lower():
+        raise ValueError("wrong Frame payer")
+    balances = {}
+    for name, address in (("sender", sender), ("payer", payer)):
+        balances[name] = [int(rpc(execution, "eth_getBalance", address, at), 16)
+                          for at in (parent, receipt["blockNumber"])]
+    expected_charge = int(receipt["gasUsed"], 16) * (int(block["baseFeePerGas"], 16) + 1000000000)
+    if balances["payer"][0] - balances["payer"][1] != expected_charge or balances["sender"][0] != balances["sender"][1]:
+        raise ValueError("Frame sponsor charge or sender balance mismatch")
+    storage = [rpc(execution, "eth_getStorageAt", "0x0000000000000000000000000000000000007100", "0x0", at)
+               for at in ("0x0", receipt["blockNumber"])]
+    if [int(value, 16) for value in storage] != [0, 1]:
+        raise ValueError("Frame historical state mismatch")
+    return {"receipt": receipt, "balances": balances, "storage": storage,
+            "state_root": block["stateRoot"], "payer_charge": str(expected_charge)}
+
+
+def verify(enclave, timeout, frame_tool=None):
     el = [endpoint(enclave, f"el-{i}-geth-lighthouse", "rpc") for i in (1, 2)]
     bn = [endpoint(enclave, f"cl-{i}-lighthouse-geth", "http") for i in (1, 2)]
     deadline = time.time() + timeout
@@ -121,13 +151,22 @@ def verify(enclave, timeout):
         if time.time() - (genesis + slot * seconds_per_slot) > seconds_per_slot / 4:
             continue
 
-        nonce = int(rpc(el[origin], "eth_getTransactionCount", sender, "latest"), 16)
-        raw = command(
-            "cast", "mktx", "--private-key", FIXTURE_KEY, "--chain", str(FIXTURE_CHAIN),
-            "--nonce", str(nonce), "--legacy", "--gas-limit", "21000", "--gas-price",
-            "10000000000", "--value", str(slot), RECIPIENT,
-        )
-        tx_hash = command("cast", "keccak", raw)
+        if frame_tool:
+            signed = json.loads(command(
+                str(frame_tool), "--rpc", el[origin], "--key", FIXTURE_KEY,
+                "--sponsor-key", "0x" + "0" * 63 + "2", "--to",
+                "0x0000000000000000000000000000000000007100", "--gas", "30000",
+                "--state-gas", "97920", "--dry-run",
+            ))
+            raw, tx_hash = signed["raw"], signed["transaction"]
+        else:
+            nonce = int(rpc(el[origin], "eth_getTransactionCount", sender, "latest"), 16)
+            raw = command(
+                "cast", "mktx", "--private-key", FIXTURE_KEY, "--chain", str(FIXTURE_CHAIN),
+                "--nonce", str(nonce), "--legacy", "--gas-limit", "21000", "--gas-price",
+                "10000000000", "--value", str(slot), RECIPIENT,
+            )
+            tx_hash = command("cast", "keccak", raw)
         assert_isolated()
         if rpc(el[target], "eth_getTransactionByHash", tx_hash) is not None:
             raise ValueError("the proposing EL already has the fixture transaction")
@@ -143,9 +182,13 @@ def verify(enclave, timeout):
             receipt = wait_for(proposer_receipt, min(deadline, genesis + (slot + 2) * seconds_per_slot + 1))
             block = fetch(bn[target] + f"/eth/v2/beacon/blocks/{slot + 1}")["data"]["message"]
         except (TimeoutError, OSError):
+            if frame_tool:
+                raise RuntimeError("Frame missed the selected FOCIL proposal")
             continue
         bid = block["body"]["signed_execution_payload_bid"]["message"]
         if receipt["blockHash"] != bid["block_hash"]:
+            if frame_tool:
+                raise RuntimeError("Frame appeared outside the selected FOCIL proposal")
             continue
 
         def matching_list():
@@ -176,12 +219,18 @@ def verify(enclave, timeout):
             return True
 
         wait_for(finalized_on_both_pairs, deadline, interval=seconds_per_slot)
-        print(json.dumps({
+        result = {
             "list_slot": slot, "proposal_slot": slot + 1, "proposer": proposers[slot + 1],
             "committee_el": origin + 1, "proposer_el": target + 1, "transaction": tx_hash,
             "block_hash": receipt["blockHash"], "finalized_on_both_pairs": True,
-        }))
-        return
+        }
+        if frame_tool:
+            readbacks = [frame_readback(node, tx_hash) for node in el]
+            if readbacks[0] != readbacks[1]:
+                raise ValueError("canonical Frame peers disagree on settlement or state")
+            result["frame"] = readbacks[0]
+        print(json.dumps(result))
+        return result
 
     raise TimeoutError("no ordinary transaction included through FOCIL")
 

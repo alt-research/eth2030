@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -103,4 +104,27 @@ func decodeFrame8141Receipt(payload []byte) (*Receipt, error) {
 	}
 	r.Bloom = LogsBloom(r.Logs)
 	return r, nil
+}
+
+// DeriveFrameFields8141 restores block-dependent RPC fields after disk readback.
+func (r *Receipt) DeriveFrameFields8141(tx *FrameTx8141, baseFee, blobBaseFee *big.Int) error {
+	budget, err := tx.GasBudget()
+	if err != nil {
+		return err
+	}
+	payment, err := tx.Payment(baseFee, blobBaseFee)
+	if err != nil {
+		return err
+	}
+	r.EffectiveGasPrice = payment.GasPrice()
+	execution := budget.Intrinsic
+	for _, frame := range r.FrameResults8141 {
+		execution += frame.GasUsed.Execution
+	}
+	r.BlockGasUsed = max(execution, budget.CalldataFloor)
+	r.BlobGasUsed = uint64(len(tx.BlobVersionedHashes)) * 131072
+	if r.BlobGasUsed > 0 {
+		r.BlobGasPrice = copyBigInt(blobBaseFee)
+	}
+	return nil
 }

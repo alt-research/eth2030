@@ -11,6 +11,7 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
 	coreconfig "github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	corevm "github.com/eth2030/eth2030/core/vm"
@@ -156,6 +157,17 @@ func calcBlockValue(block *types.Block, receipts []*types.Receipt, baseFee *big.
 			break
 		}
 		tx := txs[i]
+		if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+			excess := uint64(0)
+			if block.Header().ExcessBlobGas != nil {
+				excess = *block.Header().ExcessBlobGas
+			}
+			tip, err := types.FrameProposerTip(frame, receipt.GasUsed, baseFee, gas.CalcBlobBaseFee(excess))
+			if err == nil {
+				total.Add(total, tip)
+			}
+			continue
+		}
 
 		// Compute effective gas price.
 		effectivePrice := effectiveTipPerGas(tx, baseFee)

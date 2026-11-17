@@ -250,7 +250,8 @@ func TestSelectTransactionsForInclusionListSkipsBlobTransactions(t *testing.T) {
 	ordinary := makeILTx(0, 21000, big.NewInt(1e9), addr, big.NewInt(0))
 	blob := types.NewTransaction(&types.BlobTx{})
 	want := encodeTx(t, ordinary)
-	selected, size := SelectTransactionsForInclusionList([]*types.Transaction{nil, blob, ordinary}, MaxBytesPerInclusionList)
+	frame := types.NewTransaction(&types.FrameTx8141{BlobVersionedHashes: []types.Hash{{0: 1}}})
+	selected, size := SelectTransactionsForInclusionList([]*types.Transaction{nil, blob, frame, ordinary}, MaxBytesPerInclusionList)
 	if len(selected) != 1 || string(selected[0]) != string(want) || size != len(want) {
 		t.Fatalf("selected %x (%d bytes), want only %x", selected, size, want)
 	}

@@ -646,12 +646,8 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	isAmsterdam := bc.config != nil && bc.config.IsAmsterdam(header.Time)
 	for _, r := range receipts {
 		totalBlockGasUsed += r.BlockGasUsed
-		if isGlamsterdan && r.BlockGasUsed > 0 {
-			totalGasUsed += r.BlockGasUsed
-		} else {
-			totalGasUsed += r.GasUsed
-		}
 	}
+	totalGasUsed = types.BlockGasTotal(receipts, isGlamsterdan)
 	if header.GasUsed != totalGasUsed {
 		err := fmt.Errorf("%w: header=%d computed=%d", block.ErrInvalidGasUsedTotal, header.GasUsed, totalGasUsed)
 		blockchainLog.Warn("block_gas_mismatch",
@@ -2166,6 +2162,7 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 		return nil
 	}
 	// Restore derived fields not persisted in the consensus RLP encoding.
+	var logIndex uint
 	for i, r := range receipts {
 		r.BlockHash = hash
 		r.BlockNumber = new(big.Int).SetUint64(num)
@@ -2173,6 +2170,23 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 		if i < len(txs) {
 			tx := txs[i]
 			r.TxHash = tx.Hash()
+			if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+				headerBytes, err := rawdb.ReadHeader(bc.db, num, hash)
+				if err != nil {
+					return nil
+				}
+				header, err := types.DecodeHeaderRLP(headerBytes)
+				if err != nil {
+					return nil
+				}
+				blobFee := big.NewInt(1)
+				if header.ExcessBlobGas != nil {
+					blobFee = execution.CalcBlobBaseFee(*header.ExcessBlobGas)
+				}
+				if err := r.DeriveFrameFields8141(frame, header.BaseFee, blobFee); err != nil {
+					return nil
+				}
+			}
 			if tx.Type() == types.PQTransactionType {
 				// The private PQ envelope has a single fixed gas price.
 				r.EffectiveGasPrice = tx.GasPrice()
@@ -2183,12 +2197,13 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 		} else {
 			r.GasUsed = r.CumulativeGasUsed - receipts[i-1].CumulativeGasUsed
 		}
-		for j, log := range r.Logs {
+		for _, log := range r.Logs {
 			log.BlockHash = hash
 			log.BlockNumber = num
 			log.TxHash = r.TxHash
 			log.TxIndex = uint(i)
-			log.Index = uint(j)
+			log.Index = logIndex
+			logIndex++
 		}
 	}
 	return receipts

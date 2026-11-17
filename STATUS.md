@@ -1,3 +1,8 @@
+## Track 4 integration with master (2026-11-16)
+
+- Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.
+- The optional native consensus verifier resolves ML-DSA keys from its configured validator registry. Full Go tests, local build, vet, and targeted race tests passed during merge reconciliation.
+
 ## Bogotá follow-up review
 
 - Malformed FCU V5 attributes now use the Bogotá fork-choice path.
@@ -20,11 +25,6 @@
 - Engine, backend and chain package tests passed. The deferred Bogotá and
   Amsterdam HTTP restart tests passed with the race detector. The native
   CLI compiled. The Lighthouse paired and independent-EL gates remain open.
-
-## Track 4 integration with master (2026-11-16)
-
-- Track 4 block staging and canonical publication now use the shared execution validation and Engine forkchoice path. The block batch retains the binary overlay nodes and conversion cursor. Startup rebuilds missing validation markers for legacy canonical overlay history after replay and root checks.
-- The optional native consensus verifier resolves ML-DSA keys from its configured validator registry. Full Go tests, local build, vet, and targeted race tests passed during merge reconciliation.
 
 ## Track 4 integration and devnet verification (2026-11-16)
 

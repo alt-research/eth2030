@@ -55,6 +55,13 @@
   actual payer debit and proposer tip even when GASPRICE is only a lower bound.
   Public self-verify now requires the actual combined APPROVE scope, rather
   than treating separate successful scopes as a combined call.
+- Non-FCU head changes now supply fee/gas context during the locked pool
+  state reset, covering P2P insertion, asynchronous execution sync and native
+  fork choice. The stale-head admission regression passes without RecordBlock.
+- Draft [PR 61](https://github.com/alt-research/eth2030/pull/61) retains the
+  implementation and evidence. All owned runtime images and temporary test
+  binaries were removed after verification; Docker reports no running test
+  containers, enclave networks or engine containers.
 - Canonical-paymaster runtime/witness pinning and withdrawal accounting,
   fresh CL Frame history, service cutover and the remaining independent
   acceptance gates remain open.

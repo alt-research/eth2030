@@ -235,11 +235,13 @@
   "remaining_containers": [],
   "remaining_volumes": [],
   "enclave_removed": true,
-  "scope_note": "The verified execution runtime is 1c20e3c7. Later changes add regression/oracle coverage and enforce the public combined-approval scope; this trace uses a single combined approval.",
+  "scope_note": "The verified execution runtime is 1c20e3c7. Later changes add regression/oracle coverage, enforce the public combined-approval scope and update non-FCU pool reset fee context. This trace uses a single combined approval and normal FCU head updates.",
   "post_run_docker_audit": {
     "enclave_containers": [],
     "enclave_volumes": [],
     "enclave_networks": [],
     "engine_containers": []
-  }
+  },
+  "owned_runtime_images_removed_after_verification": true,
+  "temporary_test_binaries_removed": true
 }

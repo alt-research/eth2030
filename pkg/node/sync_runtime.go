@@ -64,7 +64,7 @@ func (n *Node) applyExecutionTarget(target syncbeacon.ExecutionTarget) error {
 		return err
 	}
 	n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
-	n.txPool.Reset(n.blockchain.State())
+	n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 	return nil
 }
 

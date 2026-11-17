@@ -608,7 +608,7 @@ func New(config *Config) (*Node, error) {
 	// Reset the tx pool after P2P block insertion to evict confirmed txs.
 	n.ethHandler.SetOnBlockInserted(func() {
 		n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
-		n.txPool.Reset(n.blockchain.State())
+		n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 	})
 
 	// Initialize P2P server with bootnodes, discovery port, and NAT.
@@ -898,7 +898,7 @@ func New(config *Config) (*Node, error) {
 		// Reset tx pool state views so pending/queued reflect the new chain tip.
 		if n.txPool != nil && n.blockchain != nil {
 			n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
-			n.txPool.Reset(n.blockchain.State())
+			n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 		}
 	})
 	n.fcStateManager.OnReorg(func(ev forkchoice.ReorgEvent) {

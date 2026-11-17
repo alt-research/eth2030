@@ -83,7 +83,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 	b.finalizedHash = fcState.FinalizedBlockHash
 	b.fcMu.Unlock()
 	b.node.TxPool().SetForkRules(bc.Config(), bc.CurrentBlock().Time())
-	b.node.TxPool().Reset(bc.State())
+	b.node.TxPool().Reset(bc.State(), headBlock.Header())
 	b.node.TxPool().RecordBlock(headBlock.Header(), headBlock.Transactions())
 	if oracle := b.node.GasOracle(); oracle != nil {
 		oracle.RecordBlock(headBlock.NumberU64(), headBlock.BaseFee(), ExtractBlockTips(headBlock.Transactions(), headBlock.BaseFee()))

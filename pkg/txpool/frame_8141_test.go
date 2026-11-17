@@ -297,3 +297,19 @@ func TestCanonicalFrame8141PoolRequiresOneCombinedApproval(t *testing.T) {
 		t.Fatal("rejected validation modified live state")
 	}
 }
+
+func TestCanonicalFrame8141ResetRefreshesHeadFeesWithoutFCU(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(tx); err != nil {
+		t.Fatal(err)
+	}
+	// P2P/native-consensus/asynchronous-sync head changes do not call RecordBlock.
+	pool.Reset(db, &types.Header{Number: big.NewInt(2), Time: 101, GasLimit: 30000000, BaseFee: big.NewInt(1000)})
+	if pool.Get(tx.Hash()) != nil {
+		t.Fatal("non-FCU head reset kept stale fee context")
+	}
+	if err := pool.AddRemote(tx); err == nil {
+		t.Fatal("admission used fees from before the state reset")
+	}
+}

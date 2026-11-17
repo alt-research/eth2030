@@ -268,6 +268,19 @@ func (pool *TxPool) RecordBlock(header *types.Header, txs []*types.Transaction) 
 		return
 	}
 	pool.mu.Lock()
+	if pool.updateHeadFeesLocked(header) {
+		pool.revalidateFrames8141()
+	}
+	pool.mu.Unlock()
+	pool.suggestor.RecordBlockFromHeader(header, txs)
+}
+
+// updateHeadFeesLocked updates fee context before revalidating the new state.
+// The caller holds pool.mu; Reset replaces state and fees in that same lock.
+func (pool *TxPool) updateHeadFeesLocked(header *types.Header) bool {
+	if header == nil {
+		return false
+	}
 	base := new(big.Int)
 	if header.BaseFee != nil {
 		base.Set(header.BaseFee)
@@ -279,11 +292,7 @@ func (pool *TxPool) RecordBlock(header *types.Header, txs []*types.Transaction) 
 	changed := pool.baseFee == nil || pool.baseFee.Cmp(base) != 0 || pool.blobBaseFee == nil || pool.blobBaseFee.Cmp(blob) != 0 || pool.config.BlockGasLimit != header.GasLimit
 	pool.baseFee, pool.blobBaseFee = base, blob
 	pool.config.BlockGasLimit = header.GasLimit
-	if changed {
-		pool.revalidateFrames8141()
-	}
-	pool.mu.Unlock()
-	pool.suggestor.RecordBlockFromHeader(header, txs)
+	return changed
 }
 
 // SetForkRules updates admission rules after a canonical head change.
@@ -1123,12 +1132,16 @@ func (pool *TxPool) QueuedCount() int {
 }
 
 // Reset removes all transactions with nonces below the current state nonces.
+// An optional head refreshes fee/gas context before Frame revalidation.
 // Called after a new block is processed.
-func (pool *TxPool) Reset(stateReader StateReader) {
+func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
 	pool.state = stateReader
+	if len(heads) > 0 {
+		pool.updateHeadFeesLocked(heads[0])
+	}
 	pool.revalidateFrames8141()
 
 	var totalConfirmed, totalDemoted int

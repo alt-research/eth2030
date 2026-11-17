@@ -13,7 +13,9 @@ implementation gaps and acceptance criteria.
 - [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
 - [x] Assign duplicate mainline features and experimental ETH2030 features to their implementation owners in the [feature-level dispositions](docs/devnet-fork-upstream-audit.md#feature-level-disposition).
 - [x] Record the [implementation PR sequence](docs/devnet-upstream-implementation-plan.md#pr-sequence), control pins, verification gates and per-profile promotion.
-- [ ] Freeze the capped control profiles, pinned inputs and verifiers in PR 1 of the [implementation plan](docs/devnet-upstream-implementation-plan.md).
+- [x] Freeze the capped Fulu control and verify finality, EL restart and enclave removal in [PR 1](docs/devnet-upstream-implementation-plan.md#1-freeze-the-control-and-make-failures-observable).
+- [x] Verify Gloas-at-genesis self-build and ordinary Heze compulsory inclusion on the merged clients, then remove both enclaves.
+- [ ] Run the scheduled Gloas, external builder, PTC and blob cases and the independent-client gates.
 - [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
 - [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
 - [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.
@@ -41,7 +43,7 @@ implementation gaps and acceptance criteria.
 - [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
 - [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
 - [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
-- [ ] Retain pending Bogotá inclusion-list inputs and evaluate them on deferred FCU validation in the EL.
+- [x] Implement and test pending Bogotá inclusion-list retention and deferred FCU validation through the native EL HTTP API.
 - [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
 - [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
 - [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
@@ -58,7 +60,7 @@ implementation gaps and acceptance criteria.
 - [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
 - [x] Check Frame blob commitment ordering through the CL historical payload verification path.
 - [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
-- [ ] Integrate upstream Lighthouse `1bcdcbfa0`, including `e723ca55f`, and rerun the Gloas light-client fork-boundary regression.
+- [x] Integrate upstream Lighthouse `1bcdcbfa0` on the staging branch and pass the Gloas light-client fork-boundary regression.
 - [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
 - [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
 - [ ] Verify Req/Resp recovery through alternate peers, partial responses and competing dependent roots.

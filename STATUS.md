@@ -1,3 +1,35 @@
+## Upstream adoption implementation (2026-11-17)
+
+- ETH2030 branch `feat/devnet-upstream-controls` at `9a52e0ae` records
+  the pinned Fulu control. Both pairs finalized the same execution block at
+  beacon slot 64. EL 2 reopened the original type-7 receipt and historical
+  storage. The controller removed its enclave and stopped its Kurtosis
+  engine, with zero remaining labeled containers and volumes.
+- Lighthouse staging branch `integrate/eth2030-upstream-1bcdcbfa` at
+  `bc56927f` passed `cargo check`, the Fulu-to-Gloas light-client regression,
+  and three Heze integration tests covering the proposer list snapshot,
+  the empty-head FCU ancestor, and verdict persistence. Its release build
+  produced `v8.4.0-rc.0-bc56927`, and the container reported that revision.
+- The ETH2030 native deferred-validation branch at `4b10a445` covers
+  missing-data SYNCING, off-canonical ACCEPTED, FileDB reopen before and
+  after FCU, and replacement of the submitted view. The native CLI built,
+  and the Amsterdam and Bogotá HTTP tests passed with the race detector.
+  Integration branch `b7944602` also passed the pinned Frame codec tests.
+- The paired `bc56927f` and `b7944602` images verified the same self-built
+  Gloas-at-genesis envelope, execution state, slot and BAL at slot 4.
+  The Heze control later finalized a transaction delivered from EL 1's
+  isolated mempool through its slot 64 list and EL 2's slot 65 proposal.
+  The Fulu, Gloas and Heze control evidence is on `929870c9`. Each
+  enclave was removed before starting the next. The independent deferred
+  EL gate remains open.
+- Upstream Spamoor `f0f83695` passes its Frame codec tests and matches the
+  ETH2030 base-envelopes' RLP and signing hash. Its scalar nonce upper
+  boundary still differs. The upstream Go codec's inclusion-list JSON
+  cases pass on its declared Go 1.25.2. Its released SSZ path decoded live
+  Gloas slot 32 and rejected the retained ETH2030 Heze slot 64 state.
+  The old Heze schema remains pinned for Dora. Service cutover,
+  pinned Frame execution and the newer package remain open.
+
 ## Devnet upstream adoption implementation plan (2026-11-17)
 
 - The [implementation plan](docs/devnet-upstream-implementation-plan.md)

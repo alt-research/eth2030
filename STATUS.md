@@ -1,3 +1,16 @@
+## Next-stage planning snapshot (2026-11-17)
+
+- The [next-stage work plan](docs/next-stage-work-plan.md) records upstream
+  ETH2030 master at `ad35748f`, the pushed integration branches, and the
+  exact binary revisions used for past live evidence.
+- Read-only merge simulation of Lighthouse `413541ba` and upstream
+  `3777cfd7` found a conflict in the FCU verdict area of
+  `beacon_chain.rs`. The plan scopes that reconciliation and the next
+  Gloas column regression.
+- P0 covers package review, patched-pair qualification and pinned Frame
+  execution. Independent Track 3 late join, moving-pivot recovery and
+  ordinary service adoption have parallel gates.
+
 ## Follow-up review of the upstream integration
 
 - ETH2030 `db91e7ef` closes the malformed-attributes and background

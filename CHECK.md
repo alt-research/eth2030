@@ -1,5 +1,16 @@
 # Lean4 Verification Check-list
 
+## Next-stage promotion (2026-11-17)
+
+See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
+state, review scope and independent-client gates.
+
+- [ ] Prepare the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
+- [ ] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
+- [ ] Rebuild and qualify the patched EL/CL pair before promotion.
+- [ ] Finish the pinned Frame transition and run its live receipt and history gates.
+- [ ] Run the Track 3 independent late-join control and continue authenticated moving-pivot recovery.
+
 ## Consensus Client Follow-up (2026-11-16)
 
 See the [Lighthouse and Hegotá implementation plan](docs/lighthouse-hegota-implementation-plan.md)

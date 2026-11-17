@@ -11,6 +11,9 @@ defines the original protocol contracts. The [CL gap audit](lighthouse-cl-gap-au
 records the existing regressions and live evidence. This plan defines the PR
 order, source changes and acceptance required to move the devnet profiles.
 
+The [next-stage work plan](next-stage-work-plan.md) records progress beyond
+these initial pins and the remaining release gates.
+
 ## Starting revisions
 
 | Work | Starting point |

@@ -1,0 +1,14 @@
+{
+  "eip_revision": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+  "source": "assets/eip-8141/CanonicalPaymaster.sol",
+  "compiler": "0.8.38+commit.1835d247.Linux.g++",
+  "command": [
+    "solc",
+    "--via-ir",
+    "--optimize",
+    "--bin-runtime",
+    "CanonicalPaymaster.sol"
+  ],
+  "exit_code": 1,
+  "diagnostics": "Error: Function \"verbatim_0i_1o\" not found.\n   --> CanonicalPaymaster.sol:103:24:\n    |\n103 |             sigHash := verbatim_0i_1o(hex\"6008b0\")\n    |                        ^^^^^^^^^^^^^^\n\nError: Variable count for assignment to \"sigHash\" does not match number of values (1 vs. 0)\n   --> CanonicalPaymaster.sol:103:13:\n    |\n103 |             sigHash := verbatim_0i_1o(hex\"6008b0\")\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nError: Function \"verbatim_0i_0o\" not found.\n   --> CanonicalPaymaster.sol:111:13:\n    |\n111 |             verbatim_0i_0o(hex\"600160006000aa\")\n    |             ^^^^^^^^^^^^^^\n\n"
+}

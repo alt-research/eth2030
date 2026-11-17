@@ -518,3 +518,51 @@ func TestCanonicalFrame8141BinaryOverlayAndTransactionOriginalSlots(t *testing.T
 		}
 	}
 }
+
+func TestCanonicalFrame8141DeployPrefixConsumesCurrentSenderNonce(t *testing.T) {
+	tx, db, cfg, header := frameExecutionFixture(t)
+	factory := types.Address{19: 0x90}
+	sender := types.Address(gethcrypto.CreateAddress([20]byte(factory), 0))
+	db.AddBalance(sender, big.NewInt(1000000000))
+	db.SetCode(factory, []byte{0x36, 0x5f, 0x5f, 0x37, 0x36, 0x5f, 0x5f, 0xf0, 0x50, 0})
+	// A deliberately permissionless fixture verifier: PUSH1 3 PUSH0 PUSH0 APPROVE.
+	init := []byte{0x64, 0x60, 3, 0x5f, 0x5f, 0xaa, 0x5f, 0x52, 0x60, 5, 0x60, 27, 0xf3}
+	tx.Sender = sender
+	tx.Frames = []types.Frame8141{
+		{Mode: types.ModeDefault, Target: &factory, Data: init, Limits: types.FrameGasLimits{Execution: 30000, State: 7650}},
+		{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000}},
+	}
+	transaction := types.NewTransaction(tx)
+	if _, err := ValidateFrame8141Prefix(cfg, db, header, transaction, big.NewInt(1)); err != nil {
+		t.Fatalf("valid deploy prefix: %v", err)
+	}
+	if db.GetNonce(sender) != 0 || db.GetCodeSize(sender) != 0 {
+		t.Fatal("prefix simulation modified live deployment state")
+	}
+	receipt, _, err := ApplyTransaction(cfg, db, header, transaction, new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// CREATE initializes the contract nonce to 1; APPROVE increments that value.
+	if db.GetNonce(sender) != 2 || receipt.FrameResults8141[0].GasUsed.State != 7650 || db.GetCodeSize(sender) != 5 {
+		t.Fatalf("deployment/approval nonce or state charge: nonce=%d, receipt=%+v", db.GetNonce(sender), receipt)
+	}
+}
+
+func TestCanonicalFrame8141ApprovalCannotWrapNonceAfterDefaultCalls(t *testing.T) {
+	tx, db, cfg, header := frameExecutionFixture(t)
+	tx.Nonce = ^uint64(0) - 2
+	db.SetNonce(tx.Sender, tx.Nonce)
+	// Two ordinary creations consume the last two available creator nonces.
+	code := []byte{0x5f, 0x5f, 0x5f, 0xf0, 0x50, 0x5f, 0x5f, 0x5f, 0xf0, 0x50, 0x60, 3, 0x5f, 0x5f, 0xaa}
+	db.SetCode(tx.Sender, code)
+	tx.Frames = []types.Frame8141{{Mode: types.ModeDefault, Flags: 3, Limits: types.FrameGasLimits{Execution: 50000, State: 367200}}}
+	root := db.GetRoot()
+	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
+	if _, _, err := ApplyTransaction(cfg, db, header, signFrameExecution(t, tx, false), gp); err == nil {
+		t.Fatal("approval lowered or wrapped the current sender nonce")
+	}
+	if db.GetRoot() != root || gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit {
+		t.Fatal("failed payment approval retained effects")
+	}
+}

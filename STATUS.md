@@ -35,6 +35,15 @@
   now uses the production batch verifier, with a valid proof deliberately
   assigned to the wrong final cell as a rejection case. The updated image
   and retained signed-list trace are next.
+- EL `6d10283d` repeated the finalized sponsored Frame control with the raw
+  transaction, original signed list, dependent root and payload bid retained.
+  Both peers agreed on settlement and restart readback. Its enclave, labeled
+  containers and volumes were removed and the engine stopped.
+- A real CREATE deploy-prefix regression exposed an approval nonce rewrite:
+  payment approval must increment the current account nonce after deployment,
+  rather than reset it from the signed transaction nonce. Deployment and
+  overflow rollback regressions now pass. This final consensus corner-case
+  fix is being qualified separately from the retained `6d10283d` runtime.
 - Canonical-paymaster runtime/witness pinning and withdrawal accounting,
   fresh CL Frame history, service cutover and the remaining independent
   acceptance gates remain open.

@@ -37,7 +37,11 @@ freeze a compiler, compiler settings or deployed runtime for the required exact
 code match. The reference also places a signature of the canonical signing hash
 in frame calldata, even though that calldata is itself committed by the signing
 hash; bespoke witnesses must instead use ARBITRARY signature entries under the
-same EIP. Its inline `verbatim` operations require a compatible compilation path.
+same EIP. A local `solc 0.8.38+commit.1835d247` invocation with
+`--via-ir --optimize --bin-runtime` rejected both inline `verbatim` calls as
+unknown functions; the [compiler evidence](verification/frame-8141-canonical-paymaster-compile.json)
+retains the command and diagnostics. A compatible compilation path and a
+consistent witness convention must be frozen before granting the exception.
 
 No arbitrary contract is granted the canonical-paymaster exception. Coded
 sponsors use the generic validation trace and the one-pending non-canonical
@@ -49,7 +53,7 @@ canonical exception remain an explicit promotion gate.
 
 Behavioral regressions exercise real EVM bytecode and inspect state, gas,
 receipts, logs and balances. They cover sponsorship, sender-account creation,
-code deposit, state exhaustion, cross-frame refills, nested/delegate approvals,
+code deposit, state exhaustion, cross-frame refills, deployed-sender nonce increments and overflow rollback, nested/delegate approvals,
 atomic rollback, introspection, transient isolation, signature restrictions,
 public-prefix simulation, replacement and exposure release. Cross-transaction slot originals and canonical receipts are checked on both memory and binary-overlay state backends.
 

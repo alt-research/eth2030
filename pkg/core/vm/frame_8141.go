@@ -163,7 +163,11 @@ func (evm *EVM) approve8141(target types.Address, scope uint64) error {
 				return err
 			}
 		}
-		evm.StateDB.SetNonce(f.Tx.Sender, f.Tx.Nonce+1)
+		nonce := evm.StateDB.GetNonce(f.Tx.Sender)
+		if nonce == ^uint64(0) {
+			return errors.New("Frame sender nonce overflow")
+		}
+		evm.StateDB.SetNonce(f.Tx.Sender, nonce+1)
 		evm.StateDB.SubBalance(target, f.Payment.Escrow())
 		payer := target
 		f.Payer = &payer

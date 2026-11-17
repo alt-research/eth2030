@@ -12,6 +12,8 @@ implementation gaps and acceptance criteria.
 - [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
 - [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
 - [x] Assign duplicate mainline features and experimental ETH2030 features to their implementation owners in the [feature-level dispositions](docs/devnet-fork-upstream-audit.md#feature-level-disposition).
+- [x] Record the [implementation PR sequence](docs/devnet-upstream-implementation-plan.md#pr-sequence), control pins, verification gates and per-profile promotion.
+- [ ] Freeze the capped control profiles, pinned inputs and verifiers in PR 1 of the [implementation plan](docs/devnet-upstream-implementation-plan.md).
 - [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
 - [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
 - [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.

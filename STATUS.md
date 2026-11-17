@@ -1,3 +1,13 @@
+## Devnet upstream adoption implementation plan (2026-11-17)
+
+- The [implementation plan](docs/devnet-upstream-implementation-plan.md)
+  maps the audit to eight PR groups with source pins, code entry points,
+  verification and per-profile promotion conditions.
+- The native Bogotá work distinguishes the missing-data `SYNCING` path
+  from staging an eligible off-canonical `ACCEPTED` payload and completing
+  its verdict through FCU. The plan also separates upstream image swaps from
+  Heze/Frame execution, Dora migration and package qualification.
+
 ## Devnet fork implementation ownership (2026-11-17)
 
 - The [feature-level disposition](docs/devnet-fork-upstream-audit.md#feature-level-disposition)

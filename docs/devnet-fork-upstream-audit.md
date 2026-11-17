@@ -248,6 +248,9 @@ on the EL Frame state transition. [Profile inventory](devnet-third-party-invento
 
 ## Orchestration and rollout order
 
+The [implementation plan](devnet-upstream-implementation-plan.md) gives the
+PR sequence, code entry points and required evidence for each profile.
+
 The newer ethereum-package pin defaults to genesis generator `6.2.9` and
 upstream Dora, Spamoor and Assertoor `:master` tags. It removes the
 Heze-specific Quick Slots setting. In the package's local and shadow-fork

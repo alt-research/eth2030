@@ -142,6 +142,9 @@ Each feature has a `scripts/features/verify-<feature>.sh` script that performs f
 
 ## ethpandaops Tools
 
+See the [devnet service inventory](../../../docs/devnet-third-party-inventory.md)
+for maintained fork revisions, profile selections, and verified uses.
+
 | Tool | Description |
 |------|-------------|
 | **Assertoor** | Automated test runner — stability, block proposals, transactions, blobs |

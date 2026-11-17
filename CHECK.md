@@ -9,6 +9,7 @@ The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the audited revision
 implementation gaps and acceptance criteria.
 
 - [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
+- [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
 - [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
 - [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
 - [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.

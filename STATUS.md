@@ -1,3 +1,15 @@
+## Devnet third-party inventory (2026-11-17)
+
+- The [devnet service inventory](docs/devnet-third-party-inventory.md) records the
+  maintained forks, nested source pins, upstream image services, profile choices and
+  prior run evidence. The checks covered 51 tracked profiles and the companion Heze
+  fixture.
+- Compared the Dora and Spamoor fork refs with the images selected by older profiles.
+  The two `v0.0.1` local tags lack a registry digest and a source revision label.
+- Documented the Assertoor quick-run result boundary and the dependency on the
+  fork-specific genesis generator. The verification used existing checkouts, images and
+  recorded results.
+
 ## Lighthouse CL gap audit (2026-11-17)
 
 - The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the published Lighthouse

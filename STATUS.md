@@ -1,3 +1,11 @@
+## ETH2030 PR readiness review (2026-11-17)
+
+- Upstream master is `ad35748f` with zero open upstream PRs at the
+  review snapshot. The [PR readiness review](docs/next-stage-work-plan.md#pr-readiness-on-the-current-eth2030-master)
+  identifies the Bogotá branch for direct review, scopes the devnet
+  controls to a 14-file delta on the Bogotá base, and records the
+  documentation candidate and Frame integration dependency.
+
 ## Next-stage planning snapshot (2026-11-17)
 
 - The [next-stage work plan](docs/next-stage-work-plan.md) records upstream

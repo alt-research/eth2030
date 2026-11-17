@@ -27,6 +27,34 @@ preparing the next review branches.
 
 ## P0.1 · Package the fixes and qualify the patched pair
 
+### PR readiness on the current ETH2030 master
+
+Checked 15 upstream, 34 fork and 32 local branch refs against
+`ad35748f`. GitHub listed 51 historical PRs and zero open upstream PRs.
+Prepare the following reviews in this order.
+
+| Review | Current head and readiness |
+| --- | --- |
+| Native Bogotá | `fyInALT:feat/bogota-deferred-validation` at `db91e7ef` is seven commits ahead and zero behind master. It can be submitted to master for review. The patched EL/CL live run and independent EL gate still need results before promotion. |
+| Devnet controls | Prepare a scoped branch from the Bogotá review base. The full control branch inherits the Frame codec. A temporary-index three-way application of the control delta `e628c770..2239039e` onto `db91e7ef` succeeded for 14 files with `CHECK.md` and `STATUS.md` excluded. Reconcile tracking entries separately. Applying the entire delta to master conflicts in the devnet README. Target master once the Bogotá dependency is present. |
+| Roadmap and review notes | The documentation branch has a clean apply to current master. The plan update `fb510fde` is local, beyond the pushed `82646274` head inspected in this audit. Publish the selected documentation head before opening a separate PR. Coordinate the devnet README edit with the controls review. |
+
+The older `feat/bogota-inclusion-list-wire` is an ancestor of
+`db91e7ef`. The Frame branch adds codecs and caps. The Frame integration
+branch combines this work with Bogotá for devnet evaluation. Stage the
+next Frame implementation review after reviewing the Bogotá base and
+keep the seven-field execution and pool-admission gates visible in it.
+
+Historical branches need no additional whole-branch PR. Track 1–4 and the
+recent website work have merged PRs. The fork's `feat/fix-cpu` has 19
+patches equivalent to master, and the local package-split variant has 54.
+The fork `feat/add-more-scripts` is the exact head covered by merged PR
+#3. The older upstream script variants, EIP-7701 development branches,
+binary-tree/VM prototype and local DAS split belong to their historical
+or research scope. The local `feat/node-args` can be reviewed for specific
+preset behavior where a current regression demonstrates a need.
+[PR history][pr-history]
+
 Prepare four review units.
 
 | Review unit | Scope and dependency |
@@ -155,3 +183,4 @@ lists EIP-8025 as declined for that fork. [Strawmap][strawmap] · [Hegotá sched
 [binary]: https://eips.ethereum.org/EIPS/eip-7864
 [witness]: https://eips.ethereum.org/EIPS/eip-4762
 [strawmap]: https://strawmap.org/
+[pr-history]: https://github.com/alt-research/eth2030/pulls?q=is%3Apr

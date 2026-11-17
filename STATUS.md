@@ -1,3 +1,14 @@
+## Devnet fork implementation ownership (2026-11-17)
+
+- The [feature-level disposition](docs/devnet-fork-upstream-audit.md#feature-level-disposition)
+  assigns overlapping released and maintained-mainline features to upstream
+  implementations. For experimental features it specifies the ETH2030 owner,
+  matching upstream architecture, local behavior to carry and retirement gate.
+- Lighthouse unstable moved to `1bcdcbfa0`. Its builder configuration and
+  metric changes leave the Heze implementation decisions in place. The audit
+  also records the two independent inclusion-list reads in the experimental
+  producer and the shared snapshot required by the ETH2030 self-build path.
+
 ## Devnet fork and upstream adoption audit (2026-11-17)
 
 - The [upstream adoption audit](docs/devnet-fork-upstream-audit.md) pins Lighthouse

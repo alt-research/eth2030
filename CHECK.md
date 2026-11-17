@@ -11,6 +11,7 @@ implementation gaps and acceptance criteria.
 - [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
 - [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
 - [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
+- [x] Assign duplicate mainline features and experimental ETH2030 features to their implementation owners in the [feature-level dispositions](docs/devnet-fork-upstream-audit.md#feature-level-disposition).
 - [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
 - [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
 - [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.
@@ -55,7 +56,7 @@ implementation gaps and acceptance criteria.
 - [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
 - [x] Check Frame blob commitment ordering through the CL historical payload verification path.
 - [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
-- [ ] Integrate upstream Lighthouse `e723ca55f` and rerun the Gloas light-client fork-boundary regression.
+- [ ] Integrate upstream Lighthouse `1bcdcbfa0`, including `e723ca55f`, and rerun the Gloas light-client fork-boundary regression.
 - [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
 - [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
 - [ ] Verify Req/Resp recovery through alternate peers, partial responses and competing dependent roots.

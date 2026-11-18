@@ -1,3 +1,7 @@
+## Sparse blob relay implementation (2026-11-19)
+
+Active work on isolated `feat/glamsterdam-eth72`, based on qualified development composition `1efbd03a`. Existing production full-data validation remains the promotion gate. EIP-8070 table omission of request IDs is resolved by formal devp2p file `a23dc172` and merged Geth PR 35428: flat correlated request/response fields. Provider/sampler/custody and actual cell consumers remain under implementation, not qualified by existing sparse helper names.
+
 ## Snap version 2 composed regression (2026-11-19)
 
 At source `13969eaf`, feature reviews 65–81 compose successfully: all 211 Go packages, 27 tagged Core/EIP packages, affected race/vet and build pass, including five encrypted Node snap/2 scenarios. Repeated identical tracker sections are removed. [Evidence](docs/verification/glamsterdam-snap2-integration-20261119.md). Final gas, eth/72 and complete CL/multiclient/release qualification remain open.

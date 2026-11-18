@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## eth version 72 sparse blob relay (2026-11-19)
+
+- [ ] Pin full EIP-8070/7594 and devp2p schemas plus Geth merged flat request-id fix.
+- [ ] Add actual negotiated version 72 announcements, elided pooled metadata and correlated cell exchange.
+- [ ] Stage signed sparse metadata/cells under resource bounds; authenticate every cell and reconstruct before ordinary pool promotion.
+- [ ] Wire provider/sampler selection, two-provider threshold, custody plus random extra, custody expansion and eager building.
+- [ ] Consume actual FCU custody updates and implement getBlobsV4 cell/proof readback.
+- [ ] Verify encrypted SDK/Node consumers, invalid/unrequested data, recovery and independent reconstruction; build/test/mutate and publish a separate PR.
+
 ## snap/2 BAL state catch-up (2026-11-18)
 
 - [x] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.

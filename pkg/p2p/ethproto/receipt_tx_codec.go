@@ -88,9 +88,9 @@ func (p *ReceiptsPacket) DecodeRLP(data []byte) error {
 	p.RequestID, p.Receipts = packet.ID, pages
 	return nil
 }
-func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
-	packet := wireReceipts70{ID: p.RequestID, Incomplete: p.LastBlockIncomplete, Pages: make([][]gethrlp.RawValue, len(p.Receipts))}
-	for i, page := range p.Receipts {
+func encodeModernReceiptPages(pages [][]*types.Receipt) ([][]gethrlp.RawValue, error) {
+	out := make([][]gethrlp.RawValue, len(pages))
+	for i, page := range pages {
 		for _, receipt := range page {
 			if receipt == nil {
 				return nil, fmt.Errorf("nil receipt")
@@ -109,7 +109,7 @@ func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
 				if err != nil {
 					return nil, err
 				}
-				packet.Pages[i] = append(packet.Pages[i], raw)
+				out[i] = append(out[i], raw)
 				continue
 			}
 			item := wireReceipt70{Type: receipt.Type, CumulativeGas: receipt.CumulativeGasUsed}
@@ -132,33 +132,29 @@ func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			packet.Pages[i] = append(packet.Pages[i], encoded)
+			out[i] = append(out[i], encoded)
 		}
 	}
-	return gethrlp.EncodeToBytes(packet)
+	return out, nil
 }
-func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
-	var packet wireReceipts70
-	if err := gethrlp.DecodeBytes(data, &packet); err != nil {
-		return err
-	}
-	pages := make([][]*types.Receipt, len(packet.Pages))
-	for i, page := range packet.Pages {
+func decodeModernReceiptPages(rawPages [][]gethrlp.RawValue) ([][]*types.Receipt, error) {
+	pages := make([][]*types.Receipt, len(rawPages))
+	for i, page := range rawPages {
 		for _, raw := range page {
 			var fields []gethrlp.RawValue
 			if err := gethrlp.DecodeBytes(raw, &fields); err != nil {
-				return err
+				return nil, err
 			}
 			if len(fields) == 4 && len(fields[0]) == 1 && fields[0][0] == types.FrameTxType {
 				var payer types.Address
 				if gethrlp.DecodeBytes(fields[2], &payer) == nil {
 					encoded, err := gethrlp.EncodeToBytes(fields[1:])
 					if err != nil {
-						return err
+						return nil, err
 					}
 					receipt, err := types.DecodeReceiptRLP(append([]byte{types.FrameTxType}, encoded...))
 					if err != nil {
-						return err
+						return nil, err
 					}
 					pages[i] = append(pages[i], receipt)
 					continue
@@ -166,12 +162,12 @@ func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
 			}
 			var item wireReceipt70
 			if err := gethrlp.DecodeBytes(raw, &item); err != nil {
-				return err
+				return nil, err
 			}
 			receipt := &types.Receipt{Type: item.Type, CumulativeGasUsed: item.CumulativeGas}
 			var status []byte
 			if err := gethrlp.DecodeBytes(item.State, &status); err != nil {
-				return err
+				return nil, err
 			}
 			switch {
 			case len(status) == 0:
@@ -180,7 +176,7 @@ func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
 			case len(status) == 32:
 				receipt.PostState = status
 			default:
-				return fmt.Errorf("invalid receipt status")
+				return nil, fmt.Errorf("invalid receipt status")
 			}
 			for _, log := range item.Logs {
 				receipt.Logs = append(receipt.Logs, &types.Log{Address: log.Address, Topics: log.Topics, Data: log.Data})
@@ -189,8 +185,7 @@ func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
 			pages[i] = append(pages[i], receipt)
 		}
 	}
-	p.RequestID, p.LastBlockIncomplete, p.Receipts = packet.ID, packet.Incomplete, pages
-	return nil
+	return pages, nil
 }
 
 type wirePooledTransactions struct {
@@ -239,5 +234,50 @@ func (p *PooledTransactionsPacket) DecodeRLP(data []byte) error {
 		}
 		p.Transactions = append(p.Transactions, tx)
 	}
+	return nil
+}
+
+// ReceiptsPacketV69 removes bloom filters without the eth/70 pagination flag.
+type ReceiptsPacketV69 struct {
+	RequestID uint64
+	Receipts  [][]*types.Receipt
+}
+
+func (p ReceiptsPacketV69) EncodeRLP() ([]byte, error) {
+	pages, err := encodeModernReceiptPages(p.Receipts)
+	if err != nil {
+		return nil, err
+	}
+	return gethrlp.EncodeToBytes(wireReceipts{p.RequestID, pages})
+}
+func (p *ReceiptsPacketV69) DecodeRLP(data []byte) error {
+	var packet wireReceipts
+	if err := gethrlp.DecodeBytes(data, &packet); err != nil {
+		return err
+	}
+	pages, err := decodeModernReceiptPages(packet.Pages)
+	if err != nil {
+		return err
+	}
+	p.RequestID, p.Receipts = packet.ID, pages
+	return nil
+}
+func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
+	pages, err := encodeModernReceiptPages(p.Receipts)
+	if err != nil {
+		return nil, err
+	}
+	return gethrlp.EncodeToBytes(wireReceipts70{p.RequestID, p.LastBlockIncomplete, pages})
+}
+func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
+	var packet wireReceipts70
+	if err := gethrlp.DecodeBytes(data, &packet); err != nil {
+		return err
+	}
+	pages, err := decodeModernReceiptPages(packet.Pages)
+	if err != nil {
+		return err
+	}
+	p.RequestID, p.LastBlockIncomplete, p.Receipts = packet.ID, packet.Incomplete, pages
 	return nil
 }

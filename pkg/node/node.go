@@ -601,12 +601,13 @@ func New(config *Config) (*Node, error) {
 		n.snapHandler = p2psnap.NewServerHandler(newSnapStateBackend(bc, n.db))
 	}
 
-	// Initialize ETH/68 protocol handler for block and transaction exchange.
+	// Initialize negotiated ETH/68-71 block and transaction exchange.
 	n.ethHandler = eth.NewHandler(bc, n.txPool, config.NetworkID)
 	n.ethHandler.SetForkchoiceControlled(true)
 
 	// Reset the tx pool after P2P block insertion to evict confirmed txs.
 	n.ethHandler.SetOnBlockInserted(func() {
+		n.ethHandler.NotifyBlockRange()
 		n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
 		n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 	})
@@ -625,7 +626,7 @@ func New(config *Config) (*Node, error) {
 		BootstrapNodes: config.Bootnodes,
 		DiscoveryPort:  config.EffectiveDiscoveryPort(),
 		NAT:            config.NAT,
-		Protocols:      []p2p.Protocol{n.ethHandler.Protocol(), n.snapHandler.Protocol()},
+		Protocols:      append(n.ethHandler.Protocols(), n.snapHandler.Protocol()),
 	}
 	if n.nativeConsensus != nil {
 		p2pCfg.Protocols = append(p2pCfg.Protocols, n.nativeProtocol())

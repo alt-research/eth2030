@@ -1,3 +1,11 @@
+## Glamsterdam eth/69-71 production protocols
+
+- [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
+- [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.
+- [x] Register negotiated versions, implement status/range and version-aware receipt serving.
+- [x] Correlate and validate received BALs before restoring verified historical data.
+- [x] Verify affected network/chain/node/consumer paths and race/build; prepare the separate feature review.
+
 # Lean4 Verification Check-list
 
 - [x] Inspect the production HTTP/backend route and merged execution-apis #950 semantics.

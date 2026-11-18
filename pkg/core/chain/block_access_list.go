@@ -36,3 +36,20 @@ func (bc *Blockchain) BlockAccessList(hash types.Hash) ([]byte, error) {
 	}
 	return encoded, nil
 }
+
+// StoreBlockAccessListRLP restores historical BAL data only for a locally
+// execution-validated block and only when it matches that block's commitment.
+func (bc *Blockchain) StoreBlockAccessListRLP(hash types.Hash, encoded []byte) error {
+	block := bc.GetBlock(hash)
+	if block == nil || !bc.HasValidatedBlock(hash) {
+		return fmt.Errorf("BAL target is not execution-validated")
+	}
+	expected := block.Header().BlockAccessListHash
+	if expected == nil || crypto.Keccak256Hash(encoded) != *expected {
+		return fmt.Errorf("received block access list hash mismatch")
+	}
+	if err := bc.db.Put(blockAccessListKey(hash), append([]byte(nil), encoded...)); err != nil {
+		return storageFailure(err)
+	}
+	return nil
+}

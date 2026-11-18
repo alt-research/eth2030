@@ -123,6 +123,10 @@ func canonicalFrameThroughEngineAndRestart(t *testing.T, nonce uint64) {
 	if len(envelope.ExecutionPayload.Transactions) != 1 {
 		t.Fatal("Frame was not built from the inclusion list")
 	}
+	var expectedBAL string
+	if err := json.Unmarshal(envelope.ExecutionPayload.BlockAccessList, &expectedBAL); err != nil {
+		t.Fatal(err)
+	}
 	for _, rpc := range []track4RPC{source, destination} {
 		var status bogotaIntegrationStatus
 		rpc.call(t, "engine_newPayloadV6", &status, envelope.ExecutionPayload, []types.Hash{}, beacon, envelope.ExecutionRequests, []string{rawHex})
@@ -154,6 +158,32 @@ func canonicalFrameThroughEngineAndRestart(t *testing.T, nonce uint64) {
 		rpc.call(t, "eth_getTransactionCount", &count, addresses[0].Hex(), receipt["blockNumber"])
 		if count != fmt.Sprintf("0x%x", nonce+1) {
 			t.Fatalf("wrong persisted post-approval nonce: %s", count)
+		}
+		for _, version := range []string{"V1", "V2"} {
+			for _, byHash := range []bool{true, false} {
+				var bodies []map[string]any
+				if byHash {
+					rpc.call(t, "engine_getPayloadBodiesByHash"+version, &bodies, []types.Hash{envelope.ExecutionPayload.BlockHash, {31: 0xff}})
+					if len(bodies) != 2 || bodies[1] != nil {
+						t.Fatal("payload body lookup lost the unknown-hash position")
+					}
+				} else {
+					rpc.call(t, "engine_getPayloadBodiesByRange"+version, &bodies, "0x1", "0x1")
+				}
+				if len(bodies) == 0 || bodies[0] == nil {
+					t.Fatal("historical Frame body missing")
+				}
+				transactions, ok := bodies[0]["transactions"].([]any)
+				if !ok || len(transactions) != 1 || transactions[0] != rawHex {
+					t.Fatalf("historical transactions must retain exact hex DATA: %+v", bodies[0])
+				}
+				if version == "V2" && bodies[0]["blockAccessList"] != expectedBAL {
+					t.Fatal("historical body lost the original execution-validated RLP BAL")
+				}
+				if withdrawals, ok := bodies[0]["withdrawals"].([]any); !ok || len(withdrawals) != 0 {
+					t.Fatal("post-Shanghai empty withdrawals must remain an array")
+				}
+			}
 		}
 		return receipt
 	}

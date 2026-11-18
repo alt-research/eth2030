@@ -27,7 +27,7 @@ func (api *EngineAPI) GetPayloadBodiesByHashV1(hashes []types.Hash) ([]*Executio
 
 // GetPayloadBodiesByRangeV1 returns payload bodies for a range of block numbers (Shanghai).
 func (api *EngineAPI) GetPayloadBodiesByRangeV1(start, count uint64) ([]*ExecutionPayloadBodyV1, error) {
-	v2s, err := api.GetPayloadBodiesByRangeV2(start, count)
+	v2s, err := api.GetPayloadBodiesByRangeV2(uint64(start), uint64(count))
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +37,9 @@ func (api *EngineAPI) GetPayloadBodiesByRangeV1(start, count uint64) ([]*Executi
 // GetPayloadBodiesByHashV2 returns payload bodies for the given block hashes,
 // including the Block Access List per EIP-7928 §engine-api.
 func (api *EngineAPI) GetPayloadBodiesByHashV2(hashes []types.Hash) ([]*ExecutionPayloadBodyV2, error) {
+	if len(hashes) > 1024 {
+		return nil, ErrTooLargeRequest
+	}
 	pb, ok := api.backend.(backendapi.PayloadBodiesBackend)
 	if !ok {
 		return nil, fmt.Errorf("payload bodies not supported by this backend")
@@ -47,8 +50,11 @@ func (api *EngineAPI) GetPayloadBodiesByHashV2(hashes []types.Hash) ([]*Executio
 // GetPayloadBodiesByRangeV2 returns payload bodies for a range of block numbers,
 // including the Block Access List per EIP-7928 §engine-api.
 func (api *EngineAPI) GetPayloadBodiesByRangeV2(start, count uint64) ([]*ExecutionPayloadBodyV2, error) {
-	if count == 0 || count > 1024 {
-		return nil, fmt.Errorf("count must be in [1, 1024], got %d", count)
+	if count == 0 {
+		return nil, ErrInvalidParams
+	}
+	if count > 1024 {
+		return nil, ErrTooLargeRequest
 	}
 	pb, ok := api.backend.(backendapi.PayloadBodiesBackend)
 	if !ok {
@@ -84,14 +90,17 @@ func (api *EngineAPI) handleGetPayloadBodiesByRangeV2(params []json.RawMessage) 
 	if len(params) != 2 {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected 2 params"}
 	}
-	var start, count uint64
+	var start, count flexibleUint64
 	if err := json.Unmarshal(params[0], &start); err != nil {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: fmt.Sprintf("invalid start: %v", err)}
 	}
 	if err := json.Unmarshal(params[1], &count); err != nil {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: fmt.Sprintf("invalid count: %v", err)}
 	}
-	result, err := api.GetPayloadBodiesByRangeV2(start, count)
+	if start == 0 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "start must be at least 1"}
+	}
+	result, err := api.GetPayloadBodiesByRangeV2(uint64(start), uint64(count))
 	if err != nil {
 		return nil, engineErrorToRPC(err)
 	}
@@ -119,14 +128,17 @@ func (api *EngineAPI) handleGetPayloadBodiesByRangeV1(params []json.RawMessage) 
 	if len(params) != 2 {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected 2 params"}
 	}
-	var start, count uint64
+	var start, count flexibleUint64
 	if err := json.Unmarshal(params[0], &start); err != nil {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: fmt.Sprintf("invalid start: %v", err)}
 	}
 	if err := json.Unmarshal(params[1], &count); err != nil {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: fmt.Sprintf("invalid count: %v", err)}
 	}
-	result, err := api.GetPayloadBodiesByRangeV1(start, count)
+	if start == 0 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "start must be at least 1"}
+	}
+	result, err := api.GetPayloadBodiesByRangeV1(uint64(start), uint64(count))
 	if err != nil {
 		return nil, engineErrorToRPC(err)
 	}

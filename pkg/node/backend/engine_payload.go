@@ -295,12 +295,24 @@ func (b *EngineBackend) GetPayloadBodiesByHash(hashes []types.Hash) ([]*payload.
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(h)
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }
 
 // GetPayloadBodiesByRange returns payload bodies for a range of block numbers.
 func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload.ExecutionPayloadBodyV2, error) {
+	head := b.node.Blockchain().CurrentBlock().NumberU64()
+	if start > head {
+		return []*payload.ExecutionPayloadBodyV2{}, nil
+	}
+	if remaining := head - start; count > remaining && count-remaining > 1 {
+		count = remaining + 1
+	}
 	results := make([]*payload.ExecutionPayloadBodyV2, count)
 	for i := uint64(0); i < count; i++ {
 		num := start + i
@@ -310,6 +322,11 @@ func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(blk.Hash())
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }

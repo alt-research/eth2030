@@ -56,8 +56,8 @@ func TestGetPayloadBodiesByHashV2_GenesisBlock(t *testing.T) {
 	if body.Transactions == nil {
 		t.Error("Transactions must be non-nil slice")
 	}
-	if body.Withdrawals == nil {
-		t.Error("Withdrawals must be non-nil slice")
+	if body.Withdrawals != nil {
+		t.Error("pre-Shanghai withdrawals must be nil")
 	}
 }
 
@@ -107,8 +107,8 @@ func TestGetPayloadBodiesByRangeV2_MaxCount(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetPayloadBodiesByRangeV2(0, 1024): %v", err)
 	}
-	if uint64(len(results)) != 1024 {
-		t.Errorf("want 1024 results, got %d", len(results))
+	if len(results) != 1 {
+		t.Errorf("trailing unknown heights must be trimmed, got %d bodies", len(results))
 	}
 }
 
@@ -222,8 +222,8 @@ func ptrAddress(addr types.Address) *types.Address {
 func TestHandleGetPayloadBodiesByRangeV2_Handler(t *testing.T) {
 	api, _ := makePayloadBodiesAPI(t)
 
-	startJSON, _ := json.Marshal(uint64(0))
-	countJSON, _ := json.Marshal(uint64(1))
+	startJSON := json.RawMessage(`"0x1"`)
+	countJSON := json.RawMessage(`"0x1"`)
 	params := []json.RawMessage{startJSON, countJSON}
 
 	result, rpcErr := api.handleGetPayloadBodiesByRangeV2(params)
@@ -232,6 +232,34 @@ func TestHandleGetPayloadBodiesByRangeV2_Handler(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestPayloadBodyRangeWireBounds(t *testing.T) {
+	api, _ := makePayloadBodiesAPI(t)
+	for _, handler := range []func([]json.RawMessage) (any, *jsonrpcError){api.handleGetPayloadBodiesByRangeV1, api.handleGetPayloadBodiesByRangeV2} {
+		for _, tc := range []struct {
+			start, count string
+			code         int
+		}{
+			{`"0x0"`, `"0x1"`, InvalidParamsCode},
+			{`"0x1"`, `"0x0"`, InvalidParamsCode},
+			{`"0x1"`, `"0x401"`, TooLargeRequestCode},
+			{`"0x10000000000000000"`, `"0x1"`, InvalidParamsCode},
+		} {
+			_, err := handler([]json.RawMessage{json.RawMessage(tc.start), json.RawMessage(tc.count)})
+			if err == nil || err.Code != tc.code {
+				t.Fatalf("range %s %s: want code %d, got %+v", tc.start, tc.count, tc.code, err)
+			}
+		}
+		result, err := handler([]json.RawMessage{json.RawMessage(`"0xffffffffffffffff"`), json.RawMessage(`"0x400"`)})
+		if err != nil {
+			t.Fatalf("beyond-head range overflowed: %+v", err)
+		}
+		encoded, marshalErr := json.Marshal(result)
+		if marshalErr != nil || string(encoded) != "[]" {
+			t.Fatalf("beyond-head range must be empty: %s %v", encoded, marshalErr)
+		}
 	}
 }
 
@@ -298,8 +326,8 @@ func TestBlockToPayloadBodyV2_EmptyBlock(t *testing.T) {
 	if body.Transactions == nil {
 		t.Error("Transactions must be non-nil")
 	}
-	if body.Withdrawals == nil {
-		t.Error("Withdrawals must be non-nil")
+	if body.Withdrawals != nil {
+		t.Error("pre-Shanghai withdrawals must be nil")
 	}
 	if body.BlockAccessList != nil {
 		t.Error("BlockAccessList should be nil for no BAL")

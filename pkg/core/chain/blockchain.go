@@ -805,6 +805,15 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	if err := writeValidatedBlock(batch, blk, receipts); err != nil {
 		return storageFailure(err)
 	}
+	if header.BlockAccessListHash != nil && result.BlockAccessList != nil {
+		encoded, err := result.BlockAccessList.EncodeRLP()
+		if err != nil {
+			return err
+		}
+		if err := batch.Put(blockAccessListKey(hash), encoded); err != nil {
+			return storageFailure(err)
+		}
+	}
 	if overlay, ok := statedb.(*state.BinaryOverlayState); ok {
 		if err := writeOverlayCheckpoint(bc.db, batch, blk, overlay); err != nil {
 			return storageFailure(err)

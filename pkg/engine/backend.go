@@ -440,12 +440,12 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 	results := make([]*enginepayload.ExecutionPayloadBodyV2, len(hashes))
 	for i, h := range hashes {
 		block, found := b.blocks[h]
-		if !found || !rawdb.IsBALRetained(headNum, block.NumberU64()) {
+		if !found {
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok {
-			balBytes, _ := json.Marshal(blockBAL)
+		if blockBAL, ok := b.bals[h]; ok && rawdb.IsBALRetained(headNum, block.NumberU64()) {
+			balBytes, _ := blockBAL.EncodeRLP()
 			body.BlockAccessList = balBytes
 		}
 		results[i] = body
@@ -464,12 +464,19 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 		headNum = head.NumberU64()
 	}
 
+	if start > headNum {
+		return []*enginepayload.ExecutionPayloadBodyV2{}
+	}
+	if remaining := headNum - start; count > remaining && count-remaining > 1 {
+		count = remaining + 1
+	}
+
 	canonical := make(map[uint64]types.Hash, count)
 	if head, ok := b.blocks[headHash]; ok {
 		minNum := start
 		for cur := head; cur != nil && cur.NumberU64() >= minNum; {
 			num := cur.NumberU64()
-			if num >= start && num < start+count {
+			if num >= start && num-start < count {
 				canonical[num] = cur.Hash()
 				if len(canonical) == int(count) {
 					break
@@ -512,12 +519,12 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			)
 		}
 		block, ok := b.blocks[hash]
-		if !ok || !rawdb.IsBALRetained(headNum, num) {
+		if !ok {
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok {
-			balBytes, _ := json.Marshal(blockBAL)
+		if blockBAL, ok := b.bals[hash]; ok && rawdb.IsBALRetained(headNum, num) {
+			balBytes, _ := blockBAL.EncodeRLP()
 			body.BlockAccessList = balBytes
 		}
 		results[i] = body

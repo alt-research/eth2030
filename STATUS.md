@@ -1,3 +1,23 @@
+## Historical Engine payload bodies (2026-11-18)
+
+- The fresh CL control exposed actual historical serving failures after the
+  source CL pruned its payload cache: base64 transaction DATA and absent BALs
+  prevented envelope reconstruction, so range sync stalled at the checkpoint.
+- Payload-body V1/V2 now use hex DATA, correct pre-Shanghai null withdrawals,
+  an explicit nullable V2 BAL and hex range quantities. Ranges reject invalid
+  bounds with the specified errors, preserve unavailable internal positions
+  and trim heights past the canonical head without uint64 overflow.
+- Native chain validation stores the reconstructed RLP BAL atomically with the
+  validated block. Historical lookup checks its header commitment and retains
+  the execution body when BAL data is absent/pruned. Native hash/range V1/V2
+  HTTP regressions compare original transaction and BAL bytes on both nodes and
+  after FileDB reopen, at nonce zero and the final valid scalar nonce.
+- The separate Engine backend now returns RLP BALs and preserves historical
+  transaction bodies beyond its BAL-retention window. Corrupt stored BAL data
+  is rejected by a real build/import/storage regression.
+- The failed observer run cleaned all enclave resources and stopped its engine;
+  a rebuilt runtime must pass the same fresh-CL control before closing history.
+
 ## Frame upper nonce boundary (2026-11-18)
 
 - Reproduced public admission rejecting the last valid scalar nonce

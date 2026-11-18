@@ -39,6 +39,7 @@ type advancingSnapBackend struct {
 	oldCalls        atomic.Uint64
 	newCalls        atomic.Uint64
 	pointCalls      atomic.Uint64
+	contractPoints  atomic.Uint64
 	restores        atomic.Uint64
 	partialStorage  bool
 	storageResumes  atomic.Uint64
@@ -64,6 +65,9 @@ func (b *advancingSnapBackend) AccountIterator(root, origin types.Hash, fn func(
 	// Corrupt only the contract point query. Subsequent bulk proofs stay valid,
 	// so their independent range guard cannot mask a bypassed point guard.
 	b.corruptPoint.Store(b.corruptProof && root != b.oldRoot && origin == b.contract)
+	if root != b.oldRoot && origin == b.contract {
+		b.contractPoints.Add(1)
+	}
 	if root == b.oldRoot {
 		b.oldCalls.Add(1)
 		if b.stale.Load() {
@@ -107,7 +111,7 @@ func (b *advancingSnapBackend) StorageIterator(root, account types.Hash, origin 
 }
 
 func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
-	for _, scenario := range []string{"moving-partial", "moving-partial-storage", "reorg-partial-storage", "missing-orphan", "corrupt-new-proof"} {
+	for _, scenario := range []string{"moving-partial", "moving-partial-storage", "reorg-partial-storage", "missing-orphan", "corrupt-new-proof", "moving-unchanged-storage", "unchanged-storage-bad-point"} {
 		t.Run(scenario, func(t *testing.T) {
 			key, err := gethcrypto.HexToECDSA(strings.Repeat("11", 32))
 			if err != nil {
@@ -124,7 +128,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			alloc := genesis["alloc"].(map[string]any)
 			alloc[sender.Hex()] = map[string]string{"balance": "100000000000000000000"}
 			alloc[contract.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x6020355f355500", "storage": map[string]string{"0x00": "0x05"}}
-			if scenario == "moving-partial-storage" {
+			if scenario == "moving-partial-storage" || scenario == "moving-unchanged-storage" || scenario == "unchanged-storage-bad-point" {
 				alloc[contract.Hex()].(map[string]any)["storage"] = map[string]string{"0x00": "0x05", "0x06": "0x06", "0x07": "0x07"}
 			}
 			data, err := json.Marshal(genesis)
@@ -173,6 +177,8 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			var latest *types.Block
 			if scenario == "moving-partial" || scenario == "corrupt-new-proof" {
 				latest = build(old, 1, 1, 20, 24)
+			} else if scenario == "moving-unchanged-storage" || scenario == "unchanged-storage-bad-point" {
+				latest = build(old, 1, 0, 10, 24)
 			} else if scenario == "moving-partial-storage" {
 				latest = build(old, 1, 5, 20, 24)
 			} else {
@@ -185,7 +191,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			backend := &advancingSnapBackend{snapStateBackend: newSnapStateBackend(source.blockchain, source.db), oldRoot: old.Root(), contract: crypto.Keccak256Hash(contract[:]), onStorage: scenario != "moving-partial" && scenario != "corrupt-new-proof", partialStorage: scenario == "moving-partial-storage", corruptProof: scenario == "corrupt-new-proof"}
+			backend := &advancingSnapBackend{snapStateBackend: newSnapStateBackend(source.blockchain, source.db), oldRoot: old.Root(), contract: crypto.Keccak256Hash(contract[:]), onStorage: scenario != "moving-partial" && scenario != "corrupt-new-proof", partialStorage: scenario == "moving-partial-storage" || scenario == "moving-unchanged-storage" || scenario == "unchanged-storage-bad-point", corruptProof: scenario == "corrupt-new-proof" || scenario == "unchanged-storage-bad-point"}
 			backend.advance = func() {
 				target.executionSync.Request(syncbeacon.ExecutionTarget{Head: latest.Hash(), Finalized: latest.Hash()})
 			}
@@ -209,7 +215,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 			defer cancel()
 			adopted, err := target.syncFinalizedPivot(ctx, old)
-			if scenario == "corrupt-new-proof" {
+			if scenario == "corrupt-new-proof" || scenario == "unchanged-storage-bad-point" {
 				if err == nil || !strings.Contains(err.Error(), "proof") || adopted || target.blockchain.CurrentBlock().NumberU64() != 0 {
 					t.Fatalf("unverified rebase adopted: %t %v", adopted, err)
 				}
@@ -225,6 +231,12 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 				t.Fatal("wrong CL-selected pivot adopted")
 			}
 			want0, want1 := byte(10), byte(20)
+			if scenario == "moving-unchanged-storage" {
+				want1 = 0
+				if backend.contractPoints.Load() == 0 {
+					t.Fatal("unchanged storage account was not authenticated at new root")
+				}
+			}
 			if scenario == "reorg-partial-storage" || scenario == "missing-orphan" {
 				want0, want1 = 5, 30
 			}
@@ -236,7 +248,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			if st.GetState(contract, types.Hash{}) != (types.Hash{31: want0}) || st.GetState(contract, wantSlot) != (types.Hash{31: want1}) {
 				t.Fatalf("old-fork storage leaked: 0=%s 1=%s", st.GetState(contract, types.Hash{}), st.GetState(contract, types.Hash{31: 1}))
 			}
-			if scenario == "moving-partial-storage" && (backend.storageResumes.Load() == 0 || backend.storageRestarts.Load() != 0 || st.GetState(contract, types.Hash{31: 6}) != (types.Hash{31: 6}) || st.GetState(contract, types.Hash{31: 7}) != (types.Hash{31: 7})) {
+			if (scenario == "moving-partial-storage" || scenario == "moving-unchanged-storage") && (backend.storageResumes.Load() == 0 || backend.storageRestarts.Load() != 0 || st.GetState(contract, types.Hash{31: 6}) != (types.Hash{31: 6}) || st.GetState(contract, types.Hash{31: 7}) != (types.Hash{31: 7})) {
 				t.Fatalf("partial storage cursor/suffix: resumes=%d restarts=%d slot6=%s slot7=%s", backend.storageResumes.Load(), backend.storageRestarts.Load(), st.GetState(contract, types.Hash{31: 6}), st.GetState(contract, types.Hash{31: 7}))
 			}
 			if scenario != "moving-partial" && st.GetState(contract, types.Hash{31: 2}) != (types.Hash{}) {

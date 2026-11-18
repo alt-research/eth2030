@@ -11,6 +11,7 @@ import (
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/log"
 	"github.com/eth2030/eth2030/metrics"
@@ -617,11 +618,26 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 		return ErrGasLimit
 	}
 
-	// RLP size limit enforcement: reject transactions exceeding 128KB encoded size.
-	if rlpBytes, err := tx.EncodeRLP(); err == nil {
-		if len(rlpBytes) > MaxTxSize {
-			return ErrOversizedRLP
+	// EIP-3860/7954 creation input is a consensus limit, separate from
+	// the local encoded-envelope policy. A 128 KiB initcode needs room
+	// for the signed transaction envelope after Glamsterdam.
+	maxEncodedSize := MaxTxSize
+	if tx.To() == nil {
+		shanghai := pool.config.IsPrague || pool.config.IsGlamsterdan ||
+			(pool.frameConfig != nil && pool.frameConfig.IsShanghai(pool.frameTime))
+		if shanghai {
+			limit := vm.MaxInitCodeSize
+			if pool.config.IsGlamsterdan {
+				limit = vm.MaxInitCodeSizeGlamsterdam
+				maxEncodedSize = 2 * MaxTxSize
+			}
+			if len(tx.Data()) > limit {
+				return vm.ErrMaxInitCodeSizeExceeded
+			}
 		}
+	}
+	if rlpBytes, err := tx.EncodeRLP(); err == nil && len(rlpBytes) > maxEncodedSize {
+		return ErrOversizedRLP
 	}
 
 	// Data size check (max 128KB).

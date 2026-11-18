@@ -1141,6 +1141,18 @@ func intrinsicGasGlamst(data []byte, isCreate bool, hasValue bool, toExists bool
 // when non-nil, the tracker is injected into the EVM so opcodes record
 // storage reads, storage changes, and address touches during execution.
 func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	// EIP-3860/7954: oversized creation input invalidates the transaction,
+	// before fees, nonce or the block gas pool are changed.
+	if msg.To == nil && config != nil && config.IsShanghai(header.Time) {
+		limit := vm.MaxInitCodeSize
+		if config.IsGlamsterdan(header.Time) {
+			limit = vm.MaxInitCodeSizeGlamsterdam
+		}
+		if len(msg.Data) > limit {
+			return nil, fmt.Errorf("%w: size %d, limit %d", vm.ErrMaxInitCodeSizeExceeded, len(msg.Data), limit)
+		}
+	}
+
 	// Create EVM
 	blockCtx := vm.BlockContext{
 		GetHash:     getHash,

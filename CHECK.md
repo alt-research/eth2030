@@ -8,6 +8,13 @@
 
 # Lean4 Verification Check-list
 
+## Glamsterdam combined feature qualification (2026-11-18)
+
+- [ ] Merge only the isolated Glamsterdam review branches into a local integration branch.
+- [ ] Resolve owned overlapping changes and retain every verification boundary.
+- [ ] Run the combined Go suite, tagged integration tests, build and affected race/vet checks.
+- [ ] Record exact branch heads, review links and remaining program gates without claiming release completion.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

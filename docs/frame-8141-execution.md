@@ -72,16 +72,19 @@ STATUS.md after execution.
 
 ## Remaining promotion gates
 
-- Qualify the frozen paymaster v1 candidate on live traffic and align its runtime/witness ABI with independent clients.
-- The sponsored FOCIL/finality/restart gate passed on EL `1c20e3c7` and
-  Lighthouse `a05a56de`; see the [retained wire and settlement evidence](verification/frame-8141-20261118-final.json).
-  Fresh CL historical backfill remains a separate gate.
-- Exercise blob commitment ordering and Frame historical backfill through a fresh
-  CL, including an independent compatible execution source.
-- Qualify upstream workload/explorer consumers against the signed envelope and
-  RPC fields before retiring the maintained service modifications.
-- Keep the independent-client, state-sync, external-builder/PTC and remaining Heze
-  gates in [the next-stage plan](next-stage-work-plan.md) open until measured.
+- Agree the frozen paymaster runtime/witness ABI with independent clients.
+  ETH2030's experimental v1 candidate passed coded live traffic.
+- The finalized sponsored/blob, fresh CL historical-envelope and receiver
+  restart controls passed on EL `e0451092` and Lighthouse `a4ceb86e`; see the
+  [final paired evidence](verification/frame-8141-20261118-paymaster-history-final.json).
+  The new CL shares a synchronized EL. Independent EL late join and independent
+  execution-client agreement remain separate qualifications.
+- Wire the upstream-shaped codec candidate into the workload/explorer consumers
+  and qualify their actual epoch/restart paths before retiring maintained forks.
+- Keep independent state sync, external-builder/PTC, skipped-slot checkpoint
+  variants and the remaining profiles in the [next-stage plan](next-stage-work-plan.md)
+  open until measured. The dated failure records below explain the repaired
+  blockers; they do not override the final qualified run.
 
 ## Independent-client revision audit (2026-11-18)
 
@@ -176,3 +179,23 @@ parent (a debug node at anchor slot 224 requested its missing slot-223 parent).
 The Heze `get_forkchoice_store` specification initializes the trusted anchor's
 IL satisfaction to true. This is a separate Lighthouse bootstrap repair; source
 history serving success does not establish fresh CL acceptance.
+
+### Final qualified coded/blob history control
+
+EL `e0451092` and Lighthouse `a4ceb86e` finalized the coded sponsored Frame at
+slot 66 and blob Frame at slot 165.
+A new validator-free CL joined at slot 256, then returned
+both original finalized envelopes with exact raw Frame hashes and matching
+Beacon/execution roots and commitments. The receiver's real restart preserved
+both workloads' historical receipts, storage and sponsor settlement. Runtime
+identities, caps, source version and complete resource removal are retained in
+the [final record](verification/frame-8141-20261118-paymaster-history-final.json).
+This establishes the paired native control; independent EL/client and service
+promotion remain governed by the gates above.
+
+The compatible CL runtime recipe is committed as
+[`lighthouse-runtime.Dockerfile`](../pkg/devnet/kurtosis/scripts/lighthouse-runtime.Dockerfile).
+The pinned package supplies the VC executable explicitly, so the image has no
+entrypoint. Both the actual binary and image reported `a4ceb86`; the worktree
+Git-version cache regression is fixed in that CL revision. Published Lighthouse
+`eth2030` includes the qualified code and its tracking record.

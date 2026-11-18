@@ -2,7 +2,10 @@
 > executes the pinned envelope through native state transition, admission,
 > networking, Engine and restart paths. See the
 > [execution record](frame-8141-execution.md) for verified behavior and the
-> remaining promotion gates. The dated review snapshots below retain their
+> remaining promotion gates. The coded-paymaster/blob control now passed fresh
+> CL historical-envelope readback and receiver restart on EL `e0451092` /
+> Lighthouse `a4ceb86e`; independent EL and service promotion are separate.
+> The dated review snapshots below retain their
 > original revisions and evidence boundaries.
 
 # ETH2030 next-stage work plan

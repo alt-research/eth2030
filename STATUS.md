@@ -1,3 +1,27 @@
+## Qualified paymaster, blob and fresh CL history (2026-11-18)
+
+- Native EL `e0451092` and Lighthouse `a4ceb86e` passed the complete capped
+  control. Coded sponsorship finalized through signed FOCIL at slot
+  66; the blob Frame finalized at slot 165.
+- A validator-free CL with a new database joined at slot 256,
+  checkpoint-synced and returned both original finalized historical envelopes.
+  Raw transaction identities, Beacon roots, execution hashes and ordered blob
+  commitments matched the source. It shares the synchronized second EL.
+- Actual receiver restart preserved sponsored readback and the original blob
+  receipt, parent/post application storage and both paymaster balances. The
+  [final record](docs/verification/frame-8141-20261118-paymaster-history-final.json)
+  retains runtime/image identities, source versions, resource caps and cleanup.
+- The owned enclave, containers and volumes were removed and its engine stopped.
+  Seven owned runtime images and temporary binaries/contexts were also removed.
+  Native Go tests/build/vet/race, real consensus SSZ/block replay, twelve Python
+  controls, Heze regressions, Git-version cache tests, cargo check and full lint
+  passed. The CI matrix has seven required jobs; the final review head is
+  checked after publishing the retained evidence.
+- Remaining promotion gates: independent-client/runtime ABI agreement,
+  independent EL late join/state sync, Dora's production epoch consumer and
+  service restart, external-builder/PTC and other separately planned profiles.
+  Earlier entries below retain intermediate runs and their explicit failures.
+
 ## Qualified CL runtime packaging (2026-11-18)
 
 - The new runtime reports `a4ceb86`, including the checkpoint and worktree-version
@@ -184,9 +208,9 @@
   implementation and evidence. All owned runtime images and temporary test
   binaries were removed after verification; Docker reports no running test
   containers, enclave networks or engine containers.
-- Canonical-paymaster runtime/witness pinning and withdrawal accounting,
-  fresh CL Frame history, service cutover and the remaining independent
-  acceptance gates remain open.
+- The later paymaster/history follow-up qualifies the local runtime, withdrawal
+  accounting and fresh CL control. Formal cross-client agreement and service
+  cutover remain separate promotion gates.
 
 ## ETH2030 PR readiness review (2026-11-17)
 

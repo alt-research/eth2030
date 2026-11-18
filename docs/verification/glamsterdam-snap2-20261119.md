@@ -50,3 +50,13 @@ This qualifies native Node moving-pivot/reorg/restart behavior and independent S
 ## Explicit socket lifecycle follow up
 
 The manually started P2P servers now have explicit test cleanup, and the receiver server is stopped before closing/reopening its Node database. This is required because the test does not invoke full Node.Start; Node.Stop's not-running path does not own an independently started server. All five real Node scenarios pass again under race, with affected vet and local build. The production protocol behavior is unchanged.
+
+## Unchanged account proof binding follow up
+
+A new real encrypted scenario exposed a missing production consumer step: a moving-pivot proof adapter has a fresh account-root cache, but a partially downloaded storage account can be absent from BAL state changes because its leaf is unchanged. The scheduler correctly preserved its cursor while `RequestStorageRange` rejected the unauthenticated root. The red result is retained in `/tmp/glamsterdam-snap2-unchanged-red.log` (`storage account not verified`).
+
+The verified storage consumer now fetches an exact account inclusion/absence proof at the requested pivot when that root binding is absent, then checks the proof-bound storage root before requesting storage. An old adapter cannot change its already bound pivot. No local snapshot value is trusted as an account proof, and final snapshot/root/CL adoption guards remain intact.
+
+Two added actual Node scenarios preserve a nonzero storage cursor and untouched suffix through an unchanged leaf, and reject damaged proofs for precisely that unchanged leaf before checkpoint/adoption. The corrupt case retains correct leaf values and later range proofs, so final-root failure cannot mask a missing point guard. Together with the original cases, all seven encrypted scenarios pass. Disabling the new lookup breaks the valid scenario; bypassing point verification wrongly adopts the corrupt scenario and fails its assertion. All source mutations are restored.
+
+Full Go and tagged Core/EIP suites, affected snap/scheduler/Node race/vet and build pass after this repair. Logs: `/tmp/glamsterdam-snap2-unchanged-{green,all,tagged,race}.log` and the two added mutation logs. This follow-up extends the original five-scenario qualification; full independent-client cold sync and mainnet resource gates remain open.

@@ -22,6 +22,13 @@ The merged LIFO rules are the explicit versioned development baseline. Final rel
 
 - [x] Publish the independent feature review as PR 82; composed qualification is tracked separately.
 
+## snap version 2 unchanged storage account proof binding (2026-11-19)
+
+- [x] Reproduce a moving pivot with partial storage whose account body/storage root is unchanged.
+- [x] Authenticate that account against the fresh pivot before using its storage root.
+- [x] Reject a damaged proof for that unchanged account without checkpoint/adoption.
+- [x] Qualify all encrypted Node scenarios, affected race/vet/build and update PR 81.
+
 ## snap/2 BAL state catch-up (2026-11-18)
 
 - [x] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.

@@ -1,5 +1,12 @@
 ## Glamsterdam eth/69-71 production protocols
 
+## snap version 2 unchanged storage account proof binding (2026-11-19)
+
+- [ ] Reproduce a moving pivot with partial storage whose account body/storage root is unchanged.
+- [ ] Authenticate that account against the fresh pivot before using its storage root.
+- [ ] Reject a damaged proof for that unchanged account without checkpoint/adoption.
+- [ ] Qualify all encrypted Node scenarios, affected race/vet/build and update PR 81.
+
 ## snap/2 BAL state catch-up (2026-11-18)
 
 - [x] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.

@@ -1,3 +1,7 @@
+## Unchanged storage account pivot regression (2026-11-19)
+
+An added actual encrypted Node scenario reproduces `storage account not verified` when a partial storage account is unchanged across a moving pivot. The fresh proof adapter has not authenticated that account at the new state root. A second scenario isolates damage to its exact account proof. The regression is being repaired in this feature branch; prior five-scenario success did not cover this case.
+
 ## Snap version 2 socket lifecycle follow up (2026-11-19)
 
 Explicitly stop the test-owned P2P servers before Node/database restart and on every scenario exit. Five encrypted Node cases pass again under race, with affected vet and build. This makes the test resource ownership match the manually started component setup; production protocol behavior is unchanged.

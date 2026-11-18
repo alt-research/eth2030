@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Complete ordinary blob sidecar validation (2026-11-18)
+
+- [x] Read pinned EIP-4844/7594 networking and proof requirements.
+- [x] Reproduce invalid ordinary-cell-proof admission through real node HTTP.
+- [x] Validate complete sidecar binding/proofs and preserve Frame regression behavior.
+- [x] Require full data for pool-based builders and return genuine legacy blob proofs.
+- [x] Qualify actual wire/admission/Engine consumers, affected checks/build and regression mutations.
+- [ ] Publish the isolated blob-validation PR.
+
 ## Glamsterdam independent current-text gas corpus (2026-11-18)
 
 - [x] Freeze signed transactions, complete pre-state, fork/config and reference-client version.

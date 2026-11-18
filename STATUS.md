@@ -1,3 +1,7 @@
+## Ordinary blob proof validation and Engine publication (2026-11-18)
+
+Reproduced and repaired invalid ordinary cell-proof admission through real HTTP. Preserve wrapper versions and pooled sidecars, authenticate KZG data, wait for complete pool data, derive genuine legacy proofs and expose canonical BlobAndProofV1 DATA. Shared payload collectors no longer fabricate zero proofs or publish missing data. Journal insert/rotation and fresh-node replay preserve authenticated sidecars. Frame checks remain qualified. Affected suites, targeted race/vet and build pass; four controlled mutations fail as intended. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Complete eth/72 sparse relay and release gates remain open.
+
 ## Glamsterdam signed candidate-gas integration checkpoint (2026-11-18)
 
 The isolated feature integration passes the full Go suite, including the new differential command. The actual 44-case signed corpus preserves 19/22 Amsterdam candidate mismatches and separately classifies Osaka transition-versus-outer-validator checks; it does not claim release parity. See [integrated observations](docs/audits/glamsterdam-gas-2026-11-18/INTEGRATED.md). All remaining gas/CL/network/release gates remain open.

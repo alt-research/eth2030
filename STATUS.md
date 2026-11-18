@@ -1,3 +1,13 @@
+## Qualified CL runtime packaging (2026-11-18)
+
+- The new runtime reports `a4ceb86`, including the checkpoint and worktree-version
+  fixes. The first image accidentally added an entrypoint despite the pinned
+  package's explicit VC executable, so validator startup failed before traffic.
+  The entire failed enclave and its volumes were removed and its engine stopped.
+- The [runtime Dockerfile](pkg/devnet/kurtosis/scripts/lighthouse-runtime.Dockerfile)
+  now records the package's command contract. Beacon/observer entrypoints remain
+  supplied by their Starlark services; validator commands run directly.
+
 ## Heze checkpoint parent follow-up (2026-11-18)
 
 - EL `e0451092` now serves reconstructed finalized sponsored, blob and checkpoint

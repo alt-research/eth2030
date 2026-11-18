@@ -17,10 +17,10 @@ The historical experimental AllCapabilities helper is not the production adverti
 ## Verification
 
 - True encrypted TCP/RLPx sessions using independent Geth crypto, RLPx and RLP codecs negotiate each of 68/69/70/71. Tests validate actual seven/six-field status, nonempty receipt schemas and raw BAL unavailable encoding.
-- Immutable receipt/BAL golden encodings test bytes, not merely local round trips.
+- Immutable receipt/BAL golden encodings test bytes, not merely local round trips. Nonzero-log cases additionally exposed the zero-bloom restoration bug; the scoped fix from PR #70 is included here and exact consensus receipt bytes are preserved.
 - Correlated BAL consumer tests check successful storage, full-packet validation before writes, tamper, reordering, replay, unsolicited and unavailable input. Historical fetch runs both live message loops.
 - Receipt fetch tests follow two pages and reject a changed root, no-progress pagination, too-large receipt and extra pages. A native eiptest commits a transfer and verifies persistent receipt restoration, derived metadata and rejection of bad counts/roots.
-- Restoring the missing consumer hash-check behavior in a temporary mutation makes tamper/reordering tests fail; the production check was restored. The earlier wire golden test failed on the baseline for the expected wrapping difference.
+- Disabling the consumer BAL hash check makes tamper/reordering tests fail; disabling the complete receipt-root check makes the bad-root test fail; the production check was restored. The earlier wire golden test failed on the baseline for the expected wrapping difference.
 
 Passed from pkg:
 

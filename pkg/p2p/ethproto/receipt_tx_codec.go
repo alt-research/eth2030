@@ -181,7 +181,7 @@ func decodeModernReceiptPages(rawPages [][]gethrlp.RawValue) ([][]*types.Receipt
 			for _, log := range item.Logs {
 				receipt.Logs = append(receipt.Logs, &types.Log{Address: log.Address, Topics: log.Topics, Data: log.Data})
 			}
-			receipt.Bloom = types.CreateBloom([]*types.Receipt{receipt})
+			receipt.Bloom = types.LogsBloom(receipt.Logs)
 			pages[i] = append(pages[i], receipt)
 		}
 	}

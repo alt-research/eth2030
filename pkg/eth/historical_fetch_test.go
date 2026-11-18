@@ -30,6 +30,10 @@ func TestReceiptConsumerPaginationAndIntegrity(t *testing.T) {
 		t.Run(mode, func(t *testing.T) {
 			chain := &receiptRestoringChain{mockBlockchain: newMockBlockchain()}
 			receipts := []*types.Receipt{{Status: 1, CumulativeGasUsed: 21000}, {Status: 1, CumulativeGasUsed: 42000}}
+			for _, receipt := range receipts {
+				receipt.Logs = []*types.Log{{Address: types.Address{19: 9}, Topics: []types.Hash{{31: 7}}}}
+				receipt.Bloom = types.LogsBloom(receipt.Logs)
+			}
 			candidate := makeTestBlock(1, chain.Genesis().Hash(), []*types.Transaction{makeTestTx(0), makeTestTx(1)})
 			header := candidate.Header()
 			header.ReceiptHash = coreblock.ComputeReceiptsRoot(receipts)

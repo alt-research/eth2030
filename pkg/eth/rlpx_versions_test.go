@@ -25,7 +25,9 @@ func TestNegotiatedEthVersionsAgainstIndependentCodec(t *testing.T) {
 			block := makeTestBlock(1, chain.Genesis().Hash(), []*types.Transaction{makeTestTx(0)})
 			chain.addBlock(block)
 			h := NewHandler(chain, newMockTxPool(), 1)
-			h.SetReceiptProvider(fixedReceiptProvider{block.Hash(), []*types.Receipt{{Status: 1, CumulativeGasUsed: 21000}}})
+			sample := &types.Receipt{Status: 1, CumulativeGasUsed: 21000, Logs: []*types.Log{{Address: types.Address{19: 9}, Topics: []types.Hash{{31: 7}}, Data: []byte{1}}}}
+			sample.Bloom = types.LogsBloom(sample.Logs)
+			h.SetReceiptProvider(fixedReceiptProvider{block.Hash(), []*types.Receipt{sample}})
 			server := p2p.NewServer(p2p.Config{ListenAddr: "127.0.0.1:0", EnableRLPx: true, RLPxPrivateKey: key, Protocols: h.Protocols()})
 			if err := server.Start(); err != nil {
 				t.Fatal(err)

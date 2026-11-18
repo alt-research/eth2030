@@ -46,12 +46,6 @@ Branch `feat/glamsterdam-factory` uses the EIP-7997 factory at 0x4e59b44847b3795
 
 Canonical address/runtime/nonce and actual CREATE2/value/return-byte/collision tests plus a no-fork-injection regression first failed for the intended reasons and now pass. Preserved legacy private BLS 0x12 without changing the canonical 0x0b..0x11 map. Core/Engine/node/eiptest suites and full build passed. This implements the canonical factory path; live network/genesis tooling qualification remains in the broader integration gates.
 
-## Glamsterdam BAL availability window (2026-11-18)
-
-Branch `feat/glamsterdam-bal-retention` updates EIP-7928 availability to 14,299 epochs. The bounded Engine backend uses actual header slots when available, with a conservative block-number fallback for legacy headers; both ByHash and ByRange preserve the body when BAL is unavailable. The production chain backend already persists validated canonical BALs on mainline and retains them beyond the minimum window.
-
-Tests exercise the prior-window gap, exact cutoff, outside cutoff and missed slots through both Engine body APIs. A targeted mutation restoring 3,533 epochs fails the intended availability assertions. Affected storage/Engine/node/eiptest suites, build and targeted vet passed. This closes the obsolete-window subtask of GL-040; physical pruning, complete independent CL/recovery and full network qualification remain separate gates. [Evidence](docs/verification/glamsterdam-bal-retention-20261118.md).
-
 ## Glamsterdam EIP-7954 limits (2026-11-18)
 
 Branch `feat/glamsterdam-contract-limits` updates deployed/initcode limits to the published 64/128 KiB EIP-7954 revision, retaining pre-fork limits. Activation follows canonical Amsterdam independently of the private gas-repricing timestamp. Oversized Shanghai+ creation transactions are rejected before fees/nonce/gas-pool mutation, and post-fork pool envelope policy leaves space for a valid maximum-size initcode transaction.

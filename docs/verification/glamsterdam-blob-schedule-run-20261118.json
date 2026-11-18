@@ -30,5 +30,11 @@
       "senderSpent": "402982122148608"
     }
   ],
-  "full_client_release_qualified": false
+  "full_client_release_qualified": false,
+  "tested_source_ancestor": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+  "sidecar_version": 1,
+  "dependency_prs": [
+    76,
+    79
+  ]
 }

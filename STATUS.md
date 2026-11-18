@@ -1,3 +1,7 @@
+## Glamsterdam slot commitments across Engine backends (2026-11-18)
+
+Preserved explicit zero slots through production HTTP Engine build/import, and supplied the missing slots to memory Engine construction/import. Independent go-ethereum header hashes now agree with actual payloads, SLOTNUM execution, public block RPC and committed historical BAL bytes. Slot zero, nondefault and uint64 maximum values are covered. See [verification](docs/verification/glamsterdam-slot-commitment-20261118.md); full independent-client/schema/CL and final gas gates remain open.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

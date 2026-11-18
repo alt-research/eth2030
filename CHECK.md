@@ -1,5 +1,12 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam header and slot independent qualification (2026-11-18)
+
+- [x] Compare native canonical header RLP/hash against go-ethereum v1.17.10.
+- [x] Drive nondefault slots through HTTP FCU/build/import and observe SLOTNUM state and block RPC.
+- [x] Match historical Engine BAL bytes to the independent decoded header commitment.
+- [ ] Run affected tests and local build; submit the isolated qualification PR.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

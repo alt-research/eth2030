@@ -102,7 +102,7 @@ func TestCalcCalldataBaseFee_HigherExcessMeansHigherFee(t *testing.T) {
 // --- SPEC-6.4: BuildBlock wires calldata dimension into 3D gas vectors ---
 
 func TestBuildBlock_3DGasVectors_Set(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := coreblock.NewBlockBuilder(config.TestConfigGlamsterdan, nil, nil)
 	builder.SetState(statedb)
 

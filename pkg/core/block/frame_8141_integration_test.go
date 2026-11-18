@@ -12,7 +12,6 @@ import (
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -68,7 +67,7 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			sender := types.Address(gethcrypto.PubkeyToAddress(senderKey.PublicKey))
 			payer := types.Address(gethcrypto.PubkeyToAddress(payerKey.PublicKey))
 			target, coinbase := types.Address{19: 0x90}, types.Address{19: 0xff}
-			alloc := state.NewMemoryStateDB()
+			alloc := newBuilderRequestTestState()
 			alloc.AddBalance(sender, big.NewInt(100_000_000))
 			alloc.AddBalance(payer, big.NewInt(100_000_000))
 			alloc.SetCode(target, []byte{0x60, 1, 0x5f, 0x55, 0x5f, 0x5f, 0xa0, 0})

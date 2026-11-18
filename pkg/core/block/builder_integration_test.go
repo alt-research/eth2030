@@ -158,7 +158,7 @@ func (p *mockTxPoolInteg) Pending() []*types.Transaction {
 
 // TestBuildBlock_Empty tests building an empty block via the new API.
 func TestBuildBlock_Empty(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -199,7 +199,7 @@ func TestBuildBlock_Empty(t *testing.T) {
 
 // TestBuildBlock_WithTransactions tests building a block with transactions from pool.
 func TestBuildBlock_WithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -257,7 +257,7 @@ func TestBuildBlock_WithTransactions(t *testing.T) {
 
 // TestBuildBlock_GasLimitEnforcement tests that the block builder respects gas limits.
 func TestBuildBlock_GasLimitEnforcement(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000))
@@ -310,8 +310,8 @@ func TestBuildBlock_GasLimitEnforcement(t *testing.T) {
 }
 
 func TestBuildBlock_AATxReplayMatchesBuiltStateRoot(t *testing.T) {
-	builderState := state.NewMemoryStateDB()
-	replayState := state.NewMemoryStateDB()
+	builderState := newBuilderRequestTestState()
+	replayState := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 	funds := new(big.Int).Mul(big.NewInt(10), big.NewInt(1e18))
 	builderState.AddBalance(sender, funds)
@@ -424,8 +424,8 @@ func TestBuildBlock_AATxReplayMatchesBuiltStateRoot_PreAmsterdam(t *testing.T) {
 
 func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T) {
 	cfg := testConfigAmsterdamWithoutGlamsterdam()
-	builderState := state.NewMemoryStateDB()
-	replayState := state.NewMemoryStateDB()
+	builderState := newBuilderRequestTestState()
+	replayState := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xdddddddddddddddddddddddddddddddddddddddd")
 	contractAddr := types.HexToAddress("0x000000000000000000000000000000000000c1ea")
 	funds := new(big.Int).Mul(big.NewInt(10), big.NewInt(1e18))
@@ -498,7 +498,7 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 // TestBuildBlock_WithdrawalProcessing tests that withdrawals are applied
 // correctly during block building.
 func TestBuildBlock_WithdrawalProcessing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -566,7 +566,7 @@ func TestBuildBlock_WithdrawalProcessing(t *testing.T) {
 // TestBuildBlock_RequestsHash tests that the block builder sets the requests
 // hash in the header when Prague is active (EIP-7685).
 func TestBuildBlock_RequestsHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -600,7 +600,7 @@ func TestBuildBlock_RequestsHash(t *testing.T) {
 
 // TestReorg_Simple tests a basic chain reorganization.
 func TestReorg_Simple(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)

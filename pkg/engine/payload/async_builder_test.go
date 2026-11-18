@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -221,7 +220,7 @@ func TestAsyncBuilder_EvictOldest(t *testing.T) {
 func TestAsyncBuildKeepsExecutionRequests(t *testing.T) {
 	cfg := *config.TestConfig
 	cfg.RequireRequestPredeploys = true
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	config.ApplyGenesisAlloc(statedb, config.ExecutionRequestContractAlloc())
 
 	// Seed one consolidation entry in the deployed contract's queue.

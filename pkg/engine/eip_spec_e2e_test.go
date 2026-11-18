@@ -10,7 +10,6 @@ import (
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -21,7 +20,7 @@ import (
 // makeE2EBackend creates a full EngineBackend with genesis, usable for e2e tests.
 func makeE2EBackend(t *testing.T, cfg *coreconfig.ChainConfig) (*EngineBackend, *EngineAPI) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	backend := NewEngineBackend(cfg, statedb, genesis)
 	api := NewEngineAPI(backend)

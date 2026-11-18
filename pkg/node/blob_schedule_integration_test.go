@@ -71,7 +71,7 @@ func TestSignedBlobSchedulesThroughActualHTTPAndRestart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proof, err := kzg4844.ComputeBlobProof(&blob, commitment)
+	cellProofs, err := kzg4844.ComputeCellProofs(&blob)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,9 +94,10 @@ func TestSignedBlobSchedulesThroughActualHTTPAndRestart(t *testing.T) {
 		hashes := []types.Hash{}
 		transactionHashes := []types.Hash{}
 		for i, count := range step.counts {
-			sidecar := &gethtypes.BlobTxSidecar{Blobs: make([]kzg4844.Blob, count), Commitments: make([]kzg4844.Commitment, count), Proofs: make([]kzg4844.Proof, count)}
+			sidecar := &gethtypes.BlobTxSidecar{Version: gethtypes.BlobSidecarVersion1, Blobs: make([]kzg4844.Blob, count), Commitments: make([]kzg4844.Commitment, count), Proofs: make([]kzg4844.Proof, count*kzg4844.CellProofsPerBlob)}
 			for j := 0; j < count; j++ {
-				sidecar.Blobs[j], sidecar.Commitments[j], sidecar.Proofs[j] = blob, commitment, proof
+				sidecar.Blobs[j], sidecar.Commitments[j] = blob, commitment
+				copy(sidecar.Proofs[j*kzg4844.CellProofsPerBlob:], cellProofs)
 			}
 			body := &gethtypes.BlobTx{ChainID: uint256.NewInt(1337), Nonce: nonce, GasTipCap: uint256.NewInt(uint64(5-i) * 1_000_000_000), GasFeeCap: uint256.NewInt(6_000_000_000), Gas: 100_000, To: gethcommon.Address(contract), Value: new(uint256.Int), BlobFeeCap: uint256.NewInt(1_000_000_000), BlobHashes: sidecar.BlobHashes(), Sidecar: sidecar}
 			tx, err := gethtypes.SignNewTx(key, gethtypes.LatestSignerForChainID(big.NewInt(1337)), body)

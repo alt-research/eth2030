@@ -1,5 +1,16 @@
 # Lean4 Verification Check-list
 
+## Current merged state gas model (2026-11-19)
+
+- [ ] Re-read the complete chosen 3db38a3 EIPs, current-text gas corpus and actual production validation/runtime/settlement consumers; exclude older 49beda9 reference defaults and unmerged alternatives.
+- [ ] Reproduce the signed 19/22 candidate differences on the latest composition and classify each actual layer before editing.
+- [ ] Implement coherent intrinsic execution/state gas, CPSB, access/write pricing, reservoir charges/refills, frame merge and halt/revert behavior.
+- [ ] Wire authorization/pre-execution, creation/destruction/refund/floor, receipt/accounting and per-dimension block/build/basefee rules.
+- [ ] Wire pool, estimate/call/access-list/trace consumers to their selected method contracts, preserving canonical Frame behavior.
+- [ ] Qualify independent signed multi-transaction/application/recovery consumers with exact unsupported boundaries and sensitive mutations; run scoped/full/tagged/race/vet/build and publish a separate PR.
+
+The merged LIFO rules are the explicit versioned development baseline. Final release selection remains open; no unmerged refill/allowance alternative is combined with it.
+
 ## eth version 72 sparse blob relay (2026-11-19)
 
 - [x] Pin full EIP-8070/7594 and devp2p schemas plus Geth merged flat request-id fix.

@@ -1,3 +1,7 @@
+## Current merged gas development baseline (2026-11-19)
+
+Isolated `feat/glamsterdam-state-gas` starts at qualified feature composition `aacc65ea`. The published 3db38a3 merged LIFO model is the development target; unmerged EIPs PRs 12581/12582 remain separate pending final release choices. The local read-only EIPs checkout is older 49beda9 and is not the chosen numeric/formula authority. Signed differential, actual pool/VM/block/API settlement and application qualification remain under implementation.
+
 ## Sparse relay composed regression (2026-11-19)
 
 At source `20b1c1f`, submitted feature reviews 65–82 compose: all 212 Go packages, 27 tagged Core/EIP packages, 97 affected race packages, vet and build pass. Real eth/72 and snap/2 consumers pass alongside prior Engine/blob/configuration/request paths. [Evidence](docs/verification/glamsterdam-eth72-integration-20261119.md). Final gas, complete CL/multiclient/resource and release qualification remain open.

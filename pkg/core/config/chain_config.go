@@ -359,7 +359,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsEIP7706:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7708:        isMerge && (c.IsAmsterdam(timestamp) || c.IsGlamsterdan(timestamp)),
 		IsEIP7954:        isMerge && c.IsEIP7954(timestamp),
-		IsEIP7778:        isMerge && c.IsGlamsterdan(timestamp),
+		IsEIP7778:        isMerge && (c.IsAmsterdam(timestamp) || c.IsGlamsterdan(timestamp)),
 		IsEIP2780:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7976:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7981:        isMerge && c.IsGlamsterdan(timestamp),

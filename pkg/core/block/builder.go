@@ -315,7 +315,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			ilTxHashes[ilTx.Hash()] = struct{}{}
 
 			// EIP-7825 caps individual transactions at Osaka.
-			if !fitsTransaction(gp, ilTx) || exceedsTxGasCap(b.config, header.Time, ilTx) {
+			if !fitsTransaction(b.config, header.Time, gp, ilTx) || exceedsTxGasCap(b.config, header.Time, ilTx) {
 				continue
 			}
 			// Check base fee.
@@ -439,7 +439,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		}
 
 		// Skip if not enough gas left for this tx.
-		if !fitsTransaction(gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
+		if !fitsTransaction(b.config, header.Time, gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
@@ -560,7 +560,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		txIndex++
 	}
 
-	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && b.config.IsGlamsterdan(header.Time))
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && (b.config.IsGlamsterdan(header.Time) || b.config.IsAmsterdam(header.Time)))
 
 	// EIP-4844: set blob gas used in header.
 	if cancunActive {
@@ -655,15 +655,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 }
 
 func exceedsTxGasCap(cfg *config.ChainConfig, timestamp uint64, tx *types.Transaction) bool {
-	limit := tx.Gas()
-	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
-		budget, err := frame.GasBudget()
-		if err != nil {
-			return true
-		}
-		limit = budget.ExecutionReservation
-	}
-	return gas.IsGasLimitCapped(cfg, timestamp) && gas.ValidateTransactionGasLimit(limit) != nil
+	return gas.ValidateTransactionGasForFork(cfg, timestamp, tx) != nil
 }
 
 // BuildBlockLegacy constructs a new block using the legacy interface (for backward
@@ -805,7 +797,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		}
 
 		// Skip if not enough gas left for this tx.
-		if !fitsTransaction(gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
+		if !fitsTransaction(b.config, header.Time, gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
@@ -884,7 +876,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		txIndex++
 	}
 
-	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && b.config.IsGlamsterdan(header.Time))
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && (b.config.IsGlamsterdan(header.Time) || b.config.IsAmsterdam(header.Time)))
 	if cancunActive {
 		header.BlobGasUsed = &blobGasUsed
 	}
@@ -1127,10 +1119,13 @@ func (b *BlockBuilder) getHashFnForParent(parent *types.Header) func(uint64) typ
 	return b.getHashFn(parent)
 }
 
-func fitsTransaction(gp *gaspool.GasPool, tx *types.Transaction) bool {
+func fitsTransaction(cfg *config.ChainConfig, timestamp uint64, gp *gaspool.GasPool, tx *types.Transaction) bool {
 	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
 		budget, err := frame.GasBudget()
 		return err == nil && gp.FitsFrame(budget.ExecutionReservation, budget.StateReservation)
+	}
+	if cfg != nil && cfg.IsMerge() && cfg.IsAmsterdam(timestamp) && tx.Type() <= types.SetCodeTxType {
+		return gp.FitsFrame(min(tx.Gas(), vm.AmsterdamMaxExecutionGas), tx.Gas())
 	}
 	return gp.Gas() >= tx.Gas()
 }

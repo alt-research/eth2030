@@ -171,11 +171,9 @@ func (v *BlockValidator) ValidateBody(block *types.Block) error {
 		return ErrInvalidUncleHash
 	}
 
-	if gas.IsGasLimitCapped(v.config, header.Time) {
-		for i, tx := range block.Transactions() {
-			if err := gas.ValidateTransactionGasLimit(tx.Gas()); err != nil {
-				return fmt.Errorf("transaction %d: %w", i, err)
-			}
+	for i, tx := range block.Transactions() {
+		if err := gas.ValidateTransactionGasForFork(v.config, header.Time, tx); err != nil {
+			return fmt.Errorf("transaction %d: %w", i, err)
 		}
 	}
 

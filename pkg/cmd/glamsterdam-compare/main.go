@@ -126,6 +126,7 @@ func scenarios() []scenario {
 		{Name: "nested_refill_success", Gas: 500000, Code: nested, ChildCode: append(bytes.Clone(clear), 0)},
 		{Name: "nested_refill_revert", Gas: 500000, Code: nested, ChildCode: append(bytes.Clone(clear), 0x60, 0, 0x60, 0, 0xfd)},
 		{Name: "create_empty", Gas: 500000, Creation: true, Data: []byte{0}},
+		{Name: "create_maximum_code_7954", Gas: 110_000_000, Creation: true, Data: []byte{0x62, 0x01, 0x00, 0x00, 0x5f, 0xf3}},
 		{Name: "create_revert", Gas: 500000, Creation: true, Data: []byte{0x60, 0, 0x60, 0, 0xfd}},
 		{Name: "create_selfdestruct", Gas: 500000, Creation: true, Value: 7, Data: append(bytes.Clone(slots), 0x30, 0xff)},
 		{Name: "above_execution_cap", Gas: 16777217},

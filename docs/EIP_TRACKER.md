@@ -6,16 +6,26 @@ model and the update workflow.
 
 ## Data source of truth
 
-`site/src/data/eips.ts` is the **single source of truth**. Everything on the `/eips`
-pages is generated from it — edit the data, not the markup, to change progress.
+`site/src/data/eips.ts` is the **single source of truth** for EIP status labels,
+paths and scoped gaps. The homepage's phase cards and `/roadmap` derive counts
+from it through `site/src/lib/roadmap.ts`. Complete entries are omitted from the
+homepage's pending-work lists; percentages count labels rather than whole-fork
+conformance.
+
+`site/src/lib/data.ts` supplies the shared dated development snapshot rendered
+by `DevelopmentProgress` on both pages. Its November 18, 2026 update cites merged
+PR 61 (`911afb0c`) and the retained run record. Keep runtime source identities
+separate from the merge revision. A fresh CL using a synchronized EL must not be
+presented as independent EL late join. Update snapshot, EIP evidence, active
+plans and export assertions together when a qualified milestone merges.
 
 ### Fork placement baseline
 
 Fork placement (Glamsterdam → Hegotá → I* → J* → K* → L* → longer term) follows the
-**L1 Strawmap revision of Nov 2, 2026** (strawmap.org). Note this differs from the
-older derivation in `docs/ROADMAP.md` (Feb 2026), e.g. FOCIL and frame transactions
-are now Hegotá headliners, native rollups moved to L*. The strawmap is re-published
-roughly quarterly — re-check placement after each revision.
+**L1 Strawmap revision of Nov 2, 2026** (strawmap.org). FOCIL and Frame transactions
+are Hegotá headliners; native rollups are placed at L*. The active
+`docs/ROADMAP.md` now uses this baseline. A development-progress refresh does not
+claim a new EF schedule review; re-check placement when adopting a new revision.
 
 The strawmap visual is a Google Drawings embed; to extract it:
 
@@ -41,7 +51,8 @@ google-chrome --headless --screenshot=/tmp/strawmap.png --window-size=2979,2272 
 | `implementation` / `tests` | Paths **relative to `pkg/`** (verified to exist by the verify script) |
 | `implemented` / `gaps` | Deep-analysis content (the 11 gap-analyzed EIPs) |
 
-Status semantics: `complete` = full implementation per `EIP_SPEC_IMPL.md`;
+Status semantics: `complete` = the recorded implementation scope in `EIP_SPEC_IMPL.md`,
+with current-spec and independent-client limits retained in `gaps`;
 `substantial` = major parts in place (ePBS, FOCIL, execution proofs, binary trie);
 `functional` = framework-level roadmap feature with working code; `referenced` =
 spec consulted / partial hooks only; `partial` = known incomplete; `planned` =
@@ -51,15 +62,20 @@ strawmap box with no eth2030 implementation yet.
 
 ```bash
 cd site
-node scripts/verify-eips.ts          # cross-check data vs docs + CLAUDE.md + refs/EIPs
-node scripts/verify-eips.ts --files  # additionally verify every pkg/ path exists
+node --experimental-strip-types scripts/verify-eips.ts          # cross-check data vs docs + CLAUDE.md + refs/EIPs
+node --experimental-strip-types scripts/verify-eips.ts --files  # additionally verify every pkg/ path exists
 npm run build                        # type-check + regenerate static pages
+node scripts/check-export.mjs         # verify rendered progress against evidence
 ```
+
+Use Node 22 or later for the TypeScript verifier.
 
 1. Implement/modify EIP code in `pkg/` as usual.
 2. Run `verify-eips.ts --files` — fix any drift it reports by updating
    `site/src/data/eips.ts` (paths, status, completeness, gaps).
-3. `npm run build` and spot-check `/eips/<id>` pages.
+3. Build, run `check-export.mjs`, and inspect the homepage, `/roadmap` and affected
+   `/eips/<id>` pages at desktop/mobile widths. The export check compares the
+   shared milestone with the retained live record and checks phase-count parity.
 4. Commit everything in **this repo only** (site + docs + code together is fine);
    action-oriented commit message, no AI co-author line.
 
@@ -83,5 +99,6 @@ separately in that repo.
 - `docs/EIP_SPEC_IMPL.md` — per-EIP traceability matrix (doc-side source)
 - `docs/GAP_ANALYSIS.md` — 65 roadmap-item audit
 - `docs/EIP_IMPLEMENTATION_GAP_ANALYSIS.md` (workspace root `docs/`) — completeness % + P0/P1/P2 for 11 key EIPs
-- `docs/ROADMAP.md` — older Feb 2026 strawmap derivation (kept for history; fork
-  placement on the site follows the Nov 2026 strawmap instead)
+- `docs/ROADMAP.md` — current development evidence and next acceptance gates
+- `docs/PROGRESS.md` — merged implementation and verification boundaries
+- `docs/next-stage-work-plan.md` — active implementation and acceptance sequence

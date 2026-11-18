@@ -1,34 +1,32 @@
 # EIP Specification & Implementation Traceability
 
-> Last updated: 2026-02-22
+> Scoped refresh: November 18, 2026, merged mainline `911afb0c` (PR 61).
 
-Complete traceability matrix mapping every EIP to its specification, implementation, tests, and roadmap position. ETH2030 implements **94+ EIPs** across all upgrade phases.
+This is a historical implementation index, with the Frame, FOCIL and BAL paths
+refreshed below. Other rows retain the February 22, 2026 inventory and have not
+received a new conformance audit. `Complete` is an implementation label within
+its recorded scope; it does not establish current-draft or cross-client acceptance.
+For current fork placement use the [site tracker](EIP_TRACKER.md); for qualified
+results and remaining work use [development progress](PROGRESS.md) and the
+[active roadmap](ROADMAP.md). Historical aggregate percentages and EF totals are
+not current acceptance scores.
 
----
+Frame execution is qualified against the pinned seven-field, scalar-nonce draft
+and local paymaster candidate. Signed FOCIL, blob history and receiver restart
+passed on the paired ETH2030/Lighthouse profile. The fresh CL used a synchronized
+EL. Independent EL agreement and the Dora consumer migration remain open; see the
+[retained run](verification/frame-8141-20261118-paymaster-history-final.json).
 
-## Quick Summary
-
-| Category | Count |
-|----------|-------|
-| EIPs Complete | 58 |
-| EIPs Substantial | 5 |
-| EIPs Referenced/Partial | 30+ |
-| Total unique EIPs | 94+ |
-| EF State Tests | 36,126/36,126 (100%) |
-
----
-
-## Glamsterdam (2026, ~99% complete)
+## Glamsterdam (historical inventory)
 
 ### Core EIPs
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7928 | Block Access Lists (BALs) | Complete | [EIP-7928](https://eips.ethereum.org/EIPS/eip-7928) | `bal/types.go`, `bal/scheduler_pipeline.go`, `bal/conflict_detector_advanced.go`, `core/state/bals_engine.go` | `core/bal_integration_test.go`, `bal/*_test.go` |
+| 7928 | Block Access Lists (BALs) | Complete | [EIP-7928](https://eips.ethereum.org/EIPS/eip-7928) | `bal/types.go`, `core/chain/block_access_list.go`, `engine/payload_bodies.go` | `core/chain/block_access_list_test.go`, `engine/payload/bodies_json_test.go`, `node/frame_8141_integration_test.go` |
 | 7702 | Set Code Authorization | Complete | [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) | `core/eip7702.go`, `core/types/tx_setcode.go`, `core/vm/precompile_7702.go`, `p2p/setcode_broadcast.go` | `core/eip7702_test.go`, `core/vm/precompile_7702_test.go` |
 | 7701 | Native Account Abstraction | Complete | [EIP-7701](https://eips.ethereum.org/EIPS/eip-7701) | `core/types/tx_aa.go`, `core/vm/eip7701_opcodes.go`, `core/vm/aa_executor.go`, `core/aa_entrypoint.go` | `core/vm/eip7701_opcodes_test.go` |
 | 8070 | Sparse Blob Pool | Complete | [EIP-8070](https://eips.ethereum.org/EIPS/eip-8070) | `txpool/blobpool.go`, `txpool/sparse_blobpool.go`, `das/sparse_blobpool.go` | `txpool/blobpool_test.go`, `txpool/sparse_blobpool_test.go` |
-| 8141 | Frame Transactions | Complete | [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) | `core/types/tx_frame.go`, `core/vm/eip8141_opcodes.go`, `core/frame_execution.go` | `core/vm/eip8141_opcodes_test.go` |
 | 7685 | Execution Layer Requests | Complete | [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) | `core/types/request.go` | `core/withdrawal_test.go` |
 | 7708 | ETH Transfers Emit Log | Complete | [EIP-7708](https://eips.ethereum.org/EIPS/eip-7708) | `core/vm/eip7708.go`, `core/vm/eip7708_deep.go` | `core/vm/eip7708_test.go` |
 | 7918 | Blob Base Fee Floor | Complete | [EIP-7918](https://eips.ethereum.org/EIPS/eip-7918) | `core/blob_gas.go` | `core/blob_gas_test.go` |
@@ -66,10 +64,12 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 
 ---
 
-## Hegotá (2026-2027, ~85% complete)
+## Hegotá (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
+| 8141 | Frame Transactions (pinned draft) | Complete | [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) | `core/types/frame_8141.go`, `core/execution/frame_8141.go`, `core/vm/frame_8141.go`, `core/framepay/`, `txpool/frame_8141.go` | `core/execution/frame_8141_test.go`, `core/execution/frame_paymaster_test.go`, `txpool/frame_paymaster_test.go`, `node/frame_8141_integration_test.go`, `node/frame_blob_rpc_test.go` |
+| 7805 | FOCIL (Inclusion Lists) | Substantial | [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) | `focil/validation.go`, `engine/bogota.go`, `node/backend/engine_bogota.go` | `focil/il_satisfaction_test.go`, `node/frame_8141_integration_test.go` |
 | 7742 | Uncoupled Blob Count | Complete | [EIP-7742](https://eips.ethereum.org/EIPS/eip-7742) | `core/types/header.go` (TargetBlobsPerBlock), `core/blob_gas.go`, `engine/payload_attributes_v4.go` | `core/blob_schedule_test.go` |
 | 7898 | Uncoupled Execution Payload | Complete | [EIP-7898](https://eips.ethereum.org/EIPS/eip-7898) | `engine/engine_uncoupled.go` | `engine/engine_glamsterdam_test.go` |
 | 7706 | Separate Calldata Gas Dimension | Complete | [EIP-7706](https://eips.ethereum.org/EIPS/eip-7706) | `core/calldata_gas.go`, `core/multidim.go`, `core/multidim_gas.go` | `core/multidim_test.go`, `core/calldata_gas_test.go` |
@@ -84,7 +84,7 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 
 ---
 
-## I+ (2027, ~80% complete)
+## I+ (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
@@ -98,17 +98,16 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 
 ---
 
-## J+ (2027-2028, ~75% complete)
+## J+ (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
 | 7732 | Enshrined PBS (ePBS) | Substantial | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/engine_epbs.go` | `epbs/*_test.go` |
-| 7805 | FOCIL (Inclusion Lists) | Substantial | [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) | `focil/types.go`, `focil/builder.go`, `focil/validation.go`, `focil/compliance_tracker.go` | `focil/*_test.go` |
 | 7547 | Inclusion Lists | Complete | [EIP-7547](https://eips.ethereum.org/EIPS/eip-7547) | `core/types/inclusion_list.go`, `core/inclusion_list.go` | via focil tests |
 
 ---
 
-## K+ (2028, ~80% complete)
+## K+ (historical inventory)
 
 | Feature | Related EIPs | Status | Implementation | Tests |
 |---------|-------------|--------|----------------|-------|

@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import GlitchText from '@/components/ui/GlitchText';
 import MatrixRain from '@/components/ui/MatrixRain';
+import DevelopmentProgress from '@/components/DevelopmentProgress';
+import { developmentSnapshot } from '@/lib/data';
 import { type Layer } from '@/data/eips';
 import { roadmapStages, roadmapStatuses, roadmapStatusNames, roadmapLayer, roadmapProgress, groupRoadmapNodes } from '@/lib/roadmap';
 import styles from './roadmap.module.css';
@@ -74,7 +76,8 @@ export default function RoadmapPage() {
         <div className={styles.heroAside}><span>THE BIG PICTURE</span><strong>G* <i>→</i> L*</strong><p>Six upgrades. One evolving map.</p><a href={source} target="_blank" rel="noreferrer">View the original EF drawing ↗</a></div>
       </section>
 
-      <div className={styles.intro}><div><span>01 / PROTOCOL ROADMAP</span><h2>Six upgrades. One view.</h2><p>Each card contains all mapped entries from the project tracker.</p></div><div className={styles.snapshot}><i /> TRACKER SNAPSHOT <b>NOV 2026</b></div></div>
+      <DevelopmentProgress />
+      <div className={styles.intro}><div><span>01 / PROTOCOL ROADMAP</span><h2>Six upgrades. One view.</h2><p>Each card contains all mapped entries from the project tracker.</p></div><div className={styles.snapshot}><i /> REVIEWED UPDATE <b>{developmentSnapshot.date}</b></div></div>
       <section className={styles.cards} aria-label="Ethereum roadmap upgrades">{roadmapStages.map((phase, index) => <PhaseCard key={phase.id} phase={phase} index={index} />)}</section>
       <aside className={styles.caveat}><span>READING THE SIGNAL</span><p>Each percentage is the number of mapped entries labelled <strong>Complete</strong> in the historical project tracker divided by all mapped tracker entries in that card, rounded to the nearest whole percent. The unmapped EF node is excluded. These figures are not measured implementation completion, independent conformance, or production readiness. Colored bars show all tracker-label categories. EF&apos;s roadmap is a changing draft; I*–L* are placeholders. The older tracker places leanVM and ethp2p unification in different columns; this view follows the EF drawing. The longer-term column is outside these six cards.</p><a href="https://github.com/alt-research/eth2030/blob/master/STATUS.md" target="_blank" rel="noreferrer">Read project status ↗</a></aside>
       <footer className={styles.footer}><span>◆ ETH2030 <i>/</i> ROADMAP EXPLORER</span><a href={source}>SOURCE: EF ARCHITECTURE ↗</a></footer>

@@ -1,6 +1,9 @@
 // ETH2030 EIP / roadmap progress — single source of truth.
 //
 // Fork placement follows the L1 Strawmap revision of Nov 2, 2026 (strawmap.org).
+// Reviewed Frame/FOCIL/BAL update: PR 61 merged at 911afb0c (2026-11-18).
+// Evidence: docs/frame-8141-execution.md and its final paired control record.
+// Other implementation labels retain their historical review scope.
 // Implementation status / file paths come from eth2030 docs:
 //   - docs/EIP_SPEC_IMPL.md      (traceability matrix, per-EIP files & tests)
 //   - CLAUDE.md L70-71           (complete / substantial lists)
@@ -179,8 +182,10 @@ export const EIPS: EipEntry[] = [
       'bal/scheduler_pipeline.go',
       'bal/conflict_detector_advanced.go',
       'core/state/bals_engine.go',
+      'core/chain/block_access_list.go',
+      'engine/payload/bodies.go',
     ],
-    tests: ['core/bal_integration_test.go', 'bal/*_test.go'],
+    tests: ['core/bal_integration_test.go', 'bal/*_test.go', 'core/chain/block_access_list_test.go', 'engine/payload/bodies_json_test.go', 'node/frame_8141_integration_test.go'],
     implemented: [
       'Core types: BlockAccessList, AccessEntry, StorageChange',
       'Conflict detection (graph-based conflict_detector)',
@@ -189,6 +194,8 @@ export const EIPS: EipEntry[] = [
       'Canonical ordering (Sort by address/accessIndex)',
       'BAL validator',
       'BAL header commitment encoded and checked in Engine processing',
+      'Validated RLP BALs stored atomically with blocks and checked against their header commitments',
+      'Historical V1/V2 Engine body DATA, nullable fork fields and exact readback after FileDB reopen',
     ],
     gaps: [
       'Full current-spec conformance and independent interoperability remain to be established',
@@ -602,8 +609,10 @@ export const EIPS: EipEntry[] = [
       'focil/il_satisfaction.go',
       'focil/state_checker.go',
       'focil/list_validator.go',
+      'engine/bogota.go',
+      'node/backend/engine_bogota.go',
     ],
-    tests: ['focil/*_test.go'],
+    tests: ['focil/*_test.go', 'node/frame_8141_integration_test.go', 'node/bogota_deferred_integration_test.go'],
     implemented: [
       'InclusionList / SignedInclusionList types',
       'IL builder',
@@ -611,10 +620,13 @@ export const EIPS: EipEntry[] = [
       'State checker, IL satisfaction verification',
       'List validator',
       'Inclusion-list gossip validation, equivocation evidence, and engine_getInclusionListV1',
-      'Dora explorer IL support + EIP-8141 frame-tx IL satisfaction',
+      'Native Bogotá V6/FCU V5 keeps execution validity separate from inclusion satisfaction',
+      'Signed-list delivery of a sponsored Frame between isolated EL mempools, followed by common finality',
+      'Lighthouse trusted-checkpoint import and live nonempty-list V6 wire regressions',
     ],
     gaps: [
-      'Full current-spec and independent cross-client conformance remain to be established',
+      'Independent EL verdict parity, alternate-peer recovery and redundant BN/remote signing still need acceptance',
+      'The updated Dora epoch/receipt consumer is not qualified by earlier IL display tests',
     ],
     summary: 'CL headliner of Hegotá. Fork-choice enforced inclusion lists for censorship resistance.',
   },
@@ -630,20 +642,24 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(8141),
     specStatus: 'Draft',
     strawmap: { item: 'frame transactions', tag: 'SFI', headliner: true },
-    implementation: ['core/types/tx_frame.go', 'core/vm/eip8141_opcodes.go', 'core/eips/frame_execution.go', 'txpool/frametx/'],
-    tests: ['core/vm/eip8141_opcodes_test.go', 'core/types/tx_frame_test.go'],
+    implementation: ['core/types/frame_8141.go', 'core/execution/frame_8141.go', 'core/vm/frame_8141.go', 'core/framepay/', 'txpool/frame_8141.go', 'engine/bogota.go', 'cmd/send-frame/main.go'],
+    tests: ['core/execution/frame_8141_test.go', 'core/execution/frame_paymaster_test.go', 'txpool/frame_paymaster_test.go', 'node/frame_8141_integration_test.go', 'node/frame_blob_rpc_test.go'],
     implemented: [
-      'FrameTx type (0x06) with Frame {Mode, Target, GasLimit, Data}',
-      'DEFAULT / VERIFY / SENDER modes',
-      '2D nonces (NonceKey, NonceSeq)',
-      'TXPARAMLOAD / TXPARAMSIZE / TXPARAMCOPY opcode framework',
-      'APPROVE scope handling, payer gas charging and frame receipts',
+      'Pinned seven-field type-0x06 envelope with scalar nonce and protocol-validated signatures',
+      'DEPLOY / VERIFY / SENDER frames, exact APPROVE scopes and atomic rollback',
+      'Independent execution/state gas, cross-frame refills, escrow and payer settlement',
+      'Public prefix simulation, fee/exposure reservations and reproducible paymaster v1 with delayed withdrawals',
+      'EIP-7594 blob wrappers, KZG validation, Engine import and canonical receipt/BAL persistence',
+      'Finalized coded sponsorship at slot 66 and blob Frame at slot 165 in the paired control',
+      'New CL joined at slot 256 and read both original finalized envelopes; receiver restart preserved receipts, storage and payer balances',
     ],
     gaps: [
-      'Full conformance to the evolving draft and independent interoperability remain to be assessed',
+      'Independent-client agreement on the pinned draft and paymaster runtime/witness ABI remains open',
+      'The fresh CL shares a synchronized EL; independent EL late join/state sync is not qualified by that control',
+      'Dora production epoch/receipt consumers and service restart still need migration',
+      'Keyed nonces in newer Geth experiments are a separate protocol variant',
     ],
-    summary:
-      'EL headliner of Hegotá on the Nov 2026 strawmap. Programmable tx validation; implemented in eth2030 ahead of the strawmap slot.',
+    summary: 'PR 61 merged native execution of the pinned EIP-8141 draft. The local implementation and paired history control passed; independent-client and service promotion remain separate.',
   },
 
   // ── Hegotá — CL ──────────────────────────────────────────────────────

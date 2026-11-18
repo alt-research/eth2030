@@ -1,15 +1,15 @@
 import SectionHeading from '@/components/ui/SectionHeading';
-import { evidence } from '@/lib/data';
+import { evidence, developmentSnapshot } from '@/lib/data';
 import { GITHUB_URL } from '@/lib/constants';
 
-const revision = '81951e52373bebb01405c9cefadc39ff3b6304d3';
+const revision = developmentSnapshot.revision;
 const base = GITHUB_URL;
 
 export default function FeaturesGrid() {
   return <section id="features" className="py-20 md:py-28 px-4">
     <SectionHeading title="Research you can inspect" subtitle="Selected code and tests, with the limits of this review" />
     <div className="max-w-5xl mx-auto">
-      <p className="text-eth-text/80 text-sm leading-7 mb-8">ETH2030 is an experimental execution client and research codebase. The entries below identify code to review, not claims of full EIP conformance or production readiness. Selected source paths and limitations checked against repository revision <a className="text-eth-teal underline" href={`${base}/commit/${revision}`}>81951e5</a> on November 12, 2026.</p>
+      <p className="text-eth-text/80 text-sm leading-7 mb-8">ETH2030 is an experimental execution client and research codebase. Sources below are pinned to merged revision <a className="text-eth-teal underline" href={`${base}/commit/${revision}`}>{revision.slice(0, 7)}</a>. The {developmentSnapshot.date} update qualifies the paired Frame, FOCIL and historical BAL paths; broader conformance and production acceptance remain tracked separately.</p>
       <div className="grid md:grid-cols-2 gap-4">
         {evidence.map(item => <article key={item.eip} className="rounded-xl border border-eth-purple/25 bg-eth-surface/60 p-6">
           <p className="text-xs uppercase tracking-wider text-eth-teal mb-2">Code present · verification incomplete</p>

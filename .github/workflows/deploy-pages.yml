@@ -38,6 +38,9 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Verify exported progress and evidence
+        run: node scripts/check-export.mjs
+
       - name: Add CNAME for eth2030.altllm.ai
         run: echo 'eth2030.altllm.ai' > out/CNAME
 

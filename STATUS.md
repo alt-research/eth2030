@@ -1,3 +1,22 @@
+## Merged roadmap and homepage progress (2026-11-18)
+
+- Refreshed the active roadmap, progress report and next-stage/CL iteration
+  sequence after PR 61 merged at `911afb0c`. Replaced obsolete aggregate completion
+  claims with qualified results and independent-client/service acceptance gates.
+- Homepage and `/roadmap` share a dated development panel: sponsored slot 66,
+  blob slot 165, fresh CL join at slot 256 and receiver restart. The panel links
+  the merged PR and immutable run record and states the synchronized-EL boundary.
+- Updated Frame, FOCIL and historical BAL evidence paths, scoped gaps and the
+  maintenance guide. Historical tracker labels remain distinct from current-spec
+  conformance; no fork completion percentage was inferred from the paired control.
+- Site production build, 386 EIP implementation/test paths, retained-record export
+  assertions and the local Go build passed. Browser checks covered homepage and
+  roadmap at 1440px/390px, milestone visibility, phase/detail navigation, layout
+  overflow and JavaScript errors. Pages deployment now checks the exported claims.
+- No devnet was started for this documentation/site refresh. The temporary static
+  preview was stopped after verification. Publication follows review/merge through
+  the existing Pages workflow.
+
 ## Qualified paymaster, blob and fresh CL history (2026-11-18)
 
 - Native EL `e0451092` and Lighthouse `a4ceb86e` passed the complete capped
@@ -215,7 +234,7 @@
 ## ETH2030 PR readiness review (2026-11-17)
 
 - Upstream master is `ad35748f` with zero open upstream PRs at the
-  review snapshot. The [PR readiness review](docs/next-stage-work-plan.md#pr-readiness-on-the-current-eth2030-master)
+  review snapshot. The [PR readiness review](https://github.com/alt-research/eth2030/blob/911afb0c42a2e33c9e65881b31ed1b1c446390b8/docs/next-stage-work-plan.md#pr-readiness-on-the-current-eth2030-master)
   identifies the Bogotá branch for direct review, scopes the devnet
   controls to a 14-file delta on the Bogotá base, and records the
   documentation candidate and Frame integration dependency.

@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Merged Frame roadmap and homepage progress (2026-11-18)
+
+- [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+- [x] Share the qualified development snapshot between the homepage and roadmap.
+- [x] Refresh Frame, FOCIL and historical BAL references; retain independent-client and service gates.
+- [x] Replace obsolete active plans and progress totals with current evidence and next acceptance work.
+- [x] Verify the static export, progress consistency, source paths, local build and responsive rendering.
+- [x] Commit and publish only the scoped changes for review.
+
 ## Frame paymaster and history follow-up (2026-11-18)
 
 - [x] Freeze a reproducible ETH2030 paymaster runtime with an acyclic protocol-signature witness convention and explicit upstream-reference differences.

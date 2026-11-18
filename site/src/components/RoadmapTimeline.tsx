@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import SectionHeading from '@/components/ui/SectionHeading';
+import DevelopmentProgress from '@/components/DevelopmentProgress';
 import { roadmapStages, roadmapProgress, roadmapStatusNames } from '@/lib/roadmap';
 import styles from './RoadmapTimeline.module.css';
 
@@ -12,6 +13,7 @@ export default function RoadmapTimeline() {
         <p>Six proposed upgrades from the EF Architecture Strawmap, dated November 2, 2026. Explore the project&apos;s tracked work against the roadmap.</p>
         <Link href="/roadmap/" className={styles.detailLink}>Explore the full roadmap <span>↗</span></Link>
       </div>
+      <DevelopmentProgress />
       <div className={styles.cards} aria-label="Roadmap progress">
         {roadmapStages.map((stage, index) => {
           const { entries, counts, completePercentage } = roadmapProgress(stage.id);

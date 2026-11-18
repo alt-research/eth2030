@@ -15,7 +15,7 @@ def run(plan, args):
                 "--port=9000", "--quic-port=9001", "--enr-address=KURTOSIS_IP_ADDR_PLACEHOLDER",
                 "--enr-tcp-port=9000", "--enr-udp-port=9000", "--enr-quic-port=9001",
                 "--boot-nodes=" + args["bootnodes"], "--target-peers=2", "--disable-peer-scoring",
-                "--enable-private-discovery", "--disable-packet-filter", "--allow-insecure-genesis-sync",
+                "--enable-private-discovery", "--disable-packet-filter",
                 "--disable-backfill-rate-limiting", "--subscribe-all-subnets",
             ],
             private_ip_address_placeholder="KURTOSIS_IP_ADDR_PLACEHOLDER",

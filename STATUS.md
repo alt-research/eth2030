@@ -24,6 +24,11 @@
   JSON (hex DATA and lower-case field names, per Engine Osaka).
 - Replacements now test rejected payer changes preserving the old exposure and
   successful payer changes releasing it for another sender.
+- The next live run finalized both coded sponsorship (slot 66) and a blob
+  Frame (slot 162), with identical receipts and exact sponsor settlement.
+  The observer launch rejected incompatible checkpoint/genesis CLI options;
+  its failure path removed the entire enclave and stopped the engine. The
+  observer now uses checkpoint sync exclusively.
 - This is an explicitly versioned experimental implementation; upstream bytecode
   and ABI agreement, live coded sponsorship and fresh CL history are next.
 

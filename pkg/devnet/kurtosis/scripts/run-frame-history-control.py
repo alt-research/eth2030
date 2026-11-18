@@ -144,6 +144,10 @@ def verify_history(enclave, evidence, rpcs, beacons, frame_tool, output):
     (output / "heze-finalized-header.json").write_text(json.dumps(checkpoint, indent=2) + "\n")
     (output / "consensus-spec.json").write_text(json.dumps(verifier.fetch(beacons[0] + "/eth/v1/config/spec"), indent=2) + "\n")
     evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"], "state_root": state_root}
+    verify_observer_history(enclave, evidence, beacons, output)
+
+
+def verify_observer_history(enclave, evidence, beacons, output):
     observer, evidence["observer"] = start_observer(enclave, beacons[0], output)
     histories = []
     for item in (evidence["sponsored"], evidence["blob"]):

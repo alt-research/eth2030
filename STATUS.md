@@ -1,3 +1,7 @@
+## Snap version 2 review and composition (2026-11-19)
+
+PR 81 adds real BAL-based moving-pivot/reorg state synchronization, exact point-proof restoration, cursor reuse and missing-orphan restart. Independent SDK RLPx packet consumers and five native encrypted Node scenarios pass; seven behavioral mutations are detected. Aggregate source `13969eaf` passes 211 Go packages, 27 tagged Core/EIP packages, affected race/vet and build. Program/review records are updated; final gas, eth/72 and complete CL/multiclient/release gates remain open.
+
 ## Configured blob schedule and signed capacity review (2026-11-18)
 
 [PR 80](https://github.com/alt-research/eth2030/pull/80) qualifies configured capacities/prices, actual fee burn, opcode/receipt/RPC contexts and persisted historical parameters. Real version-1 signed HTTP passes at 7/10/21 blobs with independent formulas and fresh-node recovery. Aggregate `53099cbe` passes all 211 tested Go packages, tagged Core/EIP, 54 targeted race packages, vet/build. [Verification](docs/verification/glamsterdam-blob-schedule-20261118.md). Final gas and remaining network/CL/release gates stay open.

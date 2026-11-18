@@ -1,5 +1,11 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Snap version 2 review tracking (2026-11-19)
+
+- [x] Record separate PR 81, exact source, dependencies and qualified consumers.
+- [x] Preserve full program gates and import verification/results/composition evidence.
+- [x] Verify aggregate tests, tagged suites, affected race/vet and build.
+
 ## Configured blob schedule review (2026-11-18)
 
 - [x] Publish PR 80 with explicit dependencies and isolated review delta.

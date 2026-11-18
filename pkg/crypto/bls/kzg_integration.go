@@ -530,3 +530,26 @@ func (b *GoEthKZGBackend) VerifyBlobCellProofs(blob, commitment []byte, proofs [
 	err = b.ctx.VerifyCellKZGProofBatch(commitments, indices, cells[:], batchProofs)
 	return err == nil, err
 }
+
+// VerifyCells authenticates a bounded sparse batch with the production setup.
+func (b *GoEthKZGBackend) VerifyCells(commitments [][]byte, indices []uint64, cells, proofs [][]byte) error {
+	if b.ctx == nil {
+		return ErrKZGBackendNotImplemented
+	}
+	if len(commitments) != len(indices) || len(cells) != len(indices) || len(proofs) != len(indices) {
+		return errors.New("invalid sparse cell batch shape")
+	}
+	comms := make([]goethkzg.KZGCommitment, len(indices))
+	points := make([]*goethkzg.Cell, len(indices))
+	openings := make([]goethkzg.KZGProof, len(indices))
+	for i := range indices {
+		if indices[i] >= KZGCellsPerExtBlob || len(commitments[i]) != KZGBytesPerCommitment || len(cells[i]) != KZGBytesPerCell || len(proofs[i]) != KZGBytesPerProof {
+			return errors.New("invalid sparse cell dimensions")
+		}
+		copy(comms[i][:], commitments[i])
+		points[i] = new(goethkzg.Cell)
+		copy(points[i][:], cells[i])
+		copy(openings[i][:], proofs[i])
+	}
+	return b.ctx.VerifyCellKZGProofBatch(comms, indices, points, openings)
+}

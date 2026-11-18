@@ -1,3 +1,7 @@
+## Glamsterdam EIP-8024 bytecode and activation (2026-11-18)
+
+Corrected native DUPN/SWAPN/EXCHANGE immediate permutations and reserved ranges, and activated the instructions at canonical Amsterdam. Published bytecode vectors, all valid depths/pairs, stack and jump boundaries, and native transactions/fork transitions pass. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-stack-opcodes-20261118.md). Independent-client and full release gates remain open.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

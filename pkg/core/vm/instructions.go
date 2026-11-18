@@ -1273,25 +1273,15 @@ func opCLZ(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stac
 	return nil, nil
 }
 
-// decodeSingle decodes a single immediate byte for DUPN/SWAPN per EIP-8024.
-// Maps the full byte range [0..255] (excluding 91..127) onto stack depths [17..236].
+// decodeSingle maps valid EIP-8024 immediates to depths 17 through 235.
 func decodeSingle(x byte) int {
-	if x <= 90 {
-		return int(x) + 17
-	}
-	// x >= 128
-	return int(x) - 20
+	return (int(x) + 145) % 256
 }
 
-// decodePair decodes a pair immediate byte for EXCHANGE per EIP-8024.
-// Maps the full byte range [0..255] (excluding 80..127) onto two stack depths.
+// decodePair implements the EIP-8024 XOR permutation for EXCHANGE.
+// Callers reject the reserved range 82 through 127 before decoding.
 func decodePair(x byte) (int, int) {
-	var k int
-	if x <= 79 {
-		k = int(x)
-	} else {
-		k = int(x) - 48
-	}
+	k := int(x ^ 143)
 	q, r := k/16, k%16
 	if q < r {
 		return q + 1, r + 1
@@ -1358,8 +1348,8 @@ func opExchange(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 		x = contract.Code[*pc+1]
 	}
 
-	// Range 80..127 is excluded per spec.
-	if x > 79 && x < 128 {
+	// Range 82..127 is excluded per spec.
+	if x > 81 && x < 128 {
 		return nil, ErrInvalidOpCode
 	}
 	n, m := decodePair(x)

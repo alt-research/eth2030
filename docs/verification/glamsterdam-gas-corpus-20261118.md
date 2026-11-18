@@ -1,6 +1,6 @@
 # Independent Glamsterdam gas corpus
 
-Branch: `test/glamsterdam-gas-corpus`, based on `origin/master` `38ea9259`.
+[PR 75](https://github.com/alt-research/eth2030/pull/75), branch: `test/glamsterdam-gas-corpus`, based on `origin/master` `38ea9259`.
 
 ## Scope and reproducibility
 

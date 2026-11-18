@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "ab3653621b65a80b6fdaaca15ac9a25a080010b1",
+  "integration_tested_commit": "53099cbe28f4dfdcb31e84b1dfee5754a10ec137",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -166,10 +166,26 @@
       "scope": "Persisted configuration authority before actual Node restart/replay",
       "release_qualified": false,
       "source_in_tested_integration": true
+    },
+    {
+      "pr": 80,
+      "url": "https://github.com/alt-research/eth2030/pull/80",
+      "branch": "feat/glamsterdam-blob-schedule",
+      "commit": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "remote_head": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "tested_source_commit": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+      "scope": "Configured blob capacity, exact prices, fee burn and signed 21-blob consumers",
+      "dependencies": [
+        76,
+        79
+      ],
+      "review_delta": "https://github.com/fyInALT/eth2030/compare/review/glamsterdam-blob-foundation...feat/glamsterdam-blob-schedule",
+      "release_qualified": false,
+      "source_in_tested_integration": true
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
-  "integration_published_head": "1d9826c2bfb0f70dd294db85d9bef1f3911e3d45",
+  "integration_published_head": "ab3653621b65a80b6fdaaca15ac9a25a080010b1",
   "checked_at_utc": "2026-11-18 11:15:45 UTC",
-  "previous_integration_tested_commit": "1d9826c2bfb0f70dd294db85d9bef1f3911e3d45"
+  "previous_integration_tested_commit": "ab3653621b65a80b6fdaaca15ac9a25a080010b1"
 }

@@ -1,3 +1,7 @@
+## Configured blob schedule and signed capacity review (2026-11-18)
+
+[PR 80](https://github.com/alt-research/eth2030/pull/80) qualifies configured capacities/prices, actual fee burn, opcode/receipt/RPC contexts and persisted historical parameters. Real version-1 signed HTTP passes at 7/10/21 blobs with independent formulas and fresh-node recovery. Aggregate `53099cbe` passes all 211 tested Go packages, tagged Core/EIP, 54 targeted race packages, vet/build. [Verification](docs/verification/glamsterdam-blob-schedule-20261118.md). Final gas and remaining network/CL/release gates stay open.
+
 ## Actual persisted configuration recovery review (2026-11-18)
 
 [PR 79](https://github.com/alt-research/eth2030/pull/79) qualifies pre-replay runtime configuration authority through signed HTTP and actual restarts. Compatible future updates survive; active changes, corrupt/unknown authority and changed historical parameters are rejected without head/config adoption. Aggregate `ab365362` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. [Verification](docs/verification/glamsterdam-config-recovery-20261118.md). Dynamic blob schedules, final gas and release gates remain open.

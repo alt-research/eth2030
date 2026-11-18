@@ -1,5 +1,13 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Configured blob schedule review (2026-11-18)
+
+- [x] Publish PR 80 with explicit dependencies and isolated review delta.
+- [x] Qualify real 7/10/21-blob version-1 HTTP and restart consumers, independent formulas and six mutations.
+- [x] Retain the failed legacy race observation and pass current proofs without timeout changes.
+- [x] Qualify full/tagged/54-package race/vet/build composition.
+- [ ] Complete sparse relay, snap/2, final gas and remaining release gates.
+
 ## Canonical startup and Engine review (2026-11-18)
 
 - [x] Publish isolated PR 78 and pin complete Engine specifications.

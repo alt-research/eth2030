@@ -128,15 +128,22 @@ def start_observer(enclave, beacon, output):
 def verify_history(enclave, evidence, rpcs, beacons, frame_tool, output):
     evidence["blob"] = verify_blob(rpcs, beacons, frame_tool, output)
     # Preserve real public consensus fixtures for the service-codec cutover.
-    request = Request(beacons[0] + "/eth/v2/debug/beacon/states/finalized", headers={"Accept": "application/octet-stream"})
+    checkpoint = verifier.fetch(beacons[0] + "/eth/v1/beacon/headers/finalized")
+    state_root = checkpoint["data"]["header"]["message"]["state_root"]
+    state_url = beacons[0] + "/eth/v2/debug/beacon/states/" + state_root
+    request = Request(state_url, headers={"Accept": "application/octet-stream"})
     with urlopen(request, timeout=30) as response:
         state_ssz = response.read(16 * 1024 * 1024 + 1)
         if len(state_ssz) > 16 * 1024 * 1024:
             raise RuntimeError("unexpectedly large observer state fixture")
         (output / "heze-finalized.ssz").write_bytes(state_ssz)
-    state_json = verifier.fetch(beacons[0] + "/eth/v2/debug/beacon/states/finalized")
+    state_json = verifier.fetch(state_url)
+    if state_json["data"]["slot"] != checkpoint["data"]["header"]["message"]["slot"]:
+        raise RuntimeError("consensus fixture and finalized header slots differ")
     (output / "heze-finalized.json").write_text(json.dumps(state_json, indent=2) + "\n")
-    evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"]}
+    (output / "heze-finalized-header.json").write_text(json.dumps(checkpoint, indent=2) + "\n")
+    (output / "consensus-spec.json").write_text(json.dumps(verifier.fetch(beacons[0] + "/eth/v1/config/spec"), indent=2) + "\n")
+    evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"], "state_root": state_root}
     observer, evidence["observer"] = start_observer(enclave, beacons[0], output)
     histories = []
     for item in (evidence["sponsored"], evidence["blob"]):

@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "13969eaf4de50215744676a41b7eca12a5795ad5",
+  "integration_tested_commit": "20b1c1f310017edd83f050a366d0f8f72a4757ee",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -187,9 +187,9 @@
       "pr": 81,
       "url": "https://github.com/alt-research/eth2030/pull/81",
       "branch": "feat/glamsterdam-snap2",
-      "commit": "d171d1deff49b143fbfda5ffa7ea7c4c5bf9f9c4",
-      "remote_head": "d171d1deff49b143fbfda5ffa7ea7c4c5bf9f9c4",
-      "tested_source_commit": "d171d1deff49b143fbfda5ffa7ea7c4c5bf9f9c4",
+      "commit": "ffe95de1b67848e296d2edebcd144f63beb76d42",
+      "remote_head": "ffe95de1b67848e296d2edebcd144f63beb76d42",
+      "tested_source_commit": "ffe95de1b67848e296d2edebcd144f63beb76d42",
       "dependencies": [
         69,
         77
@@ -197,10 +197,23 @@
       "scope": "Authenticated BAL moving-pivot and reorg catch-up over real encrypted Node sync",
       "release_qualified": false,
       "source_in_tested_integration": true
+    },
+    {
+      "pr": 82,
+      "url": "https://github.com/alt-research/eth2030/pull/82",
+      "branch": "feat/glamsterdam-eth72",
+      "commit": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "remote_head": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "tested_source_commit": "d72a8d35dd2bea6bcf6794c30efcd88c9968ec00",
+      "foundation_commit": "1efbd03a311e3c88c64837fa1aff7ec7b68066e2",
+      "review_delta": "https://github.com/fyInALT/eth2030/compare/review/glamsterdam-eth72-foundation...feat/glamsterdam-eth72",
+      "scope": "Sparse provider/sampler/custody relay, verified reconstruction and actual Engine/Node consumers",
+      "release_qualified": false,
+      "source_in_tested_integration": true
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
-  "integration_published_head": "1efbd03a311e3c88c64837fa1aff7ec7b68066e2",
-  "checked_at_utc": "2026-11-18 16:34:46 UTC",
-  "previous_integration_tested_commit": "53099cbe28f4dfdcb31e84b1dfee5754a10ec137"
+  "integration_published_head": "aacc65ea06fd105afe2258f44eebfc9390f21a26",
+  "checked_at_utc": "2026-11-18 17:09:48 UTC",
+  "previous_integration_tested_commit": "13969eaf4de50215744676a41b7eca12a5795ad5"
 }

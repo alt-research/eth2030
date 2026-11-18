@@ -28,7 +28,8 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | [PR #72](https://github.com/alt-research/eth2030/pull/72) — destruction and BAL | Balance-preserving EIP-8246 lifecycle, journaled creation/revert, final-state BAL and CREATE2 nonce/prechecks | Submitted; native and Frame behavioral tests pass; full fixture/gas qualification remains open |
 | [PR #73](https://github.com/alt-research/eth2030/pull/73) — stack opcodes | Current EIP-8024 immediate encoding, canonical activation and every valid depth/pair | Submitted; native transactions and published vectors pass |
 | [PR #81](https://github.com/alt-research/eth2030/pull/81) — snap/2 | Authenticated BAL catch-up, moving/rollback pivots, missing-orphan restart and actual encrypted Node/SDK consumers | Submitted; full independent-client/resource gates remain open |
-| eth/72 and CL lifecycle | Full remaining protocols, actual CL/builder and recovery acceptance | Pending |
+| [PR #82](https://github.com/alt-research/eth2030/pull/82) — eth/72 | Actual sparse provider/sampler/custody relay, reconstruction, Engine APIs and encrypted Node recovery | Submitted; full independent-client/CL/resource gates remain open |
+| CL lifecycle | Actual CL/builder and recovery acceptance | Pending |
 
 Each major change receives its own branch and PR; no unrelated changes are staged. Final task completion requires the acceptance evidence in DEVELOPMENT_PLAN.md. A submitted PR is not a merged or release-qualified feature.
 
@@ -68,7 +69,7 @@ The 33-task plan remains the acceptance contract. A native fix, a passing develo
 | GL-032/033 | Native protocol log and destruction/state/BAL corrections are implemented, including canonical Frame composition. Full upstream scenario matrix, selected gas and independent execution remain. |
 | GL-034 | PR 77 implements canonical contracts, mandatory extraction, real HTTP production/import and identical real-BLS CL component consumers (Lighthouse PR 3). Full live deployment/transport/recovery and final gas remain open. |
 | GL-040/041 | Canonical persisted bodies already existed; retention, empty BAL recovery, negotiated eth/69–71 and correlated bounded history consumers are implemented. Full independent-client historical/cold-sync and recovery gates remain. |
-| GL-042/043 | PR 81 implements actual snap/2 moving-pivot/reorg/cursor/restart consumers with SDK encrypted wire checks. Full independent-client cold sync and resource limits remain; eth/72 cell relay/provider/sampler is in progress. |
+| GL-042/043 | PR 81 implements actual snap/2 moving-pivot/reorg/cursor/restart consumers with SDK encrypted wire checks. PR 82 implements actual sparse cell relay/provider/sampler/custody/reconstruction and Engine consumers. Full independent-client cold sync/gossip, live CL reconnect and resource/WAL qualification remain. |
 | GL-044/045 | Actual access-list discovery and returned-list gas behavior are implemented; final API/gas fixtures and selected multidimensional trace semantics remain. |
 | GL-050–055 | Actual Lighthouse/builder transitions, selected authentication and optimistic state, payment invariants, SSZ/proofs and partial-message recovery remain open. Merged upstream transition changes can be audited immediately; these are not all blocked by unresolved alternatives. |
 | GL-060–063 | The combined development gate passes. Independent gas/current-text corpus, application compatibility, real multi-client devnets, restart/cold-sync, measured limits and release qualification remain open. |
@@ -141,3 +142,14 @@ The composed source `53099cbe` passes all 211 tested Go packages, 27 tagged Core
 [PR 81](https://github.com/alt-research/eth2030/pull/81) composes PRs 69 and 77 and implements actual Node snap/2 negotiation, ordered committed BAL exchange and staged state catch-up. Verified point proofs restore old-only fork effects; partial cursors survive and missing orphan BALs force fresh bulk synchronization. The wire distinguishes unavailable 80 from empty c0 through actual custom send/receive paths. Five real encrypted Node scenarios and unmodified Geth SDK packets qualify root/adoption/restart and corrupted proof rejection. Seven compiling behavioral mutations are detected. [Feature evidence](../../verification/glamsterdam-snap2-20261119.md).
 
 The composed source `13969eaf` passes all 211 tested Go packages, 27 tagged Core/EIP packages, affected race/vet and build. [Composition evidence](../../verification/glamsterdam-snap2-integration-20261119.md). Full Geth cold sync, mainnet resource/retention qualification, eth/72, final gas, complete CL and release gates remain open. The PR count does not indicate release completion.
+
+
+## Sparse blob relay and Engine cell consumers
+
+[PR 82](https://github.com/alt-research/eth2030/pull/82) is a separate major feature review based on the qualified submitted composition. It connects actual eth/72 negotiation, flat correlated cells, elided metadata, bounded signed staging, KZG authentication and 64-index reconstruction before ordinary full-data pool promotion. Native encrypted peers qualify two-provider sampling, custody plus random extra, custody expansion and eager mode. Actual Nodes qualify HTTP propagation, Engine proof/data/null projections and fresh receiver reacquisition. [Feature evidence and exact results](../../verification/glamsterdam-eth72-20261119.md).
+
+The implementation follows the formal devp2p request-ID schema and the October 30 merged blob-major correction (PR 291 / issue 290), rather than the stale alternative ordering. Eight compiling behavioral mutations are detected. Independent source passes all 212 Go packages, 27 tagged Core/EIP packages, 36 affected race packages, vet and build. The aggregate `20b1c1f` passes all 212 packages, 27 tagged packages, 97 affected race packages, vet and build. [Composition evidence](../../verification/glamsterdam-eth72-integration-20261119.md).
+
+PR 81 also explicitly stops its test-owned encrypted servers before Node/database restart; all five snap/2 scenarios pass under race after that cleanup. Full independent-client gossip/cold sync, actual CL custody reconnect, resource/fairness and sparse WAL campaigns, final execution gas and complete release qualification remain open. No upstream PR was merged.
+
+EIPs PRs 12581 and 12582 were rechecked at this follow-up and remain open/unmerged at the same frozen heads. The merged LIFO text remains the versioned development/measurement baseline; final release selection stays unresolved.

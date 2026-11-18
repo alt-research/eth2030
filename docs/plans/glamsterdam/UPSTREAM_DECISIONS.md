@@ -75,3 +75,9 @@ Canonical header repairs change hashes compared with the experimental native for
 ## Updating a decision
 
 Append the refresh timestamp, selected source URL and commit/release, adoption status and rationale, rejected alternative disposition, affected GL tasks, invalidated evidence and replacement vectors. Record implementer/reviewer responsibility when assigned. A changed upstream decision reopens the affected acceptance claims without erasing previous versioned evidence. Do not silently mutate historical audit results or mark all development blocked while unrelated tasks remain actionable.
+
+## Networking refresh on 2026 11 19
+
+At 2026-11-18 17:09:48 UTC, the supporting eth/72 source set is pinned to devp2p commit `88f1c80800d622cc3a542a2125bbe33cc18c9f9c` (file blob `a23dc172`). [Merged Geth 35428](https://github.com/ethereum/go-ethereum/pull/35428) confirms flat request IDs; [merged devp2p 291](https://github.com/ethereum/devp2p/pull/291) resolves [issue 290](https://github.com/ethereum/devp2p/issues/290) to blob-major cell order. PR 82 adopts those settled inputs and qualifies native/SDK consumers; full independent-client and CL/resource release gates remain open. This refresh does not choose an unmerged gas or payload-authentication alternative.
+
+EIPs 12581/12582 remain open/unmerged at the baseline heads on this refresh. Current merged LIFO text remains the explicit development and measurement baseline, with final release selection unclosed.

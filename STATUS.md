@@ -1,3 +1,7 @@
+## Sparse relay review and integration (2026-11-19)
+
+PR 82 connects actual eth/72 provider/sampler/custody relay, authenticated reconstruction and Engine cells, with encrypted native-pool/SDK/Node/restart consumers and eight detected guard mutations. Aggregate source `20b1c1f` passes 212 Go packages, 27 tagged Core/EIP packages, 97 affected race packages, vet/build. PR 81 socket cleanup also passes five race-tested scenarios. Exact review/source/discussion records are updated; final gas, full independent-client/CL/resource and release gates remain open.
+
 ## Snap version 2 review and composition (2026-11-19)
 
 PR 81 adds real BAL-based moving-pivot/reorg state synchronization, exact point-proof restoration, cursor reuse and missing-orphan restart. Independent SDK RLPx packet consumers and five native encrypted Node scenarios pass; seven behavioral mutations are detected. Aggregate source `13969eaf` passes 211 Go packages, 27 tagged Core/EIP packages, affected race/vet and build. Program/review records are updated; final gas, eth/72 and complete CL/multiclient/release gates remain open.

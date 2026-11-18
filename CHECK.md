@@ -1,5 +1,12 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Sparse relay review tracking (2026-11-19)
+
+- [x] Record separate PR 82, source/foundation/remote heads and current merged wire decisions.
+- [x] Import actual native/SDK/Engine/recovery/mutation evidence and snap/2 socket follow-up.
+- [x] Verify the 212-package aggregate, tagged suites, 97-package race, vet/build and published integration head.
+- [x] Preserve final gas, CL/multiclient/resource and release gates.
+
 ## Snap version 2 review tracking (2026-11-19)
 
 - [x] Record separate PR 81, exact source, dependencies and qualified consumers.

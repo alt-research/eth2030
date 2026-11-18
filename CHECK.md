@@ -5,7 +5,8 @@
 - [x] Freeze signed transactions, complete pre-state, fork/config and reference-client version.
 - [x] Execute identical inputs through native admission/execution and the unmodified Geth Amsterdam transition.
 - [x] Record invalid versus included failure, gas dimensions, logs and exact final account/state results.
-- [ ] Verify pre-Amsterdam controls, archive candidate mismatches, build locally and publish a separate review.
+- [x] Verify pre-Amsterdam controls, archive candidate mismatches and build locally.
+- [ ] Publish the separate gas-corpus review.
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

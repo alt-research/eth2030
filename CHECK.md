@@ -1,3 +1,11 @@
+## Glamsterdam completion implementation (2026-11-18)
+
+- [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
+- [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.
+- [ ] Publish the baseline/acceptance program in its own review branch.
+- [ ] Deliver each major feature in a separate scoped branch and PR, retaining test evidence.
+- [ ] Close native, consumer, independent-client, recovery and release gates with observed evidence.
+
 # Lean4 Verification Check-list
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)

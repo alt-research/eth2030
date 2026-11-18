@@ -1,3 +1,9 @@
+## Glamsterdam implementation baseline (2026-11-18)
+
+Started the 33-task completion plan on isolated branch `feat/glamsterdam-baseline`, based on freshly fetched `origin/master` at `38ea9259`. Imported the dated plan/audits without replacing newer mainline work. [Implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md).
+
+Revalidation finds BAL/slot canonical headers, execution-slot propagation, canonical persisted Engine bodies and the old tagged expectation already repaired on mainline. Those defects must not be reimplemented from the stale audit branch. The latest targeted core/Engine/node/eiptest suite is green; source/spec decisions and remaining size/factory/retention/RPC/gas/network work remain under qualification. Large functional changes will use separate branches and PRs.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -1,3 +1,9 @@
+## RPC access-list discovery (2026-11-18)
+
+Branch `feat/glamsterdam-access-list` replaces the eth_createAccessList empty placeholder with production backend discovery. Independent state copies execute native transactions until the access list converges; returned gas is measured with the returned list, without selecting an empty list merely because it is cheaper. Reverted child touches are retained, lists/keys are deterministic, and malformed addresses/keys/quantities return invalid-params errors. Unsupported backends no longer report fictitious discovery.
+
+The actual HTTP/node-backend regression first failed on the placeholder and now passes. Additional tests cover reverted inner calls, contract-creation accesses, historical versus current state, no canonical nonce/storage mutation and malformed input. RPC/node/eiptest suites, targeted race, full build and vet passed. This delivers GL-044 access discovery for current CallArgs; final gas-model/API semantic and broader authorization/blob argument qualification remain GL-020/025/045 work. [Evidence](docs/verification/glamsterdam-access-list-20261118.md).
+
 ## Glamsterdam canonical deterministic factory (2026-11-18)
 
 Branch `feat/glamsterdam-factory` uses the EIP-7997 factory at 0x4e59b44847b379578588920cA78FbF26c0B4956C with its exact 69-byte runtime and nonce 1 for explicit genesis/test state. Removed block-processor and both builder paths that injected a different contract at a fork. Private chains must include the canonical alloc or deploy it with an ordinary transaction before activation; no fork existence check or new switch is added.

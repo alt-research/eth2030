@@ -1,4 +1,12 @@
-## Glamsterdam deterministic factory
+# Lean4 Verification Check-list
+
+- [x] Inspect the production HTTP/backend route and merged execution-apis #950 semantics.
+- [x] Add failing real-backend HTTP storage-discovery and non-mutation regressions.
+- [x] Replace the empty placeholder with bounded discovery/convergence and gas readback.
+- [x] Verify returned access items, reverted touches, creation, historical state and affected packages/build.
+- [x] Prepare this major RPC feature for its separate PR.
+
+# Lean4 Verification Check-list
 
 - [x] Read old local and pinned current EIP-7997, including deployment and no-fork-check rules.
 - [x] Add canonical address/runtime/nonce and actual CREATE2/value tests plus a no-fork-injection regression.

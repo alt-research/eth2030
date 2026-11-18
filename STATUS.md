@@ -1,3 +1,7 @@
+## Canonical execution system transitions (2026-11-19)
+
+Isolated `fix/glamsterdam-system-transitions` starts from qualified composition `95382598`, separately from the Gas draft. Pinned EIP-2935 defines canonical address 0x0000F90827F1C53a10cb7A02335B175320002935 and an 8191 window; the existing direct helper uses an obsolete address/window. EIPs 2935/4788 permit direct optimizations, but actual EVM calls will qualify deployed/missing/custom code and match canonical runtimes. This feature is under implementation and not release-qualified.
+
 ## Moving pivot proof binding composed regression (2026-11-19)
 
 Source `c0df6062` composes PR 81's unchanged-account exact-proof repair with reviews 65–82. All 212 Go packages, 27 tagged Core/EIP packages, affected snap/scheduler/Node race, vet and build pass. Seven encrypted Node pivot scenarios now cover unchanged pending storage and its damaged proof. The Gas draft remains separate; final cross-client/resource/release gates stay open. [Evidence](docs/verification/glamsterdam-snap2-binding-integration-20261119.md).

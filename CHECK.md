@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Canonical execution system transitions (2026-11-19)
+
+- [x] Read complete pinned EIPs 2935/4788 and the selected 8037 system-call margin; compare canonical SDK assets.
+- [ ] Reproduce wrong history address/window and missing/custom-runtime behavior through actual block processing.
+- [ ] Share pre-block EVM system-call execution between builder/importer; preserve caller exclusion, ordering, isolation, actual BAL changes and no block/user fee debit.
+- [ ] Supply explicit canonical assets before owned genesis roots without mutating supplied network state or fork-time injection.
+- [ ] Qualify independent runtime/storage/root consumers, wrap/missing-slot/query bounds and native Node build/import/restart; preserve 8282/6110/7002/7251 coverage.
+- [ ] Run full/tagged/affected race/vet/build and sensitive mutations; publish a separate feature PR.
+
 ## eth version 72 sparse blob relay (2026-11-19)
 
 - [x] Pin full EIP-8070/7594 and devp2p schemas plus Geth merged flat request-id fix.

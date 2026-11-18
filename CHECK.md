@@ -1,5 +1,12 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Builder execution requests review batch (2026-11-18)
+
+- [x] Publish isolated EL PR 77 and Lighthouse PR 3 with exact spec and wire evidence.
+- [x] Compose the feature sets without altering the original checkouts.
+- [x] Qualify 211 aggregate Go packages, tagged Core/EIP, vet/build and 25 paired CL library tests/check/full lint.
+- [x] Retain final gas, full live network/deployment/recovery and release gates.
+
 - [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
 - [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.
 - [ ] Publish the baseline/acceptance program in its own review branch.

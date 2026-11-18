@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "3b05bdbbee8a1fb172ae1f4f271351b6cdd0dab2",
+  "integration_tested_commit": "d97be4c32e54e1f516391fe45262e01acd27c841",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -133,10 +133,21 @@
       "release_qualified": false,
       "tested_source_commit": "85ad1bca9a34e26934b06bc46cf1b1c1e5fc2b6f",
       "source_in_tested_integration": true
+    },
+    {
+      "pr": 77,
+      "url": "https://github.com/alt-research/eth2030/pull/77",
+      "branch": "feat/glamsterdam-builder-requests",
+      "commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "remote_head": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "scope": "Mandatory EIP-8282 contracts, extraction and Engine/CL bytes",
+      "release_qualified": false,
+      "tested_source_commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "source_in_tested_integration": true
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
   "integration_published_head": "3b05bdbbee8a1fb172ae1f4f271351b6cdd0dab2",
   "checked_at_utc": "2026-11-18 11:15:45 UTC",
-  "previous_integration_tested_commit": "24e0bd542ebb36676ab6831a33bfb43cd4d6f2db"
+  "previous_integration_tested_commit": "3b05bdbbee8a1fb172ae1f4f271351b6cdd0dab2"
 }

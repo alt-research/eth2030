@@ -1,3 +1,7 @@
+## Builder execution request reviews (2026-11-18)
+
+[EL PR 77](https://github.com/alt-research/eth2030/pull/77) and [Lighthouse PR 3](https://github.com/jiayaoqijia/lighthouse/pull/3) qualify canonical mandatory queues, actual HTTP request commitments and independent real-BLS state-processing consumers. The composed EL source passes all 211 tested packages, tagged Core/EIP, vet and build; paired CL source passes 25 library tests/check. See [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). Final gas, live deployment/devnet, networking and release gates remain open.
+
 ## Blob authentication, publication and replay review (2026-11-18)
 
 PR 76 closes ordinary full-data sidecar authentication and proof-consumer defects, with real HTTP/SDK wire checks and fresh-node journal recovery. Independent full Go/race/vet/build pass; the feature aggregate at `3b05bdb` passes all 211 tested packages, tagged Core/EIP, build and affected vet. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Sparse eth/72 and final gas/release gates remain open.

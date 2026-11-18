@@ -104,6 +104,18 @@ func (c *ChainConfig) Validate() error {
 		lastTimeName = f.name
 	}
 
+	// EIP-7892 BPO schedules extend Prague and may interleave with later forks.
+	for _, bpo := range []struct {
+		name string
+		time *uint64
+	}{{"BPO1", c.BPO1Time}, {"BPO2", c.BPO2Time}} {
+		if bpo.time != nil && (c.PragueTime == nil || *bpo.time < *c.PragueTime) {
+			return fmt.Errorf("%s requires prior or simultaneous Prague activation", bpo.name)
+		}
+	}
+	if c.BPO1Time != nil && c.BPO2Time != nil && *c.BPO2Time < *c.BPO1Time {
+		return errors.New("BPO2 must not precede BPO1")
+	}
 	// Post-merge timestamp forks require TerminalTotalDifficulty.
 	if c.ShanghaiTime != nil && c.TerminalTotalDifficulty == nil {
 		return errors.New("Shanghai requires TerminalTotalDifficulty to be set")

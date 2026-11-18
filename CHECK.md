@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Persisted fork configuration and restart authority (2026-11-18)
+
+- [x] Trace actual Node startup before history replay and reuse the existing persisted config key.
+- [x] Detect incompatible active schedules and immutable parameter changes before state/metadata adoption.
+- [x] Qualify future updates, either-side activation, missing/corrupt metadata and failed persistence.
+- [x] Verify actual node restart preserves heads/state/configuration on rejection and does not mutate network globals.
+- [x] Run affected/full tests, build and race/vet; publish a dedicated PR.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

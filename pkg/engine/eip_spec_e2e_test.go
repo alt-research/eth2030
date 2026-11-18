@@ -178,18 +178,12 @@ func TestE2E_Engine_PayloadBodiesV2_RangeIncludesGenesis(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetPayloadBodiesByRangeV2: %v", err)
 	}
-	if len(results) != 3 {
-		t.Fatalf("want 3 results, got %d", len(results))
+	if len(results) != 1 {
+		t.Fatalf("want only genesis with trailing unknown heights trimmed, got %d", len(results))
 	}
-	// Genesis is block 0; blocks 1 and 2 don't exist yet → nil.
+	// Genesis is block 0; unknown trailing blocks must be omitted.
 	if results[0] == nil {
 		t.Error("genesis block (num=0): want non-nil body")
-	}
-	if results[1] != nil {
-		t.Error("block 1 (not yet processed): want nil body")
-	}
-	if results[2] != nil {
-		t.Error("block 2 (not yet processed): want nil body")
 	}
 }
 
@@ -208,8 +202,8 @@ func TestE2E_Engine_PayloadBodiesV2_BodyFields(t *testing.T) {
 	if body.Transactions == nil {
 		t.Error("Transactions must be non-nil slice (may be empty)")
 	}
-	if body.Withdrawals == nil {
-		t.Error("Withdrawals must be non-nil slice (may be empty)")
+	if body.Withdrawals != nil {
+		t.Error("pre-Shanghai withdrawals must be nil")
 	}
 }
 
@@ -241,7 +235,7 @@ func TestE2E_Engine_PayloadBodiesV2_Handler_DispatchRouting(t *testing.T) {
 func TestE2E_Engine_PayloadBodiesV2_RangeHandler_DispatchRouting(t *testing.T) {
 	_, api := makeE2EBackend(t, coreconfig.TestConfig)
 
-	req := []byte(`{"jsonrpc":"2.0","id":2,"method":"engine_getPayloadBodiesByRangeV2","params":[0,1]}`)
+	req := []byte(`{"jsonrpc":"2.0","id":2,"method":"engine_getPayloadBodiesByRangeV2","params":["0x1","0x1"]}`)
 	resp := api.HandleRequest(req)
 	var rpcResp jsonrpcResponse
 	if err := json.Unmarshal(resp, &rpcResp); err != nil {

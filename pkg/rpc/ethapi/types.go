@@ -47,11 +47,12 @@ const (
 
 // Re-export formatting functions.
 var (
-	FormatBlock       = rpctypes.FormatBlock
-	FormatHeader      = rpctypes.FormatHeader
-	FormatTransaction = rpctypes.FormatTransaction
-	FormatReceipt     = rpctypes.FormatReceipt
-	FormatLog         = rpctypes.FormatLog
+	FormatBlock          = rpctypes.FormatBlock
+	FormatHeader         = rpctypes.FormatHeader
+	FormatTransaction    = rpctypes.FormatTransaction
+	BlobBaseFeeForHeader = rpctypes.BlobBaseFeeForHeader
+	FormatReceipt        = rpctypes.FormatReceipt
+	FormatLog            = rpctypes.FormatLog
 )
 
 // Unexported helpers delegating to rpctypes.

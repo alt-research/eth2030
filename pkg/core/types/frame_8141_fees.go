@@ -73,3 +73,17 @@ func (payment *FramePayment) Settle(gasUsed uint64) (FrameSettlement, error) {
 	}
 	return FrameSettlement{Burned: burned, Tip: tip, Refund: refund.Sub(refund, tip)}, nil
 }
+
+// FrameProposerTip calculates the exact tip, including fee-budget headroom
+// that cannot be represented by the integer GASPRICE returned inside the EVM.
+func FrameProposerTip(tx *FrameTx8141, gasUsed uint64, baseFee, blobBaseFee *big.Int) (*big.Int, error) {
+	payment, err := tx.Payment(baseFee, blobBaseFee)
+	if err != nil {
+		return nil, err
+	}
+	settlement, err := payment.Settle(gasUsed)
+	if err != nil {
+		return nil, err
+	}
+	return settlement.Tip, nil
+}

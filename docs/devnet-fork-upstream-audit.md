@@ -19,6 +19,40 @@ transport, runtime wiring, persistence and consumer behavior independently.
 A mature wire codec can be adopted while its experimental runtime caller
 still needs ETH2030 code.
 
+## Executed consensus codec comparison (2026-11-18)
+
+The [retained replay](../tools/consensus-replay/README.md) updates the codec
+qualification beyond the earlier source comparison. The exact Go dependency is
+ethpandaops `v0.1.11`, and the actual CL is Lighthouse `a05a56de`.
+
+- The March maintained Go codec failed a live **Gloas** state request with
+  `incorrect offset`. Its state still places `LatestExecutionPayloadBid` at
+  the former payload-header position, omits the newer execution requests root
+  in the bid and has no PTC window. Retaining the old Heze Eth1 fields alone
+  does not make that codec compatible with the current CL.
+- The published Heze decoder failed the real current Heze state at
+  `HistoricalRoots`: first offset `3134845`, expected `3134753`. The difference
+  is exactly 92 fixed bytes for the retained `eth1_data`, `eth1_data_votes`
+  offset, `eth1_deposit_index` and `deposit_requests_start_index`.
+- The compatibility candidate uses the published **Gloas** state's current
+  field order and progressive SSZ tags with the published **Heze** bid. The
+  actual finalized slot-192 SSZ roundtrips byte-for-byte and matches the
+  original Beacon header state root, all 256 public keys and balances, and
+  the 96-slot PTC window. Changing state, root, preset, epoch JSON or the
+  execution requests root fails replay. Removing the root comparison is
+  detected by the changed-state and unrelated-header regressions.
+- This supports an upstream-based, fork-specific compatibility decoder rather
+  than carrying forward the March state structs. It does not qualify a Dora
+  deployment or the indexer's epoch consumer. Keep the fork/profile pin until
+  those paths process the retained SSZ and match epoch statistics through a
+  service restart. The published codec is tried first and remains the preferred
+  path for its own released layout; no state-root agreement is inferred from
+  JSON display.
+
+The compressed real state, runtime revisions, Beacon header, spec response and
+all expected epoch identities/balances are committed with the replay tool.
+Its CI job runs real-fixture, mutation-derived negative and race regressions.
+
 ## Decisions and revisions
 
 | Component | ETH2030 revision | Upstream examined | Decision |

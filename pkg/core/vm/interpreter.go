@@ -118,15 +118,17 @@ type EVM struct {
 	readOnly             bool
 	jumpTable            JumpTable
 	precompiles          map[types.Address]PrecompiledContract
-	returnData           []byte              // return data from the last CALL/CREATE
-	callGasTemp          uint64              // temporary storage for CALL gas (set by dynamic gas, read by opCall)
-	callReservoirForward uint64              // reservoir forwarded to child call (set by opCall, read by evm.Call)
-	callReservoirReturn  uint64              // reservoir returned from child call (set by evm.Call, read by opCall)
-	dimGasUsage          *TxDimGasUsage      // per-dimension gas tracking (GAP-2.1, nil if not active)
-	witnessGas           *WitnessGasTracker  // EIP-4762: witness gas tracking (nil if not Verkle)
-	balTracker           BALTracker          // EIP-7928: BAL state access tracking (nil if not active)
-	txIndex              uint64              // EIP-7928: current transaction index for BAL
-	forkRules            ForkRules           // active fork rules for this block
+	returnData           []byte             // return data from the last CALL/CREATE
+	callGasTemp          uint64             // temporary storage for CALL gas (set by dynamic gas, read by opCall)
+	callReservoirForward uint64             // reservoir forwarded to child call (set by opCall, read by evm.Call)
+	callReservoirReturn  uint64             // reservoir returned from child call (set by evm.Call, read by opCall)
+	dimGasUsage          *TxDimGasUsage     // per-dimension gas tracking (GAP-2.1, nil if not active)
+	witnessGas           *WitnessGasTracker // EIP-4762: witness gas tracking (nil if not Verkle)
+	balTracker           BALTracker         // EIP-7928: BAL state access tracking (nil if not active)
+	txIndex              uint64             // EIP-7928: current transaction index for BAL
+	forkRules            ForkRules          // active fork rules for this block
+	frame8141            *FrameStateGas
+	frameValidationErr   error
 	FrameCtx             *FrameContext       // EIP-8141: frame transaction approval context (nil if not frame tx)
 	guestRegistry        *zkvm.GuestRegistry // EL-3: RISC-V guest registry for RVCREATE (nil if not I+)
 }
@@ -334,6 +336,9 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 // (which includes memory expansion cost) -> resize memory -> execute.
 func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 	contract.Input = input
+	if evm.frame8141 != nil {
+		evm.returnData = nil
+	}
 
 	var (
 		pc    uint64
@@ -356,6 +361,11 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 		}
 		if sLen > operation.maxStack {
 			return nil, ErrStackOverflow
+		}
+
+		if err := evm.checkFrameValidation(op, contract, stack, pc); err != nil {
+			evm.frameValidationErr = err
+			return nil, err
 		}
 
 		// Calculate total gas cost for this step (for tracing).
@@ -471,6 +481,13 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 	// Snapshot state for revert on failure.
 	snapshot := evm.StateDB.Snapshot()
 
+	if evm.frame8141 != nil && transfersValue && evm.depth > 0 && evm.StateDB.Empty(addr) {
+		if err := evm.frame8141.Charge(frameNewAccountGas); err != nil {
+			evm.StateDB.RevertToSnapshot(snapshot)
+			return nil, gas, ErrFrameStateGas
+		}
+	}
+
 	// Check for precompiled contract.
 	p, isPrecompile := evm.precompile(addr)
 
@@ -483,7 +500,9 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 			}
 			return nil, gas, nil
 		}
-		evm.StateDB.CreateAccount(addr)
+		if evm.frame8141 == nil || !isPrecompile || transfersValue {
+			evm.StateDB.CreateAccount(addr)
+		}
 	}
 
 	// Transfer value (before running precompile or code).
@@ -533,6 +552,18 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 	// is followed exactly once — resolved code is never re-resolved.
 	if types.HasDelegationPrefix(code) {
 		if delegate, ok := types.ParseDelegation(code); ok {
+			if evm.frame8141 != nil {
+				cost := uint64(100)
+				if !evm.StateDB.AddressInAccessList(delegate) {
+					cost = 3000
+					evm.StateDB.AddAddressToAccessList(delegate)
+				}
+				if gas < cost {
+					evm.StateDB.RevertToSnapshot(snapshot)
+					return nil, 0, ErrOutOfGas
+				}
+				gas -= cost
+			}
 			code = evm.StateDB.GetCode(delegate)
 		}
 	}
@@ -841,8 +872,14 @@ func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
+	if evm.frame8141 != nil && value != nil && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
+		return nil, types.Address{}, gas, ErrInsufficientBalance
+	}
 	// Compute the new contract address
 	nonce := evm.StateDB.GetNonce(caller)
+	if evm.frame8141 != nil && nonce == ^uint64(0) {
+		return nil, types.Address{}, gas, errors.New("creator nonce overflow")
+	}
 	evm.StateDB.SetNonce(caller, nonce+1)
 	contractAddr := createAddress(caller, nonce)
 
@@ -861,6 +898,16 @@ func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
+	if evm.frame8141 != nil {
+		if endowment != nil && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
+			return nil, types.Address{}, gas, ErrInsufficientBalance
+		}
+		nonce := evm.StateDB.GetNonce(caller)
+		if nonce == ^uint64(0) {
+			return nil, types.Address{}, gas, errors.New("creator nonce overflow")
+		}
+		evm.StateDB.SetNonce(caller, nonce+1)
+	}
 	initCodeHash := crypto.Keccak256(code)
 	contractAddr := create2Address(caller, salt, initCodeHash)
 
@@ -927,6 +974,10 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		return nil, types.Address{}, gas, ErrMaxInitCodeSizeExceeded
 	}
 
+	if evm.frame8141 != nil && evm.frame8141.PublicValidation && contractAddr != evm.frame8141.Tx.Sender {
+		evm.frameValidationErr = errors.New("Frame deployment created an account other than sender")
+		return nil, types.Address{}, gas, evm.frameValidationErr
+	}
 	// Collision check: fail if address already has non-zero nonce or non-empty code.
 	// Per go-ethereum, all gas is consumed on collision.
 	contractHash := evm.StateDB.GetCodeHash(contractAddr)
@@ -941,6 +992,13 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 
 	snapshot := evm.StateDB.Snapshot()
 
+	if evm.frame8141 != nil && evm.StateDB.Empty(contractAddr) {
+		if err := evm.frame8141.Charge(frameNewAccountGas); err != nil {
+			evm.StateDB.RevertToSnapshot(snapshot)
+			return nil, types.Address{}, gas, ErrFrameStateGas
+		}
+	}
+
 	// Only create a new account if it doesn't already exist.
 	// It's possible the contract code is deployed to a pre-existent
 	// account with non-zero balance.
@@ -948,6 +1006,9 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		evm.StateDB.CreateAccount(contractAddr)
 	}
 
+	if evm.frame8141 != nil {
+		evm.frame8141.created[contractAddr] = true
+	}
 	// EIP-161: set contract nonce to 1 (post Spurious Dragon).
 	evm.StateDB.SetNonce(contractAddr, 1)
 
@@ -1018,6 +1079,13 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 			return nil, types.Address{}, 0, errors.New("max code size exceeded")
 		}
 		depositCost := uint64(len(ret)) * CreateDataGas
+		if evm.frame8141 != nil {
+			if err := evm.frame8141.Charge(uint64(len(ret)) * 1530); err != nil {
+				evm.StateDB.RevertToSnapshot(snapshot)
+				return nil, types.Address{}, 0, ErrOutOfGas
+			}
+			depositCost = 6 * toWordSize(uint64(len(ret)))
+		}
 		if gas < depositCost {
 			evm.StateDB.RevertToSnapshot(snapshot)
 			return nil, types.Address{}, 0, ErrOutOfGas

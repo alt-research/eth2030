@@ -796,3 +796,71 @@ func (p *GlamsterdamPayloadAttributes) UnmarshalJSON(data []byte) error {
 	p.SlotNumber = uint64(j.SlotNumber)
 	return nil
 }
+
+// BlobAndProofV2 uses Engine DATA encoding rather than Go's base64 []byte JSON.
+func (b BlobAndProofV2) MarshalJSON() ([]byte, error) {
+	type wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	return json.Marshal(wire{Blob: hexBytes(b.Blob), Proofs: toHexBytesSlice(b.Proofs)})
+}
+
+func (b *BlobAndProofV2) UnmarshalJSON(data []byte) error {
+	var wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Blob = []byte(wire.Blob)
+	b.Proofs = fromHexBytesSlice(wire.Proofs)
+	return nil
+}
+
+type payloadBodyJSON struct {
+	Transactions []hexBytes    `json:"transactions"`
+	Withdrawals  []*Withdrawal `json:"withdrawals"`
+}
+
+func (b ExecutionPayloadBodyV1) MarshalJSON() ([]byte, error) {
+	return json.Marshal(payloadBodyJSON{toHexBytesSlice(b.Transactions), b.Withdrawals})
+}
+
+func (b *ExecutionPayloadBodyV1) UnmarshalJSON(data []byte) error {
+	var wire payloadBodyJSON
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
+	return nil
+}
+
+type payloadBodyV2JSON struct {
+	Transactions    []hexBytes    `json:"transactions"`
+	Withdrawals     []*Withdrawal `json:"withdrawals"`
+	BlockAccessList *hexBytes     `json:"blockAccessList"`
+}
+
+func (b ExecutionPayloadBodyV2) MarshalJSON() ([]byte, error) {
+	var blockAccessList *hexBytes
+	if b.BlockAccessList != nil {
+		value := hexBytes(b.BlockAccessList)
+		blockAccessList = &value
+	}
+	return json.Marshal(payloadBodyV2JSON{toHexBytesSlice(b.Transactions), b.Withdrawals, blockAccessList})
+}
+
+func (b *ExecutionPayloadBodyV2) UnmarshalJSON(data []byte) error {
+	var wire payloadBodyV2JSON
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
+	b.BlockAccessList = nil
+	if wire.BlockAccessList != nil {
+		b.BlockAccessList = []byte(*wire.BlockAccessList)
+	}
+	return nil
+}

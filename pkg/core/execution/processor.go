@@ -815,7 +815,10 @@ func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc,
 // paymaster slashing on bad gas settlement.
 func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher) (*types.Receipt, uint64, error) {
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
-		return nil, 0, types.ErrFrame8141ExecutionUnavailable
+		return applyFrame8141(config, getHash, statedb, header, tx, gp, tracker)
+	}
+	if tx.Type() == types.FrameTxType && config != nil && config.IsHogota(header.Time) {
+		return nil, 0, errors.New("historical Frame envelope is not valid at Bogotá")
 	}
 	// EIP-2200 original storage is scoped to this transaction, not to the
 	// last disk/block commit. Builders and staged sync may execute many txs

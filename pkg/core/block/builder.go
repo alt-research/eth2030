@@ -69,7 +69,7 @@ func NewBlockBuilder(config *config.ChainConfig, chain BlockchainReader, pool Tx
 // transaction lists, each ordered by effective gas price descending.
 func sortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blobs []*types.Transaction) {
 	for _, tx := range pending {
-		if tx.Type() == types.BlobTxType {
+		if len(tx.BlobHashes()) > 0 {
 			blobs = append(blobs, tx)
 		} else {
 			regular = append(regular, tx)
@@ -333,7 +333,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			ilTxHashes[ilTx.Hash()] = struct{}{}
 
 			// EIP-7825 caps individual transactions at Osaka.
-			if gp.Gas() < ilTx.Gas() || exceedsTxGasCap(b.config, header.Time, ilTx) {
+			if !fitsTransaction(gp, ilTx) || exceedsTxGasCap(b.config, header.Time, ilTx) {
 				continue
 			}
 			// Check base fee.
@@ -343,6 +343,11 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 				}
 			}
 
+			if cancunActive && len(ilTx.BlobHashes()) > 0 {
+				if ilTx.BlobGas() > gas.MaxBlobGasPerBlock-blobGasUsed || validateBlobHashes(ilTx.BlobHashes()) != nil {
+					continue
+				}
+			}
 			statedb.SetTxContext(ilTx.Hash(), txIndex)
 
 			// EIP-7928: create per-transaction BAL tracker before execution.
@@ -357,6 +362,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 
 			snap := statedb.Snapshot()
+			gpBefore := *gp
 			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
 			if applyErr != nil {
 				statedb.RevertToSnapshot(snap)
@@ -366,7 +372,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 			if glamActive && !vm.CheckDimStorageCap(blockDimStorageUsed, receipt.DimStorageGas) {
 				statedb.RevertToSnapshot(snap)
-				gp.AddGas(used)
+				*gp = gpBefore
 				continue
 			}
 			blockDimStorageUsed += receipt.DimStorageGas
@@ -385,7 +391,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 				gasUsed += used
 			}
 
-			if ilTx.Type() == types.BlobTxType && cancunActive {
+			if len(ilTx.BlobHashes()) > 0 && cancunActive {
 				blobGasUsed += ilTx.BlobGas()
 			}
 
@@ -451,12 +457,12 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		}
 
 		// Skip if not enough gas left for this tx.
-		if gp.Gas() < tx.Gas() || exceedsTxGasCap(b.config, header.Time, tx) {
+		if !fitsTransaction(gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
 		// EIP-4844: validate blob transactions and enforce blob gas limit.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
 			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
 				continue // would exceed block blob gas limit
@@ -467,7 +473,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 			// Validate blob fee cap against current blob base fee.
 			blobBaseFee := execution.CalcBlobBaseFee(excessBlobGas)
-			if tx.BlobGasFeeCap() == nil || tx.BlobGasFeeCap().Cmp(blobBaseFee) < 0 {
+			if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical && (tx.BlobGasFeeCap() == nil || tx.BlobGasFeeCap().Cmp(blobBaseFee) < 0) {
 				continue
 			}
 		}
@@ -488,7 +494,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
-		gpBefore := gp.Gas()
+		gpBefore := *gp
 		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
@@ -502,7 +508,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			statedb.RevertToSnapshot(snap)
 			// Restore the exact amount debited from the pool (EIP-7778 uses
 			// pre-refund gas for pool accounting, which may differ from used).
-			gp.AddGas(gpBefore - gp.Gas())
+			*gp = gpBefore
 			continue
 		}
 		blockDimStorageUsed += receipt.DimStorageGas
@@ -556,7 +562,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		recGen.GenerateReceipt(outcome, uint(txIndex))
 
 		// Track blob gas for EIP-4844 blob transactions.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			blobGasUsed += tx.BlobGas()
 		}
 
@@ -572,7 +578,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		txIndex++
 	}
 
-	header.GasUsed = gasUsed
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && b.config.IsGlamsterdan(header.Time))
 
 	// EIP-4844: set blob gas used in header.
 	if cancunActive {
@@ -667,7 +673,15 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 }
 
 func exceedsTxGasCap(cfg *config.ChainConfig, timestamp uint64, tx *types.Transaction) bool {
-	return gas.IsGasLimitCapped(cfg, timestamp) && gas.ValidateTransactionGasLimit(tx.Gas()) != nil
+	limit := tx.Gas()
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		budget, err := frame.GasBudget()
+		if err != nil {
+			return true
+		}
+		limit = budget.ExecutionReservation
+	}
+	return gas.IsGasLimitCapped(cfg, timestamp) && gas.ValidateTransactionGasLimit(limit) != nil
 }
 
 // BuildBlockLegacy constructs a new block using the legacy interface (for backward
@@ -814,12 +828,12 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		}
 
 		// Skip if not enough gas left for this tx.
-		if gp.Gas() < tx.Gas() || exceedsTxGasCap(b.config, header.Time, tx) {
+		if !fitsTransaction(gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
 		// EIP-4844: enforce blob gas limit.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
 			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
 				continue
@@ -845,6 +859,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
+		gpBefore := *gp
 		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
@@ -856,7 +871,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 		if glamActiveLegacy && !vm.CheckDimStorageCap(blockDimStorageUsedLegacy, receipt.DimStorageGas) {
 			statedb.RevertToSnapshot(snap)
-			gp.AddGas(used)
+			*gp = gpBefore
 			continue
 		}
 		blockDimStorageUsedLegacy += receipt.DimStorageGas
@@ -876,7 +891,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		}
 
 		// Track blob gas.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			blobGasUsed += tx.BlobGas()
 		}
 
@@ -892,7 +907,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		txIndex++
 	}
 
-	header.GasUsed = gasUsed
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && b.config.IsGlamsterdan(header.Time))
 	if cancunActive {
 		header.BlobGasUsed = &blobGasUsed
 	}
@@ -1012,6 +1027,13 @@ func SortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blo
 // effectiveGasPrice returns the effective gas price for a transaction
 // considering the base fee (EIP-1559).
 func effectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		payment, err := frame.Payment(baseFee, big.NewInt(1))
+		if err != nil {
+			return new(big.Int)
+		}
+		return payment.GasPrice()
+	}
 	if baseFee == nil || tx.GasFeeCap() == nil || tx.GasTipCap() == nil {
 		return tx.GasPrice()
 	}
@@ -1126,4 +1148,12 @@ func (b *BlockBuilder) getHashFnForParent(parent *types.Header) func(uint64) typ
 		return chain.BranchHashFn(parent)
 	}
 	return b.getHashFn(parent)
+}
+
+func fitsTransaction(gp *gaspool.GasPool, tx *types.Transaction) bool {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		budget, err := frame.GasBudget()
+		return err == nil && gp.FitsFrame(budget.ExecutionReservation, budget.StateReservation)
+	}
+	return gp.Gas() >= tx.Gas()
 }

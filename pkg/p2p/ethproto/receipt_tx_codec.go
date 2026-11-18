@@ -24,7 +24,7 @@ type wireReceipt70 struct {
 type wireReceipts70 struct {
 	ID         uint64
 	Incomplete bool
-	Pages      [][]wireReceipt70
+	Pages      [][]gethrlp.RawValue
 }
 
 func encodeReceiptPages(pages [][]*types.Receipt) ([][]gethrlp.RawValue, error) {
@@ -89,11 +89,28 @@ func (p *ReceiptsPacket) DecodeRLP(data []byte) error {
 	return nil
 }
 func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
-	packet := wireReceipts70{ID: p.RequestID, Incomplete: p.LastBlockIncomplete, Pages: make([][]wireReceipt70, len(p.Receipts))}
+	packet := wireReceipts70{ID: p.RequestID, Incomplete: p.LastBlockIncomplete, Pages: make([][]gethrlp.RawValue, len(p.Receipts))}
 	for i, page := range p.Receipts {
 		for _, receipt := range page {
 			if receipt == nil {
 				return nil, fmt.Errorf("nil receipt")
+			}
+			if receipt.FrameResults8141 != nil {
+				raw, err := receipt.EncodeRLP()
+				if err != nil {
+					return nil, err
+				}
+				var fields []gethrlp.RawValue
+				if err := gethrlp.DecodeBytes(raw[1:], &fields); err != nil {
+					return nil, err
+				}
+				fields = append([]gethrlp.RawValue{{types.FrameTxType}}, fields...)
+				raw, err = gethrlp.EncodeToBytes(fields)
+				if err != nil {
+					return nil, err
+				}
+				packet.Pages[i] = append(packet.Pages[i], raw)
+				continue
 			}
 			item := wireReceipt70{Type: receipt.Type, CumulativeGas: receipt.CumulativeGasUsed}
 			var err error
@@ -111,7 +128,11 @@ func (p ReceiptsPacketV70) EncodeRLP() ([]byte, error) {
 				}
 				item.Logs = append(item.Logs, wireReceiptLog{log.Address, log.Topics, log.Data})
 			}
-			packet.Pages[i] = append(packet.Pages[i], item)
+			encoded, err := gethrlp.EncodeToBytes(item)
+			if err != nil {
+				return nil, err
+			}
+			packet.Pages[i] = append(packet.Pages[i], encoded)
 		}
 	}
 	return gethrlp.EncodeToBytes(packet)
@@ -123,7 +144,30 @@ func (p *ReceiptsPacketV70) DecodeRLP(data []byte) error {
 	}
 	pages := make([][]*types.Receipt, len(packet.Pages))
 	for i, page := range packet.Pages {
-		for _, item := range page {
+		for _, raw := range page {
+			var fields []gethrlp.RawValue
+			if err := gethrlp.DecodeBytes(raw, &fields); err != nil {
+				return err
+			}
+			if len(fields) == 4 && len(fields[0]) == 1 && fields[0][0] == types.FrameTxType {
+				var payer types.Address
+				if gethrlp.DecodeBytes(fields[2], &payer) == nil {
+					encoded, err := gethrlp.EncodeToBytes(fields[1:])
+					if err != nil {
+						return err
+					}
+					receipt, err := types.DecodeReceiptRLP(append([]byte{types.FrameTxType}, encoded...))
+					if err != nil {
+						return err
+					}
+					pages[i] = append(pages[i], receipt)
+					continue
+				}
+			}
+			var item wireReceipt70
+			if err := gethrlp.DecodeBytes(raw, &item); err != nil {
+				return err
+			}
 			receipt := &types.Receipt{Type: item.Type, CumulativeGasUsed: item.CumulativeGas}
 			var status []byte
 			if err := gethrlp.DecodeBytes(item.State, &status); err != nil {
@@ -157,7 +201,7 @@ type wirePooledTransactions struct {
 func (p PooledTransactionsPacket) EncodeRLP() ([]byte, error) {
 	packet := wirePooledTransactions{ID: p.RequestID}
 	for _, tx := range p.Transactions {
-		raw, err := tx.EncodeRLP()
+		raw, err := types.EncodePooledTransaction(tx)
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +233,7 @@ func (p *PooledTransactionsPacket) DecodeRLP(data []byte) error {
 				return err
 			}
 		}
-		tx, err := types.DecodeTxRLP(encoded)
+		tx, err := types.DecodePooledTransaction(encoded)
 		if err != nil {
 			return err
 		}

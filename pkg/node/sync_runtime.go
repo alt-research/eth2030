@@ -49,7 +49,7 @@ func (n *Node) applyExecutionTarget(target syncbeacon.ExecutionTarget) error {
 	if head == nil {
 		return fmt.Errorf("%w: execution target is unknown", chain.ErrStateNotFound)
 	}
-	if n.blockchain.Config().IsHogota(head.Time()) {
+	if n.blockchain.Config().IsHogota(head.Time()) && head.Hash() != n.blockchain.Genesis().Hash() {
 		view, err := n.blockchain.ReadBogotaPayload(target.Head)
 		if err != nil {
 			return fmt.Errorf("%w: read Bogotá list view: %w", chain.ErrStorageFailure, err)
@@ -64,7 +64,7 @@ func (n *Node) applyExecutionTarget(target syncbeacon.ExecutionTarget) error {
 		return err
 	}
 	n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
-	n.txPool.Reset(n.blockchain.State())
+	n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 	return nil
 }
 

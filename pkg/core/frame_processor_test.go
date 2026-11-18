@@ -187,7 +187,7 @@ func TestFrameTx_NonceGuard(t *testing.T) {
 		Coinbase: types.HexToAddress("0xfee"),
 	}
 
-	gp := gaspool.GasPool(30_000_000)
+	gp := *new(gaspool.GasPool).AddGas(30_000_000)
 
 	// Run ApplyMessage. The call will likely fail during EVM execution
 	// since we have no real EVM setup, but the nonce guard happens before
@@ -219,7 +219,7 @@ func TestFrameTx_NonceGuard(t *testing.T) {
 		GasTipCap: big.NewInt(1),
 		TxType:    types.LegacyTxType,
 	}
-	gp2 := gaspool.GasPool(30_000_000)
+	gp2 := *new(gaspool.GasPool).AddGas(30_000_000)
 	_, _ = execution.ApplyMessage(config.TestConfig, func(n uint64) types.Hash { return types.Hash{} }, statedb2, header, &legacyMsg, &gp2)
 
 	legacyNonce := statedb2.GetNonce(sender)

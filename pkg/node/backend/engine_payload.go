@@ -3,6 +3,7 @@ package backend
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"math/big"
@@ -106,7 +107,17 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 	}
 
 	blockValue := new(big.Int)
-	for _, receipt := range p.receipts {
+	for i, receipt := range p.receipts {
+		if i < len(blk.Transactions()) {
+			if frame, ok := blk.Transactions()[i].Inner().(*types.FrameTx8141); ok {
+				blobFee := gas.CalcBlobBaseFee(excessBlobGas)
+				tip, err := types.FrameProposerTip(frame, receipt.GasUsed, header.BaseFee, blobFee)
+				if err == nil {
+					blockValue.Add(blockValue, tip)
+				}
+				continue
+			}
+		}
 		if receipt.EffectiveGasPrice != nil && header.BaseFee != nil {
 			tip := new(big.Int).Sub(receipt.EffectiveGasPrice, header.BaseFee)
 			if tip.Sign() > 0 {
@@ -127,7 +138,7 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 	blobsBundle := &payload.BlobsBundleV1{}
 	blobTxCount := 0
 	for _, tx := range blk.Transactions() {
-		if tx.Type() != types.BlobTxType {
+		if len(tx.BlobHashes()) == 0 {
 			continue
 		}
 		blobTxCount++
@@ -140,7 +151,24 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 			continue
 		}
 		blobsBundle.Commitments = append(blobsBundle.Commitments, sc.Commitments...)
-		blobsBundle.Proofs = append(blobsBundle.Proofs, sc.Proofs...)
+		if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
+			backend, err := bls.NewGoEthKZGBackend()
+			if err != nil {
+				return nil, err
+			}
+			for i, blob := range sc.Blobs {
+				if i >= len(sc.Commitments) || len(sc.Commitments[i]) != 48 {
+					return nil, errors.New("invalid canonical Frame blob commitment")
+				}
+				proof, err := backend.ComputeBlobProof(blob, [48]byte(sc.Commitments[i]))
+				if err != nil {
+					return nil, err
+				}
+				blobsBundle.Proofs = append(blobsBundle.Proofs, proof[:])
+			}
+		} else {
+			blobsBundle.Proofs = append(blobsBundle.Proofs, sc.Proofs...)
+		}
 		blobsBundle.Blobs = append(blobsBundle.Blobs, sc.Blobs...)
 	}
 	if blobTxCount > 0 {
@@ -159,7 +187,7 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 		// Clear old cache entries to avoid stale data
 		b.blobCache = make(map[types.Hash][]byte)
 		for _, tx := range blk.Transactions() {
-			if tx.Type() != types.BlobTxType {
+			if len(tx.BlobHashes()) == 0 {
 				continue
 			}
 			sc := tx.BlobSidecar()
@@ -267,12 +295,24 @@ func (b *EngineBackend) GetPayloadBodiesByHash(hashes []types.Hash) ([]*payload.
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(h)
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }
 
 // GetPayloadBodiesByRange returns payload bodies for a range of block numbers.
 func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload.ExecutionPayloadBodyV2, error) {
+	head := b.node.Blockchain().CurrentBlock().NumberU64()
+	if start > head {
+		return []*payload.ExecutionPayloadBodyV2{}, nil
+	}
+	if remaining := head - start; count > remaining && count-remaining > 1 {
+		count = remaining + 1
+	}
 	results := make([]*payload.ExecutionPayloadBodyV2, count)
 	for i := uint64(0); i < count; i++ {
 		num := start + i
@@ -282,6 +322,11 @@ func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(blk.Hash())
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }

@@ -1,0 +1,21 @@
+{
+  "version": "eth2030-frame-paymaster-v1",
+  "compiler": "0.8.38+commit.1835d247.Linux.g++",
+  "eipRevision": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "osaka",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "evm.bytecode.object",
+          "evm.deployedBytecode.object"
+        ]
+      }
+    }
+  },
+  "witness": "protocol-validated SECP256K1 signature at index 1, empty msg, resolved signer equal to owner"
+}

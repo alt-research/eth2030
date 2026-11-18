@@ -241,11 +241,10 @@ func (api *EthDirectAPI) SendRawTransaction(data string) (string, error) {
 		return "", ErrEmptyTxData
 	}
 
-	// Wrap raw bytes as a legacy transaction. A full implementation would
-	// RLP-decode the transaction to determine its type.
-	tx := types.NewTransaction(&types.LegacyTx{
-		Data: rawBytes,
-	})
+	tx, err := types.DecodePooledTransaction(rawBytes)
+	if err != nil {
+		return "", err
+	}
 
 	if err := api.backend.SendTransaction(tx); err != nil {
 		return "", err

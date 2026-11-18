@@ -138,11 +138,12 @@ type StateReader interface {
 
 // txLookup tracks transactions by hash for fast duplicate detection.
 type txLookup struct {
-	all map[types.Hash]*types.Transaction
+	all         map[types.Hash]*types.Transaction
+	framePayers map[types.Hash]types.Address
 }
 
 func newTxLookup() *txLookup {
-	return &txLookup{all: make(map[types.Hash]*types.Transaction)}
+	return &txLookup{all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address)}
 }
 
 func (l *txLookup) Get(hash types.Hash) *types.Transaction {
@@ -155,6 +156,7 @@ func (l *txLookup) Add(tx *types.Transaction) {
 
 func (l *txLookup) Remove(hash types.Hash) {
 	delete(l.all, hash)
+	delete(l.framePayers, hash)
 }
 
 func (l *txLookup) Count() int {
@@ -222,6 +224,8 @@ func (l *txSortedList) Ready(baseNonce uint64) []*types.Transaction {
 // TxPool implements a transaction pool for pending and queued transactions.
 type TxPool struct {
 	config      Config
+	frameConfig *config.ChainConfig
+	frameTime   uint64
 	chainID     *big.Int
 	pqForkKnown bool
 	pqActive    bool
@@ -260,13 +264,42 @@ func New(config Config, state StateReader) *TxPool {
 // suggestion engine. Call this once per block so SuggestGasPrice returns
 // up-to-date recommendations.
 func (pool *TxPool) RecordBlock(header *types.Header, txs []*types.Transaction) {
+	if header == nil {
+		return
+	}
+	pool.mu.Lock()
+	if pool.updateHeadFeesLocked(header) {
+		pool.revalidateFrames8141()
+	}
+	pool.mu.Unlock()
 	pool.suggestor.RecordBlockFromHeader(header, txs)
+}
+
+// updateHeadFeesLocked updates fee context before revalidating the new state.
+// The caller holds pool.mu; Reset replaces state and fees in that same lock.
+func (pool *TxPool) updateHeadFeesLocked(header *types.Header) bool {
+	if header == nil {
+		return false
+	}
+	base := new(big.Int)
+	if header.BaseFee != nil {
+		base.Set(header.BaseFee)
+	}
+	blob := big.NewInt(1)
+	if header.ExcessBlobGas != nil {
+		blob = gas.CalcBlobBaseFee(*header.ExcessBlobGas)
+	}
+	changed := pool.baseFee == nil || pool.baseFee.Cmp(base) != 0 || pool.blobBaseFee == nil || pool.blobBaseFee.Cmp(blob) != 0 || pool.config.BlockGasLimit != header.GasLimit
+	pool.baseFee, pool.blobBaseFee = base, blob
+	pool.config.BlockGasLimit = header.GasLimit
+	return changed
 }
 
 // SetForkRules updates admission rules after a canonical head change.
 func (pool *TxPool) SetForkRules(cfg *config.ChainConfig, time uint64) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
+	pool.frameConfig, pool.frameTime = cfg, time
 	pool.config.IsPrague = cfg.IsPrague(time)
 	pool.config.IsGlamsterdan = cfg.IsGlamsterdan(time)
 	pool.config.IsOsaka = cfg.IsOsaka(time)
@@ -314,6 +347,11 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 	defer pool.mu.Unlock()
 
 	hash := tx.Hash()
+	defer func() {
+		if pool.lookup.Get(hash) == nil {
+			delete(pool.lookup.framePayers, hash)
+		}
+	}()
 
 	txpoolLog.Debug("tx_received",
 		"event", "tx_received",
@@ -362,7 +400,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Nonce gap detection: reject transactions with nonces too far ahead
 	// of the current state nonce to prevent memory exhaustion attacks.
-	if tx.Nonce() > stateNonce+MaxNonceGap {
+	// The low-nonce check above makes subtraction safe, including states
+	// near the EIP-2681 upper bound where adding the gap would wrap.
+	if tx.Nonce()-stateNonce > MaxNonceGap {
 		txpoolLog.Debug("tx_rejected",
 			"event", "tx_rejected",
 			"hash", hash.Hex(),
@@ -500,6 +540,11 @@ func (pool *TxPool) checkReplacement(from types.Address, tx *types.Transaction) 
 // effective gas price than oldTx. For EIP-1559 style transactions, both the
 // fee cap and tip cap must individually meet the bump threshold.
 func (pool *TxPool) hasSufficientBump(oldTx, newTx *types.Transaction) bool {
+	oldFrame, oldCanonical := oldTx.Inner().(*types.FrameTx8141)
+	newFrame, newCanonical := newTx.Inner().(*types.FrameTx8141)
+	if oldCanonical || newCanonical {
+		return oldCanonical && newCanonical && frameFeeBumped(oldFrame.Fees.MaxFee, newFrame.Fees.MaxFee) && frameFeeBumped(oldFrame.Fees.MaxPriorityFeePerGas, newFrame.Fees.MaxPriorityFeePerGas)
+	}
 	oldPrice := EffectiveGasPrice(oldTx, pool.baseFee)
 	newPrice := EffectiveGasPrice(newTx, pool.baseFee)
 
@@ -539,7 +584,10 @@ func isDynamic(tx *types.Transaction) bool {
 // validateTx performs comprehensive validation of a transaction.
 func (pool *TxPool) validateTx(tx *types.Transaction) error {
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
-		return types.ErrFrame8141ExecutionUnavailable
+		return pool.validateFrame8141(tx)
+	}
+	if tx.Type() == types.FrameTxType && pool.frameConfig != nil && pool.frameConfig.IsHogota(pool.frameTime) {
+		return errors.New("historical Frame envelope is not valid at Bogotá")
 	}
 	// BB-2.2: gate type-0x08 LocalTx behind --experimental-local-tx flag.
 	if tx.Type() == types.LocalTxType && !pool.config.AllowLocalTx {
@@ -1086,12 +1134,17 @@ func (pool *TxPool) QueuedCount() int {
 }
 
 // Reset removes all transactions with nonces below the current state nonces.
+// An optional head refreshes fee/gas context before Frame revalidation.
 // Called after a new block is processed.
-func (pool *TxPool) Reset(stateReader StateReader) {
+func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
 	pool.state = stateReader
+	if len(heads) > 0 {
+		pool.updateHeadFeesLocked(heads[0])
+	}
+	pool.revalidateFrames8141()
 
 	var totalConfirmed, totalDemoted int
 	for addr, list := range pool.pending {
@@ -1202,6 +1255,13 @@ func (pool *TxPool) senderOf(tx *types.Transaction) types.Address {
 // For EIP-1559 transactions: min(MaxFeePerGas, BaseFee + MaxPriorityFeePerGas).
 // If baseFee is nil, returns GasFeeCap (MaxFeePerGas) as the effective price.
 func EffectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		payment, err := frame.Payment(baseFee, big.NewInt(1))
+		if err != nil {
+			return new(big.Int)
+		}
+		return payment.GasPrice()
+	}
 	if baseFee == nil || tx.Type() == types.LegacyTxType || tx.Type() == types.AccessListTxType {
 		gp := tx.GasPrice()
 		if gp == nil {
@@ -1261,12 +1321,13 @@ func (pool *TxPool) GetBlobsByVersionedHashes(hashes []types.Hash) []*BlobAndPro
 		blob       []byte
 		commitment []byte
 		proof      []byte
+		frame      bool
 	}
 	index := make(map[types.Hash]*entry)
 
 	for _, list := range pool.pending {
 		for _, tx := range list.items {
-			if tx.Type() != types.BlobTxType {
+			if len(tx.BlobHashes()) == 0 {
 				continue
 			}
 			sc := tx.BlobSidecar()
@@ -1281,6 +1342,7 @@ func (pool *TxPool) GetBlobsByVersionedHashes(hashes []types.Hash) []*BlobAndPro
 					blob:       sc.Blobs[i],
 					commitment: sc.Commitments[i],
 					proof:      sc.Proofs[i],
+					frame:      isCanonicalFrame8141(tx),
 				}
 			}
 		}
@@ -1288,7 +1350,7 @@ func (pool *TxPool) GetBlobsByVersionedHashes(hashes []types.Hash) []*BlobAndPro
 	// Also check the queue.
 	for _, list := range pool.queue {
 		for _, tx := range list.items {
-			if tx.Type() != types.BlobTxType {
+			if len(tx.BlobHashes()) == 0 {
 				continue
 			}
 			sc := tx.BlobSidecar()
@@ -1304,6 +1366,7 @@ func (pool *TxPool) GetBlobsByVersionedHashes(hashes []types.Hash) []*BlobAndPro
 						blob:       sc.Blobs[i],
 						commitment: sc.Commitments[i],
 						proof:      sc.Proofs[i],
+						frame:      isCanonicalFrame8141(tx),
 					}
 				}
 			}
@@ -1313,10 +1376,18 @@ func (pool *TxPool) GetBlobsByVersionedHashes(hashes []types.Hash) []*BlobAndPro
 	result := make([]*BlobAndProof, len(hashes))
 	for i, h := range hashes {
 		if e, ok := index[h]; ok {
+			proof := e.proof
+			if e.frame {
+				var err error
+				proof, err = frameBlobProof8141(e.blob, e.commitment)
+				if err != nil {
+					continue
+				}
+			}
 			result[i] = &BlobAndProof{
 				Blob:       e.blob,
 				Commitment: e.commitment,
-				Proof:      e.proof,
+				Proof:      proof,
 			}
 		}
 	}
@@ -1429,6 +1500,7 @@ func (pool *TxPool) SetBaseFee(baseFee *big.Int) {
 	)
 
 	pool.baseFee = new(big.Int).Set(baseFee)
+	pool.revalidateFrames8141()
 
 	// Demote pending txs whose max fee is below the new base fee.
 	var totalDemoted int
@@ -1596,4 +1668,5 @@ func (pool *TxPool) SetBlobBaseFee(blobBaseFee *big.Int) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 	pool.blobBaseFee = new(big.Int).Set(blobBaseFee)
+	pool.revalidateFrames8141()
 }

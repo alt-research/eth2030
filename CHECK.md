@@ -1,14 +1,34 @@
 # Lean4 Verification Check-list
 
+## Frame paymaster and history follow-up (2026-11-18)
+
+- [x] Freeze a reproducible ETH2030 paymaster runtime with an acyclic protocol-signature witness convention and explicit upstream-reference differences.
+- [x] Qualify exact-code recognition, prefix execution, aggregate exposure, delayed-withdrawal reservations and head/reorg revalidation.
+- [x] Test actual authorization, timelock enforcement, storage changes and value transfers, including negative and mutation cases.
+- [x] Repair historical Engine body DATA encoding and validated BAL persistence, including both wire versions and restart readback.
+- [x] Exercise coded sponsorship and fresh CL Frame history with bounded live resources, then remove all owned runtime resources.
+- [x] Retain a root-checked replay of the real Heze state using the released Go client and a minimal profile-specific compatibility type.
+- [x] Reconcile service-consumer and independent-client gates against current sources; keep unsupported boundaries explicit.
+
+## Canonical Frame execution
+
+- [x] Implement the pinned execution, state gas, approval and atomic rollback paths.
+- [x] Wire activation, generic public admission, payload import and receipt persistence.
+- [x] Pin the canonical-paymaster runtime and witness convention and qualify withdrawal reservations.
+- [x] Verify signatures, sponsorship, native blob order and EL restart.
+- [x] Qualify fresh CL Frame backfill against the paired native EL.
+- [ ] Qualify independent-client Frame history.
+- [ ] Qualify updated services and independent-client and state-sync gates.
+
 ## Next-stage promotion (2026-11-17)
 
 See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
 state, review scope and independent-client gates.
 
-- [ ] Prepare the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
-- [ ] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
-- [ ] Rebuild and qualify the patched EL/CL pair before promotion.
-- [ ] Finish the pinned Frame transition and run its live receipt and history gates.
+- [x] Prepare and merge the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
+- [x] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
+- [x] Rebuild and qualify the patched EL/CL pair on finalized sponsored Frame traffic.
+- [x] Finish the pinned Frame transition and run its live receipt and history gates.
 - [ ] Run the Track 3 independent late-join control and continue authenticated moving-pivot recovery.
 
 ## Consensus Client Follow-up (2026-11-16)
@@ -56,7 +76,9 @@ implementation gaps and acceptance criteria.
 - [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
 - [x] Implement and test pending Bogotá inclusion-list retention and deferred FCU validation through the native EL HTTP API.
 - [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
-- [ ] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify restart and late join.
+- [x] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify EL restart.
+- [x] Verify the same sponsored Frame through fresh CL late join with a synchronized EL.
+- [ ] Verify the same Frame through independent EL late join.
 - [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
 - [ ] Update Dora epoch statistics to decode current Gloas and Heze BeaconState SSZ.
 - [ ] Verify full and snap late join and restart against independent source clients.
@@ -70,7 +92,7 @@ implementation gaps and acceptance criteria.
 - [x] Recover signed lists advertised by embedded self-build bids with gossip delivery deliberately dropped in a capped devnet.
 - [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
 - [x] Check Frame blob commitment ordering through the CL historical payload verification path.
-- [ ] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
+- [x] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
 - [x] Integrate upstream Lighthouse `1bcdcbfa0` on the staging branch and pass the Gloas light-client fork-boundary regression.
 - [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
 - [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
@@ -80,9 +102,13 @@ implementation gaps and acceptance criteria.
 
 - [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
 - [x] Match canonical receipt encoding, split gas readback after a FileDB reopen, and the fee-budget arithmetic.
-- [ ] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
-- [ ] Wire Bogotá activation, public-mempool policy, blob sidecars, Engine validation, and historical replay.
-- [ ] Run sponsored, blob-bearing, restart and late-join scenarios with independently checked receipts and balances.
+- [x] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
+- [x] Wire Bogotá activation, generic public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [x] Freeze the canonical-paymaster exception and delayed-withdrawal reservation rules against a deployable runtime.
+- [x] Run finalized sponsored FOCIL and EL restart scenarios with reconciled receipts and balances.
+- [x] Run native blob-bearing build/import, reorg and disk replay with real KZG data.
+- [x] Run live blob-bearing Frame history and receiver restart scenarios.
+- [ ] Run independent EL late-join scenarios.
 
 ## Roadmap Homepage Integration (2026-11-13)
 

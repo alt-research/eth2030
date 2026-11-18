@@ -81,6 +81,12 @@ func (b *EngineBackend) ForkchoiceUpdatedBogota(
 		result, err := b.ForkchoiceUpdatedV4(state, attrs)
 		return result, true, err
 	}
+	// Genesis is configured locally and has no submitted inclusion-list view.
+	// It must remain a usable head when Bogotá is active from genesis.
+	if head != nil && head.NumberU64() == 0 && head.Hash() == bc.Genesis().Hash() {
+		result, err := b.ForkchoiceUpdatedV4(state, attrs)
+		return result, true, err
+	}
 	record, err := bc.ReadBogotaPayload(state.HeadBlockHash)
 	if err != nil {
 		return payload.ForkchoiceUpdatedResult{}, false, err
@@ -206,7 +212,10 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 	var omitted []*types.Transaction
 	for _, raw := range list {
 		tx, err := types.DecodeTxRLP(raw)
-		if err != nil || tx.Gas() > remaining {
+		if err != nil {
+			continue
+		}
+		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
 			continue
 		}
 		if _, present := included[tx.Hash()]; !present {
@@ -233,10 +242,59 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		}
 		return types.Hash{}
 	}
+	var framePool *gaspool.GasPool
+	for _, tx := range omitted {
+		if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical {
+			continue
+		}
+		receipts := bc.GetReceipts(hash)
+		replay := len(receipts) != len(payload.Transactions())
+		for _, receipt := range receipts {
+			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed == 0 {
+				replay = true
+			}
+		}
+		if replay {
+			parent := bc.GetBlock(payload.ParentHash())
+			if parent == nil {
+				return false, fmt.Errorf("missing parent for inclusion gas accounting")
+			}
+			before, err := bc.StateAtBlock(parent)
+			if err != nil {
+				return false, err
+			}
+			processor := execution.NewStateProcessor(bc.Config()).WithGetHash(getHash)
+			result, err := processor.ProcessWithBAL(payload, before)
+			if err != nil {
+				return false, err
+			}
+			receipts = result.Receipts
+		}
+		var executionUsed, stateUsed uint64
+		for _, receipt := range receipts {
+			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed != 0 {
+				executionUsed += receipt.BlockGasUsed
+			} else {
+				executionUsed += receipt.GasUsed
+			}
+			for _, frame := range receipt.FrameResults8141 {
+				stateUsed += frame.GasUsed.State
+			}
+		}
+		framePool = new(gaspool.GasPool).AddGas(payload.GasLimit())
+		if err := framePool.ReserveFrame(executionUsed, stateUsed); err != nil {
+			return false, err
+		}
+		break
+	}
 	for _, tx := range omitted {
 		trial := postState.Dup()
 		trial.SetTxContext(tx.Hash(), len(payload.Transactions()))
 		gas := new(gaspool.GasPool).AddGas(remaining)
+		if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
+			copied := *framePool
+			gas = &copied
+		}
 		if _, _, err := execution.ApplyTransactionWithBALGetHash(
 			bc.Config(), getHash, trial, payload.Header(), tx, gas, nil,
 		); err == nil {

@@ -791,6 +791,9 @@ func opCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Sta
 	contract.StateGasReservoir = 0
 
 	ret, returnGas, err := evm.Call(contract.Address, addr, args, callGas, value)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
 	// GAP-1.2: restore parent reservoir with whatever the child did not consume.
 	contract.StateGasReservoir += evm.callReservoirReturn
@@ -978,6 +981,9 @@ func opCreate(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *S
 	contract.Gas = 0
 
 	ret, addr, returnGas, err := evm.Create(contract.Address, initCode, gas, value)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
 	contract.Gas += returnGas
 	evm.returnData = ret
@@ -1014,6 +1020,9 @@ func opCreate2(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *
 	contract.Gas = 0
 
 	ret, addr, returnGas, err := evm.Create2(contract.Address, initCode, gas, value, salt)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
 	contract.Gas += returnGas
 	evm.returnData = ret

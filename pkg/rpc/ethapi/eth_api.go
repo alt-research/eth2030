@@ -1184,9 +1184,10 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 	}
 
 	var (
-		blockHash *types.Hash
-		blockTS   uint64
-		baseFee   *big.Int
+		blockHash   *types.Hash
+		blockTS     uint64
+		baseFee     *big.Int
+		blobBaseFee *big.Int
 	)
 	if blockNum > 0 {
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
@@ -1195,10 +1196,11 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 			blockHash = &h
 			blockTS = header.Time
 			baseFee = header.BaseFee
+			blobBaseFee = BlobBaseFeeForHeader(header)
 		}
 	}
 
-	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee))
+	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
 }
 
 // getTransactionReceipt returns a receipt for a transaction hash.
@@ -1259,7 +1261,7 @@ func (api *EthAPI) sendRawTransaction(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "empty transaction data")
 	}
 
-	tx, err := types.DecodeTxRLP(rawBytes)
+	tx, err := types.DecodePooledTransaction(rawBytes)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
@@ -1338,7 +1340,7 @@ func (api *EthAPI) getTransactionByBlockHashAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, BlobBaseFeeForHeader(block.Header())))
 }
 
 // getTransactionByBlockNumberAndIndex implements eth_getTransactionByBlockNumberAndIndex.
@@ -1371,7 +1373,7 @@ func (api *EthAPI) getTransactionByBlockNumberAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, BlobBaseFeeForHeader(block.Header())))
 }
 
 // getBlockTransactionCountByHash implements eth_getBlockTransactionCountByHash.

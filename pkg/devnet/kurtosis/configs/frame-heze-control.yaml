@@ -1,0 +1,48 @@
+# Canonical sponsored Frame control. Public fixture keys 1 and 2 only.
+participants:
+  - el_type: geth
+    el_image: eth2030:frame-control
+    el_max_mem: 2048
+    cl_max_mem: 2048
+    vc_max_mem: 1024
+    el_extra_params: ["--networkid=3151910", "--rpc.rate_limit=0", "--bootnodes="]
+    cl_type: lighthouse
+    cl_image: eth2030cl:frame-control
+    cl_extra_params: ["--subscribe-all-subnets", "--target-peers=1", "--disable-peer-scoring"]
+  - el_type: geth
+    el_image: eth2030:frame-control
+    el_max_mem: 2048
+    cl_max_mem: 2048
+    vc_max_mem: 1024
+    el_extra_params: ["--networkid=3151911", "--rpc.rate_limit=0", "--bootnodes="]
+    cl_type: lighthouse
+    cl_image: eth2030cl:frame-control
+    cl_extra_params: ["--subscribe-all-subnets", "--target-peers=1", "--disable-peer-scoring"]
+network_params:
+  network: kurtosis
+  seconds_per_slot: 3
+  genesis_delay: 50
+  electra_fork_epoch: 0
+  fulu_fork_epoch: 0
+  gloas_fork_epoch: 1
+  heze_fork_epoch: 2
+  num_validator_keys_per_node: 128
+  additional_preloaded_contracts:
+    "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf":
+      balance: 100ETH
+      nonce: 0
+      code: "0x"
+      storage: {}
+    "0x2b5ad5c4795c026514f8317c7a215e218dccd6cf":
+      balance: 100ETH
+      nonce: 0
+      code: "0x"
+      storage: {}
+    "0x0000000000000000000000000000000000007100":
+      balance: 0ETH
+      nonce: 1
+      code: "0x60015f555f5fa000"
+      storage: {}
+ethereum_genesis_generator_params:
+  image: ethpandaops/ethereum-genesis-generator@sha256:e1ac93bb064fc00aacf5a6533b8a5a8d9eb1903350d24598a87d3ed186eb6b8a
+additional_services: []

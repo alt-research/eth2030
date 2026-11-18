@@ -1,3 +1,217 @@
+## Qualified paymaster, blob and fresh CL history (2026-11-18)
+
+- Native EL `e0451092` and Lighthouse `a4ceb86e` passed the complete capped
+  control. Coded sponsorship finalized through signed FOCIL at slot
+  66; the blob Frame finalized at slot 165.
+- A validator-free CL with a new database joined at slot 256,
+  checkpoint-synced and returned both original finalized historical envelopes.
+  Raw transaction identities, Beacon roots, execution hashes and ordered blob
+  commitments matched the source. It shares the synchronized second EL.
+- Actual receiver restart preserved sponsored readback and the original blob
+  receipt, parent/post application storage and both paymaster balances. The
+  [final record](docs/verification/frame-8141-20261118-paymaster-history-final.json)
+  retains runtime/image identities, source versions, resource caps and cleanup.
+- The owned enclave, containers and volumes were removed and its engine stopped.
+  Seven owned runtime images and temporary binaries/contexts were also removed.
+  Native Go tests/build/vet/race, real consensus SSZ/block replay, twelve Python
+  controls, Heze regressions, Git-version cache tests, cargo check and full lint
+  passed. The CI matrix has seven required jobs; the final review head is
+  checked after publishing the retained evidence.
+- Remaining promotion gates: independent-client/runtime ABI agreement,
+  independent EL late join/state sync, Dora's production epoch consumer and
+  service restart, external-builder/PTC and other separately planned profiles.
+  Earlier entries below retain intermediate runs and their explicit failures.
+
+## Qualified CL runtime packaging (2026-11-18)
+
+- The new runtime reports `a4ceb86`, including the checkpoint and worktree-version
+  fixes. The first image accidentally added an entrypoint despite the pinned
+  package's explicit VC executable, so validator startup failed before traffic.
+  The entire failed enclave and its volumes were removed and its engine stopped.
+- The [runtime Dockerfile](pkg/devnet/kurtosis/scripts/lighthouse-runtime.Dockerfile)
+  now records the package's command contract. Beacon/observer entrypoints remain
+  supplied by their Starlark services; validator commands run directly.
+
+## Heze checkpoint parent follow-up (2026-11-18)
+
+- EL `e0451092` now serves reconstructed finalized sponsored, blob and checkpoint
+  envelopes through Lighthouse's historical API. The same run preserved blob
+  receipt, original storage and sponsor balances across a real receiver restart.
+- Fresh CL range sync exposed the next CL-specific failure: the Heze notifier
+  resolves the trusted checkpoint's IL view through its pre-anchor parent,
+  which a checkpoint-synced database does not contain. A debug observer at
+  checkpoint slot 224 repeatedly failed on the missing slot-223 parent.
+- Lighthouse fix `d8a064bf` on `fix/heze-checkpoint-history` passes five Heze
+  regressions, cargo check, full lint-fix and the release build. The Heze spec
+  initializes the anchor's IL satisfaction to true; the fix must preserve that
+  trusted bootstrap and keep unresolved live-parent views strict. A regression
+  uses real signed blocks and an empty checkpoint store with Engine notification
+  forced on, rather than manually marking the anchor payload received.
+- The failed enclave, temporary debug observer and labeled volumes were removed
+  and its engine stopped. The [record](docs/verification/frame-8141-20261118-checkpoint-parent-failed.json)
+  distinguishes repaired source history from the still-open fresh CL gate.
+
+## Historical Engine payload bodies (2026-11-18)
+
+- The fresh CL control exposed actual historical serving failures after the
+  source CL pruned its payload cache: base64 transaction DATA and absent BALs
+  prevented envelope reconstruction, so range sync stalled at the checkpoint.
+- Payload-body V1/V2 now use hex DATA, correct pre-Shanghai null withdrawals,
+  an explicit nullable V2 BAL and hex range quantities. Ranges reject invalid
+  bounds with the specified errors, preserve unavailable internal positions
+  and trim heights past the canonical head without uint64 overflow.
+- Native chain validation stores the reconstructed RLP BAL atomically with the
+  validated block. Historical lookup checks its header commitment and retains
+  the execution body when BAL data is absent/pruned. Native hash/range V1/V2
+  HTTP regressions compare original transaction and BAL bytes on both nodes and
+  after FileDB reopen, at nonce zero and the final valid scalar nonce.
+- The separate Engine backend now returns RLP BALs and preserves historical
+  transaction bodies beyond its BAL-retention window. Corrupt stored BAL data
+  is rejected by a real build/import/storage regression.
+- The rebuilt live receiver also reopened the original blob receipt, parent/post
+  application storage and both sponsor balances after a real EL restart. This
+  check now runs in the repeatable controller, with negative readback controls.
+- Removing BAL persistence and removing the V2 DATA codec were each detected
+  by the actual HTTP/restart integration using isolated Go build overlays.
+- The failed observer run cleaned all enclave resources and stopped its engine;
+  a rebuilt runtime must pass the same fresh-CL control before closing history.
+
+## Frame upper nonce boundary (2026-11-18)
+
+- Reproduced public admission rejecting the last valid scalar nonce
+  (`2^64 - 2`) because `stateNonce + MaxNonceGap` overflowed. The lower-nonce
+  guard now precedes a subtraction-based gap comparison.
+- The failing-before-fix pool regression now passes. The actual HTTP/Engine
+  integration also runs at this nonce: admission, FOCIL omission verdict,
+  construction, both imports, receipt/storage readback and FileDB reopen all
+  preserve the final post-approval nonce (`2^64 - 1`).
+- The running live image remains `38bbcff5`; this boundary correction is covered
+  by local node tests and is identified separately from that live image.
+
+## Consensus service codec replay (2026-11-18)
+
+- Added a separate [consensus replay module](tools/consensus-replay/README.md)
+  against released ethpandaops Go client `v0.1.11`. The actual finalized Heze
+  state is retained as compressed SSZ with its Beacon header and spec response.
+- The published Heze decoder rejects the current CL layout by 92 fixed bytes
+  because EIP-8015 removed four Eth1 fields. A minimal upstream-shaped replay
+  type matches byte-for-byte SSZ and the original state root, every validator
+  key and balance, and the 96-slot PTC window. Changed state, root, epoch JSON,
+  PTC preset and execution-requests-root controls are rejected. Removing the
+  state-root comparison was detected by two behavioral regressions.
+- Original sponsored and blob BeaconBlock SSZ also roundtrip exactly; their
+  message roots match the finalized state's block-root window. Signatures,
+  execution identities, FOCIL bits and commitments match captured evidence.
+  Changed bits, commitments, signatures and unrelated EL identities fail.
+- CI now runs the standalone replay, its race regressions and all twelve
+  Python control tests when either protocol code or the replay module changes.
+- The March local Dora codec also failed actual Gloas state decoding. It lacks
+  the relocated latest block hash, execution requests root and PTC state layout.
+  Successful block JSON display does not qualify epoch statistics. The replay
+  candidate does not yet wire the Dora consumer or qualify its restart path.
+
+## Frame paymaster completion (2026-11-18)
+
+- Frozen ETH2030's [paymaster v1 candidate](pkg/core/framepay/README.md), retaining
+  the EIP reference owner and delayed-withdrawal storage layout. Its Yul runtime
+  is reproducible with the recorded compiler and settings; the witness uses the
+  protocol-validated canonical-hash signature at index 1.
+- Prefix execution, exact-code recognition, multiple sponsored senders,
+  aggregate max-fee exposure, pending/matured withdrawal reservations and code
+  change revalidation pass behavioral tests. Actual EVM tests cover deployment,
+  unauthorized requests, exact timelock boundary, transfer and rollback.
+- Four targeted mutations were detected: relaxed runtime identity, omitted
+  withdrawal reservation, removed owner check and removed timelock. The last
+  two recompiled the actual Yul runtime and failed behavioral state tests.
+- The workload CLI now supports the frozen coded paymaster. A bounded control
+  covers sponsored FOCIL, a blob Frame and a validator-free checkpoint-synced
+  CL observer reading older execution envelopes. The observer shares an already
+  synchronized EL; independent EL late join remains a separate acceptance gate.
+- The first coded-paymaster control finalized the sponsored FOCIL transaction
+  on both peers. Its subsequent blob submission exposed the real HTTP path's
+  use of the plain transaction decoder; both public RPC entrypoints now decode
+  pooled wrappers. A real HTTP regression rejects a valid KZG proof at the
+  wrong cell index, admits the corrected wrapper and retrieves all 128 ordered
+  proofs through Engine API. The test also exposed and fixed `BlobAndProofV2`
+  JSON (hex DATA and lower-case field names, per Engine Osaka).
+- Replacements now test rejected payer changes preserving the old exposure and
+  successful payer changes releasing it for another sender.
+- The next live run finalized both coded sponsorship (slot 66) and a blob
+  Frame (slot 162), with identical receipts and exact sponsor settlement.
+  The observer launch rejected incompatible checkpoint/genesis CLI options;
+  its failure path removed the entire enclave and stopped the engine. The
+  observer now uses checkpoint sync exclusively.
+- This is an explicitly versioned experimental implementation; upstream bytecode
+  and ABI agreement, live coded sponsorship and fresh CL history are next.
+
+## Canonical Frame execution (2026-11-18)
+
+- Branch `feat/frame-8141-execution` extends merged master `cc567f93` in an
+  isolated worktree. The [execution record](docs/frame-8141-execution.md)
+  maps the pinned EIP to transition, journal, state-gas, admission, network,
+  receipt, Engine and workload paths.
+- Behavioral tests pass for sponsored settlement, sender creation, code
+  deposit, introspection, atomic rollback and cross-frame refills. Real KZG
+  sidecar validation and eth/70 receipt-page tests pass.
+- Build/import, same-height reorg, FileDB reopen and production startup
+  replay tests pass for sponsored and blob-bearing Frames. Native HTTP
+  tests pass for RPC admission, list construction, V6 import, FCU V5 and
+  receiver restart. The tests exposed and fixed the trusted-genesis Bogotá
+  FCU and execution-sync guards.
+- The full Go suite, targeted race checks, local build and vet checks pass.
+  Three behavioral mutations were each detected by their regression. Nine
+  Python controller/readback tests pass. The resource-capped sponsored Frame
+  control passed on Lighthouse `a05a56de` with three native EL revisions.
+  Controlled tests do not establish independent-client interoperability.
+- The first live launch used Heze at genesis and failed while decoding the
+  generated beacon SSZ (`OffsetOutOfBounds`) on Lighthouse `a05a56de`.
+  Cleanup removed its labeled containers and volumes and stopped its engine.
+  The Frame control now uses the previously qualified Fulu genesis with
+  scheduled Gloas/Heze transitions; the generator compatibility gate remains open.
+- The compatible live pair passed with native EL `88d9c118` and Lighthouse
+  `a05a56de`: a signed list at slot 66 delivered the sponsored Frame to the
+  isolated proposing EL at slot 67. Both pairs finalized it. The sponsor paid
+  exactly 137946955735149 wei; the sender balance stayed unchanged. The receiver
+  reopened the same receipt and historical storage after restart. Cleanup
+  reported zero remaining labeled containers and volumes and stopped the engine.
+- Follow-up review wires the production head's fee and gas-limit context into
+  pool admission, handles zero-valued Go fee metadata safely, and supplies the
+  including block's blob base fee to RPC transaction formatting. Targeted
+  regressions pass, including binary-overlay receipt parity. KZG admission
+  now uses the production batch verifier, with a valid proof deliberately
+  assigned to the wrong final cell as a rejection case. The updated images
+  and retained signed-list traces passed the paired control.
+- EL `6d10283d` repeated the finalized sponsored Frame control with the raw
+  transaction, original signed list, dependent root and payload bid retained.
+  Both peers agreed on settlement and restart readback. Its enclave, labeled
+  containers and volumes were removed and the engine stopped.
+- A real CREATE deploy-prefix regression exposed an approval nonce rewrite:
+  payment approval must increment the current account nonce after deployment,
+  rather than reset it from the signed transaction nonce. Deployment and
+  overflow rollback regressions now pass. The final consensus corner-case
+  fix was qualified on the retained `1c20e3c7` runtime.
+- EL `1c20e3c7` passed the final paired control with Lighthouse `a05a56de`:
+  slot 65's original signed list delivered the Frame at slot 66, both pairs
+  finalized it, and the receiver returned identical historical data after
+  restart. Raw bytes, signed list, payload bid, receipts, balances, image IDs
+  and memory limits are retained in the [final run evidence](docs/verification/frame-8141-20261118-final.json).
+  The sponsor paid exactly 137949520800762 wei; sender balance was unchanged.
+- The four-account deploy-prefix post-state matches an independently encoded
+  go-ethereum StateAccount/StackTrie oracle. Clipped-budget tests reconcile
+  actual payer debit and proposer tip even when GASPRICE is only a lower bound.
+  Public self-verify now requires the actual combined APPROVE scope, rather
+  than treating separate successful scopes as a combined call.
+- Non-FCU head changes now supply fee/gas context during the locked pool
+  state reset, covering P2P insertion, asynchronous execution sync and native
+  fork choice. The stale-head admission regression passes without RecordBlock.
+- Draft [PR 61](https://github.com/alt-research/eth2030/pull/61) retains the
+  implementation and evidence. All owned runtime images and temporary test
+  binaries were removed after verification; Docker reports no running test
+  containers, enclave networks or engine containers.
+- The later paymaster/history follow-up qualifies the local runtime, withdrawal
+  accounting and fresh CL control. Formal cross-client agreement and service
+  cutover remain separate promotion gates.
+
 ## ETH2030 PR readiness review (2026-11-17)
 
 - Upstream master is `ad35748f` with zero open upstream PRs at the

@@ -1,3 +1,7 @@
+## Glamsterdam independent gas corpus (2026-11-18)
+
+Added an offline signed-transaction differential command with 18 scenarios across Osaka controls and a pinned Amsterdam reference (36 comparisons). Reports preserve complete inputs, gas dimensions, validity versus included failure, logs and final state. The independent context explicitly includes CPSB; a targeted mutation proves its sanity check detects missing state creation pricing. Scoped tests/race/vet and local build pass. This is mismatch evidence, not release parity; see [verification](docs/verification/glamsterdam-gas-corpus-20261118.md).
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

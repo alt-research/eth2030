@@ -1,5 +1,12 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam independent current-text gas corpus (2026-11-18)
+
+- [x] Freeze signed transactions, complete pre-state, fork/config and reference-client version.
+- [x] Execute identical inputs through native admission/execution and the unmodified Geth Amsterdam transition.
+- [x] Record invalid versus included failure, gas dimensions, logs and exact final account/state results.
+- [ ] Verify pre-Amsterdam controls, archive candidate mismatches, build locally and publish a separate review.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

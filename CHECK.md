@@ -6,6 +6,7 @@
 - [x] Qualify exact-code recognition, prefix execution, aggregate exposure, delayed-withdrawal reservations and head/reorg revalidation.
 - [x] Test actual authorization, timelock enforcement, storage changes and value transfers, including negative and mutation cases.
 - [ ] Exercise coded sponsorship and fresh CL Frame history with bounded live resources, then remove all owned runtime resources.
+- [x] Retain a root-checked replay of the real Heze state using the released Go client and a minimal profile-specific compatibility type.
 - [ ] Reconcile service-consumer and independent-client gates against current sources; keep unsupported boundaries explicit.
 
 ## Canonical Frame execution

@@ -1,3 +1,19 @@
+## Consensus service codec replay (2026-11-18)
+
+- Added a separate [consensus replay module](tools/consensus-replay/README.md)
+  against released ethpandaops Go client `v0.1.11`. The actual finalized Heze
+  state is retained as compressed SSZ with its Beacon header and spec response.
+- The published Heze decoder rejects the current CL layout by 92 fixed bytes
+  because EIP-8015 removed four Eth1 fields. A minimal upstream-shaped replay
+  type matches byte-for-byte SSZ and the original state root, every validator
+  key and balance, and the 96-slot PTC window. Changed state, root, epoch JSON,
+  PTC preset and execution-requests-root controls are rejected. Removing the
+  state-root comparison was detected by two behavioral regressions.
+- The March local Dora codec also failed actual Gloas state decoding. It lacks
+  the relocated latest block hash, execution requests root and PTC state layout.
+  Successful block JSON display does not qualify epoch statistics. The replay
+  candidate does not yet wire the Dora consumer or qualify its restart path.
+
 ## Frame paymaster completion (2026-11-18)
 
 - Frozen ETH2030's [paymaster v1 candidate](pkg/core/framepay/README.md), retaining

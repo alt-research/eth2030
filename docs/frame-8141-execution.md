@@ -121,3 +121,16 @@ through authenticated `engine_getBlobsV2`. This also exposed the missing
 `BlobAndProofV2` Engine DATA JSON codec, which now follows the Osaka wire
 fields. The direct facade regression uses a real encoded legacy transaction
 and checks decoded identity rather than accepting arbitrary bytes.
+
+### Consensus service state fixture
+
+The second coded/blob run finalized sponsored Frame slot 66 and blob Frame
+slot 162 on both peers. The observer process rejected the mutually exclusive
+checkpoint/genesis-sync options. The controller removed the failed observer,
+both pairs, labeled volumes and its engine. Its archived Heze state at slot
+192 is retained in the [consensus replay module](../tools/consensus-replay/README.md).
+The byte-for-byte fixture and its original state root qualify a minimal
+upstream-shaped compatibility type, including all validator keys and balances.
+Removing the root comparison makes the changed-state and unrelated-header
+regressions fail. This is decoder evidence; Dora's actual epoch consumer and
+service restart remain unqualified.

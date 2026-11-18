@@ -1,14 +1,61 @@
-# Consensus client iteration after Track 4
+# Consensus client iteration after the merged Frame milestone
 
-This plan is based on ETH2030 master `ad35748` and the Lighthouse revisions
-below, inspected on 2026-11-16.
-[Track 4 merge and CI](https://github.com/alt-research/eth2030/pull/55)
+Updated November 18, 2026 after ETH2030 PR 61 merged at `911afb0c`.
+The active milestone is independent-client and service acceptance. The private
+native control already covers nonempty signed FOCIL, coded sponsorship, blob
+Frames, fresh CL history and receiver restart.
 
-The [Lighthouse and Hegotá implementation plan](lighthouse-hegota-implementation-plan.md)
-records the published `eth2030` development branch, Frame transaction
-work, and the cross-client acceptance matrix.
-The [legacy branch integration plan](lighthouse-legacy-branch-merge-plan.md)
-maps the historical commits and backend entry points to the porting work.
+## Delivered baseline
+
+- Lighthouse `eth2030` includes runtime `a4ceb86e` and tracking commit `29d66c238`.
+  Its upstream integration, Heze duty/signing/publication and Req/Resp paths are
+  retained with regression coverage.
+- Native Bogotá keeps execution validity separate from inclusion satisfaction,
+  including deferred FCU and persisted view/restart cases.
+- The final paired control finalized coded sponsorship at slot 66 and a blob
+  Frame at slot 165. A fresh validator-free CL joined at slot 256 and read both
+  original finalized envelopes. Its EL was already synchronized.
+- Real envelope processing now handles the trusted checkpoint without its
+  unavailable pre-anchor parent. Live V6 requests retain nonempty observed lists;
+  bad signatures/bids and missing custody data remain rejected or pending.
+- Receiver restart preserved both workloads' historical receipts, storage and
+  sponsor settlement. Runtime version metadata matches the built source.
+
+[Final control](verification/frame-8141-20261118-paymaster-history-final.json) ·
+[Execution record](frame-8141-execution.md) · [Active work plan](next-stage-work-plan.md)
+
+## Next iterations
+
+1. **Independent contract:** choose matching Frame/Bogotá fixtures and an
+   independent EL, or version the keyed-nonce experiment separately. Compare
+   actual execution/IL verdicts, canonical roots and recovery.
+2. **Service consumers:** adopt upstream Dora/workload behavior for covered
+   contracts. Wire the qualified Heze SSZ candidate through normal epoch/receipt
+   consumers and qualify pruning, event recovery and restart before retiring forks.
+3. **CL reliability:** exercise skipped-slot checkpoints, VC restart, remote
+   signing, redundant BN publication, alternate-peer and partial-response recovery.
+   Preserve duty/root binding and avoid signing conflicting lists for a duty.
+4. **Gloas external builders:** require signed external bid/payment, late/withheld
+   payload and PTC outcomes, BAL rejection and blob custody evidence.
+5. **Genesis and sync:** qualify the newer package/generator schema, independent
+   full/snap late join, restart and authenticated state recovery.
+6. **Longer horizon:** Heze light-client/proof vectors, decoupled consensus and
+   PQ key/committee lifecycle remain separately pinned research acceptance.
+
+Keep the strict live-view and fork-choice verdict regressions when integrating
+upstream. The experimental upstream helper's broad empty-list fallback is not
+used to resolve unknown live parents. Use released implementations for covered
+features and keep experimental compatibility within upstream component boundaries.
+
+Every live profile uses one bounded enclave, explicit client/service caps and
+retained source/image identities. Stop and remove owned runtime resources after
+every terminal result.
+
+## Historical design and migration review
+
+The dated review below predates the merged milestone. Its source comparisons
+and legacy-port rationale remain useful; the delivered baseline and next
+iterations above supersede its implementation-to-do statements.
 
 ## Decision and first milestone
 

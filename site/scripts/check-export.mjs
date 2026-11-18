@@ -5,6 +5,29 @@ const home = readFileSync(new URL('../out/index.html', import.meta.url), 'utf8')
 const pq = readFileSync(new URL('../out/pq-roadmap/index.html', import.meta.url), 'utf8');
 const tracker = readFileSync(new URL('../out/eips/index.html', import.meta.url), 'utf8');
 const roadmap = readFileSync(new URL('../out/roadmap/index.html', import.meta.url), 'utf8');
+// The retained live control is the oracle for published milestone values.
+const recordPath = 'docs/verification/frame-8141-20261118-paymaster-history-final.json';
+const record = JSON.parse(readFileSync(new URL(`../../${recordPath}`, import.meta.url), 'utf8'));
+const progress = html => html.match(/<aside aria-label="Verified development progress"[^>]*>(.*?)<\/aside>/s)?.[1];
+assert.ok(progress(home), 'Missing homepage development progress');
+assert.equal(progress(home), progress(roadmap), 'Homepage/detail development snapshots diverged');
+for (const milestone of [
+  `Slot ${record.sponsored.proposal_slot}`,
+  `Slot ${record.blob.slot}`,
+  `Joined at slot ${record.observer.join_slot}`,
+  'Readback passed',
+]) {
+  assert.ok(progress(home).includes(milestone), `Missing qualified milestone: ${milestone}`);
+}
+assert.equal(record.sponsored.finalized_on_both_pairs, true);
+assert.match(record.outcome.blob, /finalized on both pairs/);
+assert.match(record.outcome.restart, /recovered from the restarted receiver/);
+assert.match(record.outcome.qualification_boundary, /already-synchronized second EL/);
+assert.match(progress(home), /synchronized EL/);
+assert.match(progress(home), /Independent EL interoperability, Dora consumer migration and state-sync acceptance remain/);
+assert.match(progress(home), /November 18, 2026/);
+assert.match(progress(home), /href="https:\/\/github\.com\/alt-research\/eth2030\/pull\/61"/);
+assert.ok(progress(home).includes(`/blob/911afb0c42a2e33c9e65881b31ed1b1c446390b8/${recordPath}`), 'Missing pinned verification record');
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
@@ -40,14 +63,19 @@ assert.ok(tracker.includes('id="fork-longer"'), 'Missing longer-term tracker sec
 for (const [id, expected, obsolete] of [
   ['eip-7928', 'BAL header commitment encoded', 'block_access_list_hash header field not yet added'],
   ['eip-7805', 'Inclusion-list gossip validation', 'CL P2P gossip validation rules for ILs'],
-  ['eip-8141', 'APPROVE scope handling', 'Payer gas-approval logic'],
+  ['eip-8141', 'exact APPROVE scopes and atomic rollback', 'Payer gas-approval logic'],
   ['eip-7495', 'ssz/stable_container_test.go', 'No tests'],
 ]) {
   const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
   assert.ok(page.includes(expected), `Missing current evidence on ${id}`);
   assert.ok(!page.includes(obsolete), `Obsolete claim on ${id}`);
 }
-for (const path of ['pkg/bal/spec_test.go', 'pkg/epbs/validation_test.go', 'pkg/focil/il_satisfaction_test.go', 'pkg/core/eips/frame_execution_test.go', 'pkg/rollup/execute_test.go', 'pkg/crypto/pqc/pubkey_registry.go']) {
+const framePage = readFileSync(new URL('../out/eips/eip-8141/index.html', import.meta.url), 'utf8');
+for (const claim of ['scalar nonce', 'DEPLOY / VERIFY / SENDER', 'cross-frame refills', 'delayed withdrawals', 'synchronized EL', 'Dora production epoch/receipt']) {
+  assert.ok(framePage.includes(claim), `Missing scoped Frame evidence: ${claim}`);
+}
+assert.doesNotMatch(framePage, /2D nonces|TXPARAMLOAD \/ TXPARAMSIZE \/ TXPARAMCOPY|core\/eips\/frame_execution/);
+for (const path of ['pkg/bal/spec_test.go', 'pkg/epbs/validation_test.go', 'pkg/focil/il_satisfaction_test.go', 'pkg/node/frame_8141_integration_test.go', 'pkg/core/execution/frame_8141.go', recordPath, 'pkg/rollup/execute_test.go', 'pkg/crypto/pqc/pubkey_registry.go']) {
   assert.ok(existsSync(new URL(`../../${path}`, import.meta.url)), `Missing evidence: ${path}`);
 }
 function checkPages(dir) {
@@ -63,4 +91,4 @@ function checkPages(dir) {
 checkPages(new URL('../out/', import.meta.url));
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
 assert.match(pagesWorkflow, /echo 'eth2030\.altllm\.ai' > out\/CNAME/);
-console.log('Export claims, evidence paths and tracker links verified.');
+console.log('Export claims, retained milestones, shared progress, evidence paths and tracker links verified.');

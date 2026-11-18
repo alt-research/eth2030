@@ -7,7 +7,6 @@ import (
 	"time"
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 )
 
 // TestGetPayloadV6ResponseCarriesGloasFields drives the real backend through
@@ -15,7 +14,7 @@ import (
 // asserting the marshaled response exposes blockAccessList and slotNumber —
 // the fields lighthouse >= 8.4 requires on Gloas payloads.
 func TestGetPayloadV6ResponseCarriesGloasFields(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	api := NewEngineAPI(b)

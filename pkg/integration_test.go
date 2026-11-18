@@ -10,7 +10,6 @@ import (
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 )
@@ -108,7 +107,7 @@ func TestFullTransactionLifecycle(t *testing.T) {
 	recipient := types.HexToAddress("0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 	coinbase := types.HexToAddress("0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, etherI(100))
 
 	chainID := coreconfig.TestConfig.ChainID
@@ -170,7 +169,7 @@ func TestMultipleTransactionsInBlock(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 	gasPrice := big.NewInt(10)
@@ -242,13 +241,13 @@ func TestTransactionTypeMatrix(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(1_000_000_000_000_000))
 
 	chainID := big.NewInt(1337)
 
 	t.Run("LegacyTx", func(t *testing.T) {
-		db := state.NewMemoryStateDB()
+		db := newBuilderRequestTestState()
 		db.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		tx := types.NewTransaction(&types.LegacyTx{
@@ -283,7 +282,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 	})
 
 	t.Run("AccessListTx", func(t *testing.T) {
-		db := state.NewMemoryStateDB()
+		db := newBuilderRequestTestState()
 		db.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		tx := types.NewTransaction(&types.AccessListTx{
@@ -322,7 +321,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 	})
 
 	t.Run("DynamicFeeTx", func(t *testing.T) {
-		db := state.NewMemoryStateDB()
+		db := newBuilderRequestTestState()
 		db.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		tx := types.NewTransaction(&types.DynamicFeeTx{
@@ -359,7 +358,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 	})
 
 	t.Run("BlobTx", func(t *testing.T) {
-		db := state.NewMemoryStateDB()
+		db := newBuilderRequestTestState()
 		db.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		blobHash := types.Hash{0x01, 0x02, 0x03}
@@ -388,7 +387,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 	})
 
 	t.Run("SetCodeTx", func(t *testing.T) {
-		db := state.NewMemoryStateDB()
+		db := newBuilderRequestTestState()
 		db.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		auth := types.Authorization{
@@ -433,7 +432,7 @@ func TestBlockBuildAndValidate(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 	var txs []*types.Transaction
@@ -516,7 +515,7 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 	coinbase := types.BytesToAddress([]byte{0xff})
 
 	t.Run("PreGlamsterdam", func(t *testing.T) {
-		statedb := state.NewMemoryStateDB()
+		statedb := newBuilderRequestTestState()
 		statedb.AddBalance(sender, big.NewInt(1_000_000_000_000))
 
 		tx := types.NewTransaction(&types.LegacyTx{
@@ -553,7 +552,7 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 	})
 
 	t.Run("Glamsterdam", func(t *testing.T) {
-		statedb := state.NewMemoryStateDB()
+		statedb := newBuilderRequestTestState()
 		statedb.AddBalance(sender, big.NewInt(1_000_000_000_000))
 		// Pre-create receiver so EIP-2780 GAS_NEW_ACCOUNT (25000) surcharge
 		// does not apply -- we want to test the reduced base gas path.
@@ -610,7 +609,7 @@ func TestMixedTypedTransactionsBlock(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender1, big.NewInt(1_000_000_000_000))
 	statedb.AddBalance(sender2, big.NewInt(1_000_000_000_000))
 

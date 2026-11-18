@@ -34,7 +34,7 @@ func TestE2E_BALOrdering_InProcessedBlock(t *testing.T) {
 	sender := crypto.PubkeyToAddress(key.PublicKey)
 	recipient := types.HexToAddress("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, ether(10))
 
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
@@ -124,7 +124,7 @@ func TestE2E_CalldataGasHeader_UpdatesAcrossBlocks(t *testing.T) {
 	coinbase := types.HexToAddress("0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
 	// Use Glamsterdan config so CalldataGasUsed/CalldataExcessGas headers are populated.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, ether(100))
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
@@ -441,7 +441,7 @@ func TestE2E_MultiBlock_BALAccessIndex(t *testing.T) {
 
 		// Re-process with BAL to get access indices.
 		// Build a state that mirrors the chain state: correct nonce + remaining balance.
-		blockState := state.NewMemoryStateDB()
+		blockState := newBuilderRequestTestState()
 		spent := new(big.Int).Mul(big.NewInt(int64(nonce)), new(big.Int).Mul(big.NewInt(21000), big.NewInt(10)))
 		remaining := new(big.Int).Sub(ether(100), spent)
 		blockState.AddBalance(sender, remaining)

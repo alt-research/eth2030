@@ -68,7 +68,7 @@ func (n *Node) applyExecutionTarget(target syncbeacon.ExecutionTarget) error {
 	return nil
 }
 
-func (n *Node) syncFinalizedPivot(ctx context.Context, pivot *types.Block) (bool, error) {
+func (n *Node) syncFinalizedPivotV1(ctx context.Context, pivot *types.Block) (bool, error) {
 	if n.blockchain.CurrentBlock().NumberU64() != 0 {
 		return false, nil
 	}
@@ -163,6 +163,10 @@ type snapStateBackend struct {
 
 func newSnapStateBackend(chain *chain.Blockchain, db rawdb.Database) *snapStateBackend {
 	return &snapStateBackend{chain: chain, db: db}
+}
+
+func (b *snapStateBackend) BlockAccessList(hash types.Hash) ([]byte, error) {
+	return b.chain.BlockAccessList(hash)
 }
 func (b *snapStateBackend) snapshot(root types.Hash) (*state.StateSnapshot, error) {
 	b.mu.Lock()

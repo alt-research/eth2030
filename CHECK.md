@@ -1,5 +1,30 @@
 # Lean4 Verification Check-list
 
+## snap/2 BAL state catch-up (2026-11-18)
+
+- [x] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.
+- [x] Negotiate snap/2 separately, retain unchanged range/code packets and reject removed trie-node messages.
+- [x] Serve and authenticate ordered raw BAL responses with missing entries, budgets and cancellation.
+- [x] Rebase downloaded state and outstanding ranges through verified BALs, including moving pivots and reorg handling.
+- [x] Qualify actual Node sync/restart and independent wire/root consumers; run builds/tests and publish the separate PR.
+
+- [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
+- [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.
+- [x] Register negotiated versions, implement status/range and version-aware receipt serving.
+- [x] Correlate and validate received BALs before restoring verified historical data.
+- [x] Verify affected network/chain/node/consumer paths and race/build; prepare the separate feature review.
+
+# Lean4 Verification Check-list
+
+## EIP-8282 builder execution requests (2026-11-18)
+
+- [x] Read the complete pinned EIP, canonical bytecode assets and selected CL processing.
+- [x] Add exact runtime/constructor assets and request types/SSZ encoding with provenance.
+- [x] Wire mandatory Amsterdam system queues, rollback and commitment validation.
+- [x] Supply explicit pre-fork deployment/genesis fixtures without fork-time code injection.
+- [x] Qualify fee/queue/endian/cap/failure and actual Engine/CL consumer paths.
+- [x] Run affected builds/tests and publish a dedicated feature PR.
+
 ## Complete ordinary blob sidecar validation (2026-11-18)
 
 - [x] Read pinned EIP-4844/7594 networking and proof requirements.

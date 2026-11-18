@@ -12,23 +12,23 @@ import (
 	"github.com/eth2030/eth2030/rlp"
 )
 
-type indexedChange[T any] struct {
+type IndexedChange[T any] struct {
 	Index uint64
 	Value T
 }
 
-type slotChanges struct {
+type SlotChanges struct {
 	Slot    *big.Int
-	Changes []indexedChange[*big.Int]
+	Changes []IndexedChange[*big.Int]
 }
 
-type accountChanges struct {
+type AccountChanges struct {
 	Address        types.Address
-	StorageChanges []slotChanges
+	StorageChanges []SlotChanges
 	StorageReads   []*big.Int
-	BalanceChanges []indexedChange[*big.Int]
-	NonceChanges   []indexedChange[uint64]
-	CodeChanges    []indexedChange[[]byte]
+	BalanceChanges []IndexedChange[*big.Int]
+	NonceChanges   []IndexedChange[uint64]
+	CodeChanges    []IndexedChange[[]byte]
 }
 
 // EncodeRLP encodes the EIP-7928 account-grouped wire format. Internal
@@ -44,7 +44,7 @@ func (list *BlockAccessList) EncodeRLP() ([]byte, error) {
 	if err := ValidateBALOrdering(&BlockAccessList{Entries: entries}); err != nil {
 		return nil, err
 	}
-	accounts := make([]accountChanges, 0)
+	accounts := make([]AccountChanges, 0)
 	for first := 0; first < len(entries); {
 		last := first + 1
 		for last < len(entries) && entries[last].Address == entries[first].Address {
@@ -60,14 +60,14 @@ func (list *BlockAccessList) EncodeRLP() ([]byte, error) {
 	return rlp.EncodeToBytes(accounts)
 }
 
-func encodeAccountChanges(entries []AccessEntry) (accountChanges, error) {
-	account := accountChanges{Address: entries[0].Address}
-	writes := make(map[types.Hash][]indexedChange[*big.Int])
+func encodeAccountChanges(entries []AccessEntry) (AccountChanges, error) {
+	account := AccountChanges{Address: entries[0].Address}
+	writes := make(map[types.Hash][]IndexedChange[*big.Int])
 	reads := make(map[types.Hash]bool)
 	for _, entry := range entries {
 		idx := entry.AccessIndex
-		if idx > math.MaxUint16 {
-			return account, fmt.Errorf("BAL access index %d exceeds uint16", idx)
+		if idx > math.MaxUint32 {
+			return account, fmt.Errorf("BAL access index %d exceeds uint32", idx)
 		}
 		for _, read := range entry.StorageReads {
 			reads[read.Slot] = true
@@ -77,20 +77,20 @@ func encodeAccountChanges(entries []AccessEntry) (accountChanges, error) {
 				reads[write.Slot] = true
 				continue
 			}
-			writes[write.Slot] = append(writes[write.Slot], indexedChange[*big.Int]{idx, new(big.Int).SetBytes(write.NewValue[:])})
+			writes[write.Slot] = append(writes[write.Slot], IndexedChange[*big.Int]{idx, new(big.Int).SetBytes(write.NewValue[:])})
 		}
 		if change := entry.BalanceChange; change != nil {
-			account.BalanceChanges = append(account.BalanceChanges, indexedChange[*big.Int]{idx, change.NewValue})
+			account.BalanceChanges = append(account.BalanceChanges, IndexedChange[*big.Int]{idx, change.NewValue})
 		}
 		if change := entry.NonceChange; change != nil {
-			account.NonceChanges = append(account.NonceChanges, indexedChange[uint64]{idx, change.NewValue})
+			account.NonceChanges = append(account.NonceChanges, IndexedChange[uint64]{idx, change.NewValue})
 		}
 		if change := entry.CodeChange; change != nil {
-			account.CodeChanges = append(account.CodeChanges, indexedChange[[]byte]{idx, change.NewCode})
+			account.CodeChanges = append(account.CodeChanges, IndexedChange[[]byte]{idx, change.NewCode})
 		}
 	}
 	for slot, changes := range writes {
-		account.StorageChanges = append(account.StorageChanges, slotChanges{new(big.Int).SetBytes(slot[:]), changes})
+		account.StorageChanges = append(account.StorageChanges, SlotChanges{new(big.Int).SetBytes(slot[:]), changes})
 		delete(reads, slot)
 	}
 	for slot := range reads {

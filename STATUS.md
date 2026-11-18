@@ -1,3 +1,15 @@
+## Frame upper nonce boundary (2026-11-18)
+
+- Reproduced public admission rejecting the last valid scalar nonce
+  (`2^64 - 2`) because `stateNonce + MaxNonceGap` overflowed. The lower-nonce
+  guard now precedes a subtraction-based gap comparison.
+- The failing-before-fix pool regression now passes. The actual HTTP/Engine
+  integration also runs at this nonce: admission, FOCIL omission verdict,
+  construction, both imports, receipt/storage readback and FileDB reopen all
+  preserve the final post-approval nonce (`2^64 - 1`).
+- The running live image remains `38bbcff5`; this boundary correction is covered
+  by local node tests and is identified separately from that live image.
+
 ## Consensus service codec replay (2026-11-18)
 
 - Added a separate [consensus replay module](tools/consensus-replay/README.md)

@@ -400,7 +400,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Nonce gap detection: reject transactions with nonces too far ahead
 	// of the current state nonce to prevent memory exhaustion attacks.
-	if tx.Nonce() > stateNonce+MaxNonceGap {
+	// The low-nonce check above makes subtraction safe, including states
+	// near the EIP-2681 upper bound where adding the gap would wrap.
+	if tx.Nonce()-stateNonce > MaxNonceGap {
 		txpoolLog.Debug("tx_rejected",
 			"event", "tx_rejected",
 			"hash", hash.Hex(),

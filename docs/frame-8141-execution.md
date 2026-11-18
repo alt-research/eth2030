@@ -134,3 +134,14 @@ upstream-shaped compatibility type, including all validator keys and balances.
 Removing the root comparison makes the changed-state and unrelated-header
 regressions fail. This is decoder evidence; Dora's actual epoch consumer and
 service restart remain unqualified.
+
+### Upper scalar nonce admission
+
+The final scalar transaction nonce allowed by EIP-2681 and the pinned Frame
+validation is `2^64 - 2`. A shared pool guard previously added its future-nonce
+gap to the current state nonce and wrapped near that bound. The pool regression
+failed with `nonce too high` before changing it to compare the nonnegative
+difference. The actual HTTP/Engine/restart integration now runs both at nonce
+zero and at this upper nonce, checking the post-approval nonce through both
+nodes and the reopened database. The live `38bbcff5` image uses ordinary nonce
+values; the later guard correction has separate local regression evidence.

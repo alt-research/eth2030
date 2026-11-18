@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -16,6 +17,14 @@ import (
 )
 
 func TestCanonicalFrame8141ThroughEngineAndRestart(t *testing.T) {
+	for _, nonce := range []uint64{0, math.MaxUint64 - 1} {
+		t.Run(fmt.Sprintf("nonce_%d", nonce), func(t *testing.T) {
+			canonicalFrameThroughEngineAndRestart(t, nonce)
+		})
+	}
+}
+
+func canonicalFrameThroughEngineAndRestart(t *testing.T, nonce uint64) {
 	const token = "canonical-frame-integration"
 	var genesis map[string]any
 	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
@@ -35,6 +44,7 @@ func TestCanonicalFrame8141ThroughEngineAndRestart(t *testing.T) {
 		addresses[i] = types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
 		alloc[addresses[i].Hex()] = map[string]string{"balance": "1000000000000000000"}
 	}
+	alloc[addresses[0].Hex()].(map[string]string)["nonce"] = fmt.Sprintf("0x%x", nonce)
 	target := types.Address{18: 0x89}
 	alloc[target.Hex()] = map[string]string{"code": "0x60015f555f5fa000", "balance": "0", "nonce": "1"}
 	rawGenesis, err := json.Marshal(genesis)
@@ -53,7 +63,7 @@ func TestCanonicalFrame8141ThroughEngineAndRestart(t *testing.T) {
 	receiverConfig := config()
 	receiver := newTestNode(t, receiverConfig)
 	source, destination := track4NodeRPC(t, producer, token), track4NodeRPC(t, receiver, token)
-	frame := &types.FrameTx8141{ChainID: big.NewInt(1337), Sender: addresses[0],
+	frame := &types.FrameTx8141{ChainID: big.NewInt(1337), Sender: addresses[0], Nonce: nonce,
 		Fees: types.FrameFeeBudget{MaxFee: big.NewInt(100_000_000_000_000_000), MaxPriorityFeePerGas: big.NewInt(1_000_000_000)},
 		Frames: []types.Frame8141{
 			{Mode: types.ModeVerify, Flags: 2, Limits: types.FrameGasLimits{Execution: 1000}},
@@ -139,6 +149,11 @@ func TestCanonicalFrame8141ThroughEngineAndRestart(t *testing.T) {
 		rpc.call(t, "eth_getStorageAt", &value, target.Hex(), "0x0", receipt["blockNumber"])
 		if value != (types.Hash{31: 1}) {
 			t.Fatal("Frame application state missing")
+		}
+		var count string
+		rpc.call(t, "eth_getTransactionCount", &count, addresses[0].Hex(), receipt["blockNumber"])
+		if count != fmt.Sprintf("0x%x", nonce+1) {
+			t.Fatalf("wrong persisted post-approval nonce: %s", count)
 		}
 		return receipt
 	}

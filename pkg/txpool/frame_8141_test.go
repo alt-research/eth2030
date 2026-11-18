@@ -3,6 +3,7 @@ package txpool
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"math/big"
 	"testing"
 
@@ -72,6 +73,19 @@ func sponsorPoolFrame(t *testing.T, frame *types.FrameTx8141, key int) {
 	payer := framePoolAddress(t, key)
 	frame.Frames[0].Flags = 2
 	frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &payer, Limits: types.FrameGasLimits{Execution: 4000}})
+}
+
+func TestCanonicalFrame8141PoolLastValidNonce(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	frame.Nonce = math.MaxUint64 - 1
+	db.SetNonce(frame.Sender, frame.Nonce)
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(tx); err != nil {
+		t.Fatalf("last valid scalar nonce was rejected: %v", err)
+	}
+	if len(pool.PendingFlat()) != 1 || db.GetNonce(frame.Sender) != frame.Nonce {
+		t.Fatal("high nonce admission changed live state or lost the pending Frame")
+	}
 }
 
 func TestCanonicalFrame8141PoolPrefixDoesNotExecuteBody(t *testing.T) {

@@ -1,3 +1,11 @@
+## Glamsterdam RPC access-list discovery
+
+- [x] Inspect the production HTTP/backend route and merged execution-apis #950 semantics.
+- [x] Add failing real-backend HTTP storage-discovery and non-mutation regressions.
+- [x] Replace the empty placeholder with bounded discovery/convergence and gas readback.
+- [x] Verify returned access items, reverted touches, creation, historical state and affected packages/build.
+- [x] Prepare this major RPC feature for its separate PR.
+
 # Lean4 Verification Check-list
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)

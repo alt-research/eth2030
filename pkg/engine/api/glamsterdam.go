@@ -21,14 +21,14 @@ type jsonrpcError struct {
 
 // Type aliases — canonical definitions live in engine/payload and engine/backendapi.
 type (
-	GlamsterdamBackend           = backendapi.GlamsterdamBackend
-	PayloadStatusV1              = payload.PayloadStatusV1
-	ForkchoiceStateV1            = payload.ForkchoiceStateV1
-	ForkchoiceUpdatedResult      = payload.ForkchoiceUpdatedResult
-	BlobAndProofV2               = payload.BlobAndProofV2
-	BlobsBundleV2                = payload.BlobsBundleV2
-	GlamsterdamPayloadAttributes = payload.GlamsterdamPayloadAttributes
-	GetPayloadV5Response         = payload.GetPayloadV5Response
+	GlamsterdamBackend               = backendapi.GlamsterdamBackend
+	PayloadStatusV1                  = payload.PayloadStatusV1
+	ForkchoiceStateV1                = payload.ForkchoiceStateV1
+	ForkchoiceUpdatedResult          = payload.ForkchoiceUpdatedResult
+	BlobAndProofV2                   = payload.BlobAndProofV2
+	BlobsBundleV2                    = payload.BlobsBundleV2
+	GlamsterdamPayloadAttributes     = payload.GlamsterdamPayloadAttributes
+	LegacyGlamsterdamPayloadResponse = payload.LegacyGlamsterdamPayloadResponse
 )
 
 // ClientVersionV2 extends ClientVersionV1 with additional fields.
@@ -134,7 +134,7 @@ func (e *EngineGlamsterdam) HandleForkchoiceUpdatedV4(
 }
 
 // HandleGetPayloadV5 retrieves a previously built payload by ID.
-func (e *EngineGlamsterdam) HandleGetPayloadV5(payloadID payload.PayloadID) (*GetPayloadV5Response, error) {
+func (e *EngineGlamsterdam) HandleGetPayloadV5(payloadID payload.PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 

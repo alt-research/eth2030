@@ -151,7 +151,9 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleGetPayloadV3(params)
 	case "engine_getPayloadV4":
 		return api.handleGetPayloadV4(params)
-	case "engine_getPayloadV5", "engine_getPayloadV6":
+	case "engine_getPayloadV5":
+		return api.handleGetPayloadV5(params)
+	case "engine_getPayloadV6":
 		return api.handleGetPayloadV6(params)
 
 	case "engine_getPayloadV7":
@@ -206,6 +208,10 @@ func (api *EngineAPI) handleNewPayloadV3(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
+	if err := validateNewPayloadWire(params, false); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var payload ExecutionPayloadV3
 	if err := json.Unmarshal(params[0], &payload); err != nil {
 		return nil, &jsonrpcError{
@@ -246,6 +252,10 @@ func (api *EngineAPI) handleForkchoiceUpdatedV3(params []json.RawMessage) (any, 
 		}
 	}
 
+	if err := validateForkchoiceWire(params[0]); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var state ForkchoiceStateV1
 	if err := json.Unmarshal(params[0], &state); err != nil {
 		return nil, &jsonrpcError{
@@ -257,7 +267,10 @@ func (api *EngineAPI) handleForkchoiceUpdatedV3(params []json.RawMessage) (any, 
 	var payloadAttributes *PayloadAttributesV3
 	if len(params) == 2 {
 		// Check if the second param is null.
-		if string(params[1]) != "null" {
+		if !isNullWire(params[1]) {
+			if err := validateAttributesWire(params[1], false); err != nil {
+				return api.rejectAttributes(state, false)
+			}
 			payloadAttributes = new(PayloadAttributesV3)
 			if err := json.Unmarshal(params[1], payloadAttributes); err != nil {
 				return nil, &jsonrpcError{
@@ -284,6 +297,10 @@ func (api *EngineAPI) handleGetPayloadV3(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var payloadID PayloadID
 	if err := json.Unmarshal(params[0], &payloadID); err != nil {
 		return nil, &jsonrpcError{
@@ -306,6 +323,10 @@ func (api *EngineAPI) handleNewPayloadV4(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 4 params, got %d", len(params)),
 		}
+	}
+
+	if err := validateNewPayloadWire(params, false); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payload ExecutionPayloadV3
@@ -354,6 +375,10 @@ func (api *EngineAPI) handleNewPayloadV5(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 4 params, got %d", len(params)),
 		}
+	}
+
+	if err := validateNewPayloadWire(params, true); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payload ExecutionPayloadV5
@@ -426,6 +451,10 @@ func (api *EngineAPI) handleGetPayloadV4(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var payloadID PayloadID
 	if err := json.Unmarshal(params[0], &payloadID); err != nil {
 		return nil, &jsonrpcError{
@@ -441,6 +470,26 @@ func (api *EngineAPI) handleGetPayloadV4(params []json.RawMessage) (any, *jsonrp
 	return result, nil
 }
 
+// handleGetPayloadV5 processes an engine_getPayloadV5 request (Osaka).
+func (api *EngineAPI) handleGetPayloadV5(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 1 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected one payload ID"}
+	}
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
+	var id PayloadID
+	if err := json.Unmarshal(params[0], &id); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "invalid payload ID"}
+	}
+	result, err := api.GetPayloadV5(id)
+	if err != nil {
+		return nil, engineErrorToRPC(err)
+	}
+	return result, nil
+}
+
 // handleGetPayloadV6 processes an engine_getPayloadV6 request (Amsterdam).
 func (api *EngineAPI) handleGetPayloadV6(params []json.RawMessage) (any, *jsonrpcError) {
 	if len(params) != 1 {
@@ -448,6 +497,10 @@ func (api *EngineAPI) handleGetPayloadV6(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
+	}
+
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payloadID PayloadID
@@ -525,6 +578,10 @@ func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota
 		}
 	}
 
+	if err := validateForkchoiceWire(params[0]); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var state ForkchoiceStateV1
 	if err := json.Unmarshal(params[0], &state); err != nil {
 		return nil, &jsonrpcError{
@@ -547,6 +604,11 @@ func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota
 		if _, native := api.backend.(bogotaBackend); bogota && native && string(params[1]) != "null" {
 			if err := validateBogotaAttributes(params[1]); err != nil {
 				return api.forkchoiceUpdatedBogota(state, nil, ErrInvalidPayloadAttributes)
+			}
+		}
+		if !bogota && !isNullWire(params[1]) {
+			if err := validateAttributesWire(params[1], true); err != nil {
+				return api.rejectAttributes(state, true)
 			}
 		}
 		attrs, err := parsePayloadAttributes(params[1])

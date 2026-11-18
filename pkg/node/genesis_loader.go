@@ -298,6 +298,9 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 
 	// Apply fork override timestamps from CLI flags.
 	applyForkOverrides(chainCfg, cfg)
+	if err := chainCfg.Validate(); err != nil {
+		return nil, fmt.Errorf("invalid genesis fork schedule: %w", err)
+	}
 
 	// Resolve network ID.
 	networkID := cfg.NetworkID

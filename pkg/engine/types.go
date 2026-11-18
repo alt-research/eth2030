@@ -43,10 +43,11 @@ type (
 	// Blobs — canonical in engine/payload.
 	BlobAndProofV1 = payload.BlobAndProofV1
 	// Glamsterdam — canonical in engine/payload.
-	BlobAndProofV2               = payload.BlobAndProofV2
-	BlobsBundleV2                = payload.BlobsBundleV2
-	GlamsterdamPayloadAttributes = payload.GlamsterdamPayloadAttributes
-	GetPayloadV5Response         = payload.GetPayloadV5Response
+	BlobAndProofV2                   = payload.BlobAndProofV2
+	BlobsBundleV2                    = payload.BlobsBundleV2
+	GlamsterdamPayloadAttributes     = payload.GlamsterdamPayloadAttributes
+	LegacyGlamsterdamPayloadResponse = payload.LegacyGlamsterdamPayloadResponse
+	GetPayloadV5Response             = payload.GetPayloadV5Response
 	// V7 — canonical in engine/payload.
 	DALayerConfig        = payload.DALayerConfig
 	ProofRequirements    = payload.ProofRequirements

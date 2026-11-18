@@ -59,6 +59,7 @@ func (c *ChainConfig) ForkSchedule() []ForkID {
 		{Name: "Shanghai", Timestamp: c.ShanghaiTime},
 		{Name: "Cancun", Timestamp: c.CancunTime},
 		{Name: "Prague", Timestamp: c.PragueTime},
+		{Name: "Osaka", Timestamp: c.OsakaTime},
 		{Name: "Amsterdam", Timestamp: c.AmsterdamTime},
 		{Name: "Glamsterdan", Timestamp: c.GlamsterdanTime},
 		{Name: "Hogota", Timestamp: c.HogotaTime},
@@ -195,7 +196,15 @@ func CheckConfigCompatible(local, remote *ChainConfig, headNum uint64, headTime 
 				continue
 			}
 			// Only report incompatibility if the fork is already active.
-			if f.IsActive(num, headTime) {
+			remoteFork := remote.ForkSchedule()
+			remoteActive := false
+			for _, candidate := range remoteFork {
+				if candidate.Name == f.Name {
+					remoteActive = candidate.IsActive(num, headTime)
+					break
+				}
+			}
+			if f.IsActive(num, headTime) || remoteActive {
 				return &ConfigCompatError{
 					ForkName:  d.ForkName,
 					LocalVal:  d.Local,

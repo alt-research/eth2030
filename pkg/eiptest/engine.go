@@ -124,6 +124,7 @@ func (p *EngineProbe) FCUWith(attrs engine.PayloadAttributesV4) (engine.PayloadI
 	var wireAttrs any
 	if p.s.cfg.IsAmsterdam(attrs.Timestamp) {
 		method, wireAttrs = "engine_forkchoiceUpdatedV4", attrs
+
 	} else {
 		if len(attrs.InclusionListTransactions) != 0 {
 			return engine.PayloadID{}, fmt.Errorf("inclusion list attributes require Amsterdam")
@@ -151,6 +152,17 @@ func (p *EngineProbe) GetPayload(id engine.PayloadID) (*engine.GetPayloadV6Respo
 		if err := engineCall(p.proposer, "engine_getPayloadV6", &result, id); err != nil {
 			return nil, err
 		}
+	} else if p.s.cfg.IsOsaka(attrs.Timestamp) {
+		var v5 engine.GetPayloadV5Response
+		if err := engineCall(p.proposer, "engine_getPayloadV5", &v5, id); err != nil {
+			return nil, err
+		}
+		if v5.ExecutionPayload == nil {
+			return nil, fmt.Errorf("engine_getPayloadV5 returned no payload")
+		}
+		result.ExecutionPayload = &engine.ExecutionPayloadV5{}
+		result.ExecutionPayload.ExecutionPayloadV3 = *v5.ExecutionPayload
+		result.BlockValue, result.ExecutionRequests, result.BlobsBundle = v5.BlockValue, v5.ExecutionRequests, v5.BlobsBundle
 	} else {
 		var v4 engine.GetPayloadV4Response
 		if err := engineCall(p.proposer, "engine_getPayloadV4", &v4, id); err != nil {

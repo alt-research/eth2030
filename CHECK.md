@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Complete ordinary blob sidecar validation (2026-11-18)
+
+- [x] Read pinned EIP-4844/7594 networking and proof requirements.
+- [x] Reproduce invalid ordinary-cell-proof admission through real node HTTP.
+- [x] Validate complete sidecar binding/proofs and preserve Frame regression behavior.
+- [x] Require full data for pool-based builders and return genuine legacy blob proofs.
+- [x] Qualify actual wire/admission/Engine consumers, affected checks/build and regression mutations.
+- [ ] Publish the isolated blob-validation PR.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

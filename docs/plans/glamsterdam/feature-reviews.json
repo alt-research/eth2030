@@ -1,0 +1,117 @@
+{
+  "implementation_base": "38ea9259",
+  "integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
+  "status": "development integration passed; program incomplete",
+  "reviews": [
+    {
+      "pr": 65,
+      "url": "https://github.com/alt-research/eth2030/pull/65",
+      "branch": "feat/glamsterdam-contract-limits",
+      "commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "remote_head": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "scope": "EIP-7954 code/initcode and admission",
+      "release_qualified": false,
+      "tested_source_commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 66,
+      "url": "https://github.com/alt-research/eth2030/pull/66",
+      "branch": "feat/glamsterdam-bal-retention",
+      "commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "remote_head": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "scope": "Historical BAL retention and empty-cache recovery",
+      "release_qualified": false,
+      "tested_source_commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 67,
+      "url": "https://github.com/alt-research/eth2030/pull/67",
+      "branch": "feat/glamsterdam-factory",
+      "commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "remote_head": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "scope": "Canonical EIP-7997 factory",
+      "release_qualified": false,
+      "tested_source_commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 68,
+      "url": "https://github.com/alt-research/eth2030/pull/68",
+      "branch": "feat/glamsterdam-access-list",
+      "commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "remote_head": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "scope": "Actual access-list RPC discovery",
+      "release_qualified": false,
+      "tested_source_commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 69,
+      "url": "https://github.com/alt-research/eth2030/pull/69",
+      "branch": "feat/glamsterdam-eth71",
+      "commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "remote_head": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "scope": "Negotiated eth/69-71 and correlated history",
+      "release_qualified": false,
+      "tested_source_commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 70,
+      "url": "https://github.com/alt-research/eth2030/pull/70",
+      "branch": "fix/eth-receipt-bloom",
+      "commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "remote_head": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "scope": "Independent receipt bloom reconstruction",
+      "release_qualified": false,
+      "tested_source_commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 71,
+      "url": "https://github.com/alt-research/eth2030/pull/71",
+      "branch": "feat/glamsterdam-transfer-logs",
+      "commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "remote_head": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "scope": "Canonical EIP-7708 transfer logs",
+      "release_qualified": false,
+      "tested_source_commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 72,
+      "url": "https://github.com/alt-research/eth2030/pull/72",
+      "branch": "feat/glamsterdam-selfdestruct",
+      "commit": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "remote_head": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "scope": "EIP-8246 lifecycle and final BAL",
+      "release_qualified": false,
+      "tested_source_commit": "509a47ab41636e72c80adaf5353ff7d9d233d0cb",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 73,
+      "url": "https://github.com/alt-research/eth2030/pull/73",
+      "branch": "feat/glamsterdam-stack-opcodes",
+      "commit": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "remote_head": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "scope": "EIP-8024 encoding and Amsterdam activation",
+      "release_qualified": false,
+      "tested_source_commit": "408544c629f27812ebe1f2afb1d11ef3b71d0ef1",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 74,
+      "url": "https://github.com/alt-research/eth2030/pull/74",
+      "branch": "feat/glamsterdam-slot-commitment",
+      "commit": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "remote_head": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "scope": "Supplied slot commitments and independent headers",
+      "release_qualified": false,
+      "tested_source_commit": "61a245e30458258480d2d5986e81b5970cab4344",
+      "source_in_tested_integration": true
+    }
+  ]
+}

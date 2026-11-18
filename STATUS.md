@@ -1,3 +1,7 @@
+## Glamsterdam isolated reviews and aggregate qualification (2026-11-18)
+
+The completion program now has ten isolated implementation/qualification reviews (PRs 65–74), plus the plan/baseline PR 64. Combined source commit `96a1994c` passes all 210 tested Go packages, tagged Core/EIP tests, local build and affected vet/race checks. The program remains incomplete: coherent gas/API semantics, 8282, eth/72, snap/2, actual CL/builder and independent release qualification are open. See [implementation tracking](docs/plans/glamsterdam/IMPLEMENTATION.md) and [exact review heads](docs/plans/glamsterdam/feature-reviews.json).
+
 ## Glamsterdam feature review batch (2026-11-18)
 
 Published independent reviews from current master: [#65 contract/initcode limits](https://github.com/alt-research/eth2030/pull/65), [#66 BAL availability window](https://github.com/alt-research/eth2030/pull/66), [#67 canonical factory](https://github.com/alt-research/eth2030/pull/67), and [#68 native RPC access discovery](https://github.com/alt-research/eth2030/pull/68). Each branch retains its affected test/build evidence and explicit remaining qualification boundaries. The negotiated eth/69-71/historical-consumer feature is prepared on its own branch and awaiting review publication.

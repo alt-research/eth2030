@@ -8,6 +8,13 @@
 
 # Lean4 Verification Check-list
 
+## Glamsterdam implementation checkpoint (2026-11-18)
+
+- [x] Publish separate branches and reviews for scoped major changes.
+- [x] Qualify their combined production sources with full Go, tagged, build and affected vet/race checks.
+- [x] Record exact reviewed/source heads and distinguish development evidence from open release gates.
+- [ ] Complete the remaining 33-task program acceptance matrix.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

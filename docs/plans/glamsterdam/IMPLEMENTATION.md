@@ -7,7 +7,7 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 - Mainline already includes native BAL and slot header encoding (`db9f384b` and related changes). The old diagnostic now reports different BAL commitments produce different RLP/hash and native Header has SlotNumber.
 - Mainline already propagates header slot into execution and persists/serves canonical hex/RLP historical Engine bodies (`e0451092`). The old body-converter-only probe cannot prove omission in the production adapter and is not treated as such.
 - Mainline fixed the stale tagged BAL expectation (`49030842`). Tagged regressions are rerun on the actual baseline.
-- Remaining observed source gaps include 3,533-epoch BAL retention, old 7954 size limits, the invented 0x12 factory path, old gas constants/refund/reservoir semantics, eth/68-only registration and the access-list placeholder.
+- At the `38ea9259` baseline, remaining observed gaps included 3,533-epoch BAL retention, old 7954 size limits, the invented 0x12 factory path, old gas constants/refund/reservoir semantics, eth/68-only registration and the access-list placeholder. The feature reviews below repair the specified subsets. Independent header tests additionally reproduced zero-slot loss in the production Engine and all-slot omission in the memory Engine; PR 74 fixes those actual paths.
 - GL-001 remains partial: [baseline inputs](implementation-baseline.json) freeze the audit scope and live-rechecked pending choices. Exact compatible fixtures/client artifacts and open protocol decisions are release inputs, not invented defaults.
 
 ## Delivery sequence
@@ -15,19 +15,60 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | Feature review | Scope | State |
 | --- | --- | --- |
 | [PR #64](https://github.com/alt-research/eth2030/pull/64) — baseline | Import the complete plan/evidence and reconcile newer mainline fixes | Submitted; release-input closure remains open |
-| Canonical header/slot qualification | Verify merged code and add only missing consumer/independent regression coverage | Pending |
+| [PR #74](https://github.com/alt-research/eth2030/pull/74) — supplied slot/header qualification | Preserve zero slots and memory-backend slots; independent Geth header hash, SLOTNUM and HTTP/RPC/BAL body readback | Submitted; complete schema/asynchronous/CL qualification remains open |
 | [PR #65](https://github.com/alt-research/eth2030/pull/65) — EIP-7954 | Published code/initcode bounds and transaction/pool boundaries | Submitted; final fork/model qualification remains open |
 | [PR #67](https://github.com/alt-research/eth2030/pull/67) — EIP-7997 | Canonical runtime/address/nonce and no fork-time mutation | Submitted; actual generated genesis/control remains open |
 | [PR #66](https://github.com/alt-research/eth2030/pull/66) — BAL retention | Published slot-based window, body preservation and conservative fallback | Submitted; complete cold-sync/physical-GC gates remain open |
 | [PR #68](https://github.com/alt-research/eth2030/pull/68) — RPC discovery | Actual HTTP/backend discovery, historical/reverted/creation cases and non-mutation | Submitted; final gas/schema qualification remains open |
 | Gas/state execution | Selected coherent intrinsic/runtime/state/refund/floor model; upstream choice gate retained | Pending |
-| eth/69–71 feature review | Negotiated protocols, canonical wire, correlated historical consumers and encrypted-socket checks | Implemented on separate branch; review publication in progress |
+| [PR #69](https://github.com/alt-research/eth2030/pull/69) — eth/69–71 | Negotiated protocols, canonical wire, correlated historical consumers and encrypted-socket checks | Submitted; independent full-client cold-sync gates remain open |
+| [PR #70](https://github.com/alt-research/eth2030/pull/70) — receipt bloom | Rebuild omitted wire bloom from actual nonzero logs | Submitted; included in branches 69/71 for standalone tests |
+| [PR #71](https://github.com/alt-research/eth2030/pull/71) — transfer logs | Canonical Amsterdam activation, value transfer ordering and exclusions | Submitted; final gas/cross-client composition remains open |
+| [PR #72](https://github.com/alt-research/eth2030/pull/72) — destruction and BAL | Balance-preserving EIP-8246 lifecycle, journaled creation/revert, final-state BAL and CREATE2 nonce/prechecks | Submitted; native and Frame behavioral tests pass; full fixture/gas qualification remains open |
+| [PR #73](https://github.com/alt-research/eth2030/pull/73) — stack opcodes | Current EIP-8024 immediate encoding, canonical activation and every valid depth/pair | Submitted; native transactions and published vectors pass |
 | eth/72, snap/2 and CL lifecycle | Full remaining protocols, actual CL/builder and recovery acceptance | Pending |
 
 Each major change receives its own branch and PR; no unrelated changes are staged. Final task completion requires the acceptance evidence in DEVELOPMENT_PLAN.md. A submitted PR is not a merged or release-qualified feature.
 
 ## Verified branch evidence
 
-Feature branches are based independently on mainline `38ea9259`; no feature was merged upstream by this implementation run. Each has its own CHECK/STATUS entry and verification document. Current reviews retain pre-fix failures, meaningful behavioral assertions and scoped builds. The eth/69-71 consumer hash-check mutation fails tamper/reordering cases as intended. A combined local integration run and full release matrix have not yet passed and are not inferred from separate branch tests.
+Feature branches are based independently on mainline `38ea9259`; no feature was merged upstream by this implementation run. Each has its own CHECK/STATUS entry and verification document. Current reviews retain pre-fix failures, meaningful behavioral assertions and scoped builds. The eth/69-71 consumer hash-check mutation fails tamper/reordering cases as intended. A combined local integration run has passed for the scoped production changes; the full release matrix remains open. See the exact evidence below.
 
 Upstream PRs #12581/#12582 and #5770/#5820 were rechecked live and remain unmerged at this pass. Their concrete heads are frozen in implementation-baseline.json. No open alternative is silently selected as mainnet consensus. Independent work continues while those final semantic choices remain unresolved.
+
+
+## Combined development qualification
+
+Integration branch: `integration/glamsterdam-completion`; tested commit `96a1994cc6c007b521517cd025a70627f5b6e3b2`. This is an isolated local merge of the submitted feature branches, not a merge into upstream master. All overlapping code resolutions preserve both features: Amsterdam activation of limits and transfer logs, initcode validation followed by BAL baseline collection, and destruction semantics without fee/self-burn logs.
+
+Passing combined checks (after the slot and empty-BAL follow-ups):
+
+- `cd pkg && go test -count=1 ./...`: 210 tested packages pass; 18 packages report no tests.
+- `go test -tags integration -count=1 ./core/... ./eiptest`: 27 tested packages pass.
+- `go build ./...`: passes.
+- `go vet ./bal ./core/... ./eth/... ./p2p/... ./engine/... ./node/... ./rpc/... ./txpool/... ./eiptest`: passes.
+- Initial aggregate targeted race checks cover BAL, VM/execution, eth/P2P, Engine, RPC, pool and HTTP consumers. After the last Engine follow-ups, `go test -race -count=1 ./engine/... ./node/backend ./eiptest` passes across 18 tested packages.
+
+Logs are retained locally as `/tmp/glamsterdam-integrated-final-{tests,tagged,race,vet}.log`. The earlier broader race log is `/tmp/glamsterdam-integrated-race.log`. Exact review branches, published heads and tested source ancestors are recorded in [feature-reviews.json](feature-reviews.json). Later documentation-only review commits do not change the tested production sources.
+
+## Program task status and next implementation
+
+The 33-task plan remains the acceptance contract. A native fix, a passing development suite and an open PR do not close an unrun release gate.
+
+| Tasks | Current evidence and unfinished work |
+| --- | --- |
+| GL-001–003 | Spec/decision baseline, source-backed failures and many precise regressions are recorded. Complete compatible fixture/client manifests and registry coverage are unfinished. |
+| GL-010/011 | Canonical codec existed on mainline; PR 74 adds independent hashes and repairs actual missing slot routes. Complete asynchronous/custom builder, persistence/replay and schema permutations remain. |
+| GL-012 | Full coherent fork schedule and strict versioned field requirements remain open; isolated Amsterdam activation was repaired for limits, opcodes and logs. |
+| GL-020–025 | Coherent gas model, validation/pre-execution/runtime/settlement and method-specific simulation remain open. Current merged LIFO text is the measurement baseline; final release selection is still U-01/U-02 dependent. No partial constant patch is presented as a coherent model. |
+| GL-030 | Native size limits, pool/creation boundaries and current stack opcode semantics are implemented. Final gas/estimate and cross-client cases remain. |
+| GL-031 | Canonical factory implementation and real CREATE2 behavior are implemented. Actual generated genesis/deployment control and final gas qualification remain. |
+| GL-032/033 | Native protocol log and destruction/state/BAL corrections are implemented, including canonical Frame composition. Full upstream scenario matrix, selected gas and independent execution remain. |
+| GL-034 | EIP-8282 canonical runtimes, request extraction and actual CL registration/exit consumers remain open. |
+| GL-040/041 | Canonical persisted bodies already existed; retention, empty BAL recovery, negotiated eth/69–71 and correlated bounded history consumers are implemented. Full independent-client historical/cold-sync and recovery gates remain. |
+| GL-042/043 | Actual eth/72 cell relay/provider/sampler and snap/2 state-sync flows remain open. Existing helper names do not satisfy these tasks. |
+| GL-044/045 | Actual access-list discovery and returned-list gas behavior are implemented; final API/gas fixtures and selected multidimensional trace semantics remain. |
+| GL-050–055 | Actual Lighthouse/builder transitions, selected authentication and optimistic state, payment invariants, SSZ/proofs and partial-message recovery remain open. Merged upstream transition changes can be audited immediately; these are not all blocked by unresolved alternatives. |
+| GL-060–063 | The combined development gate passes. Independent gas/current-text corpus, application compatibility, real multi-client devnets, restart/cold-sync, measured limits and release qualification remain open. |
+
+Next implementation order: finish the compatible fixture/independent current-text gas corpus; audit actual CL adoption of already merged transitions; implement the settled 8282/request and eth/72/snap/2 production flows in their own branches; complete the chosen gas/API and authentication model when the corresponding upstream inputs are recorded. Continue independent work while those final decisions remain unsettled. No final release date or completion percentage is inferred from PR count.

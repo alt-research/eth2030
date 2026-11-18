@@ -126,7 +126,8 @@ and checks decoded identity rather than accepting arbitrary bytes.
 
 The second coded/blob run finalized sponsored Frame slot 66 and blob Frame
 slot 162 on both peers. The observer process rejected the mutually exclusive
-checkpoint/genesis-sync options. The controller removed the failed observer,
+checkpoint/genesis-sync options. The [failed observer record](verification/frame-8141-20261118-blob-observer-failed.json)
+retains both finalized workloads. The controller removed the failed observer,
 both pairs, labeled volumes and its engine. Its archived Heze state at slot
 192 is retained in the [consensus replay module](../tools/consensus-replay/README.md).
 The byte-for-byte fixture and its original state root qualify a minimal

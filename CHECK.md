@@ -1,5 +1,18 @@
 # Lean4 Verification Check-list
 
+- [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
+- [x] Reproduce the obsolete availability window through the real Engine body consumer.
+- [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
+- [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
+
+# Lean4 Verification Check-list
+
+## Empty committed historical BAL recovery (2026-11-18)
+
+- [x] Reproduce an empty BAL cache miss without hiding its execution body.
+- [x] Regenerate only the header-committed empty list inside retention, for hash and range APIs.
+- [x] Verify affected suites and local build, then update PR 66.
+
 ## Glamsterdam EIP-8024 current byte encoding (2026-11-18)
 
 - [x] Pin the current EIP and reproduce published execution vectors against the native VM.

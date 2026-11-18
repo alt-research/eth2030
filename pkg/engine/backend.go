@@ -440,10 +440,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok && isBALRetainedForBlocks(headBlock, block) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[h])
 		results[i] = body
 	}
 	return results
@@ -520,10 +517,7 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok && isBALRetainedForBlocks(headBlock, block) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[hash])
 		results[i] = body
 	}
 	if len(canonical) != int(count) {

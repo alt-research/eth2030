@@ -1,3 +1,9 @@
+## Modern receipt bloom restoration
+
+- [x] Reproduce nonzero-log consensus receipt roundtrip failure.
+- [x] Recompute omitted wire blooms from decoded logs, not from an empty receipt bloom.
+- [x] Verify codecs/consumers/build and prepare the scoped fix review.
+
 # Lean4 Verification Check-list
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)

@@ -1,3 +1,7 @@
+## Modern receipt bloom restoration (2026-11-18)
+
+Branch `fix/eth-receipt-bloom` repairs a receipt-root interoperability defect: eth/69+ omits bloom on the wire, but the decoder OR-ed the newly constructed receipt's zero bloom instead of computing it from decoded logs. It now uses LogsBloom. A nonzero-log typed receipt roundtrip first failed on baseline and now preserves exact consensus bytes. p2p/ethproto, eth and eiptest suites plus full build passed. The fix is also required by the negotiated protocol and transfer-log feature reviews.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

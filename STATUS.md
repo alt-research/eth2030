@@ -1,3 +1,7 @@
+## Glamsterdam EIP-8246 execution and BAL (2026-11-18)
+
+Implemented balance-preserving destruction, transaction-end account clearing, journaled native creations and rollback, correct CREATE2 creator nonce/prechecks, and final-state BAL reconciliation. Native and canonical Frame tests cover late credits, CREATE2 reuse, existing contracts, fork boundaries and four state backends. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-selfdestruct-20261118.md). Independent-client and final gas qualification remain open.
+
 ## Glamsterdam protocol ETH transfer logs (2026-11-18)
 
 Branch `feat/glamsterdam-transfer-logs` activates 7708 at canonical Amsterdam independently of the private gas timestamp and removes extra fee-burn and self-beneficiary burn events. Specified transfers keep the ERC20-compatible system event; same-address/zero-value transfers are suppressed. Existing CREATE/CREATE2 endowment emission is retained and verified before constructor logs, with failed-call rollback preserved.

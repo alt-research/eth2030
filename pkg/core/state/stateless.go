@@ -287,6 +287,16 @@ func (s *StatelessStateDB) HasSelfDestructed(addr types.Address) bool {
 	return false
 }
 
+// FinalizeTransaction keeps destruction-marked accounts observable during
+// execution, then hides empty accounts at the same boundary as native state.
+func (s *StatelessStateDB) FinalizeTransaction() {
+	for _, obj := range s.accounts {
+		if obj.selfDestructed {
+			obj.deleted = true
+		}
+	}
+}
+
 // --- Storage operations ---
 
 func (s *StatelessStateDB) GetState(addr types.Address, key types.Hash) types.Hash {
@@ -311,7 +321,7 @@ func (s *StatelessStateDB) GetCommittedState(addr types.Address, key types.Hash)
 
 func (s *StatelessStateDB) Exist(addr types.Address) bool {
 	if obj, ok := s.accounts[addr]; ok {
-		return !obj.selfDestructed
+		return !obj.deleted
 	}
 	return s.existsInWitness(addr)
 }
@@ -348,6 +358,7 @@ func (s *StatelessStateDB) Snapshot() int {
 			dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
 			committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
 			selfDestructed:   obj.selfDestructed,
+			deleted:          obj.deleted,
 		}
 		copy(cp.account.CodeHash, obj.account.CodeHash)
 		copy(cp.code, obj.code)

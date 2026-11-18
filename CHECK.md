@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam EIP-8246 transaction lifecycle (2026-11-18)
+
+- [x] Pin EIP-8246 and read EIP-6780/161; reproduce missing native destruction cleanup.
+- [x] Journal same-transaction creations with nested rollback and preserve balances through finalization.
+- [x] Verify native CREATE/CREATE2, pre-funded targets, late credits, old contracts and reverted creation.
+- [x] Qualify BAL final-state changes and persistence; run affected tests and local build.
+- [x] Publish the isolated implementation branch and update program evidence (PR 72).
+
 - [x] Read both local legacy and pinned current EIP-7708, including fee/withdrawal exclusions and 8246 dependency.
 - [x] Add failing native fork-boundary, fees/self/zero-value, creation ordering and rollback regressions.
 - [x] Correct consensus emission and canonical Amsterdam activation without a new toggle.

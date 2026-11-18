@@ -1,3 +1,7 @@
+## Glamsterdam EIP-8024 bytecode and activation (2026-11-18)
+
+Corrected native DUPN/SWAPN/EXCHANGE immediate permutations and reserved ranges, and activated the instructions at canonical Amsterdam. Published bytecode vectors, all valid depths/pairs, stack and jump boundaries, and native transactions/fork transitions pass. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-stack-opcodes-20261118.md). Independent-client and full release gates remain open.
+
 ## Glamsterdam EIP-8246 execution and BAL (2026-11-18)
 
 Implemented balance-preserving destruction, transaction-end account clearing, journaled native creations and rollback, correct CREATE2 creator nonce/prechecks, and final-state BAL reconciliation. Native and canonical Frame tests cover late credits, CREATE2 reuse, existing contracts, fork boundaries and four state backends. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-selfdestruct-20261118.md). Independent-client and final gas qualification remain open.

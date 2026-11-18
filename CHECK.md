@@ -1,5 +1,12 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam EIP-8024 current byte encoding (2026-11-18)
+
+- [x] Pin the current EIP and reproduce published execution vectors against the native VM.
+- [x] Correct legacy-bytecode immediate decoding and its invalid ranges.
+- [x] Verify every valid depth/pair, stack boundaries, code-end immediates, jumps and native transactions.
+- [ ] Run affected tests, local build and vet; publish an isolated implementation PR.
+
 ## Glamsterdam EIP-8246 transaction lifecycle (2026-11-18)
 
 - [x] Pin EIP-8246 and read EIP-6780/161; reproduce missing native destruction cleanup.

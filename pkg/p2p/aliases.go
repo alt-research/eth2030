@@ -153,6 +153,7 @@ const (
 	PooledTransactionsMsg         = ethproto.PooledTransactionsMsg
 	GetReceiptsMsg                = ethproto.GetReceiptsMsg
 	ReceiptsMsg                   = ethproto.ReceiptsMsg
+	BlockRangeUpdateMsg           = ethproto.BlockRangeUpdateMsg
 	GetBlockAccessListsMsg        = ethproto.GetBlockAccessListsMsg
 	BlockAccessListsMsg           = ethproto.BlockAccessListsMsg
 	InclusionList                 = gossip.InclusionList

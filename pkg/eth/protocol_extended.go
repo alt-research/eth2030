@@ -62,8 +62,9 @@ type ProtocolCapability struct {
 	MessageIDs []uint64
 }
 
-// AllCapabilities returns the full set of supported ETH protocol capabilities,
-// from ETH/68 through ETH/72.
+// AllCapabilities is the historical experimental capability inventory.
+// Production negotiation uses Handler.Protocols; the legacy witness entry
+// is not EIP-8070 eth/72 and is not advertised by the node.
 func AllCapabilities() []ProtocolCapability {
 	return []ProtocolCapability{
 		{

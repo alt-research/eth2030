@@ -1,3 +1,11 @@
+## Negotiated eth/69-71 and historical consumers (2026-11-18)
+
+Branch `feat/glamsterdam-eth71` registers eth/68/69/70/71 on the production node. Implements seven-field range status without TD for 69+, version-correct bloom-free receipts, nonblocking queued range updates and canonical raw-list BAL wire encoding. Independent golden bytes expose the old double-wrapped BAL response.
+
+Correlated historical fetchers paginate receipts, bound decoding by requested block transaction/gas limits, verify the complete receipt root and rebuild persistent metadata only for validated blocks. BAL replies are matched to peer/request/hash, checked against headers before any restore, and reject tamper/reordering/replay/unsolicited data. Unavailable markers preserve body availability and are not trusted as arbitrary BALs.
+
+Independent Geth RLPx/codec tests negotiate all four versions over real encrypted sockets and check status plus actual receipt/BAL formats. Real-chain eiptests validate restored receipt metadata and tampered BAL preservation; a disabled consumer hash-check mutation fails the intended tests. Affected eth/P2P/chain/node/eiptest suites, targeted race, full build and vet passed. Full independent-client/devnet, eth/72/snap/2 and complete sync/recovery qualification remain separate program gates. [Evidence](docs/verification/glamsterdam-eth71-20261118.md).
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -1,4 +1,10 @@
-## Glamsterdam completion implementation (2026-11-18)
+# Lean4 Verification Check-list
+
+- [x] Reproduce nonzero-log consensus receipt roundtrip failure.
+- [x] Recompute omitted wire blooms from decoded logs, not from an empty receipt bloom.
+- [x] Verify codecs/consumers/build and prepare the scoped fix review.
+
+# Lean4 Verification Check-list
 
 - [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
 - [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.

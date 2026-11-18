@@ -82,3 +82,23 @@ STATUS.md after execution.
   RPC fields before retiring the maintained service modifications.
 - Keep the independent-client, state-sync, external-builder/PTC and remaining Heze
   gates in [the next-stage plan](next-stage-work-plan.md) open until measured.
+
+## Independent-client revision audit (2026-11-18)
+
+The upstream Geth `bogota-devnet-2` branch resolves to
+`f71f4be8027bc0828148ae03424231092ed7ab66`. Its
+[Frame type](https://github.com/ethereum/go-ethereum/blob/f71f4be8027bc0828148ae03424231092ed7ab66/core/types/tx_frame.go)
+incorporates EIP-8250 nonce keys and nonce sequence in place of the base scalar
+nonce. It also prices their encoded bytes as transaction data. An empty key set
+uses the account nonce, but does not restore the base seven-field envelope or
+its signing hash. The installed released Geth v1.17.10 type/VM sources contain
+no Frame type implementation.
+
+Consequently neither is recorded as an independent execution oracle for this
+pinned base envelope. Geth's experimental implementation is an architecture
+reference for a separately scoped protocol-family migration; accepting its
+wire format silently would change signatures and fee accounting. Fresh CL
+history against an existing compatible EL and independent EL execution remain
+distinct gates. The pinned upstream source and the
+[Bogotá test release](https://github.com/ethereum/execution-specs/releases/tag/tests-bogota-devnet%40v2.0.0)
+make the additional EIP-8250/7906/8298 scope explicit.

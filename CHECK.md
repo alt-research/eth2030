@@ -1,3 +1,9 @@
+## Qualified gas development tracking (2026-11-19)
+
+- [x] Archive the clean 42-case checkpoint, actual HTTP/system/accounting consumers and detected mutations.
+- [x] Record full/tagged/race/vet/build without converting final protocol choices into development defaults.
+- [x] Keep separate RPC branch and broader acceptance outside the stable qualified integration.
+
 ## Canonical system review tracking (2026-11-19)
 
 - [x] Record separate PR 84, canonical independent roots, actual Node consumers and mutations.

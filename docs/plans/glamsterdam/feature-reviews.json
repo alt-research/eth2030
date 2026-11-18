@@ -215,21 +215,32 @@
       "pr": 83,
       "url": "https://github.com/alt-research/eth2030/pull/83",
       "branch": "feat/glamsterdam-state-gas",
-      "commit": "f8dcfd47e3690151b8ed167bfcb95606a6d509fc",
-      "remote_head": "f8dcfd47e3690151b8ed167bfcb95606a6d509fc",
+      "commit": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "remote_head": "bd0f33577c0d343abb7057894d9702a27d7ff157",
       "draft": true,
       "scope": "Current merged LIFO development baseline; native signed transitions and initial high-state block consumers",
-      "tested_transaction_source_commit": "c6cdf15ac7377773a5c05d8948bf8b292dd8d700",
+      "tested_transaction_source_commit": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
       "source_in_tested_integration": false,
       "release_qualified": false,
       "remaining": [
-        "full suite semantic fixture/implementation repair",
-        "RPC modes and traces",
-        "application and independent full-client vectors",
+        "method-specific RPC/simulation/traces in separate feature branch",
+        "broader official EEST/application and full-client vectors",
+        "resource/performance campaigns",
         "final gas choice and release qualification"
       ],
-      "local_authorization_checkpoint": "3db0a192",
-      "system_margin_composition": "eight/sixteen/seventeen actual new slots passed; independent 30M execution budget retained"
+      "system_margin_composition": "eight/sixteen/seventeen actual new slots passed; independent 30M execution budget retained",
+      "signed_amsterdam_cases": 42,
+      "signed_matches": 42,
+      "mutations_detected": 10,
+      "initial_escaped_mutation": "early pre-execution rollback fixture had no earlier write; late-OOG case added and detects it",
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "broad_race_packages": 96,
+        "final_affected_race_packages": 33,
+        "vet": "passed",
+        "build": "passed"
+      }
     },
     {
       "pr": 84,

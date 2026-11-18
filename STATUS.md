@@ -1,3 +1,7 @@
+## Qualified gas development checkpoint (2026-11-19)
+
+Draft PR 83 at tested source `2cde17ad` passes all 212 Go packages, 27 tagged Core/EIP, broad affected race, final 33 affected race, vet/build and ten compiling mutations. All 42 clean signed Amsterdam cases match independent SDK; actual HTTP/system/capacity/fees/restart consumers pass. RPC consumers are being repaired in their own branch, with simulation/application/full-client/resource/final release gates still open. Stable integration remains reviews 65–82/84.
+
 ## Canonical system review and integration (2026-11-19)
 
 PR 84 qualifies actual-code history/beacon callbacks and explicit genesis assets against independent complete roots and Node recovery. Reviews 65–82 and 84 compose at `2f253d33`; 212 Go packages, 27 tagged Core/EIP packages, eleven affected race packages, vet/build pass. Published head: `b1a696d1`. Gas draft 83 remains separate; its nine new signed authorization controls and system margin pass locally, while full-suite/API/application and release gates stay open.

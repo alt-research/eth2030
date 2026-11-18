@@ -15,6 +15,8 @@
 - The separate Engine backend now returns RLP BALs and preserves historical
   transaction bodies beyond its BAL-retention window. Corrupt stored BAL data
   is rejected by a real build/import/storage regression.
+- Removing BAL persistence and removing the V2 DATA codec were each detected
+  by the actual HTTP/restart integration using isolated Go build overlays.
 - The failed observer run cleaned all enclave resources and stopped its engine;
   a rebuilt runtime must pass the same fresh-CL control before closing history.
 

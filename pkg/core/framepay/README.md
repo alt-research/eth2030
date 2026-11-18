@@ -26,7 +26,7 @@ The standard-JSON compiler request is reproducible with the recorded
 `solc 0.8.38+commit.1835d247.Linux.g++`, optimizer runs 200 and Osaka EVM target:
 
 ```sh
-rtk proxy python3 pkg/core/framepay/contracts/generate.py --check
+python3 pkg/core/framepay/contracts/generate.py --check
 ```
 
 `runtime.hex` is 459 bytes with Keccak-256
@@ -38,3 +38,9 @@ match and still requires normal execution to approve payment. Availability is
 balance minus all pending max-fee reservations and the entire pending withdrawal
 amount, including a matured request that has not executed. Unknown or changed
 code follows generic trace rules and the non-canonical paymaster cap.
+
+CI downloads the pinned Linux compiler from the official solc-bin distribution,
+checks SHA-256 `65c3180a336eabb6bdc4bbd49cc405aeb233976964ae6c11fba2a6c8be8f3243`,
+and reruns the artifact comparison. The generator requires only Python and the
+recorded `solc` on PATH; it does not depend on workspace-specific command wrappers.
+[Compiler distribution](https://binaries.soliditylang.org/linux-amd64/list.json)

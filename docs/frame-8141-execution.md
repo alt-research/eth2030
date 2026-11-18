@@ -146,3 +146,21 @@ difference. The actual HTTP/Engine/restart integration now runs both at nonce
 zero and at this upper nonce, checking the post-approval nonce through both
 nodes and the reopened database. The live `38bbcff5` image uses ordinary nonce
 values; the later guard correction has separate local regression evidence.
+
+### Historical body serving after CL payload pruning
+
+The [failed fresh-CL record](verification/frame-8141-20261118-history-serving-failed.json)
+retains finalized coded and blob Frames on EL `38bbcff5`. The source CL's own
+historical envelope endpoint returned `PayloadBodiesByHashV2Failure` with
+`hex must have 0x prefix` for the sponsored Frame and
+`PayloadBodyMissingBlockAccessList` for the blob and checkpoint blocks. The new
+observer remained at checkpoint slot 192 until the bounded timeout. All owned
+enclave resources were removed and its engine stopped.
+
+EL `e0451092` repairs the actual wire path: V1/V2 body transactions are hex
+DATA, native validated RLP BALs persist atomically with blocks and are served
+through both hash and canonical-range retrieval, and nullable/pre-fork fields
+follow the Engine contract. HTTP integration compares exact original Frame and
+BAL bytes on both nodes and after FileDB reopen. Separate mutations omitting
+BAL persistence and the V2 DATA codec each fail this integration. Range controls
+cover invalid quantities, bounds, error codes, overflow and trailing heights.

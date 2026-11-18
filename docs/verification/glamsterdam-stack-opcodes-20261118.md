@@ -1,6 +1,6 @@
 # Glamsterdam EIP-8024 bytecode verification
 
-Branch: `feat/glamsterdam-stack-opcodes`, based on `origin/master` `38ea9259`.
+[PR 73](https://github.com/alt-research/eth2030/pull/73), branch: `feat/glamsterdam-stack-opcodes`, based on `origin/master` `38ea9259`.
 
 ## Specification and changes
 

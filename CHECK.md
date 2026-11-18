@@ -5,7 +5,7 @@
 - [x] Pin the current EIP and reproduce published execution vectors against the native VM.
 - [x] Correct legacy-bytecode immediate decoding and its invalid ranges.
 - [x] Verify every valid depth/pair, stack boundaries, code-end immediates, jumps and native transactions.
-- [ ] Run affected tests, local build and vet; publish an isolated implementation PR.
+- [x] Run affected tests, local build and vet; publish an isolated implementation PR (PR 73).
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

@@ -62,7 +62,7 @@ def listen_for_lists(beacon, events):
         events.put(error)
 
 
-def frame_readback(execution, tx_hash):
+def frame_readback(execution, tx_hash, paymaster=None):
     receipt = rpc(execution, "eth_getTransactionReceipt", tx_hash)
     if not receipt or receipt.get("type") != "0x6" or receipt.get("status") != "0x1":
         raise ValueError("missing successful canonical Frame receipt")
@@ -74,7 +74,7 @@ def frame_readback(execution, tx_hash):
     block = rpc(execution, "eth_getBlockByNumber", receipt["blockNumber"], False)
     parent = hex(int(receipt["blockNumber"], 16) - 1)
     sender = command("cast", "wallet", "address", "--private-key", FIXTURE_KEY)
-    payer = command("cast", "wallet", "address", "--private-key", "0x" + "0" * 63 + "2")
+    payer = paymaster or command("cast", "wallet", "address", "--private-key", "0x" + "0" * 63 + "2")
     if receipt.get("payer", "").lower() != payer.lower():
         raise ValueError("wrong Frame payer")
     balances = {}
@@ -92,7 +92,7 @@ def frame_readback(execution, tx_hash):
             "state_root": block["stateRoot"], "payer_charge": str(expected_charge)}
 
 
-def verify(enclave, timeout, frame_tool=None, evidence_dir=None):
+def verify(enclave, timeout, frame_tool=None, evidence_dir=None, paymaster=None):
     el = [endpoint(enclave, f"el-{i}-geth-lighthouse", "rpc") for i in (1, 2)]
     bn = [endpoint(enclave, f"cl-{i}-lighthouse-geth", "http") for i in (1, 2)]
     deadline = time.time() + timeout
@@ -154,12 +154,13 @@ def verify(enclave, timeout, frame_tool=None, evidence_dir=None):
             continue
 
         if frame_tool:
-            signed = json.loads(command(
-                str(frame_tool), "--rpc", el[origin], "--key", FIXTURE_KEY,
-                "--sponsor-key", "0x" + "0" * 63 + "2", "--to",
-                "0x0000000000000000000000000000000000007100", "--gas", "30000",
-                "--state-gas", "97920", "--dry-run",
-            ))
+            arguments = [str(frame_tool), "--rpc", el[origin], "--key", FIXTURE_KEY,
+                         "--sponsor-key", "0x" + "0" * 63 + "2", "--to",
+                         "0x0000000000000000000000000000000000007100", "--gas", "30000",
+                         "--state-gas", "97920", "--dry-run"]
+            if paymaster:
+                arguments += ["--paymaster", paymaster]
+            signed = json.loads(command(*arguments))
             raw, tx_hash = signed["raw"], signed["transaction"]
         else:
             nonce = int(rpc(el[origin], "eth_getTransactionCount", sender, "latest"), 16)
@@ -238,7 +239,7 @@ def verify(enclave, timeout, frame_tool=None, evidence_dir=None):
             "block_hash": receipt["blockHash"], "finalized_on_both_pairs": True,
         }
         if frame_tool:
-            readbacks = [frame_readback(node, tx_hash) for node in el]
+            readbacks = [frame_readback(node, tx_hash, paymaster) for node in el]
             if readbacks[0] != readbacks[1]:
                 raise ValueError("canonical Frame peers disagree on settlement or state")
             result["frame"] = readbacks[0]

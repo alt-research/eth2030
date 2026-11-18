@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
@@ -27,16 +28,17 @@ import (
 )
 
 type options struct {
-	rpc, key, sponsor, sender, to, data, value, blob string
-	execution, state                                 uint64
-	dry                                              bool
+	rpc, key, sponsor, sender, to, data, value, blob, paymaster string
+	execution, state                                            uint64
+	dry                                                         bool
 }
 
 func main() {
 	var opts options
 	flag.StringVar(&opts.rpc, "rpc", "http://localhost:8545", "JSON-RPC URL")
 	flag.StringVar(&opts.key, "key", "", "Sender private key")
-	flag.StringVar(&opts.sponsor, "sponsor-key", "", "Optional funded sponsor private key")
+	flag.StringVar(&opts.sponsor, "sponsor-key", "", "Optional funded sponsor or paymaster owner private key")
+	flag.StringVar(&opts.paymaster, "paymaster", "", "ETH2030 v1 paymaster instance (requires sponsor-key)")
 	flag.StringVar(&opts.sender, "sender", "", "Expected sender address (checked against key)")
 	flag.StringVar(&opts.to, "to", "", "Application target (defaults to sender)")
 	flag.StringVar(&opts.data, "data", "0x", "Application calldata")
@@ -107,6 +109,9 @@ func keyFromHex(text string) (*ecdsa.PrivateKey, error) {
 }
 
 func makeFrame(opts options, chainID *big.Int, nonce uint64, baseFee, blobFee *big.Int) (*types.Transaction, error) {
+	if opts.paymaster != "" && opts.sponsor == "" {
+		return nil, errors.New("paymaster requires sponsor-key")
+	}
 	senderKey, err := keyFromHex(opts.key)
 	if err != nil {
 		return nil, fmt.Errorf("sender key: %w", err)
@@ -141,8 +146,19 @@ func makeFrame(opts options, chainID *big.Int, nonce uint64, baseFee, blobFee *b
 			return nil, fmt.Errorf("sponsor key: %w", err)
 		}
 		sponsor := types.Address(gethcrypto.PubkeyToAddress(sponsorKey.PublicKey))
+		paymentData := []byte(nil)
+		paymentGas := uint64(4000)
+		if opts.paymaster != "" {
+			address, err := hex.DecodeString(strings.TrimPrefix(opts.paymaster, "0x"))
+			if err != nil || len(address) != 20 {
+				return nil, errors.New("paymaster must be a 20-byte address")
+			}
+			copy(sponsor[:], address)
+			paymentData = framepay.ValidationData()
+			paymentGas = 10000
+		}
 		frame.Frames[0].Flags = 2
-		frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &sponsor, Limits: types.FrameGasLimits{Execution: 4000, State: 183600}})
+		frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &sponsor, Data: paymentData, Limits: types.FrameGasLimits{Execution: paymentGas, State: 183600}})
 		keys = append(keys, sponsorKey)
 	}
 	frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: opts.execution, State: opts.state}, Value: value, Data: data})
@@ -252,6 +268,16 @@ func run(opts options) error {
 	tx, err := makeFrame(opts, chainID, nonce.Uint64(), base, blobFee)
 	if err != nil {
 		return err
+	}
+	if opts.paymaster != "" {
+		var code string
+		if err := rpc.call(ctx, "eth_getCode", &code, opts.paymaster, "latest"); err != nil {
+			return err
+		}
+		decoded, err := hex.DecodeString(strings.TrimPrefix(code, "0x"))
+		if err != nil || !framepay.IsV1(decoded) {
+			return errors.New("paymaster does not match the frozen ETH2030 v1 runtime")
+		}
 	}
 	raw, err := types.EncodePooledTransaction(tx)
 	if err != nil {

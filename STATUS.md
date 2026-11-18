@@ -8,6 +8,13 @@
   aggregate max-fee exposure, pending/matured withdrawal reservations and code
   change revalidation pass behavioral tests. Actual EVM tests cover deployment,
   unauthorized requests, exact timelock boundary, transfer and rollback.
+- Four targeted mutations were detected: relaxed runtime identity, omitted
+  withdrawal reservation, removed owner check and removed timelock. The last
+  two recompiled the actual Yul runtime and failed behavioral state tests.
+- The workload CLI now supports the frozen coded paymaster. A bounded control
+  covers sponsored FOCIL, a blob Frame and a validator-free checkpoint-synced
+  CL observer reading older execution envelopes. The observer shares an already
+  synchronized EL; independent EL late join remains a separate acceptance gate.
 - This is an explicitly versioned experimental implementation; upstream bytecode
   and ABI agreement, live coded sponsorship and fresh CL history are next.
 

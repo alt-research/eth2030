@@ -61,3 +61,19 @@ func TestMakeFrameRejectsInvalidInputs(t *testing.T) {
 		}
 	}
 }
+
+func TestMakeFrameUsesPaymasterOwnerMetadata(t *testing.T) {
+	opts := options{key: fmt.Sprintf("%064x", 1), sponsor: fmt.Sprintf("%064x", 2), paymaster: "0x0000000000000000000000000000000000007300", data: "0x", value: "0", execution: 30000, state: 97920}
+	tx, err := makeFrame(opts, big.NewInt(1337), 0, big.NewInt(1), big.NewInt(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	frame := tx.Inner().(*types.FrameTx8141)
+	if frame.Validate() != nil || frame.Frames[1].Target == nil || *frame.Frames[1].Target != types.HexToAddress(opts.paymaster) || string(frame.Frames[1].Data) != string([]byte{0x63, 0x4b, 1, 0xe8}) || frame.Signatures[1].Signer == nil || *frame.Signatures[1].Signer == *frame.Frames[1].Target {
+		t.Fatal("coded payer and signature owner were confused")
+	}
+	opts.sponsor = ""
+	if _, err := makeFrame(opts, big.NewInt(1337), 0, big.NewInt(1), big.NewInt(1)); err == nil {
+		t.Fatal("paymaster without owner signature accepted")
+	}
+}

@@ -9,7 +9,7 @@
 - [x] Consume actual FCU custody updates and implement getBlobsV4 cell/proof readback.
 - [x] Verify encrypted SDK/Node consumers, invalid/unrequested data, recovery and independent reconstruction; build/test/mutate and prepare a separate PR.
 
-- [ ] Publish the independent feature review and record the composed result.
+- [x] Publish the independent feature review as PR 82; composed qualification is tracked separately.
 
 ## snap/2 BAL state catch-up (2026-11-18)
 

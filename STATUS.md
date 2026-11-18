@@ -22,7 +22,7 @@ Independent Geth RLPx/codec tests negotiate all four versions over real encrypte
 
 ## Sparse blob relay qualification (2026-11-19)
 
-Production eth/72 now connects flat correlated cell exchange, elided signed metadata, authenticated bounded staging, provider/sampler custody requests, 64-cell reconstruction and full-data-only pool promotion. Real encrypted native-pool peers qualify the two-provider threshold, random extra, custody expansion and eager mode. Actual Node HTTP/Engine/P2P/restart consumers and independent SDK packet consumers pass. All 212 Go packages, 27 tagged Core/EIP packages, 36 affected race packages, vet/build and eight failing behavioral mutations qualify this source. [Evidence](docs/verification/glamsterdam-eth72-20261119.md). Full independent-client gossip, live CL custody reconnect, resource/fairness/WAL campaigns, selected gas and final release gates remain open.
+[PR 82](https://github.com/alt-research/eth2030/pull/82) connects production eth/72 flat correlated cell exchange, elided signed metadata, authenticated bounded staging, provider/sampler custody requests, 64-cell reconstruction and full-data-only pool promotion. Real encrypted native-pool peers qualify the two-provider threshold, random extra, custody expansion and eager mode. Actual Node HTTP/Engine/P2P/restart consumers and independent SDK packet consumers pass. All 212 Go packages, 27 tagged Core/EIP packages, 36 affected race packages, vet/build and eight failing behavioral mutations qualify this source. [Evidence](docs/verification/glamsterdam-eth72-20261119.md). Full independent-client gossip, live CL custody reconnect, resource/fairness/WAL campaigns, selected gas and final release gates remain open.
 
 
 ## Snap version 2 composed regression (2026-11-19)

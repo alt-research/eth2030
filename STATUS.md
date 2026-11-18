@@ -1,6 +1,7 @@
-## Unchanged storage account pivot regression (2026-11-19)
+## Unchanged storage account pivot proof repair (2026-11-19)
 
-An added actual encrypted Node scenario reproduces `storage account not verified` when a partial storage account is unchanged across a moving pivot. The fresh proof adapter has not authenticated that account at the new state root. A second scenario isolates damage to its exact account proof. The regression is being repaired in this feature branch; prior five-scenario success did not cover this case.
+Reproduced `storage account not verified` over real encrypted Node sync when an unchanged account still has partial storage after a pivot move. The verified storage consumer now obtains an exact account inclusion proof against the fresh pivot before trusting its storage root. Seven encrypted Node scenarios pass, including damaged-proof rejection for the unchanged account; two added compiling mutations are detected. Full Go, tagged Core/EIP, affected race/vet and build pass. This closes the reproduced cache-binding gap without waiving root authentication. Independent-client/resource and final release gates remain open.
+
 
 ## Snap version 2 socket lifecycle follow up (2026-11-19)
 

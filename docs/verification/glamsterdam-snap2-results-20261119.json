@@ -12,7 +12,9 @@
     "moving-partial-storage",
     "reorg-partial-storage",
     "missing-orphan",
-    "corrupt-new-proof"
+    "corrupt-new-proof",
+    "moving-unchanged-storage",
+    "unchanged-storage-bad-point"
   ],
   "mutations": [
     {
@@ -56,7 +58,29 @@
       "detected": true,
       "exit_code": 1,
       "log": "/tmp/glamsterdam-snap2-mutation-removed-trie-messages.log"
+    },
+    {
+      "name": "unmapped-account-root",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-snap2-mutation-unmapped-account-root.log"
+    },
+    {
+      "name": "unchanged-account-proof",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-snap2-mutation-unchanged-account-proof.log"
     }
   ],
-  "release_qualified": false
+  "release_qualified": false,
+  "unchanged_account_follow_up": {
+    "reproduced_error": "state sync: task permanently failed: storage range: snap: storage account not verified",
+    "consumer": "exact account proof at requested pivot before uncached storage-root use",
+    "encrypted_node_scenarios": 7,
+    "full_go": "passed",
+    "tagged_core_eip": "passed",
+    "affected_race": "passed",
+    "affected_vet": "passed",
+    "local_build": "passed"
+  }
 }

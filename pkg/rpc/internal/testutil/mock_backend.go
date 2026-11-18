@@ -200,3 +200,5 @@ func MinTestRawTxHex() (string, error) {
 	}
 	return fmt.Sprintf("0x%x", raw), nil
 }
+
+func (b *MockBackend) IsOsaka(uint64) bool { return false }

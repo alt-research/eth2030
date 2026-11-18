@@ -157,7 +157,7 @@ func (api *TxPoolAPI) GetTransactionByHash(req *Request) *Response {
 				blockHash = &h
 				blockTS = header.Time
 				baseFee = header.BaseFee
-				blobBaseFee = BlobBaseFeeForHeader(header)
+				blobBaseFee = blobPriceForHeader(api.backend, header)
 			}
 		}
 		return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))

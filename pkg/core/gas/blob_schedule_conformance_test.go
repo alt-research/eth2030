@@ -39,7 +39,11 @@ func TestCanonicalBlobScheduleMatchesIndependentClient(t *testing.T) {
 		parent := &types.Header{Number: big.NewInt(1), Time: timestamp - 1, BaseFee: big.NewInt(1000), BlobGasUsed: &parentUsed, ExcessBlobGas: &parentExcess}
 		refParent := &gethtypes.Header{Number: big.NewInt(1), Time: timestamp - 1, BaseFee: big.NewInt(1000), BlobGasUsed: &parentUsed, ExcessBlobGas: &parentExcess}
 		want := geth4844.CalcExcessBlobGas(&reference, refParent, timestamp)
-		if got := CalcExcessBlobGasV2ForHeader(parent, &native, timestamp); got != want {
+		got, err := CalcExcessBlobGasForHeader(parent, &native, timestamp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != want {
 			t.Errorf("time %d excess transition %d want %d", timestamp, got, want)
 		}
 	}

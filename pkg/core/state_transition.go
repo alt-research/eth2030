@@ -218,12 +218,12 @@ func ValidateTransaction(tx *types.Transaction, statedb state.StateDB, header *t
 		if len(blobHashes) == 0 {
 			return errors.New("blob tx must have at least one blob")
 		}
-		if uint64(len(blobHashes))*stBlobGasPerBlob > stMaxBlobGasPerBlock {
+		if uint64(len(blobHashes)) > gas.MaxBlobsPerTransaction(config, header.Time) {
 			return fmt.Errorf("%w: %d blobs", ErrSTBlobGasExceeded, len(blobHashes))
 		}
 		// Blob fee cap must cover the blob base fee.
 		if header.ExcessBlobGas != nil {
-			blobBaseFee := execution.CalcBlobBaseFee(*header.ExcessBlobGas)
+			blobBaseFee := gas.BlobBaseFeeForHeader(config, header)
 			blobFeeCap := tx.BlobGasFeeCap()
 			if blobFeeCap != nil && blobFeeCap.Cmp(blobBaseFee) < 0 {
 				return fmt.Errorf("blob fee cap (%s) < blob base fee (%s)",

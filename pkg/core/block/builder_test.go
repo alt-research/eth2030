@@ -497,7 +497,7 @@ func TestBuildBlock_BlobGasLimitEnforcement(t *testing.T) {
 	}
 
 	// Each blob tx uses 3 * 131072 = 393216 blob gas.
-	// Max per block is 786432, so at most 2 txs fit (2 * 393216 = 786432).
+	// Prague permits nine blobs, so three of these transactions fit.
 	var totalBlobGas uint64
 	var blobTxCount int
 	for _, tx := range blk.Transactions() {
@@ -507,14 +507,9 @@ func TestBuildBlock_BlobGasLimitEnforcement(t *testing.T) {
 		}
 	}
 
-	if totalBlobGas > gas.MaxBlobGasPerBlock {
-		t.Errorf("total blob gas %d exceeds max %d", totalBlobGas, gas.MaxBlobGasPerBlock)
-	}
-	if blobTxCount > 2 {
-		t.Errorf("expected at most 2 blob txs (6 blobs), got %d", blobTxCount)
-	}
-	if blobTxCount < 2 {
-		t.Errorf("expected 2 blob txs to fit, got %d", blobTxCount)
+	// Prague's block limit is nine blobs; each transaction still fits its bound.
+	if totalBlobGas != 9*gas.GasPerBlob || blobTxCount != 3 {
+		t.Fatalf("Prague capacity: %d blobs in %d txs, want nine in three", totalBlobGas/gas.GasPerBlob, blobTxCount)
 	}
 }
 
@@ -586,12 +581,12 @@ func TestBuildBlock_ExcessBlobGasCalculation(t *testing.T) {
 		t.Fatalf("BuildBlockLegacy: %v", err)
 	}
 
-	// Expected excess = (0 + 786432) - 393216 = 393216
+	// Parent usage exactly equals the active Prague target (six blobs).
 	h := blk.Header()
 	if h.ExcessBlobGas == nil {
 		t.Fatal("ExcessBlobGas should be set on Cancun block")
 	}
-	expectedExcess := gas.CalcExcessBlobGas(parentExcessBlobGas, parentBlobGasUsed)
+	expectedExcess := uint64(0)
 	if *h.ExcessBlobGas != expectedExcess {
 		t.Errorf("ExcessBlobGas = %d, want %d", *h.ExcessBlobGas, expectedExcess)
 	}

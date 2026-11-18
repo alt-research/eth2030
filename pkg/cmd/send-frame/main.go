@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/eth2030/eth2030/core/framepay"
-	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -259,11 +258,14 @@ func run(opts options) error {
 	}
 	blobFee := big.NewInt(1)
 	if head.ExcessBlobGas != "" {
-		excess, err := quantity(head.ExcessBlobGas)
-		if err != nil || !excess.IsUint64() {
-			return errors.New("invalid excess blob gas")
+		var feeText string
+		if err := rpc.call(ctx, "eth_blobBaseFee", &feeText); err != nil {
+			return err
 		}
-		blobFee = gas.CalcBlobBaseFee(excess.Uint64())
+		blobFee, err = quantity(feeText)
+		if err != nil || blobFee.Sign() <= 0 {
+			return errors.New("invalid RPC blob base fee")
+		}
 	}
 	tx, err := makeFrame(opts, chainID, nonce.Uint64(), base, blobFee)
 	if err != nil {

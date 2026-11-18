@@ -18,7 +18,7 @@ func TestCanonicalFrame8141BlockValueIncludesClippedTip(t *testing.T) {
 	frame.Fees.MaxFee.Add(new(big.Int).SetUint64(budget.MaxGas), big.NewInt(1))
 	used := budget.CalldataFloor
 	block := types.NewBlock(&types.Header{Number: big.NewInt(1), BaseFee: big.NewInt(1)}, &types.Body{Transactions: []*types.Transaction{types.NewTransaction(frame)}})
-	value := calcBlockValue(block, []*types.Receipt{{GasUsed: used, EffectiveGasPrice: big.NewInt(1)}}, big.NewInt(1))
+	value := calcBlockValue(nil, block, []*types.Receipt{{GasUsed: used, EffectiveGasPrice: big.NewInt(1)}}, big.NewInt(1))
 	expected := new(big.Int).Sub(frame.Fees.MaxFee, new(big.Int).SetUint64(used))
 	if value.Cmp(expected) != 0 || value.Sign() == 0 {
 		t.Fatalf("clipped tip was rounded away: got %s want %s", value, expected)

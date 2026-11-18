@@ -68,6 +68,8 @@ type ChainConfig struct {
 	BPO1Time *uint64
 	BPO2Time *uint64
 
+	BlobScheduleConfig *BlobScheduleConfig `json:"blobSchedule,omitempty"`
+
 	// EIP7864FinalHashTime is the timestamp at which the binary trie switches
 	// from SHA-256 to BLAKE3-256 as the canonical hash function (BL-1.3).
 	// Nil means the fork is not yet activated; SHA-256 remains default.
@@ -415,12 +417,12 @@ var MainnetConfig = &ChainConfig{
 	CancunTime:              newUint64(1710338135),
 	PragueTime:              newUint64(1746612311),
 	OsakaTime:               newUint64(1764798551),
-	AmsterdamTime:           nil, // not yet scheduled
-	GlamsterdanTime:         nil, // not yet scheduled
-	HogotaTime:              nil, // not yet scheduled
-	IPlusTime:               nil, // not yet scheduled
-	BPO1Time:                nil, // not yet scheduled
-	BPO2Time:                nil, // not yet scheduled
+	AmsterdamTime:           nil,                   // not yet scheduled
+	GlamsterdanTime:         nil,                   // not yet scheduled
+	HogotaTime:              nil,                   // not yet scheduled
+	IPlusTime:               nil,                   // not yet scheduled
+	BPO1Time:                newUint64(1765290071), // pinned Geth v1.17.10 mainnet BPO1
+	BPO2Time:                newUint64(1767747671), // pinned Geth v1.17.10 mainnet BPO2
 }
 
 // SepoliaConfig is the chain config for the Sepolia test network.
@@ -449,8 +451,8 @@ var SepoliaConfig = &ChainConfig{
 	GlamsterdanTime:         nil,
 	HogotaTime:              nil,
 	IPlusTime:               nil,
-	BPO1Time:                nil,
-	BPO2Time:                nil,
+	BPO1Time:                newUint64(1761017184),
+	BPO2Time:                newUint64(1761607008),
 }
 
 // HoleskyConfig is the chain config for the Holesky test network.

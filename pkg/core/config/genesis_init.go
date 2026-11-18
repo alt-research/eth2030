@@ -103,6 +103,9 @@ func ValidateGenesis(g *Genesis) error {
 	if g.Config.ChainID == nil || g.Config.ChainID.Sign() <= 0 {
 		return ErrGenesisChainIDZero
 	}
+	if err := g.Config.Validate(); err != nil {
+		return fmt.Errorf("invalid genesis fork schedule: %w", err)
+	}
 	if g.Timestamp > maxReasonableTimestamp {
 		return fmt.Errorf("%w: %d", ErrGenesisTimestampFuture, g.Timestamp)
 	}

@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	corconfig "github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -59,7 +60,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	}
 	blobFee := big.NewInt(1)
 	if header.ExcessBlobGas != nil {
-		blobFee = calcBlobBaseFee(*header.ExcessBlobGas)
+		blobFee = gas.BlobBaseFeeForHeader(config, header)
 	}
 	if blobBaseFee != nil {
 		blobFee = new(big.Int).Set(blobBaseFee)

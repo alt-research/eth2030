@@ -68,3 +68,59 @@ func TestNativeBlobFeeBurnReceiptAndOpcodeMatchIndependentPrice(t *testing.T) {
 		})
 	}
 }
+
+func TestNativeBlobLimitChangesAtOsaka(t *testing.T) {
+	cfg := *config.TestConfig
+	cfg.AmsterdamTime = nil
+	osaka := uint64(100)
+	cfg.OsakaTime = &osaka
+	for _, at := range []uint64{99, 100} {
+		db := state.NewMemoryStateDB()
+		sender, to := types.Address{18: 0xaa}, types.Address{18: 0xbb}
+		db.AddBalance(sender, big.NewInt(1_000_000_000_000_000_000))
+		db.SetNonce(to, 1)
+		before := db.GetRoot()
+		hashes := make([]types.Hash, 7)
+		for i := range hashes {
+			hashes[i][0] = 1
+		}
+		tx := types.NewTransaction(&types.BlobTx{Nonce: 0, To: to, Gas: 21_000, GasFeeCap: big.NewInt(10), GasTipCap: big.NewInt(1), BlobFeeCap: big.NewInt(1), BlobHashes: hashes, Value: new(big.Int)})
+		tx.SetSender(sender)
+		zero := uint64(0)
+		h := &types.Header{Number: big.NewInt(1), Time: at, GasLimit: 30_000_000, BaseFee: big.NewInt(1), ExcessBlobGas: &zero}
+		gp := new(gaspool.GasPool).AddGas(h.GasLimit)
+		r, _, err := ApplyTransaction(&cfg, db, h, tx, gp)
+		if at < osaka {
+			if err != nil || r.BlobGasUsed != 7*131072 {
+				t.Fatalf("valid historical Prague count rejected: %v", err)
+			}
+		} else if err == nil || db.GetRoot() != before || gp.Gas() != h.GasLimit {
+			t.Fatalf("Osaka per-transaction bound not enforced before mutation: %v", err)
+		}
+	}
+}
+
+func TestBlobFeeRemainsBurnedWhenExecutionFails(t *testing.T) {
+	cfg := *config.TestConfig
+	cfg.AmsterdamTime = nil
+	for _, code := range [][]byte{{0x5f, 0x5f, 0xfd}, {0xfe}} {
+		db := state.NewMemoryStateDB()
+		sender, to := types.Address{18: 0xaa}, types.Address{18: 0xbb}
+		initial := big.NewInt(1_000_000_000_000_000_000)
+		db.AddBalance(sender, initial)
+		db.SetCode(to, code)
+		db.SetNonce(to, 1)
+		zero := uint64(0)
+		h := &types.Header{Number: big.NewInt(1), Time: 12, GasLimit: 30_000_000, BaseFee: big.NewInt(1), ExcessBlobGas: &zero}
+		tx := types.NewTransaction(&types.BlobTx{To: to, Gas: 100_000, GasFeeCap: big.NewInt(50), GasTipCap: big.NewInt(2), BlobFeeCap: big.NewInt(1), BlobHashes: []types.Hash{{0: 1}}, Value: new(big.Int)})
+		tx.SetSender(sender)
+		r, _, err := ApplyTransaction(&cfg, db, h, tx, new(gaspool.GasPool).AddGas(h.GasLimit))
+		if err != nil || r.Status != types.ReceiptStatusFailed || db.GetNonce(sender) != 1 {
+			t.Fatalf("included failure changed validity/nonce: %v %+v", err, r)
+		}
+		want := new(big.Int).Add(new(big.Int).Mul(new(big.Int).SetUint64(r.GasUsed), big.NewInt(3)), big.NewInt(131072))
+		if new(big.Int).Sub(initial, db.GetBalance(sender)).Cmp(want) != 0 {
+			t.Fatal("execution failure refunded or mischarged blob gas")
+		}
+	}
+}

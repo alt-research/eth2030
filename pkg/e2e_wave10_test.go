@@ -1408,11 +1408,9 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 		ExcessBlobGas: &excessBlobGas,
 	}
 
-	// Create 7 blob transactions, each with 1 blob. Since MaxBlobGasPerBlock =
-	// 786432 and GasPerBlob = 131072, the maximum is 6 blobs per block.
-	// The 7th should be excluded.
+	// Ten candidates exceed the active Prague capacity of nine.
 	var blobTxs []*types.Transaction
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 10; i++ {
 		blobHash := types.Hash{}
 		blobHash[0] = 0x01
 		blobHash[1] = byte(i + 1)
@@ -1437,16 +1435,8 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 		t.Fatalf("BuildBlockLegacy: %v", err)
 	}
 
-	// At most 6 blob txs should be included (MaxBlobGasPerBlock / GasPerBlob = 6).
-	included := len(block.Transactions())
-	if included > 6 {
-		t.Errorf("included %d blob txs, want at most 6", included)
-	}
-
-	if block.Header().BlobGasUsed != nil {
-		if *block.Header().BlobGasUsed > gas.MaxBlobGasPerBlock {
-			t.Errorf("BlobGasUsed %d exceeds max %d", *block.Header().BlobGasUsed, gas.MaxBlobGasPerBlock)
-		}
+	if len(block.Transactions()) != 9 || block.Header().BlobGasUsed == nil || *block.Header().BlobGasUsed != 9*gas.GasPerBlob {
+		t.Fatalf("Prague builder must include nine and exclude the tenth: tx=%d blobGas=%v", len(block.Transactions()), block.Header().BlobGasUsed)
 	}
 }
 
@@ -1647,3 +1637,5 @@ func buildCallContract(value byte, slot byte, target types.Address) []byte {
 	)
 	return code
 }
+
+func (b *blockchainBackend) IsOsaka(uint64) bool { return false }

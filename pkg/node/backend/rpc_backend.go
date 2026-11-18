@@ -486,3 +486,8 @@ func (b *RPCBackend) TraceTransaction(txHash types.Hash) (*vm.StructLogTracer, e
 
 	return tracer, nil
 }
+
+// IsOsaka supplies the fork rule used by blob fee forecasts.
+func (b *RPCBackend) IsOsaka(timestamp uint64) bool {
+	return b.node.Blockchain().Config().IsOsaka(timestamp)
+}

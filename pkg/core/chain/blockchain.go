@@ -12,6 +12,7 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -2190,7 +2191,7 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 				}
 				blobFee := big.NewInt(1)
 				if header.ExcessBlobGas != nil {
-					blobFee = execution.CalcBlobBaseFee(*header.ExcessBlobGas)
+					blobFee = gas.BlobBaseFeeForHeader(bc.config, header)
 				}
 				if err := r.DeriveFrameFields8141(frame, header.BaseFee, blobFee); err != nil {
 					return nil

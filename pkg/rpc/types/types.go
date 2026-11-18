@@ -487,7 +487,7 @@ func FormatAuthorizationList(auths []types.Authorization) []RPCAuthorization {
 
 // FormatBlock converts a block to its JSON-RPC representation.
 // If fullTx is true, returns full transaction objects; otherwise returns tx hashes.
-func FormatBlock(block *types.Block, fullTx bool) interface{} {
+func FormatBlock(block *types.Block, fullTx bool, blobFees ...*big.Int) interface{} {
 	header := block.Header()
 	if !fullTx {
 		rb := FormatHeader(header)
@@ -579,7 +579,11 @@ func FormatBlock(block *types.Block, fullTx bool) interface{} {
 	blockTS := header.Time
 	for i, tx := range txs {
 		idx := uint64(i)
-		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee, BlobBaseFeeForHeader(header))
+		blobFee := BlobBaseFeeForHeader(header)
+		if len(blobFees) > 0 && blobFees[0] != nil {
+			blobFee = blobFees[0]
+		}
+		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee, blobFee)
 	}
 
 	// Withdrawals: always present (even empty) for post-Shanghai blocks.

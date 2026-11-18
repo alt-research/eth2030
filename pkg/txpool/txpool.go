@@ -287,7 +287,7 @@ func (pool *TxPool) updateHeadFeesLocked(header *types.Header) bool {
 	}
 	blob := big.NewInt(1)
 	if header.ExcessBlobGas != nil {
-		blob = gas.CalcBlobBaseFee(*header.ExcessBlobGas)
+		blob = gas.BlobBaseFeeForHeader(pool.frameConfig, header)
 	}
 	changed := pool.baseFee == nil || pool.baseFee.Cmp(base) != 0 || pool.blobBaseFee == nil || pool.blobBaseFee.Cmp(blob) != 0 || pool.config.BlockGasLimit != header.GasLimit
 	pool.baseFee, pool.blobBaseFee = base, blob

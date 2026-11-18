@@ -267,13 +267,7 @@ func (v *HeaderVerifier) verifyBlobGas(header, parent *types.Header) error {
 		return fmt.Errorf("%w: ExcessBlobGas is nil", ErrBlobFieldsMissing)
 	}
 
-	// Use fork-aware validation when Prague+ is active (supports BPO schedules).
-	if v.config.IsPrague(header.Time) {
-		return gas.ValidateBlockBlobGasWithConfig(v.config, header, parent)
-	}
-
-	// Cancun-era validation (original EIP-4844 parameters).
-	return gas.ValidateBlockBlobGas(header, parent)
+	return gas.ValidateBlockBlobGasWithConfig(v.config, header, parent)
 }
 
 // verifyCalldataGas validates the EIP-7706 calldata gas fields for

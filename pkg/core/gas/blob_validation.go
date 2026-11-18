@@ -122,7 +122,13 @@ func ValidateBlockBlobGasWithConfig(config *config.ChainConfig, header *types.He
 		return ErrExcessBlobGasNil
 	}
 
-	expectedExcess := CalcExcessBlobGasV2ForHeader(parentHeader, config, header.Time)
+	if *header.BlobGasUsed%GasPerBlob != 0 {
+		return fmt.Errorf("blob gas used is not a multiple of gas per blob")
+	}
+	expectedExcess, err := CalcExcessBlobGasForHeader(parentHeader, config, header.Time)
+	if err != nil {
+		return err
+	}
 
 	if *header.ExcessBlobGas != expectedExcess {
 		return fmt.Errorf("%w: have %d, want %d", ErrExcessBlobGasMismatch, *header.ExcessBlobGas, expectedExcess)

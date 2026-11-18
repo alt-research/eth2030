@@ -117,7 +117,7 @@ func (pb *PayloadBuilder) StartBuild(
 	}
 
 	// Calculate block value as the sum of effective tips paid by transactions.
-	blockValue := calcBlockValue(blk, result.Receipts, parentHeader.BaseFee)
+	blockValue := calcBlockValue(pb.config, blk, result.Receipts, blk.Header().BaseFee)
 
 	pb.payloads[id] = &BuiltPayload{
 		Block:             blk,
@@ -145,7 +145,7 @@ func (pb *PayloadBuilder) GetPayload(id PayloadID) (*BuiltPayload, error) {
 
 // calcBlockValue computes the total tips (block value) from receipts.
 // Block value = sum over txs of (effectiveGasPrice - baseFee) * gasUsed.
-func calcBlockValue(block *types.Block, receipts []*types.Receipt, baseFee *big.Int) *big.Int {
+func calcBlockValue(cfg *coreconfig.ChainConfig, block *types.Block, receipts []*types.Receipt, baseFee *big.Int) *big.Int {
 	total := new(big.Int)
 	if baseFee == nil {
 		return total
@@ -158,11 +158,8 @@ func calcBlockValue(block *types.Block, receipts []*types.Receipt, baseFee *big.
 		}
 		tx := txs[i]
 		if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
-			excess := uint64(0)
-			if block.Header().ExcessBlobGas != nil {
-				excess = *block.Header().ExcessBlobGas
-			}
-			tip, err := types.FrameProposerTip(frame, receipt.GasUsed, baseFee, gas.CalcBlobBaseFee(excess))
+
+			tip, err := types.FrameProposerTip(frame, receipt.GasUsed, baseFee, gas.BlobBaseFeeForHeader(cfg, block.Header()))
 			if err == nil {
 				total.Add(total, tip)
 			}

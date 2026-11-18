@@ -220,7 +220,7 @@ func (api *EthAPI) getBlockByNumber(req *Request) *Response {
 	// are always populated per the Ethereum JSON-RPC spec.
 	block := api.backend.BlockByNumber(bn)
 	if block != nil {
-		return successResponse(req.ID, FormatBlock(block, fullTx))
+		return successResponse(req.ID, FormatBlock(block, fullTx, blobPriceForHeader(api.backend, block.Header())))
 	}
 	return successResponse(req.ID, FormatHeader(header))
 }
@@ -260,7 +260,7 @@ func (api *EthAPI) getBlockByHash(req *Request) *Response {
 	// are always populated per the Ethereum JSON-RPC spec.
 	block := api.backend.BlockByHash(hash)
 	if block != nil {
-		return successResponse(req.ID, FormatBlock(block, fullTx))
+		return successResponse(req.ID, FormatBlock(block, fullTx, blobPriceForHeader(api.backend, block.Header())))
 	}
 	return successResponse(req.ID, FormatHeader(header))
 }
@@ -503,6 +503,22 @@ func (api *EthAPI) feeHistory(req *Request) *Response {
 	// plus the next block's base fees (N+1 entries for baseFeePerGas / baseFeePerBlobGas).
 	for i := oldest; i <= newestNum+1; i++ {
 		header := api.backend.HeaderByNumber(BlockNumber(i))
+		if header == nil && i == newestNum+1 {
+			// Match the reference oracle: forecast with the latest known fork,
+			// not an invented timestamp for a future CL proposal.
+			result.BaseFeePerGas = append(result.BaseFeePerGas, encodeBigInt(gas.CalcBaseFee(newestHeader)))
+			if newestHeader.ExcessBlobGas != nil {
+				target, max, fraction := api.backend.BlobSchedule(newestHeader.Time)
+				excess, err := gas.CalcExcessBlobGasWithRules(newestHeader, gas.BlobSchedule{Target: target, Max: max, UpdateFraction: fraction}, api.backend.IsOsaka(newestHeader.Time))
+				if err != nil {
+					return errorResponse(req.ID, ErrCodeInternal, err.Error())
+				}
+				result.BaseFeePerBlobGas = append(result.BaseFeePerBlobGas, encodeBigInt(api.calcBlobBaseFee(excess, newestHeader.Time)))
+			} else {
+				result.BaseFeePerBlobGas = append(result.BaseFeePerBlobGas, "0x0")
+			}
+			continue
+		}
 		if header != nil && header.BaseFee != nil {
 			result.BaseFeePerGas = append(result.BaseFeePerGas, encodeBigInt(header.BaseFee))
 		} else {
@@ -1196,7 +1212,7 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 			blockHash = &h
 			blockTS = header.Time
 			baseFee = header.BaseFee
-			blobBaseFee = BlobBaseFeeForHeader(header)
+			blobBaseFee = blobPriceForHeader(api.backend, header)
 		}
 	}
 
@@ -1340,7 +1356,7 @@ func (api *EthAPI) getTransactionByBlockHashAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, BlobBaseFeeForHeader(block.Header())))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, blobPriceForHeader(api.backend, block.Header())))
 }
 
 // getTransactionByBlockNumberAndIndex implements eth_getTransactionByBlockNumberAndIndex.
@@ -1373,7 +1389,7 @@ func (api *EthAPI) getTransactionByBlockNumberAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, BlobBaseFeeForHeader(block.Header())))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, blobPriceForHeader(api.backend, block.Header())))
 }
 
 // getBlockTransactionCountByHash implements eth_getBlockTransactionCountByHash.
@@ -1487,6 +1503,14 @@ func (api *EthAPI) calcBlobBaseFee(excessBlobGas, blockTime uint64) *big.Int {
 	_, _, fraction := api.backend.BlobSchedule(blockTime)
 	sched := gas.BlobScheduleEntry{BaseFeeUpdateFraction: fraction}
 	return gas.CalcBlobBaseFeeWithSchedule(excessBlobGas, sched)
+}
+
+func blobPriceForHeader(backend Backend, header *types.Header) *big.Int {
+	if header == nil || header.ExcessBlobGas == nil {
+		return new(big.Int)
+	}
+	_, _, fraction := backend.BlobSchedule(header.Time)
+	return gas.CalcBlobBaseFeeWithSchedule(*header.ExcessBlobGas, gas.BlobScheduleEntry{BaseFeeUpdateFraction: fraction})
 }
 
 // UnsubscribeID removes a subscription by ID. Used by WebSocket connection

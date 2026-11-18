@@ -298,3 +298,5 @@ func TestBackendInterface_HistoryOldestBlock(t *testing.T) {
 		t.Fatal("want 100 after set")
 	}
 }
+
+func (m *localMock) IsOsaka(uint64) bool { return false }

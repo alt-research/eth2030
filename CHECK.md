@@ -7,7 +7,7 @@
 - [x] Validate complete sidecar binding/proofs and preserve Frame regression behavior.
 - [x] Require full data for pool-based builders and return genuine legacy blob proofs.
 - [x] Qualify actual wire/admission/Engine consumers, affected checks/build and regression mutations.
-- [ ] Publish the isolated blob-validation PR.
+- [x] Publish the isolated blob-validation PR (PR 76).
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

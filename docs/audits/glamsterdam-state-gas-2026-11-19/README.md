@@ -1,6 +1,6 @@
 # Current merged gas implementation checkpoint
 
-The clean development baseline `52e35b68` preserves 19 differing Amsterdam observations out of 22. The first implementation snapshot in `first-transition-match.json` matches all 22 Amsterdam scenarios. It explicitly records its dirty source state; the following committed rerun will identify the exact source revision. The five Osaka differences are unchanged transition-versus-outer-validator observations from the existing corpus, not newly introduced block acceptance failures.
+The clean development baseline `52e35b68` preserves 19 differing Amsterdam observations out of 22. The first implementation snapshot in `first-transition-match.json` matches all 22 Amsterdam scenarios. It explicitly records its dirty source state. `transaction-checkpoint.json` repeats the full signed corpus from clean source `c6cdf15ac7377773a5c05d8948bf8b292dd8d700` and matches all 22 Amsterdam cases. The five Osaka differences are unchanged transition-versus-outer-validator observations from the existing corpus, not newly introduced block acceptance failures.
 
 The native implementation adds fixed current parameters, state-independent intrinsic/floor calculation, two-dimensional reservations/settlement, LIFO borrowing/refill/baseline restoration, cross-frame carry, conditional creation costs and authorization pre-execution commit/rollback. The reference remains unmodified Geth v1.17.10 and is an implementation observation rather than normative authority.
 

@@ -1,3 +1,10 @@
+## Glamsterdam deterministic factory
+
+- [x] Read old local and pinned current EIP-7997, including deployment and no-fork-check rules.
+- [x] Add canonical address/runtime/nonce and actual CREATE2/value tests plus a no-fork-injection regression.
+- [x] Replace the obsolete factory fixture and remove execution/builder fork-time state mutation.
+- [x] Qualify affected paths and prepare the separate feature review.
+
 # Lean4 Verification Check-list
 
 - [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.

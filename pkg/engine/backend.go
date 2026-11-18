@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -1178,6 +1180,13 @@ func (b *EngineBackend) processRequestPayload(
 			return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
 		}
 		header.BlockAccessListHash = &hash
+		if payload.SlotNumber != "" {
+			slot, err := strconv.ParseUint(strings.TrimPrefix(payload.SlotNumber, "0x"), 16, 64)
+			if err != nil || fmt.Sprintf("0x%x", slot) != payload.SlotNumber {
+				return PayloadStatusV1{}, ErrInvalidParams
+			}
+			header.SlotNumber = &slot
+		}
 	}
 	blk = types.NewBlock(header, blk.Body())
 
@@ -1349,6 +1358,7 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			Withdrawals:      WithdrawalsToCore(attrs.Withdrawals),
 			BeaconRoot:       &attrs.ParentBeaconBlockRoot,
 			InclusionListTxs: attrs.InclusionListTransactions,
+			SlotNumber:       &attrs.SlotNumber,
 		})
 		if err != nil {
 			return ForkchoiceUpdatedResult{}, fmt.Errorf("payload build failed: %w", err)

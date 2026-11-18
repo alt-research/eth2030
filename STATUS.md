@@ -1,3 +1,7 @@
+## Glamsterdam slot commitments across Engine backends (2026-11-18)
+
+Preserved explicit zero slots through production HTTP Engine build/import, and supplied the missing slots to memory Engine construction/import. Independent go-ethereum header hashes now agree with actual payloads, SLOTNUM execution, public block RPC and committed historical BAL bytes. Slot zero, nondefault and uint64 maximum values are covered. See [verification](docs/verification/glamsterdam-slot-commitment-20261118.md); full independent-client/schema/CL and final gas gates remain open.
+
 ## Historical empty BAL cache recovery (2026-11-18)
 
 The bounded native Engine backend now regenerates the canonical empty BAL only when its header commitment matches, even without a cached BAL object. Both historical body APIs retain the execution body; nonempty/unknown commitments stay unavailable. This extends PR 66's slot-based retention qualification.

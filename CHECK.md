@@ -1,5 +1,12 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam header and slot independent qualification (2026-11-18)
+
+- [x] Compare native canonical header RLP/hash against go-ethereum v1.17.10.
+- [x] Drive nondefault slots through HTTP FCU/build/import and observe SLOTNUM state and block RPC.
+- [x] Match historical Engine BAL bytes to the independent decoded header commitment.
+- [ ] Run affected tests and local build; submit the isolated qualification PR.
+
 - [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
 - [x] Reproduce the obsolete availability window through the real Engine body consumer.
 - [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.

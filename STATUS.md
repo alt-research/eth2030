@@ -1,6 +1,6 @@
 ## Canonical execution system transitions (2026-11-19)
 
-Isolated `fix/glamsterdam-system-transitions` starts from qualified composition `95382598`, separately from the Gas draft. Pinned EIP-2935 defines canonical address 0x0000F90827F1C53a10cb7A02335B175320002935 and an 8191 window; the existing direct helper uses an obsolete address/window. EIPs 2935/4788 permit direct optimizations, but actual EVM calls will qualify deployed/missing/custom code and match canonical runtimes. This feature is under implementation and not release-qualified.
+Isolated `fix/glamsterdam-system-transitions` starts from qualified composition `95382598`, separately from the Gas draft. Pinned EIP-2935 defines canonical address 0x0000F90827F1C53a10cb7A02335B175320002935 and an 8191 window; the existing direct helper uses an obsolete address/window. EIPs 2935/4788 permit direct optimizations, but actual EVM calls will qualify deployed/missing/custom code and match canonical runtimes. Actual StateProcessor scenarios for canonical deployed, missing, custom and reverting runtime code all reproduce state-root differences against unmodified Geth v1.17.10 with identical frozen allocations. This feature is under implementation and not release-qualified.
 
 ## Moving pivot proof binding composed regression (2026-11-19)
 

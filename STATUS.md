@@ -1,6 +1,6 @@
 ## Builder-request feature composition (2026-11-18)
 
-PR 77 composes with the previous feature set. Isolated blob readiness, factory non-injection and memory slot tests now use an explicit owned genesis with mandatory builder contracts. Existing feature obligations are preserved. Combined qualification is in progress.
+PR 77 composes with the previous feature set. Isolated blob readiness, factory non-injection and memory slot tests now use an explicit owned genesis with mandatory builder contracts. Existing feature obligations are preserved. At source `d97be4c3`, all 211 tested Go packages, tagged Core/EIP, affected vet and local build pass. Final gas and independent live release gates remain open.
 
 ## EIP-8282 native builder requests (2026-11-18)
 

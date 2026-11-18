@@ -3,7 +3,7 @@
 ## Mandatory builder-request feature composition (2026-11-18)
 
 - [x] Allocate canonical contracts in blob/factory/slot owned fixtures before root construction.
-- [ ] Qualify all combined Go tests, tagged Core/EIP, vet and local build.
+- [x] Qualify all combined Go tests, tagged Core/EIP, vet and local build.
 
 ## EIP-8282 builder execution requests (2026-11-18)
 

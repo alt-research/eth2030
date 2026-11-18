@@ -121,11 +121,7 @@ func makeBlockWithStateInteg(parent *types.Block, txs []*types.Transaction, stat
 	proc := execution.NewStateProcessor(config.TestConfig)
 	result, err := proc.ProcessWithBAL(blk, statedb)
 	if err == nil {
-		var gasUsed uint64
-		for _, r := range result.Receipts {
-			gasUsed += r.GasUsed
-		}
-		header.GasUsed = gasUsed
+		header.GasUsed = types.BlockGasTotal(result.Receipts, config.TestConfig.IsAmsterdam(header.Time) || config.TestConfig.IsGlamsterdan(header.Time))
 
 		var cdGasUsed uint64
 		for _, tx := range txs {
@@ -217,7 +213,7 @@ func TestBuildBlock_WithTransactions(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -422,7 +418,7 @@ func TestBuildBlock_AATxReplayMatchesBuiltStateRoot_PreAmsterdam(t *testing.T) {
 	}
 }
 
-func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T) {
+func TestBuildBlock_AmsterdamWithoutLegacyFlagUsesGrossExecutionForHeader(t *testing.T) {
 	cfg := testConfigAmsterdamWithoutGlamsterdam()
 	builderState := newBuilderRequestTestState()
 	replayState := newBuilderRequestTestState()
@@ -475,8 +471,8 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 	if receipts[0].BlockGasUsed <= receipts[0].GasUsed {
 		t.Fatalf("expected refund-driven gas split, got blockGasUsed=%d gasUsed=%d", receipts[0].BlockGasUsed, receipts[0].GasUsed)
 	}
-	if blk.GasUsed() != receipts[0].GasUsed {
-		t.Fatalf("header gas used = %d, want post-refund gas %d before Glamsterdam", blk.GasUsed(), receipts[0].GasUsed)
+	if blk.GasUsed() != receipts[0].BlockGasUsed {
+		t.Fatalf("header gas used = %d, want gross execution %d under Amsterdam", blk.GasUsed(), receipts[0].BlockGasUsed)
 	}
 
 	proc := execution.NewStateProcessor(cfg)
@@ -487,7 +483,7 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 	if len(result.Receipts) != 1 {
 		t.Fatalf("replay receipt count = %d, want 1", len(result.Receipts))
 	}
-	if result.Receipts[0].GasUsed != blk.GasUsed() {
+	if result.Receipts[0].BlockGasUsed != blk.GasUsed() {
 		t.Fatalf("replay gas used = %d, want header gas %d", result.Receipts[0].GasUsed, blk.GasUsed())
 	}
 	if result.Receipts[0].BlockGasUsed != receipts[0].BlockGasUsed {

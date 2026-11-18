@@ -48,8 +48,8 @@ func TestEIP8282BuilderRequestsThroughActualEngine(t *testing.T) {
 		t.Fatalf("queue activation: %v status=%+v", err, status)
 	}
 	depositAddress, exitAddress := types.BuilderDepositRequestAddress, types.BuilderExitRequestAddress
-	deposit := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), 0, &depositAddress, new(big.Int).Add(eiptest.Ether, big.NewInt(1)), decode(fixture.Calldata), 1500000, big.NewInt(10000000000), big.NewInt(2000000000))
-	exit := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), 1, &exitAddress, big.NewInt(1), decode(fixture.Pubkey), 500000, big.NewInt(10000000000), big.NewInt(1000000000))
+	deposit := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), 0, &depositAddress, new(big.Int).Add(eiptest.Ether, big.NewInt(1)), decode(fixture.Calldata), 3000000, big.NewInt(10000000000), big.NewInt(2000000000))
+	exit := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), 1, &exitAddress, big.NewInt(1), decode(fixture.Pubkey), 1000000, big.NewInt(10000000000), big.NewInt(1000000000))
 	probe.Submit(deposit, exit)
 	attributes := probe.Attributes()
 	id, err := probe.FCUWith(attributes)

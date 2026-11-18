@@ -91,6 +91,7 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 	var built struct {
 		ExecutionPayload  payload.ExecutionPayloadV5
 		ExecutionRequests []string
+		BlockValue        string
 	}
 	writer.call(t, "engine_getPayloadV6", &built, fc.PayloadID)
 	p := built.ExecutionPayload
@@ -170,6 +171,11 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 			price.Set(feeCap)
 		}
 		wantBalance := new(big.Int).Sub(initial, new(big.Int).Mul(new(big.Int).SetUint64(cumulative), price))
+		wantTip := new(big.Int).Mul(tip, new(big.Int).SetUint64(cumulative))
+		value, err := hexutil.DecodeBig(built.BlockValue)
+		if err != nil || value.Cmp(wantTip) != 0 || node.blockchain.State().GetBalance(miner).Cmp(new(big.Int).Add(big.NewInt(1), wantTip)) != 0 {
+			t.Fatalf("builder blockValue/fee recipient mismatch: blockValue=%s error=%v", built.BlockValue, err)
+		}
 		if node.blockchain.State().GetBalance(sender).Cmp(wantBalance) != 0 || node.blockchain.State().GetNonce(sender) != 2 {
 			t.Fatal("sender payment/nonce mismatch")
 		}
@@ -220,6 +226,7 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 	var next struct {
 		ExecutionPayload  payload.ExecutionPayloadV5
 		ExecutionRequests []string
+		BlockValue        string
 	}
 	writer.call(t, "engine_getPayloadV6", &next, fc.PayloadID)
 	if len(next.ExecutionPayload.Transactions) != 1 || next.ExecutionPayload.GasUsed != 12000 {
@@ -248,6 +255,24 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 	reread.call(t, "eth_getTransactionReceipt", &final, deferredHash)
 	if final.GasUsed != "0x2ee0" || final.CumulativeGasUsed != "0x2ee0" || reopened.blockchain.State().GetNonce(sender) != 3 {
 		t.Fatal("next-block paid gas or nonce did not reset correctly")
+	}
+
+	nextPrice := new(big.Int).Add(wantBaseFee, tip)
+	if nextPrice.Cmp(feeCap) > 0 {
+		nextPrice.Set(feeCap)
+	}
+	firstPrice := new(big.Int).Add(header.BaseFee, tip)
+	if firstPrice.Cmp(feeCap) > 0 {
+		firstPrice.Set(feeCap)
+	}
+	finalBalance := new(big.Int).Sub(initial, new(big.Int).Mul(firstPrice, new(big.Int).SetUint64(cumulative)))
+	finalBalance.Sub(finalBalance, new(big.Int).Mul(nextPrice, big.NewInt(12000)))
+	finalTip := new(big.Int).Mul(tip, new(big.Int).SetUint64(cumulative+12000))
+	nextValue, valueErr := hexutil.DecodeBig(next.BlockValue)
+	for _, node := range []*Node{producer, reopened} {
+		if node.blockchain.State().GetBalance(sender).Cmp(finalBalance) != 0 || node.blockchain.State().GetBalance(miner).Cmp(new(big.Int).Add(big.NewInt(1), finalTip)) != 0 || valueErr != nil || nextValue.Cmp(new(big.Int).Mul(tip, big.NewInt(12000))) != 0 {
+			t.Fatal("second-block fee settlement or advertised value mismatch")
+		}
 	}
 	t.Logf("signed creation=%s self=%s codeBytes=65536 state=%d header=%d userCumulative=%d", createHash, selfHash, wantState, p.GasUsed, cumulative)
 }

@@ -27,3 +27,13 @@ Current execution/VM suites pass after preserving fresh-account transfer/creatio
 ## Independent system transition gap
 
 The production EIP-2935 helper still uses address 0x0F792be4B0c0cb4DAE440Ef133E90C0eCD48CCCC and an 8192 window. The complete selected EIP-2935 text instead specifies 0x0000F90827F1C53a10cb7A02335B175320002935 and 8191. This is a separate full-state interoperability gap; native two-node agreement cannot qualify it. EIPs 2935 and 4788 permit direct storage optimization, but EVM invocation is preferred for observing absent/custom code. The system transition/deployment correction will receive its own feature branch/review, with canonical runtime and independent state consumers. Final system/multiclient release gates remain open.
+
+## Signed authorization and actual consumer follow-up
+
+Ten signed authority controls cover valid existing/new authorities, two distinct pre-execution failure points, frame revert, skipped nonce warming, max nonce, clear/reset once, existing indicators and sender authorization. Explicit expected charges supplement the independent comparison. Added GAS-dependent storage controls make LIFO refill and ancestor repayment observable in actual execution.
+
+Historical Prague authorization tests select Prague explicitly; canonical Amsterdam tests fund the actual account/slot costs and preserve success, state, nonce, fees and requests. Test block assemblers use max(sum gross execution, sum state), while receipts retain paid cumulative gas. Tagged tests include a Prague control that fits twenty new slots, whereas the same Amsterdam block admits nine because the next declared state reservation does not fit. Funded/unfunded reservoir controls pay the same 125026 gas for a single slot.
+
+Actual Node HTTP settlement additionally checks both blocks' advertised blockValue and fee-recipient balance, final sender debit, deferred transaction and next SDK base fee. Ten compiling guard mutations detect state pricing, LIFO refill, ancestor repayment, exceptional baseline, authorization commit/rollback, gross execution, header bottleneck, import reservation and system margin. The first rollback mutation escaped an early failure with no prior write; this failed sensitivity result is preserved and repaired by a late pre-execution failure after successful authorization writes.
+
+Full ordinary/tagged and broad affected race/vet/build passed before these last boundary additions. Final evidence records the subsequent affected repeat and clean signed checkpoint separately. This does not qualify RPC modes or final protocol choices.

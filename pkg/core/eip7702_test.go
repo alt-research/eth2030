@@ -107,7 +107,7 @@ func TestSetCodeTx_AuthorizationProcessedInApplyMessage(t *testing.T) {
 	targetContract := types.HexToAddress("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 
 	// Create a properly signed authorization.
-	chainID := config.TestConfig.ChainID
+	chainID := pragueAuthorizationTestConfig().ChainID
 	auth := signAuthorization(privKey, chainID, targetContract, 0)
 
 	// Build a SetCode transaction message directly (bypass Transaction struct).
@@ -128,7 +128,7 @@ func TestSetCodeTx_AuthorizationProcessedInApplyMessage(t *testing.T) {
 	header := newTestHeader()
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	result, err := execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	result, err := execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	if err != nil {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestSetCodeTx_IntrinsicGasIncludesAuthCosts(t *testing.T) {
 	}
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	result, err := execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	result, err := execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	if err != nil {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
@@ -255,7 +255,7 @@ func TestSetCodeTx_IntrinsicGasTooLow(t *testing.T) {
 	}
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	_, err := execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	_, err := execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	// Intrinsic gas too low is now returned as a protocol error (matching go-ethereum).
 	if err == nil {
 		t.Fatal("SetCode tx with insufficient gas should return error")
@@ -319,7 +319,7 @@ func TestSetCodeTx_NonExistentAccountAuthGas(t *testing.T) {
 	}
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	result, err := execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	result, err := execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	if err != nil {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
@@ -362,7 +362,7 @@ func TestSetCodeTx_LegacyTxUnaffected(t *testing.T) {
 	}
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	result, err := execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	result, err := execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	if err != nil {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
@@ -459,7 +459,7 @@ func TestSetCodeTx_MultipleAuthsWithSignatures(t *testing.T) {
 	target1 := types.HexToAddress("0x1111111111111111111111111111111111111111")
 	target2 := types.HexToAddress("0x2222222222222222222222222222222222222222")
 
-	chainID := config.TestConfig.ChainID
+	chainID := pragueAuthorizationTestConfig().ChainID
 	auth1 := signAuthorization(privKey1, chainID, target1, 0)
 	auth2 := signAuthorization(privKey2, chainID, target2, 0)
 
@@ -480,7 +480,7 @@ func TestSetCodeTx_MultipleAuthsWithSignatures(t *testing.T) {
 	header := newTestHeader()
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
-	_, err = execution.ApplyMessage(config.TestConfig, nil, statedb, header, &msg, gp)
+	_, err = execution.ApplyMessage(pragueAuthorizationTestConfig(), nil, statedb, header, &msg, gp)
 	if err != nil {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
@@ -511,4 +511,12 @@ func TestSetCodeTx_MultipleAuthsWithSignatures(t *testing.T) {
 	if statedb.GetNonce(signer2) != 1 {
 		t.Errorf("signer2 nonce: got %d, want 1", statedb.GetNonce(signer2))
 	}
+}
+
+// pragueAuthorizationTestConfig pins the original EIP-7702 pricing lane.
+// Amsterdam authority transitions and fees have independent signed corpus coverage.
+func pragueAuthorizationTestConfig() *config.ChainConfig {
+	cfg := *config.TestConfig
+	cfg.AmsterdamTime, cfg.GlamsterdanTime = nil, nil
+	return &cfg
 }

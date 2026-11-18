@@ -109,7 +109,7 @@ func TestEIP2780ReducedIntrinsicGasViaApplyMessage(t *testing.T) {
 		To:       &to,
 		GasLimit: 100000,
 		GasPrice: big.NewInt(1),
-		Value:    big.NewInt(1),
+		Value:    big.NewInt(0),
 		Nonce:    0,
 	}
 
@@ -126,12 +126,9 @@ func TestEIP2780ReducedIntrinsicGasViaApplyMessage(t *testing.T) {
 		t.Fatalf("applyMessage failed: %v", err)
 	}
 
-	// Under Glamsterdam (EIP-2780), a simple ETH transfer to existing EOA
-	// should use ~6000 gas (4500 base + 500 cold_nocode + 1000 state_update),
-	// but the calldata floor or other costs may dominate.
-	// The key check is that it's less than the legacy 21000.
-	if result.UsedGas >= 21000 {
-		t.Errorf("UsedGas = %d, expected < 21000 under EIP-2780", result.UsedGas)
+	// Current EIP-2780 charges 12k sender + 3k distinct recipient for a zero-value call.
+	if result.Failed() || result.UsedGas != 15000 {
+		t.Errorf("UsedGas = %d, expected successful 15000 under current EIP-2780", result.UsedGas)
 	}
 }
 

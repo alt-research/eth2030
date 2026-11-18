@@ -1,3 +1,7 @@
+## Blob authentication, publication and replay review (2026-11-18)
+
+PR 76 closes ordinary full-data sidecar authentication and proof-consumer defects, with real HTTP/SDK wire checks and fresh-node journal recovery. Independent full Go/race/vet/build pass; the feature aggregate at `3b05bdb` passes all 211 tested packages, tagged Core/EIP, build and affected vet. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Sparse eth/72 and final gas/release gates remain open.
+
 ## Actual CL Gloas transition repairs (2026-11-18)
 
 Two isolated Lighthouse fork reviews repair first-slot payload availability and independent builder/validator onboarding. Real-crypto regressions fail on the baseline; each branch passes 23 library tests/check/full lint. Their owned changes compose on the paired-client base with 24 passing library tests, cargo check and full workspace lint. See [client review tracking](docs/plans/glamsterdam/client-reviews.json) and [integration evidence](docs/verification/glamsterdam-fork-integration-20261118.md). Full devnet/release gates remain open.

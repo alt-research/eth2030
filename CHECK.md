@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Frame paymaster and history follow-up (2026-11-18)
+
+- [ ] Freeze a reproducible ETH2030 paymaster runtime with an acyclic protocol-signature witness convention and explicit upstream-reference differences.
+- [ ] Qualify exact-code recognition, prefix execution, aggregate exposure, delayed-withdrawal reservations and head/reorg revalidation.
+- [ ] Test actual authorization, timelock enforcement, storage changes and value transfers, including negative and mutation cases.
+- [ ] Exercise coded sponsorship and fresh CL Frame history with bounded live resources, then remove all owned runtime resources.
+- [ ] Reconcile service-consumer and independent-client gates against current sources; keep unsupported boundaries explicit.
+
 ## Canonical Frame execution
 
 - [x] Implement the pinned execution, state gas, approval and atomic rollback paths.

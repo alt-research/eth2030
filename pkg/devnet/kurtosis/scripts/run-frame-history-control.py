@@ -187,9 +187,22 @@ def main():
             raise RuntimeError("paymaster history changed across restart")
     finally:
         try:
-            control.cleanup(enclave, evidence, was_running)
+            # Docker inspection never starts a stopped Kurtosis engine. Preserve
+            # bounded failure traces before the owned services are removed.
+            for container in control.run("docker", "ps", "-aq", "--filter", "network=kt-" + enclave).splitlines():
+                try:
+                    name = control.run("docker", "inspect", container, "--format", "{{.Name}}").lstrip("/")
+                    logs = subprocess.run(["docker", "logs", "--tail", "1500", container], capture_output=True, text=True, timeout=15)
+                    (args.output / (name + ".log")).write_text(logs.stdout + logs.stderr)
+                except (OSError, RuntimeError, subprocess.TimeoutExpired):
+                    pass
+        except (OSError, RuntimeError):
+            pass
         finally:
-            (args.output / "evidence.json").write_text(json.dumps(evidence, indent=2) + "\n")
+            try:
+                control.cleanup(enclave, evidence, was_running)
+            finally:
+                (args.output / "evidence.json").write_text(json.dumps(evidence, indent=2) + "\n")
     print("Verified paymaster, blob and observer history; removed", enclave, flush=True)
 
 

@@ -1261,7 +1261,7 @@ func (api *EthAPI) sendRawTransaction(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "empty transaction data")
 	}
 
-	tx, err := types.DecodeTxRLP(rawBytes)
+	tx, err := types.DecodePooledTransaction(rawBytes)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}

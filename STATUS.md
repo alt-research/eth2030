@@ -15,6 +15,15 @@
   covers sponsored FOCIL, a blob Frame and a validator-free checkpoint-synced
   CL observer reading older execution envelopes. The observer shares an already
   synchronized EL; independent EL late join remains a separate acceptance gate.
+- The first coded-paymaster control finalized the sponsored FOCIL transaction
+  on both peers. Its subsequent blob submission exposed the real HTTP path's
+  use of the plain transaction decoder; both public RPC entrypoints now decode
+  pooled wrappers. A real HTTP regression rejects a valid KZG proof at the
+  wrong cell index, admits the corrected wrapper and retrieves all 128 ordered
+  proofs through Engine API. The test also exposed and fixed `BlobAndProofV2`
+  JSON (hex DATA and lower-case field names, per Engine Osaka).
+- Replacements now test rejected payer changes preserving the old exposure and
+  successful payer changes releasing it for another sender.
 - This is an explicitly versioned experimental implementation; upstream bytecode
   and ABI agreement, live coded sponsorship and fresh CL history are next.
 

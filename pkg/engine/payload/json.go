@@ -796,3 +796,25 @@ func (p *GlamsterdamPayloadAttributes) UnmarshalJSON(data []byte) error {
 	p.SlotNumber = uint64(j.SlotNumber)
 	return nil
 }
+
+// BlobAndProofV2 uses Engine DATA encoding rather than Go's base64 []byte JSON.
+func (b BlobAndProofV2) MarshalJSON() ([]byte, error) {
+	type wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	return json.Marshal(wire{Blob: hexBytes(b.Blob), Proofs: toHexBytesSlice(b.Proofs)})
+}
+
+func (b *BlobAndProofV2) UnmarshalJSON(data []byte) error {
+	var wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Blob = []byte(wire.Blob)
+	b.Proofs = fromHexBytesSlice(wire.Proofs)
+	return nil
+}

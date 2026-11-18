@@ -1,6 +1,7 @@
 package ethapi
 
 import (
+	"encoding/hex"
 	"errors"
 	"math/big"
 	"testing"
@@ -340,7 +341,13 @@ func TestEthDirectAPI_SendRawTransaction(t *testing.T) {
 	mb := testutil.NewMockBackend()
 	api := NewEthDirectAPI(mb)
 
-	hash, err := api.SendRawTransaction("0xdeadbeef")
+	to := types.Address{19: 1}
+	original := types.NewTransaction(&types.LegacyTx{Nonce: 3, To: &to, Gas: 21000, GasPrice: big.NewInt(2), Value: big.NewInt(7), V: big.NewInt(27), R: big.NewInt(1), S: big.NewInt(1)})
+	raw, err := original.EncodeRLP()
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash, err := api.SendRawTransaction("0x" + hex.EncodeToString(raw))
 	if err != nil {
 		t.Fatalf("SendRawTransaction error: %v", err)
 	}
@@ -349,6 +356,12 @@ func TestEthDirectAPI_SendRawTransaction(t *testing.T) {
 	}
 	if len(mb.SentTxs) != 1 {
 		t.Fatalf("expected 1 sent tx, got %d", len(mb.SentTxs))
+	}
+	if hash != original.Hash().Hex() || mb.SentTxs[0].Nonce() != 3 || mb.SentTxs[0].Value().Int64() != 7 {
+		t.Fatal("raw bytes were wrapped instead of decoded")
+	}
+	if _, err := api.SendRawTransaction("0xdeadbeef"); err == nil || len(mb.SentTxs) != 1 {
+		t.Fatal("invalid RLP was submitted as transaction data")
 	}
 }
 

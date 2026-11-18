@@ -114,3 +114,41 @@ func TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal(t *testing.T) {
 		t.Fatal("code change retained canonical paymaster privileges")
 	}
 }
+
+func TestFramePaymasterV1ReplacementMovesWithdrawalAdjustedExposure(t *testing.T) {
+	pool, db, frame, payer := paymasterPoolFixture(t)
+	db.SetState(payer, types.Hash{31: 2}, types.BytesToHash(big.NewInt(99000000).Bytes()))
+	db.SetState(payer, types.Hash{31: 3}, types.Hash{31: 1})
+	first := signPoolFrame(t, frame, 1, 2)
+	if err := pool.AddRemote(first); err != nil {
+		t.Fatal(err)
+	}
+	alternate := types.Address{19: 0x95}
+	owner := framePoolAddress(t, 2)
+	db.SetCode(alternate, framepay.RuntimeV1())
+	db.SetState(alternate, types.Hash{}, types.BytesToHash(owner[:]))
+	db.AddBalance(alternate, big.NewInt(1050000))
+	replacement := *frame
+	replacement.Frames = append([]types.Frame8141(nil), frame.Frames...)
+	replacement.Frames[1].Target = &alternate
+	replacement.Fees = types.FrameFeeBudget{MaxFee: big.NewInt(1100000), MaxPriorityFeePerGas: big.NewInt(3)}
+	next := signPoolFrame(t, &replacement, 1, 2)
+	if err := pool.AddRemote(next); err != ErrInsufficientFunds {
+		t.Fatalf("replacement exceeded new payer availability: %v", err)
+	}
+	if pool.Get(first.Hash()) == nil || pool.lookup.framePayers[first.Hash()] != payer {
+		t.Fatal("failed replacement released the old payer")
+	}
+	db.AddBalance(alternate, big.NewInt(100000))
+	if err := pool.AddRemote(next); err != nil {
+		t.Fatal(err)
+	}
+	if pool.Get(first.Hash()) != nil || pool.lookup.framePayers[next.Hash()] != alternate {
+		t.Fatal("successful replacement did not shift payer exposure")
+	}
+	third := *frame
+	third.Sender = framePoolAddress(t, 3)
+	if err := pool.AddRemote(signPoolFrame(t, &third, 3, 2)); err != nil {
+		t.Fatalf("old withdrawal-adjusted reservation was not released: %v", err)
+	}
+}

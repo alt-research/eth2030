@@ -18,13 +18,13 @@ def emit(name, value):
             raise RuntimeError("artifact differs: " + name)
     else:
         path.write_text(value)
-version = subprocess.check_output(["rtk", "proxy", "solc", "--version"], text=True)
+version = subprocess.check_output(["solc", "--version"], text=True)
 if "Version: " + VERSION not in version:
     raise RuntimeError("paymaster v1 requires solc " + VERSION)
 request = {"language": "Yul", "sources": {"Paymaster.yul": {"content": (HERE / "Paymaster.yul").read_text()}},
            "settings": {"optimizer": {"enabled": True, "runs": 200}, "evmVersion": "osaka",
                         "outputSelection": {"*": {"*": ["evm.bytecode.object", "evm.deployedBytecode.object"]}}}}
-result = subprocess.run(["rtk", "proxy", "solc", "--standard-json"], input=json.dumps(request),
+result = subprocess.run(["solc", "--standard-json"], input=json.dumps(request),
                         capture_output=True, text=True, check=True)
 output = json.loads(result.stdout)
 errors = [item["formattedMessage"] for item in output.get("errors", []) if item["severity"] == "error"]

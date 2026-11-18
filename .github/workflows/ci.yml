@@ -46,6 +46,12 @@ jobs:
           go run . testdata/heze-a05a56de
       - name: Verify devnet control assertions
         run: python3 -m unittest discover -s pkg/devnet/kurtosis/scripts -p 'test_*.py'
+      - name: Rebuild the frozen paymaster runtime
+        run: |
+          curl --fail --location --retry 3 https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/linux-amd64/solc-linux-amd64-v0.8.38+commit.1835d247 -o "$RUNNER_TEMP/frame-solc"
+          printf '%s  %s\n' '65c3180a336eabb6bdc4bbd49cc405aeb233976964ae6c11fba2a6c8be8f3243' "$RUNNER_TEMP/frame-solc" | sha256sum -c -
+          sudo install -m 755 "$RUNNER_TEMP/frame-solc" /usr/local/bin/solc
+          python3 pkg/core/framepay/contracts/generate.py --check
 
   ci:
     name: Build, Vet, Lint, Test

@@ -1,3 +1,16 @@
+## Frame paymaster completion (2026-11-18)
+
+- Frozen ETH2030's [paymaster v1 candidate](pkg/core/framepay/README.md), retaining
+  the EIP reference owner and delayed-withdrawal storage layout. Its Yul runtime
+  is reproducible with the recorded compiler and settings; the witness uses the
+  protocol-validated canonical-hash signature at index 1.
+- Prefix execution, exact-code recognition, multiple sponsored senders,
+  aggregate max-fee exposure, pending/matured withdrawal reservations and code
+  change revalidation pass behavioral tests. Actual EVM tests cover deployment,
+  unauthorized requests, exact timelock boundary, transfer and rollback.
+- This is an explicitly versioned experimental implementation; upstream bytecode
+  and ABI agreement, live coded sponsorship and fresh CL history are next.
+
 ## Canonical Frame execution (2026-11-18)
 
 - Branch `feat/frame-8141-execution` extends merged master `cc567f93` in an

@@ -43,11 +43,14 @@ unknown functions; the [compiler evidence](verification/frame-8141-canonical-pay
 retains the command and diagnostics. A compatible compilation path and a
 consistent witness convention must be frozen before granting the exception.
 
-No arbitrary contract is granted the canonical-paymaster exception. Coded
-sponsors use the generic validation trace and the one-pending non-canonical
-paymaster limit. Default-code sponsors use aggregate per-payer exposure. Runtime
-pinning, a consistent witness convention, delayed-withdrawal accounting and the
-canonical exception remain an explicit promotion gate.
+ETH2030 now freezes the [v1 candidate](../pkg/core/framepay/README.md) as a
+local experimental runtime. It preserves the reference owner and twelve-hour
+withdrawal layout and uses protocol-validated signature entry 1 with empty
+`msg`. Exact runtime matching, actual prefix execution and withdrawal-adjusted
+aggregate reservations qualify this one implementation. Unknown code retains
+generic trace rules and the one-pending coded-paymaster cap. This explicitly
+records the witness/ABI/compiler differences from the uncompiled upstream asset;
+formal cross-client runtime agreement remains a promotion gate.
 
 ## Verification
 
@@ -69,7 +72,7 @@ STATUS.md after execution.
 
 ## Remaining promotion gates
 
-- Pin and qualify the canonical-paymaster runtime and withdrawal accounting.
+- Qualify the frozen paymaster v1 candidate on live traffic and align its runtime/witness ABI with independent clients.
 - The sponsored FOCIL/finality/restart gate passed on EL `1c20e3c7` and
   Lighthouse `a05a56de`; see the [retained wire and settlement evidence](verification/frame-8141-20261118-final.json).
   Fresh CL historical backfill remains a separate gate.

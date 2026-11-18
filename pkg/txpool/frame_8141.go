@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
@@ -80,7 +81,11 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 		reserved.Set(frame.Fees.MaxFee)
 	}
 	prefixEnd, _ := frame.ValidationPrefix8141(pool.frameTime)
-	nonCanonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0
+	canonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
+	if canonicalPaymaster {
+		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
+	}
+	nonCanonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0 && !canonicalPaymaster
 	for hash, pending := range pool.lookup.all {
 		other, ok := pending.Inner().(*types.FrameTx8141)
 		if !ok {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -588,6 +589,16 @@ func gasFrameCall8141(op OpCode, evm *EVM, contract *Contract, stack *Stack, mem
 func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack, pc uint64) error {
 	f := evm.frame8141
 	if f == nil || !f.PublicValidation {
+		return nil
+	}
+	frame := f.Tx.Frames[f.Index]
+	target := f.Tx.Sender
+	if frame.Target != nil {
+		target = *frame.Target
+	}
+	// Only the fixed PAY runtime receives the draft's canonical-code exception.
+	// STATICCALL/write protection and exact-scope approval still apply normally.
+	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && framepay.IsV1(evm.StateDB.GetCode(target)) {
 		return nil
 	}
 	deploy := f.Tx.Frames[f.Index].Mode == types.ModeDefault &&

@@ -3,7 +3,6 @@ package block
 import (
 	"crypto/sha256"
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
 	"math/big"
@@ -44,7 +43,7 @@ func TestPoolBuilderWaitsForCompleteBlobData(t *testing.T) {
 		{"metadata_only", nil, 0}, {"allocated_but_empty", &types.BlobSidecarData{}, 0}, {"complete", complete, 1},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			db := state.NewMemoryStateDB()
+			db := newBuilderRequestTestState()
 			db.AddBalance(sender, big.NewInt(1000000000))
 			db.SetNonce(receiver, 1)
 			transaction.SetBlobSidecar(tc.sidecar)

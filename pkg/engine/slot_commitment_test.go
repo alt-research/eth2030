@@ -3,7 +3,6 @@ package engine
 import (
 	"fmt"
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	gethrlp "github.com/ethereum/go-ethereum/rlp"
@@ -16,7 +15,7 @@ func TestMemoryEngineSlotCommitment(t *testing.T) {
 			cfg := *config.TestConfig
 			cfg.GlamsterdanTime = nil
 			genesis := makeGenesis()
-			db := state.NewMemoryStateDB()
+			db := newBuilderRequestTestState()
 			builder := NewEngineBackend(&cfg, db, genesis)
 			defer builder.Close()
 			receiver := NewEngineBackend(&cfg, db.Dup(), genesis)

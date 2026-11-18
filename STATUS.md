@@ -1,3 +1,21 @@
+## Heze checkpoint parent follow-up (2026-11-18)
+
+- EL `e0451092` now serves reconstructed finalized sponsored, blob and checkpoint
+  envelopes through Lighthouse's historical API. The same run preserved blob
+  receipt, original storage and sponsor balances across a real receiver restart.
+- Fresh CL range sync exposed the next CL-specific failure: the Heze notifier
+  resolves the trusted checkpoint's IL view through its pre-anchor parent,
+  which a checkpoint-synced database does not contain. A debug observer at
+  checkpoint slot 224 repeatedly failed on the missing slot-223 parent.
+- Lighthouse work is isolated on `fix/heze-checkpoint-history`. The Heze spec
+  initializes the anchor's IL satisfaction to true; the fix must preserve that
+  trusted bootstrap and keep unresolved live-parent views strict. A regression
+  uses real signed blocks and an empty checkpoint store with Engine notification
+  forced on, rather than manually marking the anchor payload received.
+- The failed enclave, temporary debug observer and labeled volumes were removed
+  and its engine stopped. The [record](docs/verification/frame-8141-20261118-checkpoint-parent-failed.json)
+  distinguishes repaired source history from the still-open fresh CL gate.
+
 ## Historical Engine payload bodies (2026-11-18)
 
 - The fresh CL control exposed actual historical serving failures after the

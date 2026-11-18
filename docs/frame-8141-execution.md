@@ -164,3 +164,15 @@ follow the Engine contract. HTTP integration compares exact original Frame and
 BAL bytes on both nodes and after FileDB reopen. Separate mutations omitting
 BAL persistence and the V2 DATA codec each fail this integration. Range controls
 cover invalid quantities, bounds, error codes, overflow and trailing heights.
+
+### Heze checkpoint IL view
+
+On the repaired EL, source historical APIs return the original finalized
+sponsored, blob and checkpoint envelopes. The [next failed observer record](verification/frame-8141-20261118-checkpoint-parent-failed.json)
+also retains an actual blob-receiver restart with unchanged receipt, parent/post
+storage and sponsor balances. Fresh range sync still failed in the CL: the
+Heze notifier looked up the checkpoint's IL view using an unavailable pre-anchor
+parent (a debug node at anchor slot 224 requested its missing slot-223 parent).
+The Heze `get_forkchoice_store` specification initializes the trusted anchor's
+IL satisfaction to true. This is a separate Lighthouse bootstrap repair; source
+history serving success does not establish fresh CL acceptance.

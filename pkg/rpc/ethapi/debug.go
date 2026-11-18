@@ -226,6 +226,28 @@ func (api *EthAPI) traceBlock(req *Request, block *types.Block, cfg debugapi.Dbg
 		return successResponse(req.ID, results)
 	}
 
+	if backend, ok := api.backend.(rpcbackend.BlockTraceBackend); ok {
+		traces, err := backend.TraceBlock(blockHash)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, err.Error())
+		}
+		if len(traces) != len(txs) {
+			return errorResponse(req.ID, ErrCodeInternal, "incomplete block trace")
+		}
+		results := make([]*BlockTraceResult, len(txs))
+		for i, tracer := range traces {
+			logs := make([]StructLog, len(tracer.Logs))
+			for j, entry := range tracer.Logs {
+				stack := make([]string, len(entry.Stack))
+				for k, v := range entry.Stack {
+					stack[k] = "0x" + v.Text(16)
+				}
+				logs[j] = StructLog{PC: entry.Pc, Op: entry.Op.String(), Gas: entry.Gas, GasCost: entry.GasCost, Depth: entry.Depth, Stack: stack}
+			}
+			results[i] = &BlockTraceResult{TxHash: encodeHash(txs[i].Hash()), Result: &TraceResult{Gas: tracer.GasUsed(), Failed: tracer.Error() != nil, ReturnValue: encodeBytes(tracer.Output()), StructLogs: logs}}
+		}
+		return successResponse(req.ID, results)
+	}
 	results := make([]*BlockTraceResult, len(txs))
 	for i, tx := range txs {
 		trace := &TraceResult{

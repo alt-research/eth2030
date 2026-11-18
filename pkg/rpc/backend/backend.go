@@ -98,3 +98,8 @@ type CallBackend interface {
 	EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (uint64, error)
 	TraceCall(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error)
 }
+
+// BlockTraceBackend supplies canonical single-pass opcode traces.
+type BlockTraceBackend interface {
+	TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error)
+}

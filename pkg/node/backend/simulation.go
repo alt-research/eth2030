@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
@@ -77,6 +78,13 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 		input = args.Data
 	}
 	var data []byte
+	if args.Input != nil && args.Data != nil {
+		left, e1 := hexutil.Decode(*args.Input)
+		right, e2 := hexutil.Decode(*args.Data)
+		if e1 != nil || e2 != nil || !bytes.Equal(left, right) {
+			return nil, invalid("input/data", fmt.Errorf("fields must contain identical bytes"))
+		}
+	}
 	if input != nil {
 		data, err = hexutil.Decode(*input)
 		if err != nil {

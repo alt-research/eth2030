@@ -355,12 +355,34 @@ func (b *RPCBackend) TraceTransaction(hash types.Hash) (*vm.StructLogTracer, err
 	if block == nil {
 		return nil, fmt.Errorf("block not found")
 	}
-	txs := block.Transactions()
-	if entry.TxIndex >= uint64(len(txs)) {
-		return nil, fmt.Errorf("transaction index out of range")
+	traces, err := b.traceTransactions(block, &entry.TxIndex)
+	if err != nil {
+		return nil, err
 	}
-	if txs[entry.TxIndex].Type() > types.SetCodeTxType {
-		return nil, fmt.Errorf("transaction envelope has no qualified opcode tracer")
+	return traces[0], nil
+}
+
+// TraceBlock replays its prefix once instead of independently rebuilding it for
+// every target. Each tracer observes its own complete transaction transition.
+func (b *RPCBackend) TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error) {
+	block := b.node.Blockchain().GetBlock(hash)
+	if block == nil {
+		return nil, fmt.Errorf("block not found")
+	}
+	return b.traceTransactions(block, nil)
+}
+func (b *RPCBackend) traceTransactions(block *types.Block, target *uint64) ([]*vm.StructLogTracer, error) {
+	bc := b.node.Blockchain()
+	txs := block.Transactions()
+	if len(txs) == 0 {
+		return []*vm.StructLogTracer{}, nil
+	}
+	last := uint64(len(txs) - 1)
+	if target != nil {
+		last = *target
+	}
+	if last >= uint64(len(txs)) {
+		return nil, fmt.Errorf("transaction index out of range")
 	}
 	header := block.Header()
 	parent := bc.GetBlock(header.ParentHash)
@@ -376,14 +398,19 @@ func (b *RPCBackend) TraceTransaction(hash types.Hash) (*vm.StructLogTracer, err
 		return nil, err
 	}
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
-	tracer := vm.NewStructLogTracer()
-	for i := uint64(0); i <= entry.TxIndex; i++ {
+	var traces []*vm.StructLogTracer
+	for i := uint64(0); i <= last; i++ {
 		tx := txs[i]
 		db.SetTxContext(tx.Hash(), int(i))
 		db.ClearTransientStorage()
 		db.SubRefund(db.GetRefund())
 		tracing := vm.Config{}
-		if i == entry.TxIndex {
+		var tracer *vm.StructLogTracer
+		if target == nil || i == last {
+			if tx.Type() > types.SetCodeTxType {
+				return nil, fmt.Errorf("transaction envelope has no qualified opcode tracer")
+			}
+			tracer = vm.NewStructLogTracer()
 			tracing = vm.Config{Debug: true, Tracer: tracer}
 		}
 		receipt, used, err := execution.ApplyTransactionWithVMConfig(bc.Config(), bc.GetHashFn(), db, header, tx, gp, tracing)
@@ -391,8 +418,11 @@ func (b *RPCBackend) TraceTransaction(hash types.Hash) (*vm.StructLogTracer, err
 			return nil, fmt.Errorf("replay tx %d: %w", i, err)
 		}
 		execution.ApplyAAPostExecution(db, tx, receipt, used, nil)
+		if tracer != nil {
+			traces = append(traces, tracer)
+		}
 	}
-	return tracer, nil
+	return traces, nil
 }
 
 // IsOsaka supplies the fork rule used by blob fee forecasts.

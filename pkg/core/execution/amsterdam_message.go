@@ -28,7 +28,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if value.Sign() < 0 || value.BitLen() > 256 {
 		return nil, errors.New("invalid transaction value")
 	}
-	if msg.Nonce == math.MaxUint64 {
+	if msg.Nonce == math.MaxUint64 && !options.simulation {
 		return nil, errors.New("sender nonce overflow")
 	}
 	nonce := db.GetNonce(msg.From)

@@ -4,7 +4,7 @@ Branch: `test/glamsterdam-gas-corpus`, based on `origin/master` `38ea9259`.
 
 ## Scope and reproducibility
 
-`pkg/cmd/glamsterdam-compare` executes 18 frozen scenarios under both Osaka control and Amsterdam candidate rules (36 comparisons). Each client decodes the same signed dynamic-fee transaction. The report retains complete pre-state, native/reference chain configurations, block context inputs, signed bytes, validation errors, included success/failure, user and block gas dimensions, logs, exact observed accounts and final roots. It records the source revision, dirty state, reference module/version and EIPs revision. The corpus has no live-chain side effects.
+`pkg/cmd/glamsterdam-compare` executes 22 frozen scenarios under both Osaka control and Amsterdam candidate rules (44 comparisons). Each client decodes the same signed dynamic-fee transaction. The report retains complete pre-state, native/reference chain configurations, block context inputs, signed bytes, validation errors, included success/failure, user and block gas dimensions, logs, exact observed accounts and final roots. It records the source revision, dirty state, reference module/version and EIPs revision. The corpus has no live-chain side effects.
 
 Reference transition: unmodified `github.com/ethereum/go-ethereum v1.17.10`, pinned by the existing module dependency (`h1:b3WO+xux3pItpm13kqT5Xddv01zOxBFZxQgk/Ate4/M=`). The command rejects an unknown/replaced/different reference version until requalification. This is an independent implementation observation, not normative authority or a claim of full SDK/EIP conformance. The candidate context follows [EIPs 3db38a3](https://github.com/ethereum/EIPs/tree/3db38a3725105cb67b8804ac3e147967113bc3ca): EIP-2780 base 12,000/value 6,000; EIP-8037 CPSB 1,530 and 120/64-byte account/slot creation; EIP-8038 access/write repricing and the current merged LIFO model. Open alternatives #12581/#12582 are not mixed in.
 
@@ -21,7 +21,7 @@ A report with mismatches is a successful measurement, not a passing release gate
 
 ## Cases and acceptance
 
-Cases cover existing/new accounts, zero/nonzero value, low-budget new-account runtime failure, calldata floor, access lists, new/cleared/restored/reverted storage, exceptional halt, successful/reverted nested DELEGATECALL refills, successful/reverted creation, created-account selfdestruction, execution-cap overflow and total-cap overflow. The reference new-account failure must be an included transaction whose target remains absent; the signed Osaka transfer control must match exactly, including its root, and use 21,000 gas.
+Cases include empty, funded and partially exhausted reservoirs, nested refills and exceptional exits. They cover existing/new accounts, zero/nonzero value, low-budget new-account runtime failure, calldata floor, access lists, new/cleared/restored/reverted storage, exceptional halt, successful/reverted nested DELEGATECALL refills, successful/reverted creation, created-account selfdestruction, execution-cap overflow and total-cap overflow. The reference new-account failure must be an included transaction whose target remains absent; the signed Osaka transfer control must match exactly, including its root, and use 21,000 gas.
 
 Passing checks:
 

@@ -41,3 +41,26 @@ func TestReferenceNewAccountRuntimeOOGIsIncluded(t *testing.T) {
 		t.Fatalf("new-account pre-execution OOG did not reach its intended included failure: %+v", result.Reference)
 	}
 }
+
+func TestReferenceFundedReservoirChargesActualState(t *testing.T) {
+	var ordinary, funded scenario
+	for _, sc := range scenarios() {
+		switch sc.Name {
+		case "allocate_slot":
+			ordinary = sc
+		case "funded_reservoir_allocate":
+			funded = sc
+		}
+	}
+	left, err := runScenario(ordinary, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	right, err := runScenario(funded, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if left.Reference.StateGas != 64*1530 || right.Reference.StateGas != 64*1530 || left.Reference.GasUsed != right.Reference.GasUsed || left.Reference.StateRoot != right.Reference.StateRoot {
+		t.Fatalf("funded reservoir changed the price or state of identical work: bare=%+v funded=%+v", left.Reference, right.Reference)
+	}
+}

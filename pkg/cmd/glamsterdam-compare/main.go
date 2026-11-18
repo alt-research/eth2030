@@ -129,6 +129,10 @@ func scenarios() []scenario {
 		{Name: "create_selfdestruct", Gas: 500000, Creation: true, Value: 7, Data: append(bytes.Clone(slots), 0x30, 0xff)},
 		{Name: "above_execution_cap", Gas: 16777217},
 		{Name: "above_total_cap", Gas: 4294967296},
+		{Name: "funded_reservoir_allocate", Gas: 16777216 + 200000, Code: append(bytes.Clone(slots), 0)},
+		{Name: "partial_reservoir_allocate_clear", Gas: 16777216 + 50000, Code: append(append(bytes.Clone(slots), clear...), 0)},
+		{Name: "funded_reservoir_nested_refill", Gas: 16777216 + 200000, Code: nested, ChildCode: append(bytes.Clone(clear), 0)},
+		{Name: "funded_reservoir_exception", Gas: 16777216 + 200000, Code: append(bytes.Clone(slots), 0xfe)},
 	}
 }
 

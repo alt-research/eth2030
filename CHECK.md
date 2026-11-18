@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Fork-aware blob capacity, fees and configuration (2026-11-18)
+
+- [ ] Read EIPs 7840/7892/7691/7918 and trace actual builder/import/pool/VM/RPC consumers.
+- [ ] Reproduce hardcoded capacity/fee and ignored configuration defects against independent reference inputs.
+- [ ] Wire one selected schedule through canonical block admission, fee calculation, payloads and RPC.
+- [ ] Qualify actual signed blob traffic, fork transitions, invalid blocks and configuration/restart boundaries.
+- [ ] Run affected/full builds/tests and publish the isolated feature review.
+
 ## Persisted fork configuration and restart authority (2026-11-18)
 
 - [x] Trace actual Node startup before history replay and reuse the existing persisted config key.

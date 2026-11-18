@@ -98,11 +98,7 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 	proc := execution.NewStateProcessor(config.TestConfig)
 	result, err := proc.ProcessWithBAL(blk, statedb)
 	if err == nil {
-		var gasUsed uint64
-		for _, r := range result.Receipts {
-			gasUsed += r.GasUsed
-		}
-		header.GasUsed = gasUsed
+		header.GasUsed = types.BlockGasTotal(result.Receipts, config.TestConfig.IsAmsterdam(header.Time) || config.TestConfig.IsGlamsterdan(header.Time))
 
 		var cdGasUsed uint64
 		for _, tx := range txs {

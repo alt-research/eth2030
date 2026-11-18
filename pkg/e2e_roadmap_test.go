@@ -576,7 +576,7 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 	tx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(2000),
-		Gas:      100000,
+		Gas:      300000,
 		To:       &to,
 		Value:    big.NewInt(1000),
 		Data:     make([]byte, 256), // 256 bytes of calldata
@@ -593,9 +593,9 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 	if len(receipts) == 0 {
 		t.Fatal("no receipts returned; tx may have been rejected")
 	}
-	if receipts[0].GasUsed <= e2e.RoadmapTestTxGas {
+	if receipts[0].Status != types.ReceiptStatusSuccessful || receipts[0].GasUsed <= 21000 {
 		t.Errorf("gas used %d should exceed base tx gas %d due to calldata",
-			receipts[0].GasUsed, e2e.RoadmapTestTxGas)
+			receipts[0].GasUsed, uint64(21000))
 	}
 	if block.GasUsed() == 0 {
 		t.Error("block gas used is zero")

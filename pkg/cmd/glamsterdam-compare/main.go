@@ -140,6 +140,7 @@ func scenarios() []scenario {
 		{Name: "authorization_existing", Gas: 500000, AuthorizationCase: "existing"},
 		{Name: "authorization_new", Gas: 500000, AuthorizationCase: "new"},
 		{Name: "authorization_preexecution_oog", Gas: 50000, AuthorizationCase: "preexecution_oog"},
+		{Name: "authorization_late_preexecution_oog", Gas: 100000, Value: 1, NewTarget: true, AuthorizationCase: "late_preexecution_oog"},
 		{Name: "authorization_frame_revert", Gas: 500000, AuthorizationCase: "revert"},
 		{Name: "authorization_bad_nonce_warms", Gas: 500000, AuthorizationCase: "bad_nonce"},
 		{Name: "authorization_max_nonce_not_warm", Gas: 500000, AuthorizationCase: "max_nonce"},
@@ -165,6 +166,8 @@ func scenarios() []scenario {
 		{Name: "allocate_then_clear", Gas: 500000, Code: append(append(bytes.Clone(slots), clear...), 0)},
 		{Name: "allocate_then_revert", Gas: 500000, Code: append(bytes.Clone(slots), 0x60, 0, 0x60, 0, 0xfd)},
 		{Name: "allocate_then_exception", Gas: 500000, Code: append(bytes.Clone(slots), 0xfe)},
+		{Name: "refill_observable_gas", Gas: 500000, Code: append(append(append(bytes.Clone(slots), clear...), 0x5a, 0x60, 1, 0x55), 0)},
+		{Name: "nested_refill_observable_gas", Gas: 500000, Code: append(append(bytes.Clone(nested[:len(nested)-1]), 0x5a, 0x60, 1, 0x55), 0), ChildCode: append(bytes.Clone(clear), 0)},
 		{Name: "nested_refill_success", Gas: 500000, Code: nested, ChildCode: append(bytes.Clone(clear), 0)},
 		{Name: "nested_refill_revert", Gas: 500000, Code: nested, ChildCode: append(bytes.Clone(clear), 0x60, 0, 0x60, 0, 0xfd)},
 		{Name: "create_empty", Gas: 500000, Creation: true, Data: []byte{0}},
@@ -294,7 +297,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	tx := gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: big.NewInt(1337), To: to, Gas: sc.Gas, GasFeeCap: big.NewInt(2), GasTipCap: big.NewInt(1), Value: big.NewInt(sc.Value), Data: sc.Data, AccessList: sc.AccessList})
 	if sc.AuthorizationCase != "" {
 		recipient := gethcommon.Address(authority)
-		if sc.AuthorizationCase == "bad_nonce" || sc.AuthorizationCase == "max_nonce" {
+		if sc.AuthorizationCase == "bad_nonce" || sc.AuthorizationCase == "max_nonce" || sc.AuthorizationCase == "late_preexecution_oog" {
 			recipient = gethcommon.Address(target)
 		}
 		tx = gethtypes.NewTx(&gethtypes.SetCodeTx{ChainID: uint256.NewInt(1337), To: recipient, Gas: sc.Gas, GasFeeCap: uint256.NewInt(2), GasTipCap: uint256.NewInt(1), Value: uint256.NewInt(uint64(sc.Value)), Data: sc.Data, AccessList: sc.AccessList, AuthList: authorizations})
@@ -444,7 +447,7 @@ func readAccounts(addresses []types.Address, exists func(types.Address) bool, ba
 	return out
 }
 func makeReport() (report, error) {
-	out := report{Status: "development corpus; not release-qualified", Scope: "signed transaction transitions; pool and outer block validation are not invoked", EIPsRevision: eipsRevision, OracleModule: "github.com/ethereum/go-ethereum", OracleVersion: "unknown", Uncovered: []string{"pool admission and outer block validation", "full EEST corpus", "7702 authorizations and application invariants", "multi-transaction block settlement and next base fee", "method-specific RPC semantics", "cross-client process/devnet recovery", "unmerged alternative gas models"}}
+	out := report{Status: "development corpus; not release-qualified", Scope: "signed transaction transitions; pool and outer block validation are not invoked", EIPsRevision: eipsRevision, OracleModule: "github.com/ethereum/go-ethereum", OracleVersion: "unknown", Uncovered: []string{"pool admission and outer block validation", "full EEST corpus", "full authorization/application scenario coverage", "multi-transaction block settlement and next base fee", "method-specific RPC semantics", "cross-client process/devnet recovery", "unmerged alternative gas models"}}
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, dep := range info.Deps {
 			if dep.Path == out.OracleModule {

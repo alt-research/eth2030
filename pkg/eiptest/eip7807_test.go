@@ -77,7 +77,7 @@ func TestEIP7807_NativeRequestsThroughEngine(t *testing.T) {
 	}
 	input := append(bytes.Clone(consolidationRequest.SourcePubkey[:]), consolidationRequest.TargetPubkey[:]...)
 	consolidation := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), 2,
-		eiptest.ToPtr(types.ConsolidationRequestAddress), eiptest.Wei(1), input, 200_000, bigFeeCap, bigTipCap)
+		eiptest.ToPtr(types.ConsolidationRequestAddress), eiptest.Wei(1), input, nativeRequestGas(s), bigFeeCap, bigTipCap)
 	probe.Submit(deposit, withdrawal, consolidation)
 
 	id, err := probe.FCUWith(attrs)

@@ -1340,7 +1340,7 @@ func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
 			Nonce:      uint64(i),
 			GasTipCap:  big.NewInt(2000),
 			GasFeeCap:  big.NewInt(100000),
-			Gas:        21000,
+			Gas:        300_000,
 			To:         recipient,
 			Value:      big.NewInt(100),
 			BlobFeeCap: big.NewInt(100000),
@@ -1526,7 +1526,7 @@ func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    uint64(i),
 			GasPrice: big.NewInt(100000),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &recipient,
 			Value:    big.NewInt(1),
 		})
@@ -1545,7 +1545,7 @@ func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
 			Nonce:      uint64(3 + i),
 			GasTipCap:  big.NewInt(2000),
 			GasFeeCap:  big.NewInt(100000),
-			Gas:        21000,
+			Gas:        300_000,
 			To:         recipient,
 			Value:      big.NewInt(1),
 			BlobFeeCap: big.NewInt(100000),

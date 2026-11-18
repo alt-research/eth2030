@@ -683,7 +683,7 @@ func TestForkChoice_StateRollbackOnReorg(t *testing.T) {
 	txA := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(7),
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiverA,
 		Value:    big.NewInt(1000),
 	})
@@ -706,7 +706,7 @@ func TestForkChoice_StateRollbackOnReorg(t *testing.T) {
 	txB := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(7),
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiverB,
 		Value:    big.NewInt(2000),
 	})

@@ -9,6 +9,16 @@
 - [ ] Qualify real Node HTTP call/estimate/access-list/trace/simulation consumers, high/low gas, creation, historical context and non-mutation.
 - [ ] Run affected/full/race/vet/build and behavioral mutations; publish a separate feature PR.
 
+## Current gas signed and system consumer follow up (2026-11-19)
+
+- [x] Qualify ten signed authorization boundaries including late pre-execution failure after successful authorization writes.
+- [x] Observe LIFO refill/ancestor repayment through GAS-dependent on-chain storage.
+- [x] Preserve Prague pricing controls; migrate current-fork budgets and exact fees/header expectations.
+- [x] Check actual system state margin at 8/16/17 new slots and execution/state block capacity independently.
+- [x] Check both actual HTTP blocks' sender/miner settlement, advertised block value and SDK next-base-fee formula.
+- [x] Detect ten compiling gas guard mutations; retain the initial escaped rollback mutation and repaired fixture.
+- [x] Repeat final full/tagged/affected race/vet/build; archive the clean signed checkpoint separately. RPC/application/final release gates remain separate.
+
 ## Canonical execution system transitions (2026-11-19)
 
 - [x] Read complete pinned EIPs 2935/4788 and the selected 8037 system-call margin; compare canonical SDK assets.

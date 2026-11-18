@@ -25,7 +25,7 @@ const (
 	RoadmapTestGasLimit = uint64(30_000_000)
 	RoadmapTestBaseFee  = 1000
 	RoadmapTestGasPrice = 10
-	RoadmapTestTxGas    = uint64(21000)
+	RoadmapTestTxGas    = uint64(300_000)
 )
 
 // ---------------------------------------------------------------------------

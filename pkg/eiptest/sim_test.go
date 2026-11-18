@@ -111,7 +111,7 @@ func TestSTF_ReceiptsLogsAndHistoricalCalls(t *testing.T) {
 	s := eiptest.New(t, eiptest.ForkAt(eiptest.ForkAmsterdam, 0))
 	p := s.STF()
 	log := p.Deploy(s.Alice(), []byte{0x60, 42, 0x5f, 0x5f, 0xa1, 0x00})
-	tx := p.Execute(s.Alice(), log, nil).ExpectStatus(t, types.ReceiptStatusSuccessful).ExpectGas(t, 21_000, 25_000)
+	tx := p.Execute(s.Alice(), log, nil).ExpectStatus(t, types.ReceiptStatusSuccessful).ExpectGas(t, 15_757, 15_757)
 	result := s.Chain().GetReceipts(s.CurrentBlock().Hash())
 	if len(result) != 1 || len(tx.Logs()) != 1 || tx.Logs()[0].Topics[0] != eiptest.Uint64ToHash(42) {
 		t.Fatal("missing log topic or persisted receipt")

@@ -199,8 +199,7 @@ func (n *Node) syncFinalizedPivot2(ctx context.Context, pivot *types.Block) (boo
 				}
 				continue
 			}
-			progress := scheduler.Progress()
-			if progress.PivotRoot != pivot.Root() {
+			if scheduler.PivotHeader().Hash() != pivot.Hash() {
 				pivot, err = n.snapBlock(ctx, scheduler.PivotHeader().Hash())
 				if err != nil {
 					return false, err

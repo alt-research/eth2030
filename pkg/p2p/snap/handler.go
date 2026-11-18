@@ -89,7 +89,7 @@ func (h *ServerHandler) HandleGetBlockAccessLists(req *GetBlockAccessListsPacket
 		if cost == 0 {
 			cost = 1
 		}
-		if cost > BALHardResponseLimit || (len(response.Lists) > 0 && size+cost > limit) {
+		if size+cost > BALHardResponseLimit-1024 || (len(response.Lists) > 0 && size+cost > limit) {
 			break
 		}
 		response.Lists = append(response.Lists, bytes.Clone(data))
@@ -525,7 +525,13 @@ func (h *ServerHandler) handleSnapMsgVersion(t wire.Transport, msg wire.Msg, ver
 
 // sendSnapMsg RLP-encodes val and writes it as a snap/1 message with the given code.
 func sendSnapMsg(t wire.Transport, code uint64, val interface{}) error {
-	payload, err := rlp.EncodeToBytes(val)
+	var payload []byte
+	var err error
+	if encoder, ok := val.(interface{ EncodeRLP() ([]byte, error) }); ok {
+		payload, err = encoder.EncodeRLP()
+	} else {
+		payload, err = rlp.EncodeToBytes(val)
+	}
 	if err != nil {
 		return fmt.Errorf("snap: encode message 0x%02x: %w", code, err)
 	}

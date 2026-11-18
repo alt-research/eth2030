@@ -5,6 +5,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/p2p/wire"
@@ -68,7 +69,13 @@ func TestSnap2ClientValidatesHeaderBeforeReturningBAL(t *testing.T) {
 			}
 			item := data
 			if corrupt {
-				item = []byte{0xc1, 0xc0}
+				validOther := bal.NewBlockAccessList()
+				validOther.AddEntry(bal.AccessEntry{Address: types.Address{19: 9}})
+				item, err = validOther.EncodeRLP()
+				if err != nil {
+					finished <- err
+					return
+				}
 			}
 			finished <- sendSnapMsg(right, BlockAccessListsMsg, &BlockAccessListsPacket{req.ID, [][]byte{item}})
 		}()

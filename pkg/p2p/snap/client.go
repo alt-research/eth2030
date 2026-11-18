@@ -26,7 +26,7 @@ type pendingResponse struct {
 	ch   chan wire.Msg
 }
 
-// Client is a snap/1 peer with response correlation. Verification is bound to
+// Client is a negotiated snap peer with response correlation. Verification is bound to
 // the requested pivot root, not to an untrusted server completion flag.
 type Client struct {
 	id        string
@@ -103,6 +103,9 @@ func (c *Client) request(ctx context.Context, code uint64, packet func(uint64) a
 	case <-ctx.Done():
 		return ctx.Err()
 	case msg := <-ch:
+		if decoder, ok := out.(interface{ DecodeRLP([]byte) error }); ok {
+			return decoder.DecodeRLP(msg.Payload)
+		}
 		return rlp.DecodeBytes(msg.Payload, out)
 	}
 }
@@ -151,6 +154,45 @@ func verifyRange(root, origin types.Hash, keys, values, proof [][]byte) (bool, e
 	return gethtrie.VerifyRangeProof(gethcommon.Hash(root), origin[:], keys, values, db)
 }
 
+// A zero-width query needs an inclusion/absence proof, not a proof that every
+// leaf to its right is exhausted. Range verification rejects valid bounded
+// absence when another leaf exists beyond the requested point.
+func verifyPoint(root, key types.Hash, keys, values, proof [][]byte) (int, error) {
+	var actual []byte
+	if root != types.EmptyRootHash {
+		db := memorydb.New()
+		for _, node := range proof {
+			if err := db.Put(crypto.Keccak256(node), node); err != nil {
+				return -1, err
+			}
+		}
+		var err error
+		actual, err = gethtrie.VerifyProof(gethcommon.Hash(root), key[:], db)
+		if err != nil {
+			return -1, err
+		}
+	}
+	index := -1
+	for i, candidate := range keys {
+		if bytes.Equal(candidate, key[:]) {
+			if index >= 0 {
+				return -1, fmt.Errorf("duplicate snap point value")
+			}
+			index = i
+		}
+	}
+	if actual == nil {
+		if index >= 0 {
+			return -1, fmt.Errorf("snap point contradicts authenticated absence")
+		}
+		return -1, nil
+	}
+	if index < 0 || !bytes.Equal(actual, values[index]) {
+		return -1, fmt.Errorf("snap point value does not match proof")
+	}
+	return index, nil
+}
+
 func (p *VerifiedPeer) RequestAccountRange(req statesync.AccountRangeRequest) (*statesync.AccountRangeResponse, error) {
 	p.state.mu.Lock()
 	mismatch := p.state.rootSet && p.state.stateRoot != req.Root
@@ -179,10 +221,35 @@ func (p *VerifiedPeer) RequestAccountRange(req statesync.AccountRangeRequest) (*
 		out.Accounts = append(out.Accounts, statesync.AccountData{Hash: item.Hash, Nonce: acc.Nonce, Balance: acc.Balance.ToBig(), Root: types.Hash(acc.Root), CodeHash: types.BytesToHash(acc.CodeHash)})
 		roots[item.Hash] = types.Hash(acc.Root)
 	}
-	more, err := verifyRange(req.Root, req.Origin, keys, values, response.Proof)
+	var more bool
+	var err error
+	if req.Origin == req.Limit {
+		var index int
+		index, err = verifyPoint(req.Root, req.Origin, keys, values, response.Proof)
+		roots = make(map[types.Hash]types.Hash)
+		if index < 0 {
+			out.Accounts = nil
+		} else {
+			out.Accounts = []statesync.AccountData{out.Accounts[index]}
+			roots[out.Accounts[0].Hash] = out.Accounts[0].Root
+		}
+	} else {
+		more, err = verifyRange(req.Root, req.Origin, keys, values, response.Proof)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("snap: account range proof: %w", err)
 	}
+	// The boundary leaf may lie beyond Limit and is needed by the range proof.
+	// It is not a leaf of this partition and must not enqueue duplicate storage.
+	filtered := make([]statesync.AccountData, 0, len(out.Accounts))
+	roots = make(map[types.Hash]types.Hash)
+	for _, account := range out.Accounts {
+		if bytes.Compare(account.Hash[:], req.Origin[:]) >= 0 && bytes.Compare(account.Hash[:], req.Limit[:]) <= 0 {
+			filtered = append(filtered, account)
+			roots[account.Hash] = account.Root
+		}
+	}
+	out.Accounts = filtered
 	p.state.mu.Lock()
 	defer p.state.mu.Unlock()
 	if p.state.rootSet && p.state.stateRoot != req.Root {
@@ -224,7 +291,19 @@ func (p *VerifiedPeer) RequestStorageRange(req statesync.StorageRangeRequest) (*
 		values = append(values, slot.Body)
 		out.Slots = append(out.Slots, statesync.StorageData{AccountHash: account, SlotHash: slot.Hash, Value: slot.Body})
 	}
-	more, err := verifyRange(root, req.Origin, keys, values, response.Proof)
+	var more bool
+	var err error
+	if req.Origin == req.Limit {
+		var index int
+		index, err = verifyPoint(root, req.Origin, keys, values, response.Proof)
+		if index < 0 {
+			out.Slots = nil
+		} else {
+			out.Slots = []statesync.StorageData{out.Slots[index]}
+		}
+	} else {
+		more, err = verifyRange(root, req.Origin, keys, values, response.Proof)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("snap: storage range proof: %w", err)
 	}

@@ -24,10 +24,14 @@ func (p BlockAccessListsPacket) EncodeRLP() ([]byte, error) {
 		}
 		items[i] = item
 	}
-	return gethrlp.EncodeToBytes(struct {
+	encoded, err := gethrlp.EncodeToBytes(struct {
 		ID    uint64
 		Lists []gethrlp.RawValue
 	}{p.ID, items})
+	if err == nil && len(encoded) > BALHardResponseLimit {
+		return nil, ErrRequestTooLarge
+	}
+	return encoded, err
 }
 
 func (p *BlockAccessListsPacket) DecodeRLP(data []byte) error {

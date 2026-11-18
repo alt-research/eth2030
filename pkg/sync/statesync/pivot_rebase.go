@@ -202,6 +202,8 @@ func (w *SnapshotWriter) rebase(old *types.Header, update *PivotUpdate) error {
 }
 
 func (s *StateSyncScheduler) SetPivotResolver(resolver PivotResolver) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if s.running.Load() {
 		return ErrStateSyncRunning
 	}
@@ -262,7 +264,7 @@ func (s *StateSyncScheduler) updatePivot() error {
 				task.done = true
 			} else {
 				if task.done {
-					task.origin = types.Hash{}
+					return fmt.Errorf("snap/2 BAL diffs contradict completed storage root")
 				}
 				task.done = false
 			}
@@ -274,6 +276,10 @@ func (s *StateSyncScheduler) updatePivot() error {
 		}
 	}
 	s.storageTasks, s.codeTasks = storageTasks, codeTasks
+	s.storageIndex = make(map[types.Hash]*storageTask, len(storageTasks))
+	for _, task := range storageTasks {
+		s.storageIndex[task.accountHash] = task
+	}
 	committed = true
 	s.pivotHeader, s.pivotRoot, s.pivotBlock = update.Header, update.Header.Root, update.Header.Number.Uint64()
 	s.activePeer = update.Peer

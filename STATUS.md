@@ -1,3 +1,9 @@
+## snap version 2 state catch up (2026-11-19)
+
+The production node negotiates snap/2 and snap/1, preserving range/code schemas and rejecting removed trie-node messages on version 2. Raw positional BAL responses distinguish missing 0x80 from available c0; the actual sender and receiver use the custom codec. Header commitments and canonical BAL structure are verified before staged state rebasing.
+
+CL-selected moving pivots reuse partial account/storage progress. Reorg recovery restores old-only entries through exact inclusion/absence proofs and applies ordered new-fork diffs; missing orphan BALs discard partial state and restart bulk download. Final roots and CL authority gate adoption. Five real encrypted Node scenarios and an unmodified Geth SDK packet consumer qualify cursor preservation, rollback/deletion, restart and invalid-proof rejection. Seven compiling guard mutations are detected. Full Go, tagged Core/EIP, affected race/vet and build pass. [Evidence](docs/verification/glamsterdam-snap2-20261119.md). Full independent-client cold sync, mainnet resource limits, peer reliability policy, eth/72, final gas and release gates remain open.
+
 ## EIP-8282 native builder requests (2026-11-18)
 
 Canonical contracts and mandatory Amsterdam type-3/type-4 extraction now compose with the existing snapshot and Engine commitment path. Explicit owned genesis allocation precedes roots; missing production predeploys invalidate blocks. Actual HTTP and separate real-BLS Lighthouse component consumers qualify request bytes and registration/exit gates. Full Go, tagged Core/EIP, targeted race/vet/build and failing guard mutations pass. See [verification](docs/verification/glamsterdam-builder-requests-20261118.md). Final gas, live full-client/devnet and release gates remain open.

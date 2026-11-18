@@ -2,11 +2,11 @@
 
 ## snap/2 BAL state catch-up (2026-11-18)
 
-- [ ] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.
-- [ ] Negotiate snap/2 separately, retain unchanged range/code packets and reject removed trie-node messages.
-- [ ] Serve and authenticate ordered raw BAL responses with missing entries, budgets and cancellation.
-- [ ] Rebase downloaded state and outstanding ranges through verified BALs, including moving pivots and reorg handling.
-- [ ] Qualify actual Node sync/restart and independent wire/root consumers; run builds/tests and publish the separate PR.
+- [x] Pin EIP-8189/7928 and trace real snap peer, state scheduler/writer and CL target adoption.
+- [x] Negotiate snap/2 separately, retain unchanged range/code packets and reject removed trie-node messages.
+- [x] Serve and authenticate ordered raw BAL responses with missing entries, budgets and cancellation.
+- [x] Rebase downloaded state and outstanding ranges through verified BALs, including moving pivots and reorg handling.
+- [x] Qualify actual Node sync/restart and independent wire/root consumers; run builds/tests and publish the separate PR.
 
 - [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
 - [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.

@@ -142,6 +142,7 @@ type StateSyncScheduler struct {
 	accountTasks  []*accountRangeTask
 	nextTaskID    atomic.Uint64
 	storageTasks  []*storageTask
+	storageIndex  map[types.Hash]*storageTask
 	codeTasks     map[types.Hash]*codeTask
 	progress      StateSyncProgress
 	onProgress    ProgressCallback
@@ -274,6 +275,7 @@ func (s *StateSyncScheduler) RunContext(ctx context.Context, peer SnapPeer) erro
 	s.cancel = make(chan struct{})
 	s.runContext, s.activePeer = ctx, peer
 	s.storageTasks = nil
+	s.storageIndex = make(map[types.Hash]*storageTask)
 	s.codeTasks = make(map[types.Hash]*codeTask)
 	s.progress = StateSyncProgress{PivotBlock: s.pivotBlock, PivotRoot: s.pivotRoot}
 	s.progress.StartTime = time.Now()
@@ -390,7 +392,17 @@ func (s *StateSyncScheduler) runAccountDownload(peer SnapPeer) error {
 			s.progress.AccountsDownloaded++
 			s.progress.AccountBytes += estimateAccountSize(acct)
 			if acct.Root != types.EmptyRootHash {
-				s.storageTasks = append(s.storageTasks, &storageTask{accountHash: acct.Hash})
+				if s.storageIndex == nil {
+					s.storageIndex = make(map[types.Hash]*storageTask)
+					for _, task := range s.storageTasks {
+						s.storageIndex[task.accountHash] = task
+					}
+				}
+				if s.storageIndex[acct.Hash] == nil {
+					task := &storageTask{accountHash: acct.Hash}
+					s.storageTasks = append(s.storageTasks, task)
+					s.storageIndex[acct.Hash] = task
+				}
 			}
 			if acct.CodeHash != types.EmptyCodeHash {
 				if _, ok := s.codeTasks[acct.CodeHash]; !ok {
@@ -448,13 +460,7 @@ func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 				return err
 			}
 			if generation != s.generation {
-				var replacement *storageTask
-				for _, candidate := range s.storageTasks {
-					if candidate.accountHash == task.accountHash {
-						replacement = candidate
-						break
-					}
-				}
+				replacement := s.storageIndex[task.accountHash]
 				if replacement == nil {
 					break
 				}

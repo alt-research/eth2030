@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"github.com/eth2030/eth2030/rpc/debugapi"
 )
 
@@ -265,6 +266,30 @@ func (api *EthAPI) debugTraceCall(req *Request) *Response {
 		if err := json.Unmarshal(req.Params[1], &bn); err != nil {
 			return errorResponse(req.ID, ErrCodeInvalidParams, "invalid block number: "+err.Error())
 		}
+	}
+
+	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
+		var callConfig struct {
+			StateOverrides StateOverride `json:"stateOverrides"`
+		}
+		if len(req.Params) > 2 {
+			if err := json.Unmarshal(req.Params[2], &callConfig); err != nil {
+				return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+			}
+		}
+		tracer, err := backend.TraceCall(args, bn, callConfig.StateOverrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, err.Error())
+		}
+		logs := make([]StructLog, len(tracer.Logs))
+		for i, entry := range tracer.Logs {
+			stack := make([]string, len(entry.Stack))
+			for j, v := range entry.Stack {
+				stack[j] = "0x" + v.Text(16)
+			}
+			logs[i] = StructLog{PC: entry.Pc, Op: entry.Op.String(), Gas: entry.Gas, GasCost: entry.GasCost, Depth: entry.Depth, Stack: stack}
+		}
+		return successResponse(req.ID, &TraceResult{Gas: tracer.GasUsed(), Failed: tracer.Error() != nil, ReturnValue: encodeBytes(tracer.Output()), StructLogs: logs})
 	}
 
 	from := types.Address{}

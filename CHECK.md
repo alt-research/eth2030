@@ -3,9 +3,9 @@
 ## Method-specific gas simulation and tracing (2026-11-19)
 
 - [x] Read current EIP-8037/8038 requirements, open execution-apis issue 977 and merged Geth PR 35845 with its complete patch and review discussion.
-- [ ] Record an explicit versioned method policy; keep unmerged schema/trace choices open.
-- [ ] Reuse actual transaction transitions for estimation/access-list and canonical historical trace replay.
-- [ ] Implement uncapped call execution with intrinsic costs and zero initial reservoir; preserve state-gas rules and complete block context.
+- [x] Record an explicit versioned method policy; keep unmerged schema/trace choices open.
+- [x] Reuse actual transaction transitions for estimation/access-list and canonical historical trace replay.
+- [x] Implement uncapped call execution with intrinsic costs and zero initial reservoir; preserve state-gas rules and complete block context.
 - [ ] Qualify real Node HTTP call/estimate/access-list/trace/simulation consumers, high/low gas, creation, historical context and non-mutation.
 - [ ] Run affected/full/race/vet/build and behavioral mutations; publish a separate feature PR.
 

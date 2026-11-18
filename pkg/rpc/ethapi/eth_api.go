@@ -1082,6 +1082,9 @@ func (api *EthAPI) getBlockReceipts(req *Request) *Response {
 
 // ethCall executes a read-only EVM call without creating a transaction.
 func (api *EthAPI) ethCall(req *Request) *Response {
+	if _, ok := api.backend.(rpcbackend.CallBackend); ok {
+		return api.ethCallFull(req)
+	}
 	if len(req.Params) < 1 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "missing call arguments")
 	}
@@ -1110,6 +1113,9 @@ func (api *EthAPI) ethCall(req *Request) *Response {
 
 // estimateGas estimates the gas needed to execute a transaction.
 func (api *EthAPI) estimateGas(req *Request) *Response {
+	if _, ok := api.backend.(rpcbackend.CallBackend); ok {
+		return api.estimateGasFull(req)
+	}
 	if len(req.Params) < 1 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "missing call arguments")
 	}

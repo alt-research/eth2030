@@ -767,7 +767,7 @@ func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc,
 // applyTransactionInternal is the shared implementation for all applyTransaction
 // variants. tracker enables EIP-7928 BAL recording; slasher enables EIP-8141
 // paymaster slashing on bad gas settlement.
-func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher) (*types.Receipt, uint64, error) {
+func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher, tracing ...vm.Config) (*types.Receipt, uint64, error) {
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return applyFrame8141(config, getHash, statedb, header, tx, gp, tracker)
 	}
@@ -839,10 +839,18 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 
 	snapshot := statedb.Snapshot()
 
-	result, err := applyMessage(config, getHash, statedb, header, &msg, gp, tracker)
+	options := messageOptions{}
+	if len(tracing) > 0 {
+		options.vmConfig = tracing[0]
+	}
+	result, err := applyMessageWithOptions(config, getHash, statedb, header, &msg, gp, options, tracker)
 	if err != nil {
 		statedb.RevertToSnapshot(snapshot)
 		return nil, 0, err
+	}
+
+	if options.vmConfig.Tracer != nil {
+		options.vmConfig.Tracer.CaptureEnd(result.ReturnData, result.UsedGas, result.Err)
 	}
 
 	// Create receipt. CumulativeGasUsed is set to this transaction's gas
@@ -1096,6 +1104,21 @@ func intrinsicGasGlamst(data []byte, isCreate bool, hasValue bool, toExists bool
 // when non-nil, the tracker is injected into the EVM so opcodes record
 // storage reads, storage changes, and address touches during execution.
 func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	return applyMessageWithOptions(config, getHash, statedb, header, msg, gp, messageOptions{}, balTracker...)
+}
+
+func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, options messageOptions, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	if options.simulation {
+		copy := *msg
+		copy.Nonce = statedb.GetNonce(copy.From)
+		msg = &copy
+	}
+	if msg.Value == nil {
+		copy := *msg
+		copy.Value = new(big.Int)
+		msg = &copy
+	}
+
 	// EIP-3860/7954: oversized creation input invalidates the transaction,
 	// before fees, nonce or the block gas pool are changed.
 	if msg.To == nil && msg.TxType != types.FrameTxType && msg.TxType != types.AATxType && config != nil && config.IsShanghai(header.Time) {
@@ -1134,7 +1157,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		GasPrice:   msg.GasPrice,
 		BlobHashes: msg.BlobHashes,
 	}
-	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
+	evm := vm.NewEVMWithState(blockCtx, txCtx, options.vmConfig, statedb)
 
 	precompileAddrs, err := ConfigureBlockEVM(config, header, evm)
 	if err != nil {
@@ -1164,7 +1187,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 	}
 
 	if config != nil && config.IsMerge() && config.IsAmsterdam(header.Time) && msg.TxType <= types.SetCodeTxType {
-		return applyAmsterdamMessage(config, statedb, header, msg, gp, evm, precompileAddrs, blobCost, blobMaxCost, balTracker)
+		return applyAmsterdamMessage(config, statedb, header, msg, gp, evm, precompileAddrs, blobCost, blobMaxCost, options, balTracker)
 	}
 	// Validate and consume gas from the pool
 	if err := gp.SubGas(msg.GasLimit); err != nil {
@@ -1189,7 +1212,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 	// delegated their code execution.
 	// EIP-8141: Frame transactions allow smart contract senders (the whole point
 	// of account abstraction via VERIFY/APPROVE).
-	if msg.TxType != types.FrameTxType {
+	if !options.simulation && msg.TxType != types.FrameTxType {
 		if codeHash := statedb.GetCodeHash(msg.From); codeHash != (types.Hash{}) && codeHash != types.EmptyCodeHash {
 			// Check if the sender has EIP-7702 delegated code, which is allowed.
 			if code := statedb.GetCode(msg.From); !types.HasDelegationPrefix(code) {
@@ -1211,7 +1234,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 				return nil, fmt.Errorf("max priority fee per gas higher than max fee per gas: tip %s, cap %s", msg.GasTipCap, msg.GasFeeCap)
 			}
 			// Reject if MaxFeePerGas < BaseFee (applies to all tx types under London).
-			if msg.GasFeeCap.Cmp(header.BaseFee) < 0 {
+			if msg.GasFeeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && msg.GasFeeCap.Sign() == 0 && msg.GasTipCap.Sign() == 0) {
 				gp.AddGas(msg.GasLimit)
 				return nil, fmt.Errorf("max fee per gas less than block base fee: fee %s, baseFee %s", msg.GasFeeCap, header.BaseFee)
 			}

@@ -1,3 +1,7 @@
+## RPC method consumer implementation checkpoint (2026-11-19)
+
+Real Node HTTP now passes intrinsic GAS observations, exact slot/new-account estimates, uncapped call versus transaction-cap behavior, creation return bytes, state/code overrides including full storage replacement, real traceCall steps and a signed two-transaction historical prefix replay with exact receipt/trace gas and canonical non-mutation. Strict full input parsing retains access lists, dynamic fees and authorizations. Affected Core/SDK/Node backend/RPC tests and local build pass. Full composed/mutation qualification, extended historical/system/application controls and simulationV1 remain pending; no API conformance claim is inferred.
+
 ## Method-specific gas consumer implementation (2026-11-19)
 
 Separate branch `feat/glamsterdam-rpc-gas` builds on Gas draft 83. Current production call execution omits intrinsic costs and creation; estimation reuses that call path; historical tracing replays direct calls without the canonical transaction/fork/system transition. These consumers need repair before API qualification. Open execution-apis issue 977 has no comments or adopted cross-client decision; merged Geth 35845 supplies a concrete development reference, including its corrected non-strict simulation reservation. Final API and trace schema acceptance remain open.

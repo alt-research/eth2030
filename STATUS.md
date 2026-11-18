@@ -1,3 +1,7 @@
+## Canonical system review and integration (2026-11-19)
+
+PR 84 qualifies actual-code history/beacon callbacks and explicit genesis assets against independent complete roots and Node recovery. Reviews 65–82 and 84 compose at `2f253d33`; 212 Go packages, 27 tagged Core/EIP packages, eleven affected race packages, vet/build pass. Published head: `b1a696d1`. Gas draft 83 remains separate; its nine new signed authorization controls and system margin pass locally, while full-suite/API/application and release gates stay open.
+
 ## Pivot proof repair and active gas draft (2026-11-19)
 
 PR 81 adds authenticated unchanged-account storage recovery; seven encrypted Node scenarios and nine detected mutations pass. Aggregate `c0df6062` passes 212 Go packages, 27 tagged Core/EIP packages, affected snap/scheduler/Node race/vet and build. Draft PR 83 separately implements current-text LIFO gas, with 22 clean signed matches and an expanded 23-case/high-state HTTP block checkpoint. Full suite/API/application/system and final release gates remain open; the draft is not integrated.

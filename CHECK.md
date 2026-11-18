@@ -1,3 +1,9 @@
+## Canonical system review tracking (2026-11-19)
+
+- [x] Record separate PR 84, canonical independent roots, actual Node consumers and mutations.
+- [x] Verify composed full/tagged/affected race/vet/build and published integration head.
+- [x] Retain Gas draft full-suite/API/application and full-client/release gates.
+
 ## Glamsterdam completion implementation (2026-11-18)
 
 ## Pivot proof and gas draft tracking (2026-11-19)

@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "c0df60625f45dab79f8940032aa7e4112e35d7d5",
+  "integration_tested_commit": "2f253d330465650bf360b0f6d2f8e8a836e928a4",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -215,8 +215,8 @@
       "pr": 83,
       "url": "https://github.com/alt-research/eth2030/pull/83",
       "branch": "feat/glamsterdam-state-gas",
-      "commit": "d7feea448ce9c1a8e8c4b4467e515489d30629b2",
-      "remote_head": "d7feea448ce9c1a8e8c4b4467e515489d30629b2",
+      "commit": "f8dcfd47e3690151b8ed167bfcb95606a6d509fc",
+      "remote_head": "f8dcfd47e3690151b8ed167bfcb95606a6d509fc",
       "draft": true,
       "scope": "Current merged LIFO development baseline; native signed transitions and initial high-state block consumers",
       "tested_transaction_source_commit": "c6cdf15ac7377773a5c05d8948bf8b292dd8d700",
@@ -225,13 +225,26 @@
       "remaining": [
         "full suite semantic fixture/implementation repair",
         "RPC modes and traces",
-        "expanded authorization/application/system vectors",
+        "application and independent full-client vectors",
         "final gas choice and release qualification"
-      ]
+      ],
+      "local_authorization_checkpoint": "3db0a192",
+      "system_margin_composition": "eight/sixteen/seventeen actual new slots passed; independent 30M execution budget retained"
+    },
+    {
+      "pr": 84,
+      "url": "https://github.com/alt-research/eth2030/pull/84",
+      "branch": "fix/glamsterdam-system-transitions",
+      "commit": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "remote_head": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "scope": "Canonical pre-block actual-code transitions, explicit genesis assets, independent roots and Node recovery",
+      "tested_source_commit": "3355156e45b16f11eef2acea20931fd77ab70ab9",
+      "source_in_tested_integration": true,
+      "release_qualified": false
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
-  "integration_published_head": "953825986838a7da854ed30ea64b7eaf06c4f6d3",
-  "checked_at_utc": "2026-11-18 18:11:59 UTC",
-  "previous_integration_tested_commit": "20b1c1f310017edd83f050a366d0f8f72a4757ee"
+  "integration_published_head": "b1a696d15e304cc0a388869d355e44ccccab360e",
+  "checked_at_utc": "2026-11-18 19:26:42 UTC",
+  "previous_integration_tested_commit": "c0df60625f45dab79f8940032aa7e4112e35d7d5"
 }

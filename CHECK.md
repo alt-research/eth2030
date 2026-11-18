@@ -2,12 +2,14 @@
 
 ## eth version 72 sparse blob relay (2026-11-19)
 
-- [ ] Pin full EIP-8070/7594 and devp2p schemas plus Geth merged flat request-id fix.
-- [ ] Add actual negotiated version 72 announcements, elided pooled metadata and correlated cell exchange.
-- [ ] Stage signed sparse metadata/cells under resource bounds; authenticate every cell and reconstruct before ordinary pool promotion.
-- [ ] Wire provider/sampler selection, two-provider threshold, custody plus random extra, custody expansion and eager building.
-- [ ] Consume actual FCU custody updates and implement getBlobsV4 cell/proof readback.
-- [ ] Verify encrypted SDK/Node consumers, invalid/unrequested data, recovery and independent reconstruction; build/test/mutate and publish a separate PR.
+- [x] Pin full EIP-8070/7594 and devp2p schemas plus Geth merged flat request-id fix.
+- [x] Add actual negotiated version 72 announcements, elided pooled metadata and correlated cell exchange.
+- [x] Stage signed sparse metadata/cells under resource bounds; authenticate every cell and reconstruct before ordinary pool promotion.
+- [x] Wire provider/sampler selection, two-provider threshold, custody plus random extra, custody expansion and eager building.
+- [x] Consume actual FCU custody updates and implement getBlobsV4 cell/proof readback.
+- [x] Verify encrypted SDK/Node consumers, invalid/unrequested data, recovery and independent reconstruction; build/test/mutate and prepare a separate PR.
+
+- [ ] Publish the independent feature review and record the composed result.
 
 ## snap/2 BAL state catch-up (2026-11-18)
 
@@ -23,7 +25,6 @@
 - [x] Correlate and validate received BALs before restoring verified historical data.
 - [x] Verify affected network/chain/node/consumer paths and race/build; prepare the separate feature review.
 
-# Lean4 Verification Check-list
 
 ## EIP-8282 builder execution requests (2026-11-18)
 
@@ -103,7 +104,6 @@
 - [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
 - [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
 
-# Lean4 Verification Check-list
 
 ## Empty committed historical BAL recovery (2026-11-18)
 
@@ -131,7 +131,6 @@
 - [x] Correct consensus emission and canonical Amsterdam activation without a new toggle.
 - [x] Verify affected consumers/roots and build; prepare a separate PR with the 8246 lifecycle gate explicit.
 
-# Lean4 Verification Check-list
 
 - [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
 - [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.
@@ -139,7 +138,6 @@
 - [x] Correlate and validate received BALs before restoring verified historical data.
 - [x] Verify affected network/chain/node/consumer paths and race/build; prepare the separate feature review.
 
-# Lean4 Verification Check-list
 
 - [x] Inspect the production HTTP/backend route and merged execution-apis #950 semantics.
 - [x] Add failing real-backend HTTP storage-discovery and non-mutation regressions.
@@ -147,34 +145,29 @@
 - [x] Verify returned access items, reverted touches, creation, historical state and affected packages/build.
 - [x] Prepare this major RPC feature for its separate PR.
 
-# Lean4 Verification Check-list
 
 - [x] Read old local and pinned current EIP-7997, including deployment and no-fork-check rules.
 - [x] Add canonical address/runtime/nonce and actual CREATE2/value tests plus a no-fork-injection regression.
 - [x] Replace the obsolete factory fixture and remove execution/builder fork-time state mutation.
 - [x] Qualify affected paths and prepare the separate feature review.
 
-# Lean4 Verification Check-list
 
 - [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
 - [x] Reproduce the obsolete availability window through the real Engine body consumer.
 - [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
 - [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
 
-# Lean4 Verification Check-list
 
 - [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
 - [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.
 - [x] Correct fork-gated limits and reject oversized creation transactions before mutation.
 - [x] Verify affected packages, build and prepare the separate feature review.
 
-# Lean4 Verification Check-list
 
 - [x] Reproduce nonzero-log consensus receipt roundtrip failure.
 - [x] Recompute omitted wire blooms from decoded logs, not from an empty receipt bloom.
 - [x] Verify codecs/consumers/build and prepare the scoped fix review.
 
-# Lean4 Verification Check-list
 
 - [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
 - [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.
@@ -182,7 +175,6 @@
 - [ ] Deliver each major feature in a separate scoped branch and PR, retaining test evidence.
 - [ ] Close native, consumer, independent-client, recovery and release gates with observed evidence.
 
-# Lean4 Verification Check-list
 
 ## Glamsterdam combined feature qualification (2026-11-18)
 

@@ -1,3 +1,9 @@
+## Glamsterdam canonical deterministic factory (2026-11-18)
+
+Branch `feat/glamsterdam-factory` uses the EIP-7997 factory at 0x4e59b44847b379578588920cA78FbF26c0B4956C with its exact 69-byte runtime and nonce 1 for explicit genesis/test state. Removed block-processor and both builder paths that injected a different contract at a fork. Private chains must include the canonical alloc or deploy it with an ordinary transaction before activation; no fork existence check or new switch is added.
+
+Canonical address/runtime/nonce and actual CREATE2/value/return-byte/collision tests plus a no-fork-injection regression first failed for the intended reasons and now pass. Preserved legacy private BLS 0x12 without changing the canonical 0x0b..0x11 map. Core/Engine/node/eiptest suites and full build passed. This implements the canonical factory path; live network/genesis tooling qualification remains in the broader integration gates.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

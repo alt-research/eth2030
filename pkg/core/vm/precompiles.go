@@ -568,8 +568,9 @@ var PrecompiledContractsGlamsterdan = map[types.Address]PrecompiledContract{
 	types.BytesToAddress([]byte{0x0f}): &bls12G2Mul{},
 	types.BytesToAddress([]byte{0x10}): &bls12G2MSM{},
 	types.BytesToAddress([]byte{0x11}): &bls12Pairing{},
-	// EIP-7997: address 0x12 is now the deterministic CREATE2 factory (system contract).
-	// bls12MapFpToG1 removed from precompile set; calls to 0x12 run stored EVM bytecode.
+	// Preserve the legacy native BLS layout when explicitly selected.
+	// standardBLSPrecompiles removes 0x12/0x13 for canonical Ethereum.
+	types.BytesToAddress([]byte{0x12}): &bls12MapFpToG1{},
 	types.BytesToAddress([]byte{0x13}): &bls12MapFp2ToG2{},
 	// EIP-7212: P256VERIFY precompile.
 	types.BytesToAddress([]byte{0x01, 0x00}): &p256Verify{},

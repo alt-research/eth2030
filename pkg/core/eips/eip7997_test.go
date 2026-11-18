@@ -7,9 +7,9 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
-// TestFactoryAddress verifies the factory address is at 0x12.
+// TestFactoryAddress verifies the established deterministic factory address.
 func TestFactoryAddress(t *testing.T) {
-	expected := types.HexToAddress("0x0000000000000000000000000000000000000012")
+	expected := types.HexToAddress("0x4e59b44847b379578588920cA78FbF26c0B4956C")
 	if FactoryAddress != expected {
 		t.Errorf("FactoryAddress = %s, want %s", FactoryAddress.Hex(), expected.Hex())
 	}

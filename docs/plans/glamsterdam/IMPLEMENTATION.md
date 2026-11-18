@@ -20,6 +20,7 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | [PR #67](https://github.com/alt-research/eth2030/pull/67) — EIP-7997 | Canonical runtime/address/nonce and no fork-time mutation | Submitted; actual generated genesis/control remains open |
 | [PR #66](https://github.com/alt-research/eth2030/pull/66) — BAL retention | Published slot-based window, body preservation and conservative fallback | Submitted; complete cold-sync/physical-GC gates remain open |
 | [PR #68](https://github.com/alt-research/eth2030/pull/68) — RPC discovery | Actual HTTP/backend discovery, historical/reverted/creation cases and non-mutation | Submitted; final gas/schema qualification remains open |
+| [PR #75](https://github.com/alt-research/eth2030/pull/75) — independent gas corpus | 22 signed scenarios under Osaka/Amsterdam, explicit reference CPSB and retained per-field mismatches | Submitted; transaction-transition evidence only; final gas/application/block/API gates remain open |
 | Gas/state execution | Selected coherent intrinsic/runtime/state/refund/floor model; upstream choice gate retained | Pending |
 | [PR #69](https://github.com/alt-research/eth2030/pull/69) — eth/69–71 | Negotiated protocols, canonical wire, correlated historical consumers and encrypted-socket checks | Submitted; independent full-client cold-sync gates remain open |
 | [PR #70](https://github.com/alt-research/eth2030/pull/70) — receipt bloom | Rebuild omitted wire bloom from actual nonzero logs | Submitted; included in branches 69/71 for standalone tests |
@@ -72,3 +73,12 @@ The 33-task plan remains the acceptance contract. A native fix, a passing develo
 | GL-060–063 | The combined development gate passes. Independent gas/current-text corpus, application compatibility, real multi-client devnets, restart/cold-sync, measured limits and release qualification remain open. |
 
 Next implementation order: finish the compatible fixture/independent current-text gas corpus; audit actual CL adoption of already merged transitions; implement the settled 8282/request and eth/72/snap/2 production flows in their own branches; complete the chosen gas/API and authentication model when the corresponding upstream inputs are recorded. Continue independent work while those final decisions remain unsettled. No final release date or completion percentage is inferred from PR count.
+
+
+## Signed current-text gas follow-up
+
+The extended integration at `24e0bd542ebb36676ab6831a33bfb43cd4d6f2db` passes all 211 tested Go packages and the local build. PR 75's independent command runs 44 comparisons with frozen signed transactions, full pre-state/config/context and an unmodified Geth v1.17.10 reference. The clean [aggregate report](../../audits/glamsterdam-gas-2026-11-18/INTEGRATED.md) retains 19/22 Amsterdam candidate mismatches. These are not converted into passing parity tests. It fixes the reference-context omission of CPSB in the diagnostic itself and uses a failing mutation to prove that omission is detected.
+
+The remaining five Osaka high-gas comparisons are explicitly transaction-transition observations. Native outer block validation already checks the Osaka limit; that outer layer is not invoked by this corpus, so these comparisons do not prove a production block-validation bypass. The ordinary creation/destruction and value-log controls demonstrate the effect of PRs 72 and 71. Pool/block/RPC, multi-transaction, 7702/application and full-client gates remain uncovered.
+
+The final gas alternatives were rechecked through GitHub on 2026-11-18 at this follow-up: EIPs PR 12581 remains open/unmerged at `2ba9176f360c3c95641c6c1b5428ac3113335c4b`, and PR 12582 remains open/unmerged at `19d788c896ad35fc53dc5721dbe70ed91cb40069`. The pinned merged LIFO text remains the measurement baseline; this does not close the final release-model decision.

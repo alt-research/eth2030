@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
+  "integration_tested_commit": "24e0bd542ebb36676ab6831a33bfb43cd4d6f2db",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -112,6 +112,20 @@
       "release_qualified": false,
       "tested_source_commit": "61a245e30458258480d2d5986e81b5970cab4344",
       "source_in_tested_integration": true
+    },
+    {
+      "pr": 75,
+      "url": "https://github.com/alt-research/eth2030/pull/75",
+      "branch": "test/glamsterdam-gas-corpus",
+      "commit": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "remote_head": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "scope": "Independent signed current-text gas corpus",
+      "release_qualified": false,
+      "tested_source_commit": "54b2cf8023e56c9a2c21ecb54a383ec2cede1c1c",
+      "source_in_tested_integration": true
     }
-  ]
+  ],
+  "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
+  "integration_published_head": "10a379c7fbc18f0ddd4a4c1913f50c62afd06502",
+  "checked_at_utc": "2026-11-18 11:15:45 UTC"
 }

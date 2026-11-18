@@ -1,3 +1,7 @@
+## Glamsterdam signed gas evidence and review 75 (2026-11-18)
+
+PR 75 adds an independent 44-comparison signed corpus. Aggregate source `24e0bd54` passes all 211 tested Go packages and build, while preserving 19/22 Amsterdam candidate mismatches and explicitly classifying the Osaka transition-only checks. Upstream gas alternatives remain open/unmerged. See [candidate evidence](docs/audits/glamsterdam-gas-2026-11-18/INTEGRATED.md) and [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). The whole program remains incomplete.
+
 ## Glamsterdam isolated reviews and aggregate qualification (2026-11-18)
 
 The completion program now has ten isolated implementation/qualification reviews (PRs 65–74), plus the plan/baseline PR 64. Combined source commit `96a1994c` passes all 210 tested Go packages, tagged Core/EIP tests, local build and affected vet/race checks. The program remains incomplete: coherent gas/API semantics, 8282, eth/72, snap/2, actual CL/builder and independent release qualification are open. See [implementation tracking](docs/plans/glamsterdam/IMPLEMENTATION.md) and [exact review heads](docs/plans/glamsterdam/feature-reviews.json).

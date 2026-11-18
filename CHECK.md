@@ -1,4 +1,11 @@
-## Glamsterdam eth/69-71 production protocols
+# Lean4 Verification Check-list
+
+- [x] Read both local legacy and pinned current EIP-7708, including fee/withdrawal exclusions and 8246 dependency.
+- [x] Add failing native fork-boundary, fees/self/zero-value, creation ordering and rollback regressions.
+- [x] Correct consensus emission and canonical Amsterdam activation without a new toggle.
+- [x] Verify affected consumers/roots and build; prepare a separate PR with the 8246 lifecycle gate explicit.
+
+# Lean4 Verification Check-list
 
 - [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
 - [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.

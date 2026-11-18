@@ -1143,9 +1143,9 @@ func intrinsicGasGlamst(data []byte, isCreate bool, hasValue bool, toExists bool
 func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
 	// EIP-3860/7954: oversized creation input invalidates the transaction,
 	// before fees, nonce or the block gas pool are changed.
-	if msg.To == nil && config != nil && config.IsShanghai(header.Time) {
+	if msg.To == nil && msg.TxType != types.FrameTxType && msg.TxType != types.AATxType && config != nil && config.IsShanghai(header.Time) {
 		limit := vm.MaxInitCodeSize
-		if config.IsGlamsterdan(header.Time) {
+		if config.Rules(header.Number, config.IsMerge(), header.Time).IsEIP7954 {
 			limit = vm.MaxInitCodeSizeGlamsterdam
 		}
 		if len(msg.Data) > limit {

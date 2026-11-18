@@ -622,12 +622,16 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 	// the local encoded-envelope policy. A 128 KiB initcode needs room
 	// for the signed transaction envelope after Glamsterdam.
 	maxEncodedSize := MaxTxSize
-	if tx.To() == nil {
+	if tx.To() == nil && tx.Type() != types.FrameTxType && tx.Type() != types.AATxType {
 		shanghai := pool.config.IsPrague || pool.config.IsGlamsterdan ||
 			(pool.frameConfig != nil && pool.frameConfig.IsShanghai(pool.frameTime))
 		if shanghai {
 			limit := vm.MaxInitCodeSize
-			if pool.config.IsGlamsterdan {
+			active7954 := pool.config.IsGlamsterdan
+			if pool.frameConfig != nil && pool.frameConfig.IsMerge() {
+				active7954 = pool.frameConfig.IsEIP7954(pool.frameTime)
+			}
+			if active7954 {
 				limit = vm.MaxInitCodeSizeGlamsterdam
 				maxEncodedSize = 2 * MaxTxSize
 			}

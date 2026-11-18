@@ -11,9 +11,11 @@ import (
 )
 
 func TestCreationAdmissionInitcodeBoundaries(t *testing.T) {
-	for _, cfg := range []*config.ChainConfig{config.TestConfig, config.TestConfigGlamsterdan} {
+	pre := *config.TestConfig
+	pre.AmsterdamTime = nil
+	for _, cfg := range []*config.ChainConfig{&pre, config.TestConfig, config.TestConfigGlamsterdan} {
 		limit := 49152
-		if cfg.IsGlamsterdan(100) {
+		if cfg.IsEIP7954(100) {
 			limit = 131072
 		}
 		for _, size := range []int{limit, limit + 1} {

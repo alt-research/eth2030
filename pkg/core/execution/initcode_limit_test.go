@@ -12,14 +12,17 @@ import (
 )
 
 func TestCreationTransactionInitcodeLimit(t *testing.T) {
+	pre := *config.TestConfig
+	pre.AmsterdamTime = nil
 	for _, tc := range []struct {
 		name  string
 		cfg   *config.ChainConfig
 		size  int
 		valid bool
 	}{
-		{"pre_limit", config.TestConfig, 49152, true}, {"pre_over", config.TestConfig, 49153, false},
-		{"amsterdam_limit", config.TestConfigGlamsterdan, 131072, true}, {"amsterdam_over", config.TestConfigGlamsterdan, 131073, false},
+		{"pre_limit", &pre, 49152, true}, {"pre_over", &pre, 49153, false},
+		{"amsterdam_limit", config.TestConfigGlamsterdan, 131072, true},
+		{"amsterdam_without_private_gas_gate", config.TestConfig, 131072, true}, {"amsterdam_over", config.TestConfigGlamsterdan, 131073, false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db := state.NewMemoryStateDB()

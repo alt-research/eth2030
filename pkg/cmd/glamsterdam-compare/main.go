@@ -27,6 +27,7 @@ import (
 	gethvm "github.com/ethereum/go-ethereum/core/vm"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/holiman/uint256"
 )
 
 const blockGas = 150_000_000
@@ -43,6 +44,7 @@ type scenario struct {
 	Value                 int64
 	Creation, NewTarget   bool
 	ZeroBaseFee           bool
+	AuthorizationCase     string
 	Code, Data, ChildCode []byte
 	DelegateCode          []byte
 	InitialSlot           uint64
@@ -135,6 +137,16 @@ func scenarios() []scenario {
 
 	return []scenario{
 		{Name: "existing_zero_value", Gas: 100000},
+		{Name: "authorization_existing", Gas: 500000, AuthorizationCase: "existing"},
+		{Name: "authorization_new", Gas: 500000, AuthorizationCase: "new"},
+		{Name: "authorization_preexecution_oog", Gas: 50000, AuthorizationCase: "preexecution_oog"},
+		{Name: "authorization_frame_revert", Gas: 500000, AuthorizationCase: "revert"},
+		{Name: "authorization_bad_nonce_warms", Gas: 500000, AuthorizationCase: "bad_nonce"},
+		{Name: "authorization_max_nonce_not_warm", Gas: 500000, AuthorizationCase: "max_nonce"},
+		{Name: "authorization_clear_reset_once", Gas: 500000, AuthorizationCase: "clear_reset"},
+		{Name: "authorization_existing_indicator_reset", Gas: 500000, AuthorizationCase: "existing_indicator"},
+		{Name: "authorization_sender", Gas: 500000, AuthorizationCase: "sender"},
+
 		{Name: "delegated_call", Gas: 500000, Code: callSequence(0xf1, true, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
 		{Name: "delegated_callcode", Gas: 500000, Code: callSequence(0xf2, true, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
 		{Name: "delegated_delegatecall", Gas: 500000, Code: callSequence(0xf4, false, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
@@ -209,12 +221,85 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	if len(sc.DelegateCode) > 0 {
 		pre[delegate.Hex()] = bridge.PreAccount{Balance: big.NewInt(1), Nonce: 1, Code: bytes.Clone(sc.DelegateCode)}
 	}
+	var authority types.Address
+	var authorizations []gethtypes.SetCodeAuthorization
+	if sc.AuthorizationCase != "" {
+		authorityKey, err := gethcrypto.HexToECDSA(strings.Repeat("0", 63) + "2")
+		if err != nil {
+			return comparison{}, err
+		}
+		authority = types.Address(gethcrypto.PubkeyToAddress(authorityKey.PublicKey))
+		if sc.AuthorizationCase == "sender" {
+			authorityKey = key
+			authority = sender
+		}
+		if sc.AuthorizationCase != "new" && authority != sender {
+			pre[authority.Hex()] = bridge.PreAccount{Balance: big.NewInt(5)}
+		}
+		pre[delegate.Hex()] = bridge.PreAccount{Balance: big.NewInt(1), Nonce: 1, Code: []byte{0}}
+		if sc.AuthorizationCase == "revert" {
+			account := pre[delegate.Hex()]
+			account.Code = []byte{0x5f, 0x5f, 0xfd}
+			pre[delegate.Hex()] = account
+		}
+		if sc.AuthorizationCase == "existing_indicator" {
+			account := pre[authority.Hex()]
+			account.Code = types.AddressToDelegation(delegate)
+			pre[authority.Hex()] = account
+		}
+		tuples := []struct {
+			nonce  uint64
+			target types.Address
+		}{{0, delegate}}
+		switch sc.AuthorizationCase {
+		case "sender":
+			tuples[0].nonce = 1
+		case "bad_nonce":
+			tuples[0].nonce = 1
+		case "max_nonce":
+			tuples[0].nonce = ^uint64(0)
+		case "clear_reset":
+			tuples = append(tuples, struct {
+				nonce  uint64
+				target types.Address
+			}{1, types.Address{}}, struct {
+				nonce  uint64
+				target types.Address
+			}{2, delegate})
+		case "existing_indicator":
+			tuples = []struct {
+				nonce  uint64
+				target types.Address
+			}{{0, types.Address{}}, {1, delegate}}
+		}
+		for _, tuple := range tuples {
+			auth, err := gethtypes.SignSetCode(authorityKey, gethtypes.SetCodeAuthorization{ChainID: *uint256.NewInt(1337), Address: gethcommon.Address(tuple.target), Nonce: tuple.nonce})
+			if err != nil {
+				return comparison{}, err
+			}
+			authorizations = append(authorizations, auth)
+		}
+		if sc.AuthorizationCase == "bad_nonce" || sc.AuthorizationCase == "max_nonce" {
+			account := pre[target.Hex()]
+			account.Code = append([]byte{0x73}, authority[:]...)
+			account.Code = append(account.Code, 0x31, 0x50, 0)
+			pre[target.Hex()] = account
+		}
+	}
 	var to *gethcommon.Address
 	if !sc.Creation {
 		addr := gethcommon.Address(target)
 		to = &addr
 	}
 	tx := gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: big.NewInt(1337), To: to, Gas: sc.Gas, GasFeeCap: big.NewInt(2), GasTipCap: big.NewInt(1), Value: big.NewInt(sc.Value), Data: sc.Data, AccessList: sc.AccessList})
+	if sc.AuthorizationCase != "" {
+		recipient := gethcommon.Address(authority)
+		if sc.AuthorizationCase == "bad_nonce" || sc.AuthorizationCase == "max_nonce" {
+			recipient = gethcommon.Address(target)
+		}
+		tx = gethtypes.NewTx(&gethtypes.SetCodeTx{ChainID: uint256.NewInt(1337), To: recipient, Gas: sc.Gas, GasFeeCap: uint256.NewInt(2), GasTipCap: uint256.NewInt(1), Value: uint256.NewInt(uint64(sc.Value)), Data: sc.Data, AccessList: sc.AccessList, AuthList: authorizations})
+	}
+
 	tx, err = gethtypes.SignTx(tx, gethtypes.LatestSignerForChainID(big.NewInt(1337)), key)
 	if err != nil {
 		return comparison{}, err
@@ -272,6 +357,10 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	if len(sc.DelegateCode) > 0 {
 		addresses = append(addresses, delegate)
 	}
+	if sc.AuthorizationCase != "" {
+		addresses = append(addresses, authority, delegate)
+	}
+
 	native.Accounts = readAccounts(addresses, ndb.Exist, ndb.GetBalance, ndb.GetNonce, ndb.GetCode, ndb.GetState)
 	root, err := ndb.Commit()
 	if err != nil {

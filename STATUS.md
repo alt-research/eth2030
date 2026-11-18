@@ -1,3 +1,7 @@
+## Glamsterdam signed candidate-gas integration checkpoint (2026-11-18)
+
+The isolated feature integration passes the full Go suite, including the new differential command. The actual 44-case signed corpus preserves 19/22 Amsterdam candidate mismatches and separately classifies Osaka transition-versus-outer-validator checks; it does not claim release parity. See [integrated observations](docs/audits/glamsterdam-gas-2026-11-18/INTEGRATED.md). All remaining gas/CL/network/release gates remain open.
+
 ## Glamsterdam independent gas corpus (2026-11-18)
 
 Added an offline signed-transaction differential command with 22 scenarios across Osaka controls and a pinned Amsterdam reference (44 comparisons). Reports preserve complete inputs, gas dimensions, validity versus included failure, logs and final state. The independent context explicitly includes CPSB; a targeted mutation proves its sanity check detects missing state creation pricing. Scoped tests/race/vet and local build pass. This is mismatch evidence, not release parity; see [verification](docs/verification/glamsterdam-gas-corpus-20261118.md).

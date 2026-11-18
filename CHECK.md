@@ -103,10 +103,10 @@
 
 ## Glamsterdam combined feature qualification (2026-11-18)
 
-- [ ] Merge only the isolated Glamsterdam review branches into a local integration branch.
-- [ ] Resolve owned overlapping changes and retain every verification boundary.
-- [ ] Run the combined Go suite, tagged integration tests, build and affected race/vet checks.
-- [ ] Record exact branch heads, review links and remaining program gates without claiming release completion.
+- [x] Merge only the isolated Glamsterdam review branches into a local integration branch.
+- [x] Resolve owned overlapping changes and retain every verification boundary.
+- [x] Run the combined Go suite, tagged integration tests, build and affected race/vet checks.
+- [x] Record exact branch heads, review links and remaining program gates without claiming release completion.
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

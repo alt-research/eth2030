@@ -3,10 +3,10 @@
 ## Glamsterdam independent current-text gas corpus (2026-11-18)
 
 - [x] Freeze signed transactions, complete pre-state, fork/config and reference-client version.
-- [x] Execute identical inputs through native admission/execution and the unmodified Geth Amsterdam transition.
+- [x] Execute identical inputs through native transaction-level execution and the unmodified Geth Amsterdam transition.
 - [x] Record invalid versus included failure, gas dimensions, logs and exact final account/state results.
 - [x] Verify pre-Amsterdam controls, archive candidate mismatches and build locally.
-- [ ] Publish the separate gas-corpus review.
+- [x] Publish the separate gas-corpus review (PR 75).
 
 ## Glamsterdam header and slot independent qualification (2026-11-18)
 

@@ -1,0 +1,165 @@
+{
+  "enclave": "eth2030-paymaster-history-953c30a5",
+  "source": "cb1eb732c5b9caf4d90994562fa1e7d5ea08028b",
+  "package": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
+  "enclave_id": "244712de41524455825b0422ec5f511e",
+  "nodes": {
+    "vc-1-geth-lighthouse": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:f70314e025befa89eaa1c2ed04a541d5222ea3747cecd8ae8395fba84cf389db",
+      "memory": 1024000000
+    },
+    "vc-2-geth-lighthouse": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:f70314e025befa89eaa1c2ed04a541d5222ea3747cecd8ae8395fba84cf389db",
+      "memory": 1024000000
+    },
+    "cl-2-lighthouse-geth": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:f70314e025befa89eaa1c2ed04a541d5222ea3747cecd8ae8395fba84cf389db",
+      "memory": 2048000000
+    },
+    "cl-1-lighthouse-geth": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:f70314e025befa89eaa1c2ed04a541d5222ea3747cecd8ae8395fba84cf389db",
+      "memory": 2048000000
+    },
+    "el-2-geth-lighthouse": {
+      "image": "eth2030:frame-control",
+      "image_id": "sha256:cb2778450e650d0e76cf549fed4d1b8d3015b17134da58650292440fc71bbe2c",
+      "memory": 2048000000
+    },
+    "el-1-geth-lighthouse": {
+      "image": "eth2030:frame-control",
+      "image_id": "sha256:cb2778450e650d0e76cf549fed4d1b8d3015b17134da58650292440fc71bbe2c",
+      "memory": 2048000000
+    }
+  },
+  "execution_source": "387c7a6d",
+  "consensus_source": "a05a56de03471aeffcdf3dbadd965af9da6462bf",
+  "sponsored": {
+    "list_slot": 64,
+    "proposal_slot": 65,
+    "committee_el": 1,
+    "proposer_el": 2,
+    "transaction": "0x50eceea816a34b2ec7493a02a8e00765982d0ee0489d464db921cc2376477653",
+    "raw_transaction": "0x06f901248330182480947e5f4552091a69125d5dfcb7b8c2659029395bdff853ca010280c48203e8808080e50101940000000000000000000000000000000000007300c78227108302cd308084634b01e8e10280940000000000000000000000000000000000007100c782753083017e808080f8a4f846018080b84100ba1eec7d6e044914c8e41f4bca64d14380069a8717cf55ae2d6bed7f28589b1b7d6b443bf8a24006fdd73c3295950f8038e2fca8b28b0101b41340071cf086b5f85a01942b5ad5c4795c026514f8317c7a215e218dccd6cf80b841005e00dbdee219caeec703e14f3164250d4eaecef586b411f4d33932cad11de1352079023d3e070f6412ad9b4f0a6b1d5a31096b99f1efc73ae715fe9c8c820583cd870138fef7357044843b9aca00c0",
+    "signed_inclusion_list": {
+      "message": {
+        "slot": "64",
+        "validator_index": "29",
+        "dependent_root": "0x7e60f110f355b130ed21fca3cc0630d37f3621aad9c53b5c4110ab31f9ec9a79",
+        "transactions": [
+          "0x06f901248330182480947e5f4552091a69125d5dfcb7b8c2659029395bdff853ca010280c48203e8808080e50101940000000000000000000000000000000000007300c78227108302cd308084634b01e8e10280940000000000000000000000000000000000007100c782753083017e808080f8a4f846018080b84100ba1eec7d6e044914c8e41f4bca64d14380069a8717cf55ae2d6bed7f28589b1b7d6b443bf8a24006fdd73c3295950f8038e2fca8b28b0101b41340071cf086b5f85a01942b5ad5c4795c026514f8317c7a215e218dccd6cf80b841005e00dbdee219caeec703e14f3164250d4eaecef586b411f4d33932cad11de1352079023d3e070f6412ad9b4f0a6b1d5a31096b99f1efc73ae715fe9c8c820583cd870138fef7357044843b9aca00c0"
+        ]
+      },
+      "signature": "0xb2f236805e4185299b17cf6dc1b121770cc529199b3e44fdda3086f8c47d62a4dbb6e29091100378f9deb02a96752e51193e54259a2759c1b8e6dfa3e9ee2abcfe4599ef291e1608fad19191b196ea6849c7bba5d87b02eba23bfbd6455fc420"
+    },
+    "payload_bid": {
+      "parent_block_hash": "0x550fbcd5548c27c5f4a13333269b6371a9c3ce251d3d118e55b943fd070a9088",
+      "parent_block_root": "0xf9403917aeda107dad2f421ff9f842fae7abe8c769e9fb8025d04b6d2fe3e3c6",
+      "block_hash": "0xfb7b4e3399b4c943fcca5fad11198b17dcc3094aec46f168159a8b02e730f09c",
+      "prev_randao": "0x971c049efebbc25e3263c79c9581dc4ed5f39eabde6bd61f831b6315f42dec4a",
+      "fee_recipient": "0x0000000000000000000000000000000000000000",
+      "gas_limit": "60000000",
+      "builder_index": "18446744073709551615",
+      "slot": "65",
+      "value": "0",
+      "execution_payment": "0",
+      "blob_kzg_commitments": [],
+      "execution_requests_root": "0x87b69a306c8e430d0857f7c4ac5e27cecffa1108d43c2e5df7388056fea7a423",
+      "inclusion_list_bits": "0x3838"
+    },
+    "block_hash": "0xfb7b4e3399b4c943fcca5fad11198b17dcc3094aec46f168159a8b02e730f09c",
+    "proposer": 220,
+    "finalized_on_both_pairs": true,
+    "frame": {
+      "receipt": {
+        "transactionHash": "0x50eceea816a34b2ec7493a02a8e00765982d0ee0489d464db921cc2376477653",
+        "transactionIndex": "0x0",
+        "blockHash": "0xfb7b4e3399b4c943fcca5fad11198b17dcc3094aec46f168159a8b02e730f09c",
+        "blockNumber": "0x41",
+        "from": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "to": null,
+        "gasUsed": "0x2244e",
+        "cumulativeGasUsed": "0x2244e",
+        "contractAddress": null,
+        "logs": [
+          {
+            "address": "0x0000000000000000000000000000000000007100",
+            "topics": [],
+            "data": "0x",
+            "blockNumber": "0x41",
+            "transactionHash": "0x50eceea816a34b2ec7493a02a8e00765982d0ee0489d464db921cc2376477653",
+            "transactionIndex": "0x0",
+            "blockHash": "0xfb7b4e3399b4c943fcca5fad11198b17dcc3094aec46f168159a8b02e730f09c",
+            "blockTimestamp": "0x6afd1e8f",
+            "logIndex": "0x0",
+            "removed": false
+          }
+        ],
+        "status": "0x1",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "type": "0x6",
+        "effectiveGasPrice": "0x3b9d6230",
+        "payer": "0x0000000000000000000000000000000000007300",
+        "frameResults": [
+          {
+            "status": "0x1",
+            "gasUsed": "0x64",
+            "stateGasUsed": "0x0"
+          },
+          {
+            "status": "0x1",
+            "gasUsed": "0x14fd",
+            "stateGasUsed": "0x0"
+          },
+          {
+            "status": "0x1",
+            "gasUsed": "0x3c7c",
+            "stateGasUsed": "0x17e80",
+            "logs": [
+              {
+                "address": "0x0000000000000000000000000000000000007100",
+                "topics": [],
+                "data": "0x",
+                "blockNumber": "0x41",
+                "transactionHash": "0x50eceea816a34b2ec7493a02a8e00765982d0ee0489d464db921cc2376477653",
+                "transactionIndex": "0x0",
+                "blockHash": "0xfb7b4e3399b4c943fcca5fad11198b17dcc3094aec46f168159a8b02e730f09c",
+                "blockTimestamp": "0x6afd1e8f",
+                "logIndex": "0x0",
+                "removed": false
+              }
+            ]
+          }
+        ]
+      },
+      "balances": {
+        "sender": [
+          100000000000000000000,
+          100000000000000000000
+        ],
+        "payer": [
+          100000000000000000000,
+          99999859610133288288
+        ]
+      },
+      "storage": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+      ],
+      "state_root": "0x1aaaceaa9cd6d89c952f9253d37689a9adcca2c3e42f798f4f1ea95a5fe51019",
+      "payer_charge": "140389866711712"
+    }
+  },
+  "remaining_containers": [],
+  "remaining_volumes": [],
+  "enclave_removed": true,
+  "outcome": {
+    "sponsored": "finalized on both peers",
+    "blob": "failed at public RPC: plain decoder rejected pooled wrapper field count 5",
+    "fresh_cl_history": "not reached",
+    "followup": "38bbcff5 fixes both production HTTP entrypoints and Engine BlobAndProofV2 DATA serialization; actual HTTP regression passes"
+  }
+}

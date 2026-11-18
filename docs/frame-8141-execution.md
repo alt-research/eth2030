@@ -102,3 +102,22 @@ history against an existing compatible EL and independent EL execution remain
 distinct gates. The pinned upstream source and the
 [Bogotá test release](https://github.com/ethereum/execution-specs/releases/tag/tests-bogota-devnet%40v2.0.0)
 make the additional EIP-8250/7906/8298 scope explicit.
+
+### Coded sponsorship live RPC follow-up
+
+The first coded-paymaster run (EL `387c7a6d`, Lighthouse `a05a56de`)
+finalized transaction `0x50eceea816a34b2ec7493a02a8e00765982d0ee0489d464db921cc2376477653`
+at slot 65 on both peers. Its subsequent blob submission failed because the
+production `EthAPI` decoded a pooled Frame wrapper as a plain transaction.
+The [failed-run record](verification/frame-8141-20261118-paymaster-rpc-failed.json)
+retains the successful sponsored result and complete enclave cleanup; it does
+not establish blob or fresh-CL acceptance.
+
+Both public transaction entrypoints now use the pooled decoder. The actual
+HTTP regression submits an incorrect final-cell KZG proof, checks rejection,
+then submits the corrected wrapper with the same transaction identity. It
+checks admission, retained sidecar, and all 128 ordered hex proofs obtained
+through authenticated `engine_getBlobsV2`. This also exposed the missing
+`BlobAndProofV2` Engine DATA JSON codec, which now follows the Osaka wire
+fields. The direct facade regression uses a real encoded legacy transaction
+and checks decoded identity rather than accepting arbitrary bytes.

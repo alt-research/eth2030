@@ -1,3 +1,7 @@
+## Actual CL Gloas transition repairs (2026-11-18)
+
+Two isolated Lighthouse fork reviews repair first-slot payload availability and independent builder/validator onboarding. Real-crypto regressions fail on the baseline; each branch passes 23 library tests/check/full lint. Their owned changes compose on the paired-client base with 24 passing library tests, cargo check and full workspace lint. See [client review tracking](docs/plans/glamsterdam/client-reviews.json) and [integration evidence](docs/verification/glamsterdam-fork-integration-20261118.md). Full devnet/release gates remain open.
+
 ## Glamsterdam signed gas evidence and review 75 (2026-11-18)
 
 PR 75 adds an independent 44-comparison signed corpus. Aggregate source `24e0bd54` passes all 211 tested Go packages and build, while preserving 19/22 Amsterdam candidate mismatches and explicitly classifying the Osaka transition-only checks. Upstream gas alternatives remain open/unmerged. See [candidate evidence](docs/audits/glamsterdam-gas-2026-11-18/INTEGRATED.md) and [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). The whole program remains incomplete.

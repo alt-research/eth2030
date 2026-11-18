@@ -1,0 +1,28 @@
+{
+  "repository": "jiayaoqijia/lighthouse",
+  "review_base": "8104a2467c59487e69aa95b6acedbaeea4a534a1",
+  "paired_client_base": "f85fa05b6df2b275b114050b01acd4381e621744",
+  "integration_tested_commit": "e6ff51d525d7061c473282d8dc05acca43be2e42",
+  "integration_published_head": "b2905797756f61d6cf54412d23a7ce26833bb77b",
+  "status": "24 library tests, cargo check and full workspace lint passed; full release/devnet open",
+  "reviews": [
+    {
+      "pr": 1,
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/1",
+      "branch": "fix/glamsterdam-first-slot",
+      "head": "9b27d866c2c747abb28b760a8c52c0602c8d0d1f",
+      "source_commit": "9302ab9ae6e886ae6f1899294ed7fae89da400e8",
+      "scope": "Gloas first-slot payload availability",
+      "release_qualified": false
+    },
+    {
+      "pr": 2,
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/2",
+      "branch": "fix/glamsterdam-builder-onboarding",
+      "head": "b57d54d45ec45b47d940a6689a2f2f8fb39b8f8a",
+      "source_commit": "d93ce032674c0d27588c7692b420310237e8e258",
+      "scope": "Independent builder/validator fork onboarding",
+      "release_qualified": false
+    }
+  ]
+}

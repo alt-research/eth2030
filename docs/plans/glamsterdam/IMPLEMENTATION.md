@@ -82,3 +82,15 @@ The extended integration at `24e0bd542ebb36676ab6831a33bfb43cd4d6f2db` passes al
 The remaining five Osaka high-gas comparisons are explicitly transaction-transition observations. Native outer block validation already checks the Osaka limit; that outer layer is not invoked by this corpus, so these comparisons do not prove a production block-validation bypass. The ordinary creation/destruction and value-log controls demonstrate the effect of PRs 72 and 71. Pool/block/RPC, multi-transaction, 7702/application and full-client gates remain uncovered.
 
 The final gas alternatives were rechecked through GitHub on 2026-11-18 at this follow-up: EIPs PR 12581 remains open/unmerged at `2ba9176f360c3c95641c6c1b5428ac3113335c4b`, and PR 12582 remains open/unmerged at `19d788c896ad35fc53dc5721dbe70ed91cb40069`. The pinned merged LIFO text remains the measurement baseline; this does not close the final release-model decision.
+
+
+## Actual Lighthouse fork-transition repairs
+
+Source audit of the current paired client (`f85fa05b6`) and upstream candidate `8104a2467` reproduced two missing merged-rule adoptions. They are now separate client-repository reviews:
+
+- [Lighthouse fork PR 1](https://github.com/jiayaoqijia/lighthouse/pull/1): unset the Gloas fork slot's payload availability; real scheduled slot transitions cover the ordinary and wrapped historical ring.
+- [Lighthouse fork PR 2](https://github.com/jiayaoqijia/lighthouse/pull/2): independent builder/validator keys, credential-first funding, exact pending-deposit retention and full/cold/seeded-cache post-state equivalence, following merged consensus-specs PR 5736.
+
+Each branch passes its 23 library tests, cargo check, formatting and complete workspace make lint-fix. Cherry-picking only the owned changes onto the actual paired-client base gives `e6ff51d52`, which passes 24 library tests, cargo check, formatting and full workspace lint-fix. [Combined evidence](../../verification/glamsterdam-fork-integration-20261118.md) and [exact client reviews](client-reviews.json) retain the source boundaries. The original CL checkout is unchanged; no upstream PR was merged.
+
+GL-050 is therefore partially implemented and tested for these transitions. This does not close actual multi-client devnets, bid/authentication choices, optimistic invalidation, payment invariants, complete SSZ/proofs, partial-message recovery or the EIP-8282 end-to-end contract pipeline. Existing CL builder-request containers, processing and Gloas partial-group version 0x01 are source-present, with remaining behavior gates explicitly unqualified.

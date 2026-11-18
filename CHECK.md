@@ -5,7 +5,7 @@
 - [x] Compare native canonical header RLP/hash against go-ethereum v1.17.10.
 - [x] Drive nondefault slots through HTTP FCU/build/import and observe SLOTNUM state and block RPC.
 - [x] Match historical Engine BAL bytes to the independent decoded header commitment.
-- [ ] Run affected tests and local build; submit the isolated qualification PR.
+- [x] Run affected tests and local build; submit the isolated qualification PR (PR 74).
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

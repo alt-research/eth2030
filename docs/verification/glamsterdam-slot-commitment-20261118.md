@@ -1,6 +1,6 @@
 # Glamsterdam slot commitment and independent header verification
 
-Branch `feat/glamsterdam-slot-commitment`, based on `origin/master` `38ea9259`.
+[PR 74](https://github.com/alt-research/eth2030/pull/74), branch `feat/glamsterdam-slot-commitment`, based on `origin/master` `38ea9259`.
 
 The requirements follow [EIP-7843](https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7843.md) and [EIP-7928](https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7928.md). Reference encoder/decoder: the existing `github.com/ethereum/go-ethereum v1.17.10` module, with its independent Header type, generated RLP encoder and block-hash implementation.
 

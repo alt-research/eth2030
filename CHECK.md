@@ -1,3 +1,10 @@
+## Glamsterdam EIP-7954 contract limits
+
+- [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
+- [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.
+- [x] Correct fork-gated limits and reject oversized creation transactions before mutation.
+- [x] Verify affected packages, build and prepare the separate feature review.
+
 # Lean4 Verification Check-list
 
 - [x] Reproduce nonzero-log consensus receipt roundtrip failure.

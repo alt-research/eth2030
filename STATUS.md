@@ -1,3 +1,9 @@
+## Glamsterdam EIP-7954 limits (2026-11-18)
+
+Branch `feat/glamsterdam-contract-limits` updates deployed/initcode limits to the published 64/128 KiB EIP-7954 revision, retaining pre-fork limits. Activation follows canonical Amsterdam independently of the private gas-repricing timestamp. Oversized Shanghai+ creation transactions are rejected before fees/nonce/gas-pool mutation, and post-fork pool envelope policy leaves space for a valid maximum-size initcode transaction.
+
+New CREATE/CREATE2 exact-limit tests and transaction/pool boundary regressions first failed on the baseline for the intended limits/admission reasons, then passed. Affected core/txpool/Engine/node/RPC/eiptest suites, local full build and targeted vet passed. This closes the size/admission portion of GL-030; the coherent gas model, complete 8024 qualification and independent-client release gates remain separate work. [Evidence](docs/verification/glamsterdam-7954-20261118.md).
+
 ## Modern receipt bloom restoration (2026-11-18)
 
 Branch `fix/eth-receipt-bloom` repairs a receipt-root interoperability defect: eth/69+ omits bloom on the wire, but the decoder OR-ed the newly constructed receipt's zero bloom instead of computing it from decoded logs. It now uses LogsBloom. A nonzero-log typed receipt roundtrip first failed on baseline and now preserves exact consensus bytes. p2p/ethproto, eth and eiptest suites plus full build passed. The fix is also required by the negotiated protocol and transfer-log feature reviews.

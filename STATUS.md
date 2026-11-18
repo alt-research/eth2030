@@ -43,6 +43,10 @@
   key and balance, and the 96-slot PTC window. Changed state, root, epoch JSON,
   PTC preset and execution-requests-root controls are rejected. Removing the
   state-root comparison was detected by two behavioral regressions.
+- Original sponsored and blob BeaconBlock SSZ also roundtrip exactly; their
+  message roots match the finalized state's block-root window. Signatures,
+  execution identities, FOCIL bits and commitments match captured evidence.
+  Changed bits, commitments, signatures and unrelated EL identities fail.
 - CI now runs the standalone replay, its race regressions and all eleven
   Python control tests when either protocol code or the replay module changes.
 - The March local Dora codec also failed actual Gloas state decoding. It lacks

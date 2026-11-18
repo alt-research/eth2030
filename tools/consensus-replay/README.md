@@ -32,3 +32,12 @@ schema remains the default candidate for a CL that implements EIP-8015.
 Reference: [upstream state](https://github.com/ethpandaops/go-eth2-client/blob/v0.1.11/spec/gloas/beaconstate.go),
 [upstream Heze bid](https://github.com/ethpandaops/go-eth2-client/blob/v0.1.11/spec/heze/executionpayloadbid.go),
 [paired CL state](https://github.com/jiayaoqijia/lighthouse/blob/a05a56de03471aeffcdf3dbadd965af9da6462bf/consensus/types/src/state/beacon_state.rs).
+
+The fixture also retains the original sponsored slot-66 and blob slot-162
+signed BeaconBlock SSZ. The same command checks their exact byte roundtrips,
+message roots against the finalized state's `block_roots` window, original
+signatures against Beacon JSON, execution hashes, FOCIL bits and ordered blob
+commitments against the captured workload evidence. Tests independently change
+bits, commitment and signature bytes and reject an unrelated EL identity.
+This is codec and committed-history replay; the importing CL's BLS and KZG
+validation is qualified by the live control rather than reimplemented here.

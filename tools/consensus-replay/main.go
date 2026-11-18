@@ -24,6 +24,7 @@ type manifest struct {
 	Validators int            `json:"validators"`
 	Balances   []uint64       `json:"balances"`
 	PublicKeys []string       `json:"public_keys"`
+	Blocks     []blockRecord  `json:"blocks"`
 }
 
 type report struct {
@@ -106,21 +107,26 @@ func loadFixture(dir string) ([]byte, manifest, error) {
 	if err = json.Unmarshal(data, &m); err != nil {
 		return nil, m, err
 	}
-	f, err := os.Open(filepath.Join(dir, "heze-finalized.ssz.gz"))
+	raw, err := readCompressed(filepath.Join(dir, "heze-finalized.ssz.gz"))
+	return raw, m, err
+}
+
+func readCompressed(path string) ([]byte, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return nil, m, err
+		return nil, err
 	}
 	defer f.Close()
 	gz, err := gzip.NewReader(f)
 	if err != nil {
-		return nil, m, err
+		return nil, err
 	}
 	defer gz.Close()
 	raw, err := io.ReadAll(io.LimitReader(gz, 16*1024*1024+1))
 	if len(raw) > 16*1024*1024 {
-		return nil, m, errors.New("oversized fixture")
+		return nil, errors.New("oversized fixture")
 	}
-	return raw, m, err
+	return raw, err
 }
 
 func main() {
@@ -133,11 +139,18 @@ func main() {
 	if err == nil {
 		result, err = replay(raw, m)
 	}
+	if err == nil {
+		err = replayHistoricalBlocks(os.Args[1], raw, m)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if err = json.NewEncoder(os.Stdout).Encode(result); err != nil {
+	output := struct {
+		report
+		HistoricalBlocks int `json:"historical_blocks_verified"`
+	}{result, len(m.Blocks)}
+	if err = json.NewEncoder(os.Stdout).Encode(output); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

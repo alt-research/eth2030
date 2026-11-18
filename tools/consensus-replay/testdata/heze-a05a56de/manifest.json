@@ -757,5 +757,25 @@
         "signature": "0x91efa7cbb4c74c5a39e844911717f36d59d4fa4e33195bc3d802d667c5e01e484f38c636f292ace52c408b8aded5923f181ef9bdf34c9c479cd934192eee9ba0898626f76821e3fbedd911fc73af2871f7bf4f2498f8e96ee6ea733c1f8db305"
       }
     }
-  }
+  },
+  "blocks": [
+    {
+      "slot": 66,
+      "root": "0x33823794d59b64e7c94542e8844b4e37977e19f6f2705cc188235bc3839f0f03",
+      "execution_hash": "0x790967ce3299b2378622a09fe15563d4e01e73d84614ffad421fe29cf9ec138c",
+      "commitments": [],
+      "inclusion_list_bits": "0xd5d5",
+      "signature": "0xa7530bb98f5f19d7698cb57ac165780380e5f7ef2f037c87d673ef6226213f3b8543c081304d0e3b8cb0147b2cc1972103ff513dd9a16ac30db5d36a6d98b7260f40c658f8354ce3e10620af1b797ce75e6fe3a5769223c36e4d1e6d47a18f46"
+    },
+    {
+      "slot": 162,
+      "root": "0xf8b80404540a108a678efd73b75763efeeffcae31902eb0678f486d25ef7a1b5",
+      "execution_hash": "0xb29dc3d959de96a565e9c2e833e6092941f93cedf9163aa9214092879481fff3",
+      "commitments": [
+        "0xa0413c0dcafec6dbc9f47d66785cf1e8c981044f7d13cfe3e4fcbb71b5408dfde6312493cb3c1d30516cb3ca88c03654"
+      ],
+      "inclusion_list_bits": "0x0000",
+      "signature": "0xa4c7a5bef5e95e28fd1c8c1b31af66697124e039d7e1b3e8c2b35a97432df985d3c1d8b8dd6349611eadb5d06735e0300d4ab4b8c3cfa87cfcb152b559744366ee953c224be43322af81ca241f4585b3ba4965350c42b7ad252f9837934efa26"
+    }
+  ]
 }

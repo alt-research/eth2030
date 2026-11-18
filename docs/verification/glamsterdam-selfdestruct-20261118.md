@@ -1,6 +1,6 @@
 # Glamsterdam EIP-8246 lifecycle verification
 
-Implementation branch: `feat/glamsterdam-selfdestruct`, based on `origin/master` `38ea9259`.
+Implementation [PR 72](https://github.com/alt-research/eth2030/pull/72), branch `feat/glamsterdam-selfdestruct`, based on `origin/master` `38ea9259`.
 
 ## Specification and behavior
 

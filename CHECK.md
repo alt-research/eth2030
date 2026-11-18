@@ -6,7 +6,7 @@
 - [x] Journal same-transaction creations with nested rollback and preserve balances through finalization.
 - [x] Verify native CREATE/CREATE2, pre-funded targets, late credits, old contracts and reverted creation.
 - [x] Qualify BAL final-state changes and persistence; run affected tests and local build.
-- [ ] Publish the isolated implementation branch and update program evidence.
+- [x] Publish the isolated implementation branch and update program evidence (PR 72).
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

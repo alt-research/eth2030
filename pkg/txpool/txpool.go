@@ -584,6 +584,10 @@ func isDynamic(tx *types.Transaction) bool {
 
 // validateTx performs comprehensive validation of a transaction.
 func (pool *TxPool) validateTx(tx *types.Transaction) error {
+	return pool.validateTxData(tx, true)
+}
+
+func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return pool.validateFrame8141(tx)
 	}
@@ -898,7 +902,7 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 		}
 	}
 
-	if tx.Type() == types.BlobTxType {
+	if tx.Type() == types.BlobTxType && fullBlob {
 		return validateOrdinaryBlobSidecar(tx)
 	}
 	return nil

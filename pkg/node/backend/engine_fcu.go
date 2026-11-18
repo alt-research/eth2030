@@ -100,6 +100,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 		return payload.ForkchoiceUpdatedResult{}, engine.ErrInvalidPayloadAttributes
 	}
 
+	if relay, ok := b.node.EthHandler().(interface{ PrepareBlobBuilding() }); ok {
+		relay.PrepareBlobBuilding()
+	}
 	// Step 7b: payload attributes provided — start async block build.
 	slog.Debug("engine_forkchoiceUpdated: building payload",
 		"parentNum", headBlock.NumberU64(),

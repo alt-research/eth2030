@@ -60,6 +60,7 @@ type Handler struct {
 	// onBlockInserted is called after a P2P block is successfully inserted.
 	// Used to reset the tx pool so stale confirmed txs are evicted.
 	onBlockInserted func()
+	relay           *sparseRelay
 }
 
 // NewHandler creates a new eth protocol handler.
@@ -71,6 +72,7 @@ func NewHandler(chain Blockchain, txPool TxPool, networkID uint64) *Handler {
 		peers:     p2p.NewPeerSet(),
 		ethPeers:  make(map[string]*EthPeer),
 	}
+	h.relay = newSparseRelay(txPool)
 	if provider, ok := chain.(ReceiptProvider); ok {
 		h.receiptProvider = provider
 	}
@@ -134,7 +136,7 @@ func (h *Handler) announceTransactions(txs []*types.Transaction, excludeID strin
 		if id == excludeID {
 			continue
 		}
-		if err := ep.SendNewPooledTransactionHashes(txs); err != nil {
+		if err := h.sendRelayAnnouncement(ep, txs); err != nil {
 			log.Printf("eth: announce tx hashes to peer %s: %v", ep.ID(), err)
 		}
 	}
@@ -146,12 +148,12 @@ func (h *Handler) Chain() Blockchain {
 }
 
 // Protocol returns a p2p.Protocol that can be registered with the P2P server.
-func (h *Handler) Protocol() p2p.Protocol { return h.protocol(ETH71) }
+func (h *Handler) Protocol() p2p.Protocol { return h.protocol(ETH72) }
 
 // Protocols advertises all compatible wire versions; the P2P server chooses
 // the highest common version before any version-specific status is sent.
 func (h *Handler) Protocols() []p2p.Protocol {
-	return []p2p.Protocol{h.protocol(ETH71), h.protocol(ETH70), h.protocol(ETH69), h.protocol(ETH68)}
+	return []p2p.Protocol{h.protocol(ETH72), h.protocol(ETH71), h.protocol(ETH70), h.protocol(ETH69), h.protocol(ETH68)}
 }
 func (h *Handler) protocol(version uint32) p2p.Protocol {
 	length := uint64(17)
@@ -160,6 +162,9 @@ func (h *Handler) protocol(version uint32) p2p.Protocol {
 	}
 	if version >= ETH71 {
 		length = 20
+	}
+	if version >= ETH72 {
+		length = 22
 	}
 	return p2p.Protocol{Name: "eth", Version: uint(version), Length: length, Run: func(peer *p2p.Peer, t p2p.Transport) error { return h.runPeerVersion(peer, t, version) }}
 }
@@ -217,6 +222,16 @@ func (h *Handler) runPeerVersion(peer *p2p.Peer, t p2p.Transport, version uint32
 	h.ethPeersMu.Unlock()
 	defer func() {
 		h.peers.Unregister(peer.ID())
+		h.relay.mu.Lock()
+		for key := range h.relay.requests {
+			if key.peer == peer.ID() {
+				delete(h.relay.requests, key)
+			}
+		}
+		for _, record := range h.relay.records {
+			delete(record.peers, peer.ID())
+		}
+		h.relay.mu.Unlock()
 		h.ethPeersMu.Lock()
 		delete(h.ethPeers, peer.ID())
 		h.ethPeersMu.Unlock()
@@ -225,6 +240,9 @@ func (h *Handler) runPeerVersion(peer *p2p.Peer, t p2p.Transport, version uint32
 	// Keep range notifications off the canonical-head/FCU hot path.
 	if version >= ETH69 {
 		go ethPeer.runRangeUpdates()
+	}
+	if version >= ETH72 {
+		go h.runSparseRelay(ethPeer)
 	}
 	// Message loop.
 	return h.handleMessages(ethPeer)
@@ -254,6 +272,10 @@ func (h *Handler) handleMsg(ep *EthPeer, msg p2p.Msg) error {
 		return ErrMessageTooLarge
 	}
 	switch msg.Code {
+	case GetCellsMsg:
+		return h.handleGetCells(ep, msg)
+	case CellsMsg:
+		return h.handleCells(ep, msg)
 	case p2p.StatusMsg:
 		return fmt.Errorf("eth: unexpected status message after handshake")
 
@@ -571,6 +593,9 @@ func (h *Handler) handleTransactions(ep *EthPeer, msg p2p.Msg) error {
 // announcement from a peer. For any hashes not already in our pool, request
 // the full transaction bodies via GetPooledTransactions (0x09).
 func (h *Handler) handleNewPooledTransactionHashes(ep *EthPeer, msg p2p.Msg) error {
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleSparseAnnouncement(ep, msg)
+	}
 	var ann NewPooledTxHashesMsg68
 	if err := decodeMsg(msg, &ann); err != nil {
 		return err
@@ -593,6 +618,9 @@ func (h *Handler) handleNewPooledTransactionHashes(ep *EthPeer, msg p2p.Msg) err
 // handleGetPooledTransactions responds to a GetPooledTransactions (0x09) request
 // by returning the requested transactions from our pool via PooledTransactions (0x0a).
 func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleGetSparsePooled(ep, msg)
+	}
 	var req p2p.GetPooledTransactionsPacket
 	if err := decodeMsg(msg, &req); err != nil {
 		return err
@@ -609,6 +637,9 @@ func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
 // handlePooledTransactions processes a PooledTransactions (0x0a) response from
 // a peer and adds any new transactions to our pool.
 func (h *Handler) handlePooledTransactions(ep *EthPeer, msg p2p.Msg) error {
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleSparsePooled(ep, msg)
+	}
 	var packet p2p.PooledTransactionsPacket
 	if err := decodeMsg(msg, &packet); err != nil {
 		return err

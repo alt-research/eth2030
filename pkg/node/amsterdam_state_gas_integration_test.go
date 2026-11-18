@@ -14,9 +14,12 @@ import (
 	"github.com/eth2030/eth2030/engine/payload"
 	gethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	geth1559 "github.com/ethereum/go-ethereum/consensus/misc/eip1559"
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
 	gethrlp "github.com/ethereum/go-ethereum/rlp"
+	gethtrie "github.com/ethereum/go-ethereum/trie"
 )
 
 func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
@@ -54,6 +57,7 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 	producer, receiver := newTestNode(t, producerCfg), newTestNode(t, receiverCfg)
 	writer, reader := track4NodeRPC(t, producer, token), track4NodeRPC(t, receiver, token)
 	feeCap, tip := big.NewInt(2_000_000_000), big.NewInt(1_000_000_000)
+	rawByHash := make(map[types.Hash][]byte)
 	submit := func(nonce, limit uint64, to *gethcommon.Address, data []byte) types.Hash {
 		t.Helper()
 		signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: big.NewInt(1337), Nonce: nonce, Gas: limit, GasFeeCap: feeCap, GasTipCap: tip, To: to, Value: new(big.Int), Data: data}), gethtypes.NewCancunSigner(big.NewInt(1337)), key)
@@ -69,11 +73,13 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 		if hash != types.Hash(signed.Hash()) {
 			t.Fatal("signed transaction hash changed")
 		}
+		rawByHash[hash] = raw
 		return hash
 	}
 	createHash := submit(0, 110_000_000, nil, []byte{0x62, 0x01, 0x00, 0x00, 0x5f, 0xf3})
 	self := gethcommon.Address(sender)
 	selfHash := submit(1, 100000, &self, nil)
+	deferredHash := submit(2, 60_000_000, &self, nil)
 	beacon := types.Hash{31: 1}
 	attrs := map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": miner, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x8f0d180"}
 	parent := producer.blockchain.Genesis().Hash()
@@ -179,6 +185,69 @@ func TestAmsterdamStateGasThroughPoolHTTPBlockImportAndRestart(t *testing.T) {
 	reread.call(t, "eth_getTransactionReceipt", &after, selfHash)
 	if after.CumulativeGasUsed != last.CumulativeGasUsed || after.GasUsed != last.GasUsed {
 		t.Fatal("receipt payment changed after restart")
+	}
+	// Declared state reservation must fit even for a transaction that would
+	// ultimately create no state. Authenticate a three-transaction body/hash so
+	// rejection reaches the actual gas-pool guard rather than a root shortcut.
+	invalidReservation := p
+	invalidReservation.Transactions = append(append([][]byte(nil), p.Transactions...), rawByHash[deferredHash])
+	var referenceHeader gethtypes.Header
+	if err := gethrlp.DecodeBytes(encoded, &referenceHeader); err != nil {
+		t.Fatal(err)
+	}
+	var sdkTransactions gethtypes.Transactions
+	for _, raw := range invalidReservation.Transactions {
+		var tx gethtypes.Transaction
+		if err := tx.UnmarshalBinary(raw); err != nil {
+			t.Fatal(err)
+		}
+		sdkTransactions = append(sdkTransactions, &tx)
+	}
+	referenceHeader.TxHash = gethtypes.DeriveSha(sdkTransactions, gethtrie.NewStackTrie(nil))
+	invalidReservation.BlockHash = types.Hash(referenceHeader.Hash())
+	reread.call(t, "engine_newPayloadV5", &invalid, invalidReservation, []types.Hash{}, beacon, built.ExecutionRequests)
+	if invalid.Status != "INVALID" || invalid.ValidationError == nil || !strings.Contains(strings.ToLower(*invalid.ValidationError), "gas pool exhausted") {
+		t.Fatalf("state reservation was not rejected by its intended consumer: %+v", invalid)
+	}
+	assertState(reopened)
+	// It fits the fresh next block. The next base fee must use the previous
+	// bottleneck header gas, not the larger receipt payment cumulative sum.
+	attrs["timestamp"], attrs["slotNumber"] = "0x18", "0x2"
+	writer.call(t, "engine_forkchoiceUpdatedV4", &fc, payload.ForkchoiceStateV1{HeadBlockHash: p.BlockHash}, attrs)
+	if fc.PayloadID == nil {
+		t.Fatal("next payload ID missing")
+	}
+	var next struct {
+		ExecutionPayload  payload.ExecutionPayloadV5
+		ExecutionRequests []string
+	}
+	writer.call(t, "engine_getPayloadV6", &next, fc.PayloadID)
+	if len(next.ExecutionPayload.Transactions) != 1 || next.ExecutionPayload.GasUsed != 12000 {
+		t.Fatal("deferred high-total transaction did not fit the next block")
+	}
+	for _, rpc := range []track4RPC{writer, reread} {
+		var status payload.PayloadStatusV1
+		rpc.call(t, "engine_newPayloadV5", &status, next.ExecutionPayload, []types.Hash{}, beacon, next.ExecutionRequests)
+		if status.Status != "VALID" {
+			t.Fatalf("next block: %+v", status)
+		}
+		rpc.call(t, "engine_forkchoiceUpdatedV4", &fc, payload.ForkchoiceStateV1{HeadBlockHash: next.ExecutionPayload.BlockHash}, nil)
+		if fc.PayloadStatus.Status != "VALID" {
+			t.Fatal("next head rejected")
+		}
+	}
+	var parentReference gethtypes.Header
+	if err := gethrlp.DecodeBytes(encoded, &parentReference); err != nil {
+		t.Fatal(err)
+	}
+	wantBaseFee := geth1559.CalcBaseFee(params.AllDevChainProtocolChanges, &parentReference)
+	if producer.blockchain.CurrentBlock().BaseFee().Cmp(wantBaseFee) != 0 || reopened.blockchain.CurrentBlock().BaseFee().Cmp(wantBaseFee) != 0 {
+		t.Fatal("next base fee used the wrong gas dimension")
+	}
+	var final receipt
+	reread.call(t, "eth_getTransactionReceipt", &final, deferredHash)
+	if final.GasUsed != "0x2ee0" || final.CumulativeGasUsed != "0x2ee0" || reopened.blockchain.State().GetNonce(sender) != 3 {
+		t.Fatal("next-block paid gas or nonce did not reset correctly")
 	}
 	t.Logf("signed creation=%s self=%s codeBytes=65536 state=%d header=%d userCumulative=%d", createHash, selfHash, wantState, p.GasUsed, cumulative)
 }

@@ -56,7 +56,7 @@ func TestEIP8246NativeCreationFinalization(t *testing.T) {
 				init = append(init, beneficiary[:]...)
 			}
 			init = append(init, 0xff)
-			tx := types.NewTransaction(&types.LegacyTx{Gas: 300000, GasPrice: big.NewInt(2), Value: big.NewInt(tc.value), Data: init})
+			tx := types.NewTransaction(&types.LegacyTx{Gas: 1_000_000, GasPrice: big.NewInt(2), Value: big.NewInt(tc.value), Data: init})
 			tx.SetSender(sender)
 			header := newTestHeader()
 			header.BaseFee = big.NewInt(1)
@@ -357,7 +357,7 @@ func TestEIP8246ActivationBoundary(t *testing.T) {
 			cfg := amsterdam8246()
 			activation := uint64(100)
 			cfg.AmsterdamTime = &activation
-			tx := types.NewTransaction(&types.LegacyTx{Gas: 300000, GasPrice: big.NewInt(1), Value: big.NewInt(7), Data: []byte{0x30, 0xff}})
+			tx := types.NewTransaction(&types.LegacyTx{Gas: 1_000_000, GasPrice: big.NewInt(1), Value: big.NewInt(7), Data: []byte{0x30, 0xff}})
 			tx.SetSender(sender)
 			header := newTestHeader()
 			header.Time = timestamp

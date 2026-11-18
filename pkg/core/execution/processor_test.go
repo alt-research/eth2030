@@ -62,8 +62,8 @@ func TestSimpleTransfer(t *testing.T) {
 	statedb.AddBalance(sender, tenETH)
 
 	oneETH := new(big.Int).SetUint64(1e18)
-	gasPrice := big.NewInt(1) // 1 wei gas price for simplicity
-	gasLimit := uint64(21000)
+	gasPrice := big.NewInt(1)  // 1 wei gas price for simplicity
+	gasLimit := uint64(300000) // Includes the fresh account state charge.
 
 	tx := newTransferTx(0, recipient, oneETH, gasLimit, gasPrice)
 	msg := config.TransactionToMessage(tx)
@@ -81,7 +81,7 @@ func TestSimpleTransfer(t *testing.T) {
 	if result.Failed() {
 		t.Fatalf("transfer should not fail: %v", result.Err)
 	}
-	if result.UsedGas != TxGas {
+	if result.UsedGas != 204600 {
 		t.Fatalf("expected gas used %d, got %d", TxGas, result.UsedGas)
 	}
 
@@ -92,7 +92,7 @@ func TestSimpleTransfer(t *testing.T) {
 	}
 
 	// Sender should have 10 ETH - 1 ETH - gasCost
-	gasCost := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(TxGas))
+	gasCost := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(204600))
 	expectedSender := new(big.Int).Sub(tenETH, oneETH)
 	expectedSender.Sub(expectedSender, gasCost)
 	senderBal := statedb.GetBalance(sender)
@@ -179,7 +179,7 @@ func TestNonceValidation(t *testing.T) {
 	statedb.SetNonce(sender, 5) // state nonce = 5
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(21000)
+	gasLimit := uint64(300000)
 
 	// Test nonce too low
 	tx := newTransferTx(3, recipient, big.NewInt(100), gasLimit, gasPrice)
@@ -438,7 +438,7 @@ func TestContractCreation(t *testing.T) {
 	statedb.AddBalance(sender, tenETH)
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(100000)
+	gasLimit := uint64(500000)
 
 	// Contract creation tx: To is nil, Data is init code.
 	// Simple init code: PUSH1 0x42, PUSH1 0x00, MSTORE, PUSH1 0x01, PUSH1 0x1f, RETURN
@@ -644,7 +644,7 @@ func TestProcessBlockWithTransfer(t *testing.T) {
 
 	oneETH := new(big.Int).SetUint64(1e18)
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(21000)
+	gasLimit := uint64(300000)
 
 	tx := newTransferTx(0, recipient, oneETH, gasLimit, gasPrice)
 
@@ -673,7 +673,7 @@ func TestProcessBlockWithTransfer(t *testing.T) {
 	if receipt.Status != types.ReceiptStatusSuccessful {
 		t.Fatal("receipt should be successful")
 	}
-	if receipt.CumulativeGasUsed != TxGas {
+	if receipt.CumulativeGasUsed != 204600 {
 		t.Fatalf("receipt cumulative gas: want %d, got %d", TxGas, receipt.CumulativeGasUsed)
 	}
 }
@@ -796,7 +796,7 @@ func TestExecutionStateBinaryMaterialization(t *testing.T) {
 		t.Fatal(err)
 	}
 	snapshot := db.Snapshot()
-	tx := newTransferTx(0, to, big.NewInt(100), 100_000, big.NewInt(10))
+	tx := newTransferTx(0, to, big.NewInt(100), 300_000, big.NewInt(10))
 	tx.SetSender(from)
 	receipt, _, err := ApplyTransaction(&cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit))
 	if err != nil {

@@ -56,6 +56,9 @@ func gasAmsterdamSstore(evm *EVM, c *Contract, s *Stack, m *Memory, size uint64)
 		evm.StateDB.AddSlotToAccessList(c.Address, key)
 	}
 	current, original, next := evm.StateDB.GetState(c.Address, key), evm.StateDB.GetCommittedState(c.Address, key), bigToHash(s.Back(1))
+	if evm.balTracker != nil {
+		evm.balTracker.RecordStorageRead(c.Address, key, current)
+	}
 	if next != current && current == original {
 		access += AmsterdamStorageWrite
 	}
@@ -114,6 +117,11 @@ func gasAmsterdamCallBase(evm *EVM, c *Contract, s *Stack, m *Memory, size uint6
 	if c.Gas < cost {
 		return 0, ErrOutOfGas
 	}
+	cost, err = gasDelegationResolution(evm, c, address, cost)
+	if err != nil {
+		return 0, err
+	}
+
 	if canCreate && valueBearing && evm.StateDB != nil && evm.StateDB.Empty(address) {
 		if !c.ChargeStateGas(AmsterdamNewAccountStateGas) {
 			return 0, ErrOutOfGas
@@ -122,7 +130,7 @@ func gasAmsterdamCallBase(evm *EVM, c *Contract, s *Stack, m *Memory, size uint6
 	}
 	// The account charge precedes the 63/64 split. The constant warm cost was
 	// already paid by the interpreter before this dynamic-gas function.
-	evm.callGasTemp = callGasEIP150(c.Gas, cost, s.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(c.Gas, cost, s.Back(0))
 	return safeAdd(cost, evm.callGasTemp), nil
 }
 func gasAmsterdamCall(evm *EVM, c *Contract, s *Stack, m *Memory, size uint64) (uint64, error) {
@@ -147,6 +155,9 @@ func gasAmsterdamSelfdestruct(evm *EVM, c *Contract, s *Stack, m *Memory, size u
 	if c.Gas < cost {
 		return 0, ErrOutOfGas
 	}
+	if evm.balTracker != nil {
+		evm.balTracker.RecordAddressTouch(address)
+	}
 	if evm.StateDB.GetBalance(c.Address).Sign() > 0 && evm.StateDB.Empty(address) {
 		cost += AmsterdamAccountWrite
 		if !c.ChargeStateGas(AmsterdamNewAccountStateGas) {
@@ -154,4 +165,17 @@ func gasAmsterdamSelfdestruct(evm *EVM, c *Contract, s *Stack, m *Memory, size u
 		}
 	}
 	return cost, nil
+}
+
+func (evm *EVM) executionCode(address types.Address) []byte {
+	code := evm.StateDB.GetCode(address)
+	if evm.forkRules.IsPrague || evm.forkRules.IsAmsterdam || evm.forkRules.IsGlamsterdan {
+		if delegate, ok := types.ParseDelegation(code); ok {
+			if evm.balTracker != nil {
+				evm.balTracker.RecordAddressTouch(delegate)
+			}
+			return evm.StateDB.GetCode(delegate)
+		}
+	}
+	return code
 }

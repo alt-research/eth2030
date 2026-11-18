@@ -581,6 +581,9 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 				}
 				gas -= cost
 			}
+			if evm.balTracker != nil {
+				evm.balTracker.RecordAddressTouch(delegate)
+			}
 			code = evm.StateDB.GetCode(delegate)
 		}
 	}
@@ -654,6 +657,9 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 		return nil, gas, ErrMaxCallDepthExceeded
 	}
 
+	if evm.StateDB != nil && value != nil && value.Sign() > 0 && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
+		return nil, gas, ErrInsufficientBalance
+	}
 	meter := evm.beginStateGasFrame(caller, caller, value, gas)
 	if meter != nil {
 		defer func() { evm.finishStateGasFrame(meter, &gasLeft, err) }()
@@ -671,7 +677,7 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 	createdSnapshot := len(evm.createdOrder)
 
 	// Get the code to execute from the target address
-	code := evm.StateDB.GetCode(addr)
+	code := evm.executionCode(addr)
 	if len(code) == 0 {
 		return nil, gas, nil
 	}
@@ -728,7 +734,7 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 	snapshot := evm.StateDB.Snapshot()
 	createdSnapshot := len(evm.createdOrder)
 
-	code := evm.StateDB.GetCode(addr)
+	code := evm.executionCode(addr)
 	if len(code) == 0 {
 		return nil, gas, nil
 	}
@@ -793,7 +799,7 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 		return ret, gasLeft, err
 	}
 
-	code := evm.StateDB.GetCode(addr)
+	code := evm.executionCode(addr)
 	if len(code) == 0 {
 		return nil, gas, nil
 	}

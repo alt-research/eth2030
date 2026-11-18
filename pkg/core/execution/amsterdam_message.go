@@ -39,7 +39,8 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 		return nil, ErrNonceTooHigh
 	}
 	code := db.GetCode(msg.From)
-	if len(code) > 0 && !types.HasDelegationPrefix(code) {
+	_, validSenderDelegation := types.ParseDelegation(code)
+	if len(code) > 0 && !validSenderDelegation {
 		return nil, errors.New("sender not an EOA")
 	}
 	if msg.TxType == types.SetCodeTxType && (msg.To == nil || len(msg.AuthList) == 0) {
@@ -261,10 +262,11 @@ func processAmsterdamAuthorizations(db state.StateDB, msg *corconfig.Message, ch
 		}
 		code := db.GetCode(authority)
 		if !observed[authority] {
-			initialIndicator[authority] = types.HasDelegationPrefix(code)
+			_, initialIndicator[authority] = types.ParseDelegation(code)
 			observed[authority] = true
 		}
-		if len(code) != 0 && !types.HasDelegationPrefix(code) {
+		_, validDelegation := types.ParseDelegation(code)
+		if len(code) != 0 && !validDelegation {
 			continue
 		}
 		nonce := db.GetNonce(authority)

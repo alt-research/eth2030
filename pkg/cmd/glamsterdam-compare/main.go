@@ -35,13 +35,16 @@ const eipsRevision = "3db38a3725105cb67b8804ac3e147967113bc3ca"
 var target = types.HexToAddress("0x1000000000000000000000000000000000000001")
 var miner = types.HexToAddress("0x2000000000000000000000000000000000000002")
 var child = types.HexToAddress("0x3000000000000000000000000000000000000003")
+var delegate = types.HexToAddress("0x4000000000000000000000000000000000000004")
 
 type scenario struct {
 	Name                  string
 	Gas                   uint64
 	Value                 int64
 	Creation, NewTarget   bool
+	ZeroBaseFee           bool
 	Code, Data, ChildCode []byte
+	DelegateCode          []byte
 	InitialSlot           uint64
 	AccessList            gethtypes.AccessList
 }
@@ -111,8 +114,35 @@ func scenarios() []scenario {
 	callChild = append(callChild, child[:]...)
 	callChild = append(callChild, 0x5a, 0xf4, 0x50, 0)
 	nested := append(bytes.Clone(slots), callChild...)
+	callSequence := func(op byte, value bool, maximum bool) []byte {
+		count := 4
+		if value {
+			count = 5
+		}
+		code := bytes.Repeat([]byte{0x5f}, count)
+		code = append(code, 0x73)
+		code = append(code, child[:]...)
+		if maximum {
+			code = append(code, 0x7f)
+			word := make([]byte, 32)
+			word[0] = 1
+			code = append(code, word...)
+		} else {
+			code = append(code, 0x5a)
+		}
+		return append(code, op, 0x50, 0)
+	}
+
 	return []scenario{
 		{Name: "existing_zero_value", Gas: 100000},
+		{Name: "delegated_call", Gas: 500000, Code: callSequence(0xf1, true, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
+		{Name: "delegated_callcode", Gas: 500000, Code: callSequence(0xf2, true, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
+		{Name: "delegated_delegatecall", Gas: 500000, Code: callSequence(0xf4, false, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: append(bytes.Clone(slots), 0)},
+		{Name: "delegated_staticcall", Gas: 100000, Code: callSequence(0xfa, false, false), ChildCode: types.AddressToDelegation(delegate), DelegateCode: []byte{0x5f, 0x54, 0x50, 0}},
+		{Name: "wide_gas_delegatecall", Gas: 500000, Code: callSequence(0xf4, false, true), ChildCode: append(bytes.Clone(slots), 0)},
+
+		{Name: "zero_base_fee_dynamic", Gas: 100000, ZeroBaseFee: true},
+		{Name: "zero_base_fee_gasprice", Gas: 500000, ZeroBaseFee: true, Code: []byte{0x3a, 0x5f, 0x55, 0}},
 		{Name: "existing_value", Gas: 100000, Value: 7},
 		{Name: "new_account_value", Gas: 400000, Value: 7, NewTarget: true},
 		{Name: "new_account_runtime_oog", Gas: 21000, Value: 7, NewTarget: true},
@@ -176,6 +206,9 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	if len(sc.ChildCode) > 0 {
 		pre[child.Hex()] = bridge.PreAccount{Balance: big.NewInt(1), Nonce: 1, Code: bytes.Clone(sc.ChildCode)}
 	}
+	if len(sc.DelegateCode) > 0 {
+		pre[delegate.Hex()] = bridge.PreAccount{Balance: big.NewInt(1), Nonce: 1, Code: bytes.Clone(sc.DelegateCode)}
+	}
 	var to *gethcommon.Address
 	if !sc.Creation {
 		addr := gethcommon.Address(target)
@@ -192,6 +225,9 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	}
 	slot := uint64(7)
 	header := &types.Header{Number: big.NewInt(1), Time: 12, SlotNumber: &slot, GasLimit: blockGas, BaseFee: big.NewInt(1), Coinbase: miner, Difficulty: new(big.Int)}
+	if sc.ZeroBaseFee {
+		header.BaseFee.SetUint64(0)
+	}
 	ndb := state.NewMemoryStateDB()
 	for addrHex, account := range pre {
 		addr := types.HexToAddress(addrHex)
@@ -233,6 +269,9 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 		}
 	}
 	addresses := []types.Address{sender, miner, target, child, types.Address(gethcrypto.CreateAddress(gethcommon.Address(sender), 0))}
+	if len(sc.DelegateCode) > 0 {
+		addresses = append(addresses, delegate)
+	}
 	native.Accounts = readAccounts(addresses, ndb.Exist, ndb.GetBalance, ndb.GetNonce, ndb.GetCode, ndb.GetState)
 	root, err := ndb.Commit()
 	if err != nil {
@@ -246,7 +285,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	defer gst.Close()
 	rcfg := referenceConfig(amsterdam)
 	random := gethcommon.Hash{}
-	context := gethvm.BlockContext{CanTransfer: gethcore.CanTransfer, Transfer: gethcore.Transfer, GetHash: func(uint64) gethcommon.Hash { return gethcommon.Hash{} }, Coinbase: gethcommon.Address(miner), GasLimit: blockGas, BlockNumber: big.NewInt(1), Time: 12, Difficulty: new(big.Int), BaseFee: big.NewInt(1), Random: &random, SlotNum: slot, CostPerStateByte: params.CostPerStateByte}
+	context := gethvm.BlockContext{CanTransfer: gethcore.CanTransfer, Transfer: gethcore.Transfer, GetHash: func(uint64) gethcommon.Hash { return gethcommon.Hash{} }, Coinbase: gethcommon.Address(miner), GasLimit: blockGas, BlockNumber: big.NewInt(1), Time: 12, Difficulty: new(big.Int), BaseFee: new(big.Int).Set(header.BaseFee), Random: &random, SlotNum: slot, CostPerStateByte: params.CostPerStateByte}
 	evm := gethvm.NewEVM(context, gst.StateDB, rcfg, gethvm.Config{})
 	msg, err := gethcore.TransactionToMessage(tx, gethtypes.MakeSigner(rcfg, header.Number, header.Time), header.BaseFee)
 	if err != nil {
@@ -290,7 +329,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	if amsterdam {
 		fork = "amsterdam_merged_text_candidate"
 	}
-	out := comparison{Name: sc.Name, Input: input{Fork: fork, BlockNumber: 1, Timestamp: 12, Slot: 7, BlockGasLimit: blockGas, BaseFee: "1", Coinbase: miner.Hex(), SignedTransaction: hexData(raw), PreState: freezePreState(pre), NativeConfig: nativeConfig(amsterdam), ReferenceConfig: rcfg, ReferenceCPSB: context.CostPerStateByte}, Native: native, Reference: reference, Differences: []string{}}
+	out := comparison{Name: sc.Name, Input: input{Fork: fork, BlockNumber: 1, Timestamp: 12, Slot: 7, BlockGasLimit: blockGas, BaseFee: header.BaseFee.String(), Coinbase: miner.Hex(), SignedTransaction: hexData(raw), PreState: freezePreState(pre), NativeConfig: nativeConfig(amsterdam), ReferenceConfig: rcfg, ReferenceCPSB: context.CostPerStateByte}, Native: native, Reference: reference, Differences: []string{}}
 	for _, field := range []struct {
 		name              string
 		native, reference any

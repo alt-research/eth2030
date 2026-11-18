@@ -1687,7 +1687,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 // For legacy txs, it returns GasPrice directly.
 // For EIP-1559 txs, it returns min(GasFeeCap, BaseFee + GasTipCap).
 func msgEffectiveGasPrice(msg *corconfig.Message, baseFee *big.Int) *big.Int {
-	if msg.GasFeeCap != nil && baseFee != nil && baseFee.Sign() > 0 {
+	if msg.GasFeeCap != nil && baseFee != nil {
 		// EIP-1559 transaction
 		tip := msg.GasTipCap
 		if tip == nil {

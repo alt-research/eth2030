@@ -2,12 +2,36 @@ package main
 
 import (
 	"bytes"
+	"encoding/hex"
 	"strings"
 	"testing"
 
 	"github.com/ethpandaops/go-eth2-client/spec/heze"
 	dynssz "github.com/pk910/dynamic-ssz"
 )
+
+func TestReleasedWireUsesReleasedCodec(t *testing.T) {
+	// A codec-routing test, not evidence of an EIP-8015 CL's state transition.
+	// Construct the released layout with its own SDK, then require the replay
+	// tool to keep using that layout instead of the ETH2030 compatibility type.
+	ds := dynssz.NewDynSsz(nil)
+	raw, err := ds.MarshalSSZ(&heze.BeaconState{GenesisTime: 1, Slot: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded := new(heze.BeaconState)
+	if err := ds.UnmarshalSSZ(decoded, raw); err != nil {
+		t.Fatal(err)
+	}
+	root, err := ds.HashTreeRoot(decoded)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := replay(raw, manifest{StateRoot: "0x" + hex.EncodeToString(root[:]), Slot: 2})
+	if err != nil || result.Codec != "upstream-v0.1.11" {
+		t.Fatalf("released wire was not handled by the released codec: %+v %v", result, err)
+	}
+}
 
 func fixture(t *testing.T) ([]byte, manifest) {
 	t.Helper()

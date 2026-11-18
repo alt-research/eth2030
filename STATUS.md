@@ -1,3 +1,7 @@
+## Canonical startup and Engine schema review (2026-11-18)
+
+[PR 78](https://github.com/alt-research/eth2030/pull/78) qualifies canonical fork dependencies, method windows and actual HTTP field/encoding bounds. Composed source `1d9826c2` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. Persisted configuration recovery remains separate ongoing work. See [verification](docs/verification/glamsterdam-fork-schema-20261118.md).
+
 ## Builder execution request reviews (2026-11-18)
 
 [EL PR 77](https://github.com/alt-research/eth2030/pull/77) and [Lighthouse PR 3](https://github.com/jiayaoqijia/lighthouse/pull/3) qualify canonical mandatory queues, actual HTTP request commitments and independent real-BLS state-processing consumers. The composed EL source passes all 211 tested packages, tagged Core/EIP, vet and build; paired CL source passes 25 library tests/check. See [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). Final gas, live deployment/devnet, networking and release gates remain open.

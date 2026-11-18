@@ -1,5 +1,12 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Canonical startup and Engine review (2026-11-18)
+
+- [x] Publish isolated PR 78 and pin complete Engine specifications.
+- [x] Qualify actual HTTP and four behavioral mutations, preserving valid zero fields and forkchoice adoption.
+- [x] Run full/tagged/affected race/vet/build on the feature composition.
+- [ ] Complete persisted configuration recovery and remaining release gates.
+
 ## Builder execution requests review batch (2026-11-18)
 
 - [x] Publish isolated EL PR 77 and Lighthouse PR 3 with exact spec and wire evidence.

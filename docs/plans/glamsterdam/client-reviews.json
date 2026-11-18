@@ -3,7 +3,7 @@
   "review_base": "8104a2467c59487e69aa95b6acedbaeea4a534a1",
   "paired_client_base": "f85fa05b6df2b275b114050b01acd4381e621744",
   "integration_tested_commit": "4432411764d89be3fad6af98b42cdd4e995d8a82",
-  "integration_published_head": "b2905797756f61d6cf54412d23a7ce26833bb77b",
+  "integration_published_head": "4432411764d89be3fad6af98b42cdd4e995d8a82",
   "status": "25 library tests, cargo check, formatting and full workspace lint passed; full release/devnet open",
   "reviews": [
     {

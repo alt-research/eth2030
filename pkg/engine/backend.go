@@ -17,7 +17,6 @@ import (
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
-	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
@@ -432,10 +431,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 	b.blocksMu.RLock()
 	defer b.blocksMu.RUnlock()
 
-	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
-	}
+	headBlock := b.blocks[headHash]
 
 	results := make([]*enginepayload.ExecutionPayloadBodyV2, len(hashes))
 	for i, h := range hashes {
@@ -444,7 +440,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok && rawdb.IsBALRetained(headNum, block.NumberU64()) {
+		if blockBAL, ok := b.bals[h]; ok && isBALRetainedForBlocks(headBlock, block) {
 			balBytes, _ := blockBAL.EncodeRLP()
 			body.BlockAccessList = balBytes
 		}
@@ -460,8 +456,9 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 	defer b.blocksMu.RUnlock()
 
 	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
+	headBlock := b.blocks[headHash]
+	if headBlock != nil {
+		headNum = headBlock.NumberU64()
 	}
 
 	if start > headNum {
@@ -523,7 +520,7 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok && rawdb.IsBALRetained(headNum, num) {
+		if blockBAL, ok := b.bals[hash]; ok && isBALRetainedForBlocks(headBlock, block) {
 			balBytes, _ := blockBAL.EncodeRLP()
 			body.BlockAccessList = balBytes
 		}

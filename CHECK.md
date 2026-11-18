@@ -1,4 +1,11 @@
-## Glamsterdam EIP-7954 contract limits
+# Lean4 Verification Check-list
+
+- [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
+- [x] Reproduce the obsolete availability window through the real Engine body consumer.
+- [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
+- [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
+
+# Lean4 Verification Check-list
 
 - [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
 - [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.

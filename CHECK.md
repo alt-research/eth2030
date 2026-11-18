@@ -1,5 +1,11 @@
 ## Glamsterdam completion implementation (2026-11-18)
 
+## Pivot proof and gas draft tracking (2026-11-19)
+
+- [x] Record PR 81 unchanged-account consumer repair, seven scenarios and nine detected mutations.
+- [x] Preserve the qualified 212-package aggregate and changed-consumer race/build evidence.
+- [x] Track separate Draft PR 83 and signed/block checkpoints without claiming full-suite or release completion.
+
 ## Sparse relay review tracking (2026-11-19)
 
 - [x] Record separate PR 82, source/foundation/remote heads and current merged wire decisions.

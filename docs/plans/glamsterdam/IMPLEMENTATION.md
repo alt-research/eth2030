@@ -21,7 +21,7 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | [PR #66](https://github.com/alt-research/eth2030/pull/66) — BAL retention | Published slot-based window, body preservation and conservative fallback | Submitted; complete cold-sync/physical-GC gates remain open |
 | [PR #68](https://github.com/alt-research/eth2030/pull/68) — RPC discovery | Actual HTTP/backend discovery, historical/reverted/creation cases and non-mutation | Submitted; final gas/schema qualification remains open |
 | [PR #75](https://github.com/alt-research/eth2030/pull/75) — independent gas corpus | 22 signed scenarios under Osaka/Amsterdam, explicit reference CPSB and retained per-field mismatches | Submitted; transaction-transition evidence only; final gas/application/block/API gates remain open |
-| Gas/state execution | Selected coherent intrinsic/runtime/state/refund/floor model; upstream choice gate retained | Pending |
+| [Draft PR #83](https://github.com/alt-research/eth2030/pull/83) — current-text gas/state execution | Versioned merged LIFO transition and first high-state block consumers | In progress; full-suite/API/application/final choice gates remain open |
 | [PR #69](https://github.com/alt-research/eth2030/pull/69) — eth/69–71 | Negotiated protocols, canonical wire, correlated historical consumers and encrypted-socket checks | Submitted; independent full-client cold-sync gates remain open |
 | [PR #70](https://github.com/alt-research/eth2030/pull/70) — receipt bloom | Rebuild omitted wire bloom from actual nonzero logs | Submitted; included in branches 69/71 for standalone tests |
 | [PR #71](https://github.com/alt-research/eth2030/pull/71) — transfer logs | Canonical Amsterdam activation, value transfer ordering and exclusions | Submitted; final gas/cross-client composition remains open |
@@ -153,3 +153,12 @@ The implementation follows the formal devp2p request-ID schema and the October 3
 PR 81 also explicitly stops its test-owned encrypted servers before Node/database restart; all five snap/2 scenarios pass under race after that cleanup. Full independent-client gossip/cold sync, actual CL custody reconnect, resource/fairness and sparse WAL campaigns, final execution gas and complete release qualification remain open. No upstream PR was merged.
 
 EIPs PRs 12581 and 12582 were rechecked at this follow-up and remain open/unmerged at the same frozen heads. The merged LIFO text remains the versioned development/measurement baseline; final release selection stays unresolved.
+
+
+## Unchanged storage pivot proof and gas draft follow up
+
+PR 81 now reproduces and fixes an actual moving-pivot cache miss for unchanged partially downloaded storage accounts. The verified consumer fetches the exact new-root account proof before trusting its storage root. Seven encrypted Node scenarios and nine compiling detected mutations qualify the expanded feature. Aggregate source `c0df6062` passes all 212 Go packages, 27 tagged Core/EIP packages, affected snap/scheduler/Node race/vet and build. [Composed follow-up](../../verification/glamsterdam-snap2-binding-integration-20261119.md).
+
+[Draft PR 83](https://github.com/alt-research/eth2030/pull/83) implements the frozen merged LIFO development baseline in an isolated branch; no unmerged alternative is combined with it. Clean source `c6cdf15a` matches the original 22 signed Amsterdam transition cases, previously 19 differing. The next source adds a 64 KiB deployment (23 matching transition cases) and actual Node HTTP pool/build/import/restart: a 110M-total-gas transaction produces state/header gas 100,453,680 while the two-transaction receipt cumulative payment is 100,516,383. A correctly rehashed scalar-sum header is rejected. This draft is not part of the qualified aggregate.
+
+Outer reserve/fee and broader 7702/application/system/RPC coverage and old-price fixture repairs continue. Full-suite failures remain visible; native helper checks and initial signed parity do not close all GL-020–025/060 gates. Final release-model selection and CL/multiclient/resource qualification remain open. [Draft evidence](https://github.com/fyInALT/eth2030/blob/feat/glamsterdam-state-gas/docs/audits/glamsterdam-state-gas-2026-11-19/README.md).

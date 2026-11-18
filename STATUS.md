@@ -1,3 +1,7 @@
+## Pivot proof repair and active gas draft (2026-11-19)
+
+PR 81 adds authenticated unchanged-account storage recovery; seven encrypted Node scenarios and nine detected mutations pass. Aggregate `c0df6062` passes 212 Go packages, 27 tagged Core/EIP packages, affected snap/scheduler/Node race/vet and build. Draft PR 83 separately implements current-text LIFO gas, with 22 clean signed matches and an expanded 23-case/high-state HTTP block checkpoint. Full suite/API/application/system and final release gates remain open; the draft is not integrated.
+
 ## Sparse relay review and integration (2026-11-19)
 
 PR 82 connects actual eth/72 provider/sampler/custody relay, authenticated reconstruction and Engine cells, with encrypted native-pool/SDK/Node/restart consumers and eight detected guard mutations. Aggregate source `20b1c1f` passes 212 Go packages, 27 tagged Core/EIP packages, 97 affected race packages, vet/build. PR 81 socket cleanup also passes five race-tested scenarios. Exact review/source/discussion records are updated; final gas, full independent-client/CL/resource and release gates remain open.

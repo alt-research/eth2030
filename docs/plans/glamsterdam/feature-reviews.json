@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "20b1c1f310017edd83f050a366d0f8f72a4757ee",
+  "integration_tested_commit": "c0df60625f45dab79f8940032aa7e4112e35d7d5",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -187,14 +187,14 @@
       "pr": 81,
       "url": "https://github.com/alt-research/eth2030/pull/81",
       "branch": "feat/glamsterdam-snap2",
-      "commit": "ffe95de1b67848e296d2edebcd144f63beb76d42",
-      "remote_head": "ffe95de1b67848e296d2edebcd144f63beb76d42",
-      "tested_source_commit": "ffe95de1b67848e296d2edebcd144f63beb76d42",
+      "commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "remote_head": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "tested_source_commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
       "dependencies": [
         69,
         77
       ],
-      "scope": "Authenticated BAL moving-pivot and reorg catch-up over real encrypted Node sync",
+      "scope": "Authenticated BAL pivot/reorg/cursor recovery, including fresh-root proof binding for unchanged partial storage",
       "release_qualified": false,
       "source_in_tested_integration": true
     },
@@ -210,10 +210,28 @@
       "scope": "Sparse provider/sampler/custody relay, verified reconstruction and actual Engine/Node consumers",
       "release_qualified": false,
       "source_in_tested_integration": true
+    },
+    {
+      "pr": 83,
+      "url": "https://github.com/alt-research/eth2030/pull/83",
+      "branch": "feat/glamsterdam-state-gas",
+      "commit": "d7feea448ce9c1a8e8c4b4467e515489d30629b2",
+      "remote_head": "d7feea448ce9c1a8e8c4b4467e515489d30629b2",
+      "draft": true,
+      "scope": "Current merged LIFO development baseline; native signed transitions and initial high-state block consumers",
+      "tested_transaction_source_commit": "c6cdf15ac7377773a5c05d8948bf8b292dd8d700",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "remaining": [
+        "full suite semantic fixture/implementation repair",
+        "RPC modes and traces",
+        "expanded authorization/application/system vectors",
+        "final gas choice and release qualification"
+      ]
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
-  "integration_published_head": "aacc65ea06fd105afe2258f44eebfc9390f21a26",
-  "checked_at_utc": "2026-11-18 17:09:48 UTC",
-  "previous_integration_tested_commit": "13969eaf4de50215744676a41b7eca12a5795ad5"
+  "integration_published_head": "953825986838a7da854ed30ea64b7eaf06c4f6d3",
+  "checked_at_utc": "2026-11-18 18:11:59 UTC",
+  "previous_integration_tested_commit": "20b1c1f310017edd83f050a366d0f8f72a4757ee"
 }

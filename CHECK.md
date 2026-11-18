@@ -1,3 +1,10 @@
+## Glamsterdam EIP-7708 transfer logs
+
+- [x] Read both local legacy and pinned current EIP-7708, including fee/withdrawal exclusions and 8246 dependency.
+- [x] Add failing native fork-boundary, fees/self/zero-value, creation ordering and rollback regressions.
+- [x] Correct consensus emission and canonical Amsterdam activation without a new toggle.
+- [x] Verify affected consumers/roots and build; prepare a separate PR with the 8246 lifecycle gate explicit.
+
 # Lean4 Verification Check-list
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)

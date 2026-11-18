@@ -753,15 +753,16 @@ func TestDeriveReceiptFields(t *testing.T) {
 	}
 }
 
-// TestReceiptNoLogsSimpleTransfer verifies that a simple value transfer
-// produces a receipt with no logs and a zero bloom filter.
-func TestReceiptNoLogsSimpleTransfer(t *testing.T) {
+// TestReceiptSimpleTransferProtocolLog verifies post-Amsterdam receipt logs and bloom.
+func TestReceiptSimpleTransferProtocolLog(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 
 	hundredETH := new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18))
 	statedb.AddBalance(sender, hundredETH)
+	statedb.CreateAccount(receiver)
+	statedb.SetNonce(receiver, 1)
 
 	tx := types.NewTransaction(&types.LegacyTx{
 		Nonce: 0, GasPrice: big.NewInt(1), Gas: 21000,
@@ -791,11 +792,11 @@ func TestReceiptNoLogsSimpleTransfer(t *testing.T) {
 	}
 
 	r := receipts[0]
-	if len(r.Logs) != 0 {
-		t.Errorf("simple transfer should have 0 logs, got %d", len(r.Logs))
+	if len(r.Logs) != 1 || len(r.Logs[0].Topics) != 3 {
+		t.Fatalf("simple transfer should have one protocol event, got %v", r.Logs)
 	}
-	if r.Bloom != (types.Bloom{}) {
-		t.Error("simple transfer should have zero bloom filter")
+	if r.Bloom == (types.Bloom{}) || r.Bloom != types.LogsBloom(r.Logs) {
+		t.Error("protocol transfer bloom does not match the logs")
 	}
 	if r.Status != types.ReceiptStatusSuccessful {
 		t.Errorf("simple transfer should succeed, got status %d", r.Status)

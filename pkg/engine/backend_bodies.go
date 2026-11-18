@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
 )
@@ -48,4 +49,17 @@ func (b *EngineBackend) GetPayloadBodiesByHash(hashes []types.Hash) ([]*enginepa
 // P1: Uses fine-grained locks for better concurrency.
 func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*enginepayload.ExecutionPayloadBodyV2, error) {
 	return b.loadPayloadBodiesByRange(start, count), nil
+}
+
+// isBALRetainedForBlocks uses actual beacon slots when both are known.
+// A block-number fallback conservatively keeps more data across missed slots.
+func isBALRetainedForBlocks(head, block *types.Block) bool {
+	if head == nil {
+		return true
+	}
+	h, b := head.Header(), block.Header()
+	if h.SlotNumber != nil && b.SlotNumber != nil {
+		return rawdb.IsBALRetained(*h.SlotNumber, *b.SlotNumber)
+	}
+	return rawdb.IsBALRetained(head.NumberU64(), block.NumberU64())
 }

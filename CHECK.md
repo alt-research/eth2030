@@ -1,3 +1,10 @@
+## Glamsterdam historical BAL retention
+
+- [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
+- [x] Reproduce the obsolete availability window through the real Engine body consumer.
+- [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
+- [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
+
 # Lean4 Verification Check-list
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)

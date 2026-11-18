@@ -32,7 +32,7 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 	receiver2 := types.BytesToAddress([]byte{0xa3})
 
 	// Initialize state with sender having a large balance.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(1_000_000_000_000)) // 1 trillion wei
 	statedb.SetNonce(sender, 0)
 
@@ -396,7 +396,7 @@ func TestEndToEndBlockBuilder(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0xb2})
 
 	// Initialize state.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
 
 	// Create transactions.

@@ -27,7 +27,7 @@ func TestCanonicalFrame8141ThroughEngineAndRestart(t *testing.T) {
 func canonicalFrameThroughEngineAndRestart(t *testing.T, nonce uint64) {
 	const token = "canonical-frame-integration"
 	var genesis map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
 	}
 	genesis["gasLimit"] = "0x186a0"

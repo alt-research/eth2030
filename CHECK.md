@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## EIP-8282 builder execution requests (2026-11-18)
+
+- [x] Read the complete pinned EIP, canonical bytecode assets and selected CL processing.
+- [x] Add exact runtime/constructor assets and request types/SSZ encoding with provenance.
+- [x] Wire mandatory Amsterdam system queues, rollback and commitment validation.
+- [x] Supply explicit pre-fork deployment/genesis fixtures without fork-time code injection.
+- [x] Qualify fee/queue/endian/cap/failure and actual Engine/CL consumer paths.
+- [x] Run affected builds/tests and publish a dedicated feature PR.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

@@ -13,11 +13,14 @@ import (
 )
 
 func pragueConfig() *config.ChainConfig {
-	return config.TestConfig
+	cfg := *config.TestConfig
+	cfg.AmsterdamTime = nil
+	return &cfg
 }
 
 func prePragueConfig() *config.ChainConfig {
 	cfg := *config.TestConfig
+	cfg.AmsterdamTime = nil
 	cfg.PragueTime = nil
 	return &cfg
 }

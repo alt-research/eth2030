@@ -2,8 +2,8 @@
 
 ## Current merged state gas model (2026-11-19)
 
-- [ ] Re-read the complete chosen 3db38a3 EIPs, current-text gas corpus and actual production validation/runtime/settlement consumers; exclude older 49beda9 reference defaults and unmerged alternatives.
-- [ ] Reproduce the signed 19/22 candidate differences on the latest composition and classify each actual layer before editing.
+- [x] Re-read the complete chosen 3db38a3 EIPs, current-text gas corpus and actual production validation/runtime/settlement consumers; exclude older 49beda9 reference defaults and unmerged alternatives.
+- [x] Reproduce the signed 19/22 candidate differences on the latest composition and classify each actual layer before editing.
 - [ ] Implement coherent intrinsic execution/state gas, CPSB, access/write pricing, reservoir charges/refills, frame merge and halt/revert behavior.
 - [ ] Wire authorization/pre-execution, creation/destruction/refund/floor, receipt/accounting and per-dimension block/build/basefee rules.
 - [ ] Wire pool, estimate/call/access-list/trace consumers to their selected method contracts, preserving canonical Frame behavior.

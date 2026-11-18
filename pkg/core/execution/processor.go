@@ -923,6 +923,7 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 	// EIP-7778: propagate BlockGasUsed for block gas limit validation.
 	// This is the pre-refund gas used, which should match header.GasUsed.
 	receipt.BlockGasUsed = result.BlockGasUsed
+	receipt.StateGasUsed = result.StateGasUsed
 
 	// EIP-8141: record the gas payer and per-frame results for frame
 	// transactions per the receipt format [cumulative_gas_used, payer,
@@ -1199,6 +1200,9 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		blobMaxCost.Mul(blobGas, msg.BlobGasFeeCap)
 	}
 
+	if config != nil && config.IsMerge() && config.IsAmsterdam(header.Time) && msg.TxType <= types.SetCodeTxType {
+		return applyAmsterdamMessage(config, statedb, header, msg, gp, evm, precompileAddrs, blobCost, blobMaxCost, balTracker)
+	}
 	// Validate and consume gas from the pool
 	if err := gp.SubGas(msg.GasLimit); err != nil {
 		return nil, err

@@ -19,8 +19,15 @@ type Contract struct {
 	// state-growth operations are metered independently from execution gas.
 	// The GAS opcode returns only Gas; this field is intentionally excluded.
 	StateGasReservoir uint64
-	Value             *big.Int
-	jumpdests         map[uint64]bool // cached JUMPDEST analysis
+	// EIP-8037 frame-local LIFO accounting. StateGasUsed is signed because a
+	// child can clear state allocated by an ancestor or an earlier sibling.
+	StateGasFromGasLeft    uint64
+	StateGasBaseline       uint64
+	StateGasCommitted      uint64
+	StateGasUsed           int64
+	pendingAccountStateGas uint64
+	Value                  *big.Int
+	jumpdests              map[uint64]bool // cached JUMPDEST analysis
 
 	// EOF fields (EIP-3540, EIP-7480, EIP-7620)
 	Data          []byte   // EOF data section (EIP-7480: DATALOAD, DATALOADN, DATASIZE, DATACOPY)

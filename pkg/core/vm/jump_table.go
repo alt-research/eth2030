@@ -649,7 +649,7 @@ func NewAmsterdamJumpTable() JumpTable {
 	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
 	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
-
+	installAmsterdamGas(&tbl)
 	return tbl
 }
 

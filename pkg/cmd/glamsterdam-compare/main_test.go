@@ -64,3 +64,19 @@ func TestReferenceFundedReservoirChargesActualState(t *testing.T) {
 		t.Fatalf("funded reservoir changed the price or state of identical work: bare=%+v funded=%+v", left.Reference, right.Reference)
 	}
 }
+
+// This exercises native signed transaction execution and both gas-pool
+// dimensions, not the helper formulas. Full block/pool/API gates are separate.
+func TestNativeAmsterdamSignedTransitionsMatchPinnedReference(t *testing.T) {
+	for _, scenario := range scenarios() {
+		t.Run(scenario.Name, func(t *testing.T) {
+			result, err := runScenario(scenario, true)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(result.Differences) != 0 {
+				t.Fatalf("signed native/reference fields differ: %v", result.Differences)
+			}
+		})
+	}
+}

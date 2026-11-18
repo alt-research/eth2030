@@ -1,6 +1,7 @@
 ## Current merged gas development baseline (2026-11-19)
 
-Isolated `feat/glamsterdam-state-gas` starts at qualified feature composition `aacc65ea`. The published 3db38a3 merged LIFO model is the development target; unmerged EIPs PRs 12581/12582 remain separate pending final release choices. The local read-only EIPs checkout is older 49beda9 and is not the chosen numeric/formula authority. Signed differential, actual pool/VM/block/API settlement and application qualification remain under implementation.
+Isolated `feat/glamsterdam-state-gas` targets the fixed 3db38a3 LIFO model. The first native transition implementation now matches all 22 signed Amsterdam corpus cases across gas dimensions, roots, balances and logs, versus 19 differing cases before. Native frame metering, current intrinsic/runtime separation, authorizations, slot refill and creation charging are being composed. This is an implementation checkpoint: outer block/pool/RPC consumers, larger 7702/application vectors and release qualification remain incomplete; existing old-price fixture failures are retained for semantic repair. Unmerged alternatives remain separate. The older 49beda9 read-only EIP checkout is not used as numeric authority.
+
 
 ## Sparse relay composed regression (2026-11-19)
 

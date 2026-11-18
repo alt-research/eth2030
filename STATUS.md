@@ -15,6 +15,9 @@
 - The separate Engine backend now returns RLP BALs and preserves historical
   transaction bodies beyond its BAL-retention window. Corrupt stored BAL data
   is rejected by a real build/import/storage regression.
+- The rebuilt live receiver also reopened the original blob receipt, parent/post
+  application storage and both sponsor balances after a real EL restart. This
+  check now runs in the repeatable controller, with negative readback controls.
 - Removing BAL persistence and removing the V2 DATA codec were each detected
   by the actual HTTP/restart integration using isolated Go build overlays.
 - The failed observer run cleaned all enclave resources and stopped its engine;
@@ -47,7 +50,7 @@
   message roots match the finalized state's block-root window. Signatures,
   execution identities, FOCIL bits and commitments match captured evidence.
   Changed bits, commitments, signatures and unrelated EL identities fail.
-- CI now runs the standalone replay, its race regressions and all eleven
+- CI now runs the standalone replay, its race regressions and all twelve
   Python control tests when either protocol code or the replay module changes.
 - The March local Dora codec also failed actual Gloas state decoding. It lacks
   the relocated latest block hash, execution requests root and PTC state layout.

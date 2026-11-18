@@ -35,6 +35,25 @@ class FrameHistoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "original Frame"):
                 history.check_historical_envelope(self.fixture(), "execution", "tx", [], "beacon")
 
+    def test_blob_restart_requires_original_receipt_storage_and_balances(self):
+        original = {"transaction": "tx", "receipt": {"blockNumber": "0x2"}, "balances": [10, 5]}
+        def rpc(_url, method, *args):
+            if method == "eth_getTransactionReceipt":
+                return original["receipt"]
+            if method == "eth_getStorageAt":
+                return "0x0" if args[-1] == "0x1" else "0x1"
+            return "0xa" if args[-1] == "0x1" else "0x5"
+        with patch.object(history.control, "rpc", side_effect=rpc):
+            self.assertEqual(history.blob_readback("rpc", original)["storage"], [0, 1])
+        for changed_method in ("eth_getTransactionReceipt", "eth_getStorageAt", "eth_getBalance"):
+            def wrong(url, method, *args):
+                if method == changed_method:
+                    return {"blockNumber": "0x3"} if method == "eth_getTransactionReceipt" else "0xff"
+                return rpc(url, method, *args)
+            with patch.object(history.control, "rpc", side_effect=wrong):
+                with self.assertRaises(RuntimeError):
+                    history.blob_readback("rpc", original)
+
 
 if __name__ == "__main__":
     unittest.main()

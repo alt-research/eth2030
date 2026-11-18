@@ -125,6 +125,21 @@ def start_observer(enclave, beacon, output):
                       "image_id": item["Image"], "memory": memory}
 
 
+def blob_readback(execution, original):
+    receipt = control.rpc(execution, "eth_getTransactionReceipt", original["transaction"])
+    if receipt is None:
+        return None
+    if receipt != original["receipt"]:
+        raise RuntimeError("blob receipt changed after restart")
+    before = hex(int(receipt["blockNumber"], 16) - 1)
+    at = receipt["blockNumber"]
+    storage = [int(control.rpc(execution, "eth_getStorageAt", BLOB_TARGET, "0x0", block), 16) for block in (before, at)]
+    balances = [int(control.rpc(execution, "eth_getBalance", PAYMASTER, block), 16) for block in (before, at)]
+    if storage != [0, 1] or balances != original["balances"]:
+        raise RuntimeError("blob historical storage or settlement changed after restart")
+    return {"receipt": receipt, "storage": storage, "balances": balances}
+
+
 def verify_history(enclave, evidence, rpcs, beacons, frame_tool, output):
     evidence["blob"] = verify_blob(rpcs, beacons, frame_tool, output)
     # Preserve real public consensus fixtures for the service-codec cutover.
@@ -170,6 +185,7 @@ def verify_observer_history(enclave, evidence, beacons, output):
     evidence["after_restart"] = control.wait_for(lambda: verifier.frame_readback(control.endpoint(enclave, control.EL[1], "rpc"), evidence["sponsored"]["transaction"], PAYMASTER), 120, "paymaster history missing after restart")
     if evidence["after_restart"] != evidence["sponsored"]["frame"]:
         raise RuntimeError("paymaster history changed across restart")
+    evidence["blob_after_restart"] = control.wait_for(lambda: blob_readback(control.endpoint(enclave, control.EL[1], "rpc"), evidence["blob"]), 120, "blob history missing after restart")
 
 
 def main():

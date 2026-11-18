@@ -62,6 +62,45 @@ type ServerHandler struct {
 	clients map[string]*Client
 }
 
+type BlockAccessListBackend interface {
+	BlockAccessList(types.Hash) ([]byte, error)
+}
+
+func (h *ServerHandler) HandleGetBlockAccessLists(req *GetBlockAccessListsPacket) (*BlockAccessListsPacket, error) {
+	if len(req.Hashes) > MaxBlockAccessLists {
+		return nil, ErrRequestTooLarge
+	}
+	limit := req.Bytes
+	if limit == 0 {
+		limit = BALSoftResponseLimit
+	}
+	if limit > BALHardResponseLimit {
+		limit = BALHardResponseLimit
+	}
+	response := &BlockAccessListsPacket{ID: req.ID}
+	backend, _ := h.backend.(BlockAccessListBackend)
+	var size uint64
+	for _, hash := range req.Hashes {
+		var data []byte
+		if backend != nil {
+			data, _ = backend.BlockAccessList(hash)
+		}
+		cost := uint64(len(data))
+		if cost == 0 {
+			cost = 1
+		}
+		if cost > BALHardResponseLimit || (len(response.Lists) > 0 && size+cost > limit) {
+			break
+		}
+		response.Lists = append(response.Lists, bytes.Clone(data))
+		size += cost
+		if size >= limit {
+			break
+		}
+	}
+	return response, nil
+}
+
 // NewServerHandler creates a new snap protocol server handler.
 func NewServerHandler(backend StateBackend) *ServerHandler {
 	return &ServerHandler{backend: backend, clients: make(map[string]*Client)}
@@ -343,11 +382,23 @@ func (h *ServerHandler) HandleGetTrieNodes(req *GetTrieNodesPacket) (*TrieNodesP
 // Protocol returns a p2p.Protocol descriptor for snap/1. Register it with the
 // P2P server's Protocols list to enable snap-sync serving for connected peers.
 func (h *ServerHandler) Protocol() p2p.Protocol {
+	return h.protocol(ProtocolVersion)
+}
+
+func (h *ServerHandler) Protocols() []p2p.Protocol {
+	return []p2p.Protocol{h.protocol(ProtocolVersion2), h.protocol(ProtocolVersion)}
+}
+
+func (h *ServerHandler) protocol(version uint) p2p.Protocol {
+	length := uint64(8)
+	if version >= ProtocolVersion2 {
+		length = 10
+	}
 	return p2p.Protocol{
 		Name:    ProtocolName,
-		Version: ProtocolVersion,
-		Length:  8, // message codes 0x00-0x07
-		Run:     h.runPeer,
+		Version: version,
+		Length:  length,
+		Run:     func(peer *peermgr.Peer, t wire.Transport) error { return h.runPeerVersion(peer, t, version) },
 	}
 }
 
@@ -356,7 +407,11 @@ func (h *ServerHandler) Protocol() p2p.Protocol {
 // appropriate Handle* method and writes the response back. The loop exits when
 // the transport is closed or an unrecoverable error occurs.
 func (h *ServerHandler) runPeer(peer *peermgr.Peer, t wire.Transport) error {
-	client := &Client{id: peer.ID(), transport: t, pending: make(map[uint64]pendingResponse), done: make(chan struct{})}
+	return h.runPeerVersion(peer, t, ProtocolVersion)
+}
+
+func (h *ServerHandler) runPeerVersion(peer *peermgr.Peer, t wire.Transport, version uint) error {
+	client := &Client{id: peer.ID(), version: version, transport: t, pending: make(map[uint64]pendingResponse), done: make(chan struct{})}
 	h.mu.Lock()
 	h.clients[peer.ID()] = client
 	h.mu.Unlock()
@@ -373,13 +428,20 @@ func (h *ServerHandler) runPeer(peer *peermgr.Peer, t wire.Transport) error {
 		if err != nil {
 			return err
 		}
-		if msg.Code%2 == 1 && msg.Code <= TrieNodesMsg {
+		if version >= ProtocolVersion2 && (msg.Code == GetTrieNodesMsg || msg.Code == TrieNodesMsg) {
+			return fmt.Errorf("snap/2 removed trie-node message")
+		}
+		responseMax := TrieNodesMsg
+		if version >= ProtocolVersion2 {
+			responseMax = BlockAccessListsMsg
+		}
+		if msg.Code%2 == 1 && msg.Code <= responseMax {
 			if err := client.deliver(msg); err != nil {
 				return err
 			}
 			continue
 		}
-		if err := h.handleSnapMsg(t, msg); err != nil {
+		if err := h.handleSnapMsgVersion(t, msg, version); err != nil {
 			return err
 		}
 	}
@@ -387,10 +449,27 @@ func (h *ServerHandler) runPeer(peer *peermgr.Peer, t wire.Transport) error {
 
 // handleSnapMsg decodes a single snap/1 message and writes the response.
 func (h *ServerHandler) handleSnapMsg(t wire.Transport, msg wire.Msg) error {
+	return h.handleSnapMsgVersion(t, msg, ProtocolVersion)
+}
+
+func (h *ServerHandler) handleSnapMsgVersion(t wire.Transport, msg wire.Msg, version uint) error {
 	if len(msg.Payload) > HardResponseLimit {
 		return ErrRequestTooLarge
 	}
 	switch msg.Code {
+	case GetBlockAccessListsMsg:
+		if version < ProtocolVersion2 {
+			return fmt.Errorf("snap/1 does not support BAL requests")
+		}
+		var req GetBlockAccessListsPacket
+		if err := rlp.DecodeBytes(msg.Payload, &req); err != nil {
+			return err
+		}
+		response, err := h.HandleGetBlockAccessLists(&req)
+		if err != nil {
+			return err
+		}
+		return sendSnapMsg(t, BlockAccessListsMsg, response)
 	case GetAccountRangeMsg:
 		var req GetAccountRangePacket
 		if err := rlp.DecodeBytes(msg.Payload, &req); err != nil {
@@ -425,6 +504,9 @@ func (h *ServerHandler) handleSnapMsg(t wire.Transport, msg wire.Msg) error {
 		return sendSnapMsg(t, ByteCodesMsg, resp)
 
 	case GetTrieNodesMsg:
+		if version >= ProtocolVersion2 {
+			return fmt.Errorf("snap/2 removed trie-node requests")
+		}
 		var req GetTrieNodesPacket
 		if err := rlp.DecodeBytes(msg.Payload, &req); err != nil {
 			return fmt.Errorf("snap: decode GetTrieNodes: %w", err)

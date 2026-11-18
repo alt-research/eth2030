@@ -28,6 +28,10 @@ type SnapshotWriter struct {
 func NewSnapshotWriter(db rawdb.Database) *SnapshotWriter {
 	return &SnapshotWriter{db, state.NewStateSnapshot()}
 }
+
+func NewSnapshotWriterFromSnapshot(db rawdb.Database, snapshot *state.StateSnapshot) *SnapshotWriter {
+	return &SnapshotWriter{db, snapshot.Copy()}
+}
 func (w *SnapshotWriter) WriteAccount(hash types.Hash, account AccountData) error {
 	if account.Balance == nil || account.Balance.Sign() < 0 || account.Balance.BitLen() > 256 {
 		return fmt.Errorf("snap: invalid balance")

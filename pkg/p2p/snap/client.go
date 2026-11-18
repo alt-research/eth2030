@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/p2p/wire"
@@ -29,6 +30,7 @@ type pendingResponse struct {
 // the requested pivot root, not to an untrusted server completion flag.
 type Client struct {
 	id        string
+	version   uint
 	transport wire.Transport
 	seq       atomic.Uint64
 	mu        sync.Mutex
@@ -37,6 +39,13 @@ type Client struct {
 }
 
 func (c *Client) ID() string { return c.id }
+
+func (c *Client) Version() uint {
+	if c.version == 0 {
+		return ProtocolVersion
+	}
+	return c.version
+}
 
 // WithContext creates a request-scoped adapter sharing the peer connection.
 func (c *Client) WithContext(ctx context.Context) *VerifiedPeer {
@@ -99,7 +108,11 @@ func (c *Client) request(ctx context.Context, code uint64, packet func(uint64) a
 }
 
 func (c *Client) deliver(msg wire.Msg) error {
-	if len(msg.Payload) > HardResponseLimit {
+	limit := HardResponseLimit
+	if c.Version() >= ProtocolVersion2 && msg.Code == BlockAccessListsMsg {
+		limit = BALHardResponseLimit
+	}
+	if len(msg.Payload) > limit {
 		return ErrRequestTooLarge
 	}
 	// Every response starts with its request ID.
@@ -244,6 +257,9 @@ func (p *VerifiedPeer) RequestBytecodes(req statesync.BytecodeRequest) (*statesy
 }
 
 func (p *VerifiedPeer) RequestTrieNodes(root types.Hash, paths [][]byte) ([][]byte, error) {
+	if p.Version() >= ProtocolVersion2 {
+		return nil, fmt.Errorf("snap/2 removed trie-node healing")
+	}
 	sets := make([]TrieNodePathSet, len(paths))
 	for i, path := range paths {
 		if len(path) > 32 {
@@ -255,6 +271,41 @@ func (p *VerifiedPeer) RequestTrieNodes(root types.Hash, paths [][]byte) ([][]by
 	var response TrieNodesPacket
 	err := p.request(p.ctx, GetTrieNodesMsg, func(id uint64) any { return &GetTrieNodesPacket{id, root, sets, SoftResponseLimit} }, &response)
 	return response.Nodes, err
+}
+
+// RequestBlockAccessLists verifies each positional response against the exact
+// requested header. Missing data is nil; an authenticated empty BAL is c0.
+func (c *Client) RequestBlockAccessLists(ctx context.Context, headers []*types.Header, budget uint64) ([][]byte, error) {
+	if c.Version() < ProtocolVersion2 {
+		return nil, fmt.Errorf("snap peer does not support BAL catch-up")
+	}
+	if len(headers) > MaxBlockAccessLists {
+		return nil, ErrRequestTooLarge
+	}
+	hashes := make([]types.Hash, len(headers))
+	for i, header := range headers {
+		if header == nil {
+			return nil, fmt.Errorf("missing BAL header")
+		}
+		hashes[i] = header.Hash()
+	}
+	var response BlockAccessListsPacket
+	err := c.request(ctx, GetBlockAccessListsMsg, func(id uint64) any { return &GetBlockAccessListsPacket{id, hashes, budget} }, &response)
+	if err != nil {
+		return nil, err
+	}
+	if len(response.Lists) > len(headers) {
+		return nil, fmt.Errorf("snap/2 unsolicited BAL tail")
+	}
+	for i, data := range response.Lists {
+		if data == nil {
+			continue
+		}
+		if _, err := bal.DecodeForHeader(data, headers[i]); err != nil {
+			return nil, err
+		}
+	}
+	return response.Lists, nil
 }
 
 func (h *ServerHandler) Clients() []*Client {

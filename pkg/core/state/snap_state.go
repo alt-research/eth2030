@@ -26,6 +26,29 @@ func NewStateSnapshot() *StateSnapshot {
 	return &StateSnapshot{make(map[types.Hash][]byte), make(map[types.Hash]map[types.Hash][]byte), make(map[types.Hash][]byte)}
 }
 
+func (s *StateSnapshot) Copy() *StateSnapshot {
+	copy := NewStateSnapshot()
+	for key, body := range s.Accounts {
+		copy.Accounts[key] = bytes.Clone(body)
+	}
+	for account, slots := range s.Storage {
+		copy.Storage[account] = make(map[types.Hash][]byte, len(slots))
+		for key, value := range slots {
+			copy.Storage[account][key] = bytes.Clone(value)
+		}
+	}
+	for hash, code := range s.Codes {
+		copy.Codes[hash] = bytes.Clone(code)
+	}
+	return copy
+}
+
+// SnapshotTrieRoot verifies partial-download storage completion without
+// publishing trie nodes or assuming that a previous cursor proves a new root.
+func SnapshotTrieRoot(entries map[types.Hash][]byte) (types.Hash, error) {
+	return snapshotValidationRoot(entries)
+}
+
 func snapshotTrie(entries map[types.Hash][]byte) *mpt.Trie {
 	tr := mpt.New()
 	for key, value := range entries {

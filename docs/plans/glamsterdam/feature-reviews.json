@@ -1,6 +1,6 @@
 {
   "implementation_base": "38ea9259",
-  "integration_tested_commit": "1d9826c2bfb0f70dd294db85d9bef1f3911e3d45",
+  "integration_tested_commit": "ab3653621b65a80b6fdaaca15ac9a25a080010b1",
   "status": "development integration passed; program incomplete",
   "reviews": [
     {
@@ -155,10 +155,21 @@
       "scope": "Canonical startup schedules, Engine version/field bounds and actual HTTP",
       "source_in_tested_integration": true,
       "release_qualified": false
+    },
+    {
+      "pr": 79,
+      "url": "https://github.com/alt-research/eth2030/pull/79",
+      "branch": "feat/glamsterdam-config-recovery",
+      "commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "remote_head": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "tested_source_commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "scope": "Persisted configuration authority before actual Node restart/replay",
+      "release_qualified": false,
+      "source_in_tested_integration": true
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
-  "integration_published_head": "7fd69b84601d3d71df1851e86917e4d20c2fe743",
+  "integration_published_head": "1d9826c2bfb0f70dd294db85d9bef1f3911e3d45",
   "checked_at_utc": "2026-11-18 11:15:45 UTC",
-  "previous_integration_tested_commit": "d97be4c32e54e1f516391fe45262e01acd27c841"
+  "previous_integration_tested_commit": "1d9826c2bfb0f70dd294db85d9bef1f3911e3d45"
 }

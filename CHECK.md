@@ -5,7 +5,8 @@
 - [x] Publish isolated PR 78 and pin complete Engine specifications.
 - [x] Qualify actual HTTP and four behavioral mutations, preserving valid zero fields and forkchoice adoption.
 - [x] Run full/tagged/affected race/vet/build on the feature composition.
-- [ ] Complete persisted configuration recovery and remaining release gates.
+- [x] Qualify actual persisted configuration recovery in PR 79.
+- [ ] Complete remaining release gates.
 
 ## Builder execution requests review batch (2026-11-18)
 

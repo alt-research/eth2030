@@ -1,3 +1,7 @@
+## Actual persisted configuration recovery review (2026-11-18)
+
+[PR 79](https://github.com/alt-research/eth2030/pull/79) qualifies pre-replay runtime configuration authority through signed HTTP and actual restarts. Compatible future updates survive; active changes, corrupt/unknown authority and changed historical parameters are rejected without head/config adoption. Aggregate `ab365362` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. [Verification](docs/verification/glamsterdam-config-recovery-20261118.md). Dynamic blob schedules, final gas and release gates remain open.
+
 ## Canonical startup and Engine schema review (2026-11-18)
 
 [PR 78](https://github.com/alt-research/eth2030/pull/78) qualifies canonical fork dependencies, method windows and actual HTTP field/encoding bounds. Composed source `1d9826c2` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. Persisted configuration recovery remains separate ongoing work. See [verification](docs/verification/glamsterdam-fork-schema-20261118.md).

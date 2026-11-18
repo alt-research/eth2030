@@ -9,6 +9,7 @@ import signal
 import subprocess
 import time
 from uuid import uuid4
+from urllib.request import Request, urlopen
 
 import importlib.util
 SCRIPTS = Path(__file__).resolve().parent
@@ -152,6 +153,16 @@ def main():
         beacons = [control.endpoint(enclave, name, "http") for name in control.CL]
         evidence["sponsored"] = verifier.verify(enclave, 900, args.frame_tool.resolve(), args.output, PAYMASTER)
         evidence["blob"] = verify_blob(rpcs, beacons, args.frame_tool.resolve(), args.output)
+        # Preserve real public consensus fixtures for the service-codec cutover.
+        request = Request(beacons[0] + "/eth/v2/debug/beacon/states/finalized", headers={"Accept": "application/octet-stream"})
+        with urlopen(request, timeout=30) as response:
+            state_ssz = response.read(16 * 1024 * 1024 + 1)
+            if len(state_ssz) > 16 * 1024 * 1024:
+                raise RuntimeError("unexpectedly large observer state fixture")
+            (args.output / "heze-finalized.ssz").write_bytes(state_ssz)
+        state_json = verifier.fetch(beacons[0] + "/eth/v2/debug/beacon/states/finalized")
+        (args.output / "heze-finalized.json").write_text(json.dumps(state_json, indent=2) + "\n")
+        evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"]}
         observer, evidence["observer"] = start_observer(enclave, beacons[0], args.output)
         histories = []
         for item in (evidence["sponsored"], evidence["blob"]):

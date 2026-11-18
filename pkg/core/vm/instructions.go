@@ -1209,11 +1209,8 @@ func opBlockhash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack
 	return nil, nil
 }
 
-// opSelfdestruct implements the SELFDESTRUCT opcode.
-// Post-EIP-6780 (Cancun): sends remaining balance to the beneficiary but does
-// NOT destroy the account. Account destruction only occurs if the contract was
-// created in the same transaction, which is tracked externally by the state
-// processor. The opcode effectively becomes "send all balance".
+// opSelfdestruct transfers the balance and halts. Same-transaction creation
+// markers are journaled by the EVM; EIP-8246 clears their state at transaction end.
 func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	if evm.readOnly {
 		return nil, ErrWriteProtection
@@ -1228,7 +1225,7 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 			if evm.forkRules.IsEIP7708 {
 				if beneficiary != contract.Address {
 					EmitTransferLog(evm.StateDB, contract.Address, beneficiary, balance)
-				} else {
+				} else if !evm.isEIP8246() {
 					EmitBurnLog(evm.StateDB, contract.Address, balance)
 				}
 			}
@@ -1248,9 +1245,15 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 				}
 			}
 		}
-		// Post-EIP-6780: do NOT call SelfDestruct. The account persists.
-		// The state processor may still mark it for destruction if the
-		// contract was created in the same transaction.
+		if evm.createdInTransaction(contract.Address) {
+			// The StateDB marker clears the balance as a legacy side effect.
+			// Restore it so repeated destruction and later credits never burn ETH.
+			remaining := new(big.Int).Set(evm.StateDB.GetBalance(contract.Address))
+			evm.StateDB.SelfDestruct(contract.Address)
+			if evm.isEIP8246() {
+				evm.StateDB.AddBalance(contract.Address, remaining)
+			}
+		}
 	}
 
 	return nil, nil

@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Glamsterdam EIP-8246 transaction lifecycle (2026-11-18)
+
+- [x] Pin EIP-8246 and read EIP-6780/161; reproduce missing native destruction cleanup.
+- [x] Journal same-transaction creations with nested rollback and preserve balances through finalization.
+- [x] Verify native CREATE/CREATE2, pre-funded targets, late credits, old contracts and reverted creation.
+- [x] Qualify BAL final-state changes and persistence; run affected tests and local build.
+- [ ] Publish the isolated implementation branch and update program evidence.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

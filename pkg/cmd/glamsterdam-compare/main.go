@@ -93,6 +93,7 @@ type comparison struct {
 	Differences []string    `json:"differences"`
 }
 type report struct {
+	Scope          string       `json:"scope"`
 	Status         string       `json:"status"`
 	NativeRevision string       `json:"native_revision"`
 	OracleModule   string       `json:"oracle_module"`
@@ -314,7 +315,7 @@ func readAccounts(addresses []types.Address, exists func(types.Address) bool, ba
 	return out
 }
 func makeReport() (report, error) {
-	out := report{Status: "development corpus; not release-qualified", EIPsRevision: eipsRevision, OracleModule: "github.com/ethereum/go-ethereum", OracleVersion: "unknown", Uncovered: []string{"full EEST corpus", "7702 authorizations and application invariants", "multi-transaction block settlement and next base fee", "method-specific RPC semantics", "cross-client process/devnet recovery", "unmerged alternative gas models"}}
+	out := report{Status: "development corpus; not release-qualified", Scope: "signed transaction transitions; pool and outer block validation are not invoked", EIPsRevision: eipsRevision, OracleModule: "github.com/ethereum/go-ethereum", OracleVersion: "unknown", Uncovered: []string{"pool admission and outer block validation", "full EEST corpus", "7702 authorizations and application invariants", "multi-transaction block settlement and next base fee", "method-specific RPC semantics", "cross-client process/devnet recovery", "unmerged alternative gas models"}}
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, dep := range info.Deps {
 			if dep.Path == out.OracleModule {

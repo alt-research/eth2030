@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/types"
 	bridge "github.com/eth2030/eth2030/geth"
 	gethcommon "github.com/ethereum/go-ethereum/common"
@@ -83,6 +84,9 @@ func TestCanonicalPreBlockSystemsAgainstIndependentSDK(t *testing.T) {
 			if nativeRoot != types.Hash(expected) {
 				t.Fatalf("actual pre-block %s root %s differs from independent SDK %s", scenario, nativeRoot, expected)
 			}
+			if scenario == "deployed" && eips.GetHistoricalBlockHash(db, 8191) != parent {
+				t.Fatal("native valid history readback used the wrong window")
+			}
 			if scenario == "deployed" && db.GetState(history, types.Hash{}) != parent {
 				t.Fatal("8191 history wrap did not write canonical slot zero")
 			}
@@ -96,11 +100,38 @@ func TestCanonicalPreBlockSystemsAgainstIndependentSDK(t *testing.T) {
 				t.Fatal("system caller state was fabricated")
 			}
 			for _, entry := range result.BlockAccessList.Entries {
+				if scenario == "revert" && (entry.Address == history || entry.Address == beacon) && len(entry.StorageChanges) != 0 {
+					t.Fatal("reverted system write survived in BAL")
+				}
+				if scenario == "deployed" && (entry.Address == history || entry.Address == beacon) && len(entry.StorageChanges) > 0 && entry.AccessIndex != 0 {
+					t.Fatal("pre-block write used a transaction/post index")
+				}
+			}
+			for _, entry := range result.BlockAccessList.Entries {
 				if entry.Address == types.SystemAddress {
 					t.Fatal("untouched system caller included in BAL")
 				}
 			}
 			t.Logf("scenario=%s root=%s", scenario, nativeRoot)
 		})
+	}
+}
+
+func TestCanonicalSystemRuntimeAssetsAndExplicitAllocation(t *testing.T) {
+	if eips.HistoryServeWindow != 8191 || eips.HistoryStorageAddress != types.Address(params.HistoryStorageAddress) || !bytes.Equal(eips.HistoryStorageRuntime(), params.HistoryStorageCode) || !bytes.Equal(eips.BeaconRootsRuntime(), params.BeaconRootsCode) {
+		t.Fatal("native canonical system input differs from independent SDK")
+	}
+	db := newBuilderRequestTestState()
+	custom := []byte{0}
+	db.SetCode(eips.BeaconRootAddress, custom)
+	db.SetNonce(eips.BeaconRootAddress, 7)
+	eips.ApplyExecutionSystemGenesis(db)
+	if !bytes.Equal(db.GetCode(eips.BeaconRootAddress), custom) || db.GetNonce(eips.BeaconRootAddress) != 7 || !bytes.Equal(db.GetCode(eips.HistoryStorageAddress), params.HistoryStorageCode) || db.GetNonce(eips.HistoryStorageAddress) != 1 {
+		t.Fatal("explicit genesis allocation replaced custom state or omitted canonical history")
+	}
+	mutable := eips.HistoryStorageRuntime()
+	mutable[0] ^= 1
+	if bytes.Equal(mutable, eips.HistoryStorageRuntime()) {
+		t.Fatal("runtime caller mutated canonical bytes")
 	}
 }

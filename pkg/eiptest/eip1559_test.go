@@ -41,9 +41,11 @@ func TestEIP1559_BaseFeeEvolution(t *testing.T) {
 	tx := eiptest.UnsignedDynamicFee(
 		s.Alice().Address, s.Config().ChainID, s.Nonce(s.Alice().Address),
 		eiptest.ToPtr(burn), nil, nil,
-		25_000_000, big.NewInt(4_000_000_000), big.NewInt(1_000_000_000),
+		12_500_000, big.NewInt(4_000_000_000), big.NewInt(1_000_000_000),
 	)
-	r := s.Commit(tx)
+	// Respect the Osaka per-transaction cap while filling the block.
+	tx2 := eiptest.UnsignedDynamicFee(s.Alice().Address, s.Config().ChainID, s.Nonce(s.Alice().Address)+1, eiptest.ToPtr(burn), nil, nil, 12_500_000, big.NewInt(4_000_000_000), big.NewInt(1_000_000_000))
+	r := s.Commit(tx, tx2)
 	if r.GasUsed() < 15_000_000 {
 		t.Fatalf("expected a heavy block, gas used %d", r.GasUsed())
 	}

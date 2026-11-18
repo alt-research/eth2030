@@ -191,6 +191,11 @@ func (b *EngineBackend) IsPrague(timestamp uint64) bool {
 	return b.node.Blockchain().Config().IsPrague(timestamp)
 }
 
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.node.Blockchain().Config().IsOsaka(timestamp)
+}
+
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
 	return b.node.Blockchain().Config().IsAmsterdam(timestamp)

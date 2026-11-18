@@ -386,11 +386,15 @@ type payloadAttributesV3JSON struct {
 
 // ToV3AttrsJSON builds the shadow struct for V3 attributes. Used by V4 too.
 func (p *PayloadAttributesV3) ToV3AttrsJSON() payloadAttributesV3JSON {
+	withdrawals := p.Withdrawals
+	if withdrawals == nil {
+		withdrawals = []*Withdrawal{}
+	}
 	return payloadAttributesV3JSON{
 		Timestamp:             hexUint64(p.Timestamp),
 		PrevRandao:            p.PrevRandao,
 		SuggestedFeeRecipient: p.SuggestedFeeRecipient,
-		Withdrawals:           p.Withdrawals,
+		Withdrawals:           withdrawals,
 		ParentBeaconBlockRoot: p.ParentBeaconBlockRoot,
 	}
 }
@@ -422,7 +426,7 @@ func (p *PayloadAttributesV3) UnmarshalJSON(data []byte) error {
 type payloadAttributesV4JSON struct {
 	payloadAttributesV3JSON
 	SlotNumber                hexUint64  `json:"slotNumber"`
-	TargetGasLimit            hexUint64  `json:"targetGasLimit,omitempty"`
+	TargetGasLimit            hexUint64  `json:"targetGasLimit"`
 	InclusionListTransactions []hexBytes `json:"inclusionListTransactions,omitempty"`
 }
 
@@ -717,9 +721,9 @@ func (p *PayloadAttributesV7) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ── GetPayloadV5Response ─────────────────────────────────────────────────────
+// ── LegacyGlamsterdamPayloadResponse ─────────────────────────────────────────────────────
 
-type getPayloadV5ResponseJSON struct {
+type legacyGlamsterdamPayloadResponseJSON struct {
 	ExecutionPayload  *ExecutionPayloadV5 `json:"executionPayload"`
 	BlockValue        *hexBig             `json:"blockValue"`
 	BlobsBundle       *BlobsBundleV2      `json:"blobsBundle"`
@@ -727,13 +731,13 @@ type getPayloadV5ResponseJSON struct {
 	ExecutionRequests []hexBytes          `json:"executionRequests"`
 }
 
-// MarshalJSON implements json.Marshaler for GetPayloadV5Response.
-func (r GetPayloadV5Response) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements json.Marshaler for LegacyGlamsterdamPayloadResponse.
+func (r LegacyGlamsterdamPayloadResponse) MarshalJSON() ([]byte, error) {
 	blobsBundle := r.BlobsBundle
 	if blobsBundle == nil {
 		blobsBundle = &BlobsBundleV2{}
 	}
-	return json.Marshal(getPayloadV5ResponseJSON{
+	return json.Marshal(legacyGlamsterdamPayloadResponseJSON{
 		ExecutionPayload:  r.ExecutionPayload,
 		BlockValue:        newHexBig(r.BlockValue),
 		BlobsBundle:       blobsBundle,
@@ -742,9 +746,9 @@ func (r GetPayloadV5Response) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// UnmarshalJSON implements json.Unmarshaler for GetPayloadV5Response.
-func (r *GetPayloadV5Response) UnmarshalJSON(data []byte) error {
-	var j getPayloadV5ResponseJSON
+// UnmarshalJSON implements json.Unmarshaler for LegacyGlamsterdamPayloadResponse.
+func (r *LegacyGlamsterdamPayloadResponse) UnmarshalJSON(data []byte) error {
+	var j legacyGlamsterdamPayloadResponseJSON
 	if err := json.Unmarshal(data, &j); err != nil {
 		return err
 	}

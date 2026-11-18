@@ -44,6 +44,7 @@ func (m *handlerMockBackend) GetHeadTimestamp() uint64              { return 100
 func (m *handlerMockBackend) GetBlockTimestamp(_ types.Hash) uint64 { return 0 }
 func (m *handlerMockBackend) IsCancun(ts uint64) bool               { return true }
 func (m *handlerMockBackend) IsPrague(ts uint64) bool               { return true }
+func (m *handlerMockBackend) IsOsaka(ts uint64) bool                { return true }
 func (m *handlerMockBackend) IsAmsterdam(ts uint64) bool            { return true }
 func (m *handlerMockBackend) GetHeadHash() types.Hash               { return types.Hash{} }
 func (m *handlerMockBackend) GetSafeHash() types.Hash               { return types.Hash{} }

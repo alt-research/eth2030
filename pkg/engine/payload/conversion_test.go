@@ -130,7 +130,7 @@ func TestHeaderToPayloadFields(t *testing.T) {
 	}
 }
 
-func TestGetPayloadV5ResponseJSON(t *testing.T) {
+func TestLegacyGlamsterdamPayloadResponseJSON(t *testing.T) {
 	// Test that blockValue and executionRequests are hex-encoded per Engine API spec.
 	// go.mod targets go1.26 which forbids multi-level promoted-field struct
 	// literals, so build the embedding chain in steps.
@@ -142,7 +142,7 @@ func TestGetPayloadV5ResponseJSON(t *testing.T) {
 			},
 		},
 	}
-	resp := &GetPayloadV5Response{
+	resp := &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload: &ExecutionPayloadV5{
 			ExecutionPayloadV4: ExecutionPayloadV4{ExecutionPayloadV3: *v3},
 		},
@@ -170,7 +170,7 @@ func TestGetPayloadV5ResponseJSON(t *testing.T) {
 	}
 
 	// Round-trip test
-	var parsed GetPayloadV5Response
+	var parsed LegacyGlamsterdamPayloadResponse
 	if err := json.Unmarshal(data, &parsed); err != nil {
 		t.Fatalf("failed to unmarshal: %v", err)
 	}

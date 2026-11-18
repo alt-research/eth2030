@@ -341,6 +341,9 @@ func New(config *Config) (*Node, error) {
 		chainConfig = chainConfigForNetwork(config.Network)
 		// Apply any fork overrides on top of the standard chain config.
 		applyForkOverrides(chainConfig, config)
+		if err := chainConfig.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid network fork schedule: %w", err)
+		}
 		genesis = makeGenesisBlock()
 	}
 

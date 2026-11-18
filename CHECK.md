@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## Canonical fork schedule and Engine version boundaries (2026-11-18)
+
+- [x] Read the current Engine Amsterdam/Osaka/Prague/Cancun rules and trace actual startup/HTTP consumers.
+- [x] Reject incoherent canonical fork schedules before genesis/state adoption; preserve explicit private extensions.
+- [x] Enforce canonical Engine version/required-field boundaries with exact activation and presence cases.
+- [x] Qualify actual HTTP failures and valid forkchoice adoption independently from attribute rejection.
+- [x] Run affected/full tests, build, race/vet and publish the isolated review.
+
 ## Mandatory builder-request feature composition (2026-11-18)
 
 - [x] Allocate canonical contracts in blob/factory/slot owned fixtures before root construction.

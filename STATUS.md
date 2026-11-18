@@ -1,3 +1,7 @@
+## Snap version 2 socket lifecycle follow up (2026-11-19)
+
+Explicitly stop the test-owned P2P servers before Node/database restart and on every scenario exit. Five encrypted Node cases pass again under race, with affected vet and build. This makes the test resource ownership match the manually started component setup; production protocol behavior is unchanged.
+
 ## snap version 2 state catch up (2026-11-19)
 
 The production node negotiates snap/2 and snap/1, preserving range/code schemas and rejecting removed trie-node messages on version 2. Raw positional BAL responses distinguish missing 0x80 from available c0; the actual sender and receiver use the custom codec. Header commitments and canonical BAL structure are verified before staged state rebasing.

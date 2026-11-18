@@ -46,3 +46,7 @@ go build ./...
 Full tests and tagged tests pass. Affected checks were repeated after the isolated proof-fixture correction. Local logs are `/tmp/glamsterdam-snap2-all-4.log`, `-tagged-4.log`, `-final-affected.log`, `-final-race.log`, the seven mutation logs and the SDK/Node wire logs.
 
 This qualifies native Node moving-pivot/reorg/restart behavior and independent SDK wire decoding. It does not establish full Geth cold-sync interoperability, physical retention/pruning over 14,299 epochs, mainnet-scale throughput/memory, a peer reputation/rate policy or complete CL/multiclient release acceptance. Snapshot assembly and staging still materialize state in memory. eth/72 sparse blob custody/provider/sampler/reconstruction and the selected execution gas model remain separate tasks.
+
+## Explicit socket lifecycle follow up
+
+The manually started P2P servers now have explicit test cleanup, and the receiver server is stopped before closing/reopening its Node database. This is required because the test does not invoke full Node.Start; Node.Stop's not-running path does not own an independently started server. All five real Node scenarios pass again under race, with affected vet and local build. The production protocol behavior is unchanged.

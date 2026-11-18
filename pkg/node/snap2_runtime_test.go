@@ -193,6 +193,8 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			// Real encrypted negotiation and dispatch, with a serving-policy
 			// wrapper that makes the old root stale after authenticated progress.
 			source.p2pServer = p2p.NewServer(p2p.Config{ListenAddr: "127.0.0.1:0", MaxPeers: 10, EnableRLPx: true, Protocols: append(source.ethHandler.Protocols(), source.snapHandler.Protocols()...)})
+			t.Cleanup(source.p2pServer.Stop)
+			t.Cleanup(target.p2pServer.Stop)
 			if err := source.p2pServer.Start(); err != nil {
 				t.Fatal(err)
 			}
@@ -251,6 +253,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			}
 			head := target.blockchain.CurrentBlock().Hash()
 			root := target.blockchain.CurrentBlock().Root()
+			target.p2pServer.Stop()
 			if err := target.Stop(); err != nil {
 				t.Fatal(err)
 			}

@@ -111,7 +111,7 @@ def start_observer(enclave, beacon, output):
     bootnodes = [verifier.fetch(control.endpoint(enclave, name, "http") + "/eth/v1/node/identity")["data"]["enr"] for name in control.CL]
     with (output / "observer-launch.log").open("w") as log:
         control.run_job(["kurtosis", "run", str(SCRIPTS / "frame-history-observer.star"), "--enclave", enclave,
-                         "--args", json.dumps({"bootnodes": ",".join(bootnodes)})], log, 360)
+                         json.dumps({"bootnodes": ",".join(bootnodes)})], log, 360)
     observer = control.endpoint(enclave, "frame-history-observer", "http")
     ids = control.run("docker", "ps", "-q", "--filter", "network=kt-" + enclave,
                       "--filter", "name=frame-history-observer--").splitlines()
@@ -123,6 +123,42 @@ def start_observer(enclave, beacon, output):
         raise RuntimeError("observer memory cap missing")
     return observer, {"join_slot": joins["data"]["message"]["slot"], "checkpoint": checkpoint,
                       "image_id": item["Image"], "memory": memory}
+
+
+def verify_history(enclave, evidence, rpcs, beacons, frame_tool, output):
+    evidence["blob"] = verify_blob(rpcs, beacons, frame_tool, output)
+    # Preserve real public consensus fixtures for the service-codec cutover.
+    request = Request(beacons[0] + "/eth/v2/debug/beacon/states/finalized", headers={"Accept": "application/octet-stream"})
+    with urlopen(request, timeout=30) as response:
+        state_ssz = response.read(16 * 1024 * 1024 + 1)
+        if len(state_ssz) > 16 * 1024 * 1024:
+            raise RuntimeError("unexpectedly large observer state fixture")
+        (output / "heze-finalized.ssz").write_bytes(state_ssz)
+    state_json = verifier.fetch(beacons[0] + "/eth/v2/debug/beacon/states/finalized")
+    (output / "heze-finalized.json").write_text(json.dumps(state_json, indent=2) + "\n")
+    evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"]}
+    observer, evidence["observer"] = start_observer(enclave, beacons[0], output)
+    histories = []
+    for item in (evidence["sponsored"], evidence["blob"]):
+        slot = item.get("proposal_slot", item.get("slot"))
+        def history():
+            response = verifier.fetch(observer + f"/eth/v1/beacon/execution_payload_envelopes/{slot}")
+            block = verifier.fetch(observer + f"/eth/v2/beacon/blocks/{slot}")
+            bid = block["data"]["message"]["body"]["signed_execution_payload_bid"]["message"]
+            if bid["blob_kzg_commitments"] != item.get("commitments", []):
+                raise ValueError("observer historical commitment ordering changed")
+            original_header = verifier.fetch(beacons[0] + f"/eth/v1/beacon/headers/{slot}")
+            historical_header = verifier.fetch(observer + f"/eth/v1/beacon/headers/{slot}")
+            if original_header["data"]["root"] != historical_header["data"]["root"]:
+                raise ValueError("observer returned a competing historical beacon block")
+            return check_historical_envelope(response, item["block_hash"], item["transaction"], bid["blob_kzg_commitments"], original_header["data"]["root"])
+        histories.append(control.wait_for(history, 300, "new CL did not backfill original Frame envelope"))
+    evidence["observer"]["historical_envelopes"] = histories
+    control.run("kurtosis", "service", "stop", enclave, control.EL[1], timeout=75)
+    control.run("kurtosis", "service", "start", enclave, control.EL[1], timeout=75)
+    evidence["after_restart"] = control.wait_for(lambda: verifier.frame_readback(control.endpoint(enclave, control.EL[1], "rpc"), evidence["sponsored"]["transaction"], PAYMASTER), 120, "paymaster history missing after restart")
+    if evidence["after_restart"] != evidence["sponsored"]["frame"]:
+        raise RuntimeError("paymaster history changed across restart")
 
 
 def main():
@@ -152,39 +188,7 @@ def main():
         rpcs = [control.endpoint(enclave, name, "rpc") for name in control.EL]
         beacons = [control.endpoint(enclave, name, "http") for name in control.CL]
         evidence["sponsored"] = verifier.verify(enclave, 900, args.frame_tool.resolve(), args.output, PAYMASTER)
-        evidence["blob"] = verify_blob(rpcs, beacons, args.frame_tool.resolve(), args.output)
-        # Preserve real public consensus fixtures for the service-codec cutover.
-        request = Request(beacons[0] + "/eth/v2/debug/beacon/states/finalized", headers={"Accept": "application/octet-stream"})
-        with urlopen(request, timeout=30) as response:
-            state_ssz = response.read(16 * 1024 * 1024 + 1)
-            if len(state_ssz) > 16 * 1024 * 1024:
-                raise RuntimeError("unexpectedly large observer state fixture")
-            (args.output / "heze-finalized.ssz").write_bytes(state_ssz)
-        state_json = verifier.fetch(beacons[0] + "/eth/v2/debug/beacon/states/finalized")
-        (args.output / "heze-finalized.json").write_text(json.dumps(state_json, indent=2) + "\n")
-        evidence["state_fixture"] = {"ssz_bytes": len(state_ssz), "fork": state_json["version"], "slot": state_json["data"]["slot"]}
-        observer, evidence["observer"] = start_observer(enclave, beacons[0], args.output)
-        histories = []
-        for item in (evidence["sponsored"], evidence["blob"]):
-            slot = item.get("proposal_slot", item.get("slot"))
-            def history():
-                response = verifier.fetch(observer + f"/eth/v1/beacon/execution_payload_envelopes/{slot}")
-                block = verifier.fetch(observer + f"/eth/v2/beacon/blocks/{slot}")
-                bid = block["data"]["message"]["body"]["signed_execution_payload_bid"]["message"]
-                if bid["blob_kzg_commitments"] != item.get("commitments", []):
-                    raise ValueError("observer historical commitment ordering changed")
-                original_header = verifier.fetch(beacons[0] + f"/eth/v1/beacon/headers/{slot}")
-                historical_header = verifier.fetch(observer + f"/eth/v1/beacon/headers/{slot}")
-                if original_header["data"]["root"] != historical_header["data"]["root"]:
-                    raise ValueError("observer returned a competing historical beacon block")
-                return check_historical_envelope(response, item["block_hash"], item["transaction"], bid["blob_kzg_commitments"], original_header["data"]["root"])
-            histories.append(control.wait_for(history, 300, "new CL did not backfill original Frame envelope"))
-        evidence["observer"]["historical_envelopes"] = histories
-        control.run("kurtosis", "service", "stop", enclave, control.EL[1], timeout=75)
-        control.run("kurtosis", "service", "start", enclave, control.EL[1], timeout=75)
-        evidence["after_restart"] = control.wait_for(lambda: verifier.frame_readback(control.endpoint(enclave, control.EL[1], "rpc"), evidence["sponsored"]["transaction"], PAYMASTER), 120, "paymaster history missing after restart")
-        if evidence["after_restart"] != evidence["sponsored"]["frame"]:
-            raise RuntimeError("paymaster history changed across restart")
+        verify_history(enclave, evidence, rpcs, beacons, args.frame_tool.resolve(), args.output)
     finally:
         try:
             # Docker inspection never starts a stopped Kurtosis engine. Preserve

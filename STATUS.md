@@ -1,3 +1,7 @@
+## Snap version 2 composed regression (2026-11-19)
+
+At source `13969eaf`, feature reviews 65–81 compose successfully: all 211 Go packages, 27 tagged Core/EIP packages, affected race/vet and build pass, including five encrypted Node snap/2 scenarios. Repeated identical tracker sections are removed. [Evidence](docs/verification/glamsterdam-snap2-integration-20261119.md). Final gas, eth/72 and complete CL/multiclient/release qualification remain open.
+
 ## snap version 2 state catch up (2026-11-19)
 
 The production node negotiates snap/2 and snap/1, preserving range/code schemas and rejecting removed trie-node messages on version 2. Raw positional BAL responses distinguish missing 0x80 from available c0; the actual sender and receiver use the custom codec. Header commitments and canonical BAL structure are verified before staged state rebasing.
@@ -32,10 +36,6 @@ Fork-aware block capacity, pricing, ordinary fee settlement, opcode/receipt/RPC 
 
 Actual Node startup now checks persisted runtime configuration before history replay, rejects active or immutable changes and retains compatible future updates. Runtime overrides do not mutate network globals. Real signed HTTP/restart evidence preserves head/state/config bytes on rejection and verifies successful future updates; missing/corrupt authority is explicit. Full Go, affected race/vet/build and four failing behavioral mutations pass. See [verification](docs/verification/glamsterdam-config-recovery-20261118.md). Final gas, blob schedules, unknown legacy migration and release gates remain open.
 
-## Persisted configuration recovery (2026-11-18)
-
-Actual Node startup now checks persisted runtime configuration before history replay, rejects active or immutable changes and retains compatible future updates. Runtime overrides do not mutate network globals. Real signed HTTP/restart evidence preserves head/state/config bytes on rejection and verifies successful future updates; missing/corrupt authority is explicit. Full Go, affected race/vet/build and four failing behavioral mutations pass. See [verification](docs/verification/glamsterdam-config-recovery-20261118.md). Final gas, blob schedules, unknown legacy migration and release gates remain open.
-
 ## Canonical schedule and Engine wire boundaries (2026-11-18)
 
 Reject incoherent canonical genesis schedules in actual startup, add Osaka to fork identity and fix asymmetric activated-fork comparisons. Production Engine versions now enforce their timestamp windows; Osaka getPayloadV5 has its own correct shape. Actual HTTP tests cover required fields, DATA/QUANTITY bounds, zero values, malformed BAL, capabilities and forkchoice adoption before attribute errors. Full Go/tagged tests, affected race/vet/build and four failing behavioral mutations qualify this scope. See [verification](docs/verification/glamsterdam-fork-schema-20261118.md). Persisted compatibility and broader program/release gates remain open.
@@ -43,14 +43,6 @@ Reject incoherent canonical genesis schedules in actual startup, add Osaka to fo
 ## Builder-request feature composition (2026-11-18)
 
 PR 77 composes with the previous feature set. Isolated blob readiness, factory non-injection and memory slot tests now use an explicit owned genesis with mandatory builder contracts. Existing feature obligations are preserved. At source `d97be4c3`, all 211 tested Go packages, tagged Core/EIP, affected vet and local build pass. Final gas and independent live release gates remain open.
-
-## EIP-8282 native builder requests (2026-11-18)
-
-Canonical contracts and mandatory Amsterdam type-3/type-4 extraction now compose with the existing snapshot and Engine commitment path. Explicit owned genesis allocation precedes roots; missing production predeploys invalidate blocks. Actual HTTP and separate real-BLS Lighthouse component consumers qualify request bytes and registration/exit gates. Full Go, tagged Core/EIP, targeted race/vet/build and failing guard mutations pass. See [verification](docs/verification/glamsterdam-builder-requests-20261118.md). Final gas, live full-client/devnet and release gates remain open.
-
-## Ordinary blob proof validation and Engine publication (2026-11-18)
-
-Reproduced and repaired invalid ordinary cell-proof admission through real HTTP. Preserve wrapper versions and pooled sidecars, authenticate KZG data, wait for complete pool data, derive genuine legacy proofs and expose canonical BlobAndProofV1 DATA. Shared payload collectors no longer fabricate zero proofs or publish missing data. Journal insert/rotation and fresh-node replay preserve authenticated sidecars. Frame checks remain qualified. Affected suites, targeted race/vet and build pass; four controlled mutations fail as intended. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Complete eth/72 sparse relay and release gates remain open.
 
 ## Glamsterdam signed candidate-gas integration checkpoint (2026-11-18)
 
@@ -87,14 +79,6 @@ Implemented balance-preserving destruction, transaction-end account clearing, jo
 Branch `feat/glamsterdam-transfer-logs` activates 7708 at canonical Amsterdam independently of the private gas timestamp and removes extra fee-burn and self-beneficiary burn events. Specified transfers keep the ERC20-compatible system event; same-address/zero-value transfers are suppressed. Existing CREATE/CREATE2 endowment emission is retained and verified before constructor logs, with failed-call rollback preserved.
 
 Native regressions reproduce baseline extra fees, missing Amsterdam activation and incorrect creation log counts; after correction, fork-boundary, fees/self/zero-value, ordering and rollback cases pass. The new logs exposed the modern P2P decoder zero-bloom bug, fixed in shared review #70 and included here. Affected core/P2P/Engine/node/RPC/eiptest suites, full build and targeted vet passed. Full 8246 destruction/finalization and the remaining gas model are separate gates; use a fresh experimental chain to qualify corrected historical fork semantics.
-
-## Negotiated eth/69-71 and historical consumers (2026-11-18)
-
-Branch `feat/glamsterdam-eth71` registers eth/68/69/70/71 on the production node. Implements seven-field range status without TD for 69+, version-correct bloom-free receipts, nonblocking queued range updates and canonical raw-list BAL wire encoding. Independent golden bytes expose the old double-wrapped BAL response.
-
-Correlated historical fetchers paginate receipts, bound decoding by requested block transaction/gas limits, verify the complete receipt root and rebuild persistent metadata only for validated blocks. BAL replies are matched to peer/request/hash, checked against headers before any restore, and reject tamper/reordering/replay/unsolicited data. Unavailable markers preserve body availability and are not trusted as arbitrary BALs.
-
-Independent Geth RLPx/codec tests negotiate all four versions over real encrypted sockets and check status plus actual receipt/BAL formats. Real-chain eiptests validate restored receipt metadata and tampered BAL preservation; a disabled consumer hash-check mutation fails the intended tests. Affected eth/P2P/chain/node/eiptest suites, targeted race, full build and vet passed. Full independent-client/devnet, eth/72/snap/2 and complete sync/recovery qualification remain separate program gates. [Evidence](docs/verification/glamsterdam-eth71-20261118.md).
 
 ## RPC access-list discovery (2026-11-18)
 

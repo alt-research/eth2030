@@ -52,14 +52,6 @@
 - [x] Verify actual node restart preserves heads/state/configuration on rejection and does not mutate network globals.
 - [x] Run affected/full tests, build and race/vet; publish a dedicated PR.
 
-## Persisted fork configuration and restart authority (2026-11-18)
-
-- [x] Trace actual Node startup before history replay and reuse the existing persisted config key.
-- [x] Detect incompatible active schedules and immutable parameter changes before state/metadata adoption.
-- [x] Qualify future updates, either-side activation, missing/corrupt metadata and failed persistence.
-- [x] Verify actual node restart preserves heads/state/configuration on rejection and does not mutate network globals.
-- [x] Run affected/full tests, build and race/vet; publish a dedicated PR.
-
 ## Canonical fork schedule and Engine version boundaries (2026-11-18)
 
 - [x] Read the current Engine Amsterdam/Osaka/Prague/Cancun rules and trace actual startup/HTTP consumers.
@@ -72,15 +64,6 @@
 
 - [x] Allocate canonical contracts in blob/factory/slot owned fixtures before root construction.
 - [x] Qualify all combined Go tests, tagged Core/EIP, vet and local build.
-
-## EIP-8282 builder execution requests (2026-11-18)
-
-- [x] Read the complete pinned EIP, canonical bytecode assets and selected CL processing.
-- [x] Add exact runtime/constructor assets and request types/SSZ encoding with provenance.
-- [x] Wire mandatory Amsterdam system queues, rollback and commitment validation.
-- [x] Supply explicit pre-fork deployment/genesis fixtures without fork-time code injection.
-- [x] Qualify fee/queue/endian/cap/failure and actual Engine/CL consumer paths.
-- [x] Run affected builds/tests and publish a dedicated feature PR.
 
 ## Complete ordinary blob sidecar validation (2026-11-18)
 

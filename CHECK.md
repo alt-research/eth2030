@@ -7,7 +7,8 @@
 - [x] Reuse actual transaction transitions for estimation/access-list and canonical historical trace replay.
 - [x] Implement uncapped call execution with intrinsic costs and zero initial reservoir; preserve state-gas rules and complete block context.
 - [ ] Qualify real Node HTTP call/estimate/access-list/trace/simulation consumers, high/low gas, creation, historical context and non-mutation.
-- [ ] Run affected/full/race/vet/build and behavioral mutations; publish a separate feature PR.
+- [x] Pass full/tagged/affected race/vet/build and ten compiling detected mutations for call/estimate/access-list and opcode replay.
+- [ ] Publish the separate feature review; simulator and complete nested trace fields remain separate work.
 
 ## Current gas signed and system consumer follow up (2026-11-19)
 

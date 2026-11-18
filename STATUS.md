@@ -1,3 +1,7 @@
+## Qualified RPC method and opcode consumers (2026-11-19)
+
+Current source `28933241` passes full/tagged Go, affected race, vet/build and ten detected compiling mutations. Real HTTP verifies full call arguments, overrides, state/account estimates, creation, opcode traces, historical prefix/system replay, block traces and actual fork context. [Evidence](docs/verification/glamsterdam-rpc-gas-20261119.md). Simulator, nested callTracer/two-dimensional trace fields, independent full-client/API fixtures, resource and final release gates remain open. This branch is separate from the stable EL integration until composed qualification.
+
 ## RPC method consumer implementation checkpoint (2026-11-19)
 
 Real Node HTTP now passes intrinsic GAS observations, exact slot/new-account estimates, uncapped call versus transaction-cap behavior, creation return bytes, state/code overrides including full storage replacement, real traceCall steps and a signed two-transaction historical prefix replay with exact receipt/trace gas and canonical non-mutation. Strict full input parsing retains access lists, dynamic fees and authorizations. Affected Core/SDK/Node backend/RPC tests and local build pass. Full composed/mutation qualification, extended historical/system/application controls and simulationV1 remain pending; no API conformance claim is inferred.

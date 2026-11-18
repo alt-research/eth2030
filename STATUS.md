@@ -9,6 +9,8 @@
   key and balance, and the 96-slot PTC window. Changed state, root, epoch JSON,
   PTC preset and execution-requests-root controls are rejected. Removing the
   state-root comparison was detected by two behavioral regressions.
+- CI now runs the standalone replay, its race regressions and all eleven
+  Python control tests when either protocol code or the replay module changes.
 - The March local Dora codec also failed actual Gloas state decoding. It lacks
   the relocated latest block hash, execution requests root and PTC state layout.
   Successful block JSON display does not qualify epoch statistics. The replay

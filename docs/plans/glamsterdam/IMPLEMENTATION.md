@@ -14,13 +14,20 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 
 | Feature review | Scope | State |
 | --- | --- | --- |
-| Baseline | Import the complete plan/evidence and reconcile newer mainline fixes | In progress |
+| [PR #64](https://github.com/alt-research/eth2030/pull/64) — baseline | Import the complete plan/evidence and reconcile newer mainline fixes | Submitted; release-input closure remains open |
 | Canonical header/slot qualification | Verify merged code and add only missing consumer/independent regression coverage | Pending |
-| EIP-7954 limits | Enforce current code/initcode size bounds with meaningful execution/admission tests | Pending |
-| EIP-7997 factory | Canonical deployment/genesis route, runtime/address/nonce; no fork-time mutation | Pending |
-| BAL serving/retention | Qualify merged body wire/storage and fix remaining time/window/consumer gaps | Pending |
-| RPC access discovery | Replace placeholder through the actual backend and returned-list gas semantics | Pending |
+| [PR #65](https://github.com/alt-research/eth2030/pull/65) — EIP-7954 | Published code/initcode bounds and transaction/pool boundaries | Submitted; final fork/model qualification remains open |
+| [PR #67](https://github.com/alt-research/eth2030/pull/67) — EIP-7997 | Canonical runtime/address/nonce and no fork-time mutation | Submitted; actual generated genesis/control remains open |
+| [PR #66](https://github.com/alt-research/eth2030/pull/66) — BAL retention | Published slot-based window, body preservation and conservative fallback | Submitted; complete cold-sync/physical-GC gates remain open |
+| [PR #68](https://github.com/alt-research/eth2030/pull/68) — RPC discovery | Actual HTTP/backend discovery, historical/reverted/creation cases and non-mutation | Submitted; final gas/schema qualification remains open |
 | Gas/state execution | Selected coherent intrinsic/runtime/state/refund/floor model; upstream choice gate retained | Pending |
-| Network and CL lifecycle | Negotiated protocols, sync, actual CL/builder and recovery acceptance | Pending |
+| eth/69–71 feature review | Negotiated protocols, canonical wire, correlated historical consumers and encrypted-socket checks | Implemented on separate branch; review publication in progress |
+| eth/72, snap/2 and CL lifecycle | Full remaining protocols, actual CL/builder and recovery acceptance | Pending |
 
 Each major change receives its own branch and PR; no unrelated changes are staged. Final task completion requires the acceptance evidence in DEVELOPMENT_PLAN.md. A submitted PR is not a merged or release-qualified feature.
+
+## Verified branch evidence
+
+Feature branches are based independently on mainline `38ea9259`; no feature was merged upstream by this implementation run. Each has its own CHECK/STATUS entry and verification document. Current reviews retain pre-fix failures, meaningful behavioral assertions and scoped builds. The eth/69-71 consumer hash-check mutation fails tamper/reordering cases as intended. A combined local integration run and full release matrix have not yet passed and are not inferred from separate branch tests.
+
+Upstream PRs #12581/#12582 and #5770/#5820 were rechecked live and remain unmerged at this pass. Their concrete heads are frozen in implementation-baseline.json. No open alternative is silently selected as mainnet consensus. Independent work continues while those final semantic choices remain unresolved.

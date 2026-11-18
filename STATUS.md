@@ -1,3 +1,9 @@
+## Glamsterdam feature review batch (2026-11-18)
+
+Published independent reviews from current master: [#65 contract/initcode limits](https://github.com/alt-research/eth2030/pull/65), [#66 BAL availability window](https://github.com/alt-research/eth2030/pull/66), [#67 canonical factory](https://github.com/alt-research/eth2030/pull/67), and [#68 native RPC access discovery](https://github.com/alt-research/eth2030/pull/68). Each branch retains its affected test/build evidence and explicit remaining qualification boundaries. The negotiated eth/69-71/historical-consumer feature is prepared on its own branch and awaiting review publication.
+
+No review is marked merged or release-qualified here. The [implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md) distinguishes merged pre-existing header/history fixes from newly submitted work. Full gas/state, remaining protocols, CL/builder and combined independent-client/recovery gates remain open; the original dirty checkout is untouched.
+
 ## Glamsterdam implementation baseline (2026-11-18)
 
 Started the 33-task completion plan on isolated branch `feat/glamsterdam-baseline`, based on freshly fetched `origin/master` at `38ea9259`. Imported the dated plan/audits without replacing newer mainline work. [Implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md).

@@ -1,3 +1,7 @@
+## Historical empty BAL cache recovery (2026-11-18)
+
+The bounded native Engine backend now regenerates the canonical empty BAL only when its header commitment matches, even without a cached BAL object. Both historical body APIs retain the execution body; nonempty/unknown commitments stay unavailable. This extends PR 66's slot-based retention qualification.
+
 ## Glamsterdam BAL availability window (2026-11-18)
 
 Branch `feat/glamsterdam-bal-retention` updates EIP-7928 availability to 14,299 epochs. The bounded Engine backend uses actual header slots when available, with a conservative block-number fallback for legacy headers; both ByHash and ByRange preserve the body when BAL is unavailable. The production chain backend already persists validated canonical BALs on mainline and retains them beyond the minimum window.

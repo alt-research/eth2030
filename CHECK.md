@@ -7,6 +7,12 @@
 
 # Lean4 Verification Check-list
 
+## Empty committed historical BAL recovery (2026-11-18)
+
+- [x] Reproduce an empty BAL cache miss without hiding its execution body.
+- [x] Regenerate only the header-committed empty list inside retention, for hash and range APIs.
+- [x] Verify affected suites and local build, then update PR 66.
+
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 
 - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.

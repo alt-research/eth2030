@@ -3,11 +3,13 @@
 ## Canonical execution system transitions (2026-11-19)
 
 - [x] Read complete pinned EIPs 2935/4788 and the selected 8037 system-call margin; compare canonical SDK assets.
-- [ ] Reproduce wrong history address/window and missing/custom-runtime behavior through actual block processing.
-- [ ] Share pre-block EVM system-call execution between builder/importer; preserve caller exclusion, ordering, isolation, actual BAL changes and no block/user fee debit.
-- [ ] Supply explicit canonical assets before owned genesis roots without mutating supplied network state or fork-time injection.
-- [ ] Qualify independent runtime/storage/root consumers, wrap/missing-slot/query bounds and native Node build/import/restart; preserve 8282/6110/7002/7251 coverage.
-- [ ] Run full/tagged/affected race/vet/build and sensitive mutations; publish a separate feature PR.
+- [x] Reproduce wrong history address/window and missing/custom-runtime behavior through actual block processing.
+- [x] Share pre-block EVM system-call execution between builder/importer; preserve caller exclusion, ordering, isolation, actual BAL changes and no block/user fee debit.
+- [x] Supply explicit canonical assets before owned genesis roots without mutating supplied network state or fork-time injection.
+- [x] Qualify independent runtime/storage/root consumers, wrap/missing-slot/query bounds and native Node build/import/restart; preserve 8282/6110/7002/7251 coverage.
+- [x] Run full/tagged/affected race/vet/build and sensitive mutations; prepare a separate feature PR.
+
+- [ ] Publish the separate review and record composed qualification.
 
 ## eth version 72 sparse blob relay (2026-11-19)
 

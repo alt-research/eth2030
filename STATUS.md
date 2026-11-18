@@ -1,6 +1,7 @@
-## Canonical execution system transitions (2026-11-19)
+## Canonical execution system transition qualification (2026-11-19)
 
-Isolated `fix/glamsterdam-system-transitions` starts from qualified composition `95382598`, separately from the Gas draft. Pinned EIP-2935 defines canonical address 0x0000F90827F1C53a10cb7A02335B175320002935 and an 8191 window; the existing direct helper uses an obsolete address/window. EIPs 2935/4788 permit direct optimizations, but actual EVM calls will qualify deployed/missing/custom code and match canonical runtimes. Actual StateProcessor scenarios for canonical deployed, missing, custom and reverting runtime code all reproduce state-root differences against unmodified Geth v1.17.10 with identical frozen allocations. This feature is under implementation and not release-qualified.
+Correct history address/8191 ring and shared actual-code pre-block callbacks now produce identical complete roots to unmodified SDK in deployed/missing/custom/revert scenarios. Native Node HTTP build/import/query/wrap/restart and exact runtime/genesis consumers pass. Seven owned profiles preserve existing allocations while preloading canonical code before roots. All 212 Go packages, 27 tagged Core/EIP packages, 11 affected race packages, vet/build and seven compiling detected mutations qualify this source. [Evidence](docs/verification/glamsterdam-system-transitions-20261119.md). Gas draft composition, live independent-client/devnet/resource and final release gates remain open.
+
 
 ## Moving pivot proof binding composed regression (2026-11-19)
 

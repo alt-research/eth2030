@@ -186,6 +186,35 @@ func TestPersistedConfigUsesEitherSideActivationAndRegisteredBPOs(t *testing.T) 
 	}
 }
 
+func TestPersistedBlobParameterAuthorityAndUnknownLegacyHistory(t *testing.T) {
+	db := configRecoveryDB(t, 1, 12)
+	cfg := *config.TestConfig
+	at := uint64(24)
+	cfg.BPO1Time = &at
+	cfg.BlobScheduleConfig = cfg.ResolvedBlobSchedule()
+	if err := writePersistedChainConfig(db, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	future := cfg
+	future.BlobScheduleConfig = cfg.ResolvedBlobSchedule()
+	future.BlobScheduleConfig.BPO1.UpdateFraction++
+	if err := checkPersistedChainConfig(db, &future); err != nil {
+		t.Fatal("genuinely future blob update rejected:", err)
+	}
+	legacy := cfg
+	legacy.BlobScheduleConfig = nil
+	encoded, err := json.Marshal(&legacy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Put(persistedChainConfigKey, encoded); err != nil {
+		t.Fatal(err)
+	}
+	if err := checkPersistedChainConfig(db, &cfg); err == nil || !strings.Contains(err.Error(), "no resolved blobSchedule authority") {
+		t.Fatalf("unknown historical defaults guessed: %v", err)
+	}
+}
+
 func TestNodeForkOverridesDoNotMutateNetworkDefaults(t *testing.T) {
 	before := *config.MainnetConfig
 	beforeJSON, err := json.Marshal(&before)

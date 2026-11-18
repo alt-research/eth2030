@@ -209,3 +209,4 @@ func (b *MockBackend) CreateAccessList(_ rpctypes.CallArgs, _ rpctypes.BlockNumb
 	}
 	return &rpcbackend.AccessListResult{AccessList: types.AccessList{}, GasUsed: b.CallGasUsed}, nil
 }
+func (b *MockBackend) IsOsaka(uint64) bool { return false }

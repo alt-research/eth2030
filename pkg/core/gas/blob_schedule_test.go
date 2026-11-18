@@ -17,7 +17,7 @@ func TestBlobScheduleConstants(t *testing.T) {
 		updateFraction uint64
 	}{
 		{"Cancun", CancunBlobSchedule, 3, 6, 3338477},
-		{"Prague", PragueBlobSchedule, 6, 9, 5376681},
+		{"Prague", PragueBlobSchedule, 6, 9, 5007716},
 		{"BPO1", BPO1BlobSchedule, 10, 15, 8346193},
 		{"BPO2", BPO2BlobSchedule, 14, 21, 11684671},
 	}
@@ -209,7 +209,7 @@ func TestCalcExcessBlobGasV2WithSchedule_ExecutionFeeLed(t *testing.T) {
 
 func TestCalcBlobBaseFeeV2WithFraction(t *testing.T) {
 	// With zero excess, fee should be MinBaseFeePerBlobGas regardless of fraction.
-	for _, frac := range []uint64{3338477, 5376681, 8346193, 11684671} {
+	for _, frac := range []uint64{3338477, 5007716, 8346193, 11684671} {
 		fee := CalcBlobBaseFeeV2WithFraction(0, big.NewInt(0), frac)
 		expected := big.NewInt(MinBaseFeePerBlobGas)
 		if fee.Cmp(expected) != 0 {
@@ -219,7 +219,7 @@ func TestCalcBlobBaseFeeV2WithFraction(t *testing.T) {
 }
 
 // Test EIP-7742: header target override.
-func TestCalcExcessBlobGasV2ForHeader_WithTargetOverride(t *testing.T) {
+func TestCalcExcessBlobGasForLegacyTarget_WithTargetOverride(t *testing.T) {
 	// Set up a parent header with explicit TargetBlobsPerBlock = 4.
 	target := uint64(4)
 	excess := uint64(0)
@@ -250,7 +250,7 @@ func TestCalcExcessBlobGasV2ForHeader_WithTargetOverride(t *testing.T) {
 		PragueTime:              newUint64(0),
 	}
 
-	result := CalcExcessBlobGasV2ForHeader(parent, config, 100)
+	result := CalcExcessBlobGasForLegacyTarget(parent, config, 100)
 
 	// With target=4, target gas = 4 * GasPerBlob = 524288.
 	// excess + used = 0 + 786432 = 786432 > 524288
@@ -262,7 +262,7 @@ func TestCalcExcessBlobGasV2ForHeader_WithTargetOverride(t *testing.T) {
 	}
 }
 
-func TestCalcExcessBlobGasV2ForHeader_WithoutTarget(t *testing.T) {
+func TestCalcExcessBlobGasForLegacyTarget_WithoutTarget(t *testing.T) {
 	// No target in header -> uses fork schedule.
 	excess := uint64(0)
 	used := uint64(9 * GasPerBlob) // max Prague blobs
@@ -291,7 +291,7 @@ func TestCalcExcessBlobGasV2ForHeader_WithoutTarget(t *testing.T) {
 		PragueTime:              newUint64(0),
 	}
 
-	result := CalcExcessBlobGasV2ForHeader(parent, config, 100)
+	result := CalcExcessBlobGasForLegacyTarget(parent, config, 100)
 
 	// Prague schedule: target=6, so target gas = 786432.
 	// excess + used = 0 + 1179648 = 1179648 > 786432
@@ -302,7 +302,7 @@ func TestCalcExcessBlobGasV2ForHeader_WithoutTarget(t *testing.T) {
 	}
 }
 
-func TestCalcExcessBlobGasV2ForHeader_NilParentFields(t *testing.T) {
+func TestCalcExcessBlobGasForLegacyTarget_NilParentFields(t *testing.T) {
 	parent := &types.Header{
 		BaseFee: big.NewInt(1),
 	}
@@ -325,7 +325,7 @@ func TestCalcExcessBlobGasV2ForHeader_NilParentFields(t *testing.T) {
 		PragueTime:              newUint64(0),
 	}
 
-	result := CalcExcessBlobGasV2ForHeader(parent, config, 100)
+	result := CalcExcessBlobGasForLegacyTarget(parent, config, 100)
 	if result != 0 {
 		t.Errorf("nil parent fields: got %d, want 0", result)
 	}
@@ -361,7 +361,7 @@ func TestValidateBlockBlobGasWithConfig(t *testing.T) {
 		BlobGasUsed:   &parentUsed,
 	}
 
-	expectedExcess := CalcExcessBlobGasV2ForHeader(parent, config, 201)
+	expectedExcess := CalcExcessBlobGasForLegacyTarget(parent, config, 201)
 	childUsed := uint64(5 * GasPerBlob)
 	child := &types.Header{
 		Time:          201,

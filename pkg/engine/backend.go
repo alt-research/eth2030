@@ -1584,7 +1584,7 @@ func (b *EngineBackend) GetPayloadV7ByID(id PayloadID) (*GetPayloadV6Response, e
 	}
 	ctx := types.ExecutionSSZContext{
 		BlobGasLimit:     gas.FusakaMaxBlobGasPerBlock,
-		BlobBaseFee:      gas.CalcBlobBaseFeeV2(*block.Header().ExcessBlobGas, block.Header().BaseFee),
+		BlobBaseFee:      gas.BlobBaseFeeForHeader(b.config, block.Header()),
 		ExcessRegularGas: excessRegular,
 		Requests:         requests,
 		BlockAccessList:  balRLP,

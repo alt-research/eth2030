@@ -71,6 +71,8 @@ type Backend interface {
 	// fraction for the given block timestamp. Used by eth_blobBaseFee and
 	// eth_feeHistory to compute correct per-fork blob fees and ratios.
 	BlobSchedule(blockTime uint64) (target, max uint64, updateFraction uint64)
+	// IsOsaka selects EIP-7918's excess update for blob fee forecasts.
+	IsOsaka(blockTime uint64) bool
 }
 
 // AccessListResult is transaction simulation output, independent of wire encoding.

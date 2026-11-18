@@ -126,7 +126,7 @@ func (v *BlockValidator) ValidateHeader(header, parent *types.Header) error {
 
 	// EIP-4844: verify blob gas fields for Cancun+ blocks.
 	if v.config != nil && v.config.IsCancun(header.Time) {
-		if err := gas.ValidateBlockBlobGas(header, parent); err != nil {
+		if err := gas.ValidateBlockBlobGasWithConfig(v.config, header, parent); err != nil {
 			return err
 		}
 	}

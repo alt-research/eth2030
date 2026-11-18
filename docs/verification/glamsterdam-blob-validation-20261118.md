@@ -1,6 +1,6 @@
 # Complete ordinary blob validation and proof consumers
 
-Branch `fix/glamsterdam-blob-validation`, based on `origin/master` `38ea9259`.
+[PR 76](https://github.com/alt-research/eth2030/pull/76), branch `fix/glamsterdam-blob-validation`, based on `origin/master` `38ea9259`.
 
 ## Normative input and reproduced failures
 

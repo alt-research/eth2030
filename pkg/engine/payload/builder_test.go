@@ -67,7 +67,7 @@ func TestCalcBlockValue_NilBaseFee(t *testing.T) {
 	}, nil)
 	receipts := []*types.Receipt{}
 
-	value := calcBlockValue(block, receipts, nil)
+	value := calcBlockValue(nil, block, receipts, nil)
 	if value.Sign() != 0 {
 		t.Fatalf("expected zero value with nil baseFee, got %s", value.String())
 	}
@@ -81,7 +81,7 @@ func TestCalcBlockValue_EmptyBlock(t *testing.T) {
 	receipts := []*types.Receipt{}
 	baseFee := big.NewInt(1000000000) // 1 Gwei
 
-	value := calcBlockValue(block, receipts, baseFee)
+	value := calcBlockValue(nil, block, receipts, baseFee)
 	if value.Sign() != 0 {
 		t.Fatalf("expected zero value for empty block, got %s", value.String())
 	}

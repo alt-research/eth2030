@@ -7,7 +7,8 @@
   resolves the trusted checkpoint's IL view through its pre-anchor parent,
   which a checkpoint-synced database does not contain. A debug observer at
   checkpoint slot 224 repeatedly failed on the missing slot-223 parent.
-- Lighthouse work is isolated on `fix/heze-checkpoint-history`. The Heze spec
+- Lighthouse fix `d8a064bf` on `fix/heze-checkpoint-history` passes five Heze
+  regressions, cargo check, full lint-fix and the release build. The Heze spec
   initializes the anchor's IL satisfaction to true; the fix must preserve that
   trusted bootstrap and keep unresolved live-parent views strict. A regression
   uses real signed blocks and an empty checkpoint store with Engine notification

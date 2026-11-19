@@ -9,7 +9,7 @@
 - [x] Honor onlyTopCall/withLog, storage/memory/stack/return-data options, limits, timeouts and fork/context omission rules.
 - [x] Qualify actual signed/block/call consumers, nine independent SDK call trees and seventeen detected compiling mutations; pass full 212/tagged 27/race 48/vet/build.
 - [x] Archive exact results and pass five affected race packages, vet/build after simulator documentation composition.
-- [ ] Publish the separate review and stop for merge discussion.
+- [x] Publish the separate tracing review as PR 87 and stop further implementation for merge discussion.
 
 ## Stateful eth_simulateV1 implementation (2026-11-19)
 

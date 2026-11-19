@@ -1368,7 +1368,6 @@ func TestYellowPaperGasTiers(t *testing.T) {
 	}{
 		{ADD, "ADD"},
 		{SUB, "SUB"},
-		{MUL, "MUL"},
 		{LT, "LT"},
 		{GT, "GT"},
 		{SLT, "SLT"},
@@ -1402,6 +1401,7 @@ func TestYellowPaperGasTiers(t *testing.T) {
 		op   OpCode
 		name string
 	}{
+		{MUL, "MUL"},
 		{DIV, "DIV"},
 		{SDIV, "SDIV"},
 		{MOD, "MOD"},

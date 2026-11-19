@@ -385,14 +385,14 @@ func TestEVM_GasAccounting(t *testing.T) {
 		},
 		{
 			name: "MUL consumes 5 gas under Frontier table",
-			// In Cancun table, MUL is GasVerylow = 3.
+			// MUL is in the five-gas low tier in both Frontier and Cancun.
 			code: []byte{
 				byte(PUSH1), 3,
 				byte(PUSH1), 4,
 				byte(MUL),
 				byte(STOP),
 			},
-			gasGive: 9, // PUSH1(3) + PUSH1(3) + MUL(3) = 9
+			gasGive: 11, // PUSH1(3) + PUSH1(3) + MUL(5) = 11
 			wantErr: nil,
 		},
 	}

@@ -903,7 +903,7 @@ func TestMemoryLogFunctionZero(t *testing.T) {
 	if overflow {
 		t.Fatalf("memoryLog overflowed unexpectedly")
 	}
-	want := uint64(64) // offset + 0 = 64
+	want := uint64(0) // A zero-size memory region ignores the offset.
 	if got != want {
 		t.Errorf("memoryLog(0 size) = %d, want %d", got, want)
 	}

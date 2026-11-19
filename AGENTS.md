@@ -82,7 +82,9 @@ kurtosis service logs eth2030-devnet el-1-geth-lighthouse 2>&1 | grep -E "WARN|E
 - Write all project documentation in English, including new documents and updates to existing documents.
 - Always `git add` and commit after creating or editing files
 - Verify builds locally before claiming completion
-- Update `STATUS.md` for task tracking
+- Update `STATUS.md` for task tracking. For concurrent feature reviews, use
+  `docs/reviews/pr-<number>/STATUS.md` and its sibling `CHECK.md`; reserve root
+  trackers for shared integration updates. See `docs/reviews/README.md`.
 - Keep going without pausing for confirmation; only ask when blocked
 - Never stage/commit files you did not edit
 - Other agents may work in the same repo; mind your own business

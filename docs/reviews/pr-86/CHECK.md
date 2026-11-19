@@ -1,3 +1,10 @@
+## Sequential simulation merge/dependency and CI repair (2026-11-19)
+
+- [x] Read selected simulator policy and the request-owned ETH-transfer observer boundary.
+- [ ] Merge master while retaining simulation validation/nonce modes, early initcode guards and consensus-only receipt emission.
+- [ ] Reconcile repaired existing RPC dependency 85 without importing nested tracing changes.
+- [ ] Run full tests, integration, simulation/VM/RPC/Node race, formatting/vet/build; publish and verify fresh CI.
+
 # PR 86 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `7d79bbc5cd610cacca29d72285c664a6e5d1b19c`.

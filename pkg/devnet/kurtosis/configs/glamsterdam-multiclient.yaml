@@ -23,7 +23,7 @@ participants:
   el_max_mem: 4096
   cl_type: lodestar
   cl_image: eth2030-lodestar:qualification-cf705b4
-  cl_max_mem: 4096
+  cl_max_mem: 12288
   vc_max_mem: 1024
   count: 1
 - el_type: geth

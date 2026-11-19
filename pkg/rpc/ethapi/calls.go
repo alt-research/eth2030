@@ -15,6 +15,7 @@ type CallRequest struct {
 	Args      CallArgs
 	BlockNum  BlockNumber
 	Overrides StateOverride
+	selection blockSelection
 }
 
 // MaxGasEstimateIterations caps the binary search loop in estimateGas
@@ -85,11 +86,13 @@ func parseCallRequest(params []json.RawMessage) (*CallRequest, *RPCError) {
 		return nil, &RPCError{Code: ErrCodeInvalidParams, Message: err.Error()}
 	}
 
-	bn := LatestBlockNumber
+	var raw json.RawMessage
 	if len(params) > 1 {
-		if err := json.Unmarshal(params[1], &bn); err != nil {
-			return nil, &RPCError{Code: ErrCodeInvalidParams, Message: "invalid block number: " + err.Error()}
-		}
+		raw = params[1]
+	}
+	selection, selectorErr := parseBlockSelection(raw)
+	if selectorErr != nil {
+		return nil, selectorErr
 	}
 
 	var overrides StateOverride
@@ -99,7 +102,7 @@ func parseCallRequest(params []json.RawMessage) (*CallRequest, *RPCError) {
 		}
 	}
 
-	return &CallRequest{Args: args, BlockNum: bn, Overrides: overrides}, nil
+	return &CallRequest{Args: args, BlockNum: selection.number, Overrides: overrides, selection: selection}, nil
 }
 
 // resolveBlockNumber translates a symbolic block number (latest, pending,
@@ -203,6 +206,23 @@ func (api *EthAPI) ethCallFull(req *Request) *Response {
 		return &Response{JSONRPC: "2.0", Error: rpcErr, ID: req.ID}
 	}
 
+	if backend, ok := api.backend.(rpcbackend.HeaderCallBackend); ok {
+		header, selectorErr := resolveBlockSelection(api.backend, cr.selection)
+		if selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		result, _, err := backend.CallAtHeader(cr.Args, header, cr.Overrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, "execution error: "+err.Error())
+		}
+		return successResponse(req.ID, encodeBytes(result))
+	}
+	if cr.selection.hash != nil {
+		if _, selectorErr := resolveBlockSelection(api.backend, cr.selection); selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		return errorResponse(req.ID, ErrCodeMethodNotFound, "hash-selected execution unavailable")
+	}
 	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
 		result, _, err := backend.Call(cr.Args, cr.BlockNum, cr.Overrides)
 		if err != nil {
@@ -269,6 +289,23 @@ func (api *EthAPI) estimateGasFull(req *Request) *Response {
 		return &Response{JSONRPC: "2.0", Error: rpcErr, ID: req.ID}
 	}
 
+	if backend, ok := api.backend.(rpcbackend.HeaderCallBackend); ok {
+		header, selectorErr := resolveBlockSelection(api.backend, cr.selection)
+		if selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		estimate, err := backend.EstimateGasAtHeader(cr.Args, header, cr.Overrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, "gas estimation failed: "+err.Error())
+		}
+		return successResponse(req.ID, encodeUint64(estimate))
+	}
+	if cr.selection.hash != nil {
+		if _, selectorErr := resolveBlockSelection(api.backend, cr.selection); selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		return errorResponse(req.ID, ErrCodeMethodNotFound, "hash-selected estimation unavailable")
+	}
 	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
 		estimate, err := backend.EstimateGas(cr.Args, cr.BlockNum, cr.Overrides)
 		if err != nil {

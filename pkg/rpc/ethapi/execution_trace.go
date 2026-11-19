@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"github.com/eth2030/eth2030/rpc/debugapi"
@@ -150,24 +149,13 @@ func (api *EthAPI) detailedTraceCall(req *Request, backend rpcbackend.ExecutionT
 	if err := json.Unmarshal(req.Params[0], &args); err != nil {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
-	header := api.backend.CurrentHeader()
+	var raw json.RawMessage
 	if len(req.Params) > 1 {
-		var text string
-		if err := json.Unmarshal(req.Params[1], &text); err != nil {
-			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-		}
-		if len(text) == 66 {
-			header = api.backend.HeaderByHash(types.HexToHash(text))
-		} else {
-			var number BlockNumber
-			if err := json.Unmarshal(req.Params[1], &number); err != nil {
-				return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-			}
-			header = api.backend.HeaderByNumber(number)
-		}
+		raw = req.Params[1]
 	}
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, raw)
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 	config := debugapi.DefaultDbgTraceConfig()
 	var extra struct {

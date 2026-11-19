@@ -176,6 +176,9 @@ func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, bloc
 		return nil, fmt.Errorf("block not found")
 	}
 
+	return b.GetProofAtHeader(addr, storageKeys, header)
+}
+func (b *RPCBackend) GetProofAtHeader(addr types.Address, storageKeys []types.Hash, header *types.Header) (*trie.AccountProof, error) {
 	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err

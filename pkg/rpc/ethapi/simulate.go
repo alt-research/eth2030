@@ -3,10 +3,8 @@ package ethapi
 import (
 	"encoding/json"
 	"errors"
-	"github.com/eth2030/eth2030/core/types"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
-	"strings"
 )
 
 func (api *EthAPI) simulateV1(req *Request) *Response {
@@ -21,24 +19,13 @@ func (api *EthAPI) simulateV1(req *Request) *Response {
 	if err := json.Unmarshal(req.Params[0], &raw); err != nil || raw["blockStateCalls"] == nil || string(raw["blockStateCalls"]) == "null" {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "blockStateCalls is required")
 	}
-	header := api.backend.CurrentHeader()
+	var selector json.RawMessage
 	if len(req.Params) > 1 {
-		var value string
-		if err := json.Unmarshal(req.Params[1], &value); err != nil {
-			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-		}
-		if strings.HasPrefix(value, "0x") && len(value) == 66 {
-			header = api.backend.HeaderByHash(types.HexToHash(value))
-		} else {
-			var number BlockNumber
-			if err := json.Unmarshal(req.Params[1], &number); err != nil {
-				return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-			}
-			header = api.backend.HeaderByNumber(number)
-		}
+		selector = req.Params[1]
 	}
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "base block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, selector)
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 	backend, ok := api.backend.(rpcbackend.SimulateBackend)
 	if !ok {

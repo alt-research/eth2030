@@ -7,7 +7,9 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/rlp"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"github.com/eth2030/eth2030/rpc/debugapi"
+	"github.com/eth2030/eth2030/trie"
 )
 
 // Re-export trace types from rpc/debugapi.
@@ -37,9 +39,9 @@ func (api *EthAPI) getProof(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "invalid storageKeys: "+err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[2], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, "invalid block number: "+err.Error())
+	selection, selectorErr := parseBlockSelection(req.Params[2])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	addr := types.HexToAddress(addrHex)
@@ -51,7 +53,23 @@ func (api *EthAPI) getProof(req *Request) *Response {
 	}
 
 	// Generate real MPT proofs via the backend.
-	proof, err := api.backend.GetProof(addr, storageKeys, bn)
+	var proof *trie.AccountProof
+	var err error
+	if byHeader, ok := api.backend.(rpcbackend.HeaderProofBackend); ok {
+		header, selectorErr := resolveBlockSelection(api.backend, selection)
+		if selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		proof, err = byHeader.GetProofAtHeader(addr, storageKeys, header)
+	} else {
+		if selection.hash != nil {
+			if _, selectorErr := resolveBlockSelection(api.backend, selection); selectorErr != nil {
+				return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+			}
+			return errorResponse(req.ID, ErrCodeMethodNotFound, "hash-selected proofs unavailable")
+		}
+		proof, err = api.backend.GetProof(addr, storageKeys, selection.number)
+	}
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}

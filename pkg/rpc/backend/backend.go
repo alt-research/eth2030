@@ -99,6 +99,19 @@ type CallBackend interface {
 	TraceCall(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error)
 }
 
+// HeaderCallBackend keeps execution on one resolved header, including orphan branches.
+type HeaderCallBackend interface {
+	CallAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) ([]byte, uint64, error)
+	EstimateGasAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) (uint64, error)
+	TraceCallAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error)
+}
+type HeaderAccessListBackend interface {
+	CreateAccessListAtHeader(args rpctypes.CallArgs, header *types.Header) (*AccessListResult, error)
+}
+type HeaderProofBackend interface {
+	GetProofAtHeader(addr types.Address, storageKeys []types.Hash, header *types.Header) (*trie.AccountProof, error)
+}
+
 // BlockTraceBackend supplies canonical single-pass opcode traces.
 type BlockTraceBackend interface {
 	TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error)

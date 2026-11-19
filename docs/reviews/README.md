@@ -10,6 +10,8 @@ All updated branches share the same integration-tracking commit and identical ro
 
 Merge current master while preserving both code changes. In 71, retain Amsterdam activation for ETH logs and the already merged EIP-7954 helper. In 72, reject oversized initcode before BAL seeding while retaining account seeding and reconciliation for valid execution. In 82, retain master's extended snap evidence as dated evidence from PR 81, without claiming that those source fixes are implemented by PR 82. Existing protocol authority, dependent feature ancestry and Draft status do not change.
 
+The [batch validation report](conflict-cleanup-20261119.md) records tested sources and the first genuine sequential source conflict; common tracking cleanup does not silently resolve that later functional integration.
+
 ## Validation and publication
 
 For every final branch, check root equality, conflict markers, staged whitespace and the full local build. Compare the resulting source tree with Git's automatic three-way merge; only the two explicitly reviewed conflict regions may differ. Repeat core/config, core/vm, core/execution and txpool tests where master adds PR 65 to the source tree. Race and vet checks cover the source-conflict resolutions. Preserve exact original and updated heads and report GitHub's live conflict state after fast-forward publication. Local validation does not replace target CI or approval, and a conflict-free branch may still be blocked by them.

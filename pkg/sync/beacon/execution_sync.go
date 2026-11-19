@@ -7,11 +7,20 @@ import (
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/ethereum/go-ethereum/common/lru"
 )
 
 // ExecutionTarget is nominated by the CL through Engine forkchoiceUpdated.
 // Peer announcements are not an authority for choosing this target (EIP-3675).
 type ExecutionTarget struct{ Head, Safe, Finalized types.Hash }
+
+const maxExecutionAncestry = 65536
+const executionBodyCacheBytes = 64 << 20
+
+type downloadedHeader struct {
+	hash, parent types.Hash
+	number       uint64
+}
 
 type ExecutionChain interface {
 	GetBlock(types.Hash) *types.Block
@@ -39,10 +48,19 @@ type ExecutionSyncer struct {
 	pivotActive               bool
 	startHeight, targetHeight uint64
 	done                      chan struct{}
+	// Downloaded data is not an execution-validation or forkchoice authority.
+	downloadHeaders   *lru.Cache[types.Hash, downloadedHeader]
+	downloadBodies    *lru.SizeConstrainedCache[types.Hash, []byte]
+	downloadBodyLimit uint64
 }
 
 func NewExecutionSyncer(chain ExecutionChain, fetcher ExecutionFetcher, apply func(ExecutionTarget) error) *ExecutionSyncer {
-	return &ExecutionSyncer{chain: chain, fetcher: fetcher, apply: apply, wake: make(chan struct{}, 1)}
+	return &ExecutionSyncer{
+		chain: chain, fetcher: fetcher, apply: apply, wake: make(chan struct{}, 1),
+		downloadHeaders:   lru.NewCache[types.Hash, downloadedHeader](maxExecutionAncestry),
+		downloadBodyLimit: executionBodyCacheBytes,
+		downloadBodies:    lru.NewSizeConstrainedCacheWithKeySize[types.Hash, []byte](executionBodyCacheBytes, func(types.Hash) uint64 { return 32 }),
+	}
 }
 
 // SetPivotSync installs the snap bootstrap path before Start. The pivot is
@@ -241,44 +259,92 @@ func (s *ExecutionSyncer) loop(ctx context.Context, done chan struct{}) {
 	}
 }
 
+// downloadedBlock reuses completed content-addressed transfers across target
+// replacement. A block still has to pass the chain's full execution validation.
+func (s *ExecutionSyncer) downloadedBlock(ctx context.Context, hash types.Hash) (*types.Block, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	block := s.chain.GetBlock(hash)
+	if block == nil {
+		if encoded, ok := s.downloadBodies.Get(hash); ok {
+			var err error
+			block, err = types.DecodeBlockRLP(encoded)
+			if err != nil {
+				return nil, fmt.Errorf("beacon execution sync: staged block: %w", err)
+			}
+		}
+	}
+	if block == nil {
+		var err error
+		block, err = s.fetcher.FetchBlock(ctx, hash)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if block == nil || block.Header().Number == nil || !block.Header().Number.IsUint64() || block.Hash() != hash || block.NumberU64() == 0 {
+		return nil, fmt.Errorf("beacon execution sync: invalid ancestry at %s", hash)
+	}
+	encoded, err := block.EncodeRLP()
+	if err != nil {
+		return nil, err
+	}
+	// The upstream byte LRU deliberately permits one oversized value, so enforce
+	// the strict operation budget before adding. Oversized bodies may be streamed.
+	if uint64(len(encoded))+32 <= s.downloadBodyLimit {
+		s.downloadBodies.Add(hash, encoded)
+	}
+	s.downloadHeaders.Add(hash, downloadedHeader{hash: hash, parent: block.ParentHash(), number: block.NumberU64()})
+	return block, nil
+}
+
+func (s *ExecutionSyncer) downloadedHeader(ctx context.Context, hash types.Hash) (downloadedHeader, error) {
+	if header, ok := s.downloadHeaders.Get(hash); ok {
+		return header, nil
+	}
+	block, err := s.downloadedBlock(ctx, hash)
+	if err != nil {
+		return downloadedHeader{}, err
+	}
+	return downloadedHeader{hash: hash, parent: block.ParentHash(), number: block.NumberU64()}, nil
+}
+
 func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarget) error {
-	var blocks []*types.Block
+	var ancestry []downloadedHeader
 	next := target.Head
-	// Bound adversarial ancestry and memory while retaining retryable failure.
+	// Keep only hash-linked header records on the walk. Body bytes have their own
+	// strict budget and are reloaded on forward validation if evicted.
 	for !s.validated(next) {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if len(blocks) >= 65536 {
+		if len(ancestry) >= maxExecutionAncestry {
 			return fmt.Errorf("beacon execution sync: ancestry exceeds limit")
 		}
-		blk := s.chain.GetBlock(next)
-		var err error
-		if blk == nil {
-			blk, err = s.fetcher.FetchBlock(ctx, next)
-		}
+		header, err := s.downloadedHeader(ctx, next)
 		if err != nil {
 			return err
 		}
-		if blk == nil || blk.Header().Number == nil || blk.Hash() != next || blk.NumberU64() == 0 {
-			return fmt.Errorf("beacon execution sync: invalid ancestry at %s", next)
-		}
-		if len(blocks) > 0 && blocks[len(blocks)-1].NumberU64() != blk.NumberU64()+1 {
+		if len(ancestry) > 0 && (header.number == ^uint64(0) || ancestry[len(ancestry)-1].number != header.number+1) {
 			return fmt.Errorf("beacon execution sync: non-contiguous ancestry")
 		}
-		if len(blocks) == 0 {
+		if len(ancestry) == 0 {
 			s.mu.Lock()
 			if s.target == target {
-				s.targetHeight = blk.NumberU64()
+				s.targetHeight = header.number
 			}
 			s.mu.Unlock()
 		}
-		blocks = append(blocks, blk)
-		if s.pivotSync != nil && blk.Hash() == target.Finalized {
+		ancestry = append(ancestry, header)
+		if s.pivotSync != nil && header.hash == target.Finalized {
+			block, err := s.downloadedBlock(ctx, header.hash)
+			if err != nil {
+				return err
+			}
 			s.mu.Lock()
 			s.pivotActive = true
 			s.mu.Unlock()
-			adopted, err := s.pivotSync(ctx, blk)
+			adopted, err := s.pivotSync(ctx, block)
 			s.mu.Lock()
 			s.pivotActive = false
 			s.mu.Unlock()
@@ -289,22 +355,28 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 				break
 			}
 		}
-		next = blk.ParentHash()
+		next = header.parent
 	}
-	for i := len(blocks) - 1; i >= 0; i-- {
+	for i := len(ancestry) - 1; i >= 0; i-- {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if !s.validated(blocks[i].Hash()) {
+		if !s.validated(ancestry[i].hash) {
+			block, err := s.downloadedBlock(ctx, ancestry[i].hash)
+			if err != nil {
+				return err
+			}
 			insert := s.chain.InsertBlock
 			if chain, ok := s.chain.(interface{ InsertSyncedBlock(*types.Block) error }); ok {
 				insert = chain.InsertSyncedBlock
 			}
-			if err := insert(blocks[i]); err != nil {
-				return fmt.Errorf("beacon execution sync: block %d: %w", blocks[i].NumberU64(), err)
+			if err := insert(block); err != nil {
+				return fmt.Errorf("beacon execution sync: block %d: %w", block.NumberU64(), err)
 			}
 		}
+		s.downloadHeaders.Remove(ancestry[i].hash)
 	}
+
 	if err := ctx.Err(); err != nil {
 		return err
 	}

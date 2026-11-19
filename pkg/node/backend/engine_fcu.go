@@ -61,6 +61,16 @@ func (b *EngineBackend) forkchoiceUpdated(
 	if headBlock == nil || !bc.HasValidatedBlock(fcState.HeadBlockHash) {
 		return b.requestForkchoiceSync(fcState), nil
 	}
+	if attrs == nil {
+		ignore, err := bc.CanIgnoreStaleForkchoice(fcState.HeadBlockHash, fcState.SafeBlockHash, fcState.FinalizedBlockHash)
+		if err != nil {
+			return payload.ForkchoiceUpdatedResult{}, fmt.Errorf("%w: %v", engine.ErrInvalidForkchoiceState, err)
+		}
+		if ignore {
+			hash := headBlock.Hash()
+			return payload.ForkchoiceUpdatedResult{PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusValid, LatestValidHash: &hash}}, nil
+		}
+	}
 	var applyErr error
 	if coordinator, ok := b.node.(interface {
 		ApplyExecutionForkchoice(payload.ForkchoiceStateV1) error

@@ -1,0 +1,80 @@
+[
+  {
+    "artifact": "uniswap-v2-erc20.json",
+    "package": "uniswap-v2-core",
+    "version": "1.0.1",
+    "source_revision": "4dd59067c76dea4a0e8e4bfdda41877a6b16dedc",
+    "archive": "https://registry.npmjs.org/@uniswap/v2-core/-/v2-core-1.0.1.tgz",
+    "archive_integrity": "sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==",
+    "archive_sha256": "f01288aaf73a89d2ff541b7276cec215ce2c480cafbed33b0da9c89853f976a2",
+    "member": "package/build/ERC20.json",
+    "artifact_sha256": "7917faf747fc7f3023bfe102bde224ecce2f261c5993b0a5f2308f95789ff530",
+    "license": "uniswap-v2-core-LICENSE",
+    "creation_bytes": 3352
+  },
+  {
+    "artifact": "uniswap-v2-factory.json",
+    "package": "uniswap-v2-core",
+    "version": "1.0.1",
+    "source_revision": "4dd59067c76dea4a0e8e4bfdda41877a6b16dedc",
+    "archive": "https://registry.npmjs.org/@uniswap/v2-core/-/v2-core-1.0.1.tgz",
+    "archive_integrity": "sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==",
+    "archive_sha256": "f01288aaf73a89d2ff541b7276cec215ce2c480cafbed33b0da9c89853f976a2",
+    "member": "package/build/UniswapV2Factory.json",
+    "artifact_sha256": "7e666780d3ddf601a17c97dcc6a414dd77f5eae13fb37fce7e0bd282f4f61406",
+    "license": "uniswap-v2-core-LICENSE",
+    "creation_bytes": 13958
+  },
+  {
+    "artifact": "uniswap-v2-pair.json",
+    "package": "uniswap-v2-core",
+    "version": "1.0.1",
+    "source_revision": "4dd59067c76dea4a0e8e4bfdda41877a6b16dedc",
+    "archive": "https://registry.npmjs.org/@uniswap/v2-core/-/v2-core-1.0.1.tgz",
+    "archive_integrity": "sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==",
+    "archive_sha256": "f01288aaf73a89d2ff541b7276cec215ce2c480cafbed33b0da9c89853f976a2",
+    "member": "package/build/UniswapV2Pair.json",
+    "artifact_sha256": "bb00cb1d64deea4159731b5957eeb8354531a110fb9120b9ef14edbc950e0736",
+    "license": "uniswap-v2-core-LICENSE",
+    "creation_bytes": 11636
+  },
+  {
+    "artifact": "safe.json",
+    "package": "safe-contracts",
+    "version": "1.4.1",
+    "source_revision": "bf943f80fec5ac647159d26161446ac5d716a294",
+    "archive": "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz",
+    "archive_integrity": "sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==",
+    "archive_sha256": "8803f7cf26e2c58300b8136342faa7b8bce59436e300f52115fa25b095e0bf79",
+    "member": "package/build/artifacts/contracts/Safe.sol/Safe.json",
+    "artifact_sha256": "c36a5e99bc3f25c2d75ac5f7920b679200b3ce617c0d26e674b1321dbc6b0bdf",
+    "license": "safe-contracts-LICENSE",
+    "creation_bytes": 23620
+  },
+  {
+    "artifact": "safe-proxy.json",
+    "package": "safe-contracts",
+    "version": "1.4.1",
+    "source_revision": "bf943f80fec5ac647159d26161446ac5d716a294",
+    "archive": "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz",
+    "archive_integrity": "sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==",
+    "archive_sha256": "8803f7cf26e2c58300b8136342faa7b8bce59436e300f52115fa25b095e0bf79",
+    "member": "package/build/artifacts/contracts/proxies/SafeProxy.sol/SafeProxy.json",
+    "artifact_sha256": "b05eaeaf7278097e52a9e9b38410de2a812c23fa3622373473e73eaa19646ecd",
+    "license": "safe-contracts-LICENSE",
+    "creation_bytes": 486
+  },
+  {
+    "artifact": "safe-multisend.json",
+    "package": "safe-contracts",
+    "version": "1.4.1",
+    "source_revision": "bf943f80fec5ac647159d26161446ac5d716a294",
+    "archive": "https://registry.npmjs.org/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz",
+    "archive_integrity": "sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==",
+    "archive_sha256": "8803f7cf26e2c58300b8136342faa7b8bce59436e300f52115fa25b095e0bf79",
+    "member": "package/build/artifacts/contracts/libraries/MultiSend.sol/MultiSend.json",
+    "artifact_sha256": "379f3d2133eee9b8742888749dc5caf3a1f195b37cd21013bff1d00f9e806470",
+    "license": "safe-contracts-LICENSE",
+    "creation_bytes": 729
+  }
+]

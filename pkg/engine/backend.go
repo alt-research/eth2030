@@ -1006,7 +1006,7 @@ func payloadToBlock(payload *ExecutionPayloadV3, parentBeaconBlockRoot types.Has
 	// Decode transactions.
 	txs := make([]*types.Transaction, len(payload.Transactions))
 	for i, enc := range payload.Transactions {
-		tx, err := types.DecodeTxRLP(enc)
+		tx, err := types.DecodeBlockTransaction(enc)
 		if err != nil {
 			return nil, fmt.Errorf("invalid transaction %d: %w", i, err)
 		}

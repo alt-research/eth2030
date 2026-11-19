@@ -71,7 +71,7 @@ type blobTxRLP struct {
 	GasTipCap  *big.Int
 	GasFeeCap  *big.Int
 	Gas        uint64
-	To         Address
+	To         []byte
 	Value      *big.Int
 	Data       []byte
 	AccessList []accessTupleRLP
@@ -109,7 +109,7 @@ type setCodeTxRLP struct {
 	GasTipCap  *big.Int
 	GasFeeCap  *big.Int
 	Gas        uint64
-	To         Address
+	To         []byte
 	Value      *big.Int
 	Data       []byte
 	AccessList []accessTupleRLP
@@ -262,7 +262,7 @@ func encodeTypedTx(txType byte, inner TxData) ([]byte, error) {
 			GasTipCap:  bigOrZero(tx.GasTipCap),
 			GasFeeCap:  bigOrZero(tx.GasFeeCap),
 			Gas:        tx.Gas,
-			To:         tx.To,
+			To:         tx.To[:],
 			Value:      bigOrZero(tx.Value),
 			Data:       tx.Data,
 			AccessList: encodeAccessList(tx.AccessList),
@@ -281,7 +281,7 @@ func encodeTypedTx(txType byte, inner TxData) ([]byte, error) {
 			GasTipCap:  bigOrZero(tx.GasTipCap),
 			GasFeeCap:  bigOrZero(tx.GasFeeCap),
 			Gas:        tx.Gas,
-			To:         tx.To,
+			To:         tx.To[:],
 			Value:      bigOrZero(tx.Value),
 			Data:       tx.Data,
 			AccessList: encodeAccessList(tx.AccessList),
@@ -358,15 +358,7 @@ func DecodeTxRLP(data []byte) (*Transaction, error) {
 	if data[0] >= 0xc0 {
 		return decodeLegacyTx(data)
 	}
-	// If first byte is 0x00, it could be a typed legacy tx (type 0).
-	// Per EIP-2718, type 0 is not formally an envelope type, but we handle
-	// it: strip the 0x00 byte and decode the rest as legacy.
-	if data[0] == 0x00 {
-		if len(data) < 2 {
-			return nil, errShortTypedTx
-		}
-		return decodeLegacyTx(data[1:])
-	}
+
 	return nil, fmt.Errorf("invalid transaction encoding, first byte: 0x%02x", data[0])
 }
 
@@ -375,6 +367,10 @@ func decodeLegacyTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode legacy tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &LegacyTx{
 		Nonce:    dec.Nonce,
 		GasPrice: dec.GasPrice,
@@ -459,6 +455,10 @@ func decodeAccessListTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode access list tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &AccessListTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
@@ -480,6 +480,10 @@ func decodeDynamicFeeTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode dynamic fee tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &DynamicFeeTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
@@ -538,13 +542,20 @@ func decodeBlobTxFull(data []byte) (*Transaction, *BlobSidecarData, error) {
 			}
 		}
 	}
+	if len(dec.To) == 0 {
+		return nil, nil, ErrBlobTxCreate
+	}
+	if len(dec.To) != 20 {
+		return nil, nil, ErrRecipientLength
+	}
+
 	inner := &BlobTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
 		GasTipCap:  dec.GasTipCap,
 		GasFeeCap:  dec.GasFeeCap,
 		Gas:        dec.Gas,
-		To:         dec.To,
+		To:         BytesToAddress(dec.To),
 		Value:      dec.Value,
 		Data:       dec.Data,
 		AccessList: decodeAccessList(dec.AccessList),
@@ -566,13 +577,31 @@ func decodeSetCodeTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode set code tx: %w", err)
 	}
+	if len(dec.To) == 0 {
+		return nil, ErrSetCodeTxCreate
+	}
+	if len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
+	for _, auth := range dec.AuthList {
+		for _, field := range []*big.Int{auth.ChainID, auth.R, auth.S} {
+			if field != nil && field.BitLen() > 256 {
+				return nil, errors.New("authorization field exceeds uint256")
+			}
+		}
+		if auth.V != nil && auth.V.BitLen() > 8 {
+			return nil, errors.New("authorization parity exceeds uint8")
+		}
+	}
+
 	inner := &SetCodeTx{
 		ChainID:           dec.ChainID,
 		Nonce:             dec.Nonce,
 		GasTipCap:         dec.GasTipCap,
 		GasFeeCap:         dec.GasFeeCap,
 		Gas:               dec.Gas,
-		To:                dec.To,
+		To:                BytesToAddress(dec.To),
 		Value:             dec.Value,
 		Data:              dec.Data,
 		AccessList:        decodeAccessList(dec.AccessList),

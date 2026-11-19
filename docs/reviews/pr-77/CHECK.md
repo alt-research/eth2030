@@ -1,3 +1,10 @@
+## Master integration after PRs 66–76 (2026-11-19)
+
+- [x] Verify the exact PR head and current master in an isolated worktree.
+- [ ] Resolve the receipt regression conflict while retaining mandatory Amsterdam builder queues and current transfer-log expectations.
+- [ ] Run affected tests, tagged variants, race/vet, CI formatting and local build.
+- [ ] Prepare a non-forced update of the existing PR branch and verify live mergeability.
+
 # PR 77 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `6c86693815e154a092e6321e08d16109c86e49a2`.

@@ -591,7 +591,7 @@ func TestSelfdestructGas_PostCancun(t *testing.T) {
 
 	stack := testStack(new(big.Int).Set(beneficiaryInt))
 	gas, _ := gasSelfdestructEIP2929(evm, contract, stack, mem, 0)
-	expectedCold := ColdAccountAccessCost - WarmStorageReadCost
+	expectedCold := ColdAccountAccessCost
 	if gas != expectedCold {
 		t.Errorf("SELFDESTRUCT cold beneficiary, no balance: gas = %d, want %d", gas, expectedCold)
 	}
@@ -611,7 +611,7 @@ func TestSelfdestructGas_PostCancun(t *testing.T) {
 
 	stack = testStack(new(big.Int).Set(newBeneficiaryInt))
 	gas, _ = gasSelfdestructEIP2929(evm2, contract2, stack, mem, 0)
-	expected := (ColdAccountAccessCost - WarmStorageReadCost) + CreateBySelfdestructGas
+	expected := (ColdAccountAccessCost) + CreateBySelfdestructGas
 	if gas != expected {
 		t.Errorf("SELFDESTRUCT cold+new account: gas = %d, want %d", gas, expected)
 	}

@@ -65,8 +65,10 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 	}
 	snapshot := evm.StateDB.Snapshot()
 	createdSnapshot := len(evm.createdOrder)
-	if !evm.StateDB.Exist(address) {
-		evm.StateDB.CreateAccount(address)
+	previousBalance := evm.StateDB.GetBalance(address)
+	evm.StateDB.CreateAccount(address)
+	if previousBalance.Sign() > 0 {
+		evm.StateDB.AddBalance(address, previousBalance)
 	}
 	evm.markContractCreated(address)
 	evm.StateDB.SetNonce(address, 1)

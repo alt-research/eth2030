@@ -1,3 +1,10 @@
+## Sequential RPC merge/dependency and CI repair (2026-11-19)
+
+- [x] Read original CI formatting failure and the qualified method-specific execution policy.
+- [ ] Merge master while preserving canonical refund accounting and pre-mutation validation.
+- [ ] Reconcile repaired existing gas dependency 83 without promoting its Draft status or importing later simulator/tracing work.
+- [ ] Run full tests, integration, affected race/vet, formatting/build; publish and verify exact-head CI.
+
 # PR 85 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54`.

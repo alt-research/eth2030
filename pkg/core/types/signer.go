@@ -83,7 +83,11 @@ func (s EIP155Signer) Sender(tx *Transaction) (Address, error) {
 		if v.Cmp(big.NewInt(35)) < 0 {
 			return Address{}, errInvalidSig
 		}
-		if deriveChainID(v).Cmp(s.chainIDBig) != 0 {
+		derived := deriveChainID(v)
+		if !derived.IsUint64() {
+			return Address{}, errInvalidSig
+		}
+		if derived.Cmp(s.chainIDBig) != 0 {
 			return Address{}, errInvalidChainID
 		}
 		parity = new(big.Int).Sub(v, new(big.Int).Add(new(big.Int).Lsh(new(big.Int).Set(s.chainIDBig), 1), big.NewInt(35))).Uint64()

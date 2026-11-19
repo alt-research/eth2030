@@ -74,3 +74,31 @@ func TestCaptureRetainsMalformedPayloadForActualEngineRejection(t *testing.T) {
 		t.Fatal("actual rejection or malformed evidence lost")
 	}
 }
+
+func TestCapturePreservesNonJSONBytesWithoutUTF8Replacement(t *testing.T) {
+	input, output := []byte{0xff, 0, 1}, []byte{0xfe, 0, 2}
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw, _ := io.ReadAll(r.Body)
+		if !bytes.Equal(raw, input) {
+			t.Error("binary request changed")
+		}
+		w.WriteHeader(400)
+		_, _ = w.Write(output)
+	}))
+	defer upstream.Close()
+	target, _ := url.Parse(upstream.URL)
+	var evidence bytes.Buffer
+	handler := &capture{upstream: target, transport: upstream.Client().Transport, output: &evidence}
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, "http://el/", bytes.NewReader(input)))
+	var record struct {
+		RequestBody  []byte `json:"request_body"`
+		ResponseBody []byte `json:"response_body"`
+	}
+	if err := json.Unmarshal(evidence.Bytes(), &record); err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(response.Body.Bytes(), output) || !bytes.Equal(record.RequestBody, input) || !bytes.Equal(record.ResponseBody, output) {
+		t.Fatal("malformed byte evidence changed")
+	}
+}

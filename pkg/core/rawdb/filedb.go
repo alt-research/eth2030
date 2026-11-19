@@ -308,68 +308,79 @@ func (db *FileDB) replayWAL() error {
 	}
 
 	var pending []walRecord
+	committed := make(map[string]walRecord)
 	pos := 0
+parse:
 	for pos < len(data) {
 		op := data[pos]
 		pos++
 
 		switch op {
 		case walCommit:
-			// Apply all pending records.
+			// Opening is exclusive. No reader can observe intermediate WAL
+			// transactions, so retain only their final committed per-key intent.
 			for _, rec := range pending {
-				switch rec.op {
-				case walPut:
-					if err := db.writeDataFile(rec.key, rec.value); err != nil {
-						return err
-					}
-					cp := make([]byte, len(rec.value))
-					copy(cp, rec.value)
-					db.index[string(rec.key)] = cp
-				case walDelete:
-					path := db.keyPath(rec.key)
-					if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-						return err
-					}
-					delete(db.index, string(rec.key))
-				}
+				committed[string(rec.key)] = rec
 			}
 			pending = pending[:0]
 
 		case walPut, walDelete:
 			// Read key.
 			if pos+4 > len(data) {
-				return nil // Truncated WAL, discard.
+				break parse // Discard only the torn suffix, not the committed prefix.
 			}
 			kl := binary.BigEndian.Uint32(data[pos : pos+4])
 			pos += 4
 			if pos+int(kl) > len(data) {
-				return nil
+				break parse
 			}
-			key := make([]byte, kl)
-			copy(key, data[pos:pos+int(kl)])
+			key := data[pos : pos+int(kl)]
 			pos += int(kl)
 
 			// Read value.
 			if pos+4 > len(data) {
-				return nil
+				break parse
 			}
 			vl := binary.BigEndian.Uint32(data[pos : pos+4])
 			pos += 4
 			if pos+int(vl) > len(data) {
-				return nil
+				break parse
 			}
-			value := make([]byte, vl)
-			copy(value, data[pos:pos+int(vl)])
+			value := data[pos : pos+int(vl)]
 			pos += int(vl)
 
 			pending = append(pending, walRecord{op: op, key: key, value: value})
 
 		default:
 			// Unknown record type -- WAL is corrupted past this point.
-			return nil
+			break parse
 		}
 	}
 	// Any remaining pending records without a commit marker are discarded.
+	keys := make([]string, 0, len(committed))
+	for key := range committed {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		rec := committed[key]
+		switch rec.op {
+		case walPut:
+			if existing, ok := db.index[key]; ok && bytes.Equal(existing, rec.value) {
+				continue
+			}
+			if err := db.writeDataFile(rec.key, rec.value); err != nil {
+				return err
+			}
+			db.index[key] = bytes.Clone(rec.value)
+		case walDelete:
+			if err := os.Remove(db.keyPath(rec.key)); err != nil && !os.IsNotExist(err) {
+				return err
+			}
+			delete(db.index, key)
+		}
+	}
+	// NewFileDB syncs the recovered directory before truncating the journal.
 	return nil
 }
 

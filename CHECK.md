@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Nested and dimensional execution tracing (2026-11-19)
+
+- [x] Recheck execution-apis 852/855/976 and merged Geth 35970; read full selected call-frame schema and discussion.
+- [ ] Record explicit development schemas without presenting open proposals as release consensus.
+- [ ] Reproduce missing nested frames, reverted logs, block-global indices and dimensional gas through actual HTTP.
+- [ ] Add observational enter/exit/settlement/opcode hooks and real CALL/CREATE/SELFDESTRUCT frame consumers.
+- [ ] Honor onlyTopCall/withLog and historical/fork/context overrides with exact omission rules.
+- [ ] Qualify real signed/block/call consumers, independent SDK/reference fixtures and compiling mutations; pass full/affected race/vet/build and publish a separate PR.
+
 ## Stateful eth_simulateV1 implementation (2026-11-19)
 
 - [x] Read complete selected execution-apis 68d76a5b simulator schema/notes and unmodified Geth v1.17.10 simulator/provider behavior.

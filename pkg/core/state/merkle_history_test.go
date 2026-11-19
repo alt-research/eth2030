@@ -124,6 +124,16 @@ func TestMerkleHistoryPublishesAtomicallyAndRetainsExactRootsAfterRestart(t *tes
 		}
 		clone := restored.Dup()
 		clone.SetState(a, k, types.Hash{31: 99})
+		newRoot, err := clone.Commit()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if available, err := HistoryStateAvailable(db, newRoot); err != nil || available {
+			t.Fatalf("unvalidated overlay commit published history authority: %t %v", available, err)
+		}
+		if _, err := LoadStateSnapshot(db, newRoot); !errors.Is(err, rawdb.ErrNotFound) {
+			t.Fatalf("historical overlay materialized a duplicate full flat snapshot: %v", err)
+		}
 		if restored.GetState(a, k) != (types.Hash{31: test.value}) || restored.GetRoot() != test.root {
 			t.Fatal("request overlay changed immutable history")
 		}

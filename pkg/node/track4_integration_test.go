@@ -132,7 +132,7 @@ func track4Precompiles(t *testing.T, r track4RPC, at string, active bool) {
 		assertCall := func(to types.Address, input []byte, want string) {
 			t.Helper()
 			var output string
-			r.call(t, "eth_call", &output, map[string]string{"to": to.Hex(), "data": "0x" + hex.EncodeToString(input), "gas": "0xb0000"}, at)
+			r.call(t, "eth_call", &output, map[string]string{"to": to.Hex(), "data": "0x" + hex.EncodeToString(input), "gas": "0x" + strconv.FormatUint(720896+21000+64*uint64(len(input)), 16)}, at)
 			if output != want {
 				t.Fatalf("%s at %s returned %s, want %s", v.Name, at, output, want)
 			}

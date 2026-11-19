@@ -90,3 +90,16 @@ type AccessListBackend interface {
 
 // ErrInvalidCallArgs identifies malformed simulation input at the RPC boundary.
 var ErrInvalidCallArgs = errors.New("invalid call arguments")
+
+// CallBackend exposes actual method-specific simulation without narrowing input
+// to the legacy EVMCall tuple. A transaction estimate always uses transaction rules.
+type CallBackend interface {
+	Call(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) ([]byte, uint64, error)
+	EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (uint64, error)
+	TraceCall(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error)
+}
+
+// BlockTraceBackend supplies canonical single-pass opcode traces.
+type BlockTraceBackend interface {
+	TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error)
+}

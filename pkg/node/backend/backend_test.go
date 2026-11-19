@@ -167,15 +167,15 @@ func TestRPCBackendEVMCallUsesPQDraftActivation(t *testing.T) {
 			t.Fatal(err)
 		}
 		backend := NewRPCBackend(&mockNodeDeps{blockchain: bc, config: &Config{}}, nil).(*RPCBackend)
-		out, gas, err := backend.EVMCall(types.Address{}, &target, nil, 5000, nil, rpc.LatestBlockNumber)
+		out, gas, err := backend.EVMCall(types.Address{}, &target, nil, 26000, nil, rpc.LatestBlockNumber)
 		if err != nil {
 			t.Fatal(err)
 		}
 		if timestamp < activation {
-			if len(out) != 0 || gas != 5000 {
+			if len(out) != 0 || gas != 11000 {
 				t.Fatalf("before activation = %x, gas %d", out, gas)
 			}
-		} else if len(out) != 32 || types.BytesToHash(out) != (types.Hash{}) || gas != 2000 {
+		} else if len(out) != 32 || types.BytesToHash(out) != (types.Hash{}) || gas != 8000 {
 			t.Fatalf("at activation = %x, gas %d", out, gas)
 		}
 	}

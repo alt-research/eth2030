@@ -7,12 +7,15 @@ import (
 
 	"github.com/eth2030/eth2030/core/execution"
 	coregas "github.com/eth2030/eth2030/core/gas"
+	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/rpc"
+	rpctypes "github.com/eth2030/eth2030/rpc/types"
 	"github.com/eth2030/eth2030/trie"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // RPCBackend adapts NodeDeps to the rpc.Backend interface.
@@ -297,72 +300,28 @@ func (b *RPCBackend) GetBlockReceipts(number uint64) []*types.Receipt {
 	return bc.GetBlockReceipts(number)
 }
 
-func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte, gas uint64, value *big.Int, blockNumber rpc.BlockNumber) ([]byte, uint64, error) {
-	bc := b.node.Blockchain()
-	if bc == nil {
-		return nil, 0, fmt.Errorf("blockchain not available")
+func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte, gas uint64, value *big.Int, number rpc.BlockNumber) ([]byte, uint64, error) {
+	fromHex := from.Hex()
+	input := hexutil.Encode(data)
+	args := rpctypes.CallArgs{From: &fromHex, Input: &input}
+	if to != nil {
+		v := to.Hex()
+		args.To = &v
 	}
-
-	var header *types.Header
-	switch blockNumber {
-	case rpc.LatestBlockNumber, rpc.PendingBlockNumber:
-		blk := bc.CurrentBlock()
-		if blk != nil {
-			header = blk.Header()
-		}
-	default:
-		blk := bc.GetBlockByNumber(uint64(blockNumber))
-		if blk != nil {
-			header = blk.Header()
-		}
-	}
-	if header == nil {
-		return nil, 0, fmt.Errorf("block not found")
-	}
-
-	statedb, err := b.StateAtHeader(header)
-	if err != nil {
-		return nil, 0, fmt.Errorf("state not found: %w", err)
-	}
-
 	if gas == 0 {
 		gas = 50_000_000
 	}
-	if value == nil {
-		value = new(big.Int)
+	limit := hexutil.EncodeUint64(gas)
+	args.Gas = &limit
+	if value != nil {
+		v := hexutil.EncodeBig(value)
+		args.Value = &v
 	}
-
-	blockCtx := vm.BlockContext{
-		GetHash:     bc.GetHashFn(),
-		BlockNumber: header.Number,
-		Time:        header.Time,
-		GasLimit:    header.GasLimit,
-		BaseFee:     header.BaseFee,
+	output, used, err := b.Call(args, number)
+	if used > gas {
+		return output, 0, fmt.Errorf("call exceeded supplied gas")
 	}
-	txCtx := vm.TxContext{
-		Origin:   from,
-		GasPrice: header.BaseFee,
-	}
-
-	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
-
-	active, err := execution.ConfigureBlockEVM(bc.Config(), header, evm)
-	if err != nil {
-		return nil, 0, err
-	}
-	statedb.AddAddressToAccessList(from)
-	statedb.AddAddressToAccessList(header.Coinbase)
-	for address := range active {
-		statedb.AddAddressToAccessList(address)
-	}
-
-	if to == nil {
-		return nil, gas, nil
-	}
-
-	statedb.AddAddressToAccessList(*to)
-	ret, gasLeft, err := evm.Call(from, *to, data, gas, value)
-	return ret, gasLeft, err
+	return output, gas - used, err
 }
 
 func (b *RPCBackend) HistoryOldestBlock() uint64 {
@@ -383,108 +342,87 @@ func (b *RPCBackend) BlobSchedule(blockTime uint64) (target, max, updateFraction
 	return sched.Target, sched.Max, sched.UpdateFraction
 }
 
-func (b *RPCBackend) TraceTransaction(txHash types.Hash) (*vm.StructLogTracer, error) {
+func (b *RPCBackend) TraceTransaction(hash types.Hash) (*vm.StructLogTracer, error) {
 	bc := b.node.Blockchain()
 	if bc == nil {
 		return nil, fmt.Errorf("blockchain not available")
 	}
-
-	entry, found := bc.GetTxLookupEntry(txHash)
-	if !found {
-		return nil, fmt.Errorf("transaction %v not found", txHash)
+	entry, ok := bc.GetTxLookupEntry(hash)
+	if !ok {
+		return nil, fmt.Errorf("transaction %s not found", hash)
 	}
-
-	blk := bc.GetBlock(entry.BlockHash)
-	if blk == nil {
-		return nil, fmt.Errorf("block %v not found", entry.BlockHash)
+	block := bc.GetBlock(entry.BlockHash)
+	if block == nil {
+		return nil, fmt.Errorf("block not found")
 	}
-
-	txs := blk.Transactions()
-	if int(entry.TxIndex) >= len(txs) {
-		return nil, fmt.Errorf("transaction index %d out of range", entry.TxIndex)
-	}
-
-	header := blk.Header()
-	parentBlock := bc.GetBlock(header.ParentHash)
-	if parentBlock == nil {
-		return nil, fmt.Errorf("parent block %v not found", header.ParentHash)
-	}
-	statedb, err := b.StateAt(parentBlock.Header().Root)
+	traces, err := b.traceTransactions(block, &entry.TxIndex)
 	if err != nil {
-		return nil, fmt.Errorf("state not found for parent block: %w", err)
+		return nil, err
 	}
+	return traces[0], nil
+}
 
-	blockCtx := vm.BlockContext{
-		GetHash:     bc.GetHashFn(),
-		BlockNumber: header.Number,
-		Time:        header.Time,
-		GasLimit:    header.GasLimit,
-		BaseFee:     header.BaseFee,
+// TraceBlock replays its prefix once instead of independently rebuilding it for
+// every target. Each tracer observes its own complete transaction transition.
+func (b *RPCBackend) TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error) {
+	block := b.node.Blockchain().GetBlock(hash)
+	if block == nil {
+		return nil, fmt.Errorf("block not found")
 	}
-
-	// Replay preceding transactions
-	for i := uint64(0); i < entry.TxIndex; i++ {
+	return b.traceTransactions(block, nil)
+}
+func (b *RPCBackend) traceTransactions(block *types.Block, target *uint64) ([]*vm.StructLogTracer, error) {
+	bc := b.node.Blockchain()
+	txs := block.Transactions()
+	if len(txs) == 0 {
+		return []*vm.StructLogTracer{}, nil
+	}
+	last := uint64(len(txs) - 1)
+	if target != nil {
+		last = *target
+	}
+	if last >= uint64(len(txs)) {
+		return nil, fmt.Errorf("transaction index out of range")
+	}
+	header := block.Header()
+	parent := bc.GetBlock(header.ParentHash)
+	if parent == nil {
+		return nil, fmt.Errorf("parent block not found")
+	}
+	base, err := b.StateAtHeader(parent.Header())
+	if err != nil {
+		return nil, err
+	}
+	db := base.Dup()
+	if err := execution.ApplyPreExecutionSystems(bc.Config(), bc.GetHashFn(), db, header, nil); err != nil {
+		return nil, err
+	}
+	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
+	var traces []*vm.StructLogTracer
+	for i := uint64(0); i <= last; i++ {
 		tx := txs[i]
-		from := types.Address{}
-		if sender := tx.Sender(); sender != nil {
-			from = *sender
+		db.SetTxContext(tx.Hash(), int(i))
+		db.ClearTransientStorage()
+		db.SubRefund(db.GetRefund())
+		tracing := vm.Config{}
+		var tracer *vm.StructLogTracer
+		if target == nil || i == last {
+			if tx.Type() > types.SetCodeTxType {
+				return nil, fmt.Errorf("transaction envelope has no qualified opcode tracer")
+			}
+			tracer = vm.NewStructLogTracer()
+			tracing = vm.Config{Debug: true, Tracer: tracer}
 		}
-		txCtx := vm.TxContext{
-			Origin:   from,
-			GasPrice: tx.GasPrice(),
+		receipt, used, err := execution.ApplyTransactionWithVMConfig(bc.Config(), bc.GetHashFn(), db, header, tx, gp, tracing)
+		if err != nil {
+			return nil, fmt.Errorf("replay tx %d: %w", i, err)
 		}
-		evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
-		to := tx.To()
-		if to != nil {
-			evm.Call(from, *to, tx.Data(), tx.Gas(), tx.Value())
-		}
-		statedb.SetNonce(from, statedb.GetNonce(from)+1)
-	}
-
-	// Trace target transaction
-	targetTx := txs[entry.TxIndex]
-	from := types.Address{}
-	if sender := targetTx.Sender(); sender != nil {
-		from = *sender
-	}
-	txCtx := vm.TxContext{
-		Origin:   from,
-		GasPrice: targetTx.GasPrice(),
-	}
-
-	tracer := vm.NewStructLogTracer()
-	tracingCfg := vm.Config{
-		Debug:  true,
-		Tracer: tracer,
-	}
-	evm := vm.NewEVMWithState(blockCtx, txCtx, tracingCfg, statedb)
-
-	intrinsicGas := uint64(21000)
-	for _, b := range targetTx.Data() {
-		if b == 0 {
-			intrinsicGas += 4
-		} else {
-			intrinsicGas += 16
+		execution.ApplyAAPostExecution(db, tx, receipt, used, nil)
+		if tracer != nil {
+			traces = append(traces, tracer)
 		}
 	}
-	if targetTx.To() == nil {
-		intrinsicGas += 32000
-	}
-	evmGas := uint64(0)
-	if targetTx.Gas() > intrinsicGas {
-		evmGas = targetTx.Gas() - intrinsicGas
-	}
-
-	to := targetTx.To()
-	if to != nil {
-		ret, gasLeft, err := evm.Call(from, *to, targetTx.Data(), evmGas, targetTx.Value())
-		gasUsed := evmGas - gasLeft
-		tracer.CaptureEnd(ret, gasUsed, err)
-	} else if evmGas > 0 {
-		tracer.CaptureEnd(nil, evmGas, fmt.Errorf("contract creation tracing not supported"))
-	}
-
-	return tracer, nil
+	return traces, nil
 }
 
 // IsOsaka supplies the fork rule used by blob fee forecasts.

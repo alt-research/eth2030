@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 )
 
 // CallRequest wraps the full parameter set for eth_call and eth_estimateGas,
@@ -202,6 +203,13 @@ func (api *EthAPI) ethCallFull(req *Request) *Response {
 		return &Response{JSONRPC: "2.0", Error: rpcErr, ID: req.ID}
 	}
 
+	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
+		result, _, err := backend.Call(cr.Args, cr.BlockNum, cr.Overrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, "execution error: "+err.Error())
+		}
+		return successResponse(req.ID, encodeBytes(result))
+	}
 	from, to, gas, value, data := parseCallArgs(&cr.Args)
 	result, _, err := api.ethCallWithOverrides(from, to, data, gas, value, cr.BlockNum, cr.Overrides)
 	if err != nil {
@@ -261,6 +269,13 @@ func (api *EthAPI) estimateGasFull(req *Request) *Response {
 		return &Response{JSONRPC: "2.0", Error: rpcErr, ID: req.ID}
 	}
 
+	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
+		estimate, err := backend.EstimateGas(cr.Args, cr.BlockNum, cr.Overrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, "gas estimation failed: "+err.Error())
+		}
+		return successResponse(req.ID, encodeUint64(estimate))
+	}
 	from, to, _, value, data := parseCallArgs(&cr.Args)
 
 	header := api.backend.HeaderByNumber(cr.BlockNum)

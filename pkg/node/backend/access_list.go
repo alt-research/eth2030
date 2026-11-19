@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -15,7 +14,6 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // accessedState records accesses independently of state rollback. In particular,
@@ -97,91 +95,11 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 	if err != nil {
 		return nil, err
 	}
-	invalid := func(field string, err error) error {
-		return fmt.Errorf("%w: %s: %v", rpcbackend.ErrInvalidCallArgs, field, err)
+	msg, err := parseSimulationMessage(args, header, base)
+	if err != nil {
+		return nil, err
 	}
-	address := func(value string) (types.Address, error) {
-		raw, err := hexutil.Decode(value)
-		if err != nil {
-			return types.Address{}, err
-		}
-		if len(raw) != types.AddressLength {
-			return types.Address{}, fmt.Errorf("address must contain 20 bytes")
-		}
-		return types.BytesToAddress(raw), nil
-	}
-	from := types.Address{}
-	if args.From != nil {
-		from, err = address(*args.From)
-		if err != nil {
-			return nil, invalid("from", err)
-		}
-	}
-	var to *types.Address
-	if args.To != nil {
-		a, err := address(*args.To)
-		if err != nil {
-			return nil, invalid("to", err)
-		}
-		to = &a
-	}
-	limit := header.GasLimit
-	if args.Gas != nil {
-		limit, err = hexutil.DecodeUint64(*args.Gas)
-		if err != nil {
-			return nil, invalid("gas", err)
-		}
-	}
-	price, value := new(big.Int), new(big.Int)
-	if args.GasPrice != nil {
-		price, err = hexutil.DecodeBig(*args.GasPrice)
-		if err != nil {
-			return nil, invalid("gasPrice", err)
-		}
-	}
-	if args.Value != nil {
-		value, err = hexutil.DecodeBig(*args.Value)
-		if err != nil {
-			return nil, invalid("value", err)
-		}
-	}
-	nonce := base.GetNonce(from)
-	if args.Nonce != nil {
-		nonce, err = hexutil.DecodeUint64(*args.Nonce)
-		if err != nil {
-			return nil, invalid("nonce", err)
-		}
-	}
-	input := args.Input
-	if input == nil {
-		input = args.Data
-	}
-	var data []byte
-	if input != nil {
-		data, err = hexutil.Decode(*input)
-		if err != nil {
-			return nil, invalid("input", err)
-		}
-	}
-	list := make(types.AccessList, 0, len(args.AccessList))
-	for _, item := range args.AccessList {
-		a, err := address(item.Address)
-		if err != nil {
-			return nil, invalid("accessList address", err)
-		}
-		tuple := types.AccessTuple{Address: a, StorageKeys: make([]types.Hash, 0, len(item.StorageKeys))}
-		for _, key := range item.StorageKeys {
-			raw, err := hexutil.Decode(key)
-			if err != nil {
-				return nil, invalid("storage key", err)
-			}
-			if len(raw) != types.HashLength {
-				return nil, invalid("storage key", fmt.Errorf("must contain 32 bytes"))
-			}
-			tuple.StorageKeys = append(tuple.StorageKeys, types.BytesToHash(raw))
-		}
-		list = append(list, tuple)
-	}
+	from, to, nonce, limit, list := msg.From, msg.To, msg.Nonce, msg.GasLimit, msg.AccessList
 	cfg := b.node.Blockchain().Config()
 	for attempt := 0; attempt < 64; attempt++ {
 		tracked := &accessedState{StateDB: base.Dup(), items: make(map[types.Address]map[types.Hash]struct{})}
@@ -199,8 +117,9 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 		for a := range active {
 			excluded[a] = true
 		}
-		msg := &config.Message{From: from, To: to, Nonce: nonce, GasLimit: limit, GasPrice: price, Value: value, Data: data, AccessList: list}
-		result, err := execution.ApplyMessage(cfg, b.node.Blockchain().GetHashFn(), tracked, header, msg, new(gaspool.GasPool).AddGas(limit))
+		candidate := *msg
+		candidate.AccessList = list
+		result, err := execution.SimulateMessage(cfg, b.node.Blockchain().GetHashFn(), tracked, header, &candidate, new(gaspool.GasPool).AddGas(limit), true, vm.Config{})
 		if err != nil {
 			return nil, err
 		}

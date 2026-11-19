@@ -20,7 +20,7 @@ import (
 // caller supplies the shared block/precompile/blob context and BAL reconciliation.
 // Older forks and independent experimental transaction envelopes retain their
 // existing entrypoints; ordinary Amsterdam transactions always use this path.
-func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, evm *vm.EVM, precompiles map[types.Address]vm.PrecompiledContract, blobCost, blobMaxCost *big.Int, trackers []vm.BALTracker) (result *ExecutionResult, err error) {
+func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, evm *vm.EVM, precompiles map[types.Address]vm.PrecompiledContract, blobCost, blobMaxCost *big.Int, options messageOptions, trackers []vm.BALTracker) (result *ExecutionResult, err error) {
 	value := msg.Value
 	if value == nil {
 		value = new(big.Int)
@@ -28,7 +28,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if value.Sign() < 0 || value.BitLen() > 256 {
 		return nil, errors.New("invalid transaction value")
 	}
-	if msg.Nonce == math.MaxUint64 {
+	if msg.Nonce == math.MaxUint64 && !options.simulation {
 		return nil, errors.New("sender nonce overflow")
 	}
 	nonce := db.GetNonce(msg.From)
@@ -40,7 +40,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	}
 	code := db.GetCode(msg.From)
 	_, validSenderDelegation := types.ParseDelegation(code)
-	if len(code) > 0 && !validSenderDelegation {
+	if !options.simulation && len(code) > 0 && !validSenderDelegation {
 		return nil, errors.New("sender not an EOA")
 	}
 	if msg.TxType == types.SetCodeTxType && (msg.To == nil || len(msg.AuthList) == 0) {
@@ -72,7 +72,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if feeCap.Sign() < 0 || tipCap.Sign() < 0 || feeCap.BitLen() > 256 || tipCap.BitLen() > 256 || tipCap.Cmp(feeCap) > 0 {
 		return nil, errors.New("invalid transaction fee caps")
 	}
-	if header.BaseFee != nil && feeCap.Cmp(header.BaseFee) < 0 {
+	if header.BaseFee != nil && feeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && feeCap.Sign() == 0 && tipCap.Sign() == 0) {
 		return nil, errors.New("max fee per gas less than block base fee")
 	}
 	intrinsic, err := gas.CalculateAmsterdamIntrinsic(msg.From, msg.To, value, msg.Data, msg.AccessList, uint64(len(msg.AuthList)))
@@ -80,6 +80,13 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 		return nil, err
 	}
 	executionLeft, reservoir, err := intrinsic.ExecutionBudget(msg.GasLimit)
+	if options.uncapped {
+		err = nil
+		if msg.GasLimit < max(intrinsic.Gas, intrinsic.Floor) {
+			return nil, ErrIntrinsicGasTooLow
+		}
+		executionLeft, reservoir = msg.GasLimit-intrinsic.Gas, 0
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +102,9 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 		return nil, ErrInsufficientBalance
 	}
 	reserveExecution := min(msg.GasLimit, vm.AmsterdamMaxExecutionGas)
+	if options.uncapped {
+		reserveExecution = msg.GasLimit
+	}
 	if err := gp.ReserveFrame(reserveExecution, msg.GasLimit); err != nil {
 		return nil, err
 	}

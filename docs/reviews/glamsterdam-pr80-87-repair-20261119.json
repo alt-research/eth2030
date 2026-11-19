@@ -1,0 +1,268 @@
+{
+  "date": "2026-11-19",
+  "initial_master": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+  "toolchain": "go1.26.11",
+  "go_flags": "-p=4",
+  "scope": "existing Glamsterdam reviews 80 through 87; no upstream merge",
+  "remote_completion_gate": "Read each current PR head and require mergeable=true plus all seven successful checks on that exact published head. Draft 83 remains Draft. Check after final publication.",
+  "reviews": [
+    {
+      "number": 80,
+      "branch": "feat/glamsterdam-blob-schedule",
+      "head": "c357d2a13f31e3d04397993aabf23d3892ad945c",
+      "draft": false,
+      "title": "feat(blob): enforce configured fork capacity, prices and fee settlement",
+      "initial_conflicts": [
+        "pkg/rpc/internal/testutil/mock_backend.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr80-ci",
+      "local_branch": "fix/pr80-master-ci",
+      "repaired_head": "9272ee39391b2d8c1c2f49e8f7ad986cb044b794",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "validated_source_tree": "3eb0237e8b1b3582ca6ce5afc6be093ee4ca5716",
+      "full_test_packages": 211,
+      "race_test_packages": 7,
+      "race_scope": "./core/config ./core/gas ./core/execution ./engine ./node ./eiptest ./rpc/ethapi",
+      "integration_scope": "./core ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/80/checks"
+    },
+    {
+      "number": 81,
+      "branch": "feat/glamsterdam-snap2",
+      "head": "51541719f4b0da18762c0721b0c193e69bde5472",
+      "draft": false,
+      "title": "snap: implement BAL pivot catch-up and reorg recovery",
+      "initial_conflicts": [],
+      "worktree": "/projects/eth2030/eth2030-pr81-ci",
+      "local_branch": "fix/pr81-master-ci",
+      "repaired_head": "0c8fd49b93b7a42c9295e119536f6fb575201669",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "validated_source_tree": "73d046947c0c99133e6485ea34f7be859dd04d07",
+      "full_test_packages": 211,
+      "race_test_packages": 4,
+      "race_scope": "./p2p/snap ./sync/statesync ./node ./eiptest",
+      "integration_scope": "./core ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/81/checks"
+    },
+    {
+      "number": 82,
+      "branch": "feat/glamsterdam-eth72",
+      "head": "16da87174e5932237d4beb2bc9418ee316448275",
+      "draft": false,
+      "title": "eth: implement sparse blob relay and custody Engine APIs",
+      "initial_conflicts": [
+        "pkg/core/execution/processor.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr82-ci",
+      "local_branch": "fix/pr82-master-ci",
+      "repaired_head": "80219cd40be7c1dca7019247bcc8571d6cbf9f88",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "repaired_dependencies": [
+        80,
+        81
+      ],
+      "validated_source_tree": "3b1cff8b5747760c243f90c9e9ab846941a5b10b",
+      "full_test_packages": 212,
+      "race_test_packages": 36,
+      "race_scope": "./eth ./txpool/... ./engine/... ./node/... ./p2p/snap ./sync/statesync",
+      "integration_scope": "./core ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/82/checks"
+    },
+    {
+      "number": 83,
+      "branch": "feat/glamsterdam-state-gas",
+      "head": "2f32762ab4d1ec5fdcc4f2921da63c06449e38ca",
+      "draft": true,
+      "title": "feat(gas): implement current merged LIFO state and execution accounting",
+      "initial_conflicts": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/execution/processor.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr83-ci",
+      "local_branch": "fix/pr83-master-ci",
+      "repaired_head": "a339283acb74c71377da7a50ce734d3bcaa1ba71",
+      "local_checks": "full,integration,broad gas race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "repaired_dependencies": [
+        84
+      ],
+      "validated_source_tree": "50ca5e493720bff909fb9e0c36b5d61209bf4223",
+      "full_test_packages": 212,
+      "race_test_packages": 35,
+      "race_scope": "./bal ./core/... ./engine ./node/... ./txpool ./eiptest",
+      "integration_scope": "./core/... ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/83/checks"
+    },
+    {
+      "number": 84,
+      "branch": "fix/glamsterdam-system-transitions",
+      "head": "4f2a0fdb75306e26a14c0d83de4d310caa9b0d35",
+      "draft": false,
+      "title": "system: execute canonical history and beacon transitions",
+      "initial_conflicts": [
+        "pkg/core/execution/processor.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr84-ci",
+      "local_branch": "fix/pr84-master-ci",
+      "repaired_head": "c2727d4831c003832e076d17ad024269a33ae0b8",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "repaired_dependencies": [
+        82
+      ],
+      "validated_source_tree": "6ec4128637463854bddf1d25cc6bada3962d8633",
+      "full_test_packages": 212,
+      "race_test_packages": 11,
+      "race_scope": "./core/eips ./core/execution ./core/block ./core/chain ./geth ./node/... ./eiptest",
+      "integration_scope": "./core ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/84/checks"
+    },
+    {
+      "number": 85,
+      "branch": "feat/glamsterdam-rpc-gas",
+      "head": "a4108837354427683f986b8ad340f0673928c2c9",
+      "draft": false,
+      "title": "feat(rpc): apply method-specific gas and canonical opcode replay",
+      "initial_conflicts": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/execution/processor.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr85-ci",
+      "local_branch": "fix/pr85-master-ci",
+      "repaired_head": "c41e61d607437dd89c93c0a46fe573d8cefe1a08",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "repaired_dependencies": [
+        83
+      ],
+      "validated_source_tree": "f1e99ccf60dfb1ef78f438cd513be8dfca716685",
+      "full_test_packages": 212,
+      "race_test_packages": 22,
+      "race_scope": "./core/execution ./rpc/... ./node/... ./eiptest",
+      "integration_scope": "./core ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/85/checks"
+    },
+    {
+      "number": 86,
+      "branch": "feat/glamsterdam-simulate-v1",
+      "head": "50be550b75e595598cbde969f4d0aed433d5c3a7",
+      "draft": false,
+      "title": "feat(rpc): execute stateful simulation with complete block commitments",
+      "initial_conflicts": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/instructions.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr86-ci",
+      "local_branch": "fix/pr86-master-ci",
+      "repaired_head": "9d7ecb18a0b8981d79d103cc5a874d508343c6c9",
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "repaired_dependencies": [
+        85
+      ],
+      "validated_source_tree": "ac54edc7df88e9b1d220d7d0b8e482375c298ed9",
+      "full_test_packages": 212,
+      "race_test_packages": 23,
+      "race_scope": "./core/vm ./core/execution ./rpc/... ./node/... ./eiptest",
+      "integration_scope": "./core/... ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/86/checks"
+    },
+    {
+      "number": 87,
+      "branch": "feat/glamsterdam-nested-traces",
+      "head": "03d585aee64cb5583199556df2e403756bad7a07",
+      "draft": false,
+      "title": "feat(trace): observe real nested frames and dimensional gas",
+      "initial_conflicts": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/instructions.go"
+      ],
+      "worktree": "/projects/eth2030/eth2030-pr87-ci",
+      "local_branch": "fix/pr87-master-ci",
+      "prepared_source_head": "0746dcba8461067a9ccc288598a544473dcf8b62",
+      "validated_source_tree": "f8844de35ec87149102b75acfbaf18a30b86e0f0",
+      "repaired_dependencies": [
+        86
+      ],
+      "local_checks": "full,integration,race,format,vet,build passed",
+      "base": "4f659fd096fe850b4a2dddaf906b05a853c59631",
+      "full_test_packages": 212,
+      "race_test_packages": 23,
+      "race_scope": "./core/vm ./core/execution ./rpc/... ./node/... ./eiptest",
+      "integration_scope": "./core/... ./p2p/... ./eiptest",
+      "checks_url": "https://github.com/alt-research/eth2030/pull/87/checks"
+    }
+  ],
+  "virtual_merge": {
+    "order": [
+      80,
+      81,
+      82,
+      84,
+      83,
+      85,
+      86,
+      87
+    ],
+    "results": [
+      {
+        "number": 80,
+        "head": "9272ee39391b2d8c1c2f49e8f7ad986cb044b794",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 81,
+        "head": "0c8fd49b93b7a42c9295e119536f6fb575201669",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 82,
+        "head": "80219cd40be7c1dca7019247bcc8571d6cbf9f88",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 84,
+        "head": "c2727d4831c003832e076d17ad024269a33ae0b8",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 83,
+        "head": "a339283acb74c71377da7a50ce734d3bcaa1ba71",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 85,
+        "head": "c41e61d607437dd89c93c0a46fe573d8cefe1a08",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 86,
+        "head": "9d7ecb18a0b8981d79d103cc5a874d508343c6c9",
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "number": 87,
+        "head": "0746dcba8461067a9ccc288598a544473dcf8b62",
+        "exit_code": 0,
+        "conflicts": []
+      }
+    ],
+    "virtual_candidate": "13c5cb13b82d19f1b63e8fb052e7d5e75cb23fbb",
+    "source_tree": "f8844de35ec87149102b75acfbaf18a30b86e0f0",
+    "matches_pr87_source": true,
+    "updates_branch_refs": false
+  },
+  "publication_note": "PR 87 prepared_source_head precedes the final documentation commit; its validated pkg tree is unchanged by that commit."
+}

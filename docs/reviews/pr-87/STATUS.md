@@ -1,3 +1,15 @@
+## Sequential tracing dependency/CI repair and batch closure (2026-11-19)
+
+Original head: `03d585aee64cb5583199556df2e403756bad7a07`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing simulator dependency PR 86 (`9d7ecb18`). The qualified implementation head before final batch documentation is `0746dcba`. Draft 83 and all versioned gas/API development boundaries are retained.
+
+Keep canonical EIP-7778 activation and the transaction-observing common execution wrapper, with ordinary zero policy, validation-aware simulation and early creation-input guards. SELFDESTRUCT already records its transfer before the synthetic child frame; the master/dependency inline emission is therefore omitted rather than emitted a second time. Exactly one helper call remains, preserving trace-log ownership/order, request-owned observation, ordinary fork gates, balance/BAL and destruction semantics.
+
+Original CI run 44477319530 stopped at inherited blob/header formatting, now fixed through master and repaired dependencies. Go 1.26.11 full default tests, integration (`./core/... ./p2p/... ./eiptest`), race (`./core/vm ./core/execution ./rpc/... ./node/... ./eiptest`), whole-module formatting/vet/build pass. Existing actual nested frame/receipt/log rollback, dimensional accounting, simulation isolation and capture/timeout assertions remain intact. Logs: `/tmp/eth2030-pr87-{full,integration,race}.log`.
+
+All eight repaired implementations also pass a dependency-ordered read-only virtual merge. Its final source tree equals this qualified implementation tree. The [batch manifest](../glamsterdam-pr80-87-repair-20261119.md) records every qualified source, original CI cause, local scope and live current-head check link. Final documentation preserves the tested source tree. Exact published heads, conflict states, unchanged Draft 83 and all seven checks per review are verified after publication before reporting completion.
+
+Shared root CHECK/STATUS/AGENTS and the original dirty checkout are preserved. No upstream PR is merged, no final API proposal is adopted and no release gate is waived by this task.
+
 # PR 87 tracking cleanup status
 
 Original review head: `0a1aa9374c061aacfb429fbfd1942d17c5faf1e5`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

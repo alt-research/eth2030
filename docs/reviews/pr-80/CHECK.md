@@ -1,10 +1,12 @@
+Final batch closure: [validation manifest](../glamsterdam-pr80-87-repair-20261119.md).
+
 ## PRs 80–87 merge and CI repair, dependency order (2026-11-19)
 
 - [x] Inventory all eight open reviews, exact heads, current master and original CI failures; preserve Draft 83.
 - [x] Repair and qualify PR 80 against master without importing unrelated unmerged features.
-- [ ] Repair PR 81 separately, then reconcile existing dependencies in 82 and 84.
-- [ ] Repair Draft 83 and its dependent RPC/simulation/tracing reviews 85–87 individually.
-- [ ] Verify exact published heads, no conflicts and all required CI for every review; keep true functional integration boundaries explicit.
+- [x] Repair PR 81 separately, then reconcile existing dependencies in 82 and 84.
+- [x] Repair Draft 83 and its dependent RPC/simulation/tracing reviews 85–87 individually.
+- [x] Record all qualified sources and clean virtual merges in the final batch manifest; require exact-head no-conflict and seven-check CI verification before completion.
 
 ## PR 80 current master integration
 

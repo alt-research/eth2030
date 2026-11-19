@@ -1,9 +1,9 @@
 ## Glamsterdam post-merge completion audit (2026-11-19)
 
 - [x] Fetch latest master and verify all EL reviews 64–87 are merged; preserve original dirty worktree.
-- [ ] Reconcile the 33-task plan against merged implementations and actual evidence rather than historic pending labels.
-- [ ] Revalidate concrete defects, native fixture infrastructure, CL/client boundaries and open qualification gates.
-- [ ] Produce a deduplicated remaining-work inventory with exact sources, priorities and completion conditions; update integration status without business changes.
+- [x] Reconcile the 33-task plan against merged implementations and actual evidence rather than historic pending labels.
+- [x] Revalidate concrete defects, native fixture infrastructure, CL/client boundaries and open qualification gates.
+- [x] Produce a deduplicated remaining-work inventory with exact sources, priorities and completion conditions; update integration status without business changes.
 
 ## Shared PR tracking conflict cleanup (2026-11-19)
 

@@ -1,6 +1,8 @@
 # Glamsterdam development plan
 
-Status: planned, not implemented. Baseline and evidence are in the [program index](README.md); requirements are in the [gap matrix](GAP_MATRIX.md). Every GL task starts open. This plan authorizes no claim that an upstream proposal has been adopted or that an unrun acceptance gate has passed.
+> Current post-merge assessment (2026-11-19): [remaining-work inventory](POST_MERGE_STATUS_20261119.md). EL reviews 64–87 are merged at `5fbc7c13`; 13 deduplicated work packages remain across correctness, test infrastructure, CL integration and acceptance/release. Earlier statuses, baseline labels and effort estimates below are historical snapshots, not a current missing-code count.
+
+Original planning status: planned, not implemented at its baseline; superseded for current implementation state by the linked post-merge assessment. Baseline and evidence are in the [program index](README.md); requirements are in the [gap matrix](GAP_MATRIX.md). Every GL task started open at that original baseline; the post-merge report reconciles all 33 IDs. This plan authorizes no claim that an upstream proposal has been adopted or that an unrun acceptance gate has passed.
 
 ## Delivery principles
 

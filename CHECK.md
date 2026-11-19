@@ -10,7 +10,7 @@
 - [x] Detect fifteen compiling mutations, including branch ancestry, uint256 override arithmetic and VM cancellation.
 - [x] Pass final full 212/tagged 27/affected race 48/vet/build after restoring all fifteen mutations.
 - [x] Archive exact results and qualify PR 85 test-only composition with five affected race packages, vet/build.
-- [ ] Publish the separate feature review.
+- [x] Publish the separate stateful simulation review as PR 86.
 
 ## Method-specific gas simulation and tracing (2026-11-19)
 

@@ -72,6 +72,11 @@ func TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation(t *testin
 				t.Fatalf("execution returned before cancellation: %v", err)
 			case <-time.After(50 * time.Millisecond):
 			}
+			// A different request remains usable while the expensive scoped execution is active.
+			otherTo, otherGas := types.Address{18: 0x43, 19: 1}.Hex(), "0x5208"
+			if _, _, err := backend.CallAtHeader(rpctypes.CallArgs{To: &otherTo, Gas: &otherGas}, header); err != nil {
+				t.Fatalf("concurrent independent request failed: %v", err)
+			}
 			cancel()
 			select {
 			case err := <-done:

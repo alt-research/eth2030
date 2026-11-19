@@ -1612,11 +1612,7 @@ func decodeBlockBody(data []byte) (*types.Body, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decoding tx: %w", err)
 		}
-		// A stored block has already been validated. Restore the sender
-		// from its PQ envelope for callers that only read the block body.
-		if pq, ok := tx.Inner().(*types.PQTransaction); ok {
-			tx.SetSender(types.PQPubKeyToAddress(pq.PQPublicKey))
-		}
+		restoreStoredSender(tx)
 		txs = append(txs, tx)
 	}
 	if err := s.ListEnd(); err != nil {
@@ -2171,6 +2167,14 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 	if len(receipts) == 0 {
 		return nil
 	}
+	headerBytes, err := rawdb.ReadHeader(bc.db, num, hash)
+	if err != nil {
+		return nil
+	}
+	header, err := types.DecodeHeaderRLP(headerBytes)
+	if err != nil || header.Hash() != hash || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != num {
+		return nil
+	}
 	// Restore derived fields not persisted in the consensus RLP encoding.
 	var logIndex uint
 	for i, r := range receipts {
@@ -2181,14 +2185,6 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 			tx := txs[i]
 			r.TxHash = tx.Hash()
 			if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
-				headerBytes, err := rawdb.ReadHeader(bc.db, num, hash)
-				if err != nil {
-					return nil
-				}
-				header, err := types.DecodeHeaderRLP(headerBytes)
-				if err != nil {
-					return nil
-				}
 				blobFee := big.NewInt(1)
 				if header.ExcessBlobGas != nil {
 					blobFee = gas.BlobBaseFeeForHeader(bc.config, header)
@@ -2197,10 +2193,7 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 					return nil
 				}
 			}
-			if tx.Type() == types.PQTransactionType {
-				// The private PQ envelope has a single fixed gas price.
-				r.EffectiveGasPrice = tx.GasPrice()
-			}
+			bc.deriveStoredReceipt(r, tx, header)
 		}
 		if i == 0 {
 			r.GasUsed = r.CumulativeGasUsed

@@ -921,7 +921,8 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 
 	// Set contract address for contract creation transactions.
 	if msg.To == nil {
-		receipt.ContractAddress = result.ContractAddress
+		// RPC creation addresses identify the attempted CREATE even on failure.
+		receipt.ContractAddress = vm.CreateAddressFromNonce(msg.From, msg.Nonce)
 	}
 
 	// Set EIP-4844 blob gas fields.

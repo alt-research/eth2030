@@ -1,0 +1,3 @@
+# WebSocket execution lifetime in progress
+
+The actual Node WebSocket path reads one frame, executes it synchronously through a new background HTTP request, and only then reads again. Consequently, a remote close is not detected while execution is busy. PR 106 supplies native request context support; this review supplies the actual connection lifetime for WebSocket dispatch. EIP-1474 JSON-RPC messages and exact block/execution rules remain unchanged. Gorilla permits one reader and one writer concurrently; one bounded reader must continue observing close events without starting concurrent execution or copying shared API state.

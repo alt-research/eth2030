@@ -1,0 +1,4 @@
+FROM ubuntu:24.04
+COPY eth2030 /usr/local/bin/eth2030
+RUN ln -s /usr/local/bin/eth2030 /usr/local/bin/geth
+ENTRYPOINT ["eth2030"]

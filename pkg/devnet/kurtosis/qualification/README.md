@@ -1,0 +1,7 @@
+# Independent runtime campaign artifacts
+
+Build the native binary from the recorded composed candidate using cmd/eth2030, never cmd/eth2030-geth. Build independent Geth from its unmodified v1.17.10 module source; the initial binary reports 1.17.10-stable. Build actual Lighthouse separately from its recorded source (initial production checkpoint 0262e8f). Copy the binaries as eth2030, geth-real and lighthouse into an owned build directory beside these Dockerfiles and wrapper, then build the three image names referenced by configs/glamsterdam-multiclient.yaml.
+
+The geth wrapper only translates the pinned package's override.genesis argument into Geth's standard init command, preserving all other arguments. It never changes execution or substitutes ETH2030's bridge. The original refs/ checkout remains read-only: archive its exact tracked c4a8e15d tree into an owned campaign directory and run that package with the explicit config.
+
+The campaign uses a mainnet preset, three-second slots, fork epoch two, three EL/CL pairs, an explicit private chain ID 1337, public test keys 1/2 and preloaded request/system contracts. The independent Lodestar and Buildoor images are pinned by repository digest. The active test keys are disposable development allocations. Runtime hashes, actual genesis/configuration, process results and failures are recorded separately; creating these inputs is not successful process qualification.

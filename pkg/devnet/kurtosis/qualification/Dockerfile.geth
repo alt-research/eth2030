@@ -1,0 +1,4 @@
+FROM ubuntu:24.04
+COPY geth-real /usr/local/bin/geth-real
+COPY geth-wrapper.sh /usr/local/bin/geth
+ENTRYPOINT ["geth"]

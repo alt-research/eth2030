@@ -57,7 +57,7 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 	attrs := map[string]any{
 		"timestamp": "0x60", "slotNumber": "0x8", "withdrawals": []any{},
 		"prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 1},
-		"parentBeaconBlockRoot": beaconRoot,
+		"parentBeaconBlockRoot": beaconRoot, "targetGasLimit": "0x1c9c380",
 	}
 	var fc payload.ForkchoiceUpdatedResult
 	proposer.call(t, "engine_forkchoiceUpdatedV4", &fc, payload.ForkchoiceStateV1{HeadBlockHash: wantGenesis}, attrs)

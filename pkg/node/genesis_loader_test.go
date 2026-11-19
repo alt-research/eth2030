@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/eips"
@@ -36,19 +37,21 @@ func builderRequestGenesisJSON(chainID uint64) []byte {
 func minimalGenesisJSON(chainID uint64) []byte {
 	g := map[string]any{
 		"config": map[string]any{
-			"chainId":             chainID,
-			"homesteadBlock":      0,
-			"eip155Block":         0,
-			"eip158Block":         0,
-			"byzantiumBlock":      0,
-			"constantinopleBlock": 0,
-			"petersburgBlock":     0,
-			"istanbulBlock":       0,
-			"berlinBlock":         0,
-			"londonBlock":         0,
-			"shanghaiTime":        0,
-			"cancunTime":          0,
-			"pragueTime":          0,
+			"chainId":                 chainID,
+			"terminalTotalDifficulty": "0x0",
+			"homesteadBlock":          0,
+			"eip155Block":             0,
+			"eip158Block":             0,
+			"byzantiumBlock":          0,
+			"constantinopleBlock":     0,
+			"petersburgBlock":         0,
+			"istanbulBlock":           0,
+			"berlinBlock":             0,
+			"londonBlock":             0,
+			"shanghaiTime":            0,
+			"cancunTime":              0,
+			"pragueTime":              0,
+			"osakaTime":               0,
 		},
 		"nonce":      "0x0",
 		"timestamp":  "0x0",
@@ -63,6 +66,36 @@ func minimalGenesisJSON(chainID uint64) []byte {
 	}
 	data, _ := json.Marshal(g)
 	return data
+}
+
+func TestNodeRejectsIncoherentCanonicalScheduleBeforeGenesisAdoption(t *testing.T) {
+	for _, field := range []string{"shanghaiTime", "cancunTime", "pragueTime", "osakaTime"} {
+		t.Run(field, func(t *testing.T) {
+			var input map[string]any
+			if err := json.Unmarshal(minimalGenesisJSON(1337), &input); err != nil {
+				t.Fatal(err)
+			}
+			forks := input["config"].(map[string]any)
+			forks["amsterdamTime"] = 100
+			delete(forks, field)
+			data, err := json.Marshal(input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			cfg := DefaultConfig()
+			cfg.DataDir, cfg.RPCPort, cfg.EnginePort = t.TempDir(), 0, 0
+			cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
+			if err := os.WriteFile(cfg.GenesisPath, data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if node, err := New(&cfg); err == nil || node != nil || !strings.Contains(err.Error(), "fork schedule") {
+				if node != nil {
+					_ = node.Stop()
+				}
+				t.Fatalf("incoherent production startup accepted: node=%v error=%v", node, err)
+			}
+		})
+	}
 }
 
 func TestLoadGenesisFile_Basic(t *testing.T) {
@@ -167,7 +200,7 @@ func TestLoadGenesisFile_HexStringNonce(t *testing.T) {
 		"config": {"chainId": 3151908, "homesteadBlock": 0, "eip155Block": 0,
 		           "eip158Block": 0, "byzantiumBlock": 0, "constantinopleBlock": 0,
 		           "petersburgBlock": 0, "istanbulBlock": 0, "berlinBlock": 0,
-		           "londonBlock": 0, "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
+		           "londonBlock": 0, "terminalTotalDifficulty": "0x0", "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
 		"nonce": "0x0", "timestamp": "0x0", "extraData": "0x",
 		"gasLimit": "0x1C9C380", "difficulty": "0x0",
 		"alloc": {
@@ -205,7 +238,7 @@ func TestLoadGenesisFile_Storage(t *testing.T) {
 		"config": {"chainId": 1, "homesteadBlock": 0, "eip155Block": 0,
 		           "eip158Block": 0, "byzantiumBlock": 0, "constantinopleBlock": 0,
 		           "petersburgBlock": 0, "istanbulBlock": 0, "berlinBlock": 0,
-		           "londonBlock": 0, "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
+		           "londonBlock": 0, "terminalTotalDifficulty": "0x0", "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
 		"nonce": "0x0", "timestamp": "0x0", "extraData": "0x",
 		"gasLimit": "0x1C9C380", "difficulty": "0x0",
 		"alloc": {

@@ -1453,10 +1453,9 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 	}, nil
 }
 
-// GetPayloadV5 retrieves a previously built payload for getPayloadV5 (Gloas/Heze).
-// Gloas payloads carry BAL + slotNumber fields (lighthouse >= 8.4 requires them).
-// Implements GlamsterdamBackend interface.
-func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error) {
+// GetPayloadV5 serves the historical standalone GlamsterdamBackend adapter.
+// Production HTTP dispatch uses EngineAPI.GetPayloadV5 for the Osaka shape.
+func (b *EngineBackend) GetPayloadV5(id PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	asyncPending, result, _, err := b.waitAsyncPayload(id, false)
 	if err != nil {
 		return nil, err
@@ -1468,7 +1467,7 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 		if err != nil {
 			return nil, err
 		}
-		return &GetPayloadV5Response{
+		return &LegacyGlamsterdamPayloadResponse{
 			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
 			BlobsBundle:       bundle,
@@ -1488,7 +1487,7 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 	if err != nil {
 		return nil, err
 	}
-	return &GetPayloadV5Response{
+	return &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload:  ep5,
 		BlockValue:        pending.blockValue,
 		BlobsBundle:       bundle,
@@ -1611,6 +1610,11 @@ func (b *EngineBackend) GetPayloadV7ByID(id PayloadID) (*GetPayloadV6Response, e
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
 	return b.config.IsPrague(timestamp)
+}
+
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.config.IsOsaka(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.

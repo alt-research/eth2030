@@ -71,7 +71,7 @@ func TestBogotaDeferredWireAcrossRestart(t *testing.T) {
 		attrs := map[string]any{
 			"timestamp": fmt.Sprintf("0x%x", ts), "slotNumber": fmt.Sprintf("0x%x", ts/12),
 			"withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 1},
-			"parentBeaconBlockRoot": beacon,
+			"parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380",
 		}
 		method := "engine_forkchoiceUpdatedV4"
 		if ts >= 48 {

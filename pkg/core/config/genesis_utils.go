@@ -78,6 +78,9 @@ func (g *Genesis) Validate() error {
 	if g.Config == nil {
 		return ErrGenesisNilConfig
 	}
+	if err := g.Config.Validate(); err != nil {
+		return fmt.Errorf("%w: %v", ErrInvalidGenesis, err)
+	}
 	if g.GasLimit == 0 {
 		return ErrGenesisZeroGasLimit
 	}

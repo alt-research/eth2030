@@ -303,7 +303,11 @@ func TestTrack4IndependentEngineAndRPC(t *testing.T) {
 			ExecutionPayload  *payload.ExecutionPayloadV3
 			ExecutionRequests []string
 		}
-		producer.call(t, "engine_getPayloadV4", &response, fc.PayloadID)
+		getMethod := "engine_getPayloadV4"
+		if producerNode.Blockchain().Config().IsOsaka(timestamp) {
+			getMethod = "engine_getPayloadV5"
+		}
+		producer.call(t, getMethod, &response, fc.PayloadID)
 		block := response.ExecutionPayload
 		if block == nil || block.ParentHash != head {
 			t.Fatalf("wrong payload parent at %d", timestamp)

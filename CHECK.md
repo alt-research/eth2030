@@ -3,11 +3,12 @@
 ## Nested and dimensional execution tracing (2026-11-19)
 
 - [x] Recheck execution-apis 852/855/976 and merged Geth 35970; read full selected call-frame schema and discussion.
-- [ ] Record explicit development schemas without presenting open proposals as release consensus.
-- [ ] Reproduce missing nested frames, reverted logs, block-global indices and dimensional gas through actual HTTP.
-- [ ] Add observational enter/exit/settlement/opcode hooks and real CALL/CREATE/SELFDESTRUCT frame consumers.
-- [ ] Honor onlyTopCall/withLog and historical/fork/context overrides with exact omission rules.
-- [ ] Qualify real signed/block/call consumers, independent SDK/reference fixtures and compiling mutations; pass full/affected race/vet/build and publish a separate PR.
+- [x] Record explicit development schemas without presenting open proposals as release consensus.
+- [x] Reproduce missing nested frames, dimension fields, frame buffer isolation and read-only charge timing through actual HTTP.
+- [x] Add actual enter/exit/settlement/opcode/log observations with CALL/CREATE/SELFDESTRUCT consumers.
+- [x] Honor onlyTopCall/withLog, storage/memory/stack/return-data options, limits, timeouts and fork/context omission rules.
+- [x] Qualify actual signed/block/call consumers, nine independent SDK call trees and seventeen detected compiling mutations; pass full 212/tagged 27/race 48/vet/build.
+- [ ] Archive exact results, publish the separate review and stop for merge discussion.
 
 ## Stateful eth_simulateV1 implementation (2026-11-19)
 

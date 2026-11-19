@@ -26,9 +26,9 @@ var (
 // EmitTransferLog emits an EIP-7708 ETH transfer log (LOG3).
 // It is called whenever nonzero ETH value is transferred between accounts.
 // The log is emitted from SYSTEM_ADDRESS with the ERC-20 Transfer event signature.
-func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
+func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) *types.Log {
 	if statedb == nil || amount == nil || amount.Sign() <= 0 || from == to {
-		return
+		return nil
 	}
 
 	// Encode amount as big-endian uint256 (32 bytes, left-padded).
@@ -36,7 +36,7 @@ func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
 	amountBytes := amount.Bytes()
 	copy(data[32-len(amountBytes):], amountBytes)
 
-	statedb.AddLog(&types.Log{
+	log := &types.Log{
 		Address: SystemAddress,
 		Topics: []types.Hash{
 			TransferEventTopic,
@@ -44,7 +44,9 @@ func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
 			addressToTopic(to),
 		},
 		Data: data,
-	})
+	}
+	statedb.AddLog(log)
+	return log
 }
 
 // EmitBurnLog is a legacy analytics helper, not EIP-7708 consensus emission.
@@ -87,6 +89,6 @@ func (evm *EVM) recordETHTransfer(from, to types.Address, amount *big.Int) {
 		observer.RecordETHTransfer(from, to, amount)
 	}
 	if evm.forkRules.IsEIP7708 {
-		EmitTransferLog(evm.StateDB, from, to, amount)
+		evm.traceLog(EmitTransferLog(evm.StateDB, from, to, amount))
 	}
 }

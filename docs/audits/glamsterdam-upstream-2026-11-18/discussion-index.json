@@ -1,0 +1,1683 @@
+{
+  "observed_at": "2026-11-18 07:59:36 UTC",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "consensus_specs_commit": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "pull_requests": [
+    {
+      "key": "gas37",
+      "url": "https://github.com/ethereum/EIPs/pull/12581",
+      "title": "Update EIP-2780: credit state-gas refills to the reservoir and add a legacy share",
+      "state": "open",
+      "merged": false,
+      "head_sha": "2ba9176f360c3c95641c6c1b5428ac3113335c4b",
+      "base_sha": "fb527daa1830467d6be1336cbf36ed11ef23e6a2",
+      "merge_commit_sha": "56e32f69cb60746cd245c00bb1c1c4982a528e86",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#pullrequestreview-5642809000",
+          "author": "svlachakis",
+          "created_at": "2026-10-25T10:49:39Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#issuecomment-6396720099",
+          "author": "svlachakis",
+          "created_at": "2026-10-25T10:51:43Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#issuecomment-6412891161",
+          "author": "LukaszRozmej",
+          "created_at": "2026-10-26T09:41:09Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#issuecomment-6436393641",
+          "author": "gurukamath",
+          "created_at": "2026-10-27T07:39:13Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#issuecomment-6592071584",
+          "author": "gretzke",
+          "created_at": "2026-11-03T00:27:38Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12581#issuecomment-6628572289",
+          "author": "rakita",
+          "created_at": "2026-11-04T10:36:52Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "gas38",
+      "url": "https://github.com/ethereum/EIPs/pull/12582",
+      "title": "Update EIP-2780: add the state-gas allowance of call frames",
+      "state": "open",
+      "merged": false,
+      "head_sha": "19d788c896ad35fc53dc5721dbe70ed91cb40069",
+      "base_sha": "fb527daa1830467d6be1336cbf36ed11ef23e6a2",
+      "merge_commit_sha": "4e66dd319133cb985eba3c27c2875f5893c6136d",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12582#pullrequestreview-5642809107",
+          "author": "svlachakis",
+          "created_at": "2026-10-25T10:49:42Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "binding",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5770",
+      "title": "Verify the payload's block hash in envelope gossip validation",
+      "state": "open",
+      "merged": false,
+      "head_sha": "dc75cee42b4b12edee8a56ff81da7b7f8f93de8d",
+      "base_sha": "44be32373afdb87496f3f68c1668f7e7d72aa662",
+      "merge_commit_sha": "9f058905f01c020294f217b15577ee85b3d5252d",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4395363858",
+          "author": "jtraglia",
+          "created_at": "2026-10-27T23:33:17Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4395731197",
+          "author": "nazarhussain",
+          "created_at": "2026-10-28T00:33:54Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": 1006
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4395843319",
+          "author": "jtraglia",
+          "created_at": "2026-10-28T00:55:09Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": 1006
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4398631795",
+          "author": "nazarhussain",
+          "created_at": "2026-10-28T08:58:27Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": 1006
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4398966120",
+          "author": "nazarhussain",
+          "created_at": "2026-10-28T09:35:18Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4412633983",
+          "author": "jtraglia",
+          "created_at": "2026-10-29T13:03:08Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4412810710",
+          "author": "jtraglia",
+          "created_at": "2026-10-29T13:20:39Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4499997486",
+          "author": "nflaig",
+          "created_at": "2026-11-07T04:04:36Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4515201010",
+          "author": "mkalinin",
+          "created_at": "2026-11-09T16:31:58Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4517427156",
+          "author": "jtraglia",
+          "created_at": "2026-11-09T20:09:53Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4517434194",
+          "author": "jtraglia",
+          "created_at": "2026-11-09T20:10:33Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4521123924",
+          "author": "mkalinin",
+          "created_at": "2026-11-10T04:27:00Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4522865864",
+          "author": "jtraglia",
+          "created_at": "2026-11-10T08:52:36Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4525262068",
+          "author": "jtraglia",
+          "created_at": "2026-11-10T13:12:58Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4531166713",
+          "author": "arnetheduck",
+          "created_at": "2026-11-10T22:08:22Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4531183528",
+          "author": "arnetheduck",
+          "created_at": "2026-11-10T22:09:41Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": 1006
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#issuecomment-6780962476",
+          "author": "wemeetagain",
+          "created_at": "2026-11-10T22:26:00Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4533220769",
+          "author": "jtraglia",
+          "created_at": "2026-11-11T02:24:59Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4534289446",
+          "author": "arnetheduck",
+          "created_at": "2026-11-11T05:16:43Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4535955778",
+          "author": "mkalinin",
+          "created_at": "2026-11-11T09:07:21Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#discussion_r4539471137",
+          "author": "arnetheduck",
+          "created_at": "2026-11-11T15:00:04Z",
+          "path": "specs/gloas/p2p-interface.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#issuecomment-6803309087",
+          "author": "jtraglia",
+          "created_at": "2026-11-11T17:57:04Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5770#issuecomment-6815893537",
+          "author": "mkalinin",
+          "created_at": "2026-11-12T05:52:59Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "binding_alt",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5820",
+      "title": "Commit to a payload root in the bid and drop the envelope signature",
+      "state": "open",
+      "merged": false,
+      "head_sha": "7af0af3c80e123a09f9cf6058b1f6934ad3115d7",
+      "base_sha": "17f9cf66a58b32ce627186936a1960dc0d869c7f",
+      "merge_commit_sha": "dec1babe787a5288ee2651a213b0e972bcee1b5c",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5820#issuecomment-6945330811",
+          "author": "raxhvl",
+          "created_at": "2026-11-17T10:24:45Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5820#discussion_r4602321894",
+          "author": "raxhvl",
+          "created_at": "2026-11-17T16:12:36Z",
+          "path": "tests/core/pyspec/eth_consensus_specs/test/gloas/fork_choice/test_on_execution_payload_envelope.py",
+          "line": 159
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5820#issuecomment-6961891493",
+          "author": "wemeetagain",
+          "created_at": "2026-11-17T21:45:30Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "retention",
+      "url": "https://github.com/ethereum/EIPs/pull/12347",
+      "title": "Update EIP-7928: align BAL retention with the history expiry window",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "a735e9bac52b3c8c44958694471d0f5874e6c3e5",
+      "base_sha": "6e69e49a99204fc7686b4975e95a9ac9ddb4fe7a",
+      "merge_commit_sha": "068e50ad2afa94c3bd967ce584867fb27d371c01",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5761757753",
+          "author": "nerolation",
+          "created_at": "2026-09-21T14:03:33Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5763044872",
+          "author": "nflaig",
+          "created_at": "2026-09-21T15:29:00Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5763279532",
+          "author": "nflaig",
+          "created_at": "2026-09-21T15:45:24Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4063860450",
+          "author": "nflaig",
+          "created_at": "2026-09-21T15:53:29Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5798690266",
+          "author": "LukaszRozmej",
+          "created_at": "2026-09-23T16:33:45Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5800873241",
+          "author": "nflaig",
+          "created_at": "2026-09-23T18:48:50Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5870154399",
+          "author": "arunimshukla",
+          "created_at": "2026-09-28T12:48:59Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4126825385",
+          "author": "nflaig",
+          "created_at": "2026-09-28T20:41:40Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4126995808",
+          "author": "kevaundray",
+          "created_at": "2026-09-28T21:01:35Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127070542",
+          "author": "kevaundray",
+          "created_at": "2026-09-28T21:11:02Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127082593",
+          "author": "nflaig",
+          "created_at": "2026-09-28T21:12:36Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127087710",
+          "author": "kevaundray",
+          "created_at": "2026-09-28T21:13:19Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127107769",
+          "author": "nflaig",
+          "created_at": "2026-09-28T21:16:03Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127128629",
+          "author": "nflaig",
+          "created_at": "2026-09-28T21:18:49Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4127216022",
+          "author": "nflaig",
+          "created_at": "2026-09-28T21:31:06Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4142821790",
+          "author": "nerolation",
+          "created_at": "2026-09-30T09:04:21Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4142830559",
+          "author": "nerolation",
+          "created_at": "2026-09-30T09:05:14Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#pullrequestreview-5364015062",
+          "author": "nerolation",
+          "created_at": "2026-09-30T09:07:53Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5908043386",
+          "author": "nflaig",
+          "created_at": "2026-09-30T09:13:36Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4142927777",
+          "author": "nflaig",
+          "created_at": "2026-09-30T09:15:38Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4143052468",
+          "author": "nerolation",
+          "created_at": "2026-09-30T09:29:08Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4143064850",
+          "author": "nerolation",
+          "created_at": "2026-09-30T09:30:32Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#discussion_r4143212078",
+          "author": "nflaig",
+          "created_at": "2026-09-30T09:45:39Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5911380070",
+          "author": "tbenr",
+          "created_at": "2026-09-30T12:33:20Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-5919220963",
+          "author": "fselmo",
+          "created_at": "2026-09-30T20:31:39Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-6128948650",
+          "author": "nflaig",
+          "created_at": "2026-10-12T17:07:54Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-6139222755",
+          "author": "nerolation",
+          "created_at": "2026-10-13T05:52:55Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#pullrequestreview-5573183312",
+          "author": "nerolation",
+          "created_at": "2026-10-19T14:36:16Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-6272952635",
+          "author": "nflaig",
+          "created_at": "2026-10-19T17:16:56Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12347#issuecomment-6273011129",
+          "author": "nerolation",
+          "created_at": "2026-10-19T17:20:02Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "corpus",
+      "url": "https://github.com/ethereum/execution-specs/pull/3948",
+      "title": "feat(tests): add a deployed-idiom invariant corpus",
+      "state": "open",
+      "merged": false,
+      "head_sha": "9fc1f302f1c93bac90d7d1f43ad2c2fada84fb60",
+      "base_sha": "16898000911c1e3caa57be08509536c10ae92d3e",
+      "merge_commit_sha": "ed42b56e7bddf77f380d75ad29c7b49773561db9",
+      "comments": []
+    },
+    {
+      "key": "fill_invariants",
+      "url": "https://github.com/ethereum/execution-specs/pull/3982",
+      "title": "feat(test-specs): check chain invariants while filling",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "017b98a6df49037ede1f4ab85e2c2c32705c3435",
+      "base_sha": "a984447a614910db19fcb656c0910012da63c675",
+      "merge_commit_sha": "d15ecf40062fcfe20d23b7b5ff1c078bcbe251c3",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#issuecomment-6805477824",
+          "author": "fselmo",
+          "created_at": "2026-11-11T19:37:56Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4542485266",
+          "author": "bt-recneps",
+          "created_at": "2026-11-11T19:41:47Z",
+          "path": "packages/testing/src/execution_testing/client_clis/clis/execution_specs.py",
+          "line": 162
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#pullrequestreview-5864466476",
+          "author": "bt-recneps",
+          "created_at": "2026-11-11T19:41:47Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4543236831",
+          "author": "fselmo",
+          "created_at": "2026-11-11T21:10:57Z",
+          "path": "packages/testing/src/execution_testing/client_clis/clis/execution_specs.py",
+          "line": 162
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568636599",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:03:19Z",
+          "path": "packages/testing/src/execution_testing/forks/forks/eips/amsterdam/eip_8037.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568732347",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:14:28Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568836298",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:26:14Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568863810",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:29:06Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568877252",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:30:40Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4568888174",
+          "author": "marioevz",
+          "created_at": "2026-11-13T21:32:01Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4569372107",
+          "author": "marioevz",
+          "created_at": "2026-11-13T22:26:59Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#pullrequestreview-5898021201",
+          "author": "marioevz",
+          "created_at": "2026-11-13T22:28:23Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4569409554",
+          "author": "fselmo",
+          "created_at": "2026-11-13T22:31:32Z",
+          "path": "packages/testing/src/execution_testing/forks/forks/eips/amsterdam/eip_8037.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4569417275",
+          "author": "fselmo",
+          "created_at": "2026-11-13T22:32:21Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576888284",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:39:03Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576890310",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:39:58Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576891152",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:40:20Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576893387",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:41:11Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576898484",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:43:17Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4576902555",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:44:57Z",
+          "path": "packages/testing/src/execution_testing/specs/invariants.py",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#issuecomment-6888861637",
+          "author": "fselmo",
+          "created_at": "2026-11-15T03:58:10Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4585439578",
+          "author": "danceratopz",
+          "created_at": "2026-11-16T12:00:25Z",
+          "path": "docs/filling_tests/debugging_t8n_tools.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4585439593",
+          "author": "danceratopz",
+          "created_at": "2026-11-16T12:00:25Z",
+          "path": "docs/filling_tests/debugging_t8n_tools.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4585439600",
+          "author": "danceratopz",
+          "created_at": "2026-11-16T12:00:25Z",
+          "path": ".github/workflows/fill-invariants-nightly.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4585439608",
+          "author": "danceratopz",
+          "created_at": "2026-11-16T12:00:25Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": 981
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#pullrequestreview-5919608788",
+          "author": "danceratopz",
+          "created_at": "2026-11-16T12:01:56Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4590983738",
+          "author": "fselmo",
+          "created_at": "2026-11-16T20:15:38Z",
+          "path": "docs/filling_tests/debugging_t8n_tools.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4590986928",
+          "author": "fselmo",
+          "created_at": "2026-11-16T20:15:56Z",
+          "path": "docs/filling_tests/debugging_t8n_tools.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4591006510",
+          "author": "fselmo",
+          "created_at": "2026-11-16T20:17:39Z",
+          "path": ".github/workflows/fill-invariants-nightly.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4591018500",
+          "author": "fselmo",
+          "created_at": "2026-11-16T20:18:43Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": 981
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#issuecomment-6929056797",
+          "author": "fselmo",
+          "created_at": "2026-11-16T20:55:11Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#pullrequestreview-5929335631",
+          "author": "marioevz",
+          "created_at": "2026-11-16T22:53:22Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#discussion_r4596313941",
+          "author": "danceratopz",
+          "created_at": "2026-11-17T06:55:10Z",
+          "path": "packages/testing/src/execution_testing/specs/blockchain.py",
+          "line": 981
+        },
+        {
+          "url": "https://github.com/ethereum/execution-specs/pull/3982#issuecomment-6941125063",
+          "author": "danceratopz",
+          "created_at": "2026-11-17T06:57:46Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "onboarding",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5736",
+      "title": "Separate builder and validator deposits at the Gloas fork",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "48fd4edc35fd42b55794f7d0d217a45de633cf09",
+      "base_sha": "ff73f4dd90a8717b13ed5a52afa5c1af358259b5",
+      "merge_commit_sha": "8b374fa81b0918b84fe0063a56b4a482e1fa2c6f",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#discussion_r4264402567",
+          "author": "michaelsproul",
+          "created_at": "2026-10-13T21:49:48Z",
+          "path": "specs/gloas/fork.md",
+          "line": 103
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#issuecomment-6155999270",
+          "author": "michaelsproul",
+          "created_at": "2026-10-13T21:53:53Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#issuecomment-6162022804",
+          "author": "nflaig",
+          "created_at": "2026-10-14T06:03:17Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#discussion_r4268594640",
+          "author": "avsetsin",
+          "created_at": "2026-10-14T08:42:43Z",
+          "path": "specs/gloas/fork.md",
+          "line": 103
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#issuecomment-6271529439",
+          "author": "jtraglia",
+          "created_at": "2026-10-19T16:02:12Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#pullrequestreview-5631371289",
+          "author": "potuz",
+          "created_at": "2026-10-23T16:29:29Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#issuecomment-6374758834",
+          "author": "avsetsin",
+          "created_at": "2026-10-23T21:07:37Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5736#pullrequestreview-5655587298",
+          "author": "nflaig",
+          "created_at": "2026-10-26T16:37:45Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "onboarding_new",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5836",
+      "title": "Only onboard builder deposits no branch applied before the fork",
+      "state": "open",
+      "merged": false,
+      "head_sha": "738044360b5589b35122860b45c06054175886fd",
+      "base_sha": "797bdc0065589de896ffa8c93543a003d5d45e47",
+      "merge_commit_sha": "514bf3683953a61d8eac8f6147d1ed2a6a4a8961",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6948485013",
+          "author": "Oguidan",
+          "created_at": "2026-11-17T12:48:31Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6962645586",
+          "author": "michaelsproul",
+          "created_at": "2026-11-17T22:18:43Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6963103287",
+          "author": "jtraglia",
+          "created_at": "2026-11-17T22:40:45Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6963515400",
+          "author": "michaelsproul",
+          "created_at": "2026-11-17T23:01:02Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6965226740",
+          "author": "michaelsproul",
+          "created_at": "2026-11-18T00:31:59Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5836#issuecomment-6965313841",
+          "author": "michaelsproul",
+          "created_at": "2026-11-18T00:36:53Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "optimistic",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5781",
+      "title": "Add optimistic sync spec for Gloas",
+      "state": "open",
+      "merged": false,
+      "head_sha": "16e71e2acdcff7dd726d3d337a840201b94745fd",
+      "base_sha": "4d16841699405ffc9d1ca9a333f31cbd40a65ec6",
+      "merge_commit_sha": "6c82478432efc0d07db46e78b769dd3ec3ca9194",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4400632355",
+          "author": "mkalinin",
+          "created_at": "2026-10-28T12:39:04Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#pullrequestreview-5682707801",
+          "author": "mkalinin",
+          "created_at": "2026-10-28T12:40:08Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4505595140",
+          "author": "ensi321",
+          "created_at": "2026-11-08T08:40:55Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 152
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4505596654",
+          "author": "ensi321",
+          "created_at": "2026-11-08T08:41:33Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 152
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4506939036",
+          "author": "mkalinin",
+          "created_at": "2026-11-08T16:34:16Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 152
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4524410145",
+          "author": "potuz",
+          "created_at": "2026-11-10T11:40:55Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 152
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4546856095",
+          "author": "michaelsproul",
+          "created_at": "2026-11-12T05:58:37Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 125
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4547385662",
+          "author": "mkalinin",
+          "created_at": "2026-11-12T07:06:57Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 125
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#issuecomment-6819554287",
+          "author": "dapplion",
+          "created_at": "2026-11-12T09:12:46Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4551016438",
+          "author": "nflaig",
+          "created_at": "2026-11-12T13:25:40Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5781#discussion_r4551231795",
+          "author": "nflaig",
+          "created_at": "2026-11-12T13:45:43Z",
+          "path": "specs/gloas/optimistic-sync.md",
+          "line": 125
+        }
+      ]
+    },
+    {
+      "key": "optimistic_tests",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5818",
+      "title": "Gloas optimistic sync tests",
+      "state": "open",
+      "merged": false,
+      "head_sha": "18eae232e57f46d4168fbf44192147dc4d1f0d19",
+      "base_sha": "d48043d51c0f0b115f0183f66ca8445a5511d68d",
+      "merge_commit_sha": "5b7e435be51b8b001df5ea549b36ff982800ab64",
+      "comments": []
+    },
+    {
+      "key": "deltas",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5835",
+      "title": "Restore Gloas partial message group ID version byte",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "3d189cd1398542a6e90103f2a9b6c9efa82d3a08",
+      "base_sha": "17f9cf66a58b32ce627186936a1960dc0d869c7f",
+      "merge_commit_sha": "797bdc0065589de896ffa8c93543a003d5d45e47",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5835#pullrequestreview-5924168058",
+          "author": "jtraglia",
+          "created_at": "2026-11-16T17:10:46Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "forkdomain",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5816",
+      "title": "Use message fork versions for gossip signatures",
+      "state": "open",
+      "merged": false,
+      "head_sha": "cc699b98b7a4851970962fbf9885b7773b338ba1",
+      "base_sha": "c3e16117a66523902fd21d6ba708d987b56bd4a4",
+      "merge_commit_sha": "c79768cae229ed3564fcd3ae7d6ba55333b49e7b",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5816#issuecomment-6889731083",
+          "author": "Srizdebnath",
+          "created_at": "2026-11-15T05:25:31Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "bid_domain",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5822",
+      "title": "Sign builder bids with the bid epoch's fork version",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "dc48b174e3cb4871e5bf5f3e3eedaa17047017de",
+      "base_sha": "e3e2d0128458c2f56092bd459d3c5a85cdf80fcd",
+      "merge_commit_sha": "313cbfe561517a81eb11607fea7c6985e562eaa9",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5822#issuecomment-6857605424",
+          "author": "jtraglia",
+          "created_at": "2026-11-13T15:36:50Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "gossip_availability",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5808",
+      "title": "Unset fork slot payload availability in `upgrade_to_gloas`",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "7b8860d7346aa4232e9651db906ca366ba40c35a",
+      "base_sha": "d3f4b290df06f300dd4a6e0237f436ae82772a1f",
+      "merge_commit_sha": "e3e2d0128458c2f56092bd459d3c5a85cdf80fcd",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/pull/5808#issuecomment-6833189535",
+          "author": "jtraglia",
+          "created_at": "2026-11-12T19:05:05Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "ptc_dedup",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5827",
+      "title": "fix: resolve issue #5825 - Gloas: validator.md PTC aggregation wording produc",
+      "state": "closed",
+      "merged": false,
+      "head_sha": "33cb53f40fb15d4f32ba5a58f5321c41b2227918",
+      "base_sha": "e3e2d0128458c2f56092bd459d3c5a85cdf80fcd",
+      "merge_commit_sha": "2d1aca077dcc5745c1d65f2bb298c774ff29d07b",
+      "comments": []
+    },
+    {
+      "key": "access_decision",
+      "url": "https://github.com/ethereum/execution-apis/pull/950",
+      "title": "eth: return the accessed list from eth_createAccessList",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "f0c878df6d00dbe293279f637b9f218696249466",
+      "base_sha": "ef8f1a5fc9ecb2276491e34bc1f154c7b98eae9c",
+      "merge_commit_sha": "dd6ef1c1169d6366ae02c6110ee448156b30e2b6",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/950#issuecomment-6770342615",
+          "author": "MysticRyuujin",
+          "created_at": "2026-11-10T14:44:34Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/950#discussion_r4584786106",
+          "author": "bomanaps",
+          "created_at": "2026-11-16T10:51:03Z",
+          "path": "src/eth/execute.yaml",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "key": "calltracer",
+      "url": "https://github.com/ethereum/execution-apis/pull/852",
+      "title": "debug: add EIP-8037 two-dimensional gas to callTracer and opcode tracer",
+      "state": "open",
+      "merged": false,
+      "head_sha": "cc1852a702a84dbcb7d149d010345114bf95cff8",
+      "base_sha": "62eefaaad6452abfec850ef0c7a3cbdd90106302",
+      "merge_commit_sha": "81485286b4f880e961a8d795a6974131d25b5047",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-5034155039",
+          "author": "MysticRyuujin",
+          "created_at": "2026-07-21T12:43:53Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-5070264973",
+          "author": "MysticRyuujin",
+          "created_at": "2026-07-24T13:16:05Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-5573693801",
+          "author": "MysticRyuujin",
+          "created_at": "2026-09-07T16:58:24Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4079293567",
+          "author": "taratorio",
+          "created_at": "2026-09-23T05:19:34Z",
+          "path": "src/schemas/opcode-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4079396456",
+          "author": "taratorio",
+          "created_at": "2026-09-23T05:41:31Z",
+          "path": "src/schemas/opcode-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4081358575",
+          "author": "taratorio",
+          "created_at": "2026-09-23T10:18:29Z",
+          "path": "src/debug/trace.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4083941075",
+          "author": "taratorio",
+          "created_at": "2026-09-23T15:03:05Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": 114
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4083983916",
+          "author": "taratorio",
+          "created_at": "2026-09-23T15:07:09Z",
+          "path": "src/debug/trace.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4084881721",
+          "author": "taratorio",
+          "created_at": "2026-09-23T16:39:47Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4085208099",
+          "author": "taratorio",
+          "created_at": "2026-09-23T17:14:11Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221940802",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:28Z",
+          "path": "src/schemas/opcode-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221941229",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:30Z",
+          "path": "src/schemas/opcode-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221941654",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:33Z",
+          "path": "src/debug/trace.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221942066",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:36Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": 114
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221942356",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:37Z",
+          "path": "src/debug/trace.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221942599",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:39Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4221943010",
+          "author": "qu0b",
+          "created_at": "2026-10-08T17:08:41Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6195773392",
+          "author": "MysticRyuujin",
+          "created_at": "2026-10-15T15:27:53Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6238495763",
+          "author": "MysticRyuujin",
+          "created_at": "2026-10-17T18:22:46Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6335490914",
+          "author": "rjl493456442",
+          "created_at": "2026-10-22T07:42:07Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6856387378",
+          "author": "MysticRyuujin",
+          "created_at": "2026-11-13T14:48:56Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6856679645",
+          "author": "qu0b",
+          "created_at": "2026-11-13T14:59:25Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4564852416",
+          "author": "qu0b",
+          "created_at": "2026-11-13T14:59:26Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6857199410",
+          "author": "MysticRyuujin",
+          "created_at": "2026-11-13T15:19:04Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6857354635",
+          "author": "qu0b",
+          "created_at": "2026-11-13T15:25:51Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6857489859",
+          "author": "qu0b",
+          "created_at": "2026-11-13T15:31:51Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#discussion_r4565279208",
+          "author": "qu0b",
+          "created_at": "2026-11-13T15:31:52Z",
+          "path": "src/schemas/call-tracer.yaml",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6857631403",
+          "author": "MysticRyuujin",
+          "created_at": "2026-11-13T15:38:00Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/execution-apis/pull/852#issuecomment-6858065348",
+          "author": "MysticRyuujin",
+          "created_at": "2026-11-13T15:56:34Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "eip12624",
+      "url": "https://github.com/ethereum/EIPs/pull/12624",
+      "title": "Update EIP-8037: correct statements contradicted by the specification",
+      "state": "open",
+      "merged": false,
+      "head_sha": "a912bb297913a0f7e9b99e72ca7cc43ea462e359",
+      "base_sha": "46976b2a9bf99f727fb87dc8c809e3a3cdc6b445",
+      "merge_commit_sha": "4d2a4ff59d2ebcf26acf05e08c000ad8e5864367",
+      "comments": []
+    },
+    {
+      "key": "eip12621",
+      "url": "https://github.com/ethereum/EIPs/pull/12621",
+      "title": "Update EIP-7843: state the header position and the consensus-layer check for slotNumber",
+      "state": "open",
+      "merged": false,
+      "head_sha": "76fca9c2d1e91c278a6d812a43fbd08c1ce6ec7e",
+      "base_sha": "46976b2a9bf99f727fb87dc8c809e3a3cdc6b445",
+      "merge_commit_sha": "10698f6bcb851715579eafea2f8c4e8e712b5fd8",
+      "comments": []
+    },
+    {
+      "key": "eip12620",
+      "url": "https://github.com/ethereum/EIPs/pull/12620",
+      "title": "Update EIP-7928: align per-field recording rules and pseudocode with the change rule",
+      "state": "open",
+      "merged": false,
+      "head_sha": "35e4ed168840add11fcca57d883bb43418e39940",
+      "base_sha": "46976b2a9bf99f727fb87dc8c809e3a3cdc6b445",
+      "merge_commit_sha": "063343c5f1b9f803c4ad26db993f6a1852f835f2",
+      "comments": []
+    },
+    {
+      "key": "eip12612",
+      "url": "https://github.com/ethereum/EIPs/pull/12612",
+      "title": "Update EIP-8038: map the EIP-7928 pre-state gas table to the new constants",
+      "state": "open",
+      "merged": false,
+      "head_sha": "a105567872596f5bfc552374f634bd1b72ebccc8",
+      "base_sha": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+      "merge_commit_sha": "1dc4f637e5a46ad451c06173a44b7100cbfa91cd",
+      "comments": []
+    },
+    {
+      "key": "eip12611",
+      "url": "https://github.com/ethereum/EIPs/pull/12611",
+      "title": "Update EIP-7928: specify static-context halts before pre-state validation",
+      "state": "open",
+      "merged": false,
+      "head_sha": "9df07bff14d823ba7d7342f2da2d5ab869b8582a",
+      "base_sha": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+      "merge_commit_sha": "fd39d6a3bcffab6297c08b240cddb751cdb4acef",
+      "comments": []
+    },
+    {
+      "key": "eip12571",
+      "url": "https://github.com/ethereum/EIPs/pull/12571",
+      "title": "Update EIP-7928: specify BAL integer encoding",
+      "state": "closed",
+      "merged": true,
+      "head_sha": "88b6f1a8011d52fb5ec88dc86cc315d31b2b1aa8",
+      "base_sha": "f1bcca1b56ee91fe115d2a8d8fd731fd6ca38bb3",
+      "merge_commit_sha": "d4c575521d99ec881a444ab3af604e684b5f0743",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#issuecomment-6367052694",
+          "author": "nerolation",
+          "created_at": "2026-10-23T14:19:31Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#discussion_r4367654794",
+          "author": "nerolation",
+          "created_at": "2026-10-24T15:58:53Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#discussion_r4367655914",
+          "author": "nerolation",
+          "created_at": "2026-10-24T15:59:17Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#pullrequestreview-5638870715",
+          "author": "nerolation",
+          "created_at": "2026-10-24T16:00:00Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#pullrequestreview-5639131343",
+          "author": "nerolation",
+          "created_at": "2026-10-24T17:23:27Z",
+          "path": null,
+          "line": null
+        },
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12571#discussion_r4367925132",
+          "author": "raxhvl",
+          "created_at": "2026-10-24T17:39:16Z",
+          "path": "EIPS/eip-7928.md",
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "eip12546",
+      "url": "https://github.com/ethereum/EIPs/pull/12546",
+      "title": "Update EIP-8159: follow the EIP-7928 BAL retention change",
+      "state": "open",
+      "merged": false,
+      "head_sha": "778b748237b4dc9fba1c003c633052c986402db5",
+      "base_sha": "41a838decba33325d01bd99b1cd6072c51214fac",
+      "merge_commit_sha": "4bc7260b6c4a88cf59d4aa75e94df3b14f901ac6",
+      "comments": []
+    },
+    {
+      "key": "eip12568",
+      "url": "https://github.com/ethereum/EIPs/pull/12568",
+      "title": "Update EIP-7773: Clear postponed Hoodi activation",
+      "state": "open",
+      "merged": false,
+      "head_sha": "158a9f90afcfd81d6f62779f180421b7762cd57b",
+      "base_sha": "f1ade090fd315895461fc3e249cb1a675aeb55a9",
+      "merge_commit_sha": "a2ceb33c7f62d213abbe7bad03daa56c493ce935",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12568#issuecomment-6623618070",
+          "author": "jochem-brouwer",
+          "created_at": "2026-11-04T05:45:13Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    },
+    {
+      "key": "eip12449",
+      "url": "https://github.com/ethereum/EIPs/pull/12449",
+      "title": "Update EIP-7773: Add EIP-7495 and EIP-7916 to Glamsterdam",
+      "state": "open",
+      "merged": false,
+      "head_sha": "5e5c09be5963a9b9aeb05d988409117dd4138416",
+      "base_sha": "9ee171b76f982cf62cadee0c4c55d9a3e306be7e",
+      "merge_commit_sha": null,
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/EIPs/pull/12449#pullrequestreview-5456818709",
+          "author": "nerolation",
+          "created_at": "2026-10-08T12:49:48Z",
+          "path": null,
+          "line": null
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "key": "rpc_cap",
+      "url": "https://github.com/ethereum/execution-apis/issues/977",
+      "title": "Call methods: define the transaction gas cap from Amsterdam (EIP-7825, EIP-8037)",
+      "state": "open",
+      "updated_at": "2026-11-13T15:34:06Z",
+      "closed_at": null
+    },
+    {
+      "key": "rpc_trace",
+      "url": "https://github.com/ethereum/execution-apis/issues/976",
+      "title": "callTracer: report state gas per nested frame (EIP-8037)",
+      "state": "open",
+      "updated_at": "2026-11-13T15:23:04Z",
+      "closed_at": null
+    },
+    {
+      "key": "rpc_access",
+      "url": "https://github.com/ethereum/execution-apis/issues/946",
+      "title": "eth_createAccessList: return the accessed list or the cheapest list after Amsterdam?",
+      "state": "closed",
+      "updated_at": "2026-11-16T23:37:04Z",
+      "closed_at": "2026-11-16T23:37:04Z"
+    },
+    {
+      "key": "payment_issue",
+      "url": "https://github.com/ethereum/consensus-specs/issues/5754",
+      "title": "Gloas: builder payment still goes to a slashed proposer if the child block arrives 2+ epochs later",
+      "state": "open",
+      "updated_at": "2026-11-14T08:20:00Z",
+      "closed_at": null
+    },
+    {
+      "key": "ptc_issue",
+      "url": "https://github.com/ethereum/consensus-specs/issues/5825",
+      "title": "Gloas: validator.md PTC aggregation wording produces an invalid block when the PTC contains duplicate validators",
+      "state": "closed",
+      "updated_at": "2026-11-13T12:57:38Z",
+      "closed_at": "2026-11-13T12:57:38Z"
+    },
+    {
+      "key": "randao_issue",
+      "url": "https://github.com/ethereum/consensus-specs/issues/5826",
+      "title": "Gloas: prev_randao checked against different epochs in gossip validation vs state transition",
+      "state": "open",
+      "updated_at": "2026-11-14T04:41:59Z",
+      "closed_at": null
+    },
+    {
+      "key": "ssz_collision_issue",
+      "url": "https://github.com/ethereum/consensus-specs/issues/5823",
+      "title": "Progressive SSZ: 1-field ProgressiveContainer and 1-element ProgressiveList share the same hash_tree_root",
+      "state": "open",
+      "updated_at": "2026-11-13T03:52:59Z",
+      "closed_at": null
+    }
+  ],
+  "comment_threads": [
+    {
+      "key": "acdt_comments",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/pm/issues/2299#issuecomment-6831513586",
+          "author": "jtraglia",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/pm/issues/2299#issuecomment-6860064283",
+          "author": "mejango",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/pm/issues/2299#issuecomment-6893348620",
+          "author": "jochem-brouwer",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/pm/issues/2299#issuecomment-6913931359",
+          "author": "pcaversaccio",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/pm/issues/2299#issuecomment-6917033995",
+          "author": "milonite",
+          "created_at": null
+        }
+      ]
+    },
+    {
+      "key": "acde249",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/pm/issues/2285#issuecomment-6405735481",
+          "author": "abcoathup",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/pm/issues/2285#issuecomment-6591968726",
+          "author": "abcoathup",
+          "created_at": null
+        }
+      ]
+    },
+    {
+      "key": "rpc_access_comments",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/execution-apis/issues/946#issuecomment-6266936024",
+          "author": "hudem1",
+          "created_at": null
+        }
+      ]
+    },
+    {
+      "key": "randao_comments",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5826#issuecomment-6871879332",
+          "author": "Srizdebnath",
+          "created_at": null
+        }
+      ]
+    },
+    {
+      "key": "payment_comments",
+      "comments": [
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6363862226",
+          "author": "nflaig",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6406808502",
+          "author": "0xys",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6412339093",
+          "author": "nflaig",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6493034795",
+          "author": "0xys",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6629900625",
+          "author": "nflaig",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6663320542",
+          "author": "exocognosis",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6734572683",
+          "author": "0xys",
+          "created_at": null
+        },
+        {
+          "url": "https://github.com/ethereum/consensus-specs/issues/5754#issuecomment-6874445264",
+          "author": "Unyiel37",
+          "created_at": null
+        }
+      ]
+    },
+    {
+      "key": "ssz_collision_comments",
+      "comments": []
+    }
+  ],
+  "files": [
+    {
+      "key": "invreadme",
+      "url": "https://github.com/ethereum/glamsterdam-gas-invariants/blob/master/README.md",
+      "blob_sha": "b5632e9a0f8c14a34a03c4f30cec11d5d95adc8b"
+    },
+    {
+      "key": "current7928",
+      "url": "https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7928.md",
+      "blob_sha": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
+    },
+    {
+      "key": "current7843",
+      "url": "https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7843.md",
+      "blob_sha": "0a3c68bbd8af638d9ff91197f64cb07bb104a3a2"
+    },
+    {
+      "key": "current7688",
+      "url": "https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7688.md",
+      "blob_sha": "bdb1119c814c032e65580118d64e12039eafe63b"
+    },
+    {
+      "key": "current7773",
+      "url": "https://github.com/ethereum/EIPs/blob/3db38a3725105cb67b8804ac3e147967113bc3ca/EIPS/eip-7773.md",
+      "blob_sha": "3b0d9db14e6a1069652045329101d907d0b739c8"
+    },
+    {
+      "key": "mainnetplan",
+      "url": "https://github.com/ethereum/pm/blob/master/glamsterdam-mainnet-plan.md",
+      "blob_sha": "66fee4fe1260fe88bf4d6593056de0022f53a8fd"
+    }
+  ]
+}

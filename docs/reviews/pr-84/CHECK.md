@@ -1,3 +1,10 @@
+## Sequential master/dependency and CI repair (2026-11-19)
+
+- [x] Inspect original CI formatting failures and the existing 81/82 system-transition foundation.
+- [ ] Merge current master and the qualified repaired sparse-relay foundation without importing Draft gas work.
+- [ ] Preserve canonical history/beacon system transitions and all mandatory request, initcode and BAL guards.
+- [ ] Run full default tests, integration, relevant race/vet, formatting and build; publish and verify fresh CI.
+
 # PR 84 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `6ed6f2562cb1c34329462196b65b12b41a56a922`.

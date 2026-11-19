@@ -1,0 +1,5 @@
+# RPC execution cancellation in progress
+
+The predeclared operating campaign exposed a source-level gap before pressure testing: both HTTP RPC dispatchers discard r.Context, batch requests create no request context, and ordinary native call/estimate/access-list execution has no context override. Simulate/trace construct bounded contexts from context.Background, so client cancellation does not release their remaining work. This is an execution-node request lifetime issue, not a consensus-rule change.
+
+EIP-1474 JSON-RPC request/response and error semantics, EIP-1898 selectors and the selected EVM rules remain the authority for observable execution. Request cancellation is local transport metadata and must never become a JSON field, fork parameter or runtime feature switch. The intended correction binds an immutable request context to the existing native backend, preserves existing explicit trace/simulation limits, and propagates cancellation into existing EVM context support. Shared API maps/locks must not be copied. Actual HTTP and concurrent isolation evidence are required before claiming the operating cancellation gate.

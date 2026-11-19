@@ -1,3 +1,10 @@
+## Sequential tracing merge/dependency and CI repair (2026-11-19)
+
+- [x] Preserve the existing nested/dimensional tracing scope and its proposed-schema boundaries.
+- [ ] Merge master while preserving ordinary execution, simulation observer and real trace hooks.
+- [ ] Reconcile repaired existing simulator dependency 86 without changing final protocol or Draft decisions.
+- [ ] Run full tests, integration, tracing/VM/RPC/Node race, formatting/vet/build; publish and verify fresh CI.
+
 # PR 87 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `0a1aa9374c061aacfb429fbfd1942d17c5faf1e5`.

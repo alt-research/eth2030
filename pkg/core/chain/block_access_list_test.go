@@ -47,4 +47,14 @@ func TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody(t *testing.T
 	if encoded, err := bc.BlockAccessList(child.Hash()); err != nil || encoded != nil || bc.GetBlock(child.Hash()) == nil {
 		t.Fatal("a pruned BAL must leave the execution body available")
 	}
+	if err := bc.StoreBlockAccessListRLP(child.Hash(), corrupt); err == nil {
+		t.Fatal("restored a tampered BAL")
+	}
+	if err := bc.StoreBlockAccessListRLP(child.Hash(), encoded); err != nil {
+		t.Fatal(err)
+	}
+	restored, err := bc.BlockAccessList(child.Hash())
+	if err != nil || crypto.Keccak256Hash(restored) != *child.Header().BlockAccessListHash {
+		t.Fatal("verified BAL restore failed")
+	}
 }

@@ -255,9 +255,8 @@ func TestEIP7708SelfdestructEmitsTransferLog(t *testing.T) {
 	}
 }
 
-// TestEIP7708SelfdestructToSelfEmitsBurnLog verifies SELFDESTRUCT to self
-// emits a burn log.
-func TestEIP7708SelfdestructToSelfEmitsBurnLog(t *testing.T) {
+// TestEIP7708SelfdestructToSelfEmitsNoLog preserves balance without a fictitious burn.
+func TestEIP7708SelfdestructToSelfEmitsNoLog(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
 	contractAddr := types.HexToAddress("0xaaaa")
 
@@ -281,18 +280,8 @@ func TestEIP7708SelfdestructToSelfEmitsBurnLog(t *testing.T) {
 	}
 
 	logs := statedb.GetLogs(types.Hash{})
-	found := false
-	for _, log := range logs {
-		if log.Address == SystemAddress && len(log.Topics) == 2 && log.Topics[0] == BurnEventTopic {
-			found = true
-			logAmount := new(big.Int).SetBytes(log.Data)
-			if logAmount.Cmp(big.NewInt(3000)) != 0 {
-				t.Errorf("burn amount = %s, want 3000", logAmount.String())
-			}
-		}
-	}
-	if !found {
-		t.Error("expected EIP-7708 burn log from SELFDESTRUCT to self")
+	if len(logs) != 0 {
+		t.Fatalf("self-beneficiary destruction emitted %d logs", len(logs))
 	}
 
 	// Balance should remain 3000 (sub then add to self).

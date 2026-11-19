@@ -1,0 +1,32 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..1d648a39 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,3 +1,11 @@
++## Glamsterdam eth/69-71 production protocols
++
++- [x] Read EIP-7975/8159 and current devp2p status/message schemas; inspect the actual node registration.
++- [x] Add independent canonical BAL-wire, versioned handshake and correlated tamper tests.
++- [x] Register negotiated versions, implement status/range and version-aware receipt serving.
++- [x] Correlate and validate received BALs before restoring verified historical data.
++- [x] Verify affected network/chain/node/consumer paths and race/build; prepare the separate feature review.
++
+ # Lean4 Verification Check-list
+ 
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..35e17ea3 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,11 @@
++## Negotiated eth/69-71 and historical consumers (2026-11-18)
++
++Branch `feat/glamsterdam-eth71` registers eth/68/69/70/71 on the production node. Implements seven-field range status without TD for 69+, version-correct bloom-free receipts, nonblocking queued range updates and canonical raw-list BAL wire encoding. Independent golden bytes expose the old double-wrapped BAL response.
++
++Correlated historical fetchers paginate receipts, bound decoding by requested block transaction/gas limits, verify the complete receipt root and rebuild persistent metadata only for validated blocks. BAL replies are matched to peer/request/hash, checked against headers before any restore, and reject tamper/reordering/replay/unsolicited data. Unavailable markers preserve body availability and are not trusted as arbitrary BALs.
++
++Independent Geth RLPx/codec tests negotiate all four versions over real encrypted sockets and check status plus actual receipt/BAL formats. Real-chain eiptests validate restored receipt metadata and tampered BAL preservation; a disabled consumer hash-check mutation fails the intended tests. Affected eth/P2P/chain/node/eiptest suites, targeted race, full build and vet passed. Full independent-client/devnet, eth/72/snap/2 and complete sync/recovery qualification remain separate program gates. [Evidence](docs/verification/glamsterdam-eth71-20261118.md).
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

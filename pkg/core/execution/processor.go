@@ -299,15 +299,6 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		}
 	}
 
-	// EIP-7997: deploy the deterministic CREATE2 factory at Glamsterdam activation.
-	if p.config != nil && p.config.IsGlamsterdan(header.Time) {
-		if balActive && statedb.GetCodeSize(eips.FactoryAddress) == 0 {
-			// Factory is about to be deployed — record the code touch.
-			preTracker.RecordAddressTouch(eips.FactoryAddress)
-		}
-		eips.ApplyEIP7997(statedb)
-	}
-
 	// Merge pre-execution system contract accesses into the block BAL.
 	if balActive {
 		preBAL := preTracker.Build(0) // AccessIndex 0 for pre-execution
@@ -1637,11 +1628,6 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 			statedb.AddBalance(header.Coinbase, tipPayment)
 		}
 
-		// EIP-7708: emit burn log for base fee portion (baseFee * gasUsed).
-		if evm.GetForkRules().IsEIP7708 {
-			burnAmount := new(big.Int).Mul(header.BaseFee, new(big.Int).SetUint64(gasUsed))
-			vm.EmitBurnLog(statedb, msg.From, burnAmount)
-		}
 	} else {
 		// Pre-EIP-1559: all gas payment goes to coinbase.
 		coinbasePayment := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(gasUsed))

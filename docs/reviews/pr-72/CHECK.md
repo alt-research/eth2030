@@ -1,9 +1,9 @@
 ## Master integration after PR 71 (2026-11-19)
 
 - [x] Verify the exact PR 72 head and current master in an isolated worktree.
-- [ ] Reconcile SELFDESTRUCT accounting with merged ETH transfer logging against pinned specifications.
-- [ ] Add a focused overlap regression and run affected tests, race/vet and full build.
-- [ ] Prepare a fast-forward update to the existing PR branch and verify live GitHub conflict state.
+- [x] Reconcile SELFDESTRUCT accounting with merged ETH transfer logging against pinned specifications.
+- [x] Add a focused overlap regression and run affected tests, race/vet and full build.
+- [x] Prepare a fast-forward update to the existing PR branch; require live GitHub conflict-state verification before reporting completion.
 
 # PR 72 tracking cleanup
 

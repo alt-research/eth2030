@@ -1,0 +1,587 @@
+{
+  "audit_date": "2026-11-19",
+  "master": "5fbc7c133b0e57352ca2a3d6fdd9a63726c42502",
+  "source_tree": "f8844de35ec87149102b75acfbaf18a30b86e0f0",
+  "qualified_pr87_source_tree": "f8844de35ec87149102b75acfbaf18a30b86e0f0",
+  "el_reviews_64_through_87_merged": 24,
+  "el_open_prs_at_snapshot": 0,
+  "current_master_ci_successful_checks": 7,
+  "counting_rule": "13 deduplicated work packages, not 13 missing production modules or 13 extra PRs. GL IDs overlap these packages; development classes are not release completion percentages.",
+  "remaining_packages": [
+    {
+      "id": "R01",
+      "priority": "P0",
+      "kind": "confirmed EL correctness defect",
+      "tasks": [
+        "GL-023",
+        "GL-060"
+      ],
+      "title": "Historical EIP-7702 skipped-authorization warming",
+      "done_when": "Fix and independently regress authority warming before nonce/code rejection; paid gas 48605 versus 46105 and post-root must agree at Osaka, while preserving all Amsterdam cases."
+    },
+    {
+      "id": "R02",
+      "priority": "P1",
+      "kind": "missing native test infrastructure and qualification",
+      "tasks": [
+        "GL-002",
+        "GL-021",
+        "GL-022",
+        "GL-030",
+        "GL-060"
+      ],
+      "title": "Native Osaka/Amsterdam fixtures and independent envelope corpus",
+      "done_when": "Register coherent native fork contexts, pin selected official fixtures and expected counts, fail unsupported/missing required cases, and extend independent signed coverage beyond 32 type-2 and 10 type-4 cases to legacy/type-1/blob boundaries."
+    },
+    {
+      "id": "R03",
+      "priority": "P1",
+      "kind": "application qualification",
+      "tasks": [
+        "GL-022",
+        "GL-032",
+        "GL-060"
+      ],
+      "title": "Application and GAS/reservoir compatibility",
+      "done_when": "Run real wallet/router/delegation/failure-handler patterns, low forwarded execution with funded reservoir, nested refill/revert and side-effect/fee invariants; evaluate the selected model without silently adopting open alternatives."
+    },
+    {
+      "id": "R04",
+      "priority": "P1",
+      "kind": "API and entrypoint qualification",
+      "tasks": [
+        "GL-021",
+        "GL-024",
+        "GL-025",
+        "GL-044",
+        "GL-045",
+        "GL-060"
+      ],
+      "title": "Outer limits and complete API/historical fixtures",
+      "done_when": "Exercise correctly bound cap/floor/state-budget negative payloads in Node and memory backends, plus official call/estimate/access/simulate/trace and historical/override matrices. Six direct-transition cap controls are not six proven acceptance bugs; the prior oversized fixture did not reach receiver validation."
+    },
+    {
+      "id": "R05",
+      "priority": "P1",
+      "kind": "implemented CL code pending integration",
+      "tasks": [
+        "GL-011",
+        "GL-034",
+        "GL-050"
+      ],
+      "title": "Integrate the three Lighthouse reviews and compatible client artifact",
+      "done_when": "Review/merge or otherwise publish a compatible candidate carrying CL PRs 1/2/3, pin it against EL 5fbc7c13, rerun actual CL transition/BLS/request/slot component tests and complete builds, including payload/beacon slot binding, adopted signing domains, slashed-proposer exclusion and churn/weak-subjectivity fork boundaries. Existing 25-test candidate 44324117 is component evidence, not final live acceptance."
+    },
+    {
+      "id": "R06",
+      "priority": "P1",
+      "kind": "CL security/fork-choice qualification with conditional implementation",
+      "tasks": [
+        "GL-050",
+        "GL-051",
+        "GL-052"
+      ],
+      "title": "Payload authentication and optimistic lifecycle",
+      "done_when": "Freeze the selected authentication format, isolate contents/claimed-hash/request binding and seen-cache negatives, then qualify FULL/EMPTY/PENDING, latestValidHash, late/missing envelopes, descendant invalidation, empty heads and restart/reorg. Open 5770/5820/5781/5818 are not all mandatory patches."
+    },
+    {
+      "id": "R07",
+      "priority": "P1",
+      "kind": "CL invariant reproduction and qualification",
+      "tasks": [
+        "GL-053"
+      ],
+      "title": "Builder settlement exactly once",
+      "done_when": "Reproduce late-child/epoch-eviction/slashed/no-quorum/exit cases in actual selected CL and assert debits, credits, withdrawals and supply. Upstream issue 5754 is open; this audit demonstrates no local double-payment exploit."
+    },
+    {
+      "id": "R08",
+      "priority": "P1",
+      "kind": "CL SSZ/proof qualification",
+      "tasks": [
+        "GL-054"
+      ],
+      "title": "Progressive migration and real proof consumers",
+      "done_when": "Qualify nonzero fork-state migration, stable generalized indices, independent proof/root vectors, runtime sizes/limits and actual light-client consumers. Code already generates progressive proofs; the unused unsupported-error comment is not a missing implementation."
+    },
+    {
+      "id": "R09",
+      "priority": "P1",
+      "kind": "CL data/network qualification",
+      "tasks": [
+        "GL-042",
+        "GL-055"
+      ],
+      "title": "Partial columns, version/group IDs and custody recovery",
+      "done_when": "Cross real CL peers at the selected Gloas boundary with group/version, bitmap and cell ordering under loss/duplication/reconnect; compose actual EL custody/cell methods. Existing native eth/72 and progressive CL data types are retained evidence."
+    },
+    {
+      "id": "R10",
+      "priority": "P1",
+      "kind": "independent full-process qualification",
+      "tasks": [
+        "GL-011",
+        "GL-031",
+        "GL-034",
+        "GL-040",
+        "GL-041",
+        "GL-042",
+        "GL-043",
+        "GL-061"
+      ],
+      "title": "Full independent multiclient and external-builder devnet",
+      "done_when": "Use current native EL plus a compatible independent EL, actual Lighthouse plus independent CL, and external builder across a coordinated fork with contracts/blobs. Preserve exact revisions, actual Engine/P2P wire, independent commitments and rejection controls."
+    },
+    {
+      "id": "R11",
+      "priority": "P1",
+      "kind": "recovery and retention qualification",
+      "tasks": [
+        "GL-040",
+        "GL-041",
+        "GL-043",
+        "GL-052",
+        "GL-062"
+      ],
+      "title": "Long cold sync, retention, reorg and durable recovery",
+      "done_when": "Run native and independent process cold sync, missed-window/orphan history, pruning/retention edges, restart/reorg and storage-failure campaigns. Existing small encrypted/native recovery scenarios are not erased and do not establish the full campaign."
+    },
+    {
+      "id": "R12",
+      "priority": "P1",
+      "kind": "operating-capacity qualification",
+      "tasks": [
+        "GL-042",
+        "GL-062"
+      ],
+      "title": "Measured CPU/memory/disk/latency and queue budgets",
+      "done_when": "Set workload/hardware/target schedules and thresholds, then measure valid/adversarial execution/state/blob mixes, historical serving, cancellation and durable storage/queue pressure. CPSB rationale and successful block production are not measured ETH2030 operating headroom."
+    },
+    {
+      "id": "R13",
+      "priority": "P0 release",
+      "kind": "input freeze and release closeout",
+      "tasks": [
+        "GL-001",
+        "GL-012",
+        "GL-020",
+        "GL-025",
+        "GL-045",
+        "GL-051",
+        "GL-063"
+      ],
+      "title": "Final compatible target, scope, artifact manifest and runbooks",
+      "done_when": "Record final compatible EL/CL/Engine/devp2p/API/fixture/runtime/network inputs, resolve the declared gas/auth/schema choices, retain all unknowns, then publish qualified artifacts and upgrade/recovery procedure after gates pass. Merging the development model closes PR integration, not external protocol adoption."
+    }
+  ],
+  "original_tasks": [
+    {
+      "id": "GL-001",
+      "development_class": "PROGRAM_ACCEPTANCE",
+      "remaining_packages": [
+        "R13"
+      ],
+      "assessment": "Release input/client/fixture tuple is not finally frozen."
+    },
+    {
+      "id": "GL-002",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R02"
+      ],
+      "assessment": "Native fixture names/configuration stop at Prague; official native Amsterdam support remains missing."
+    },
+    {
+      "id": "GL-003",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [],
+      "assessment": "Original diagnostic repairs and intended regressions are implemented; newer findings remain separately tracked."
+    },
+    {
+      "id": "GL-010",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [],
+      "assessment": "Canonical BAL/slot codec, hashes and independent header tests are on master."
+    },
+    {
+      "id": "GL-011",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R05",
+        "R10"
+      ],
+      "assessment": "EL slot propagation and actual HTTP are implemented; complete paired CL slot-boundary acceptance remains."
+    },
+    {
+      "id": "GL-012",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R13"
+      ],
+      "assessment": "Canonical schedule/configuration/Engine windows and persisted authority exist; final release feature/network tuple remains."
+    },
+    {
+      "id": "GL-020",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R13"
+      ],
+      "assessment": "Selected LIFO model is implemented; final release-model decision remains separate."
+    },
+    {
+      "id": "GL-021",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02",
+        "R04"
+      ],
+      "assessment": "Ordinary intrinsic/runtime split and dual reservation are implemented; broader fixture/entrypoint matrices remain."
+    },
+    {
+      "id": "GL-022",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02",
+        "R03"
+      ],
+      "assessment": "Selected frame/state accounting and rollback are implemented; official/application acceptance remains."
+    },
+    {
+      "id": "GL-023",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R01",
+        "R02"
+      ],
+      "assessment": "Amsterdam authorization/account lifecycle exists; historical skipped-authorization warming still differs."
+    },
+    {
+      "id": "GL-024",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02",
+        "R04"
+      ],
+      "assessment": "Paid/gross/state settlement and bottleneck header/base fee are implemented and tested."
+    },
+    {
+      "id": "GL-025",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R04",
+        "R13"
+      ],
+      "assessment": "Call/estimate/access/simulate/trace are all merged; final API fixtures/schema acceptance remains."
+    },
+    {
+      "id": "GL-030",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02"
+      ],
+      "assessment": "Contract/initcode limits and current stack encoding are implemented; full native fixture combinations remain."
+    },
+    {
+      "id": "GL-031",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R10"
+      ],
+      "assessment": "Canonical factory/precompile and explicit allocation paths exist; actual process deployment remains a campaign."
+    },
+    {
+      "id": "GL-032",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02",
+        "R03"
+      ],
+      "assessment": "Transfer logs, ordering and rollback are implemented including tracing composition."
+    },
+    {
+      "id": "GL-033",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R02"
+      ],
+      "assessment": "Balance-preserving destruction and final-state/BAL reconciliation are implemented."
+    },
+    {
+      "id": "GL-034",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R05",
+        "R10"
+      ],
+      "assessment": "EL mandatory queues/contracts and real-BLS CL component evidence exist; CL reviews and full transport/lifecycle remain."
+    },
+    {
+      "id": "GL-040",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "assessment": "Canonical persisted BAL bodies, availability window and recovery paths exist; independent history/retention campaigns remain."
+    },
+    {
+      "id": "GL-041",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "assessment": "Negotiated eth/68\u201371 and correlated historical consumers are implemented; independent long sync remains."
+    },
+    {
+      "id": "GL-042",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R09",
+        "R10",
+        "R12"
+      ],
+      "assessment": "eth/72 sparse relay/custody/reconstruction is implemented; complete live CL/independent gossip and budgets remain."
+    },
+    {
+      "id": "GL-043",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "assessment": "snap/2 actual moving-pivot/reorg/restart/proof consumers are implemented; full independent cold sync remains."
+    },
+    {
+      "id": "GL-044",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R04"
+      ],
+      "assessment": "Actual access discovery and returned-list gas are implemented; final API/historical fixture scope remains."
+    },
+    {
+      "id": "GL-045",
+      "development_class": "EL_IMPLEMENTATION_DELIVERED",
+      "remaining_packages": [
+        "R04",
+        "R13"
+      ],
+      "assessment": "Actual nested/dimensional tracing is implemented; adopted schema/fixture acceptance remains."
+    },
+    {
+      "id": "GL-050",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R05",
+        "R06"
+      ],
+      "assessment": "Actual CL fork/onboarding patches exist in separate open reviews; compatible client integration and transition matrix remain."
+    },
+    {
+      "id": "GL-051",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R06",
+        "R13"
+      ],
+      "assessment": "Signed envelope checks exist; selected authentication choice and adversarial binding/cache qualification remain."
+    },
+    {
+      "id": "GL-052",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R06",
+        "R11"
+      ],
+      "assessment": "CL processing/optimistic paths exist; complete per-payload FULL/EMPTY/PENDING/late/reorg/restart matrix is not closed."
+    },
+    {
+      "id": "GL-053",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R07"
+      ],
+      "assessment": "Settlement code exists; issue variants and settlement-once invariants remain unreproduced/unqualified locally."
+    },
+    {
+      "id": "GL-054",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R08"
+      ],
+      "assessment": "Actual progressive beacon types and proof generation exist; independent nondefault migration/proof qualification remains."
+    },
+    {
+      "id": "GL-055",
+      "development_class": "PARTIAL_OR_CROSS_CLIENT",
+      "remaining_packages": [
+        "R09"
+      ],
+      "assessment": "Gloas partial-column types/filters exist; real-peer version/group/loss/duplication recovery qualification remains."
+    },
+    {
+      "id": "GL-060",
+      "development_class": "PROGRAM_ACCEPTANCE",
+      "remaining_packages": [
+        "R02",
+        "R03",
+        "R04"
+      ],
+      "assessment": "Selected native official/deployed application and complete API/execution corpus remains incomplete."
+    },
+    {
+      "id": "GL-061",
+      "development_class": "PROGRAM_ACCEPTANCE",
+      "remaining_packages": [
+        "R10"
+      ],
+      "assessment": "Fresh independent multi-EL/multi-CL/external-builder fork campaign remains unrun for this complete head."
+    },
+    {
+      "id": "GL-062",
+      "development_class": "PROGRAM_ACCEPTANCE",
+      "remaining_packages": [
+        "R11",
+        "R12"
+      ],
+      "assessment": "Small native restart/reorg tests exist; long recovery/retention and measured operating budgets remain."
+    },
+    {
+      "id": "GL-063",
+      "development_class": "PROGRAM_ACCEPTANCE",
+      "remaining_packages": [
+        "R13"
+      ],
+      "assessment": "Development code/CI and this reconciliation are delivered; qualified release artifacts/runbook and all acceptance gates remain."
+    }
+  ],
+  "task_class_counts": {
+    "PROGRAM_ACCEPTANCE": 5,
+    "PARTIAL_OR_CROSS_CLIENT": 12,
+    "EL_IMPLEMENTATION_DELIVERED": 16
+  },
+  "confirmed_findings": [
+    {
+      "kind": "EL correctness mismatch",
+      "source": "pkg/core/eips/eip7702.go:61",
+      "case": "authorization_bad_nonce_warms",
+      "native_paid_gas": 48605,
+      "independent_paid_gas": 46105,
+      "fresh_master_reproduced": true
+    },
+    {
+      "kind": "native fixture infrastructure missing",
+      "source": "pkg/core/eftest/state_test_runner.go:396",
+      "supported_through": "Prague",
+      "unsupported": [
+        "Osaka",
+        "Amsterdam"
+      ]
+    }
+  ],
+  "fresh_corpus": {
+    "source_checkpoint": "80169cdc6f9a4f8843b70cd763976388c8332bd2",
+    "dirty": false,
+    "counts": {
+      "('amsterdam_merged_text_candidate', True)": 42,
+      "('osaka_control', False)": 7,
+      "('osaka_control', True)": 35
+    },
+    "differences": [
+      {
+        "name": "above_execution_cap",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 21000,
+        "reference_gas": 0,
+        "native_root": "0x50f6a372a0facac1d95cdeb1713ba40e39c168f4d45f12471585100f6b96f2b1",
+        "reference_root": "0x79d0ae2eda47e4059fc21ea60e2da3293e10821ef6338e5fd9ff78b82806840e"
+      },
+      {
+        "name": "authorization_bad_nonce_warms",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": true,
+        "native_gas": 48605,
+        "reference_gas": 46105,
+        "native_root": "0xdb4df8da8d4288bbf1b9ca9742432f07bc6fc02ceb28c5213df68c9c87599a73",
+        "reference_root": "0xaed3e36354d02bad2cb75f8b7840aa2638c50cd856908c6cd1e3e23439f41a79"
+      },
+      {
+        "name": "create_maximum_code_7954",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 110000000,
+        "reference_gas": 0,
+        "native_root": "0xc9c52e26633cc15dee90aebe8c207ddaba73549a83704462912bcdd6af236cf1",
+        "reference_root": "0x5c7d57da9696f56c72c9081456537e6b325e1facf7f1adb200fd8d008f10c8ac"
+      },
+      {
+        "name": "funded_reservoir_allocate",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 43106,
+        "reference_gas": 0,
+        "native_root": "0x6cebf12147e2283be1f0e17992cc0002f5613ac459c18440a2f799b5c37285b6",
+        "reference_root": "0xcbc13ed9b6be1638d9c74321af22037b8c25a454144df66c4ae592a1333b7171"
+      },
+      {
+        "name": "funded_reservoir_exception",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 16977216,
+        "reference_gas": 0,
+        "native_root": "0x147002b086d54211693dd4872f2140e675980ed805c421eb0eb47a8bfaa28590",
+        "reference_root": "0x7d7d851ca0e1557d80ad4f3847733c8e74aeb486fc82094dc2ec01c9e2bdfe92"
+      },
+      {
+        "name": "funded_reservoir_nested_refill",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 36665,
+        "reference_gas": 0,
+        "native_root": "0xef153f924019980266a804efa7a9d3b4164c924460f0f21d197edb57e4d990bb",
+        "reference_root": "0xae66c98a43e630813f65bf140f44fc99fc42b4e7320b2d0f7b335f761c433c71"
+      },
+      {
+        "name": "partial_reservoir_allocate_clear",
+        "fork": "osaka_control",
+        "native_valid": true,
+        "reference_valid": false,
+        "native_gas": 34570,
+        "reference_gas": 0,
+        "native_root": "0x4187ad3031e57fd069e05562549be7099f05cbe546ebc890e9c651aeaea58401",
+        "reference_root": "0x70cb969c9aa00fc991d1c1a3c24539205fe0f85cba1d878281c5ee2be3fe15e4"
+      }
+    ]
+  },
+  "cl_snapshot": {
+    "repository": "jiayaoqijia/lighthouse",
+    "review_base": "8104a2467c59487e69aa95b6acedbaeea4a534a1",
+    "paired_base": "f85fa05b6df2b275b114050b01acd4381e621744",
+    "integration_candidate": "4432411764d89be3fad6af98b42cdd4e995d8a82",
+    "open_prs": [
+      1,
+      2,
+      3
+    ],
+    "fresh_cargo_tests_this_audit": false
+  },
+  "not_counted_as_missing": [
+    "Merged method consumers 85/86/87",
+    "Merged eth/72 and snap/2 implementation",
+    "Old custody comment: current handler forwards the validated mask to SetCustodyColumns",
+    "Unused progressive-proof unsupported error: actual Gloas proof generation is implemented",
+    "Unselected 12581/12582 or competing authentication alternatives",
+    "Unproven local payment exploits",
+    "Later/private FOCIL progressive IL decoding outside the declared Glamsterdam target"
+  ],
+  "business_code_changes": false,
+  "evidence_boundary": "Open means no sufficient closing evidence found in audited source/records. Confirmed defects, missing infrastructure, implemented-but-unmerged changes, conditional choices and qualification are distinct."
+}

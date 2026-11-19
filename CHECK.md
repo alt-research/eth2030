@@ -1,31 +1,9 @@
-## Canonical Osaka CLZ activation (2026-11-19)
+## Glamsterdam post-merge completion audit (2026-11-19)
 
-- [ ] Read selected EIP-7939 and reproduce missing Osaka/Amsterdam opcode activation.
-- [ ] Wire the existing CLZ implementation through the canonical Osaka table and Amsterdam inheritance.
-- [ ] Compare real EVM results/gas with unchanged Geth, verify before/at-fork boundaries, run affected/full/race/vet/build.
-- [ ] Publish a separate corrective PR with per-review task records.
-
-## EIP-161 transaction-boundary empty-account finalization (2026-11-19)
-
-- [ ] Read EIP-161 and reproduce native roots retaining touched empty precompile accounts.
-- [ ] Implement reversible touched-account tracking and fork-aware finalization across native state consumers.
-- [ ] Preserve untouched empty accounts, pre-fork behavior, failed-call rollback, durable state and simulation behavior.
-- [ ] Verify independent signed/official roots, affected/full/integration/race/vet/build checks and publish a separate PR.
-
-## Osaka precompile activation and bounds (2026-11-19)
-
-- [ ] Read EIPs 7823/7883 and reproduce missing native fork activation against independent vectors.
-- [ ] Implement bounded Osaka ModExp pricing/execution and wire canonical fork selection without altering earlier pricing.
-- [ ] Verify direct and signed consumer fork boundaries, official state roots, full/integration/race/vet/build checks.
-- [ ] Record status and publish a separate corrective PR.
-
-## R02 native Osaka/Amsterdam official fixture qualification (2026-11-19)
-
-- [ ] Freeze official fixture/spec inputs and read the selected fork rules.
-- [ ] Support native fork configuration and complete typed/signed transaction envelopes.
-- [ ] Reject malformed fixtures, unexpected failures, unrelated exceptions, missing roots and skipped corpora without reporting success.
-- [ ] Qualify actual native execution against independent expected roots/logs, retaining every mismatch.
-- [ ] Add CI fixture consumption, run affected/full/integration/race/vet/build checks and publish a separate PR.
+- [x] Fetch latest master and verify all EL reviews 64–87 are merged; preserve original dirty worktree.
+- [x] Reconcile the 33-task plan against merged implementations and actual evidence rather than historic pending labels.
+- [x] Revalidate concrete defects, native fixture infrastructure, CL/client boundaries and open qualification gates.
+- [x] Produce a deduplicated remaining-work inventory with exact sources, priorities and completion conditions; update integration status without business changes.
 
 ## Shared PR tracking conflict cleanup (2026-11-19)
 

@@ -109,7 +109,7 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 	for i, receipt := range p.receipts {
 		if i < len(blk.Transactions()) {
 			if frame, ok := blk.Transactions()[i].Inner().(*types.FrameTx8141); ok {
-				blobFee := gas.CalcBlobBaseFee(excessBlobGas)
+				blobFee := gas.BlobBaseFeeForHeader(b.node.Blockchain().Config(), p.block.Header())
 				tip, err := types.FrameProposerTip(frame, receipt.GasUsed, header.BaseFee, blobFee)
 				if err == nil {
 					blockValue.Add(blockValue, tip)
@@ -471,7 +471,7 @@ func (b *EngineBackend) GetPayloadV7ByID(id payload.PayloadID) (*payload.GetPayl
 	}
 	ctx := types.ExecutionSSZContext{
 		BlobGasLimit:     gas.FusakaMaxBlobGasPerBlock,
-		BlobBaseFee:      gas.CalcBlobBaseFeeV2(*p.block.Header().ExcessBlobGas, p.block.Header().BaseFee),
+		BlobBaseFee:      gas.BlobBaseFeeForHeader(b.node.Blockchain().Config(), p.block.Header()),
 		ExcessRegularGas: excessRegular,
 		Requests:         requests,
 		BlockAccessList:  balRLP,

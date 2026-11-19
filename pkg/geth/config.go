@@ -39,7 +39,14 @@ func ToGethChainConfig(c *config.ChainConfig) *params.ChainConfig {
 		CancunTime:   c.CancunTime,
 		PragueTime:   c.PragueTime,
 		OsakaTime:    c.OsakaTime,
+		BPO1Time:     c.BPO1Time,
+		BPO2Time:     c.BPO2Time,
 	}
+	resolved := c.ResolvedBlobSchedule()
+	convert := func(p *config.BlobConfig) *params.BlobConfig {
+		return &params.BlobConfig{Target: int(p.Target), Max: int(p.Max), UpdateFraction: p.UpdateFraction}
+	}
+	gc.BlobScheduleConfig = &params.BlobScheduleConfig{Cancun: convert(resolved.Cancun), Prague: convert(resolved.Prague), BPO1: convert(resolved.BPO1), BPO2: convert(resolved.BPO2)}
 	return gc
 }
 

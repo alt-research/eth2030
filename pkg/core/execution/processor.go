@@ -907,7 +907,7 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 	if blobGas := tx.BlobGas(); blobGas > 0 {
 		receipt.BlobGasUsed = blobGas
 		if header.ExcessBlobGas != nil {
-			receipt.BlobGasPrice = calcBlobBaseFee(*header.ExcessBlobGas)
+			receipt.BlobGasPrice = gas.BlobBaseFeeForHeader(config, header)
 		}
 	}
 
@@ -1164,6 +1164,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		GasLimit:    header.GasLimit,
 		BaseFee:     header.BaseFee,
 		PrevRandao:  header.MixDigest,
+		BlobBaseFee: gas.BlobBaseFeeForHeader(config, header),
 	}
 	txCtx := vm.TxContext{
 		Origin:     msg.From,
@@ -1175,6 +1176,28 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 	precompileAddrs, err := ConfigureBlockEVM(config, header, evm)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate blob obligations before consuming execution gas or changing state.
+	blobCost, blobMaxCost := new(big.Int), new(big.Int)
+	if msg.TxType == types.BlobTxType {
+		if !config.IsCancun(header.Time) || header.ExcessBlobGas == nil {
+			return nil, fmt.Errorf("blob transaction requires Cancun blob fields")
+		}
+		if msg.To == nil || len(msg.BlobHashes) == 0 || uint64(len(msg.BlobHashes)) > gas.MaxBlobsPerTransaction(config, header.Time) {
+			return nil, fmt.Errorf("invalid blob transaction recipient or count")
+		}
+		for _, hash := range msg.BlobHashes {
+			if hash[0] != gas.BlobTxHashVersion {
+				return nil, fmt.Errorf("invalid blob versioned hash")
+			}
+		}
+		if msg.BlobGasFeeCap == nil || msg.BlobGasFeeCap.Sign() < 0 || msg.BlobGasFeeCap.BitLen() > 256 || msg.BlobGasFeeCap.Cmp(blockCtx.BlobBaseFee) < 0 {
+			return nil, fmt.Errorf("blob fee cap below active blob base fee or invalid")
+		}
+		blobGas := new(big.Int).SetUint64(uint64(len(msg.BlobHashes)) * gas.GasPerBlob)
+		blobCost.Mul(blobGas, blockCtx.BlobBaseFee)
+		blobMaxCost.Mul(blobGas, msg.BlobGasFeeCap)
 	}
 
 	// Validate and consume gas from the pool
@@ -1251,6 +1274,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 	}
 	totalCost := new(big.Int).Add(msg.Value, balanceGasCost)
 	totalCost.Add(totalCost, calldataGasCost)
+	totalCost.Add(totalCost, blobMaxCost)
 
 	// EIP-8141: Frame transactions collect fees after APPROVE opcode, not upfront.
 	// Skip balance check and gas deduction — the payer is determined at runtime
@@ -1264,6 +1288,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 
 		// Deduct gas cost + calldata gas cost from sender
 		deduction := new(big.Int).Add(gasCost, calldataGasCost)
+		deduction.Add(deduction, blobCost)
 		statedb.SubBalance(msg.From, deduction)
 	}
 

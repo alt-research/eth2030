@@ -44,10 +44,8 @@ var (
 // config and timestamp. This mirrors GetBlobSchedule from blob_gas.go but
 // returns the EIP-7691-style entry type.
 func GetBlobScheduleEntry(config *config.ChainConfig, time uint64) BlobScheduleEntry {
-	if config.IsPrague(time) {
-		return PragueElectraBlobSchedule
-	}
-	return DencunBlobSchedule
+	s := GetBlobSchedule(config, time)
+	return BlobScheduleEntry{Target: s.Target, Max: s.Max, BaseFeeUpdateFraction: s.UpdateFraction}
 }
 
 // CalcBlobBaseFeeWithSchedule computes the blob base fee from excess blob gas

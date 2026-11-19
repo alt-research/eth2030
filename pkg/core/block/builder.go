@@ -98,20 +98,6 @@ func validateBlobHashes(hashes []types.Hash) error {
 	return nil
 }
 
-// calcExcessBlobGasFromParent returns the excess blob gas for a new block
-// given the parent header. Uses parent's ExcessBlobGas and BlobGasUsed;
-// returns 0 if either is nil (pre-Cancun parent).
-func calcExcessBlobGasFromParent(parent *types.Header) uint64 {
-	var parentExcess, parentUsed uint64
-	if parent.ExcessBlobGas != nil {
-		parentExcess = *parent.ExcessBlobGas
-	}
-	if parent.BlobGasUsed != nil {
-		parentUsed = *parent.BlobGasUsed
-	}
-	return gas.CalcExcessBlobGas(parentExcess, parentUsed)
-}
-
 // calldataFloorDelta computes the additional gas to charge under EIP-7623
 // when the calldata floor exceeds the standard gas used by a transaction.
 // Returns 0 when no additional charge is needed.
@@ -192,7 +178,11 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 	var blobGasUsed uint64
 	var excessBlobGas uint64
 	if cancunActive {
-		excessBlobGas = calcExcessBlobGasFromParent(parent)
+		var blobErr error
+		excessBlobGas, blobErr = gas.CalcExcessBlobGasForHeader(parent, b.config, header.Time)
+		if blobErr != nil {
+			return nil, nil, blobErr
+		}
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = &blobGasUsed // updated later
 	}
@@ -336,7 +326,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 
 			if cancunActive && len(ilTx.BlobHashes()) > 0 {
-				if ilTx.BlobGas() > gas.MaxBlobGasPerBlock-blobGasUsed || validateBlobHashes(ilTx.BlobHashes()) != nil {
+				if ilTx.BlobGas() > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed || validateBlobHashes(ilTx.BlobHashes()) != nil {
 					continue
 				}
 			}
@@ -456,7 +446,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		// EIP-4844: validate blob transactions and enforce blob gas limit.
 		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
-			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
+			if txBlobGas > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed {
 				continue // would exceed block blob gas limit
 			}
 			// Validate versioned hashes.
@@ -464,7 +454,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 				continue
 			}
 			// Validate blob fee cap against current blob base fee.
-			blobBaseFee := execution.CalcBlobBaseFee(excessBlobGas)
+			blobBaseFee := gas.BlobBaseFeeForHeader(b.config, header)
 			if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical && (tx.BlobGasFeeCap() == nil || tx.BlobGasFeeCap().Cmp(blobBaseFee) < 0) {
 				continue
 			}
@@ -767,7 +757,10 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	cancunActive := b.config != nil && b.config.IsCancun(header.Time)
 	var blobGasUsed uint64
 	if cancunActive {
-		excessBlobGas := calcExcessBlobGasFromParent(parent)
+		excessBlobGas, blobErr := gas.CalcExcessBlobGasForHeader(parent, b.config, header.Time)
+		if blobErr != nil {
+			return nil, nil, blobErr
+		}
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = &blobGasUsed
 	}
@@ -819,7 +812,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		// EIP-4844: enforce blob gas limit.
 		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
-			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
+			if txBlobGas > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed {
 				continue
 			}
 			if err := validateBlobHashes(tx.BlobHashes()); err != nil {

@@ -47,23 +47,24 @@ type chainConfigJSON struct {
 
 	TerminalTotalDifficulty *bigIntJSON `json:"terminalTotalDifficulty"`
 
-	ShanghaiTime           *uint64      `json:"shanghaiTime"`
-	CancunTime             *uint64      `json:"cancunTime"`
-	PragueTime             *uint64      `json:"pragueTime"`
-	AmsterdamTime          *uint64      `json:"amsterdamTime"`
-	GlamsterdanTime        *uint64      `json:"glamsterdanTime"`
-	HogotaTime             *uint64      `json:"hogotaTime"`
-	BogotaTime             *uint64      `json:"bogotaTime"`
-	SSZBlockTime           *uint64      `json:"sszBlockTime"`
-	IPlusTime              *uint64      `json:"iPlusTime"`
-	OsakaTime              *uint64      `json:"osakaTime"`
-	BPO1Time               *uint64      `json:"bpo1Time"`
-	BPO2Time               *uint64      `json:"bpo2Time"`
-	PQDraft                *pqDraftJSON `json:"pqDraft"`
-	BinaryOverlayTime      *uint64      `json:"binaryOverlayTime"`
-	BinaryConversionTime   *uint64      `json:"binaryConversionTime"`
-	BinaryConversionStride int          `json:"binaryConversionStride"`
-	EIP7864FinalHashTime   *uint64      `json:"eip7864FinalHashTime"`
+	ShanghaiTime           *uint64                        `json:"shanghaiTime"`
+	CancunTime             *uint64                        `json:"cancunTime"`
+	PragueTime             *uint64                        `json:"pragueTime"`
+	AmsterdamTime          *uint64                        `json:"amsterdamTime"`
+	GlamsterdanTime        *uint64                        `json:"glamsterdanTime"`
+	HogotaTime             *uint64                        `json:"hogotaTime"`
+	BogotaTime             *uint64                        `json:"bogotaTime"`
+	SSZBlockTime           *uint64                        `json:"sszBlockTime"`
+	IPlusTime              *uint64                        `json:"iPlusTime"`
+	OsakaTime              *uint64                        `json:"osakaTime"`
+	BPO1Time               *uint64                        `json:"bpo1Time"`
+	BPO2Time               *uint64                        `json:"bpo2Time"`
+	BlobScheduleConfig     *coreconfig.BlobScheduleConfig `json:"blobSchedule"`
+	PQDraft                *pqDraftJSON                   `json:"pqDraft"`
+	BinaryOverlayTime      *uint64                        `json:"binaryOverlayTime"`
+	BinaryConversionTime   *uint64                        `json:"binaryConversionTime"`
+	BinaryConversionStride int                            `json:"binaryConversionStride"`
+	EIP7864FinalHashTime   *uint64                        `json:"eip7864FinalHashTime"`
 }
 
 type pqDraftJSON struct {
@@ -285,6 +286,7 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 	chainCfg.OsakaTime = gj.Config.OsakaTime
 	chainCfg.BPO1Time = gj.Config.BPO1Time
 	chainCfg.BPO2Time = gj.Config.BPO2Time
+	chainCfg.BlobScheduleConfig = gj.Config.BlobScheduleConfig
 	chainCfg.EIP7864FinalHashTime = gj.Config.EIP7864FinalHashTime
 	chainCfg.BinaryOverlayTime = gj.Config.BinaryOverlayTime
 	chainCfg.BinaryConversionTime = gj.Config.BinaryConversionTime

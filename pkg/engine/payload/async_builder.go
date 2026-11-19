@@ -516,7 +516,7 @@ func (b *AsyncBuilder) processRequest(req *BuildRequest, workerID int) {
 	}
 
 	// Calculate block value
-	blockValue := calcBlockValue(blk, result.Receipts, req.ParentHeader.BaseFee)
+	blockValue := calcBlockValue(b.config, blk, result.Receipts, blk.Header().BaseFee)
 
 	pending.SetCompleted(blk, result.Receipts, result.BlockAccessList, blockValue, result.Requests...)
 	metrics.EnginePayloadBuildSuccess.Inc()

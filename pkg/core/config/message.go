@@ -15,22 +15,23 @@ type PaymasterSlasher interface {
 
 // Message represents a transaction message prepared for EVM execution.
 type Message struct {
-	From        types.Address
-	To          *types.Address // nil for contract creation
-	Nonce       uint64
-	Value       *big.Int
-	GasLimit    uint64
-	GasPrice    *big.Int
-	GasFeeCap   *big.Int
-	GasTipCap   *big.Int
-	Data        []byte
-	AccessList  types.AccessList
-	BlobHashes  []types.Hash
-	AuthList    []types.Authorization // EIP-7702 authorization list for SetCode transactions
-	Frames      []types.Frame         // EIP-8141 frame transaction frames
-	FrameSender types.Address         // EIP-8141 frame tx sender (from FrameTx.Sender)
-	TxType      uint8                 // transaction type (for fork-specific processing)
-	TxHash      types.Hash            // transaction hash for log attribution
+	From          types.Address
+	To            *types.Address // nil for contract creation
+	Nonce         uint64
+	Value         *big.Int
+	GasLimit      uint64
+	GasPrice      *big.Int
+	GasFeeCap     *big.Int
+	GasTipCap     *big.Int
+	Data          []byte
+	AccessList    types.AccessList
+	BlobHashes    []types.Hash
+	BlobGasFeeCap *big.Int
+	AuthList      []types.Authorization // EIP-7702 authorization list for SetCode transactions
+	Frames        []types.Frame         // EIP-8141 frame transaction frames
+	FrameSender   types.Address         // EIP-8141 frame tx sender (from FrameTx.Sender)
+	TxType        uint8                 // transaction type (for fork-specific processing)
+	TxHash        types.Hash            // transaction hash for log attribution
 	// Slasher is optional; when set it is called if a frame tx paymaster fails
 	// to cover gas (balance goes negative after deduction). See AA-1.3.
 	Slasher PaymasterSlasher
@@ -42,17 +43,18 @@ type Message struct {
 // For type-0x08 LocalTx, the gas limit is reduced by the BAL discount (BB-2.2).
 func TransactionToMessage(tx *types.Transaction) Message {
 	msg := Message{
-		Nonce:      tx.Nonce(),
-		GasLimit:   types.ApplyLocalTxDiscount(tx),
-		GasPrice:   tx.GasPrice(),
-		GasFeeCap:  tx.GasFeeCap(),
-		GasTipCap:  tx.GasTipCap(),
-		Data:       tx.Data(),
-		AccessList: tx.AccessList(),
-		BlobHashes: tx.BlobHashes(),
-		AuthList:   tx.AuthorizationList(),
-		TxType:     tx.Type(),
-		TxHash:     tx.Hash(),
+		Nonce:         tx.Nonce(),
+		GasLimit:      types.ApplyLocalTxDiscount(tx),
+		GasPrice:      tx.GasPrice(),
+		GasFeeCap:     tx.GasFeeCap(),
+		GasTipCap:     tx.GasTipCap(),
+		Data:          tx.Data(),
+		AccessList:    tx.AccessList(),
+		BlobHashes:    tx.BlobHashes(),
+		BlobGasFeeCap: tx.BlobGasFeeCap(),
+		AuthList:      tx.AuthorizationList(),
+		TxType:        tx.Type(),
+		TxHash:        tx.Hash(),
 	}
 	if sender := tx.Sender(); sender != nil {
 		msg.From = *sender

@@ -28,6 +28,9 @@ func checkPersistedChainConfig(db rawdb.Database, incoming *config.ChainConfig) 
 	if err := incoming.Validate(); err != nil {
 		return err
 	}
+	resolved := *incoming
+	resolved.BlobScheduleConfig = incoming.ResolvedBlobSchedule()
+	incoming = &resolved
 	stored, configErr := db.Get(persistedChainConfigKey)
 	if configErr != nil && !errors.Is(configErr, rawdb.ErrNotFound) {
 		return fmt.Errorf("read persisted chain config: %w", configErr)
@@ -80,6 +83,9 @@ func checkPersistedChainConfig(db rawdb.Database, incoming *config.ChainConfig) 
 	if err := previous.Validate(); err != nil {
 		return fmt.Errorf("invalid persisted chain config: %w", err)
 	}
+	if previous.BlobScheduleConfig == nil && number > 0 {
+		return errors.New("executed history has no resolved blobSchedule authority; use a separately initialized verified replay")
+	}
 	if previous.ChainID.Cmp(incoming.ChainID) != 0 {
 		return errors.New("incompatible persisted chain ID")
 	}
@@ -88,6 +94,9 @@ func checkPersistedChainConfig(db rawdb.Database, incoming *config.ChainConfig) 
 	}
 	if number == 0 {
 		return nil
+	}
+	if err := config.CheckBlobScheduleCompatible(&previous, incoming, header.Time); err != nil {
+		return err
 	}
 	// Fields outside the registered fork schedule cannot be changed after
 	// execution without an explicit migration rule. Never silently replay old
@@ -125,11 +134,14 @@ func nonScheduleConfigFields(cfg *config.ChainConfig) (map[string]json.RawMessag
 	for _, field := range scheduledConfigFields {
 		delete(fields, field)
 	}
+	delete(fields, "blobSchedule")
 	return fields, nil
 }
 
 func writePersistedChainConfig(db rawdb.Database, cfg *config.ChainConfig) error {
-	encoded, err := json.Marshal(cfg)
+	resolved := *cfg
+	resolved.BlobScheduleConfig = cfg.ResolvedBlobSchedule()
+	encoded, err := json.Marshal(&resolved)
 	if err != nil {
 		return err
 	}

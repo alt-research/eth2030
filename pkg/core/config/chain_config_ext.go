@@ -46,6 +46,9 @@ func (c *ChainConfig) Validate() error {
 	if c.ChainID == nil || c.ChainID.Sign() <= 0 {
 		return errors.New("invalid chain ID: must be positive")
 	}
+	if err := c.ValidateBlobSchedule(); err != nil {
+		return err
+	}
 
 	// Validate block-number fork ordering.
 	blockForks := []struct {

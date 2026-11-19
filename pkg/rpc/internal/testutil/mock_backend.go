@@ -201,6 +201,8 @@ func MinTestRawTxHex() (string, error) {
 	return fmt.Sprintf("0x%x", raw), nil
 }
 
+func (b *MockBackend) IsOsaka(uint64) bool { return false }
+
 // CreateAccessList lets API shape tests supply their configured simulated output.
 // Production discovery is covered through the real node adapter in eiptest.
 func (b *MockBackend) CreateAccessList(_ rpctypes.CallArgs, _ rpctypes.BlockNumber) (*rpcbackend.AccessListResult, error) {

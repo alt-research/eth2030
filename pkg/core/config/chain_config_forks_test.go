@@ -2,16 +2,74 @@ package config
 
 import (
 	"math/big"
+	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestRegisteredOptionalForksAffectCompatibility(t *testing.T) {
+	for _, field := range []string{"MuirGlacierBlock", "ArrowGlacierBlock", "GrayGlacierBlock", "OsakaTime", "BPO1Time", "BPO2Time", "IPlusTime"} {
+		t.Run(field, func(t *testing.T) {
+			local, remote := *TestConfig, *TestConfig
+			left := reflect.ValueOf(&local).Elem().FieldByName(field)
+			right := reflect.ValueOf(&remote).Elem().FieldByName(field)
+			left.Set(reflect.Zero(left.Type()))
+			if strings.HasSuffix(field, "Block") {
+				right.Set(reflect.ValueOf(big.NewInt(0)))
+			} else {
+				right.Set(reflect.ValueOf(newUint64(0)))
+			}
+			if len(ConfigDiff(&local, &remote)) != 1 || CheckConfigCompatible(&local, &remote, 1, 1) == nil || CheckConfigCompatible(&remote, &local, 1, 1) == nil {
+				t.Fatal("active optional fork is absent from symmetric compatibility")
+			}
+		})
+	}
+}
+
+func TestNextForkUsesActualActivationTimeAcrossBPOBranch(t *testing.T) {
+	cfg := *TestConfig
+	cfg.OsakaTime = newUint64(0)
+	cfg.AmsterdamTime = newUint64(100)
+	cfg.BPO1Time = newUint64(200)
+	cfg.BPO2Time = newUint64(300)
+	if next := cfg.NextForkAfter(big.NewInt(1), 1); next.Name != "Amsterdam" {
+		t.Fatalf("registry order displaced earlier activation: %v", next)
+	}
+	cfg.BPO1Time = newUint64(50)
+	if next := cfg.NextForkAfter(big.NewInt(1), 1); next.Name != "BPO1" {
+		t.Fatalf("BPO activation missing: %v", next)
+	}
+}
+
+func TestBPOForkScheduleExtendsPragueWithoutConstrainingAmsterdam(t *testing.T) {
+	for _, test := range []struct {
+		name                          string
+		prague, bpo1, bpo2, amsterdam *uint64
+		invalid                       bool
+	}{
+		{"before Prague", newUint64(10), newUint64(9), nil, nil, true},
+		{"missing Prague", nil, newUint64(10), nil, nil, true},
+		{"reversed BPO", newUint64(0), newUint64(20), newUint64(19), nil, true},
+		{"interleaved", newUint64(0), newUint64(50), newUint64(200), newUint64(100), false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := *TestConfig
+			cfg.PragueTime, cfg.BPO1Time, cfg.BPO2Time, cfg.AmsterdamTime = test.prague, test.bpo1, test.bpo2, test.amsterdam
+			cfg.OsakaTime = test.prague
+			if (cfg.Validate() != nil) != test.invalid {
+				t.Fatalf("wrong BPO schedule acceptance: %v", cfg.Validate())
+			}
+		})
+	}
+}
 
 func TestForkScheduleLength(t *testing.T) {
 	cfg := MainnetConfig
 	schedule := cfg.ForkSchedule()
 
-	// Mainnet should have 18 forks (Homestead through SSZBlocks).
-	if len(schedule) != 18 {
-		t.Fatalf("expected 18 forks in schedule, got %d", len(schedule))
+	// Mainnet should have 24 forks (Homestead through SSZBlocks).
+	if len(schedule) != 24 {
+		t.Fatalf("expected 24 forks in schedule, got %d", len(schedule))
 	}
 
 	// First fork should be Homestead.

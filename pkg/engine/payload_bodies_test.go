@@ -15,7 +15,7 @@ import (
 
 func makePayloadBodiesAPI(t *testing.T) (*EngineAPI, backendapi.Backend) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	backend := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	api := NewEngineAPI(backend)

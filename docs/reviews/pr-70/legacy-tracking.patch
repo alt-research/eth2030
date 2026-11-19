@@ -1,0 +1,26 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..19f82b0f 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,3 +1,9 @@
++## Modern receipt bloom restoration
++
++- [x] Reproduce nonzero-log consensus receipt roundtrip failure.
++- [x] Recompute omitted wire blooms from decoded logs, not from an empty receipt bloom.
++- [x] Verify codecs/consumers/build and prepare the scoped fix review.
++
+ # Lean4 Verification Check-list
+ 
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..c60d2e6c 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Modern receipt bloom restoration (2026-11-18)
++
++Branch `fix/eth-receipt-bloom` repairs a receipt-root interoperability defect: eth/69+ omits bloom on the wire, but the decoder OR-ed the newly constructed receipt's zero bloom instead of computing it from decoded logs. It now uses LogsBloom. A nonzero-log typed receipt roundtrip first failed on baseline and now preserves exact consensus bytes. p2p/ethproto, eth and eiptest suites plus full build passed. The fix is also required by the negotiated protocol and transfer-log feature reviews.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

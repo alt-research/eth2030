@@ -616,7 +616,7 @@ func TestGetPayloadV6_RejectsWrongFork(t *testing.T) {
 
 func TestPayloadBuilder_BlockValue(t *testing.T) {
 	// Test block value calculation with the real EngineBackend.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()
@@ -671,7 +671,7 @@ func TestPayloadBuilder_BlockValue(t *testing.T) {
 
 func TestPayloadBuilder_GetPayloadV6(t *testing.T) {
 	// Test GetPayloadV6ByID with the real EngineBackend (Amsterdam config).
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()
@@ -724,7 +724,7 @@ func TestPayloadBuilder_GetPayloadV6(t *testing.T) {
 // --- TestForkchoiceUpdatedV4 with real backend ---
 
 func TestForkchoiceUpdatedV4_RealBackend(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()

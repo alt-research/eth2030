@@ -37,7 +37,7 @@ func TestBogotaDeferredWireAcrossRestart(t *testing.T) {
 		t.Fatal(err)
 	}
 	var genesis map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
 	}
 	spec := genesis["config"].(map[string]any)

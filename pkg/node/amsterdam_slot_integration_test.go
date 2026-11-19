@@ -16,7 +16,7 @@ import (
 func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 	const token = "amsterdam-slot-integration"
 	var genesis map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
 	}
 	cfg := genesis["config"].(map[string]any)

@@ -25,7 +25,7 @@ import (
 // Even without user transactions, EIP-4788 (beacon root) and EIP-2935
 // (parent block hash) system contracts write to state and are tracked.
 func TestProcessWithBAL_EmptyBlock(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	proc := execution.NewStateProcessor(config.TestConfig)
 
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
@@ -43,18 +43,27 @@ func TestProcessWithBAL_EmptyBlock(t *testing.T) {
 	if result.BlockAccessList.Len() == 0 {
 		t.Error("expected system contract entries in BAL for empty block with Cancun/Prague active")
 	}
-	// Verify that all entries have AccessIndex 0 (pre-execution system contracts).
+	// Pre-execution calls use index 0; post-execution request queues use n+1.
+	seenQueues := make(map[types.Address]bool)
 	for _, entry := range result.BlockAccessList.Entries {
-		if entry.AccessIndex != 0 {
-			t.Errorf("system contract entry for %v has AccessIndex %d, want 0", entry.Address, entry.AccessIndex)
+		want := uint64(0)
+		if entry.Address == types.BuilderDepositRequestAddress || entry.Address == types.BuilderExitRequestAddress {
+			want = 1
+			seenQueues[entry.Address] = true
 		}
+		if entry.AccessIndex != want {
+			t.Errorf("system contract entry for %v has AccessIndex %d, want %d", entry.Address, entry.AccessIndex, want)
+		}
+	}
+	if len(seenQueues) != 2 {
+		t.Fatal("both mandatory post-execution queues must appear in the BAL")
 	}
 }
 
 // TestProcessWithBAL_WithTransactions verifies that transactions produce
 // BAL entries tracking balance and nonce changes.
 func TestProcessWithBAL_WithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -143,7 +152,7 @@ func TestProcessWithBAL_PreAmsterdam(t *testing.T) {
 
 // TestBALHash_Computed verifies the BAL hash computation is deterministic.
 func TestBALHash_Computed(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -194,7 +203,7 @@ func TestBALHash_Computed(t *testing.T) {
 // TestBlockBuilder_SetsBALHash verifies that the block builder sets the
 // BlockAccessListHash in the header when Amsterdam is active.
 func TestBlockBuilder_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -231,7 +240,7 @@ func TestBlockBuilder_SetsBALHash(t *testing.T) {
 // gets a BAL hash when Amsterdam is active. The hash may include system
 // contract entries (EIP-4788, EIP-2935) depending on fork activation.
 func TestBlockBuilder_EmptyBlock_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := newLegacyBuilder(config.TestConfig, statedb)
 
 	parent := &types.Header{
@@ -261,7 +270,7 @@ func TestBlockBuilder_EmptyBlock_SetsBALHash(t *testing.T) {
 
 // TestBlockBuilder_BuildBlock_SetsBALHash tests the new BuildBlock API sets BAL hash.
 func TestBlockBuilder_BuildBlock_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -400,7 +409,7 @@ func TestValidator_AcceptsCorrectBAL(t *testing.T) {
 // TestBlockchain_BALValidation_EndToEnd verifies the full pipeline:
 // build a block, insert it, and verify the BAL hash is validated.
 func TestBlockchain_BALValidation_EndToEnd(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -455,7 +464,7 @@ func TestBlockchain_BALValidation_EndToEnd(t *testing.T) {
 // TestBlockchain_RejectsWrongBALHash verifies that a block with the wrong
 // BAL hash is rejected during insertion.
 func TestBlockchain_RejectsWrongBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))

@@ -1,6 +1,7 @@
 package node
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"os"
@@ -14,6 +15,23 @@ import (
 	"github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/trie/bintrie"
 )
+
+// builderRequestGenesisJSON deploys the owned test contracts before root creation.
+func builderRequestGenesisJSON(chainID uint64) []byte {
+	var g map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(chainID), &g); err != nil {
+		panic(err)
+	}
+	alloc := g["alloc"].(map[string]any)
+	alloc[types.BuilderDepositRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderDepositRuntime())}
+	inhibitor := types.Hash{}
+	for i := range inhibitor {
+		inhibitor[i] = 255
+	}
+	alloc[types.BuilderExitRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderExitRuntime()), "storage": map[string]string{(types.Hash{}).Hex(): inhibitor.Hex()}}
+	data, _ := json.Marshal(g)
+	return data
+}
 
 // minimalGenesisJSON builds a small genesis.json payload for testing.
 func minimalGenesisJSON(chainID uint64) []byte {
@@ -434,7 +452,7 @@ func TestNodeWithGenesisFile(t *testing.T) {
 func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 	const genesisTime = uint64(100)
 	var input map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &input); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &input); err != nil {
 		t.Fatal(err)
 	}
 	input["timestamp"] = "0x64"

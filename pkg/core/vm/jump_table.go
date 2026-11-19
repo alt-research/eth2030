@@ -642,10 +642,14 @@ func NewPragueJumpTable() JumpTable {
 	return tbl
 }
 
-// NewAmsterdamJumpTable adds EIP-7843 to the Amsterdam execution rules.
+// NewAmsterdamJumpTable adds EIP-7843 and EIP-8024 to Amsterdam.
 func NewAmsterdamJumpTable() JumpTable {
 	tbl := NewPragueJumpTable()
 	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
+	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
+	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
+	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
+
 	return tbl
 }
 
@@ -693,10 +697,6 @@ func NewGlamsterdanJumpTable() JumpTable {
 	tbl[SELFDESTRUCT] = &operation{execute: opSelfdestruct, constantGas: GasSelfdestruct, dynamicGas: gasSelfdestructGlamst, minStack: 1, maxStack: 1024, halts: true, writes: true}
 
 	tbl[CLZ] = &operation{execute: opCLZ, constantGas: GasFastStep, minStack: 1, maxStack: 1024}
-
-	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
-	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
-	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 
 	tbl[APPROVE] = &operation{execute: opApprove, constantGas: GasLow, minStack: 3, maxStack: 1024, halts: true, memorySize: memoryApprove, dynamicGas: gasMemExpansion}
 	tbl[TXPARAMLOAD] = &operation{execute: opTxParamLoad, constantGas: GasBase, minStack: 2, maxStack: 1024}

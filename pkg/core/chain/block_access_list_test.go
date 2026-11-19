@@ -7,7 +7,6 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/crypto"
 )
 
@@ -17,7 +16,7 @@ func TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody(t *testing.T
 	cfg.AmsterdamTime, cfg.TerminalTotalDifficulty = &zero, new(big.Int)
 	db := rawdb.NewMemoryDB()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
-	bc, err := NewBlockchain(&cfg, genesis, state.NewMemoryStateDB(), db)
+	bc, err := NewBlockchain(&cfg, genesis, newBuilderRequestTestState(), db)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,5 +45,15 @@ func TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody(t *testing.T
 	}
 	if encoded, err := bc.BlockAccessList(child.Hash()); err != nil || encoded != nil || bc.GetBlock(child.Hash()) == nil {
 		t.Fatal("a pruned BAL must leave the execution body available")
+	}
+	if err := bc.StoreBlockAccessListRLP(child.Hash(), corrupt); err == nil {
+		t.Fatal("restored a tampered BAL")
+	}
+	if err := bc.StoreBlockAccessListRLP(child.Hash(), encoded); err != nil {
+		t.Fatal(err)
+	}
+	restored, err := bc.BlockAccessList(child.Hash())
+	if err != nil || crypto.Keccak256Hash(restored) != *child.Header().BlockAccessListHash {
+		t.Fatal("verified BAL restore failed")
 	}
 }

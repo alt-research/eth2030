@@ -167,34 +167,25 @@ func TestCLZ_NotInCancun(t *testing.T) {
 
 // TestDecodeSingle verifies the EIP-8024 single-byte decoder.
 func TestDecodeSingle(t *testing.T) {
-	// x=0 -> 17, x=1 -> 18, ..., x=90 -> 107
-	if got := decodeSingle(0); got != 17 {
-		t.Errorf("decodeSingle(0) = %d, want 17", got)
-	}
-	if got := decodeSingle(90); got != 107 {
-		t.Errorf("decodeSingle(90) = %d, want 107", got)
-	}
-	// x=128 -> 108, x=255 -> 235
-	if got := decodeSingle(128); got != 108 {
-		t.Errorf("decodeSingle(128) = %d, want 108", got)
-	}
-	if got := decodeSingle(255); got != 235 {
-		t.Errorf("decodeSingle(255) = %d, want 235", got)
+	for _, tc := range []struct {
+		x byte
+		n int
+	}{{0, 145}, {90, 235}, {128, 17}, {255, 144}} {
+		if got := decodeSingle(tc.x); got != tc.n {
+			t.Errorf("decodeSingle(%d)=%d want=%d", tc.x, got, tc.n)
+		}
 	}
 }
 
-// TestDecodePair verifies the EIP-8024 pair-byte decoder.
 func TestDecodePair(t *testing.T) {
-	// x=0: k=0, q=0, r=0, q >= r, return (0+1, 29-0) = (1, 29)
-	n, m := decodePair(0)
-	if n != 1 || m != 29 {
-		t.Errorf("decodePair(0) = (%d, %d), want (1, 29)", n, m)
-	}
-
-	// x=1: k=1, q=0, r=1, q < r, return (0+1, 1+1) = (1, 2)
-	n, m = decodePair(1)
-	if n != 1 || m != 2 {
-		t.Errorf("decodePair(1) = (%d, %d), want (1, 2)", n, m)
+	for _, tc := range []struct {
+		x    byte
+		n, m int
+	}{{0x9d, 2, 3}, {0x2f, 1, 19}, {0x50, 14, 16}, {0x51, 14, 15}, {0x8e, 1, 2}, {0, 9, 16}} {
+		n, m := decodePair(tc.x)
+		if n != tc.n || m != tc.m {
+			t.Errorf("decodePair(%x)=(%d,%d) want=(%d,%d)", tc.x, n, m, tc.n, tc.m)
+		}
 	}
 }
 
@@ -206,10 +197,10 @@ func TestDUPN(t *testing.T) {
 		stack.Push(big.NewInt(int64(i)))
 	}
 
-	// DUPN with immediate byte 0 -> decodeSingle(0) = 17
+	// DUPN with immediate byte 128 -> decodeSingle(128) = 17
 	// So it should duplicate item at depth 17 (1-indexed from top).
 	// Dup(17) reads data[len-17] = data[20-17] = data[3] = value 3.
-	code := []byte{byte(DUPN), 0x00, byte(STOP)}
+	code := []byte{byte(DUPN), 0x80, byte(STOP)}
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 
@@ -258,12 +249,12 @@ func TestDUPN_InvalidRange(t *testing.T) {
 // TestDUPN_StackUnderflow verifies DUPN fails if the stack is too shallow.
 func TestDUPN_StackUnderflow(t *testing.T) {
 	stack := NewStack()
-	// Only push 5 items. decodeSingle(0) = 17, requires 17 items.
+	// Only push 5 items. decodeSingle(128) = 17, requires 17 items.
 	for i := 0; i < 5; i++ {
 		stack.Push(big.NewInt(int64(i)))
 	}
 
-	code := []byte{byte(DUPN), 0x00, byte(STOP)}
+	code := []byte{byte(DUPN), 0x80, byte(STOP)}
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 
@@ -284,10 +275,10 @@ func TestSWAPN(t *testing.T) {
 		stack.Push(big.NewInt(int64(i)))
 	}
 
-	// SWAPN with immediate byte 0 -> decodeSingle(0) = 17
+	// SWAPN with immediate byte 128 -> decodeSingle(128) = 17
 	// Swaps top (19) with item at depth 17 from top.
 	// depth 17 from top = data[19-17] = data[2] = value 2
-	code := []byte{byte(SWAPN), 0x00, byte(STOP)}
+	code := []byte{byte(SWAPN), 0x80, byte(STOP)}
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 
@@ -343,11 +334,11 @@ func TestEXCHANGE(t *testing.T) {
 		stack.Push(big.NewInt(int64(i)))
 	}
 
-	// EXCHANGE with immediate byte 1: decodePair(1) -> (1, 2)
+	// EXCHANGE with immediate byte 0x8e: decodePair(0x8e) -> (1, 2)
 	// Swaps item at depth 1 with item at depth 2 from top.
 	// depth 1 from top = data[29-1] = data[28] = value 28
 	// depth 2 from top = data[29-2] = data[27] = value 27
-	code := []byte{byte(EXCHANGE), 0x01, byte(STOP)}
+	code := []byte{byte(EXCHANGE), 0x8e, byte(STOP)}
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 
@@ -373,14 +364,14 @@ func TestEXCHANGE(t *testing.T) {
 	}
 }
 
-// TestEXCHANGE_InvalidRange verifies EXCHANGE rejects bytes in the excluded range 80-127.
+// TestEXCHANGE_InvalidRange verifies EXCHANGE rejects bytes in the excluded range 82-127.
 func TestEXCHANGE_InvalidRange(t *testing.T) {
 	stack := NewStack()
 	for i := 0; i < 200; i++ {
 		stack.Push(big.NewInt(int64(i)))
 	}
 
-	code := []byte{byte(EXCHANGE), 80, byte(STOP)} // 80 is in excluded range
+	code := []byte{byte(EXCHANGE), 82, byte(STOP)} // 82 is in excluded range
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 
@@ -389,7 +380,7 @@ func TestEXCHANGE_InvalidRange(t *testing.T) {
 	var pc uint64
 	_, err := opExchange(&pc, evm, contract, NewMemory(), stack)
 	if err != ErrInvalidOpCode {
-		t.Errorf("EXCHANGE with byte 80 should fail with ErrInvalidOpCode, got %v", err)
+		t.Errorf("EXCHANGE with byte 82 should fail with ErrInvalidOpCode, got %v", err)
 	}
 }
 
@@ -399,8 +390,8 @@ func TestEXCHANGE_StackUnderflow(t *testing.T) {
 	stack.Push(big.NewInt(1))
 	stack.Push(big.NewInt(2))
 
-	// decodePair(1) = (1, 2), need max(1,2)+1 = 3 items, but we only have 2.
-	code := []byte{byte(EXCHANGE), 0x01, byte(STOP)}
+	// decodePair(0x8e) = (1, 2), need max(1,2)+1 = 3 items, but we only have 2.
+	code := []byte{byte(EXCHANGE), 0x8e, byte(STOP)}
 	contract := NewContract([20]byte{}, [20]byte{}, nil, 100000)
 	contract.Code = code
 

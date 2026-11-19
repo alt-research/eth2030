@@ -64,7 +64,7 @@ func TestBeaconBlockRootNotCalledPreCancun(t *testing.T) {
 }
 
 func TestBeaconBlockRootCalledPostCancun(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 
 	beaconRoot := types.HexToHash("0xdeadbeef00000000000000000000000000000000000000000000000000000000")
 

@@ -5,6 +5,7 @@ import (
 
 	blkpkg "github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
@@ -124,8 +125,11 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 }
 
 // MakeBlock builds a valid child block of parent with the given transactions.
-// It uses a fresh empty state. Suitable only for the first block after genesis.
+// It uses a fresh state with the Amsterdam request contracts predeployed.
+// Suitable only for the first block after an identically allocated genesis.
 // For chains of blocks use MakeBlockWithState with a shared state.
 func MakeBlock(parent *types.Block, txs []*types.Transaction) *types.Block {
-	return MakeBlockWithState(parent, txs, state.NewMemoryStateDB())
+	db := state.NewMemoryStateDB()
+	eips.ApplyBuilderRequestGenesis(db)
+	return MakeBlockWithState(parent, txs, db)
 }

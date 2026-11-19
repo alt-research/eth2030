@@ -358,10 +358,10 @@ func TestSelectPrecompilesGlamsterdan(t *testing.T) {
 }
 
 // TestGlamsterdanPrecompileCount verifies precompile map sizes.
-// EIP-7997 removes 0x12 (bls12MapFpToG1) from the Glamsterdan precompile set
-// because it becomes the deterministic CREATE2 factory system contract.
+// The legacy native BLS layout is preserved across repricing.
+// Canonical Ethereum maps are selected separately.
 func TestGlamsterdanPrecompileCount(t *testing.T) {
-	expected := len(PrecompiledContractsCancun) - 1
+	expected := len(PrecompiledContractsCancun)
 	if len(PrecompiledContractsGlamsterdan) != expected {
 		t.Errorf("precompile count: Cancun=%d Glamsterdan=%d, want Glamsterdan=%d",
 			len(PrecompiledContractsCancun), len(PrecompiledContractsGlamsterdan), expected)

@@ -269,8 +269,7 @@ func (m *PrecompileForkManager) registerDefaults() {
 	m.sets[ForkPrague] = newForkPrecompileSet(ForkPrague, pragueActivations)
 
 	// Glamsterdan set: same addresses but with repriced gas for ecAdd, blake2f,
-	// pointEval, and ecPairing. Also removes 0x12 (moved to system contract
-	// per EIP-7997).
+	// pointEval, and ecPairing. The standard BLS addresses are preserved.
 	glamActivations := []PrecompileActivation{
 		{addr(0x01), "ecRecover", ForkHomestead, &ecrecover{}},
 		{addr(0x02), "sha256", ForkHomestead, &sha256hash{}},
@@ -283,7 +282,7 @@ func (m *PrecompileForkManager) registerDefaults() {
 		{addr(0x09), "blake2f", ForkGlamsterdan, &blake2FGlamsterdan{}},
 		{addr(0x0a), "pointEval", ForkGlamsterdan, &kzgPointEvaluationGlamsterdan{}},
 
-		// 0x12 removed: EIP-7997 deterministic CREATE2 factory (system contract).
+		// 0x12 is outside the canonical BLS precompile range.
 
 		{addr2(0x01, 0x00), "p256Verify", ForkCancun, &p256Verify{}},
 	}

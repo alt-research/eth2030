@@ -265,13 +265,15 @@ type RPCLog struct {
 
 // CallArgs represents the arguments for eth_call and eth_estimateGas.
 type CallArgs struct {
-	From     *string `json:"from"`
-	To       *string `json:"to"`
-	Gas      *string `json:"gas"`
-	GasPrice *string `json:"gasPrice"`
-	Value    *string `json:"value"`
-	Data     *string `json:"data"`
-	Input    *string `json:"input"`
+	AccessList []RPCAccessTuple `json:"accessList,omitempty"`
+	Nonce      *string          `json:"nonce,omitempty"`
+	From       *string          `json:"from"`
+	To         *string          `json:"to"`
+	Gas        *string          `json:"gas"`
+	GasPrice   *string          `json:"gasPrice"`
+	Value      *string          `json:"value"`
+	Data       *string          `json:"data"`
+	Input      *string          `json:"input"`
 }
 
 // GetData returns the call input data, preferring "input" over "data".

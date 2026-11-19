@@ -38,6 +38,7 @@ func wireEIP7975Request(t *testing.T, handler *eth.Handler, hashes []types.Hash,
 	defer end2.Close()
 
 	ep := eth.NewEthPeer(p2p.NewPeer("eip7975-peer", "127.0.0.1:30303", nil), end1)
+	ep.Peer().SetVersion(eth.ETH70)
 	req, err := p2p.EncodeMessage(p2p.GetReceiptsMsg, &p2p.GetReceiptsPacketV70{
 		RequestID:              7,
 		FirstBlockReceiptIndex: firstIndex,

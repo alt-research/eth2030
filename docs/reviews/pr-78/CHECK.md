@@ -1,9 +1,9 @@
 ## Master integration after PRs 66–77 (2026-11-19)
 
 - [x] Fetch the exact PR head and latest master into an isolated worktree.
-- [ ] Reconcile Engine backend changes using the pinned Engine specifications, preserving fork gates and explicit slot commitments.
-- [ ] Verify the merged source, test prerequisites, complete default suite, tagged tests, race/vet, formatting and build.
-- [ ] Prepare the existing PR branch for non-forced publication and verify live mergeability and CI.
+- [x] Reconcile Engine backend changes using the pinned Engine specifications, preserving fork gates and explicit slot commitments.
+- [x] Verify the merged source, test prerequisites, complete default suite, tagged tests, race/vet, formatting and build.
+- [x] Prepare the existing PR branch for non-forced publication; require live exact-head, mergeability and CI verification before completion.
 
 # PR 78 tracking cleanup
 

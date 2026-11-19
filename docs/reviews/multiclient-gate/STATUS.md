@@ -1,0 +1,5 @@
+# Independent full-process campaign in progress
+
+The composed native source is 7e2c66e17611765fe2c75dd2a06783e945bddce0; the independent Geth binary is unchanged v1.17.10. The built mainnet Lighthouse runtime reports 0262e8f. The independent Lodestar image digest d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad reports v1.51.0/77088eb. Buildoor and the actual compatible tuple are still being pinned and qualified. No process campaign has passed yet.
+
+The original refs/ethereum-package checkout is read-only and contains unrelated untracked genesis data. The campaign archives only its tracked c4a8e15d40f0965f3728f776d72f1954440ad96b tree into an owned qualification directory. Independent Geth uses a narrow launcher wrapper that translates the package's override.genesis argument into its standard init command; its execution implementation is unchanged. The planned three pairs combine independent Geth/Lighthouse, native ETH2030/Lodestar and native ETH2030/Lighthouse, plus an external buildoor, with an explicit common network ID and mainnet preset.

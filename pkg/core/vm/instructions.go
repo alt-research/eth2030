@@ -1265,11 +1265,7 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 		balance := evm.StateDB.GetBalance(contract.Address)
 		if balance.Sign() > 0 {
 			// EIP-7708: only a transfer to a different beneficiary is logged.
-			if evm.forkRules.IsEIP7708 {
-				if beneficiary != contract.Address {
-					EmitTransferLog(evm.StateDB, contract.Address, beneficiary, balance)
-				}
-			}
+			evm.recordETHTransfer(contract.Address, beneficiary, balance)
 			// EIP-7928: capture pre-transfer balances for BAL tracking.
 			var preSelfBal, preBenBal *big.Int
 			if evm.balTracker != nil {

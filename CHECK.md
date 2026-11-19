@@ -3,11 +3,13 @@
 ## Stateful eth_simulateV1 implementation (2026-11-19)
 
 - [x] Read complete selected execution-apis 68d76a5b simulator schema/notes and unmodified Geth v1.17.10 simulator/provider behavior.
-- [ ] Add actual HTTP failures for sequential calls/blocks, validation policy, limits and complete commitments.
-- [ ] Implement isolated sequential state, system/withdrawal/request/BAL consumers, correct fee/fork context and both gas dimensions.
-- [ ] Preserve strict nonce/fee validation and contract senders; implement overrides and exact error boundaries.
-- [ ] Qualify complete returned block/receipt/log/hash fields independently, pre-fork synthetic versus native transfer logs and recovery/non-mutation.
-- [ ] Pass affected/full/tagged/race/vet/build and sensitive compiling mutations; publish a separate major feature PR.
+- [x] Reproduce missing stateful simulation through actual HTTP and preserve the red result.
+- [x] Implement isolated sequential state, system/withdrawal/request/BAL consumers, correct fee/fork context and both gas dimensions.
+- [x] Preserve strict nonce/fee validation and contract senders; implement overrides and exact error boundaries.
+- [x] Match complete roots/header/RLP size against unmodified SDK for new-slot and floor/refund/override cases; qualify virtual/native logs, branch ancestry, rollback and non-mutation.
+- [x] Detect fifteen compiling mutations, including branch ancestry, uint256 override arithmetic and VM cancellation.
+- [x] Pass final full 212/tagged 27/affected race 48/vet/build after restoring all fifteen mutations.
+- [ ] Archive exact results and publish the separate feature review.
 
 ## Method-specific gas simulation and tracing (2026-11-19)
 

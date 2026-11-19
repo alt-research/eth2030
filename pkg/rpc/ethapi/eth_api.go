@@ -66,6 +66,8 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 		return api.getTransactionByHash(req)
 	case "eth_getTransactionReceipt":
 		return api.getTransactionReceipt(req)
+	case "eth_simulateV1":
+		return api.simulateV1(req)
 	case "eth_call":
 		return api.ethCall(req)
 	case "eth_estimateGas":

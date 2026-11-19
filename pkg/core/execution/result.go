@@ -4,6 +4,8 @@ import "github.com/eth2030/eth2030/core/types"
 
 // ExecutionResult holds the outcome of a transaction execution.
 type ExecutionResult struct {
+	MaxUsedGas      uint64 // Consumption before refund, including the calldata floor
+	GasRefund       uint64 // Actual refund before applying the calldata floor
 	UsedGas         uint64
 	StateGasUsed    uint64 // EIP-8037 net durable state gas
 	BlockGasUsed    uint64 // EIP-7778: pre-refund gas used for block accounting

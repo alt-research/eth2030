@@ -74,9 +74,7 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 			evm.balTracker.RecordBalanceChange(caller, oldCaller, evm.StateDB.GetBalance(caller))
 			evm.balTracker.RecordBalanceChange(address, oldTarget, evm.StateDB.GetBalance(address))
 		}
-		if evm.forkRules.IsEIP7708 && caller != address {
-			EmitTransferLog(evm.StateDB, caller, address, value)
-		}
+		evm.recordETHTransfer(caller, address, value)
 	}
 	frame.Code = code
 	evm.depth++

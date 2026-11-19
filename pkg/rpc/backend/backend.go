@@ -103,3 +103,8 @@ type CallBackend interface {
 type BlockTraceBackend interface {
 	TraceBlock(hash types.Hash) ([]*vm.StructLogTracer, error)
 }
+
+// SimulateBackend executes isolated, sequential blocks using actual state.
+type SimulateBackend interface {
+	Simulate(options rpctypes.SimulateOptions, base *types.Header) ([]rpctypes.SimulateBlockResult, error)
+}

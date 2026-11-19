@@ -644,6 +644,7 @@ func TestHandler_GetReceiptsV70(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH70)
 	ep := NewEthPeer(peer, end1)
 
 	// Page from receipt index 1 of the first block.
@@ -698,6 +699,7 @@ func TestHandler_GetReceiptsV70_NoProvider(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH70)
 	ep := NewEthPeer(peer, end1)
 
 	reqPkt := &p2p.GetReceiptsPacketV70{RequestID: 200, Hashes: []types.Hash{types.BytesToHash([]byte{0xab})}}
@@ -820,6 +822,7 @@ func TestHandler_GetBlockAccessLists(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH71)
 	ep := NewEthPeer(peer, end1)
 
 	reqPkt := &p2p.GetBlockAccessListsPacket{
@@ -875,6 +878,7 @@ func TestHandler_GetBlockAccessLists_NoProvider(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH71)
 	ep := NewEthPeer(peer, end1)
 
 	reqPkt := &p2p.GetBlockAccessListsPacket{
@@ -946,6 +950,7 @@ func TestEthPeer_RequestReceiptsV70(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH70)
 	ep := NewEthPeer(peer, end1)
 
 	hashes := []types.Hash{
@@ -988,6 +993,7 @@ func TestEthPeer_RequestBlockAccessLists(t *testing.T) {
 	defer end2.Close()
 
 	peer := p2p.NewPeer("test-peer", "127.0.0.1:30303", nil)
+	peer.SetVersion(ETH71)
 	ep := NewEthPeer(peer, end1)
 
 	hashes := []types.Hash{

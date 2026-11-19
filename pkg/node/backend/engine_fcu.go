@@ -82,6 +82,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 	b.safeHash = fcState.SafeBlockHash
 	b.finalizedHash = fcState.FinalizedBlockHash
 	b.fcMu.Unlock()
+	if ranges, ok := b.node.EthHandler().(interface{ NotifyBlockRange() }); ok {
+		ranges.NotifyBlockRange()
+	}
 	b.node.TxPool().SetForkRules(bc.Config(), bc.CurrentBlock().Time())
 	b.node.TxPool().Reset(bc.State(), headBlock.Header())
 	b.node.TxPool().RecordBlock(headBlock.Header(), headBlock.Transactions())

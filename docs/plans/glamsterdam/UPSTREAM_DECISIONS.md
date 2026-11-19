@@ -8,13 +8,13 @@ An engineering owner may close a decision entry only with an explicit adopted re
 
 ### U-01 — execution/state gas refill and compatibility model
 
-Status: unresolved at the snapshot. Owner role: EL + Validation. Affects GL-020–025, GL-030/032–034, GL-045, GL-060/061 and final G2/G6.
+Status: development model selected by the user on 2026-11-19; final release review remains open. Owner role: EL + Validation. Affects GL-020–025, GL-030/032–034, GL-045, GL-060/061 and final G2/G6.
 
-The merged EIP text and its current LIFO model are the versioned baseline. Open [EIPs #12581](https://github.com/ethereum/EIPs/pull/12581) proposes reservoir-only refill and a legacy execution-gas share. An [additional author comment](https://github.com/ethereum/EIPs/pull/12581#issuecomment-6412891161) proposes delayed settlement credits and explicitly says it was not pushed. These are three distinct artifacts; do not implement a mixture.
+The merged EIP text and its current LIFO model are the versioned baseline. The user explicitly directed implementation of the currently merged LIFO text first, while retaining final model review. The implementation target is EIPs `3db38a3725105cb67b8804ac3e147967113bc3ca`; this authorizes development and does not resolve future protocol adoption. Open [EIPs #12581](https://github.com/ethereum/EIPs/pull/12581) proposes reservoir-only refill and a legacy execution-gas share. An [additional author comment](https://github.com/ethereum/EIPs/pull/12581#issuecomment-6412891161) proposes delayed settlement credits and explicitly says it was not pushed. These are three distinct artifacts; do not implement a mixture.
 
 Close when the chosen protocol model is explicitly recorded from authoritative upstream decisions/specifications, and its compatible executable-spec/native vectors are pinned. Record initialization, charge order, success/revert/halt, pre-execution failure, refunds, floor and block-fee equations. Review the [eight application invariants](https://github.com/ethereum/glamsterdam-gas-invariants), including fixed gas budgets and off-chain behavior. ACDT November 16 did not decide the path forward; ACDE November 19 was a future discussion at the snapshot.
 
-Work available now: canonical header/slot repairs, test corpus construction, independent current-text measurements, settlement invariants and compatibility inventory. Release acceptance remains pending until a coherent target is selected and qualified.
+Work available now: canonical header/slot repairs, test corpus construction, independent current-text measurements, settlement invariants and compatibility inventory. The coherent LIFO development target is now selected. Final release acceptance still requires compatible fixtures, application invariants and the final model review.
 
 ### U-02 — optional per-call state-gas allowance
 

@@ -60,5 +60,15 @@
     "canonical system runtimes and exact client artifacts",
     "upstream choice resolution and application compatibility clearance",
     "qualified fork schedule and recovery/performance budgets"
-  ]
+  ],
+  "gas_development_decision": {
+    "date": "2026-11-19",
+    "source": "explicit user instruction",
+    "model": "current merged LIFO",
+    "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+    "instruction": "Implement the currently merged LIFO model first; retain final design review.",
+    "unmerged_12581_adopted": false,
+    "unmerged_12582_adopted": false,
+    "final_release_review": "open"
+  }
 }

@@ -30,6 +30,7 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | [PR #81](https://github.com/alt-research/eth2030/pull/81) — snap/2 | Authenticated BAL catch-up, moving/rollback pivots, missing-orphan restart and actual encrypted Node/SDK consumers | Submitted; full independent-client/resource gates remain open |
 | [PR #82](https://github.com/alt-research/eth2030/pull/82) — eth/72 | Actual sparse provider/sampler/custody relay, reconstruction, Engine APIs and encrypted Node recovery | Submitted; full independent-client/CL/resource gates remain open |
 | [PR #84](https://github.com/alt-research/eth2030/pull/84) — system transitions | Canonical EIP-2935/4788 actual-code callbacks, explicit pre-root genesis assets, independent roots and native Node recovery | Submitted; qualified with reviews 65–82; Gas draft/live full-client gates separate |
+| [PR #85](https://github.com/alt-research/eth2030/pull/85) — RPC methods and opcode replay | Actual call/estimate/access-list with current gas, full arguments/overrides, canonical historical/system/block replay | Submitted; full/tagged/48-package race/vet/build and eleven mutations pass; simulator/nested trace work separate |
 | CL lifecycle | Actual CL/builder and recovery acceptance | Pending |
 
 Each major change receives its own branch and PR; no unrelated changes are staged. Final task completion requires the acceptance evidence in DEVELOPMENT_PLAN.md. A submitted PR is not a merged or release-qualified feature.
@@ -175,3 +176,9 @@ Composition `2f253d33` passes all 212 Go packages, 27 tagged Core/EIP packages, 
 Draft PR 83 now has a clean `2cde17ad` checkpoint: 42/42 signed Amsterdam scenarios match independent unmodified SDK with explicit state-byte price. Ten authority controls, observable LIFO refill, actual system margins and two signed HTTP/Engine blocks qualify nonce/code rollback, capacity, receipts, blockValue, sender/miner settlement and next base fee. Full 212 Go packages, 27 tagged Core/EIP, broad affected race, final 33 affected race, vet/build and ten compiling detected mutations pass. [Evidence](../../verification/glamsterdam-state-gas-20261119.md). The initial escaped rollback mutation is preserved alongside the stronger late-OOG fixture.
 
 Separate branch `feat/glamsterdam-rpc-gas` repairs reproduced live HTTP call/estimate/creation/trace consumers and canonical prefix replay. It has not yet completed composed qualification or received its own PR. The Gas draft remains outside the stable reviews 65–82/84 integration, and full program/release gates remain open.
+
+## RPC method review and continued simulation work
+
+[PR 85](https://github.com/alt-research/eth2030/pull/85) qualifies real HTTP current-gas calls, estimates, access discovery, signed authorizations, creation, complete overrides and canonical transaction/block opcode traces. Historical fork/system/prefix consumers and eleven compiling guard mutations pass. Full 212 packages, 27 tagged Core/EIP, 48 affected race and the additional five-package access follow-up pass, with vet/build. [Evidence](../../verification/glamsterdam-rpc-gas-20261119.md). Stable integration still excludes Gas/RPC until the remaining scoped composition is qualified.
+
+The user explicitly selected the currently merged LIFO model first, with final design review retained. Stateful simulation is being implemented in separate branch `feat/glamsterdam-simulate-v1`. Nested dimensional tracing, complete CL lifecycle, independent fixtures/processes and resource/release gates remain open.

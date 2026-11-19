@@ -1,3 +1,7 @@
+## Explicit LIFO development decision (2026-11-19)
+
+The user selected implementation of the currently merged LIFO model first, retaining final design review. EIPs `3db38a3` is the development target; unmerged alternatives 12581/12582 are excluded. This decision advances implementation authority without declaring final protocol or release acceptance. PR 85 separately qualifies method-specific RPC and opcode replay; simulator, nested dimensional tracing and remaining CL/full-client/resource work continue.
+
 ## Qualified gas development checkpoint (2026-11-19)
 
 Draft PR 83 at tested source `2cde17ad` passes all 212 Go packages, 27 tagged Core/EIP, broad affected race, final 33 affected race, vet/build and ten compiling mutations. All 42 clean signed Amsterdam cases match independent SDK; actual HTTP/system/capacity/fees/restart consumers pass. RPC consumers are being repaired in their own branch, with simulation/application/full-client/resource/final release gates still open. Stable integration remains reviews 65–82/84.

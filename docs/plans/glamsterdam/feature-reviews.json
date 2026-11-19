@@ -252,6 +252,32 @@
       "tested_source_commit": "3355156e45b16f11eef2acea20931fd77ab70ab9",
       "source_in_tested_integration": true,
       "release_qualified": false
+    },
+    {
+      "pr": 85,
+      "url": "https://github.com/alt-research/eth2030/pull/85",
+      "branch": "feat/glamsterdam-rpc-gas",
+      "commit": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "remote_head": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "tested_source_commit": "2893324130e142a9fd800648c8557de9757bb16c",
+      "scope": "Method-specific call/estimate/access-list, complete inputs/overrides, canonical transaction/block opcode replay",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "access_followup_race_packages": 5,
+        "mutations_detected": 11,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "eth_simulateV1",
+        "nested callTracer and dimensional trace fields",
+        "independent full-client/API fixtures",
+        "resource and release qualification"
+      ]
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",

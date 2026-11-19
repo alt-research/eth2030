@@ -1,3 +1,9 @@
+## Explicit LIFO development selection (2026-11-19)
+
+- [x] Record the user's implementation decision and exact merged source.
+- [x] Keep unmerged alternatives excluded and final design review open.
+- [x] Continue remaining consumer/CL/validation work under this selected baseline.
+
 ## Qualified gas development tracking (2026-11-19)
 
 - [x] Archive the clean 42-case checkpoint, actual HTTP/system/accounting consumers and detected mutations.

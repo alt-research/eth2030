@@ -137,3 +137,21 @@ func TestNativeAmsterdamAuthorizationObligations(t *testing.T) {
 		})
 	}
 }
+
+// Historical signed controls must remain correct independently of the new fork.
+func TestNativeOsakaAuthorizationTransitionsMatchReference(t *testing.T) {
+	for _, sc := range scenarios() {
+		if sc.AuthorizationCase == "" {
+			continue
+		}
+		t.Run(sc.Name, func(t *testing.T) {
+			result, err := runScenario(sc, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(result.Differences) != 0 {
+				t.Fatalf("historical authorization differs: %v native=%+v reference=%+v", result.Differences, result.Native, result.Reference)
+			}
+		})
+	}
+}

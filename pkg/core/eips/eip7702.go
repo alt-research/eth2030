@@ -3,6 +3,7 @@ package eips
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/state"
@@ -19,6 +20,7 @@ const (
 var (
 	ErrAuthChainID    = errors.New("authorization chain ID mismatch")
 	ErrAuthNonce      = errors.New("authorization nonce mismatch")
+	ErrAuthCode       = errors.New("authorization authority has non-delegation code")
 	ErrAuthSignature  = errors.New("authorization signature recovery failed")
 	ErrAuthInvalidSig = errors.New("authorization signature values invalid")
 )
@@ -49,7 +51,12 @@ func processOneAuthorization(statedb state.StateDB, auth *types.Authorization, c
 		}
 	}
 
-	// 2. Recover the signer address from the authorization signature.
+	// Reject the reserved nonce before recovery or warming (EIP-7702 step 2).
+	if auth.Nonce == math.MaxUint64 {
+		return ErrAuthNonce
+	}
+
+	// 3. Recover the signer address from the authorization signature.
 	signerAddr, err := RecoverAuthority(auth)
 	if err != nil {
 		if errors.Is(err, ErrAuthInvalidSig) {
@@ -58,7 +65,17 @@ func processOneAuthorization(statedb state.StateDB, auth *types.Authorization, c
 		return fmt.Errorf("%w: %v", ErrAuthSignature, err)
 	}
 
-	// 3. Verify the nonce matches the signer's current nonce.
+	// Recovery establishes the authority access even if code/nonce checks skip
+	// this tuple. A later transaction-frame revert must not undo this warming.
+	statedb.AddAddressToAccessList(signerAddr)
+	code := statedb.GetCode(signerAddr)
+	if len(code) != 0 {
+		if _, delegated := types.ParseDelegation(code); !delegated {
+			return ErrAuthCode
+		}
+	}
+
+	// 6. Verify the nonce matches the signer's current nonce.
 	currentNonce := statedb.GetNonce(signerAddr)
 	if auth.Nonce != currentNonce {
 		return ErrAuthNonce
@@ -75,11 +92,14 @@ func processOneAuthorization(statedb state.StateDB, auth *types.Authorization, c
 		statedb.AddRefund(types.PerEmptyAccountCost - types.PerAuthBaseCost)
 	}
 
-	// 5. Set the signer's code to the delegation designator: 0xef0100 || address.
-	delegationCode := types.AddressToDelegation(auth.Address)
+	// 8. Set the signer's code to the delegation designator: 0xef0100 || address.
+	var delegationCode []byte
+	if auth.Address != (types.Address{}) {
+		delegationCode = types.AddressToDelegation(auth.Address)
+	}
 	statedb.SetCode(signerAddr, delegationCode)
 
-	// 6. Increment the signer's nonce.
+	// 9. Increment the signer's nonce.
 	statedb.SetNonce(signerAddr, currentNonce+1)
 
 	return nil

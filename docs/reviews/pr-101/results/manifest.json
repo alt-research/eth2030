@@ -1,0 +1,71 @@
+{
+  "qualification_source": "1bba8a12d5e3a9f05a62638a636decc144f53d0e",
+  "active_node_sources": {
+    "native": "1bba8a12d5e3a9f05a62638a636decc144f53d0e",
+    "lighthouse_node": "66661993f219136627e4d68ab4d9e8cd65870b8d",
+    "lighthouse_authorized_integration": "c76da1e11",
+    "lodestar": "cf705b46b08ba8172d2e32225964ecb9bb1d2b95",
+    "geth": "v1.17.10 unchanged binary"
+  },
+  "authority": {
+    "consensus_specs": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "EIPs": "3db38a3725105cb67b8804ac3e147967113bc3ca"
+  },
+  "compressed_public_inputs": [
+    {
+      "file": "attempt4-live-fifth.jsonl.gz",
+      "uncompressed_file": "attempt4-live-fifth.jsonl",
+      "uncompressed_bytes": 3259251,
+      "sha256": "8cb022b891730ef2c8e59be1c33a52bd45a2449342ea09e9fc3141e8775c148f",
+      "compressed_bytes": 187976
+    },
+    {
+      "file": "attempt4-actual-blob-cl-consumers.json.gz",
+      "uncompressed_file": "attempt4-actual-blob-cl-consumers.json",
+      "uncompressed_bytes": 1770739,
+      "sha256": "c30fd44dc8a7aee4e8f97700da4a83c58f368302284e50113ac76d3d8f08ebe8",
+      "compressed_bytes": 493503
+    },
+    {
+      "file": "attempt4-reference-light-client-advertised-baseline.jsonl.gz",
+      "uncompressed_file": "attempt4-reference-light-client-advertised-baseline.jsonl",
+      "uncompressed_bytes": 1908967,
+      "sha256": "229cbe83acf433d839481eddd67904768e096b93680434af89fae1f62a45a1c6",
+      "compressed_bytes": 522242
+    },
+    {
+      "file": "attempt4-reference-light-client-proof-recovery-verified.jsonl.gz",
+      "uncompressed_file": "attempt4-reference-light-client-proof-recovery-verified.jsonl",
+      "uncompressed_bytes": 2087967,
+      "sha256": "e201bbe6a915b8a9bd6b7f4c617da4b7edd2bd98a31d325176aba6c660d46879",
+      "compressed_bytes": 554003
+    },
+    {
+      "file": "attempt4-genesis-beacon.ssz.gz",
+      "uncompressed_file": "attempt4-genesis-beacon.ssz",
+      "uncompressed_bytes": 2791185,
+      "sha256": "42a97921b0e883fd545eb5e84c5c4ae0f7af7c3198fb010e0cf06b623b250492",
+      "compressed_bytes": 49459
+    },
+    {
+      "file": "original-checkpoint-peer-bootstrap.json.gz",
+      "uncompressed_file": "original-checkpoint-peer-bootstrap.json",
+      "uncompressed_bytes": 58810,
+      "sha256": "69c099a7da8d038915dcf3c5ab42929d5939674fbde5f01782a504b73ed8a738",
+      "compressed_bytes": 30817
+    }
+  ],
+  "scope_limit": "Complete app and single-blob consumers and original checkpoint recovery; remaining peer faults, settlement ledger, storage and operating gates stay open. No runtime secrets, node keys, private databases or authentication headers are included.",
+  "native_binary_sha256": "2d8e07e5c04779356c2a8b5e3d1c1fbf248c15ccc57f7ca7c71312c25c068ef9",
+  "native_image": {
+    "tag": "eth2030-native:wire-qualification-1bba8a12",
+    "id": "sha256:b63144bf1d5a19518ba95e9abad77e16883d7e187187c4d5a306107d7b223cce",
+    "version_checked": true
+  },
+  "public_tool_reproduction": {
+    "artifact_directory": "reproduced-public-consumers-20261120",
+    "gzip_and_uncompressed_sha256_verified": true,
+    "actual_blob_consumer_passed": true,
+    "progressive_state_consumer_passed": true
+  }
+}

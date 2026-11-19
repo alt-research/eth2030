@@ -1,0 +1,430 @@
+{
+  "spec_revision": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "reference_source_unmodified": true,
+  "passed": true,
+  "bls_active": true,
+  "scope": "Actual mainnet-preset Gloas REST consumer, trusted common epoch-three checkpoint, actual fork/domain/time inputs, original finalized-ancestor backfill and cryptographic rejection controls.",
+  "input_mode": "Exact original authenticated capture replay; only upgraded node identity/genesis/fork context and required original bootstrap are fetched live.",
+  "upgraded_node_version": {
+    "data": {
+      "version": "Lighthouse/v8.4.0-rc.0-6666199/x86_64-linux"
+    }
+  },
+  "live_fork_genesis_context_matches_capture": true,
+  "applied_network_fork_time_inputs": {
+    "GENESIS_FORK_VERSION": "0x10000038",
+    "SLOT_DURATION_MS": "3000",
+    "ALTAIR_FORK_VERSION": "0x20000038",
+    "ALTAIR_FORK_EPOCH": "0",
+    "BELLATRIX_FORK_VERSION": "0x30000038",
+    "BELLATRIX_FORK_EPOCH": "0",
+    "CAPELLA_FORK_VERSION": "0x40000038",
+    "CAPELLA_FORK_EPOCH": "0",
+    "DENEB_FORK_VERSION": "0x50000038",
+    "DENEB_FORK_EPOCH": "0",
+    "ELECTRA_FORK_VERSION": "0x60000038",
+    "ELECTRA_FORK_EPOCH": "0",
+    "FULU_FORK_VERSION": "0x70000038",
+    "FULU_FORK_EPOCH": "0",
+    "GLOAS_FORK_VERSION": "0x80000038",
+    "GLOAS_FORK_EPOCH": "2"
+  },
+  "genesis": {
+    "genesis_time": "1795103315",
+    "genesis_validators_root": "0x0888cde6ee0c51578046793b377d6f6474908f7812b8db4d87a736d73e539d2c",
+    "genesis_fork_version": "0x10000038"
+  },
+  "trusted_bootstrap": {
+    "root": "0x45499f221a955bd11e78aff4bea50928c75e08182e1db28aa453f6c06be950d7",
+    "slot": 96
+  },
+  "advertised_full_update": {
+    "version": "fulu",
+    "attested_slot": "1",
+    "official_gloas_upgrade_used": true,
+    "next_committee_known": true
+  },
+  "observations": [
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3351",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3353",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3353",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3354",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3354",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3354",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3355",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3355",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3355",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3356",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3357",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3357",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3357",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3358",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3359",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3359",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3360",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3360",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3360",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3361",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3361",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3362",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3363",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3365",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3365",
+      "participation": 176
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3366",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3367",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3370",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3372",
+      "participation": 336
+    },
+    {
+      "version": "gloas",
+      "attested_slot": "3374",
+      "participation": 512
+    }
+  ],
+  "reference_progress": {
+    "finalized_slot": 3264,
+    "finalized_root": "0x24c03af44b9f89a08fe47b47d5f9f49ab50f9284c7985a0814b1169d26b1dea0",
+    "optimistic_slot": 3374,
+    "next_committee_known": true,
+    "signature_slot": 3376
+  },
+  "cryptographic_rejection_controls": [
+    "bootstrap_state_proof",
+    "bootstrap_execution_proof",
+    "advertised_next_committee_proof",
+    "finality_proof",
+    "aggregate_signature",
+    "genesis_domain"
+  ],
+  "original_finalized_ancestor": {
+    "slot": 1215,
+    "root": "0xe4638e451320db9fa8e6528c415551cb329e2e80c9b8d5f162faaf75f0032fd3",
+    "independently_verified_header_links": 1639
+  },
+  "required_original_bootstrap_accepted": true
+}

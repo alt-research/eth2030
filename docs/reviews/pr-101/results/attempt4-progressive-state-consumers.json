@@ -1,0 +1,36 @@
+{
+  "selected_beacon_header": {
+    "root": "0x5c78498b751b481d35d551f62563d2b227f5ac0cbf0ed86ef08df7aedb3afaeb",
+    "canonical": true,
+    "header": {
+      "message": {
+        "slot": "4764",
+        "proposer_index": "47",
+        "parent_root": "0xf4a9c2e4a15085208d91e8e377df01957dabfd45305b733242974f7672341dfe",
+        "state_root": "0x9c8d61554928bec39ce478e42c450745e0f6a17540d412fb63615b84769c3dda",
+        "body_root": "0xc7525815608729c587dd76229e28d4b0f8a705001463a6a79e36b5ee76050e07"
+      },
+      "signature": "0xb905d7b5aa9bf15e14287636a43ce7e1d7533da41566aad7ea9ac6fb95201594d5a4ebd229cf46c0aeb826b36f0bba6515422c5f5668aab9bc3f3069e76b10e4e7d369c47593158ead5d26d5cf0feda0d5f14d2870ebe0cc153cc0560bd07e5d"
+    }
+  },
+  "nodes": {
+    "87799773fc57": {
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "length": 3232746,
+      "ssz_file": "attempt4-progressive-state-87799773fc57.ssz"
+    },
+    "d01ee49c0c9e": {
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "length": 3232746,
+      "ssz_file": "attempt4-progressive-state-d01ee49c0c9e.ssz"
+    },
+    "a6e54fb93e7c": {
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "length": 3232746,
+      "ssz_file": "attempt4-progressive-state-a6e54fb93e7c.ssz"
+    }
+  }
+}

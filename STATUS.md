@@ -1282,3 +1282,7 @@ GitHub Pages is configured for GitHub Actions but currently binds `eth2030.altll
 - The native transaction pool and executor still reject the pinned format.
   Activation, execution, blob sidecars and historical import remain separate
   acceptance gates. The Heze memory limits are reviewed independently.
+
+## Actual continuation: historical recovery and independent consumers
+
+PRs 102–105 are separately submitted and each passes all nine current CI jobs. Composed Native 1bba8a12 completes the actual three-EL 31-transaction/17-query application sequence and real blob. Independently signed finalized-ancestor bootstrap recovery and full block/envelope/KZG consumers pass; directly authorized Lighthouse eth2030 integration is c76da1e11. Original failures, exact public inputs and remaining payment/peer/storage/operating gates are retained in [the active progress inventory](docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md) and [PR 101 results](docs/reviews/pr-101/results/manifest.json). The corrected-budget steady window is currently measuring; no release or capacity completion is claimed.

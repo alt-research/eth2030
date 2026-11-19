@@ -1,6 +1,6 @@
 participants:
 - el_type: geth
-  el_image: eth2030-independent-geth:qualification-1.17.10
+  el_image: eth2030-independent-geth:wire-qualification-1.17.10
   el_extra_params:
   - --networkid=1337
   - --rpc.gascap=150000000
@@ -14,7 +14,7 @@ participants:
   vc_max_mem: 1024
   count: 1
 - el_type: geth
-  el_image: eth2030-native:qualification-7e2c66e1
+  el_image: eth2030-native:wire-qualification-7e2c66e1
   el_extra_params:
   - --networkid=1337
   - --rpc.rate_limit=0
@@ -25,7 +25,7 @@ participants:
   vc_max_mem: 1024
   count: 1
 - el_type: geth
-  el_image: eth2030-native:qualification-7e2c66e1
+  el_image: eth2030-native:wire-qualification-7e2c66e1
   el_extra_params:
   - --networkid=1337
   - --rpc.rate_limit=0

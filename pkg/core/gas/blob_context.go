@@ -27,13 +27,15 @@ func CalcExcessBlobGasForHeader(parent *types.Header, cfg *config.ChainConfig, c
 		return 0, fmt.Errorf("missing parent for blob gas calculation")
 	}
 	s := GetBlobSchedule(cfg, childTime)
-	return CalcExcessBlobGasWithRules(parent,s,cfg!=nil && cfg.IsOsaka(childTime))
+	return CalcExcessBlobGasWithRules(parent, s, cfg != nil && cfg.IsOsaka(childTime))
 }
 
 // CalcExcessBlobGasWithRules also serves RPC estimates whose backend supplies
 // the active parameters and fork rules separately from the consensus config.
-func CalcExcessBlobGasWithRules(parent *types.Header,s BlobSchedule,isOsaka bool) (uint64,error) {
-	if parent==nil{return 0,fmt.Errorf("missing parent for blob gas calculation")}
+func CalcExcessBlobGasWithRules(parent *types.Header, s BlobSchedule, isOsaka bool) (uint64, error) {
+	if parent == nil {
+		return 0, fmt.Errorf("missing parent for blob gas calculation")
+	}
 	if s.Max == 0 || s.Target == 0 || s.Target > s.Max || s.UpdateFraction == 0 || s.Max > math.MaxUint64/GasPerBlob {
 		return 0, fmt.Errorf("invalid active blob schedule")
 	}

@@ -1,0 +1,1093 @@
+{
+  "target_master": "98716284b049933888bcd68d64c1957004d759b2",
+  "source_comparison": "Each prepared source tree matches Git automatic three-way merge except the explicitly resolved adjacent regions in PR 71 and PR 72.",
+  "root_tracking": "CHECK.md, STATUS.md and AGENTS.md are byte-identical across all 22 branches.",
+  "virtual_merge_order": {
+    "order": [
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      84,
+      83,
+      85,
+      86,
+      87
+    ],
+    "results": [
+      {
+        "pr": 66,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 67,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 68,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 69,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 70,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 71,
+        "exit_code": 0,
+        "conflicts": []
+      },
+      {
+        "pr": 72,
+        "exit_code": 1,
+        "conflicts": [
+          "pkg/core/vm/instructions.go"
+        ]
+      }
+    ],
+    "virtual_candidate": "73232026f4ba3c3901f3e93733cd8c6c5ebf03cb",
+    "updates_branch_refs": false
+  },
+  "checks": [
+    {
+      "pr": 66,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.13,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-66-0.log"
+    },
+    {
+      "pr": 66,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.23,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-66-1.log"
+    },
+    {
+      "pr": 68,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.12,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-68-0.log"
+    },
+    {
+      "pr": 68,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.12,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-68-1.log"
+    },
+    {
+      "pr": 70,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.18,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-70-0.log"
+    },
+    {
+      "pr": 70,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.07,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-70-1.log"
+    },
+    {
+      "pr": 72,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.72,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-72-0.log"
+    },
+    {
+      "pr": 72,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.45,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-72-1.log"
+    },
+    {
+      "pr": 72,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.25,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-72-2.log"
+    },
+    {
+      "pr": 72,
+      "command": [
+        "go",
+        "vet",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.03,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-72-3.log"
+    },
+    {
+      "pr": 74,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.25,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-74-0.log"
+    },
+    {
+      "pr": 74,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.21,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-74-1.log"
+    },
+    {
+      "pr": 76,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.41,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-76-0.log"
+    },
+    {
+      "pr": 76,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.35,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-76-1.log"
+    },
+    {
+      "pr": 78,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.32,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-78-0.log"
+    },
+    {
+      "pr": 78,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.21,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-78-1.log"
+    },
+    {
+      "pr": 80,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.43,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-80-0.log"
+    },
+    {
+      "pr": 80,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.29,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-80-1.log"
+    },
+    {
+      "pr": 82,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.61,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-82-0.log"
+    },
+    {
+      "pr": 82,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.38,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-82-1.log"
+    },
+    {
+      "pr": 84,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.58,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-84-0.log"
+    },
+    {
+      "pr": 84,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.23,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-84-1.log"
+    },
+    {
+      "pr": 86,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.57,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-86-0.log"
+    },
+    {
+      "pr": 86,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.18,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-86-1.log"
+    },
+    {
+      "pr": 67,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.3,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-67-0.log"
+    },
+    {
+      "pr": 67,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.88,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-67-1.log"
+    },
+    {
+      "pr": 69,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.45,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-69-0.log"
+    },
+    {
+      "pr": 69,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.9,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-69-1.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.3,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-0.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.97,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-1.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.17,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-2.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "vet",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.01,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-3.log"
+    },
+    {
+      "pr": 73,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.5,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-73-0.log"
+    },
+    {
+      "pr": 73,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.88,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-73-1.log"
+    },
+    {
+      "pr": 75,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.46,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-75-0.log"
+    },
+    {
+      "pr": 75,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.97,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-75-1.log"
+    },
+    {
+      "pr": 77,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.31,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-77-0.log"
+    },
+    {
+      "pr": 77,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.15,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-77-1.log"
+    },
+    {
+      "pr": 79,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.41,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-79-0.log"
+    },
+    {
+      "pr": 79,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.15,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-79-1.log"
+    },
+    {
+      "pr": 81,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.0,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-81-0.log"
+    },
+    {
+      "pr": 81,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.39,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-81-1.log"
+    },
+    {
+      "pr": 83,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.56,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-83-0.log"
+    },
+    {
+      "pr": 83,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.57,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-83-1.log"
+    },
+    {
+      "pr": 85,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.06,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-85-0.log"
+    },
+    {
+      "pr": 85,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.06,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-85-1.log"
+    },
+    {
+      "pr": 87,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.92,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-87-0.log"
+    },
+    {
+      "pr": 87,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.84,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-87-1.log"
+    }
+  ],
+  "reviews": [
+    {
+      "number": 66,
+      "branch": "feat/glamsterdam-bal-retention",
+      "head": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "prepared_head": "426260ee675a9994f07624e0cd824648d9868a27",
+      "draft": false,
+      "validated_source_tree": "5e17be37a68f8c9fa1eed0b01c107569f4c3f335",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 67,
+      "branch": "feat/glamsterdam-factory",
+      "head": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "prepared_head": "31b7436fd21be67fa3ef3b076dab1db39b22a697",
+      "draft": false,
+      "validated_source_tree": "ff5222265e700e4385fb7a096612a283cff2d890",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 68,
+      "branch": "feat/glamsterdam-access-list",
+      "head": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "prepared_head": "90d613344196759791bb863f1312240787a48fe9",
+      "draft": false,
+      "validated_source_tree": "3a962bb34935495f9f14b7219b5635d3b7cf2135",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 69,
+      "branch": "feat/glamsterdam-eth71",
+      "head": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "prepared_head": "cf752df1ab1f81f5f388d0d318d421f791cf01d2",
+      "draft": false,
+      "validated_source_tree": "2c856677162e68475dcd37b1423c4ded7b6f69c5",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 70,
+      "branch": "fix/eth-receipt-bloom",
+      "head": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "prepared_head": "b303319245dc315212bc0c0f5f77de6d74e0697f",
+      "draft": false,
+      "validated_source_tree": "da3a7ca5138f65df0577fbd2ef05c8d2a7b4e9df",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 71,
+      "branch": "feat/glamsterdam-transfer-logs",
+      "head": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "prepared_head": "ade917c1295cc0afa52975b753cf42ae72bf85cb",
+      "draft": false,
+      "validated_source_tree": "6f21df4355ed1834658c31714eedab0386f20946",
+      "source_conflict_resolution": [
+        "pkg/core/config/chain_config.go"
+      ],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 72,
+      "branch": "feat/glamsterdam-selfdestruct",
+      "head": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "prepared_head": "53e3bd21ecac6394c511603049ded86ee4d45692",
+      "draft": false,
+      "validated_source_tree": "52da2f9596e359e52bdcb3ae4cff000ecc5aca4c",
+      "source_conflict_resolution": [
+        "pkg/core/execution/processor.go"
+      ],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 73,
+      "branch": "feat/glamsterdam-stack-opcodes",
+      "head": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "prepared_head": "44020ad0866bdbce6266e1c207355b3c20149ac2",
+      "draft": false,
+      "validated_source_tree": "baa5757f5ae3266d59908862fd870c3fde9372ac",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 74,
+      "branch": "feat/glamsterdam-slot-commitment",
+      "head": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "prepared_head": "a481b8cf4cd2d81e31d2ba045788c4e62b680f2b",
+      "draft": false,
+      "validated_source_tree": "218a4ec84598e0f3d1832afa2a7d8a8bbcb14254",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 75,
+      "branch": "test/glamsterdam-gas-corpus",
+      "head": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "prepared_head": "3cf6558589ab276bed40f8046096d5429d6d1b39",
+      "draft": false,
+      "validated_source_tree": "cd1f766d07537ae1f7113979727e1d7e6d0e4dc3",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 76,
+      "branch": "fix/glamsterdam-blob-validation",
+      "head": "bc2f58506b637fa19e93a5d5f3aefc8f0c966686",
+      "prepared_head": "57f49a9696ae0c08d13e746bad707e38b7de3ab3",
+      "draft": false,
+      "validated_source_tree": "a8675ab987ad4ef93d92a696631b5c6632416b5a",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 77,
+      "branch": "feat/glamsterdam-builder-requests",
+      "head": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "prepared_head": "910a91514a4a57d7562badf2e9bd88ff6466ed1d",
+      "draft": false,
+      "validated_source_tree": "3442f974c8bddc497330d8fa09ec2a053ea3fcb8",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 78,
+      "branch": "feat/glamsterdam-fork-schema",
+      "head": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "prepared_head": "3b287c7cf8bea9021f2735638da1749dc232a6ba",
+      "draft": false,
+      "validated_source_tree": "c27faac7d1b9b7ac686d8801aaa045173620373c",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 79,
+      "branch": "feat/glamsterdam-config-recovery",
+      "head": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "prepared_head": "09120deba942c667bdf0daf6a217f864ed773df9",
+      "draft": false,
+      "validated_source_tree": "846335ba5d6ab5602a588d350379a71c2738c3b8",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 80,
+      "branch": "feat/glamsterdam-blob-schedule",
+      "head": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "prepared_head": "74e105d47921b453c87a6fadf12d53a1128825c4",
+      "draft": false,
+      "validated_source_tree": "d67250e88bbfa18a03eae598a20d5f4066ea73ff",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 81,
+      "branch": "feat/glamsterdam-snap2",
+      "head": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "prepared_head": "357536d565e26fb81bfead750c438feb7efd8dc4",
+      "draft": false,
+      "validated_source_tree": "0f4b96c8f50afe2e76217f1f45309cc5b9806509",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": [
+        "pkg/core/config/chain_config.go",
+        "pkg/core/config/chain_config_forks_test.go",
+        "pkg/core/execution/initcode_limit_test.go",
+        "pkg/core/execution/processor.go",
+        "pkg/core/vm/eip7954.go",
+        "pkg/core/vm/eip7954_boundaries_test.go",
+        "pkg/core/vm/eip7954_test.go",
+        "pkg/txpool/initcode_limit_test.go",
+        "pkg/txpool/txpool.go"
+      ]
+    },
+    {
+      "number": 82,
+      "branch": "feat/glamsterdam-eth72",
+      "head": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "prepared_head": "7f315a133b2ff39c0221ae1025147f88608aae7d",
+      "draft": false,
+      "validated_source_tree": "95228a78452f18756a59c31731287604be906daa",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    },
+    {
+      "number": 83,
+      "branch": "feat/glamsterdam-state-gas",
+      "head": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "prepared_head": "975e9c6bfcdad9518a6039f25647a4183632a671",
+      "draft": true,
+      "validated_source_tree": "54c8f5869bd45cfd9c67d212da654d93c54451c9",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    },
+    {
+      "number": 84,
+      "branch": "fix/glamsterdam-system-transitions",
+      "head": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "prepared_head": "1d080908460e35b1887280f5a8cb2dc1c4171688",
+      "draft": false,
+      "validated_source_tree": "59c207eb22fa2d5c10b2ac3946c850738d5fa55d",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    },
+    {
+      "number": 85,
+      "branch": "feat/glamsterdam-rpc-gas",
+      "head": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "prepared_head": "2e8c48aab9f30bc5d0f61becddbcc0c4f25fb5f4",
+      "draft": false,
+      "validated_source_tree": "3ff3ab501e509c7fdba9fa204ff9b8b08a1a770e",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    },
+    {
+      "number": 86,
+      "branch": "feat/glamsterdam-simulate-v1",
+      "head": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "prepared_head": "51333b43b3d0e0d698d2eb94a1502e2e63f90f3e",
+      "draft": false,
+      "validated_source_tree": "9a8824e735441aeaff7cd7c8a59b5eb1f895eeea",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    },
+    {
+      "number": 87,
+      "branch": "feat/glamsterdam-nested-traces",
+      "head": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "prepared_head": "0380be9d9cfbf111d0cc6f5daff37c313290bbc3",
+      "draft": false,
+      "validated_source_tree": "5c71b4e50a7c280206a51b0eec16e4831fb3b88e",
+      "source_conflict_resolution": [],
+      "source_changes_from_original": []
+    }
+  ],
+  "publication": "Verify exact final remote heads and GitHub mergeable state after pushing; this report records local validation and does not claim CI or approval."
+}

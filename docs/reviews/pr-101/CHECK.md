@@ -7,3 +7,5 @@
 - [ ] Retain failures and recovery, update the remaining completion inventory and submit an independent campaign review; do not claim release acceptance before all gates pass.
 
 - [x] Preserve the independent Geth pruned-history control, then rebuild an archival oracle by replaying the original finalized raw blocks through unchanged Geth and resume the exact-hash application sequence.
+
+- [ ] Submit two distinct real blob rows through all actual ELs, retain their full CL columns and independently validate partial bitmap ordering before peer-fault qualification.

@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -155,7 +156,8 @@ type Blockchain struct {
 	// sfGroup deduplicates concurrent StateAtBlock re-executions: when N
 	// goroutines all request state for the same block hash, only one does the
 	// work and the rest wait for and share the result.
-	sfGroup singleflight.Group
+	sfGroup         singleflight.Group
+	queryStateSlots chan struct{}
 }
 
 // NewBlockchain creates a new blockchain initialized with the given genesis block.
@@ -244,6 +246,7 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		txLookup:         make(map[types.Hash]TxLookupEntry),
 		sc:               newStateCache(opts.StateCacheSize),
 		memSC:            newStateCache(opts.StateCacheSize),
+		queryStateSlots:  make(chan struct{}, 2),
 		genesisState:     statedb,
 		execGenesisState: execGenesis,
 		gcMode:           gcMode,
@@ -416,11 +419,19 @@ var ErrBinaryOverlayRoot = fmt.Errorf("binary overlay: %w", block.ErrInvalidStat
 
 // executeState prepares and finalizes the overlay for validation and replay.
 func (bc *Blockchain) executeState(blk *types.Block, current state.StateDB, getHash func(uint64) types.Hash) (state.StateDB, *execution.ProcessResult, error) {
+	return bc.executeStateContext(context.Background(), blk, current, getHash)
+}
+func (bc *Blockchain) executeStateContext(ctx context.Context, blk *types.Block, current state.StateDB, getHash func(uint64) types.Hash) (state.StateDB, *execution.ProcessResult, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
+
 	next, err := execution.PrepareBlockState(bc.config, blk.Time(), current)
 	if err != nil {
 		return nil, nil, err
 	}
-	processor := bc.processor
+	processorCopy := bc.processor.WithContext(ctx)
+	processor := &processorCopy
 	if getHash != nil {
 		branchProcessor := processor.WithGetHash(getHash)
 		processor = &branchProcessor
@@ -837,6 +848,16 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	if overlay, ok := statedb.(*state.BinaryOverlayState); ok {
 		if err := writeOverlayCheckpoint(bc.db, batch, blk, overlay); err != nil {
 			return storageFailure(err)
+		}
+	}
+	// Immutable MPT history is committed with the execution-validation marker,
+	// including side branches, without selecting a canonical head.
+	if !overlayConfigured {
+		switch statedb.(type) {
+		case *state.MemoryStateDB, *state.TrieStateDB, *state.SnapStateDB, *state.TrieBackedStateDB:
+			if err := state.StoreTrieHistory(bc.db, batch, header.Root, statedb); err != nil {
+				return storageFailure(err)
+			}
 		}
 	}
 	if isCanonical {
@@ -1294,6 +1315,44 @@ func (bc *Blockchain) StateAtBlock(blk *types.Block) (state.StateDB, error) {
 // Startup has already walked the canonical headers before replaying a legacy
 // overlay database. Only that path can replay blocks without validation markers.
 func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.StateDB, error) {
+	return bc.replayStateContext(context.Background(), blk, startup, true)
+}
+
+// StateAtBlockContext prepares request-owned state without coupling cancellation
+// to another caller's replay. At most two such preparations run concurrently.
+func (bc *Blockchain) StateAtBlockContext(ctx context.Context, blk *types.Block) (state.StateDB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if blk == nil {
+		return nil, ErrStateNotFound
+	}
+	if blk.Hash() == bc.genesis.Hash() {
+		return bc.execGenesisState.Copy(), nil
+	}
+	if !bc.HasValidatedBlock(blk.Hash()) {
+		return nil, fmt.Errorf("%w: block is not execution validated", ErrStateNotFound)
+	}
+	if cached, ok := bc.sc.get(blk.Hash()); ok {
+		return cached, nil
+	}
+	if cached, ok := bc.memSC.get(blk.Hash()); ok {
+		return cached, nil
+	}
+	select {
+	case bc.queryStateSlots <- struct{}{}:
+		defer func() { <-bc.queryStateSlots }()
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	return bc.replayStateContext(ctx, blk, false, false)
+}
+
+func (bc *Blockchain) replayStateContext(ctx context.Context, blk *types.Block, startup, shared bool) (state.StateDB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
 	if blk == nil {
 		return nil, ErrStateNotFound
 	}
@@ -1309,11 +1368,14 @@ func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.
 	if cached, ok := bc.memSC.get(blk.Hash()); ok {
 		return cached, nil
 	}
-	value, err, _ := bc.sfGroup.Do(blk.Hash().Hex(), func() (interface{}, error) {
+	replay := func() (interface{}, error) {
 		var pending []*types.Block
 		current := blk
 		var base state.StateDB
 		for {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
 			if current.Hash() == bc.genesis.Hash() {
 				base = bc.execGenesisState.Copy()
 				break
@@ -1327,6 +1389,12 @@ func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.
 				break
 			}
 			if bc.config == nil || bc.config.BinaryOverlayTime == nil {
+				if snapshot, err := state.OpenTrieHistory(ctx, bc.db, current.Header().Root); err == nil {
+					base = snapshot
+					break
+				} else if !errors.Is(err, rawdb.ErrNotFound) {
+					return nil, storageFailure(err)
+				}
 				if snapshot, err := state.OpenSnapState(bc.db, current.Header().Root); err == nil {
 					base = snapshot
 					break
@@ -1342,12 +1410,15 @@ func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.
 			}
 		}
 		for i := len(pending) - 1; i >= 0; i-- {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
 			block := pending[i]
 			parent := bc.GetBlock(block.ParentHash())
 			if parent == nil {
 				return nil, ErrStateNotFound
 			}
-			next, _, err := bc.executeState(block, base, bc.BranchHashFn(parent.Header()))
+			next, _, err := bc.executeStateContext(ctx, block, base, bc.BranchHashFn(parent.Header()))
 			if err != nil {
 				return nil, err
 			}
@@ -1355,12 +1426,37 @@ func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.
 			if base.GetRoot() != block.Header().Root {
 				return nil, fmt.Errorf("state readback root mismatch at block %d", block.NumberU64())
 			}
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+			if bc.config == nil || bc.config.BinaryOverlayTime == nil {
+				batch := bc.db.NewBatch()
+				if err := state.StoreTrieHistory(bc.db, batch, block.Root(), base); err != nil {
+					return nil, storageFailure(err)
+				}
+				if err := ctx.Err(); err != nil {
+					return nil, err
+				}
+				if err := batch.Write(); err != nil {
+					return nil, storageFailure(err)
+				}
+			}
 			bc.sc.put(block.Hash(), block.NumberU64(), base)
 			bc.memSC.put(block.Hash(), block.NumberU64(), base)
 		}
 		return base, nil
-	})
+	}
+	var value interface{}
+	var err error
+	if shared {
+		value, err, _ = bc.sfGroup.Do(blk.Hash().Hex(), replay)
+	} else {
+		value, err = replay()
+	}
 	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	return value.(state.StateDB).Dup(), nil

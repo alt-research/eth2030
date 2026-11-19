@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math/big"
+	"time"
 
 	"github.com/eth2030/eth2030/core/execution"
 	coregas "github.com/eth2030/eth2030/core/gas"
@@ -169,7 +170,9 @@ func (b *RPCBackend) StateAtHeader(header *types.Header) (state.StateDB, error) 
 	if blk == nil {
 		return nil, fmt.Errorf("block %s not found", hash)
 	}
-	return bc.StateAtBlock(blk)
+	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
+	defer cancel()
+	return bc.StateAtBlockContext(ctx, blk)
 }
 
 func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, blockNumber rpc.BlockNumber) (*trie.AccountProof, error) {

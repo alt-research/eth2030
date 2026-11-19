@@ -8,7 +8,8 @@
 - [x] Implement uncapped call execution with intrinsic costs and zero initial reservoir; preserve state-gas rules and complete block context.
 - [ ] Qualify real Node HTTP call/estimate/access-list/trace/simulation consumers, high/low gas, creation, historical context and non-mutation.
 - [x] Pass full/tagged/affected race/vet/build and ten compiling detected mutations for call/estimate/access-list and opcode replay.
-- [ ] Publish the separate feature review; simulator and complete nested trace fields remain separate work.
+- [x] Publish the separate method/opcode review as PR 85.
+- [x] Qualify actual current-gas access discovery and reject impossible capped execution; detect its additional transaction-policy mutation. Simulator and complete nested trace fields remain separate work.
 
 ## Current gas signed and system consumer follow up (2026-11-19)
 

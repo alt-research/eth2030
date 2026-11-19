@@ -25,6 +25,7 @@ func TestAmsterdamRPCGasModesThroughActualHTTP(t *testing.T) {
 	gasReader := types.HexToAddress("0x1000000000000000000000000000000000000002")
 	writer := types.HexToAddress("0x1000000000000000000000000000000000000003")
 	historyReader := types.HexToAddress("0x1000000000000000000000000000000000000004")
+	thresholdReader := types.HexToAddress("0x1000000000000000000000000000000000000005")
 	var genesis map[string]any
 	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
@@ -47,6 +48,7 @@ func TestAmsterdamRPCGasModesThroughActualHTTP(t *testing.T) {
 	historyCode = append(historyCode, eips.HistoryStorageAddress[:]...)
 	historyCode = append(historyCode, 0x5a, 0xfa, 0x50, 0x60, 32, 0x5f, 0xf3)
 	alloc[historyReader.Hex()] = map[string]string{"nonce": "0x1", "code": hexutil.Encode(historyCode)}
+	alloc[thresholdReader.Hex()] = map[string]string{"nonce": "0x1", "code": "0x5a6301312d0081106011575f5260205ff35b5f5ffd"}
 	alloc[gasReader.Hex()] = map[string]string{"nonce": "0x1", "code": "0x5a5f5260205ff3"}
 	alloc[writer.Hex()] = map[string]any{"nonce": "0x1", "code": "0x60015f5500", "storage": map[string]string{types.HexToHash("0x01").Hex(): types.HexToHash("0x07").Hex()}}
 	raw, err := json.Marshal(genesis)
@@ -84,6 +86,26 @@ func TestAmsterdamRPCGasModesThroughActualHTTP(t *testing.T) {
 		}
 		if gas != 125025 {
 			t.Fatalf("slot estimate=%d want 15000+3+2+2100+10000+97920", gas)
+		}
+	})
+
+	t.Run("actual-access-discovery-uses-transaction-policy", func(t *testing.T) {
+		var result struct {
+			AccessList []struct {
+				Address     string
+				StorageKeys []string
+			}
+			GasUsed string
+			Error   string
+		}
+		rpc.call(t, "eth_createAccessList", &result, map[string]any{"from": sender.Hex(), "to": writer.Hex(), "gas": "0x7a120"}, "latest")
+		gas, err := hexutil.DecodeUint64(result.GasUsed)
+		if err != nil || gas != 131253 || result.Error != "" || len(result.AccessList) != 1 || !strings.EqualFold(result.AccessList[0].Address, writer.Hex()) || len(result.AccessList[0].StorageKeys) != 1 || result.AccessList[0].StorageKeys[0] != (types.Hash{}).Hex() {
+			t.Fatalf("actual converged list/gas: %+v %v", result, err)
+		}
+		rpc.call(t, "eth_createAccessList", &result, map[string]any{"from": sender.Hex(), "to": thresholdReader.Hex(), "gas": "0x2000000"}, "latest")
+		if result.Error == "" {
+			t.Fatalf("access discovery promised impossible >2^24 execution: %+v", result)
 		}
 	})
 	t.Run("trace-call-uses-actual-steps", func(t *testing.T) {

@@ -71,7 +71,19 @@
       "detected": true,
       "exit_code": 1,
       "log": "/tmp/glamsterdam-rpc-gas-mutation-historical-fork-context.log"
+    },
+    {
+      "name": "access-discovery-transaction-policy",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-rpc-access-policy-mutation.log"
     }
   ],
-  "release_qualified": false
+  "release_qualified": false,
+  "access_followup": {
+    "race_packages": 5,
+    "vet": "passed",
+    "build": "passed",
+    "race_log": "/projects/eth2030/glamsterdam-rpc-access-followup-race.log"
+  }
 }

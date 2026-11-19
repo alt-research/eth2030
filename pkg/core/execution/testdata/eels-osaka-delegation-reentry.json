@@ -1,0 +1,138 @@
+{
+  "tests/prague/eip7702_set_code_tx/test_set_code_txs.py::test_set_code_to_self_caller[fork_Osaka-call_opcode_CALL-state_test-value_0]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentGasLimit": "0x07270e00",
+      "currentNumber": "0x01",
+      "currentTimestamp": "0x03e8",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentDifficulty": "0x00",
+      "currentBaseFee": "0x07",
+      "currentExcessBlobGas": "0x00"
+    },
+    "pre": {
+      "0x53945a940036ce7dae4a3938a6f45e202612d010": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x60005415600e580157600160015500602e5801565b60016000556000600060006000600073c0f6dc9e5836f54caadbf59cc69346c508e1992b5af1600255005b",
+        "storage": {}
+      },
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "chainId": "0x01",
+      "nonce": "0x00",
+      "maxPriorityFeePerGas": "0x00",
+      "maxFeePerGas": "0x07",
+      "gasLimit": [
+        "0x01000000"
+      ],
+      "to": "0xc0f6dc9e5836f54caadbf59cc69346c508e1992b",
+      "value": [
+        "0x00"
+      ],
+      "data": [
+        "0x"
+      ],
+      "accessLists": [
+        []
+      ],
+      "authorizationList": [
+        {
+          "chainId": "0x00",
+          "address": "0x53945a940036ce7dae4a3938a6f45e202612d010",
+          "nonce": "0x00",
+          "v": "0x00",
+          "r": "0x438cb862fe5b051bb5876bc8c34b2d1d2e754a96f556281c5eeb76874e68bf8a",
+          "s": "0x1833457abf4a421aa5da45acb1693434089c439ac5c193560a2da4879d32e235",
+          "signer": "0xc0f6dc9e5836f54caadbf59cc69346c508e1992b",
+          "yParity": "0x00"
+        }
+      ],
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0xb853138d469877f0a63e6ad12907cbd7d9c2ee4221b45470d7b6e3b0a636aff3",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "receipt": {
+            "transactionHash": "0x5c1800fc20744e2613570c3512b38f96c48810a28746c66fcc71a048a34302e4",
+            "type": "0x04",
+            "cumulativeGasUsed": "0x01b82c",
+            "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "logs": [],
+            "status": true,
+            "rlp": "0x04f90109018301b82cb9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+          },
+          "txbytes": "0x04f8c201808007840100000094c0f6dc9e5836f54caadbf59cc69346c508e1992b8080c0f85cf85a809453945a940036ce7dae4a3938a6f45e202612d0108080a0438cb862fe5b051bb5876bc8c34b2d1d2e754a96f556281c5eeb76874e68bf8aa01833457abf4a421aa5da45acb1693434089c439ac5c193560a2da4879d32e23580a032f5a2c1b5750d79d46347f99e583bc717982cd25fd9936f77aff1efbb0c067ea050f4bae35b29de15a3936453e2cad6e09e6fa2d3e027bad4284120990a9b5c3c",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          },
+          "state": {
+            "0x53945a940036ce7dae4a3938a6f45e202612d010": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x60005415600e580157600160015500602e5801565b60016000556000600060006000600073c0f6dc9e5836f54caadbf59cc69346c508e1992b5af1600255005b",
+              "storage": {}
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+              "nonce": "0x01",
+              "balance": "0x033b2e3c9fd0803ce7f3f6cc",
+              "code": "0x",
+              "storage": {}
+            },
+            "0xc0f6dc9e5836f54caadbf59cc69346c508e1992b": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0xef010053945a940036ce7dae4a3938a6f45e202612d010",
+              "storage": {
+                "0x00": "0x01",
+                "0x01": "0x01",
+                "0x02": "0x01"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "blobSchedule": {
+        "Cancun": {
+          "target": "0x03",
+          "max": "0x06",
+          "baseFeeUpdateFraction": "0x32f0ed"
+        },
+        "Prague": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        },
+        "Osaka": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        }
+      },
+      "chainid": "0x01"
+    },
+    "_info": {
+      "hash": "0xfa3cbb6aea2c9a90744b66817ae63cd19a053daa616cc302058bfe3c59032f3d",
+      "fixture-format": "state_test",
+      "comment": "`execution-specs` generated test",
+      "filling-transition-tool": "2.19.0",
+      "description": "Test the executing a self-call in a set-code transaction.",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/prague/eip7702_set_code_tx/test_set_code_txs.py#L848",
+      "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7702.md",
+      "reference-spec-version": "99f1be49f37c034bdd5c082946f5968710dbfc87"
+    }
+  }
+}

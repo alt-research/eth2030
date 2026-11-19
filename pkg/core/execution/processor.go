@@ -1429,6 +1429,14 @@ func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, state
 		}
 	}
 
+	// EIP-7702 warms the final transaction destination's delegation target
+	// after processing all authorizations. Reentrant code sees that access.
+	if msg.To != nil && config.IsPrague(header.Time) {
+		if target, delegated := types.ParseDelegation(statedb.GetCode(*msg.To)); delegated {
+			statedb.AddAddressToAccessList(target)
+		}
+	}
+
 	var (
 		execErr      error
 		returnData   []byte

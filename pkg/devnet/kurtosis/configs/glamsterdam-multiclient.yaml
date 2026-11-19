@@ -20,7 +20,7 @@ participants:
   - --rpc.rate_limit=0
   el_max_mem: 4096
   cl_type: lodestar
-  cl_image: ethpandaops/lodestar@sha256:d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad
+  cl_image: eth2030-lodestar:qualification-cf705b4
   cl_max_mem: 4096
   vc_max_mem: 1024
   count: 1

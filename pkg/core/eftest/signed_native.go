@@ -280,6 +280,10 @@ func fixtureExceptionMatches(expected string, err error, tx *types.Transaction, 
 				}
 				intrinsic, floor = cost.Gas, cost.Floor
 			}
+
+			if item == "TransactionException.INTRINSIC_GAS_TOO_LOW" && cfg.IsAmsterdam(header.Time) && strings.HasPrefix(err.Error(), "Amsterdam intrinsic/floor exceeds execution cap:") && max(intrinsic, floor) > vm.AmsterdamMaxExecutionGas {
+				return true
+			}
 			// The legacy executor exposes the same error text for these two guards;
 			// classify the actual violated bound, not merely any non-nil error.
 			if strings.HasPrefix(err.Error(), "intrinsic gas too low: have ") || errors.Is(err, execution.ErrIntrinsicGasTooLow) {

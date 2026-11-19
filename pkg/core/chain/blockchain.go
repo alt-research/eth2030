@@ -376,6 +376,25 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 	return bc, nil
 }
 
+// cacheBlockLocked keeps the body map and eviction queue consistent, including
+// cold parent reads and reorg ancestry. The caller holds bc.mu for writing.
+func (bc *Blockchain) cacheBlockLocked(blk *types.Block) {
+	hash := blk.Hash()
+	if _, exists := bc.blockCache[hash]; exists {
+		bc.blockCache[hash] = blk
+		return
+	}
+	capacity := bc.opts.BlockCacheSize
+	if capacity <= 0 {
+		capacity = defaultBlockCacheSize
+	}
+	for len(bc.blockCache) >= capacity {
+		bc.evictOldestBlock()
+	}
+	bc.blockCache[hash] = blk
+	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
+}
+
 // evictOldestBlock removes the oldest block from blockCache (LRU eviction).
 // It also removes the block's transactions from txLookup.
 // Must be called with bc.mu held for writing.
@@ -558,7 +577,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 		if parent == nil {
 			parent = bc.readBlock(header.ParentHash)
 			if parent != nil {
-				bc.blockCache[header.ParentHash] = parent
+				bc.cacheBlockLocked(parent)
 			}
 		}
 		if parent == nil {
@@ -867,11 +886,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	defer bc.mu.Unlock()
 
 	// Store in block cache (evict oldest when at capacity).
-	for len(bc.blockCache) >= bc.opts.BlockCacheSize {
-		bc.evictOldestBlock()
-	}
-	bc.blockCache[hash] = blk
-	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
+	bc.cacheBlockLocked(blk)
 
 	// Build tx lookup index.
 	for i, tx := range txs {
@@ -1808,7 +1823,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 	current := newHead
 	for {
 		if _, ok := bc.blockCache[current.Hash()]; !ok {
-			bc.blockCache[current.Hash()] = current
+			bc.cacheBlockLocked(current)
 		}
 		if current.NumberU64() == 0 {
 			break
@@ -1821,7 +1836,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 			if parent == nil {
 				return nil, nil, fmt.Errorf("%w: missing ancestor %v during reorg", ErrBlockNotFound, current.ParentHash())
 			}
-			bc.blockCache[current.ParentHash()] = parent
+			bc.cacheBlockLocked(parent)
 		}
 		current = parent
 	}
@@ -1871,7 +1886,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 		hash := blk.Hash()
 		num := blk.NumberU64()
 
-		bc.blockCache[hash] = blk
+		bc.cacheBlockLocked(blk)
 		bc.canonCache[num] = hash
 		bc.writeBlock(blk)
 		rawdb.WriteCanonicalHash(bc.db, num, hash)
@@ -2232,5 +2247,5 @@ func (bc *Blockchain) EvictBlockFromCache(hash types.Hash) {
 func (bc *Blockchain) StoreBlockInCache(block *types.Block) {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
-	bc.blockCache[block.Hash()] = block
+	bc.cacheBlockLocked(block)
 }

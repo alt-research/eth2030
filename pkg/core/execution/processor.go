@@ -653,7 +653,7 @@ func ValidatePQDraftSchedule(config *corconfig.ChainConfig) error {
 		}
 		rules := config.Rules(new(big.Int), config.IsMerge(), *time)
 		base := vm.SelectPrecompiles(vm.ForkRules{
-			IsPrague: rules.IsPrague, IsGlamsterdan: rules.IsGlamsterdan,
+			IsOsaka: rules.IsOsaka, IsPrague: rules.IsPrague, IsGlamsterdan: rules.IsGlamsterdan,
 			IsIPlus: rules.IsIPlus, LegacyNativeBLS: rules.LegacyNativeBLS,
 		})
 		if err := vm.ValidatePQDraftAddresses(base, pq.SigRecover, pq.MLDSA, pq.MLDSAETH, pqDraftReservedAddresses(config)...); err != nil {
@@ -684,6 +684,7 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 			IsGlamsterdan:    rules.IsGlamsterdan,
 			IsAmsterdam:      rules.IsAmsterdam,
 			IsPrague:         rules.IsPrague,
+			IsOsaka:          rules.IsOsaka,
 			IsCancun:         rules.IsCancun,
 			IsShanghai:       rules.IsShanghai,
 			IsMerge:          rules.IsMerge,

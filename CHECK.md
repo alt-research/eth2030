@@ -1,3 +1,9 @@
+## Stateful simulation review tracking (2026-11-19)
+
+- [x] Record PR 86, its independent complete-block evidence, scope and fifteen detected mutations.
+- [x] Keep qualified feature branches distinct from stable integration and final release acceptance.
+- [x] Continue nested tracing separately with explicit unmerged-schema boundaries.
+
 ## Explicit LIFO development selection (2026-11-19)
 
 - [x] Record the user's implementation decision and exact merged source.

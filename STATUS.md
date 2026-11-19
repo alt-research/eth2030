@@ -1,3 +1,7 @@
+## Stateful simulation feature review (2026-11-19)
+
+PR 86 publishes stateful eth_simulateV1 with two independently matching complete SDK blocks, fifteen detected mutations, full 212/tagged 27/race 48/vet/build and a five-package composition repeat. Nested/dimensional tracing continues separately. Stable integration and final API/CL/full-client/resource/release qualification are not inferred from feature review submission.
+
 ## Explicit LIFO development decision (2026-11-19)
 
 The user selected implementation of the currently merged LIFO model first, retaining final design review. EIPs `3db38a3` is the development target; unmerged alternatives 12581/12582 are excluded. This decision advances implementation authority without declaring final protocol or release acceptance. PR 85 separately qualifies method-specific RPC and opcode replay; simulator, nested dimensional tracing and remaining CL/full-client/resource work continue.

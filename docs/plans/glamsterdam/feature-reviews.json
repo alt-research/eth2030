@@ -278,6 +278,33 @@
         "independent full-client/API fixtures",
         "resource and release qualification"
       ]
+    },
+    {
+      "pr": 86,
+      "url": "https://github.com/alt-research/eth2030/pull/86",
+      "branch": "feat/glamsterdam-simulate-v1",
+      "commit": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "remote_head": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "tested_source_commit": "6daa6678",
+      "composition_commit": "206e14ac",
+      "scope": "Stateful eth_simulateV1 with complete commitments, two gas policies, overrides and resource bounds",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "composition_race_packages": 5,
+        "independent_complete_blocks": 2,
+        "mutations_detected": 15,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "complete historical/API fixture campaign",
+        "independent full-client/devnet and resource campaign",
+        "final API and release review"
+      ]
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",

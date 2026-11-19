@@ -1,0 +1,6 @@
+different_BAL_commitments_same_header_hash=true
+different_BAL_commitments_same_header_RLP=true
+native_header_has_SlotNumber=false
+BAL_retention_epochs=3533
+body_V2_for_header_with_BAL_hash={"transactions":[],"withdrawals":[]}
+native_ApplyMessage_SLOTNUM=0 error=<nil>

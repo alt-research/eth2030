@@ -1,0 +1,3 @@
+# Historical state readback in progress
+
+The real application campaign's independent full/pruned Geth control first reports its original historical state is unavailable. Replaying all 1,348 original finalized raw blocks through unchanged Geth into an archive restores the original getter there, but exposes a distinct Native error: state not found for block, no block found with state root. The historical header/body remain retained. Native StateAtHeader uses exact block replay only for the experimental binary overlay; ordinary chains fall back to a root search limited to the hot block cache. This review binds retained-header state queries to the exact validated block on every native chain, without substituting current state or widening transaction-admission authority.

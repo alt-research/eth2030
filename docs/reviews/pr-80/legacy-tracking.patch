@@ -1,0 +1,61 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..ee8a81d8 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,32 @@
+ # Lean4 Verification Check-list
+ 
++## Complete ordinary blob sidecar validation (2026-11-18)
++
++- [x] Read pinned EIP-4844/7594 networking and proof requirements.
++- [x] Reproduce invalid ordinary-cell-proof admission through real node HTTP.
++- [x] Validate complete sidecar binding/proofs and preserve Frame regression behavior.
++- [x] Require full data for pool-based builders and return genuine legacy blob proofs.
++- [x] Qualify actual wire/admission/Engine consumers, affected checks/build and regression mutations.
++- [x] Publish the isolated blob-validation PR (PR 76).
++
++## Fork-aware blob capacity, fees and configuration (2026-11-18)
++
++- [x] Base on PR 79 configuration authority and compose PR 76 full-data/proof consumers; retain the 21-blob race timeout as evidence until the current wrapper is qualified.
++
++- [x] Read EIPs 7840/7892/7691/7918 and trace actual builder/import/pool/VM/RPC consumers.
++- [x] Reproduce hardcoded capacity/fee and ignored configuration defects against independent reference inputs.
++- [x] Wire one selected schedule through canonical block admission, fee calculation, payloads and RPC.
++- [x] Qualify actual signed blob traffic, fork transitions, invalid blocks and configuration/restart boundaries.
++- [x] Run affected/full builds/tests and publish the isolated feature review.
++
++## Persisted fork configuration and restart authority (2026-11-18)
++
++- [x] Trace actual Node startup before history replay and reuse the existing persisted config key.
++- [x] Detect incompatible active schedules and immutable parameter changes before state/metadata adoption.
++- [x] Qualify future updates, either-side activation, missing/corrupt metadata and failed persistence.
++- [x] Verify actual node restart preserves heads/state/configuration on rejection and does not mutate network globals.
++- [x] Run affected/full tests, build and race/vet; publish a dedicated PR.
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..5fda96d2 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,19 @@
++## Qualified blob schedule and settlement (2026-11-18)
++
++The current version-1 signed HTTP scenario passes at 7/10/21 blobs through producer, independent receiver, receipts/RPC and fresh-node replay. Canonical per-fork capacity, pricing, fee burn/affordability, opcode context and persisted parameter authority agree with independent Geth formulas. Six behavioral mutations fail; full Go/tagged, affected race/vet/build pass after composing PR 76 and PR 79. The earlier legacy-wrapper race timeout is retained as failed evidence, not erased. See [verification](docs/verification/glamsterdam-blob-schedule-20261118.md). Final gas, sparse relay/state sync, CL/devnet and release gates remain open.
++
++## Ordinary blob proof validation and Engine publication (2026-11-18)
++
++Reproduced and repaired invalid ordinary cell-proof admission through real HTTP. Preserve wrapper versions and pooled sidecars, authenticate KZG data, wait for complete pool data, derive genuine legacy proofs and expose canonical BlobAndProofV1 DATA. Shared payload collectors no longer fabricate zero proofs or publish missing data. Journal insert/rotation and fresh-node replay preserve authenticated sidecars. Frame checks remain qualified. Affected suites, targeted race/vet and build pass; four controlled mutations fail as intended. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Complete eth/72 sparse relay and release gates remain open.
++
++## Blob schedule implementation in progress (2026-11-18)
++
++Fork-aware block capacity, pricing, ordinary fee settlement, opcode/receipt/RPC consumers and metadata history guards are implemented. Signed HTTP producer/receiver controls pass at 7/10/21 blobs. The full module and tagged suites pass; the 21-blob race run hits the unchanged Engine timeout in the legacy proof-generation route. Compose the submitted PR 76 proof path and qualify current version-1 wrappers before completion. Final gas/release gates remain open.
++
++## Persisted configuration recovery (2026-11-18)
++
++Actual Node startup now checks persisted runtime configuration before history replay, rejects active or immutable changes and retains compatible future updates. Runtime overrides do not mutate network globals. Real signed HTTP/restart evidence preserves head/state/config bytes on rejection and verifies successful future updates; missing/corrupt authority is explicit. Full Go, affected race/vet/build and four failing behavioral mutations pass. See [verification](docs/verification/glamsterdam-config-recovery-20261118.md). Final gas, blob schedules, unknown legacy migration and release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

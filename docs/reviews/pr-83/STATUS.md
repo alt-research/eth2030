@@ -1,3 +1,13 @@
+## Sequential Draft gas dependency/CI repair (2026-11-19)
+
+Original head: `2f32762ab4d1ec5fdcc4f2921da63c06449e38ca`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing system-transition dependency PR 84 (`c2727d48`, including repaired 80–82). Draft status and the user-selected EIPs `3db38a3` LIFO development model are unchanged; unmerged alternatives and final release acceptance remain excluded.
+
+Keep the draft's EIP-7778 activation at canonical Amsterdam (plus the existing private compatibility fork), as required for gross execution/block accounting. The other processor conflict is whitespace: initcode rejection remains before BAL seeding and fee/nonce mutations. EIP-7778 was re-read; no gas policy is changed by this reconciliation. Both formatting failures in original run 44477224503 are removed by current master and the repaired blob dependency.
+
+Go 1.26.11 full default tests pass, as do integration (`./core/... ./p2p/... ./eiptest`), broad gas/state race (`./bal ./core/... ./engine ./node/... ./txpool ./eiptest`), full formatting/vet/build. Existing LIFO/reservoir, authorization rollback, actual 110M-budget HTTP creation/import and receipt/header accounting assertions are preserved. Logs: `/tmp/eth2030-pr83-{full,integration,race}.log`. Shared root trackers remain unchanged.
+
+The existing Draft branch is prepared for non-forced publication; exact-head, mergeability, unchanged Draft status and fresh required CI are verified before batch completion. This repair is not approval to merge the gas draft or its dependent consumers.
+
 # PR 83 tracking cleanup status
 
 Original review head: `bd0f33577c0d343abb7057894d9702a27d7ff157`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

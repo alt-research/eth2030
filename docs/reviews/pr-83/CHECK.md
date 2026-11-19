@@ -1,9 +1,9 @@
 ## Sequential Draft gas merge/CI repair (2026-11-19)
 
 - [x] Preserve Draft status and the user-selected merged LIFO specification baseline; do not adopt open alternatives.
-- [ ] Merge current master while retaining canonical EIP-7778 activation and pre-mutation initcode validation.
-- [ ] Reconcile the repaired existing system-transition foundation (84) without changing gas policy.
-- [ ] Run full tests, integration, gas/state/Node race, formatting/vet/build; publish and verify exact-head CI.
+- [x] Merge current master while retaining canonical EIP-7778 activation and pre-mutation initcode validation.
+- [x] Reconcile the repaired existing system-transition foundation (84) without changing gas policy.
+- [x] Run full tests, integration, gas/state/Node race, formatting/vet/build; prepare publication and require exact-head CI before completion.
 
 # PR 83 tracking cleanup
 

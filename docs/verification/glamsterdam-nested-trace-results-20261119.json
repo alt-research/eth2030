@@ -1,0 +1,136 @@
+{
+  "tested_production_commit": "9700ed6b14e4ad14846f317e77f172458d2b89bc",
+  "composition_commit": "217e0164607eaedd33b80f9ebb3dd85256b928e2",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "call_schema_855": "d8409a1d01d394033b0785de18ee112b46e644d3",
+  "dimensional_schema_852": "cc1852a702a84dbcb7d149d010345114bf95cff8",
+  "merged_geth_hook_35970": "bf8ae65c7c5158e6472d2792c257bae71ac10316",
+  "sdk": "unmodified go-ethereum v1.17.10",
+  "sdk_classic_call_trees": 9,
+  "sdk_projection_omits": [
+    "regularGasUsed",
+    "stateGasUsed",
+    "gasRefund",
+    "stateGasReservoir"
+  ],
+  "sdk_free_text_normalization": "non-REVERT balance/write-protection/out-of-gas strings normalized by failure class; REVERT remains exact",
+  "checks": {
+    "full_packages": 212,
+    "tagged_packages": 27,
+    "race_packages": 48
+  },
+  "vet": "passed",
+  "build": "passed",
+  "mutations": [
+    {
+      "name": "nested-frame-presence",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-nested-frame-presence.log"
+    },
+    {
+      "name": "nested-spill-gas",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-nested-spill-gas.log"
+    },
+    {
+      "name": "failed-create-address",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-failed-create-address.log"
+    },
+    {
+      "name": "zero-frame-reservoir",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-zero-frame-reservoir.log"
+    },
+    {
+      "name": "pre-fork-omission",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-pre-fork-omission.log"
+    },
+    {
+      "name": "root-only-dimensions",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-root-only-dimensions.log"
+    },
+    {
+      "name": "log-rollback",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-log-rollback.log"
+    },
+    {
+      "name": "prefix-log-index",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-prefix-log-index.log"
+    },
+    {
+      "name": "full-reservoir-forwarding",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-full-reservoir-forwarding.log"
+    },
+    {
+      "name": "opcode-state-charge",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-opcode-state-charge.log"
+    },
+    {
+      "name": "opcode-pure-execution-cost",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-opcode-pure-execution-cost.log"
+    },
+    {
+      "name": "zero-opcode-reservoir-omission",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-zero-opcode-reservoir-omission.log"
+    },
+    {
+      "name": "post-store-snapshot",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-post-store-snapshot.log"
+    },
+    {
+      "name": "step-limit",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-step-limit.log"
+    },
+    {
+      "name": "read-only-precheck",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-read-only-precheck.log"
+    },
+    {
+      "name": "new-frame-return-buffer",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-new-frame-return-buffer.log"
+    },
+    {
+      "name": "capture-capacity",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-nested-trace-mutation-capture-capacity.log"
+    }
+  ],
+  "api_proposals_adopted_as_final_standard": false,
+  "release_qualified": false,
+  "composed_followup": {
+    "race_packages": 5,
+    "vet": "passed",
+    "build": "passed",
+    "log": "/projects/eth2030/glamsterdam-nested-trace-composed-followup.log"
+  }
+}

@@ -1,0 +1,66 @@
+ok  	github.com/eth2030/eth2030/core	0.833s
+ok  	github.com/eth2030/eth2030/core/vm	3.603s
+ok  	github.com/eth2030/eth2030/core/execution	0.762s
+ok  	github.com/eth2030/eth2030/core/block	0.744s
+ok  	github.com/eth2030/eth2030/core/config	0.698s
+ok  	github.com/eth2030/eth2030/engine	1.278s
+?   	github.com/eth2030/eth2030/engine/actor	[no test files]
+ok  	github.com/eth2030/eth2030/engine/api	0.726s
+ok  	github.com/eth2030/eth2030/engine/auction	0.686s
+?   	github.com/eth2030/eth2030/engine/backendapi	[no test files]
+ok  	github.com/eth2030/eth2030/engine/blobsbundle	0.733s
+ok  	github.com/eth2030/eth2030/engine/blobval	0.697s
+ok  	github.com/eth2030/eth2030/engine/blocks	0.697s
+ok  	github.com/eth2030/eth2030/engine/builder	0.734s
+ok  	github.com/eth2030/eth2030/engine/chunking	0.712s
+ok  	github.com/eth2030/eth2030/engine/convert	0.725s
+ok  	github.com/eth2030/eth2030/engine/distbuilder	0.006s
+ok  	github.com/eth2030/eth2030/engine/errors	0.004s
+ok  	github.com/eth2030/eth2030/engine/forkchoice	0.758s
+ok  	github.com/eth2030/eth2030/engine/payload	0.845s
+ok  	github.com/eth2030/eth2030/engine/requests	0.005s
+ok  	github.com/eth2030/eth2030/engine/util	0.125s
+ok  	github.com/eth2030/eth2030/engine/vhash	0.007s
+ok  	github.com/eth2030/eth2030/bal	0.710s
+ok  	github.com/eth2030/eth2030/eth	0.733s
+ok  	github.com/eth2030/eth2030/p2p	0.863s
+ok  	github.com/eth2030/eth2030/p2p/broadcast	0.896s
+ok  	github.com/eth2030/eth2030/p2p/discover	1.160s
+ok  	github.com/eth2030/eth2030/p2p/discv5	0.106s
+ok  	github.com/eth2030/eth2030/p2p/dispatch	0.212s
+ok  	github.com/eth2030/eth2030/p2p/dnsdisc	0.713s
+ok  	github.com/eth2030/eth2030/p2p/enode	0.692s
+ok  	github.com/eth2030/eth2030/p2p/enr	0.692s
+ok  	github.com/eth2030/eth2030/p2p/ethproto	1.007s
+ok  	github.com/eth2030/eth2030/p2p/gossip	1.052s
+?   	github.com/eth2030/eth2030/p2p/nat	[no test files]
+ok  	github.com/eth2030/eth2030/p2p/netutil	0.011s
+ok  	github.com/eth2030/eth2030/p2p/nonce	0.209s
+?   	github.com/eth2030/eth2030/p2p/peermgr	[no test files]
+ok  	github.com/eth2030/eth2030/p2p/portal	0.689s
+ok  	github.com/eth2030/eth2030/p2p/reqresp	0.433s
+ok  	github.com/eth2030/eth2030/p2p/scoring	0.006s
+ok  	github.com/eth2030/eth2030/p2p/snap	0.686s
+ok  	github.com/eth2030/eth2030/p2p/transport	0.739s
+?   	github.com/eth2030/eth2030/p2p/wire	[no test files]
+ok  	github.com/eth2030/eth2030/eiptest	2.557s
+ok  	github.com/eth2030/eth2030/consensus	11.409s
+ok  	github.com/eth2030/eth2030/epbs	0.690s
+ok  	github.com/eth2030/eth2030/epbs/auction	0.688s
+ok  	github.com/eth2030/eth2030/epbs/bid	0.683s
+ok  	github.com/eth2030/eth2030/epbs/builder	0.698s
+ok  	github.com/eth2030/eth2030/epbs/commit	0.688s
+ok  	github.com/eth2030/eth2030/epbs/escrow	0.691s
+ok  	github.com/eth2030/eth2030/epbs/mevburn	0.003s
+ok  	github.com/eth2030/eth2030/epbs/slashing	0.686s
+ok  	github.com/eth2030/eth2030/txpool	0.721s
+ok  	github.com/eth2030/eth2030/txpool/blobpool	0.006s
+ok  	github.com/eth2030/eth2030/txpool/encrypted	1.031s
+ok  	github.com/eth2030/eth2030/txpool/frametx	0.004s
+ok  	github.com/eth2030/eth2030/txpool/journal	0.060s
+ok  	github.com/eth2030/eth2030/txpool/peertick	0.003s
+ok  	github.com/eth2030/eth2030/txpool/pricing	0.005s
+ok  	github.com/eth2030/eth2030/txpool/sharding	0.005s
+ok  	github.com/eth2030/eth2030/txpool/shared	0.005s
+ok  	github.com/eth2030/eth2030/txpool/stark	1.467s
+ok  	github.com/eth2030/eth2030/txpool/tracking	0.004s

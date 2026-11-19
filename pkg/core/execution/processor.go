@@ -1212,6 +1212,11 @@ func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, state
 		}
 	}
 
+	// Refunds (EIP-2200/3529) and transient storage (EIP-1153) belong to
+	// this transaction, even when the live state is reused without a commit.
+	statedb.SubRefund(statedb.GetRefund())
+	statedb.ClearTransientStorage()
+
 	// Create EVM
 	blockCtx := vm.BlockContext{
 		GetHash:     getHash,

@@ -1,3 +1,7 @@
-# Sparse relay CI observation correction in progress
+# Sparse relay completion observation qualified
 
-After full blob admission, the cell-response worker removes staged bytes and announces the result. The integration test observes pool publication before that worker returns, then assumes cleanup has already happened. PR 90 CI reproduced this valid intermediate state. The correction waits for both pool admission and staged cleanup while retaining actual signed/KZG and bounded eventual-completion assertions; no protocol or production ordering is changed.
+PR 90 CI observed a legitimate intermediate state: executable pool admission publishes a reconstructed blob before the same response worker returns and removes its sparse staging entry. The test previously waited only for pool publication and then assumed staged cleanup had already completed.
+
+The actual RLPx two-provider test now waits, under the same bounded deadline, for both full pool admission and staged cleanup. All signed/KZG validation, custody/noise/expansion counts, Engine cell projection and exact reconstructed blob assertions remain. No protocol rule, production ordering or timeout is changed, and cleanup that never occurs still fails the test.
+
+Five consecutive full peer controls and two race repetitions pass, along with affected eth/sparse suites, scoped vet and the composed build. This review is stacked on PR 96 so the separately repaired simulation-timeout classification does not obscure its CI. It does not claim the remaining CL partial-column/version/loss/reconnect campaign complete.

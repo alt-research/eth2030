@@ -87,3 +87,5 @@ buildoor_params:
   image: ethpandaops/buildoor@sha256:19ff85b450287867390f367f8061eae8a6f5d0bc52421cb50719fca5d4b4d0af
   builder_api: true
   epbs_builder: true
+  extra_args:
+  - --lifecycle

@@ -11,11 +11,11 @@ import (
 
 // TestMaxCodeSizeConstants verifies the EIP-7954 constants.
 func TestMaxCodeSizeConstants(t *testing.T) {
-	if MaxCodeSizeGlamsterdam != 32768 {
-		t.Errorf("MaxCodeSizeGlamsterdam = %d, want 32768", MaxCodeSizeGlamsterdam)
+	if MaxCodeSizeGlamsterdam != 65536 {
+		t.Errorf("MaxCodeSizeGlamsterdam = %d, want 65536", MaxCodeSizeGlamsterdam)
 	}
-	if MaxInitCodeSizeGlamsterdam != 65536 {
-		t.Errorf("MaxInitCodeSizeGlamsterdam = %d, want 65536", MaxInitCodeSizeGlamsterdam)
+	if MaxInitCodeSizeGlamsterdam != 131072 {
+		t.Errorf("MaxInitCodeSizeGlamsterdam = %d, want 131072", MaxInitCodeSizeGlamsterdam)
 	}
 	// Relationship: init code limit = 2 * code size limit.
 	if MaxInitCodeSizeGlamsterdam != 2*MaxCodeSizeGlamsterdam {
@@ -84,7 +84,7 @@ func TestEIP7954CreateLargerCodeAllowed(t *testing.T) {
 }
 
 // TestEIP7954CreateExceedsNewLimit verifies that even post-Glamsterdam,
-// contracts exceeding 32KB are rejected.
+// contracts exceeding 64 KiB are rejected.
 func TestEIP7954CreateExceedsNewLimit(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
 	caller := types.HexToAddress("0x1111111111111111111111111111111111111111")
@@ -98,13 +98,13 @@ func TestEIP7954CreateExceedsNewLimit(t *testing.T) {
 	evm.forkRules.IsEIP7954 = true
 	evm.SetJumpTable(NewCancunJumpTable())
 
-	// Try to deploy 33000 bytes of code (> 32KB new limit).
-	codeSize := 33000
+	// Try to deploy one byte beyond the published 64 KiB limit.
+	codeSize := 65537
 	initCode := buildInitCodeForSize(codeSize)
 
 	_, _, _, err := evm.Create(caller, initCode, 10000000, big.NewInt(0))
 	if err == nil {
-		t.Error("expected error for code exceeding 32KB, got nil")
+		t.Error("expected error for code exceeding 64 KiB, got nil")
 	}
 }
 
@@ -180,8 +180,11 @@ func buildInitCodeForSize(size int) []byte {
 	// we can just RETURN the right amount from offset 0.
 	var initCode []byte
 	// PUSH2 <size>
-	initCode = append(initCode, byte(PUSH2))
-	initCode = append(initCode, byte(size>>8), byte(size))
+	if size > 65535 {
+		initCode = append(initCode, byte(PUSH3), byte(size>>16), byte(size>>8), byte(size))
+	} else {
+		initCode = append(initCode, byte(PUSH2), byte(size>>8), byte(size))
+	}
 	// PUSH1 0 (memory offset)
 	initCode = append(initCode, byte(PUSH1), 0x00)
 	// RETURN

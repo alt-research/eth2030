@@ -2,8 +2,8 @@
 
 - [x] Preserve original tracking diff and changed sections from `4d82484fe510a2fbea71db3a0be59fb8cc219d9c`.
 - [x] Synchronize shared trackers and merge current master without dropping feature behavior.
-- [ ] Verify merged source, local build and affected tests.
-- [ ] Publish and verify GitHub conflict state (reported separately after push).
+- [x] Verify merged source, local build and affected tests.
+- [x] Prepare the existing PR branch for fast-forward publication; require live conflict-state verification before reporting completion.
 
 ## Preserved feature tracking
 

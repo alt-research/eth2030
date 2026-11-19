@@ -57,59 +57,6 @@ func (st *StateTest) RunSigned(sub StateSubtest) (result *RunResult) {
 	if result.ExpectedRoot == (types.Hash{}) {
 		return fail(errors.New("missing nonzero expected state root"))
 	}
-	// Signed bytes are authoritative, including access lists, blobs and every
-	// authorization. Missing bytes must not silently fall back to a different type.
-	raw, err := fixtureBytes(post.TxBytes, -1)
-	if err != nil || len(raw) == 0 {
-		return fail(fmt.Errorf("missing or invalid signed txbytes: %v", err))
-	}
-	tx, err := types.DecodeTxRLP(raw)
-	if err != nil {
-		return fail(fmt.Errorf("decode signed envelope: %w", err))
-	}
-	if tx.Type() > types.SetCodeTxType {
-		return fail(fmt.Errorf("unsupported fixture envelope %d", tx.Type()))
-	}
-	sender, recoveryErr := types.MakeSigner(1, tx.Type()).Sender(tx)
-	var signatureErr error
-	if recoveryErr != nil {
-		kind := errFixtureSignature
-		if recoveryErr.Error() == "invalid chain ID for signer" {
-			kind = errFixtureChainID
-		}
-		signatureErr = fmt.Errorf("%w: %v", kind, recoveryErr)
-	}
-	if st.json.Tx.Sender != "" {
-		b, e := fixtureBytes(st.json.Tx.Sender, 20)
-		if e != nil {
-			return fail(e)
-		}
-		if signatureErr == nil && sender != types.BytesToAddress(b) {
-			return fail(errors.New("fixture sender disagrees with signed envelope"))
-		}
-	}
-	tx.SetSender(sender)
-	// Validate selection metadata even though bytes, not the parameter arrays,
-	// supply execution input. Malformed selectors are fixture errors.
-	idx := post.Indexes
-	if idx.Data < 0 || idx.Data >= len(st.json.Tx.Data) || idx.Gas < 0 || idx.Gas >= len(st.json.Tx.GasLimit) || idx.Value < 0 || idx.Value >= len(st.json.Tx.Value) {
-		return fail(errors.New("fixture transaction selector out of bounds"))
-	}
-	data, err := fixtureBytes(st.json.Tx.Data[idx.Data], -1)
-	if err != nil {
-		return fail(err)
-	}
-	limit, err := fixtureNumber(st.json.Tx.GasLimit[idx.Gas], 64)
-	if err != nil {
-		return fail(err)
-	}
-	value, err := fixtureNumber(st.json.Tx.Value[idx.Value], 256)
-	if err != nil {
-		return fail(err)
-	}
-	if hex.EncodeToString(data) != hex.EncodeToString(tx.Data()) || limit.Uint64() != tx.Gas() || value.Cmp(tx.Value()) != 0 {
-		return fail(errors.New("signed envelope disagrees with selected data/gas/value"))
-	}
 	db := state.NewMemoryStateDB()
 	for addrHex, account := range st.json.Pre {
 		addrBytes, e := fixtureBytes(addrHex, 20)
@@ -179,6 +126,69 @@ func (st *StateTest) RunSigned(sub StateSubtest) (result *RunResult) {
 		}
 	}
 	header := st.buildHeader(cfg)
+	// Validate selection metadata even though bytes, not the parameter arrays,
+	// supply execution input. Malformed selectors are fixture errors.
+	idx := post.Indexes
+	if idx.Data < 0 || idx.Data >= len(st.json.Tx.Data) || idx.Gas < 0 || idx.Gas >= len(st.json.Tx.GasLimit) || idx.Value < 0 || idx.Value >= len(st.json.Tx.Value) {
+		return fail(errors.New("fixture transaction selector out of bounds"))
+	}
+	data, err := fixtureBytes(st.json.Tx.Data[idx.Data], -1)
+	if err != nil {
+		return fail(err)
+	}
+	limit, err := fixtureNumber(st.json.Tx.GasLimit[idx.Gas], 64)
+	if err != nil {
+		return fail(err)
+	}
+	value, err := fixtureNumber(st.json.Tx.Value[idx.Value], 256)
+	if err != nil {
+		return fail(err)
+	}
+	var expectedSender *types.Address
+	if st.json.Tx.Sender != "" {
+		b, err := fixtureBytes(st.json.Tx.Sender, 20)
+		if err != nil {
+			return fail(err)
+		}
+		address := types.BytesToAddress(b)
+		expectedSender = &address
+	}
+	// Signed bytes are authoritative, including access lists, blobs and every
+	// authorization. Missing bytes must not silently fall back to a different type.
+	raw, err := fixtureBytes(post.TxBytes, -1)
+	if err != nil || len(raw) == 0 {
+		return fail(fmt.Errorf("missing or invalid signed txbytes: %v", err))
+	}
+	tx, err := types.DecodeBlockTransaction(raw)
+	if err != nil {
+		if fixtureDecodeExceptionMatches(post.ExpectException, err) {
+			return finishSignedFixture(result, db, crypto.Keccak256Hash(raw))
+		}
+		return fail(fmt.Errorf("decode signed envelope: %w", err))
+	}
+	if tx.Type() > types.SetCodeTxType {
+		return fail(fmt.Errorf("unsupported fixture envelope %d", tx.Type()))
+	}
+	sender, recoveryErr := types.MakeSigner(1, tx.Type()).Sender(tx)
+	var signatureErr error
+	if recoveryErr != nil {
+		kind := errFixtureSignature
+		if recoveryErr.Error() == "invalid chain ID for signer" {
+			kind = errFixtureChainID
+		}
+		signatureErr = fmt.Errorf("%w: %v", kind, recoveryErr)
+	}
+	if signatureErr == nil {
+		if expectedSender != nil && sender != *expectedSender {
+			return fail(errors.New("fixture sender disagrees with signed envelope"))
+		}
+		tx.SetSender(sender)
+	}
+
+	if hex.EncodeToString(data) != hex.EncodeToString(tx.Data()) || limit.Uint64() != tx.Gas() || value.Cmp(tx.Value()) != 0 {
+		return fail(errors.New("signed envelope disagrees with selected data/gas/value"))
+	}
+
 	db.SetTxContext(tx.Hash(), 0)
 	applyErr := signatureErr
 	if applyErr == nil {
@@ -194,21 +204,45 @@ func (st *StateTest) RunSigned(sub StateSubtest) (result *RunResult) {
 	} else if applyErr != nil {
 		return fail(fmt.Errorf("unexpected native transaction error: %w", applyErr))
 	}
-	// Commit the actual native transition without repairing its account lifecycle.
-	result.GotRoot, err = db.Commit()
+	return finishSignedFixture(result, db, tx.Hash())
+}
+
+func finishSignedFixture(result *RunResult, db *state.MemoryStateDB, txHash types.Hash) *RunResult {
+	// Never repair the native transition's account lifecycle in the harness.
+	root, err := db.Commit()
 	if err != nil {
-		return fail(err)
+		result.Error = err
+		return result
 	}
+	result.GotRoot = root
 	result.StateDB = db
-	result.GotLogs = computeLogsHash(db.GetLogs(tx.Hash()))
+	result.GotLogs = computeLogsHash(db.GetLogs(txHash))
 	if result.GotRoot != result.ExpectedRoot {
-		return fail(fmt.Errorf("state root mismatch: expected %s, got %s", result.ExpectedRoot, result.GotRoot))
+		result.Error = fmt.Errorf("state root mismatch: expected %s, got %s", result.ExpectedRoot, result.GotRoot)
+		return result
 	}
 	if result.GotLogs != result.ExpectedLogs {
-		return fail(fmt.Errorf("logs hash mismatch: expected %s, got %s", result.ExpectedLogs, result.GotLogs))
+		result.Error = fmt.Errorf("logs hash mismatch: expected %s, got %s", result.ExpectedLogs, result.GotLogs)
+		return result
 	}
 	result.Passed = true
-	return
+	return result
+}
+
+func fixtureDecodeExceptionMatches(expected string, err error) bool {
+	for _, item := range strings.Split(expected, "|") {
+		switch strings.TrimSpace(item) {
+		case "TransactionException.TYPE_3_TX_CONTRACT_CREATION":
+			if errors.Is(err, types.ErrBlobTxCreate) {
+				return true
+			}
+		case "TransactionException.TYPE_4_TX_CONTRACT_CREATION":
+			if errors.Is(err, types.ErrSetCodeTxCreate) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func fixtureBytes(s string, size int) ([]byte, error) {
@@ -308,7 +342,7 @@ func fixtureExceptionMatches(expected string, err error, tx *types.Transaction, 
 				return true
 			}
 		case "TransactionException.NONCE_IS_MAX":
-			if tx.Nonce() == math.MaxUint64 && err.Error() == "sender nonce overflow" {
+			if tx.Nonce() == math.MaxUint64 && errors.Is(err, types.ErrNonceMax) {
 				return true
 			}
 		case "TransactionException.INITCODE_SIZE_EXCEEDED":
@@ -340,7 +374,7 @@ func fixtureExceptionMatches(expected string, err error, tx *types.Transaction, 
 				return true
 			}
 		case "TransactionException.TYPE_4_EMPTY_AUTHORIZATION_LIST":
-			if tx.Type() == types.SetCodeTxType && tx.To() != nil && len(tx.AuthorizationList()) == 0 && err.Error() == "set-code transaction requires destination and authorizations" {
+			if tx.Type() == types.SetCodeTxType && tx.To() != nil && len(tx.AuthorizationList()) == 0 && errors.Is(err, types.ErrEmptyAuthorizations) {
 				return true
 			}
 		case "TransactionException.GAS_ALLOWANCE_EXCEEDED":

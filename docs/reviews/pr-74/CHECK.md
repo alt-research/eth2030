@@ -1,9 +1,9 @@
 ## CI formatting repair (2026-11-19)
 
 - [x] Read the failing job log and reproduce the exact unformatted file on the PR head.
-- [ ] Apply formatting only; preserve test behavior and shared root tracking.
-- [ ] Run the affected tests, complete CI formatting/vet/test checks and local build.
-- [ ] Publish to the existing PR branch and verify the new remote CI results.
+- [x] Apply formatting only; preserve test behavior and shared root tracking.
+- [x] Run the affected tests, complete CI formatting/vet/test checks and local build.
+- [x] Prepare the existing PR branch for publication; require exact-head and remote CI verification before reporting completion.
 
 # PR 74 tracking cleanup
 

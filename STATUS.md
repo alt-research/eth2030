@@ -1,3 +1,79 @@
+## Current work complete; stopped for merge review (2026-11-19)
+
+PR 87 publishes nested/dimensional tracing with full 212/tagged 27/race 48/vet/build, nine independent SDK classic trees, seventeen mutations and a five-package composition repeat. Implementation is stopped at the user's request. [Merge review](docs/plans/glamsterdam/MERGE_REVIEW.md) records dependencies, Draft 83, lack of observed positive fork-head CI evidence and remaining CL/fixture/process/resource/release gates. No upstream PR is merged; the original checkout and unrelated dirt remain preserved.
+
+## Stateful simulation feature review (2026-11-19)
+
+PR 86 publishes stateful eth_simulateV1 with two independently matching complete SDK blocks, fifteen detected mutations, full 212/tagged 27/race 48/vet/build and a five-package composition repeat. Nested/dimensional tracing continues separately. Stable integration and final API/CL/full-client/resource/release qualification are not inferred from feature review submission.
+
+## Explicit LIFO development decision (2026-11-19)
+
+The user selected implementation of the currently merged LIFO model first, retaining final design review. EIPs `3db38a3` is the development target; unmerged alternatives 12581/12582 are excluded. This decision advances implementation authority without declaring final protocol or release acceptance. PR 85 separately qualifies method-specific RPC and opcode replay; simulator, nested dimensional tracing and remaining CL/full-client/resource work continue.
+
+## Qualified gas development checkpoint (2026-11-19)
+
+Draft PR 83 at tested source `2cde17ad` passes all 212 Go packages, 27 tagged Core/EIP, broad affected race, final 33 affected race, vet/build and ten compiling mutations. All 42 clean signed Amsterdam cases match independent SDK; actual HTTP/system/capacity/fees/restart consumers pass. RPC consumers are being repaired in their own branch, with simulation/application/full-client/resource/final release gates still open. Stable integration remains reviews 65–82/84.
+
+## Canonical system review and integration (2026-11-19)
+
+PR 84 qualifies actual-code history/beacon callbacks and explicit genesis assets against independent complete roots and Node recovery. Reviews 65–82 and 84 compose at `2f253d33`; 212 Go packages, 27 tagged Core/EIP packages, eleven affected race packages, vet/build pass. Published head: `b1a696d1`. Gas draft 83 remains separate; its nine new signed authorization controls and system margin pass locally, while full-suite/API/application and release gates stay open.
+
+## Pivot proof repair and active gas draft (2026-11-19)
+
+PR 81 adds authenticated unchanged-account storage recovery; seven encrypted Node scenarios and nine detected mutations pass. Aggregate `c0df6062` passes 212 Go packages, 27 tagged Core/EIP packages, affected snap/scheduler/Node race/vet and build. Draft PR 83 separately implements current-text LIFO gas, with 22 clean signed matches and an expanded 23-case/high-state HTTP block checkpoint. Full suite/API/application/system and final release gates remain open; the draft is not integrated.
+
+## Sparse relay review and integration (2026-11-19)
+
+PR 82 connects actual eth/72 provider/sampler/custody relay, authenticated reconstruction and Engine cells, with encrypted native-pool/SDK/Node/restart consumers and eight detected guard mutations. Aggregate source `20b1c1f` passes 212 Go packages, 27 tagged Core/EIP packages, 97 affected race packages, vet/build. PR 81 socket cleanup also passes five race-tested scenarios. Exact review/source/discussion records are updated; final gas, full independent-client/CL/resource and release gates remain open.
+
+## Snap version 2 review and composition (2026-11-19)
+
+PR 81 adds real BAL-based moving-pivot/reorg state synchronization, exact point-proof restoration, cursor reuse and missing-orphan restart. Independent SDK RLPx packet consumers and five native encrypted Node scenarios pass; seven behavioral mutations are detected. Aggregate source `13969eaf` passes 211 Go packages, 27 tagged Core/EIP packages, affected race/vet and build. Program/review records are updated; final gas, eth/72 and complete CL/multiclient/release gates remain open.
+
+## Configured blob schedule and signed capacity review (2026-11-18)
+
+[PR 80](https://github.com/alt-research/eth2030/pull/80) qualifies configured capacities/prices, actual fee burn, opcode/receipt/RPC contexts and persisted historical parameters. Real version-1 signed HTTP passes at 7/10/21 blobs with independent formulas and fresh-node recovery. Aggregate `53099cbe` passes all 211 tested Go packages, tagged Core/EIP, 54 targeted race packages, vet/build. [Verification](docs/verification/glamsterdam-blob-schedule-20261118.md). Final gas and remaining network/CL/release gates stay open.
+
+## Actual persisted configuration recovery review (2026-11-18)
+
+[PR 79](https://github.com/alt-research/eth2030/pull/79) qualifies pre-replay runtime configuration authority through signed HTTP and actual restarts. Compatible future updates survive; active changes, corrupt/unknown authority and changed historical parameters are rejected without head/config adoption. Aggregate `ab365362` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. [Verification](docs/verification/glamsterdam-config-recovery-20261118.md). Dynamic blob schedules, final gas and release gates remain open.
+
+## Canonical startup and Engine schema review (2026-11-18)
+
+[PR 78](https://github.com/alt-research/eth2030/pull/78) qualifies canonical fork dependencies, method windows and actual HTTP field/encoding bounds. Composed source `1d9826c2` passes all 211 tested Go packages, tagged Core/EIP, affected race/vet/build. Persisted configuration recovery remains separate ongoing work. See [verification](docs/verification/glamsterdam-fork-schema-20261118.md).
+
+## Builder execution request reviews (2026-11-18)
+
+[EL PR 77](https://github.com/alt-research/eth2030/pull/77) and [Lighthouse PR 3](https://github.com/jiayaoqijia/lighthouse/pull/3) qualify canonical mandatory queues, actual HTTP request commitments and independent real-BLS state-processing consumers. The composed EL source passes all 211 tested packages, tagged Core/EIP, vet and build; paired CL source passes 25 library tests/check. See [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). Final gas, live deployment/devnet, networking and release gates remain open.
+
+## Blob authentication, publication and replay review (2026-11-18)
+
+PR 76 closes ordinary full-data sidecar authentication and proof-consumer defects, with real HTTP/SDK wire checks and fresh-node journal recovery. Independent full Go/race/vet/build pass; the feature aggregate at `3b05bdb` passes all 211 tested packages, tagged Core/EIP, build and affected vet. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Sparse eth/72 and final gas/release gates remain open.
+
+## Actual CL Gloas transition repairs (2026-11-18)
+
+Two isolated Lighthouse fork reviews repair first-slot payload availability and independent builder/validator onboarding. Real-crypto regressions fail on the baseline; each branch passes 23 library tests/check/full lint. Their owned changes compose on the paired-client base with 24 passing library tests, cargo check and full workspace lint. See [client review tracking](docs/plans/glamsterdam/client-reviews.json) and [integration evidence](docs/verification/glamsterdam-fork-integration-20261118.md). Full devnet/release gates remain open.
+
+## Glamsterdam signed gas evidence and review 75 (2026-11-18)
+
+PR 75 adds an independent 44-comparison signed corpus. Aggregate source `24e0bd54` passes all 211 tested Go packages and build, while preserving 19/22 Amsterdam candidate mismatches and explicitly classifying the Osaka transition-only checks. Upstream gas alternatives remain open/unmerged. See [candidate evidence](docs/audits/glamsterdam-gas-2026-11-18/INTEGRATED.md) and [program tracking](docs/plans/glamsterdam/IMPLEMENTATION.md). The whole program remains incomplete.
+
+## Glamsterdam isolated reviews and aggregate qualification (2026-11-18)
+
+The completion program now has ten isolated implementation/qualification reviews (PRs 65–74), plus the plan/baseline PR 64. Combined source commit `96a1994c` passes all 210 tested Go packages, tagged Core/EIP tests, local build and affected vet/race checks. The program remains incomplete: coherent gas/API semantics, 8282, eth/72, snap/2, actual CL/builder and independent release qualification are open. See [implementation tracking](docs/plans/glamsterdam/IMPLEMENTATION.md) and [exact review heads](docs/plans/glamsterdam/feature-reviews.json).
+
+## Glamsterdam feature review batch (2026-11-18)
+
+Published independent reviews from current master: [#65 contract/initcode limits](https://github.com/alt-research/eth2030/pull/65), [#66 BAL availability window](https://github.com/alt-research/eth2030/pull/66), [#67 canonical factory](https://github.com/alt-research/eth2030/pull/67), and [#68 native RPC access discovery](https://github.com/alt-research/eth2030/pull/68). Each branch retains its affected test/build evidence and explicit remaining qualification boundaries. The negotiated eth/69-71/historical-consumer feature is prepared on its own branch and awaiting review publication.
+
+No review is marked merged or release-qualified here. The [implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md) distinguishes merged pre-existing header/history fixes from newly submitted work. Full gas/state, remaining protocols, CL/builder and combined independent-client/recovery gates remain open; the original dirty checkout is untouched.
+
+## Glamsterdam implementation baseline (2026-11-18)
+
+Started the 33-task completion plan on isolated branch `feat/glamsterdam-baseline`, based on freshly fetched `origin/master` at `38ea9259`. Imported the dated plan/audits without replacing newer mainline work. [Implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md).
+
+Revalidation finds BAL/slot canonical headers, execution-slot propagation, canonical persisted Engine bodies and the old tagged expectation already repaired on mainline. Those defects must not be reimplemented from the stale audit branch. The latest targeted core/Engine/node/eiptest suite is green; source/spec decisions and remaining size/factory/retention/RPC/gas/network work remain under qualification. Large functional changes will use separate branches and PRs.
+
 ## Merged roadmap and homepage progress (2026-11-18)
 
 - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -1,3 +1,7 @@
+## Nested trace final evidence (2026-11-19)
+
+Production source `9700ed6b` passes full 212/tagged 27/affected race 48/vet/build and seventeen compiling guard mutations. Nine independent SDK classic trees and actual signed/block/receipt consumers qualify the selected dimensional extension separately. Composition `217e0164` adds only simulator publication documentation; five affected race packages, vet/build pass again. [Evidence](docs/verification/glamsterdam-nested-trace-20261119.md). Publication and merge-review handoff are the final steps; further implementation stops afterward.
+
 ## Qualified nested/dimensional trace implementation (2026-11-19)
 
 Actual HTTP qualifies real call trees across call/create/selfdestruct, frame gas including spill, exact proposed dimensional presence, reverted logs, block-global indices, opcode fields/options and resource failure without partial results. Two actual signed funded transactions reconcile root counters with receipts/header and retain prefix indices under onlyTopCall. Nine classic call trees match unmodified SDK after excluding only the four unavailable dimensional extensions and allowed non-REVERT error text normalization. EIP-211 new-frame buffer and EIP-214 pre-meter read-only failures have preserved red cases and repaired behavior; existing raw EOF tests remain unchanged. Seventeen compiling guard mutations are detected. Final full 212/tagged 27/affected race 48/vet/build pass after restoration. Evidence/publication and merge-review handoff follow; further implementation stops after this task.

@@ -5,3 +5,5 @@
 - [ ] Execute nontrivial published contracts and blobs, compare independently imported commitments and canonical state, and require actual external builder payloads.
 - [ ] Exercise rejection, missing/late payloads, cold/restart/reorg/retention and operating budgets without replacing real consumers with simulations.
 - [ ] Retain failures and recovery, update the remaining completion inventory and submit an independent campaign review; do not claim release acceptance before all gates pass.
+
+- [ ] Preserve the independent Geth pruned-history control, then rebuild an archival oracle by replaying the original finalized raw blocks through unchanged Geth and resume the exact-hash application sequence.

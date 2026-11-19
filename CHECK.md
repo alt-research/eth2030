@@ -1,3 +1,10 @@
+## Canonical Osaka CLZ activation (2026-11-19)
+
+- [ ] Read selected EIP-7939 and reproduce missing Osaka/Amsterdam opcode activation.
+- [ ] Wire the existing CLZ implementation through the canonical Osaka table and Amsterdam inheritance.
+- [ ] Compare real EVM results/gas with unchanged Geth, verify before/at-fork boundaries, run affected/full/race/vet/build.
+- [ ] Publish a separate corrective PR with per-review task records.
+
 ## EIP-161 transaction-boundary empty-account finalization (2026-11-19)
 
 - [ ] Read EIP-161 and reproduce native roots retaining touched empty precompile accounts.

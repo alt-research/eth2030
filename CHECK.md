@@ -1,9 +1,9 @@
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 - [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.
-- [ ] Preserve feature tracking under `docs/reviews/pr-<number>/` and align shared root trackers.
-- [ ] Reconcile current master without dropping either side of functional changes; verify builds and affected tests.
-- [ ] Publish fast-forward updates and verify exact remote heads and GitHub conflict state.
+- [x] Preserve feature tracking under `docs/reviews/pr-<number>/` and align shared root trackers.
+- [x] Reconcile current master without dropping either side of functional changes; verify builds and affected tests.
+- [x] Prepare non-forced updates to all existing PR branches; require exact remote-head and live conflict-state verification before reporting completion.
 
 ## PR 65 conflict resolution (2026-11-19)
 

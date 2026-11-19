@@ -1,0 +1,29 @@
+{
+  "full_package_suites_passed": 215,
+  "affected_race_suites_passed": 20,
+  "tagged_integration_suites_passed": 44,
+  "full_vet": true,
+  "native_build": true,
+  "real_tcp_websocket_tests": 5,
+  "executed_mutations": [
+    {
+      "mutation": "connection_context_erased",
+      "detected_by_executed_test": true
+    },
+    {
+      "mutation": "shutdown_hook_erased",
+      "detected_by_executed_test": true
+    },
+    {
+      "mutation": "queue_bound_exceeded",
+      "detected_by_executed_test": true
+    }
+  ],
+  "sources_restored": true,
+  "limits": {
+    "pending_frames": 16,
+    "frame_bytes": 1048576,
+    "write_seconds": 10
+  },
+  "wire_context_fields_added": false
+}

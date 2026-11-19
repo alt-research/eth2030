@@ -8,13 +8,13 @@ An engineering owner may close a decision entry only with an explicit adopted re
 
 ### U-01 — execution/state gas refill and compatibility model
 
-Status: unresolved at the snapshot. Owner role: EL + Validation. Affects GL-020–025, GL-030/032–034, GL-045, GL-060/061 and final G2/G6.
+Status: development model selected by the user on 2026-11-19; final release review remains open. Owner role: EL + Validation. Affects GL-020–025, GL-030/032–034, GL-045, GL-060/061 and final G2/G6.
 
-The merged EIP text and its current LIFO model are the versioned baseline. Open [EIPs #12581](https://github.com/ethereum/EIPs/pull/12581) proposes reservoir-only refill and a legacy execution-gas share. An [additional author comment](https://github.com/ethereum/EIPs/pull/12581#issuecomment-6412891161) proposes delayed settlement credits and explicitly says it was not pushed. These are three distinct artifacts; do not implement a mixture.
+The merged EIP text and its current LIFO model are the versioned baseline. The user explicitly directed implementation of the currently merged LIFO text first, while retaining final model review. The implementation target is EIPs `3db38a3725105cb67b8804ac3e147967113bc3ca`; this authorizes development and does not resolve future protocol adoption. Open [EIPs #12581](https://github.com/ethereum/EIPs/pull/12581) proposes reservoir-only refill and a legacy execution-gas share. An [additional author comment](https://github.com/ethereum/EIPs/pull/12581#issuecomment-6412891161) proposes delayed settlement credits and explicitly says it was not pushed. These are three distinct artifacts; do not implement a mixture.
 
 Close when the chosen protocol model is explicitly recorded from authoritative upstream decisions/specifications, and its compatible executable-spec/native vectors are pinned. Record initialization, charge order, success/revert/halt, pre-execution failure, refunds, floor and block-fee equations. Review the [eight application invariants](https://github.com/ethereum/glamsterdam-gas-invariants), including fixed gas budgets and off-chain behavior. ACDT November 16 did not decide the path forward; ACDE November 19 was a future discussion at the snapshot.
 
-Work available now: canonical header/slot repairs, test corpus construction, independent current-text measurements, settlement invariants and compatibility inventory. Release acceptance remains pending until a coherent target is selected and qualified.
+Work available now: canonical header/slot repairs, test corpus construction, independent current-text measurements, settlement invariants and compatibility inventory. The coherent LIFO development target is now selected. Final release acceptance still requires compatible fixtures, application invariants and the final model review.
 
 ### U-02 — optional per-call state-gas allowance
 
@@ -75,3 +75,9 @@ Canonical header repairs change hashes compared with the experimental native for
 ## Updating a decision
 
 Append the refresh timestamp, selected source URL and commit/release, adoption status and rationale, rejected alternative disposition, affected GL tasks, invalidated evidence and replacement vectors. Record implementer/reviewer responsibility when assigned. A changed upstream decision reopens the affected acceptance claims without erasing previous versioned evidence. Do not silently mutate historical audit results or mark all development blocked while unrelated tasks remain actionable.
+
+## Networking refresh on 2026 11 19
+
+At 2026-11-18 17:09:48 UTC, the supporting eth/72 source set is pinned to devp2p commit `88f1c80800d622cc3a542a2125bbe33cc18c9f9c` (file blob `a23dc172`). [Merged Geth 35428](https://github.com/ethereum/go-ethereum/pull/35428) confirms flat request IDs; [merged devp2p 291](https://github.com/ethereum/devp2p/pull/291) resolves [issue 290](https://github.com/ethereum/devp2p/issues/290) to blob-major cell order. PR 82 adopts those settled inputs and qualifies native/SDK consumers; full independent-client and CL/resource release gates remain open. This refresh does not choose an unmerged gas or payload-authentication alternative.
+
+EIPs 12581/12582 remain open/unmerged at the baseline heads on this refresh. Current merged LIFO text remains the explicit development and measurement baseline, with final release selection unclosed.

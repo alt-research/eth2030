@@ -9,7 +9,8 @@
 - [x] Match complete roots/header/RLP size against unmodified SDK for new-slot and floor/refund/override cases; qualify virtual/native logs, branch ancestry, rollback and non-mutation.
 - [x] Detect fifteen compiling mutations, including branch ancestry, uint256 override arithmetic and VM cancellation.
 - [x] Pass final full 212/tagged 27/affected race 48/vet/build after restoring all fifteen mutations.
-- [ ] Archive exact results and publish the separate feature review.
+- [x] Archive exact results and qualify PR 85 test-only composition with five affected race packages, vet/build.
+- [ ] Publish the separate feature review.
 
 ## Method-specific gas simulation and tracing (2026-11-19)
 

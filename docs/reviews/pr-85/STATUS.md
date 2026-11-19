@@ -1,3 +1,13 @@
+## Sequential RPC dependency/CI repair (2026-11-19)
+
+Original head: `a4108837354427683f986b8ad340f0673928c2c9`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing gas dependency PR 83 (`a339283a`). Its Draft status, existing LIFO development authority and final review boundary are unchanged. No simulator/tracing feature is imported into this method review.
+
+Resolve the configuration conflict by retaining canonical EIP-7778 activation. Retain the ordinary zero-policy applyMessage wrapper and method-specific applyMessageWithOptions setup, including simulation nonce/value normalization; master's early initcode guard remains inside the common transition before fee/nonce mutation and BAL seeding. The other processor hunk is whitespace. Original failed CI 44477288492 lists inherited blob/header formatting, now resolved through repaired dependencies/master.
+
+Go 1.26.11 full default tests, integration (`./core ./p2p/... ./eiptest`), affected race (`./core/execution ./rpc/... ./node/... ./eiptest`), full formatting/vet/build pass. Existing actual HTTP call/estimate/access-list, authorization/override, historical opcode prefix and pre-block system replay assertions are retained. Logs: `/tmp/eth2030-pr85-{full,integration,race}.log`. Shared root tracking is unchanged.
+
+Publication fast-forwards the existing feature branch; exact-head, mergeability and fresh required CI are verified before completion. No Draft promotion, upstream merge or final API/release acceptance is performed.
+
 # PR 85 tracking cleanup status
 
 Original review head: `eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

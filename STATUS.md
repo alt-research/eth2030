@@ -2,7 +2,7 @@
 
 Merged current master `d6732d3c8f67b94d433a8d7b38d2e18e58a31fcc` (PR 64) into the existing contract-limit review from `a1008f472ca63950cfb22515ce8b795d21e913bd`. Resolved only CHECK.md and STATUS.md by retaining both the EIP-7954 feature evidence and the newer program/merge-review records. The complete `pkg/` tree remains identical to the prior PR 65 head; this update introduces no execution behavior changes.
 
-Validation passed: `go test -count=1 ./core/config ./core/vm ./core/execution ./txpool`, the same four packages with `-race`, `go vet` for those packages, and `go build ./...`, all from `pkg/`. Work was isolated in `fix/pr65-conflicts`; the original dirty checkout and other feature worktrees were preserved. Publication and live mergeability verification follow this merge commit; no upstream merge is requested.
+Validation passed: `go test -count=1 ./core/config ./core/vm ./core/execution ./txpool`, the same four packages with `-race`, `go vet` for those packages, and `go build ./...`, all from `pkg/`. Work was isolated in `fix/pr65-conflicts`; the original dirty checkout and other feature worktrees were preserved. Merge commit `97fecbf78ca49725fa86e9e2bc525e525ebeba16` was pushed to the existing PR 65 branch. GitHub confirmed `mergeable=true` against master `d6732d3c`; seven CI check runs were still in progress, with merge state `blocked` and no submitted review at verification. This confirms conflict resolution, not completion of CI or approval. No upstream merge was performed.
 
 ## Current work complete; stopped for merge review (2026-11-19)
 

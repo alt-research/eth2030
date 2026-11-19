@@ -3,7 +3,7 @@
 - [x] Fetch and verify the exact PR head and current master without changing the original checkout.
 - [x] Merge current master while preserving the EIP-7954 review and latest program documentation.
 - [x] Run affected tests, race/vet and local build; update STATUS.md.
-- [ ] Push only the updated PR 65 branch and confirm GitHub mergeability.
+- [x] Push only the updated PR 65 branch and confirm GitHub mergeability (mergeable=true; CI pending).
 
 ## Glamsterdam EIP-7954 contract limits
 

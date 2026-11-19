@@ -1,9 +1,10 @@
 ## Master integration after PRs 66–76 (2026-11-19)
 
 - [x] Verify the exact PR head and current master in an isolated worktree.
-- [ ] Resolve the receipt regression conflict while retaining mandatory Amsterdam builder queues and current transfer-log expectations.
-- [ ] Run affected tests, tagged variants, race/vet, CI formatting and local build.
-- [ ] Prepare a non-forced update of the existing PR branch and verify live mergeability.
+- [x] Resolve the receipt regression conflict while retaining mandatory Amsterdam builder queues and current transfer-log expectations.
+- [x] Reproduce and repair missing builder predeploys in newly merged blob-readiness, factory and memory-Engine fixtures without changing assertions.
+- [x] Run affected tests, tagged variants, race/vet, CI formatting and local build.
+- [x] Prepare a non-forced update of the existing PR branch; require exact-head and live mergeability verification before reporting completion.
 
 # PR 77 tracking cleanup
 

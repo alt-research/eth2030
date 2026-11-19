@@ -316,11 +316,11 @@ func TestE2E_BALRetention_WindowSlidesWith_ChainGrowth(t *testing.T) {
 }
 
 // TestE2E_BALRetention_BlockAccessListRetainedDuringWeakSubjectivity verifies
-// the retention spec claim: BALs must be retained for at least 3,533 epochs
-// = 113,056 slots. Block at exactly the boundary is retained; block just
+// the retention spec claim: BALs must be retained for at least 14,299 epochs
+// = 457,568 slots. Block at exactly the boundary is retained; block just
 // outside is not.
 func TestE2E_BALRetention_BlockAccessListRetainedDuringWeakSubjectivity(t *testing.T) {
-	const weakSubjectivitySlots = rawdb.BALRetentionSlots // 3533 * 32
+	const weakSubjectivitySlots = rawdb.BALRetentionSlots // 14299 * 32
 
 	// Simulate a chain at slot 2*weakSubjectivity.
 	head := uint64(weakSubjectivitySlots * 2)

@@ -3,6 +3,7 @@
 package rpcbackend
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/state"
@@ -71,3 +72,19 @@ type Backend interface {
 	// eth_feeHistory to compute correct per-fork blob fees and ratios.
 	BlobSchedule(blockTime uint64) (target, max uint64, updateFraction uint64)
 }
+
+// AccessListResult is transaction simulation output, independent of wire encoding.
+type AccessListResult struct {
+	AccessList     types.AccessList
+	GasUsed        uint64
+	ExecutionError string
+}
+
+// AccessListBackend provides actual access discovery. Backends without this
+// capability must report unsupported instead of claiming an empty discovered list.
+type AccessListBackend interface {
+	CreateAccessList(args rpctypes.CallArgs, blockNumber rpctypes.BlockNumber) (*AccessListResult, error)
+}
+
+// ErrInvalidCallArgs identifies malformed simulation input at the RPC boundary.
+var ErrInvalidCallArgs = errors.New("invalid call arguments")

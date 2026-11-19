@@ -31,14 +31,14 @@ func (b *EngineBackend) ForkchoiceUpdated(
 	fcState payload.ForkchoiceStateV1,
 	attrs *payload.PayloadAttributesV3,
 ) (payload.ForkchoiceUpdatedResult, error) {
-	return b.forkchoiceUpdated(fcState, attrs, nil, 0, 0)
+	return b.forkchoiceUpdated(fcState, attrs, nil, nil, 0)
 }
 
 func (b *EngineBackend) forkchoiceUpdated(
 	fcState payload.ForkchoiceStateV1,
 	attrs *payload.PayloadAttributesV3,
 	inclusionListTxs [][]byte,
-	slot uint64,
+	slotNumber *uint64,
 	targetGasLimit uint64,
 ) (payload.ForkchoiceUpdatedResult, error) {
 	bc := b.node.Blockchain()
@@ -82,6 +82,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 	b.safeHash = fcState.SafeBlockHash
 	b.finalizedHash = fcState.FinalizedBlockHash
 	b.fcMu.Unlock()
+	if ranges, ok := b.node.EthHandler().(interface{ NotifyBlockRange() }); ok {
+		ranges.NotifyBlockRange()
+	}
 	b.node.TxPool().SetForkRules(bc.Config(), bc.CurrentBlock().Time())
 	b.node.TxPool().Reset(bc.State(), headBlock.Header())
 	b.node.TxPool().RecordBlock(headBlock.Header(), headBlock.Transactions())
@@ -143,8 +146,10 @@ func (b *EngineBackend) forkchoiceUpdated(
 		InclusionListTxs: inclusionListTxs,
 	}
 
-	if slot != 0 {
-		buildAttrs.SlotNumber = &slot
+	buildAttrs.SlotNumber = slotNumber
+	var slot uint64
+	if slotNumber != nil {
+		slot = *slotNumber
 	}
 
 	// Generate payload ID.
@@ -280,5 +285,5 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 	if attrs == nil {
 		return b.ForkchoiceUpdated(fcState, nil)
 	}
-	return b.forkchoiceUpdated(fcState, v3Attrs, attrs.InclusionListTransactions, attrs.SlotNumber, attrs.TargetGasLimit)
+	return b.forkchoiceUpdated(fcState, v3Attrs, attrs.InclusionListTransactions, &attrs.SlotNumber, attrs.TargetGasLimit)
 }

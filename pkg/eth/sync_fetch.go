@@ -16,13 +16,18 @@ type syncRequestKey struct {
 }
 
 type syncResponse struct {
-	headers []*types.Header
-	bodies  []*p2p.BlockBody
+	headers    []*types.Header
+	bodies     []*p2p.BlockBody
+	bals       [][]byte
+	receipts   [][]*types.Receipt
+	incomplete bool
+	err        error
 }
 
 type syncRequest struct {
-	code     uint64
-	response chan syncResponse
+	code          uint64
+	response      chan syncResponse
+	receiptLimits [][]uint64
 }
 
 // deliverSyncResponse correlates both the peer and request ID. Unsolicited or
@@ -46,7 +51,12 @@ func (h *Handler) syncRequest(ctx context.Context, ep *EthPeer, code uint64, mak
 	defer stopClose()
 	id := ep.nextRequestID()
 	key := syncRequestKey{ep, id}
-	req := &syncRequest{code: code + 1, response: make(chan syncResponse, 1)}
+	packet := makePacket(id)
+	limits, err := h.receiptBounds(packet)
+	if err != nil {
+		return syncResponse{}, err
+	}
+	req := &syncRequest{code: code + 1, response: make(chan syncResponse, 1), receiptLimits: limits}
 	h.syncMu.Lock()
 	if h.syncRequests == nil {
 		h.syncRequests = make(map[syncRequestKey]*syncRequest)
@@ -54,7 +64,16 @@ func (h *Handler) syncRequest(ctx context.Context, ep *EthPeer, code uint64, mak
 	h.syncRequests[key] = req
 	h.syncMu.Unlock()
 	defer func() { h.syncMu.Lock(); delete(h.syncRequests, key); h.syncMu.Unlock() }()
-	err := ep.sendMessage(code, makePacket(id))
+	balRequest, hasBAL := packet.(*p2p.GetBlockAccessListsPacket)
+	if hasBAL {
+		if err := ep.trackBALRequest(id, balRequest.BlockHashes); err != nil {
+			return syncResponse{}, err
+		}
+	}
+	err = ep.sendMessage(code, packet)
+	if err != nil && hasBAL {
+		ep.takeBALRequest(id)
+	}
 	stopClose() // cancelling a response wait must not disconnect a healthy peer
 	if err != nil {
 		return syncResponse{}, err
@@ -65,7 +84,7 @@ func (h *Handler) syncRequest(ctx context.Context, ep *EthPeer, code uint64, mak
 	case <-ctx.Done():
 		return syncResponse{}, ctx.Err()
 	case response := <-req.response:
-		return response, nil
+		return response, response.err
 	}
 }
 

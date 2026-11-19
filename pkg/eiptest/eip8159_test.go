@@ -1,6 +1,8 @@
 package eiptest_test
 
 import (
+	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -30,6 +32,7 @@ func wireEIP8159Request(t *testing.T, handler *eth.Handler, hashes []types.Hash)
 	defer end2.Close()
 
 	ep := eth.NewEthPeer(p2p.NewPeer("eip8159-peer", "127.0.0.1:30303", nil), end1)
+	ep.Peer().SetVersion(eth.ETH71)
 	req, err := p2p.EncodeMessage(p2p.GetBlockAccessListsMsg, &p2p.GetBlockAccessListsPacket{
 		RequestID:   9,
 		BlockHashes: hashes,
@@ -150,19 +153,28 @@ func TestEIP8159_RejectsTamperedBAL(t *testing.T) {
 		t.Fatalf("empty BAL for a header without a BAL hash must pass: %v", err)
 	}
 
-	// The handler dispatches a response containing a tampered BAL without
-	// accepting it: the client-side path logs the rejection.
-	bad := &p2p.BlockAccessListsPacket{RequestID: 11, AccessLists: [][]byte{tampered}}
-	msg, err := p2p.EncodeMessage(p2p.BlockAccessListsMsg, bad)
-	if err != nil {
-		t.Fatalf("encode BlockAccessLists: %v", err)
-	}
+	// Correlate the response to a real outstanding request, then require
+	// rejection for the hash mismatch rather than an unrelated request error.
 	end1, end2 := p2p.MsgPipe()
 	defer end1.Close()
 	defer end2.Close()
 	ep := eth.NewEthPeer(p2p.NewPeer("eip8159-client", "127.0.0.1:30303", nil), end1)
+	ep.Peer().SetVersion(eth.ETH71)
+	id, err := ep.RequestBlockAccessLists([]types.Hash{r.Block.Hash()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bad := &p2p.BlockAccessListsPacket{RequestID: id, AccessLists: [][]byte{tampered}}
+	msg, err := p2p.EncodeMessage(p2p.BlockAccessListsMsg, bad)
+	if err != nil {
+		t.Fatal(err)
+	}
 	handler := eth.NewHandler(s.Chain(), stubTxPool{}, 1)
-	if err := handler.HandleMsg(ep, p2p.Msg{Code: msg.Code, Size: msg.Size, Payload: msg.Payload}); err != nil {
-		t.Fatalf("client-side BAL handling errored: %v", err)
+	if err := handler.HandleMsg(ep, p2p.Msg{Code: msg.Code, Size: msg.Size, Payload: msg.Payload}); !errors.Is(err, eth.ErrBALHashMismatch) {
+		t.Fatalf("want BAL hash mismatch, got %v", err)
+	}
+	after, err := s.Chain().BlockAccessList(r.Block.Hash())
+	if err != nil || !bytes.Equal(after, encoded) {
+		t.Fatal("tampered reply modified validated BAL storage")
 	}
 }

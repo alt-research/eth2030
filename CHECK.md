@@ -1,10 +1,3 @@
-## R01 historical EIP-7702 authorization completion (2026-11-19)
-
-- [ ] Read selected EIP-7702 and trace the old-fork caller, warming, refunds, code checks and nonce/clear boundaries.
-- [ ] Add failing signed consumer regressions without changing the working Amsterdam lane.
-- [ ] Correct the legacy transition; independently compare Osaka/Amsterdam results and retain meaningful negative cases.
-- [ ] Run affected/full/tagged/race/vet/build checks, update task status and publish a dedicated corrective PR.
-
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 - [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.

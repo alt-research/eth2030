@@ -1,0 +1,31 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..f38d302c 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,14 @@
+ # Lean4 Verification Check-list
+ 
++## EIP-8282 builder execution requests (2026-11-18)
++
++- [x] Read the complete pinned EIP, canonical bytecode assets and selected CL processing.
++- [x] Add exact runtime/constructor assets and request types/SSZ encoding with provenance.
++- [x] Wire mandatory Amsterdam system queues, rollback and commitment validation.
++- [x] Supply explicit pre-fork deployment/genesis fixtures without fork-time code injection.
++- [x] Qualify fee/queue/endian/cap/failure and actual Engine/CL consumer paths.
++- [x] Run affected builds/tests and publish a dedicated feature PR.
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..7cd7c302 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## EIP-8282 native builder requests (2026-11-18)
++
++Canonical contracts and mandatory Amsterdam type-3/type-4 extraction now compose with the existing snapshot and Engine commitment path. Explicit owned genesis allocation precedes roots; missing production predeploys invalidate blocks. Actual HTTP and separate real-BLS Lighthouse component consumers qualify request bytes and registration/exit gates. Full Go, tagged Core/EIP, targeted race/vet/build and failing guard mutations pass. See [verification](docs/verification/glamsterdam-builder-requests-20261118.md). Final gas, live full-client/devnet and release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

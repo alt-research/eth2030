@@ -278,14 +278,9 @@ func (api *EthAPI) getBalance(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-	}
-
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
@@ -308,14 +303,9 @@ func (api *EthAPI) getTransactionCount(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-	}
-
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
@@ -338,14 +328,9 @@ func (api *EthAPI) getCode(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-	}
-
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
@@ -371,14 +356,9 @@ func (api *EthAPI) getStorageAt(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[2], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
-	}
-
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[2])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
@@ -623,18 +603,36 @@ func (api *EthAPI) createAccessList(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	bn := LatestBlockNumber
+	var raw json.RawMessage
 	if len(req.Params) > 1 {
-		if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-			return errorResponse(req.ID, ErrCodeInvalidParams, "invalid block number: "+err.Error())
-		}
+		raw = req.Params[1]
+	}
+	selection, selectorErr := parseBlockSelection(raw)
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
 	discovery, ok := api.backend.(rpcbackend.AccessListBackend)
 	if !ok {
 		return errorResponse(req.ID, ErrCodeInternal, "access-list discovery is not supported by this backend")
 	}
-	observed, err := discovery.CreateAccessList(args, bn)
+	var observed *rpcbackend.AccessListResult
+	var err error
+	if byHeader, ok := api.backend.(rpcbackend.HeaderAccessListBackend); ok {
+		header, selectorErr := resolveBlockSelection(api.backend, selection)
+		if selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+		}
+		observed, err = byHeader.CreateAccessListAtHeader(args, header)
+	} else {
+		if selection.hash != nil {
+			if _, selectorErr := resolveBlockSelection(api.backend, selection); selectorErr != nil {
+				return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+			}
+			return errorResponse(req.ID, ErrCodeMethodNotFound, "hash-selected access-list discovery unavailable")
+		}
+		observed, err = discovery.CreateAccessList(args, selection.number)
+	}
 	if err != nil {
 		if errors.Is(err, rpcbackend.ErrInvalidCallArgs) {
 			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())

@@ -1,3 +1,13 @@
+## Sequential dependency/CI repair (2026-11-19)
+
+Original head: `4f2a0fdb75306e26a14c0d83de4d310caa9b0d35`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing sparse-relay foundation PR 82 (`80219cd4`, including repaired 80/81). Draft gas 83 and later method features remain excluded. The processor text conflict was a blank line only; initcode validation, BAL seeding and mandatory request guards are retained.
+
+EIPs 2935/4788 were re-read in full. No manual system-transition policy changes are made: actual deployed runtime, missing-code/revert behavior, ordering, zero gas-pool debit, final BAL reconciliation and explicit owned genesis remain as qualified by this review. The original CI run 44477260035 stopped on the inherited blob/header formatting; repaired dependencies and master remove those exact failures.
+
+Go 1.26.11 full default tests, integration (`./core ./p2p/... ./eiptest`), race (`./core/eips ./core/execution ./core/block ./core/chain ./geth ./node/... ./eiptest`), full vet, formatting and build pass. Existing independent system-root, actual HTTP/restart and blob/snap tests run with unchanged assertions. Logs: `/tmp/eth2030-pr84-{full,integration,race}.log`. Shared root tracking/instructions remain identical to master.
+
+The branch is prepared for fast-forward publication, requiring exact-head, no-conflict and fresh target CI verification before batch completion. Independent full-client/release and final gas qualification remain separate.
+
 # PR 84 tracking cleanup status
 
 Original review head: `6ed6f2562cb1c34329462196b65b12b41a56a922`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

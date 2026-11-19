@@ -39,7 +39,9 @@ func TestEIP8246NativeCreationFinalization(t *testing.T) {
 		lateTip        bool
 	}{
 		{"self", true, 0, 7, false}, {"prefunded_self", true, 5, 7, false},
-		{"other", false, 0, 7, false}, {"zero", true, 0, 0, false}, {"late_miner_tip", false, 0, 7, true},
+		{"other", false, 0, 7, false}, {"prefunded_other", false, 5, 7, false},
+		{"prefunded_zero_endowment_other", false, 5, 0, false},
+		{"zero", true, 0, 0, false}, {"late_miner_tip", false, 0, 7, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db := state.NewMemoryStateDB()
@@ -58,6 +60,8 @@ func TestEIP8246NativeCreationFinalization(t *testing.T) {
 			init = append(init, 0xff)
 			tx := types.NewTransaction(&types.LegacyTx{Gas: 1_000_000, GasPrice: big.NewInt(2), Value: big.NewInt(tc.value), Data: init})
 			tx.SetSender(sender)
+			// Match the transaction log context installed by ProcessWithBAL.
+			db.SetTxContext(tx.Hash(), 0)
 			header := newTestHeader()
 			header.BaseFee = big.NewInt(1)
 			if tc.lateTip {
@@ -66,6 +70,31 @@ func TestEIP8246NativeCreationFinalization(t *testing.T) {
 			receipt, used, err := ApplyTransaction(amsterdam8246(), db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit))
 			if err != nil || receipt.Status != types.ReceiptStatusSuccessful {
 				t.Fatalf("creation failed: %v receipt=%+v", err, receipt)
+			}
+			// EIP-7708 and EIP-8246 must agree in the same native receipt:
+			// log real endowment/beneficiary transfers, never self or fee burns.
+			type transfer struct {
+				from, to types.Address
+				amount   int64
+			}
+			var transfers []transfer
+			if tc.value > 0 {
+				transfers = append(transfers, transfer{sender, address, tc.value})
+			}
+			if !tc.self && tc.value+tc.prefund > 0 {
+				transfers = append(transfers, transfer{address, beneficiary, tc.value + tc.prefund})
+			}
+			if len(receipt.Logs) != len(transfers) {
+				t.Fatalf("transfer logs=%d, want %d", len(receipt.Logs), len(transfers))
+			}
+			for i, transfer := range transfers {
+				log := receipt.Logs[i]
+				var fromTopic, toTopic types.Hash
+				copy(fromTopic[12:], transfer.from[:])
+				copy(toTopic[12:], transfer.to[:])
+				if log.Address != vm.SystemAddress || len(log.Topics) != 3 || log.Topics[0] != vm.TransferEventTopic || log.Topics[1] != fromTopic || log.Topics[2] != toTopic || len(log.Data) != 32 || new(big.Int).SetBytes(log.Data).Cmp(big.NewInt(transfer.amount)) != 0 {
+					t.Fatalf("transfer log %d: got %+v, want %s -> %s amount %d", i, log, transfer.from, transfer.to, transfer.amount)
+				}
 			}
 			want := new(big.Int)
 			if tc.self {

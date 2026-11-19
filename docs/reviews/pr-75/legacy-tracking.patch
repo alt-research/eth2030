@@ -1,0 +1,30 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..602804b8 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,13 @@
+ # Lean4 Verification Check-list
+ 
++## Glamsterdam independent current-text gas corpus (2026-11-18)
++
++- [x] Freeze signed transactions, complete pre-state, fork/config and reference-client version.
++- [x] Execute identical inputs through native transaction-level execution and the unmodified Geth Amsterdam transition.
++- [x] Record invalid versus included failure, gas dimensions, logs and exact final account/state results.
++- [x] Verify pre-Amsterdam controls, archive candidate mismatches and build locally.
++- [x] Publish the separate gas-corpus review (PR 75).
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..6e739cc2 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Glamsterdam independent gas corpus (2026-11-18)
++
++Added an offline signed-transaction differential command with 22 scenarios across Osaka controls and a pinned Amsterdam reference (44 comparisons). Reports preserve complete inputs, gas dimensions, validity versus included failure, logs and final state. The independent context explicitly includes CPSB; a targeted mutation proves its sanity check detects missing state creation pricing. Scoped tests/race/vet and local build pass. This is mismatch evidence, not release parity; see [verification](docs/verification/glamsterdam-gas-corpus-20261118.md).
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

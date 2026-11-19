@@ -1,4 +1,5 @@
 FROM ubuntu:24.04
 COPY geth-real /usr/local/bin/geth-real
+COPY engine-capture /usr/local/bin/engine-capture
 COPY geth-wrapper.sh /usr/local/bin/geth
 ENTRYPOINT ["geth"]

@@ -202,5 +202,8 @@ func OpenTrieHistory(ctx context.Context, db rawdb.Database, root types.Hash) (*
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return &SnapStateDB{memory: NewMemoryStateDB(), base: snapshot, db: db}, nil
+	// Execution overlays stay in memory. Publishing a newly validated root is
+	// owned by StoreTrieHistory and its caller's atomic block batch, rather than
+	// writing a duplicate full flat snapshot for each intermediate replay root.
+	return &SnapStateDB{memory: NewMemoryStateDB(), base: snapshot}, nil
 }

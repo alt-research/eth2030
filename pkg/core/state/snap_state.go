@@ -358,8 +358,10 @@ func (s *SnapStateDB) StorageRoot(addr types.Address) types.Hash {
 func (s *SnapStateDB) Commit() (types.Hash, error) {
 	snap := s.snapshot()
 	root := snap.Root()
-	if err := StoreStateSnapshot(s.db, root, snap); err != nil {
-		return types.Hash{}, err
+	if s.db != nil {
+		if err := StoreStateSnapshot(s.db, root, snap); err != nil {
+			return types.Hash{}, err
+		}
 	}
 	s.base = snap
 	s.memory = NewMemoryStateDB()

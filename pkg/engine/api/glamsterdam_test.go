@@ -19,7 +19,7 @@ type mockGlamsterdamBackend struct {
 	newPayloadErr  error
 	fcuResult      *ForkchoiceUpdatedResult
 	fcuErr         error
-	getPayloadResp *GetPayloadV5Response
+	getPayloadResp *LegacyGlamsterdamPayloadResponse
 	getPayloadErr  error
 	getBlobsResp   []*BlobAndProofV2
 	getBlobsErr    error
@@ -83,7 +83,7 @@ func (m *mockGlamsterdamBackend) ForkchoiceUpdatedV4G(
 	}, nil
 }
 
-func (m *mockGlamsterdamBackend) GetPayloadV5(id engpayload.PayloadID) (*GetPayloadV5Response, error) {
+func (m *mockGlamsterdamBackend) GetPayloadV5(id engpayload.PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.lastPayloadID = id
@@ -385,7 +385,7 @@ func TestGlamsterdam_ForkchoiceUpdatedV4_BackendError(t *testing.T) {
 }
 
 func TestGlamsterdam_GetPayloadV5_Valid(t *testing.T) {
-	expected := &GetPayloadV5Response{
+	expected := &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload:  gloasPayloadForTest("0xcc", 200),
 		BlobsBundle:       &BlobsBundleV2{},
 		ExecutionRequests: [][]byte{},
@@ -626,7 +626,7 @@ func TestGlamsterdam_JSONRPC_ForkchoiceUpdatedV4(t *testing.T) {
 }
 
 func TestGlamsterdam_JSONRPC_GetPayloadV5(t *testing.T) {
-	expected := &GetPayloadV5Response{
+	expected := &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload: gloasPayloadForTest("0xcc", 0),
 	}
 	b := &mockGlamsterdamBackend{getPayloadResp: expected}

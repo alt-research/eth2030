@@ -60,6 +60,7 @@ type mockBackend struct {
 	blockTimestampFn   func(types.Hash) uint64
 	isCancunFn         func(timestamp uint64) bool
 	isPragueFn         func(timestamp uint64) bool
+	isOsakaFn          func(timestamp uint64) bool
 	isAmsterdamFn      func(timestamp uint64) bool
 }
 
@@ -148,6 +149,13 @@ func (m *mockBackend) IsPrague(timestamp uint64) bool {
 	return true
 }
 
+func (m *mockBackend) IsOsaka(timestamp uint64) bool {
+	if m.isOsakaFn != nil {
+		return m.isOsakaFn(timestamp)
+	}
+	return true
+}
+
 func (m *mockBackend) IsAmsterdam(timestamp uint64) bool {
 	if m.isAmsterdamFn != nil {
 		return m.isAmsterdamFn(timestamp)
@@ -163,6 +171,7 @@ func (m *mockBackend) GetFinalizedHash() types.Hash { return types.Hash{} }
 func TestNewPayloadV3_Valid(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			if payload.BlockNumber != 100 {
 				t.Errorf("expected block number 100, got %d", payload.BlockNumber)
@@ -215,6 +224,7 @@ func TestNewPayloadV3_Valid(t *testing.T) {
 func TestNewPayloadV3_InvalidPayload(t *testing.T) {
 	errMsg := "block hash mismatch"
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{
 				Status:          StatusInvalid,
@@ -259,6 +269,7 @@ func TestNewPayloadV3_InvalidPayload(t *testing.T) {
 
 func TestNewPayloadV3_BackendError(t *testing.T) {
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{}, ErrInvalidParams
 		},
@@ -366,6 +377,7 @@ func TestForkchoiceUpdatedV3_WithoutAttributes(t *testing.T) {
 func TestForkchoiceUpdatedV3_WithAttributes(t *testing.T) {
 	expectedID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
 			if attrs == nil {
 				t.Fatal("expected non-nil payload attributes")
@@ -464,6 +476,7 @@ func TestForkchoiceUpdatedV3_InvalidState(t *testing.T) {
 func TestGetPayloadV3_Valid(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		getPayloadByIDFn: func(id PayloadID) (*GetPayloadResponse, error) {
 			if id != payloadID {
 				t.Errorf("unexpected payload ID")
@@ -819,6 +832,7 @@ func TestForkchoiceUpdatedV3_OnlyState(t *testing.T) {
 func TestNewPayloadV4_Valid(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef")
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		processBlockV4Fn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash, requests [][]byte) (PayloadStatusV1, error) {
 			latestValid := payload.BlockHash
 			return PayloadStatusV1{

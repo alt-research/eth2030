@@ -1209,11 +1209,8 @@ func opBlockhash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack
 	return nil, nil
 }
 
-// opSelfdestruct implements the SELFDESTRUCT opcode.
-// Post-EIP-6780 (Cancun): sends remaining balance to the beneficiary but does
-// NOT destroy the account. Account destruction only occurs if the contract was
-// created in the same transaction, which is tracked externally by the state
-// processor. The opcode effectively becomes "send all balance".
+// opSelfdestruct transfers the balance and halts. Same-transaction creation
+// markers are journaled by the EVM; EIP-8246 clears their state at transaction end.
 func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	if evm.readOnly {
 		return nil, ErrWriteProtection
@@ -1224,12 +1221,10 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	if evm.StateDB != nil {
 		balance := evm.StateDB.GetBalance(contract.Address)
 		if balance.Sign() > 0 {
-			// EIP-7708: emit transfer or burn log for SELFDESTRUCT.
+			// EIP-7708: only a transfer to a different beneficiary is logged.
 			if evm.forkRules.IsEIP7708 {
 				if beneficiary != contract.Address {
 					EmitTransferLog(evm.StateDB, contract.Address, beneficiary, balance)
-				} else {
-					EmitBurnLog(evm.StateDB, contract.Address, balance)
 				}
 			}
 			// EIP-7928: capture pre-transfer balances for BAL tracking.
@@ -1248,9 +1243,15 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 				}
 			}
 		}
-		// Post-EIP-6780: do NOT call SelfDestruct. The account persists.
-		// The state processor may still mark it for destruction if the
-		// contract was created in the same transaction.
+		if evm.createdInTransaction(contract.Address) {
+			// The StateDB marker clears the balance as a legacy side effect.
+			// Restore it so repeated destruction and later credits never burn ETH.
+			remaining := new(big.Int).Set(evm.StateDB.GetBalance(contract.Address))
+			evm.StateDB.SelfDestruct(contract.Address)
+			if evm.isEIP8246() {
+				evm.StateDB.AddBalance(contract.Address, remaining)
+			}
+		}
 	}
 
 	return nil, nil
@@ -1273,25 +1274,15 @@ func opCLZ(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stac
 	return nil, nil
 }
 
-// decodeSingle decodes a single immediate byte for DUPN/SWAPN per EIP-8024.
-// Maps the full byte range [0..255] (excluding 91..127) onto stack depths [17..236].
+// decodeSingle maps valid EIP-8024 immediates to depths 17 through 235.
 func decodeSingle(x byte) int {
-	if x <= 90 {
-		return int(x) + 17
-	}
-	// x >= 128
-	return int(x) - 20
+	return (int(x) + 145) % 256
 }
 
-// decodePair decodes a pair immediate byte for EXCHANGE per EIP-8024.
-// Maps the full byte range [0..255] (excluding 80..127) onto two stack depths.
+// decodePair implements the EIP-8024 XOR permutation for EXCHANGE.
+// Callers reject the reserved range 82 through 127 before decoding.
 func decodePair(x byte) (int, int) {
-	var k int
-	if x <= 79 {
-		k = int(x)
-	} else {
-		k = int(x) - 48
-	}
+	k := int(x ^ 143)
 	q, r := k/16, k%16
 	if q < r {
 		return q + 1, r + 1
@@ -1358,8 +1349,8 @@ func opExchange(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 		x = contract.Code[*pc+1]
 	}
 
-	// Range 80..127 is excluded per spec.
-	if x > 79 && x < 128 {
+	// Range 82..127 is excluded per spec.
+	if x > 81 && x < 128 {
 		return nil, ErrInvalidOpCode
 	}
 	n, m := decodePair(x)

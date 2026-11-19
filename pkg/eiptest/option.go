@@ -15,7 +15,7 @@ import (
 	"github.com/eth2030/eth2030/txpool"
 )
 
-// Fork names understood by the framework. The Shanghai/Cancun/Prague forks are
+// Fork names understood by the framework. The Shanghai/Cancun/Prague/Osaka forks are
 // always active from genesis (they are historical by now); the scheduled forks
 // below map to the corresponding *Time fields on config.ChainConfig.
 type Fork string
@@ -170,7 +170,7 @@ func WithPoolConfig(cfg txpool.Config) SimOption {
 }
 
 // buildChainConfig assembles the chain config from the options. Shanghai,
-// Cancun and Prague are active from genesis; scheduled forks follow the
+// Cancun, Prague and Osaka are active from genesis; scheduled forks follow the
 // ForkAt options (unset forks stay inactive).
 func (o *simOptions) buildChainConfig() (*config.ChainConfig, error) {
 	cfg := &config.ChainConfig{
@@ -192,6 +192,7 @@ func (o *simOptions) buildChainConfig() (*config.ChainConfig, error) {
 		ShanghaiTime:            newUint64p(0),
 		CancunTime:              newUint64p(0),
 		PragueTime:              newUint64p(0),
+		OsakaTime:               newUint64p(0),
 	}
 	for fork, offset := range o.forkTimes {
 		field, err := forkTimeField(cfg, fork)

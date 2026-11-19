@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -17,10 +19,8 @@ import (
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
-	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/crypto/bls"
 	"github.com/eth2030/eth2030/engine/actor"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/focil"
@@ -432,10 +432,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 	b.blocksMu.RLock()
 	defer b.blocksMu.RUnlock()
 
-	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
-	}
+	headBlock := b.blocks[headHash]
 
 	results := make([]*enginepayload.ExecutionPayloadBodyV2, len(hashes))
 	for i, h := range hashes {
@@ -444,10 +441,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok && rawdb.IsBALRetained(headNum, block.NumberU64()) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[h])
 		results[i] = body
 	}
 	return results
@@ -460,8 +454,9 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 	defer b.blocksMu.RUnlock()
 
 	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
+	headBlock := b.blocks[headHash]
+	if headBlock != nil {
+		headNum = headBlock.NumberU64()
 	}
 
 	if start > headNum {
@@ -523,10 +518,7 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok && rawdb.IsBALRetained(headNum, num) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[hash])
 		results[i] = body
 	}
 	if len(canonical) != int(count) {
@@ -919,10 +911,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 			"source", "async",
 		)
 
+		bundle, err := enginepayload.BuildBlobsBundleV1(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadResponse{
 			ExecutionPayload: ep,
 			BlockValue:       result.BlockValue,
-			BlobsBundle:      collectBlobsBundleV1(result.Block.Transactions()),
+			BlobsBundle:      bundle,
 		}, nil
 	}
 
@@ -950,10 +946,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 			"source", "actor",
 		)
 
+		bundle, err := enginepayload.BuildBlobsBundleV1(actorPayload.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadResponse{
 			ExecutionPayload: ep,
 			BlockValue:       new(big.Int).Set(actorPayload.BlockValue),
-			BlobsBundle:      collectBlobsBundleV1(actorPayload.Block.Transactions()),
+			BlobsBundle:      bundle,
 		}, nil
 	}
 
@@ -979,10 +979,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 		"source", "mutex",
 	)
 
+	bundle, err := enginepayload.BuildBlobsBundleV1(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadResponse{
 		ExecutionPayload: ep,
 		BlockValue:       new(big.Int).Set(pending.blockValue),
-		BlobsBundle:      collectBlobsBundleV1(pending.block.Transactions()),
+		BlobsBundle:      bundle,
 	}, nil
 }
 
@@ -1187,6 +1191,13 @@ func (b *EngineBackend) processRequestPayload(
 			return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
 		}
 		header.BlockAccessListHash = &hash
+		if payload.SlotNumber != "" {
+			slot, err := strconv.ParseUint(strings.TrimPrefix(payload.SlotNumber, "0x"), 16, 64)
+			if err != nil || fmt.Sprintf("0x%x", slot) != payload.SlotNumber {
+				return PayloadStatusV1{}, ErrInvalidParams
+			}
+			header.SlotNumber = &slot
+		}
 	}
 	blk = types.NewBlock(header, blk.Body())
 
@@ -1358,6 +1369,7 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			Withdrawals:      WithdrawalsToCore(attrs.Withdrawals),
 			BeaconRoot:       &attrs.ParentBeaconBlockRoot,
 			InclusionListTxs: attrs.InclusionListTransactions,
+			SlotNumber:       &attrs.SlotNumber,
 		})
 		if err != nil {
 			return ForkchoiceUpdatedResult{}, fmt.Errorf("payload build failed: %w", err)
@@ -1410,10 +1422,14 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
 		ep4 := enginepayload.BlockToPayload(result.Block, asyncPending.PrevRandao, engineWithdrawals)
+		bundle, err := enginepayload.BuildBlobsBundleV1(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadV4Response{
 			ExecutionPayload:  &ep4.ExecutionPayloadV3,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundleV1(result.Block.Transactions()),
+			BlobsBundle:       bundle,
 			ExecutionRequests: result.Requests.Encode(),
 		}, nil
 	}
@@ -1425,18 +1441,21 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 
 	ep4 := enginepayload.BlockToPayload(pending.block, pending.prevRandao, pending.withdrawals)
 
+	bundle, err := enginepayload.BuildBlobsBundleV1(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadV4Response{
 		ExecutionPayload:  &ep4.ExecutionPayloadV3,
 		BlockValue:        new(big.Int).Set(pending.blockValue),
-		BlobsBundle:       collectBlobsBundleV1(pending.block.Transactions()),
+		BlobsBundle:       bundle,
 		ExecutionRequests: pending.requests.Encode(),
 	}, nil
 }
 
-// GetPayloadV5 retrieves a previously built payload for getPayloadV5 (Gloas/Heze).
-// Gloas payloads carry BAL + slotNumber fields (lighthouse >= 8.4 requires them).
-// Implements GlamsterdamBackend interface.
-func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error) {
+// GetPayloadV5 serves the historical standalone GlamsterdamBackend adapter.
+// Production HTTP dispatch uses EngineAPI.GetPayloadV5 for the Osaka shape.
+func (b *EngineBackend) GetPayloadV5(id PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	asyncPending, result, _, err := b.waitAsyncPayload(id, false)
 	if err != nil {
 		return nil, err
@@ -1444,10 +1463,14 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
 		ep5 := enginepayload.BlockToPayloadV5(result.Block, asyncPending.PrevRandao, engineWithdrawals, result.BAL, asyncPending.SlotNumber)
-		return &GetPayloadV5Response{
+		bundle, err := enginepayload.BuildBlobsBundleV2(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
+		return &LegacyGlamsterdamPayloadResponse{
 			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundleV2(result.Block.Transactions()),
+			BlobsBundle:       bundle,
 			Override:          false,
 			ExecutionRequests: result.Requests.Encode(),
 		}, nil
@@ -1460,10 +1483,14 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 
 	ep5 := enginepayload.BlockToPayloadV5(pending.block, pending.prevRandao, pending.withdrawals, pending.bal, pending.slotNumber)
 
-	return &GetPayloadV5Response{
+	bundle, err := enginepayload.BuildBlobsBundleV2(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
+	return &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload:  ep5,
 		BlockValue:        pending.blockValue,
-		BlobsBundle:       collectBlobsBundleV2(pending.block.Transactions()),
+		BlobsBundle:       bundle,
 		Override:          false,
 		ExecutionRequests: pending.requests.Encode(),
 	}, nil
@@ -1481,10 +1508,14 @@ func (b *EngineBackend) GetPayloadV6ByID(id PayloadID) (*GetPayloadV6Response, e
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
 		ep5 := enginepayload.BlockToPayloadV5(result.Block, asyncPending.PrevRandao, engineWithdrawals, result.BAL, asyncPending.SlotNumber)
+		bundle, err := enginepayload.BuildBlobsBundleV2(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadV6Response{
 			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundle(result.Block.Transactions()),
+			BlobsBundle:       bundle,
 			ExecutionRequests: result.Requests.Encode(),
 		}, nil
 	}
@@ -1496,10 +1527,14 @@ func (b *EngineBackend) GetPayloadV6ByID(id PayloadID) (*GetPayloadV6Response, e
 
 	ep5 := enginepayload.BlockToPayloadV5(pending.block, pending.prevRandao, pending.withdrawals, pending.bal, pending.slotNumber)
 
+	bundle, err := enginepayload.BuildBlobsBundleV2(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadV6Response{
 		ExecutionPayload:  ep5,
 		BlockValue:        new(big.Int).Set(pending.blockValue),
-		BlobsBundle:       collectBlobsBundle(pending.block.Transactions()),
+		BlobsBundle:       bundle,
 		ExecutionRequests: pending.requests.Encode(),
 	}, nil
 }
@@ -1572,112 +1607,14 @@ func (b *EngineBackend) GetPayloadV7ByID(id PayloadID) (*GetPayloadV6Response, e
 	return resp, nil
 }
 
-func collectBlobSidecars(txs []*types.Transaction) (blobs, commitments [][]byte, sidecarBlobs [][]byte) {
-	for _, tx := range txs {
-		sc := tx.BlobSidecar()
-		if sc == nil {
-			continue
-		}
-		blobs = append(blobs, sc.Blobs...)
-		commitments = append(commitments, sc.Commitments...)
-		sidecarBlobs = append(sidecarBlobs, sc.Blobs...)
-	}
-	return blobs, commitments, sidecarBlobs
-}
-
-func expandBlobCellProofs(blobs [][]byte, warnLabel string) ([][]byte, int) {
-	if len(blobs) == 0 {
-		return nil, 0
-	}
-
-	kzg := bls.DefaultKZGBackend()
-	proofs := make([][]byte, 0, len(blobs)*bls.KZGCellsPerExtBlob)
-	totalProofs := 0
-	for _, blob := range blobs {
-		_, cellProofs, err := kzg.ComputeCellsAndProofs(blob)
-		if err != nil {
-			backendLog.Warn(warnLabel,
-				"err", err)
-			for range bls.KZGCellsPerExtBlob {
-				proofs = append(proofs, make([]byte, bls.KZGBytesPerProof))
-				totalProofs++
-			}
-			continue
-		}
-		for _, p := range cellProofs {
-			cp := p
-			proofs = append(proofs, cp[:])
-			totalProofs++
-		}
-	}
-	return proofs, totalProofs
-}
-
-// collectBlobsBundle builds a BlobsBundleV2 from the blob sidecar data attached
-// to the given transactions. Each blob's 48-byte KZG proof is expanded to 128
-// per-cell KZG proofs using ComputeCellsAndProofs, as required by the Fulu/PeerDAS
-// spec (engine_getPayloadV6 blobsBundle.proofs must have 128*N entries).
-func collectBlobsBundle(txs []*types.Transaction) *BlobsBundleV2 {
-	bundle := &BlobsBundleV2{}
-	blobTxCount := 0
-	totalProofs := 0
-	for _, tx := range txs {
-		if tx.BlobSidecar() != nil {
-			blobTxCount++
-		}
-	}
-	blobs, commitments, sidecarBlobs := collectBlobSidecars(txs)
-	bundle.Blobs = blobs
-	bundle.Commitments = commitments
-	totalBlobs := len(sidecarBlobs)
-	bundle.Proofs, totalProofs = expandBlobCellProofs(sidecarBlobs, "collectBlobsBundle: ComputeCellsAndProofs failed, using zero proofs")
-	backendLog.Debug("collectBlobsBundle: result",
-		"blobTxCount", blobTxCount,
-		"totalBlobs", totalBlobs,
-		"totalProofs", totalProofs,
-		"expectedProofs", totalBlobs*bls.KZGCellsPerExtBlob,
-	)
-	return bundle
-}
-
-// collectBlobsBundleV1 collects blob sidecars with one proof per blob (V1 format).
-// Used for engine_getPayloadV3 and engine_getPayloadV4 responses.
-func collectBlobsBundleV1(txs []*types.Transaction) *BlobsBundleV1 {
-	bundle := &BlobsBundleV1{}
-	for _, tx := range txs {
-		sc := tx.BlobSidecar()
-		if sc == nil {
-			continue
-		}
-		bundle.Blobs = append(bundle.Blobs, sc.Blobs...)
-		bundle.Commitments = append(bundle.Commitments, sc.Commitments...)
-		bundle.Proofs = append(bundle.Proofs, sc.Proofs...)
-	}
-	return bundle
-}
-
-// collectBlobsBundleV2 collects blob sidecars with cell proofs (V2 format).
-// Used for engine_getPayloadV5 responses (Gloas/Heze fork).
-// Each blob's 48-byte KZG proof is expanded to 128 per-cell KZG proofs
-// using ComputeCellsAndProofs, as required by the Fulu/PeerDAS spec.
-func collectBlobsBundleV2(txs []*types.Transaction) *enginepayload.BlobsBundleV2 {
-	bundle := &enginepayload.BlobsBundleV2{}
-	blobs, commitments, sidecarBlobs := collectBlobSidecars(txs)
-	bundle.Blobs = blobs
-	bundle.Commitments = commitments
-	bundle.Proofs, _ = expandBlobCellProofs(sidecarBlobs, "collectBlobsBundleV2: ComputeCellsAndProofs failed, using zero proofs")
-	backendLog.Debug("collectBlobsBundleV2: result",
-		"blobCount", len(blobs),
-		"commitmentCount", len(commitments),
-		"proofCount", len(bundle.Proofs),
-		"expectedProofs", len(sidecarBlobs)*bls.KZGCellsPerExtBlob,
-	)
-	return bundle
-}
-
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
 	return b.config.IsPrague(timestamp)
+}
+
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.config.IsOsaka(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.

@@ -41,9 +41,10 @@ func (f ForkID) IsActive(num *big.Int, time uint64) bool {
 	return false
 }
 
-// ForkSchedule returns the complete ordered list of forks defined in the
-// chain configuration, including both block-number and timestamp forks.
-// Forks with nil activation are included but marked as pending.
+// ForkSchedule returns the registered block and timestamp forks. Registry order
+// identifies configurations; optional BPO activations can interleave with later
+// named forks, so NextForkAfter compares actual activation values.
+// Unregistered research parameters remain outside this schedule.
 func (c *ChainConfig) ForkSchedule() []ForkID {
 	schedule := []ForkID{
 		{Name: "Homestead", Block: c.HomesteadBlock},
@@ -54,14 +55,21 @@ func (c *ChainConfig) ForkSchedule() []ForkID {
 		{Name: "Constantinople", Block: c.ConstantinopleBlock},
 		{Name: "Petersburg", Block: c.PetersburgBlock},
 		{Name: "Istanbul", Block: c.IstanbulBlock},
+		{Name: "MuirGlacier", Block: c.MuirGlacierBlock},
 		{Name: "Berlin", Block: c.BerlinBlock},
 		{Name: "London", Block: c.LondonBlock},
+		{Name: "ArrowGlacier", Block: c.ArrowGlacierBlock},
+		{Name: "GrayGlacier", Block: c.GrayGlacierBlock},
 		{Name: "Shanghai", Timestamp: c.ShanghaiTime},
 		{Name: "Cancun", Timestamp: c.CancunTime},
 		{Name: "Prague", Timestamp: c.PragueTime},
+		{Name: "Osaka", Timestamp: c.OsakaTime},
+		{Name: "BPO1", Timestamp: c.BPO1Time},
+		{Name: "BPO2", Timestamp: c.BPO2Time},
 		{Name: "Amsterdam", Timestamp: c.AmsterdamTime},
 		{Name: "Glamsterdan", Timestamp: c.GlamsterdanTime},
 		{Name: "Hogota", Timestamp: c.HogotaTime},
+		{Name: "IPlus", Timestamp: c.IPlusTime},
 		{Name: "SSZBlocks", Timestamp: c.SSZBlockTime},
 	}
 	return schedule
@@ -195,7 +203,15 @@ func CheckConfigCompatible(local, remote *ChainConfig, headNum uint64, headTime 
 				continue
 			}
 			// Only report incompatibility if the fork is already active.
-			if f.IsActive(num, headTime) {
+			remoteFork := remote.ForkSchedule()
+			remoteActive := false
+			for _, candidate := range remoteFork {
+				if candidate.Name == f.Name {
+					remoteActive = candidate.IsActive(num, headTime)
+					break
+				}
+			}
+			if f.IsActive(num, headTime) || remoteActive {
 				return &ConfigCompatError{
 					ForkName:  d.ForkName,
 					LocalVal:  d.Local,
@@ -219,5 +235,15 @@ func (c *ChainConfig) NextForkAfter(num *big.Int, time uint64) ForkID {
 	if len(pending) == 0 {
 		return ForkID{}
 	}
-	return pending[0]
+	next := pending[0]
+	for _, candidate := range pending[1:] {
+		if candidate.Block != nil {
+			if next.Block == nil || candidate.Block.Cmp(next.Block) < 0 {
+				next = candidate
+			}
+		} else if next.Block == nil && *candidate.Timestamp < *next.Timestamp {
+			next = candidate
+		}
+	}
+	return next
 }

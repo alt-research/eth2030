@@ -109,6 +109,8 @@ type Config struct {
 
 // EVM is the Ethereum Virtual Machine execution environment.
 type EVM struct {
+	createdContracts     map[types.Address]bool
+	createdOrder         []types.Address
 	Context              BlockContext
 	TxContext            TxContext
 	Config               Config
@@ -480,10 +482,11 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 	// Snapshot state for revert on failure.
 	snapshot := evm.StateDB.Snapshot()
+	createdSnapshot := len(evm.createdOrder)
 
 	if evm.frame8141 != nil && transfersValue && evm.depth > 0 && evm.StateDB.Empty(addr) {
 		if err := evm.frame8141.Charge(frameNewAccountGas); err != nil {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, gas, ErrFrameStateGas
 		}
 	}
@@ -536,7 +539,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 	if isPrecompile {
 		ret, gasLeft, err := runPrecompile(p, input, gas)
 		if err != nil {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
 		if debug && evm.depth == 0 {
 			evm.Config.Tracer.CaptureEnd(ret, gas-gasLeft, err)
@@ -559,7 +562,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 					evm.StateDB.AddAddressToAccessList(delegate)
 				}
 				if gas < cost {
-					evm.StateDB.RevertToSnapshot(snapshot)
+					evm.revertCreationSnapshot(snapshot, createdSnapshot)
 					return nil, 0, ErrOutOfGas
 				}
 				gas -= cost
@@ -580,7 +583,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 	if evm.forkRules.IsIPlus && IsRVCode(code) {
 		ret, gasLeft, rvErr := runRVContract(code, input, gas)
 		if rvErr != nil {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
 		if debug && evm.depth == 0 {
 			evm.Config.Tracer.CaptureEnd(ret, gas-gasLeft, rvErr)
@@ -612,11 +615,11 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 	if err != nil && !errors.Is(err, ErrExecutionReverted) {
 		// On error (not revert), revert state changes and consume all gas.
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		gasLeft = 0
 	} else if errors.Is(err, ErrExecutionReverted) {
 		// On revert, revert state changes but return remaining gas.
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 	}
 
 	if debug && evm.depth == 0 {
@@ -642,6 +645,7 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 	}
 
 	snapshot := evm.StateDB.Snapshot()
+	createdSnapshot := len(evm.createdOrder)
 
 	// Get the code to execute from the target address
 	code := evm.StateDB.GetCode(addr)
@@ -662,10 +666,10 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 	gasLeft := contract.Gas
 
 	if err != nil && !errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		gasLeft = 0
 	} else if errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 	}
 
 	return ret, gasLeft, err
@@ -692,6 +696,7 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 	}
 
 	snapshot := evm.StateDB.Snapshot()
+	createdSnapshot := len(evm.createdOrder)
 
 	code := evm.StateDB.GetCode(addr)
 	if len(code) == 0 {
@@ -711,10 +716,10 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 	gasLeft := contract.Gas
 
 	if err != nil && !errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		gasLeft = 0
 	} else if errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 	}
 
 	return ret, gasLeft, err
@@ -740,12 +745,13 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 	// were deleted, so this is not required. However, certain tests (e.g.
 	// stRevertTest/RevertPrecompiledTouchExactOOG) require this behavior.
 	snapshot := evm.StateDB.Snapshot()
+	createdSnapshot := len(evm.createdOrder)
 
 	// Check for precompiled contract.
 	if p, ok := evm.precompile(addr); ok {
 		ret, gasLeft, err := runPrecompile(p, input, gas)
 		if err != nil {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
 		return ret, gasLeft, err
 	}
@@ -766,10 +772,10 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 	gasLeft := contract.Gas
 
 	if err != nil && !errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		gasLeft = 0
 	} else if errors.Is(err, ErrExecutionReverted) {
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 	}
 
 	return ret, gasLeft, err
@@ -872,15 +878,16 @@ func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if evm.frame8141 != nil && value != nil && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
+	if value != nil && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
 		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
 	// Compute the new contract address
 	nonce := evm.StateDB.GetNonce(caller)
-	if evm.frame8141 != nil && nonce == ^uint64(0) {
+	if nonce == ^uint64(0) {
 		return nil, types.Address{}, gas, errors.New("creator nonce overflow")
 	}
 	evm.StateDB.SetNonce(caller, nonce+1)
+	evm.recordCreationNonce(caller, nonce, nonce+1)
 	contractAddr := createAddress(caller, nonce)
 
 	return evm.create(caller, code, gas, value, contractAddr)
@@ -898,16 +905,15 @@ func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if evm.frame8141 != nil {
-		if endowment != nil && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
-			return nil, types.Address{}, gas, ErrInsufficientBalance
-		}
-		nonce := evm.StateDB.GetNonce(caller)
-		if nonce == ^uint64(0) {
-			return nil, types.Address{}, gas, errors.New("creator nonce overflow")
-		}
-		evm.StateDB.SetNonce(caller, nonce+1)
+	if endowment != nil && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
+		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
+	nonce := evm.StateDB.GetNonce(caller)
+	if nonce == ^uint64(0) {
+		return nil, types.Address{}, gas, errors.New("creator nonce overflow")
+	}
+	evm.StateDB.SetNonce(caller, nonce+1)
+	evm.recordCreationNonce(caller, nonce, nonce+1)
 	initCodeHash := crypto.Keccak256(code)
 	contractAddr := create2Address(caller, salt, initCodeHash)
 
@@ -980,6 +986,9 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	}
 	// Collision check: fail if address already has non-zero nonce or non-empty code.
 	// Per go-ethereum, all gas is consumed on collision.
+	if evm.balTracker != nil {
+		evm.balTracker.RecordAddressTouch(contractAddr)
+	}
 	contractHash := evm.StateDB.GetCodeHash(contractAddr)
 	if evm.StateDB.GetNonce(contractAddr) != 0 ||
 		(contractHash != (types.Hash{}) && contractHash != types.EmptyCodeHash) {
@@ -991,10 +1000,11 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	evm.StateDB.AddAddressToAccessList(contractAddr)
 
 	snapshot := evm.StateDB.Snapshot()
+	createdSnapshot := len(evm.createdOrder)
 
 	if evm.frame8141 != nil && evm.StateDB.Empty(contractAddr) {
 		if err := evm.frame8141.Charge(frameNewAccountGas); err != nil {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, types.Address{}, gas, ErrFrameStateGas
 		}
 	}
@@ -1006,11 +1016,10 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		evm.StateDB.CreateAccount(contractAddr)
 	}
 
-	if evm.frame8141 != nil {
-		evm.frame8141.created[contractAddr] = true
-	}
+	evm.markContractCreated(contractAddr)
 	// EIP-161: set contract nonce to 1 (post Spurious Dragon).
 	evm.StateDB.SetNonce(contractAddr, 1)
+	evm.recordCreationNonce(contractAddr, 0, 1)
 
 	// Transfer value
 	if value != nil && value.Sign() > 0 {
@@ -1056,7 +1065,7 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 
 	if err != nil {
 		// On any error, revert state and return.
-		evm.StateDB.RevertToSnapshot(snapshot)
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		if !errors.Is(err, ErrExecutionReverted) {
 			// Non-revert error: all gas sent to subcall is consumed.
 			// Only the 1/64 retained by EIP-150 is returned.
@@ -1075,23 +1084,28 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		// EIP-170 / EIP-7954: max contract code size.
 		maxCode := MaxCodeSizeForFork(evm.forkRules)
 		if len(ret) > maxCode {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, types.Address{}, 0, errors.New("max code size exceeded")
 		}
 		depositCost := uint64(len(ret)) * CreateDataGas
 		if evm.frame8141 != nil {
 			if err := evm.frame8141.Charge(uint64(len(ret)) * 1530); err != nil {
-				evm.StateDB.RevertToSnapshot(snapshot)
+				evm.revertCreationSnapshot(snapshot, createdSnapshot)
 				return nil, types.Address{}, 0, ErrOutOfGas
 			}
 			depositCost = 6 * toWordSize(uint64(len(ret)))
 		}
 		if gas < depositCost {
-			evm.StateDB.RevertToSnapshot(snapshot)
+			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, types.Address{}, 0, ErrOutOfGas
 		}
 		gas -= depositCost
 		evm.StateDB.SetCode(contractAddr, ret)
+		if tracker, ok := evm.balTracker.(interface {
+			RecordCodeChange(types.Address, []byte, []byte)
+		}); ok {
+			tracker.RecordCodeChange(contractAddr, nil, ret)
+		}
 	}
 
 	return ret, contractAddr, gas, nil

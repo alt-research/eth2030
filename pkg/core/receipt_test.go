@@ -164,15 +164,15 @@ func TestGetLogs(t *testing.T) {
 		t.Fatalf("InsertBlock(2): %v", err)
 	}
 
-	// For simple value transfers, logs should be empty.
+	// Amsterdam value transfers have exactly one protocol Transfer log.
 	logs1 := bc.GetLogs(block1.Hash())
-	if len(logs1) != 0 {
-		t.Errorf("expected 0 logs for simple transfer, got %d", len(logs1))
+	if len(logs1) != 1 || len(logs1[0].Topics) != 3 || logs1[0].Address != types.HexToAddress("0xfffffffffffffffffffffffffffffffffffffffe") {
+		t.Fatalf("missing protocol transfer log: %v", logs1)
 	}
 
 	logs2 := bc.GetLogs(block2.Hash())
-	if len(logs2) != 0 {
-		t.Errorf("expected 0 logs for simple transfer, got %d", len(logs2))
+	if len(logs2) != 1 || len(logs2[0].Topics) != 3 || logs2[0].Address != types.HexToAddress("0xfffffffffffffffffffffffffffffffffffffffe") {
+		t.Fatalf("missing protocol transfer log: %v", logs2)
 	}
 
 	// Non-existent block returns nil.

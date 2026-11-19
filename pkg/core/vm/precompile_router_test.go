@@ -67,7 +67,7 @@ func TestForkPrecompileRouterActivePrecompiles(t *testing.T) {
 }
 
 // TestForkPrecompileRouterGlamsterdanRemoves0x12 verifies that address 0x12
-// (bls12MapFpToG1) is not present in the Glamsterdan set per EIP-7997.
+// is not present in the canonical Glamsterdan set (BLS ends at 0x11).
 func TestForkPrecompileRouterGlamsterdanRemoves0x12(t *testing.T) {
 	r := NewForkPrecompileRouter()
 	rules := ForkRules{IsGlamsterdan: true, IsCancun: true}

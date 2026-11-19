@@ -338,10 +338,18 @@ func New(config *Config) (*Node, error) {
 			config.NetworkID = genSpec.Config.ChainID.Uint64()
 		}
 	} else {
-		chainConfig = chainConfigForNetwork(config.Network)
+		resolved := *chainConfigForNetwork(config.Network)
+		chainConfig = &resolved
 		// Apply any fork overrides on top of the standard chain config.
 		applyForkOverrides(chainConfig, config)
+		if err := chainConfig.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid network fork schedule: %w", err)
+		}
 		genesis = makeGenesisBlock()
+	}
+	// Check persisted authority before NewBlockchain can replay or adopt history.
+	if err := checkPersistedChainConfig(n.db, chainConfig); err != nil {
+		return nil, fmt.Errorf("chain configuration recovery: %w", err)
 	}
 
 	// Use a TrieStateDB backed by a fast in-memory store when a block DB is
@@ -385,6 +393,9 @@ func New(config *Config) (*Node, error) {
 		return nil, fmt.Errorf("restore snap pivot: %w", err)
 	}
 	n.blockchain = bc
+	if err := writePersistedChainConfig(n.db, chainConfig); err != nil {
+		return nil, err
+	}
 	if err := n.initNativeConsensus(); err != nil {
 		return nil, fmt.Errorf("init native consensus: %w", err)
 	}

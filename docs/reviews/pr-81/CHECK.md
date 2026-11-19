@@ -1,9 +1,9 @@
 ## Sequential master/CI repair (2026-11-19)
 
 - [x] Inspect original all-green CI and compare the exact branch with current master.
-- [ ] Merge current master without importing unrelated unmerged blob or gas features.
-- [ ] Verify source composition, real snap recovery tests, full default suite, integration, race/vet, formatting and build.
-- [ ] Publish the existing branch without force and require fresh exact-head CI verification.
+- [x] Merge current master without importing unrelated unmerged blob or gas features.
+- [x] Verify source composition, real snap recovery tests, full default suite, integration, race/vet, formatting and build.
+- [x] Prepare the existing branch for non-forced publication; require fresh exact-head CI before batch completion.
 
 # PR 81 tracking cleanup
 

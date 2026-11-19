@@ -1,3 +1,11 @@
+## Sequential master/CI repair (2026-11-19)
+
+Original head: `51541719f4b0da18762c0721b0c193e69bde5472`. Merged master: `4f659fd096fe850b4a2dddaf906b05a853c59631`. The merge is text-conflict-free and its complete source tree matches Git's automatic merge. No unmerged blob/gas feature is added to this independent snap review; existing eth/69–71 and builder-request dependencies are now on master.
+
+Original CI was all green. Fresh Go 1.26.11 validation of the merged tree passes the full default suite (`GOFLAGS=-p=4 go test ./... -timeout=15m -count=1`), integration (`./core ./p2p/... ./eiptest`), race (`./p2p/snap ./sync/statesync ./node ./eiptest`), full formatting/vet/build. This includes real encrypted moving/reorganized pivots, missing-orphan recovery, unchanged-account point proofs and restart. Logs: `/tmp/eth2030-pr81-{full,integration,race}.log`.
+
+Shared root trackers/instructions are preserved. The branch is prepared for fast-forward publication, with exact-head, mergeability and fresh target CI verification required before batch completion. Full cross-client/release qualification remains outside this repair.
+
 # PR 81 tracking cleanup status
 
 Original review head: `6ce3eceeef539e69d5f2a20428aa7f88e651a661`. Merge base for preserved records: `38ea9259901c7873f483752ea390962e26563648`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

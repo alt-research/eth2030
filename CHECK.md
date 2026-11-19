@@ -1,11 +1,113 @@
+## Shared PR tracking conflict cleanup (2026-11-19)
+
+- [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.
+- [ ] Preserve feature tracking under `docs/reviews/pr-<number>/` and align shared root trackers.
+- [ ] Reconcile current master without dropping either side of functional changes; verify builds and affected tests.
+- [ ] Publish fast-forward updates and verify exact remote heads and GitHub conflict state.
+
+## PR 65 conflict resolution (2026-11-19)
+
+- [x] Fetch and verify the exact PR head and current master without changing the original checkout.
+- [x] Merge current master while preserving the EIP-7954 review and latest program documentation.
+- [x] Run affected tests, race/vet and local build; update STATUS.md.
+- [x] Push only the updated PR 65 branch and confirm GitHub mergeability (mergeable=true; CI pending).
+
+## Glamsterdam EIP-7954 contract limits
+
+- [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
+- [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.
+- [x] Correct fork-gated limits and reject oversized creation transactions before mutation.
+- [x] Verify affected packages, build and prepare the separate feature review.
+
+## Tracing review and merge handoff (2026-11-19)
+
+- [x] Record PR 87, exact local/SDK/mutation qualification and immutable heads.
+- [x] Fetch master and inspect PR states, Draft status, dependency ancestry and observed CI evidence.
+- [x] Prepare MERGE_REVIEW.md; leave upstream merge decisions for review.
+- [x] Stop further implementation after the current task as requested.
+
+## Stateful simulation review tracking (2026-11-19)
+
+- [x] Record PR 86, its independent complete-block evidence, scope and fifteen detected mutations.
+- [x] Keep qualified feature branches distinct from stable integration and final release acceptance.
+- [x] Continue nested tracing separately with explicit unmerged-schema boundaries.
+
+## Explicit LIFO development selection (2026-11-19)
+
+- [x] Record the user's implementation decision and exact merged source.
+- [x] Keep unmerged alternatives excluded and final design review open.
+- [x] Continue remaining consumer/CL/validation work under this selected baseline.
+
+## Qualified gas development tracking (2026-11-19)
+
+- [x] Archive the clean 42-case checkpoint, actual HTTP/system/accounting consumers and detected mutations.
+- [x] Record full/tagged/race/vet/build without converting final protocol choices into development defaults.
+- [x] Keep separate RPC branch and broader acceptance outside the stable qualified integration.
+
+## Canonical system review tracking (2026-11-19)
+
+- [x] Record separate PR 84, canonical independent roots, actual Node consumers and mutations.
+- [x] Verify composed full/tagged/affected race/vet/build and published integration head.
+- [x] Retain Gas draft full-suite/API/application and full-client/release gates.
+
+## Glamsterdam completion implementation (2026-11-18)
+
+## Pivot proof and gas draft tracking (2026-11-19)
+
+- [x] Record PR 81 unchanged-account consumer repair, seven scenarios and nine detected mutations.
+- [x] Preserve the qualified 212-package aggregate and changed-consumer race/build evidence.
+- [x] Track separate Draft PR 83 and signed/block checkpoints without claiming full-suite or release completion.
+
+## Sparse relay review tracking (2026-11-19)
+
+- [x] Record separate PR 82, source/foundation/remote heads and current merged wire decisions.
+- [x] Import actual native/SDK/Engine/recovery/mutation evidence and snap/2 socket follow-up.
+- [x] Verify the 212-package aggregate, tagged suites, 97-package race, vet/build and published integration head.
+- [x] Preserve final gas, CL/multiclient/resource and release gates.
+
+## Snap version 2 review tracking (2026-11-19)
+
+- [x] Record separate PR 81, exact source, dependencies and qualified consumers.
+- [x] Preserve full program gates and import verification/results/composition evidence.
+- [x] Verify aggregate tests, tagged suites, affected race/vet and build.
+
+## Configured blob schedule review (2026-11-18)
+
+- [x] Publish PR 80 with explicit dependencies and isolated review delta.
+- [x] Qualify real 7/10/21-blob version-1 HTTP and restart consumers, independent formulas and six mutations.
+- [x] Retain the failed legacy race observation and pass current proofs without timeout changes.
+- [x] Qualify full/tagged/54-package race/vet/build composition.
+- [ ] Complete sparse relay, snap/2, final gas and remaining release gates.
+
+## Canonical startup and Engine review (2026-11-18)
+
+- [x] Publish isolated PR 78 and pin complete Engine specifications.
+- [x] Qualify actual HTTP and four behavioral mutations, preserving valid zero fields and forkchoice adoption.
+- [x] Run full/tagged/affected race/vet/build on the feature composition.
+- [x] Qualify actual persisted configuration recovery in PR 79.
+- [ ] Complete remaining release gates.
+
+## Builder execution requests review batch (2026-11-18)
+
+- [x] Publish isolated EL PR 77 and Lighthouse PR 3 with exact spec and wire evidence.
+- [x] Compose the feature sets without altering the original checkouts.
+- [x] Qualify 211 aggregate Go packages, tagged Core/EIP, vet/build and 25 paired CL library tests/check/full lint.
+- [x] Retain final gas, full live network/deployment/recovery and release gates.
+
+- [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
+- [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.
+- [ ] Publish the baseline/acceptance program in its own review branch.
+- [ ] Deliver each major feature in a separate scoped branch and PR, retaining test evidence.
+- [ ] Close native, consumer, independent-client, recovery and release gates with observed evidence.
+
 # Lean4 Verification Check-list
 
-## Glamsterdam EIP-8024 current byte encoding (2026-11-18)
+## Glamsterdam implementation checkpoint (2026-11-18)
 
-- [x] Pin the current EIP and reproduce published execution vectors against the native VM.
-- [x] Correct legacy-bytecode immediate decoding and its invalid ranges.
-- [x] Verify every valid depth/pair, stack boundaries, code-end immediates, jumps and native transactions.
-- [x] Run affected tests, local build and vet; publish an isolated implementation PR (PR 73).
+- [x] Publish separate branches and reviews for scoped major changes.
+- [x] Qualify their combined production sources with full Go, tagged, build and affected vet/race checks.
+- [x] Record exact reviewed/source heads and distinguish development evidence from open release gates.
+- [ ] Complete the remaining 33-task program acceptance matrix.
 
 ## Merged Frame roadmap and homepage progress (2026-11-18)
 

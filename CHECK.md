@@ -1,3 +1,10 @@
+## EIP-161 transaction-boundary empty-account finalization (2026-11-19)
+
+- [ ] Read EIP-161 and reproduce native roots retaining touched empty precompile accounts.
+- [ ] Implement reversible touched-account tracking and fork-aware finalization across native state consumers.
+- [ ] Preserve untouched empty accounts, pre-fork behavior, failed-call rollback, durable state and simulation behavior.
+- [ ] Verify independent signed/official roots, affected/full/integration/race/vet/build checks and publish a separate PR.
+
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 - [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.

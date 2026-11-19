@@ -1,0 +1,30 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..e81e4f42 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,13 @@
+ # Lean4 Verification Check-list
+ 
++## Canonical fork schedule and Engine version boundaries (2026-11-18)
++
++- [x] Read the current Engine Amsterdam/Osaka/Prague/Cancun rules and trace actual startup/HTTP consumers.
++- [x] Reject incoherent canonical fork schedules before genesis/state adoption; preserve explicit private extensions.
++- [x] Enforce canonical Engine version/required-field boundaries with exact activation and presence cases.
++- [x] Qualify actual HTTP failures and valid forkchoice adoption independently from attribute rejection.
++- [x] Run affected/full tests, build, race/vet and publish the isolated review.
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..be14c100 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Canonical schedule and Engine wire boundaries (2026-11-18)
++
++Reject incoherent canonical genesis schedules in actual startup, add Osaka to fork identity and fix asymmetric activated-fork comparisons. Production Engine versions now enforce their timestamp windows; Osaka getPayloadV5 has its own correct shape. Actual HTTP tests cover required fields, DATA/QUANTITY bounds, zero values, malformed BAL, capabilities and forkchoice adoption before attribute errors. Full Go/tagged tests, affected race/vet/build and four failing behavioral mutations qualify this scope. See [verification](docs/verification/glamsterdam-fork-schema-20261118.md). Persisted compatibility and broader program/release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -17,7 +19,6 @@ import (
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
-	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine/actor"
@@ -431,10 +432,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 	b.blocksMu.RLock()
 	defer b.blocksMu.RUnlock()
 
-	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
-	}
+	headBlock := b.blocks[headHash]
 
 	results := make([]*enginepayload.ExecutionPayloadBodyV2, len(hashes))
 	for i, h := range hashes {
@@ -443,10 +441,7 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok && rawdb.IsBALRetained(headNum, block.NumberU64()) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[h])
 		results[i] = body
 	}
 	return results
@@ -459,8 +454,9 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 	defer b.blocksMu.RUnlock()
 
 	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
+	headBlock := b.blocks[headHash]
+	if headBlock != nil {
+		headNum = headBlock.NumberU64()
 	}
 
 	if start > headNum {
@@ -522,10 +518,7 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok && rawdb.IsBALRetained(headNum, num) {
-			balBytes, _ := blockBAL.EncodeRLP()
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[hash])
 		results[i] = body
 	}
 	if len(canonical) != int(count) {
@@ -1198,6 +1191,13 @@ func (b *EngineBackend) processRequestPayload(
 			return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
 		}
 		header.BlockAccessListHash = &hash
+		if payload.SlotNumber != "" {
+			slot, err := strconv.ParseUint(strings.TrimPrefix(payload.SlotNumber, "0x"), 16, 64)
+			if err != nil || fmt.Sprintf("0x%x", slot) != payload.SlotNumber {
+				return PayloadStatusV1{}, ErrInvalidParams
+			}
+			header.SlotNumber = &slot
+		}
 	}
 	blk = types.NewBlock(header, blk.Body())
 
@@ -1369,6 +1369,7 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			Withdrawals:      WithdrawalsToCore(attrs.Withdrawals),
 			BeaconRoot:       &attrs.ParentBeaconBlockRoot,
 			InclusionListTxs: attrs.InclusionListTransactions,
+			SlotNumber:       &attrs.SlotNumber,
 		})
 		if err != nil {
 			return ForkchoiceUpdatedResult{}, fmt.Errorf("payload build failed: %w", err)
@@ -1452,10 +1453,9 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 	}, nil
 }
 
-// GetPayloadV5 retrieves a previously built payload for getPayloadV5 (Gloas/Heze).
-// Gloas payloads carry BAL + slotNumber fields (lighthouse >= 8.4 requires them).
-// Implements GlamsterdamBackend interface.
-func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error) {
+// GetPayloadV5 serves the historical standalone GlamsterdamBackend adapter.
+// Production HTTP dispatch uses EngineAPI.GetPayloadV5 for the Osaka shape.
+func (b *EngineBackend) GetPayloadV5(id PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	asyncPending, result, _, err := b.waitAsyncPayload(id, false)
 	if err != nil {
 		return nil, err
@@ -1467,7 +1467,7 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 		if err != nil {
 			return nil, err
 		}
-		return &GetPayloadV5Response{
+		return &LegacyGlamsterdamPayloadResponse{
 			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
 			BlobsBundle:       bundle,
@@ -1487,7 +1487,7 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 	if err != nil {
 		return nil, err
 	}
-	return &GetPayloadV5Response{
+	return &LegacyGlamsterdamPayloadResponse{
 		ExecutionPayload:  ep5,
 		BlockValue:        pending.blockValue,
 		BlobsBundle:       bundle,
@@ -1610,6 +1610,11 @@ func (b *EngineBackend) GetPayloadV7ByID(id PayloadID) (*GetPayloadV6Response, e
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
 	return b.config.IsPrague(timestamp)
+}
+
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.config.IsOsaka(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.

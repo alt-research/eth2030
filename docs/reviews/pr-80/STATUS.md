@@ -1,3 +1,13 @@
+## Master/CI repair in the PR 80–87 batch (2026-11-19)
+
+Original head: `c357d2a13f31e3d04397993aabf23d3892ad945c`. Merged master: `4f659fd096fe850b4a2dddaf906b05a853c59631` (through PR 79). The sole text conflict appends two independent mock methods: retain both the blob fork query `IsOsaka` and master's `CreateAccessList` fixture consumer. No production validation is removed.
+
+The failed original CI run 44477321231 names only `core/gas/blob_context.go` in gofmt output; later vet/default tests were skipped. Formatting that file preserves every non-whitespace character. EIPs 7840/7892/7918 and the feature's pinned configuration/fee authority remain unchanged. Shared root trackers/instructions match master.
+
+Go 1.26.11 validation passed: full default suite (`GOFLAGS=-p=4 go test ./... -timeout=15m -count=1`), integration (`./core ./p2p/... ./eiptest`), race (`./core/config ./core/gas ./core/execution ./engine ./node ./eiptest ./rpc/ethapi`), full vet, formatting and build. This includes the existing real signed blob-schedule/fee/restart scenario. Logs are `/tmp/eth2030-pr80-{full,race,integration}.log`; original CI failure is `/tmp/eth2030-pr80-initial-ci.log`.
+
+The existing branch is prepared for fast-forward publication. Verify exact remote head and fresh target CI before completion; approval and upstream merging are separate. Later reviews will receive repairs only along already documented functional dependencies, preserving Draft 83 and avoiding importing it into earlier reviews.
+
 # PR 80 tracking cleanup status
 
 Original review head: `12e22aac2f7853092d8270beb644caaf1883f94d`. Merge base for preserved records: `38ea9259901c7873f483752ea390962e26563648`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

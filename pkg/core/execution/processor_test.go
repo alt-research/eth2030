@@ -38,7 +38,7 @@ func newTestHeader() *types.Header {
 
 func TestProcessEmptyBlock(t *testing.T) {
 	proc := NewStateProcessor(config.TestConfig)
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	header := newTestHeader()
 
 	block := types.NewBlock(header, &types.Body{})

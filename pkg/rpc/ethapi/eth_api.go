@@ -2,6 +2,7 @@ package ethapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
@@ -600,6 +601,7 @@ func (api *EthAPI) syncing(req *Request) *Response {
 type AccessListResult struct {
 	AccessList []AccessListEntry `json:"accessList"`
 	GasUsed    string            `json:"gasUsed"`
+	Error      string            `json:"error,omitempty"`
 }
 
 // AccessListEntry is a single entry in an access list result.
@@ -626,19 +628,24 @@ func (api *EthAPI) createAccessList(req *Request) *Response {
 		}
 	}
 
-	from, to, gas, value, data := parseCallArgs(&args)
-
-	// Execute the call to determine gas usage.
-	_, gasUsed, err := api.backend.EVMCall(from, to, data, gas, value, bn)
-	if err != nil {
-		return errorResponse(req.ID, ErrCodeInternal, "execution error: "+err.Error())
+	discovery, ok := api.backend.(rpcbackend.AccessListBackend)
+	if !ok {
+		return errorResponse(req.ID, ErrCodeInternal, "access-list discovery is not supported by this backend")
 	}
-
-	// A full implementation would trace storage accesses during execution.
-	// For now, return an empty access list with the gas used.
-	result := &AccessListResult{
-		AccessList: []AccessListEntry{},
-		GasUsed:    encodeUint64(gasUsed),
+	observed, err := discovery.CreateAccessList(args, bn)
+	if err != nil {
+		if errors.Is(err, rpcbackend.ErrInvalidCallArgs) {
+			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+		}
+		return errorResponse(req.ID, ErrCodeInternal, "access-list generation: "+err.Error())
+	}
+	result := &AccessListResult{AccessList: make([]AccessListEntry, 0, len(observed.AccessList)), GasUsed: encodeUint64(observed.GasUsed), Error: observed.ExecutionError}
+	for _, tuple := range observed.AccessList {
+		entry := AccessListEntry{Address: encodeAddress(tuple.Address), StorageKeys: make([]string, 0, len(tuple.StorageKeys))}
+		for _, key := range tuple.StorageKeys {
+			entry.StorageKeys = append(entry.StorageKeys, encodeHash(key))
+		}
+		result.AccessList = append(result.AccessList, entry)
 	}
 
 	return successResponse(req.ID, result)

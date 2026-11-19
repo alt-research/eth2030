@@ -196,13 +196,13 @@ func TestPruneHistory_Idempotent(t *testing.T) {
 // --- BAL retention policy (SPEC-5.5) ---
 
 func TestBALRetentionConstants(t *testing.T) {
-	if BALRetentionEpochs != 3_533 {
-		t.Errorf("BALRetentionEpochs = %d, want 3533 (EIP-7928 weak-subjectivity period)", BALRetentionEpochs)
+	if BALRetentionEpochs != 14_299 {
+		t.Errorf("BALRetentionEpochs = %d, want 14299 (EIP-7928 payload availability)", BALRetentionEpochs)
 	}
 	if SlotsPerEpoch != 32 {
 		t.Errorf("SlotsPerEpoch = %d, want 32", SlotsPerEpoch)
 	}
-	want := uint64(3_533 * 32) // 113056
+	want := uint64(14_299 * 32) // 457568
 	if BALRetentionSlots != want {
 		t.Errorf("BALRetentionSlots = %d, want %d", BALRetentionSlots, want)
 	}

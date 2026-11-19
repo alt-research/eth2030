@@ -13,7 +13,6 @@ import (
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 )
@@ -26,7 +25,7 @@ import (
 // are pre-funded. Returns the blockchain and the genesis state snapshot.
 func e2eChain(t *testing.T, gasLimit uint64, baseFee *big.Int, alloc map[types.Address]*big.Int) *chain.Blockchain {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	for addr, bal := range alloc {
 		statedb.AddBalance(addr, bal)
 	}

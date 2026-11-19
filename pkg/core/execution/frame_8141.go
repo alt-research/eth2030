@@ -209,6 +209,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	}
 	evm.StateDB.AddBalance(payer, settlement.Refund)
 	evm.StateDB.AddBalance(header.Coinbase, settlement.Tip)
+	evm.FinalizeSelfDestructs()
 	if finalizer, ok := db.(interface{ FinalizeTransaction() }); ok {
 		finalizer.FinalizeTransaction()
 	}

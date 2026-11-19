@@ -49,7 +49,7 @@ func makeGenesisBlock() (*types.Block, *state.MemoryStateDB) {
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
 	}
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	// Fund a sender for transactions.
 	sender := types.HexToAddress("0x1111")
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18)))
@@ -1307,7 +1307,7 @@ func TestE2E_TransientStorage_SurvivesRevert(t *testing.T) {
 // handling in the block builder: proper inclusion, gas accounting, and
 // blob gas limit enforcement.
 func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1387,7 +1387,7 @@ func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
 // builder enforces the MaxBlobGasPerBlock limit and skips blob txs that
 // would exceed it.
 func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1444,7 +1444,7 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 // transaction with an invalid versioned hash (wrong version byte) is
 // skipped by the block builder.
 func TestE2E_BlockBuilder_BlobTxInvalidHashRejected(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1498,7 +1498,7 @@ func TestE2E_BlockBuilder_BlobTxInvalidHashRejected(t *testing.T) {
 // correctly handles a mix of regular and blob transactions, including proper
 // separate gas accounting.
 func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})

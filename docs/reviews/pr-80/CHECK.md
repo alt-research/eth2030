@@ -1,16 +1,16 @@
 ## PRs 80–87 merge and CI repair, dependency order (2026-11-19)
 
 - [x] Inventory all eight open reviews, exact heads, current master and original CI failures; preserve Draft 83.
-- [ ] Repair and qualify PR 80 against master without importing unrelated unmerged features.
+- [x] Repair and qualify PR 80 against master without importing unrelated unmerged features.
 - [ ] Repair PR 81 separately, then reconcile existing dependencies in 82 and 84.
 - [ ] Repair Draft 83 and its dependent RPC/simulation/tracing reviews 85–87 individually.
 - [ ] Verify exact published heads, no conflicts and all required CI for every review; keep true functional integration boundaries explicit.
 
 ## PR 80 current master integration
 
-- [ ] Resolve conflicts without weakening fork/configuration or blob validation.
-- [ ] Fix the observed CI cause and run formatting, full default tests, integration, affected race/vet and build.
-- [ ] Update the existing feature branch without force and verify target-repository CI.
+- [x] Resolve conflicts without weakening fork/configuration or blob validation.
+- [x] Fix the observed CI cause and run formatting, full default tests, integration, affected race/vet and build.
+- [x] Prepare a non-forced update of the existing branch; require target CI verification before batch completion.
 
 # PR 80 tracking cleanup
 

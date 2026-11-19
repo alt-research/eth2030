@@ -3,6 +3,7 @@ package eth
 import (
 	"fmt"
 	"math/big"
+	"sync"
 	"sync/atomic"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -11,18 +12,29 @@ import (
 
 // EthPeer wraps a p2p.Peer with eth protocol-specific send/request methods.
 type EthPeer struct {
-	peer      *p2p.Peer
-	transport p2p.Transport
-	reqID     atomic.Uint64
-	done      chan struct{}
+	peer         *p2p.Peer
+	transport    p2p.Transport
+	reqID        atomic.Uint64
+	done         chan struct{}
+	writeMu      sync.Mutex
+	requestMu    sync.Mutex
+	balRequests  map[uint64][]types.Hash
+	blockRange   blockRange
+	localRange   blockRange
+	rangeUpdates chan blockRange
 }
 
 // NewEthPeer creates a new EthPeer wrapping the given p2p peer and transport.
 func NewEthPeer(peer *p2p.Peer, t p2p.Transport) *EthPeer {
+	if peer.Version() == 0 {
+		peer.SetVersion(ETH68)
+	}
 	return &EthPeer{
-		peer:      peer,
-		transport: t,
-		done:      make(chan struct{}),
+		peer:         peer,
+		transport:    t,
+		done:         make(chan struct{}),
+		balRequests:  make(map[uint64][]types.Hash),
+		rangeUpdates: make(chan blockRange, 1),
 	}
 }
 
@@ -43,7 +55,7 @@ func (ep *EthPeer) sendMessage(code uint64, val interface{}) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode %s: %w", p2p.MessageName(code), err)
 	}
-	return ep.transport.WriteMsg(p2p.Msg{
+	return ep.writeMsg(p2p.Msg{
 		Code:    msg.Code,
 		Size:    msg.Size,
 		Payload: msg.Payload,
@@ -102,7 +114,7 @@ func (ep *EthPeer) SendTransactions(txs []*types.Transaction) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode transactions: %w", err)
 	}
-	return ep.transport.WriteMsg(msg)
+	return ep.writeMsg(msg)
 }
 
 // SendNewPooledTransactionHashes announces transaction hashes to the peer via
@@ -153,7 +165,7 @@ func (ep *EthPeer) SendNewBlock(block *types.Block, td *big.Int) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode new block: %w", err)
 	}
-	return ep.transport.WriteMsg(msg)
+	return ep.writeMsg(msg)
 }
 
 // RequestReceiptsV70 sends an eth/70 GetReceipts (0x0f) request (EIP-7975).
@@ -181,12 +193,29 @@ func (ep *EthPeer) SendReceiptsV70(requestID uint64, lastBlockIncomplete bool, p
 
 // RequestBlockAccessLists sends a request for block access lists (eth/71).
 func (ep *EthPeer) RequestBlockAccessLists(hashes []types.Hash) (uint64, error) {
+	if ep.peer.Version() < ETH71 {
+		return 0, fmt.Errorf("BAL requests require eth/71")
+	}
+	if len(hashes) == 0 || len(hashes) > MaxAccessLists {
+		return 0, fmt.Errorf("invalid BAL request count")
+	}
 	reqID := ep.nextRequestID()
-	err := ep.sendMessage(p2p.GetBlockAccessListsMsg, &p2p.GetBlockAccessListsPacket{
-		RequestID:   reqID,
-		BlockHashes: hashes,
-	})
+	if err := ep.trackBALRequest(reqID, hashes); err != nil {
+		return 0, err
+	}
+	err := ep.sendMessage(p2p.GetBlockAccessListsMsg, &p2p.GetBlockAccessListsPacket{RequestID: reqID, BlockHashes: hashes})
+	if err != nil {
+		ep.takeBALRequest(reqID)
+	}
 	return reqID, err
+}
+
+func (ep *EthPeer) takeBALRequest(id uint64) ([]types.Hash, bool) {
+	ep.requestMu.Lock()
+	defer ep.requestMu.Unlock()
+	hashes, ok := ep.balRequests[id]
+	delete(ep.balRequests, id)
+	return hashes, ok
 }
 
 // SendBlockAccessLists sends an eth/71 BlockAccessLists (0x13) response
@@ -237,4 +266,25 @@ func (ep *EthPeer) Handshake(local *p2p.StatusData) (*p2p.StatusData, error) {
 	ep.peer.SetVersion(remote.ProtocolVersion)
 
 	return &remote, nil
+}
+
+// writeMsg serializes all protocol writes, including range announcements and
+// request/response traffic, for transports that permit only one writer.
+func (ep *EthPeer) writeMsg(msg p2p.Msg) error {
+	ep.writeMu.Lock()
+	defer ep.writeMu.Unlock()
+	return ep.transport.WriteMsg(msg)
+}
+
+func (ep *EthPeer) trackBALRequest(id uint64, hashes []types.Hash) error {
+	ep.requestMu.Lock()
+	defer ep.requestMu.Unlock()
+	if len(hashes) == 0 || len(hashes) > MaxAccessLists {
+		return fmt.Errorf("invalid BAL request count")
+	}
+	if len(ep.balRequests) >= MaxAccessLists {
+		return fmt.Errorf("too many outstanding BAL requests")
+	}
+	ep.balRequests[id] = append([]types.Hash(nil), hashes...)
+	return nil
 }

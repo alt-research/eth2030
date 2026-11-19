@@ -29,6 +29,7 @@ const (
 	PooledTransactionsMsg         = 0x0a
 	GetReceiptsMsg                = 0x0f
 	ReceiptsMsg                   = 0x10
+	BlockRangeUpdateMsg           = 0x11
 
 	// eth/71 message codes (EIP-8159: Block Access List Exchange).
 	// Message IDs 0x12/0x13 follow sequentially from BlockRangeUpdate (0x11).

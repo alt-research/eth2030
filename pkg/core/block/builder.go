@@ -287,14 +287,6 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		}
 	}
 
-	// EIP-7997: deploy the deterministic CREATE2 factory at Glamsterdam activation.
-	if b.config != nil && b.config.IsGlamsterdan(header.Time) {
-		if balActive && statedb.GetCodeSize(eips.FactoryAddress) == 0 {
-			preTracker.RecordAddressTouch(eips.FactoryAddress)
-		}
-		eips.ApplyEIP7997(statedb)
-	}
-
 	// Merge pre-execution system contract accesses into the block BAL.
 	if balActive {
 		preBAL := preTracker.Build(0) // AccessIndex 0 for pre-execution
@@ -751,14 +743,6 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		} else {
 			eips.ProcessParentBlockHash(statedb, header.Number.Uint64()-1, header.ParentHash)
 		}
-	}
-
-	// EIP-7997: deploy the deterministic CREATE2 factory at Glamsterdam activation.
-	if b.config != nil && b.config.IsGlamsterdan(header.Time) {
-		if balActive && statedb.GetCodeSize(eips.FactoryAddress) == 0 {
-			preTrackerLegacy.RecordAddressTouch(eips.FactoryAddress)
-		}
-		eips.ApplyEIP7997(statedb)
 	}
 
 	// Merge pre-execution system contract accesses into the block BAL.

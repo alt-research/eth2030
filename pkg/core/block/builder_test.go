@@ -20,7 +20,7 @@ func newLegacyBuilder(cfg *config.ChainConfig, statedb state.StateDB) *BlockBuil
 // --- Existing Tests (updated to new API) ---
 
 func TestBlockBuilderSimple(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 
@@ -71,7 +71,7 @@ func TestBlockBuilderSimple(t *testing.T) {
 }
 
 func TestBlockBuilderGasLimit(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 
@@ -116,7 +116,7 @@ func TestBlockBuilderGasLimit(t *testing.T) {
 }
 
 func TestBlockBuilderGasPriceOrdering(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender1 := types.BytesToAddress([]byte{0xaa})
 	sender2 := types.BytesToAddress([]byte{0xab})
 	receiver := types.BytesToAddress([]byte{0xac})
@@ -169,7 +169,7 @@ func TestBlockBuilderGasPriceOrdering(t *testing.T) {
 }
 
 func TestBlockBuilderEmptyBlock(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := newLegacyBuilder(config.TestConfig, statedb)
 
 	parent := &types.Header{
@@ -354,7 +354,7 @@ func TestCalcBaseFee_MinimumFloor(t *testing.T) {
 // TestBuildBlock_MixedTransactionTypes tests building a block with legacy, EIP-1559,
 // and blob transactions. Verifies that all types are included and properly ordered.
 func TestBuildBlock_MixedTransactionTypes(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender1 := types.BytesToAddress([]byte{0xaa})
 	sender2 := types.BytesToAddress([]byte{0xab})
 	sender3 := types.BytesToAddress([]byte{0xac})
@@ -442,7 +442,7 @@ func TestBuildBlock_MixedTransactionTypes(t *testing.T) {
 // TestBuildBlock_BlobGasLimitEnforcement tests that the builder enforces
 // MAX_BLOB_GAS_PER_BLOCK = 786432 (6 blobs * 131072 gas each).
 func TestBuildBlock_BlobGasLimitEnforcement(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	receiver := types.BytesToAddress([]byte{0xae})
 
 	// Create 4 senders with 3 blobs each (12 blobs total, but max is 6).
@@ -516,7 +516,7 @@ func TestBuildBlock_BlobGasLimitEnforcement(t *testing.T) {
 // TestBuildBlock_BlobHashValidation tests that blob transactions with invalid
 // versioned hash bytes are rejected during block building.
 func TestBuildBlock_BlobHashValidation(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000_000))
@@ -561,7 +561,7 @@ func TestBuildBlock_BlobHashValidation(t *testing.T) {
 // TestBuildBlock_ExcessBlobGasCalculation tests that the builder correctly
 // computes excess blob gas from the parent header.
 func TestBuildBlock_ExcessBlobGasCalculation(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := newLegacyBuilder(config.TestConfig, statedb)
 
 	// Parent with 6 blobs used (786432 blob gas) and 0 excess.
@@ -643,7 +643,7 @@ func TestBuildBlock_BaseFeeCalculation(t *testing.T) {
 // TestBuildBlock_WithdrawalBalanceCredits verifies that withdrawal recipients
 // receive the correct balance (converted from Gwei to Wei).
 func TestBuildBlock_WithdrawalBalanceCredits(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 
 	recipient := types.BytesToAddress([]byte{0xcc})
 
@@ -697,7 +697,7 @@ func TestBuildBlock_WithdrawalBalanceCredits(t *testing.T) {
 // TestBuildBlock_TransactionOrdering_EffectiveGasPrice tests that transactions
 // are ordered by effective gas price (considering base fee).
 func TestBuildBlock_TransactionOrdering_EffectiveGasPrice(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender1 := types.BytesToAddress([]byte{0xaa})
 	sender2 := types.BytesToAddress([]byte{0xab})
 	sender3 := types.BytesToAddress([]byte{0xac})
@@ -767,7 +767,7 @@ func TestBuildBlock_TransactionOrdering_EffectiveGasPrice(t *testing.T) {
 // TestBuildBlock_BlobTxsSeparateFromRegular tests that blob transactions are
 // processed after all regular transactions, maintaining separate ordering pools.
 func TestBuildBlock_BlobTxsSeparateFromRegular(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender1 := types.BytesToAddress([]byte{0xaa})
 	sender2 := types.BytesToAddress([]byte{0xab})
 	receiver := types.BytesToAddress([]byte{0xac})
@@ -833,7 +833,7 @@ func TestBuildBlock_BlobTxsSeparateFromRegular(t *testing.T) {
 // TestBuildBlock_BlobGasHeaderFields tests that the block header contains
 // correct BlobGasUsed and ExcessBlobGas fields.
 func TestBuildBlock_BlobGasHeaderFields(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000_000))
@@ -893,7 +893,7 @@ func TestBuildBlock_BlobGasHeaderFields(t *testing.T) {
 // TestBuildBlock_SkipTxExceedingGasLimit tests that individual transactions
 // exceeding the remaining block gas are skipped rather than causing failure.
 func TestBuildBlock_SkipTxExceedingGasLimit(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender1 := types.BytesToAddress([]byte{0xaa})
 	sender2 := types.BytesToAddress([]byte{0xab})
 	receiver := types.BytesToAddress([]byte{0xac})
@@ -1146,7 +1146,7 @@ func TestBuildBlock_NoBlobGasFieldsPreCancun(t *testing.T) {
 // TestBuildBlock_EmptyBlockBlobGasZero tests that an empty Cancun block
 // has BlobGasUsed = 0.
 func TestBuildBlock_EmptyBlockBlobGasZero(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := newLegacyBuilder(config.TestConfig, statedb)
 
 	parent := &types.Header{
@@ -1173,7 +1173,7 @@ func TestBuildBlock_EmptyBlockBlobGasZero(t *testing.T) {
 // TestBuildBlock_BaseFeeFiltersTxs tests that transactions with gasFeeCap
 // below the base fee are not included in the block.
 func TestBuildBlock_BaseFeeFiltersTxs(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000_000))

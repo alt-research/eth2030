@@ -84,8 +84,8 @@ above. `WriteBlock`, `ReadBlock`, `WriteReceipts`, `ReadReceipts`,
 ### History Expiry — EIP-4444 (`history.go`)
 
 - `DefaultHistoryRetention` = 3,153,600 blocks (~1 year).
-- `BALRetentionSlots` = 113,056 blocks (~15.6 days, EIP-7928 §retention-policy).
-- `IsBALRetained(headBlock, blockNum)` — true if BAL is within retention window.
+- `BALRetentionSlots` = 457,568 slots (~63.6 days, EIP-7928 §retention-policy).
+- `IsBALRetained(headSlot, slot)` — minimum slot-based retention; block-number fallback is conservative across missed slots.
 - `WriteHistoryOldest(db, blockNum)`, `ReadHistoryOldest(db)` — persist the
   oldest available block for body/receipt queries.
 - `ErrHistoryPruned` — returned for pruned historical data.

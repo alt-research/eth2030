@@ -1,0 +1,30 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..137061d8 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,13 @@
+ # Lean4 Verification Check-list
+ 
++## Persisted fork configuration and restart authority (2026-11-18)
++
++- [x] Trace actual Node startup before history replay and reuse the existing persisted config key.
++- [x] Detect incompatible active schedules and immutable parameter changes before state/metadata adoption.
++- [x] Qualify future updates, either-side activation, missing/corrupt metadata and failed persistence.
++- [x] Verify actual node restart preserves heads/state/configuration on rejection and does not mutate network globals.
++- [x] Run affected/full tests, build and race/vet; publish a dedicated PR.
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..475f3ca5 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Persisted configuration recovery (2026-11-18)
++
++Actual Node startup now checks persisted runtime configuration before history replay, rejects active or immutable changes and retains compatible future updates. Runtime overrides do not mutate network globals. Real signed HTTP/restart evidence preserves head/state/config bytes on rejection and verifies successful future updates; missing/corrupt authority is explicit. Full Go, affected race/vet/build and four failing behavioral mutations pass. See [verification](docs/verification/glamsterdam-config-recovery-20261118.md). Final gas, blob schedules, unknown legacy migration and release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

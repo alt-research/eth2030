@@ -1,10 +1,12 @@
 package node
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/eips"
@@ -13,6 +15,23 @@ import (
 	"github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/trie/bintrie"
 )
+
+// builderRequestGenesisJSON deploys the owned test contracts before root creation.
+func builderRequestGenesisJSON(chainID uint64) []byte {
+	var g map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(chainID), &g); err != nil {
+		panic(err)
+	}
+	alloc := g["alloc"].(map[string]any)
+	alloc[types.BuilderDepositRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderDepositRuntime())}
+	inhibitor := types.Hash{}
+	for i := range inhibitor {
+		inhibitor[i] = 255
+	}
+	alloc[types.BuilderExitRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderExitRuntime()), "storage": map[string]string{(types.Hash{}).Hex(): inhibitor.Hex()}}
+	data, _ := json.Marshal(g)
+	return data
+}
 
 // minimalGenesisJSON builds a small genesis.json payload for testing.
 func minimalGenesisJSON(chainID uint64) []byte {
@@ -32,6 +51,7 @@ func minimalGenesisJSON(chainID uint64) []byte {
 			"shanghaiTime":            0,
 			"cancunTime":              0,
 			"pragueTime":              0,
+			"osakaTime":               0,
 		},
 		"nonce":      "0x0",
 		"timestamp":  "0x0",
@@ -46,6 +66,36 @@ func minimalGenesisJSON(chainID uint64) []byte {
 	}
 	data, _ := json.Marshal(g)
 	return data
+}
+
+func TestNodeRejectsIncoherentCanonicalScheduleBeforeGenesisAdoption(t *testing.T) {
+	for _, field := range []string{"shanghaiTime", "cancunTime", "pragueTime", "osakaTime"} {
+		t.Run(field, func(t *testing.T) {
+			var input map[string]any
+			if err := json.Unmarshal(minimalGenesisJSON(1337), &input); err != nil {
+				t.Fatal(err)
+			}
+			forks := input["config"].(map[string]any)
+			forks["amsterdamTime"] = 100
+			delete(forks, field)
+			data, err := json.Marshal(input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			cfg := DefaultConfig()
+			cfg.DataDir, cfg.RPCPort, cfg.EnginePort = t.TempDir(), 0, 0
+			cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
+			if err := os.WriteFile(cfg.GenesisPath, data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if node, err := New(&cfg); err == nil || node != nil || !strings.Contains(err.Error(), "fork schedule") {
+				if node != nil {
+					_ = node.Stop()
+				}
+				t.Fatalf("incoherent production startup accepted: node=%v error=%v", node, err)
+			}
+		})
+	}
 }
 
 func TestLoadGenesisFile_Basic(t *testing.T) {
@@ -402,7 +452,7 @@ func TestNodeWithGenesisFile(t *testing.T) {
 func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 	const genesisTime = uint64(100)
 	var input map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &input); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &input); err != nil {
 		t.Fatal(err)
 	}
 	input["timestamp"] = "0x64"

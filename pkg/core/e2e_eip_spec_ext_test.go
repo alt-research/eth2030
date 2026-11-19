@@ -15,7 +15,6 @@ import (
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 )
@@ -28,7 +27,7 @@ import (
 // GasUsedVec, and ExcessGasVec survive the full build → NewBlock → insert
 // → retrieved via block.Header() path.
 func TestE2E_3DGasVectors_PersistThroughChain(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfigGlamsterdan, genesis, statedb, db)
@@ -87,7 +86,7 @@ func TestE2E_3DGasVectors_PersistThroughChain(t *testing.T) {
 // TestE2E_3DGasVectors_MultiBlockChain verifies that 3D vectors update
 // correctly across a 3-block chain (excess gas evolves with each block).
 func TestE2E_3DGasVectors_MultiBlockChain(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1_000_000_000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfigGlamsterdan, genesis, statedb, db)
@@ -317,11 +316,11 @@ func TestE2E_BALRetention_WindowSlidesWith_ChainGrowth(t *testing.T) {
 }
 
 // TestE2E_BALRetention_BlockAccessListRetainedDuringWeakSubjectivity verifies
-// the retention spec claim: BALs must be retained for at least 3,533 epochs
-// = 113,056 slots. Block at exactly the boundary is retained; block just
+// the retention spec claim: BALs must be retained for at least 14,299 epochs
+// = 457,568 slots. Block at exactly the boundary is retained; block just
 // outside is not.
 func TestE2E_BALRetention_BlockAccessListRetainedDuringWeakSubjectivity(t *testing.T) {
-	const weakSubjectivitySlots = rawdb.BALRetentionSlots // 3533 * 32
+	const weakSubjectivitySlots = rawdb.BALRetentionSlots // 14299 * 32
 
 	// Simulate a chain at slot 2*weakSubjectivity.
 	head := uint64(weakSubjectivitySlots * 2)
@@ -341,7 +340,7 @@ func TestE2E_BALRetention_BlockAccessListRetainedDuringWeakSubjectivity(t *testi
 
 func newGlamsterdanChain(t *testing.T, gasLimit uint64, baseFee *big.Int) *chain.Blockchain {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(gasLimit, baseFee)
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfigGlamsterdan, genesis, statedb, db)
@@ -379,7 +378,7 @@ func TestE2E_3DGasVectors_CalldataGasUsed_Nonzero(t *testing.T) {
 				Data:     data,
 			})
 			// Fund sender in state.
-			senderState := state.NewMemoryStateDB()
+			senderState := newBuilderRequestTestState()
 			senderState.AddBalance(sender, ether(10))
 			_ = senderState
 			return []*types.Transaction{tx}
@@ -417,7 +416,7 @@ func TestE2E_BALOrdering_PersistsAcrossBlockBuilding(t *testing.T) {
 	sender := crypto.PubkeyToAddress(key.PublicKey)
 	recipient := types.HexToAddress("0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, ether(50))
 
 	genesis := makeGenesis(30_000_000, big.NewInt(1))

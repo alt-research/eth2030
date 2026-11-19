@@ -191,6 +191,11 @@ func (b *EngineBackend) IsPrague(timestamp uint64) bool {
 	return b.node.Blockchain().Config().IsPrague(timestamp)
 }
 
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.node.Blockchain().Config().IsOsaka(timestamp)
+}
+
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
 	return b.node.Blockchain().Config().IsAmsterdam(timestamp)
@@ -259,9 +264,7 @@ func (b *EngineBackend) processBlockV5(
 		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != p.SlotNumber {
 			return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 		}
-		if slot != 0 {
-			slotNumber = &slot
-		}
+		slotNumber = &slot
 	}
 	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash, slotNumber, stage)
 }

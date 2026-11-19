@@ -129,7 +129,8 @@ func TestActiveFork_Progression(t *testing.T) {
 		{0, "Cancun"},       // Shanghai=0, Cancun=0, Prague=1000
 		{500, "Cancun"},     // Before Prague
 		{1000, "Prague"},    // Prague activated
-		{1500, "Prague"},    // Still Prague
+		{1499, "Prague"},    // Before Osaka
+		{1500, "Osaka"},     // Osaka activated
 		{2000, "Amsterdam"}, // Amsterdam activated
 		{3000, "Glamsterdan"},
 		{4000, "Hogota"},

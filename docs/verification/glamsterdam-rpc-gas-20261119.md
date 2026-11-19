@@ -20,6 +20,12 @@ The current EIP-8037/8038 execution source remains pinned at EIPs `3db38a3`. The
 
 Execution-apis [852](https://github.com/ethereum/execution-apis/pull/852), head `cc1852a7`, and [976](https://github.com/ethereum/execution-apis/issues/976) remain open. New two-dimensional trace fields, complete nested callTracer hooks and eth_simulateV1 are separate unfinished work; opcode replay here does not imply those surfaces are qualified. Unqualified experimental transaction envelopes return an explicit tracing error.
 
-All 212 Go packages and 27 tagged Core/EIP packages pass, with 48 affected race packages, vet and local build. Ten compiling mutations detect call cap, intrinsic debit, estimation transaction policy, access-list input, authorization input, complete storage replacement, opcode hooks, historical prefix, pre-block callbacks and historical fork context. Sources are restored before the full qualification run. [Exact results](glamsterdam-rpc-gas-results-20261119.json).
+All 212 Go packages and 27 tagged Core/EIP packages pass, with 48 affected race packages, vet and local build. Eleven compiling mutations detect call cap, intrinsic debit, estimation transaction policy, access-list input, authorization input, complete storage replacement, opcode hooks, historical prefix, pre-block callbacks and historical fork context. Sources are restored before the full qualification run. [Exact results](glamsterdam-rpc-gas-results-20261119.json).
 
 Local logs: `/tmp/glamsterdam-rpc-gas-{red-http,full-second,tagged-second,race-second}.log`; targeted consumer logs retain the expanded argument, historical and system controls. Independent complete-client/API fixtures, performance/resource limits, simulator/nested tracing and final release decisions remain open.
+
+## Access discovery follow-up
+
+The actual HTTP consumer returns the storage access list with exactly 131253 paid gas. An above-cap computation fails in access discovery even though uncapped eth_call can run it. An eleventh compiling mutation changes this path to call policy and is detected. Five affected race packages, affected vet, build and restored-source actual HTTP tests pass. Durable follow-up logs are `/projects/eth2030/glamsterdam-rpc-access-followup-race.log`, `/projects/eth2030/glamsterdam-rpc-access-policy-mutation.log` and `/projects/eth2030/glamsterdam-rpc-access-followup-final.log`. Earlier temporary logs were runner-local; their structured results remain archived.
+
+[Feature review 85](https://github.com/alt-research/eth2030/pull/85) is submitted. Current merged LIFO is explicitly selected for development by the user, with final design review retained. Simulator, nested trace dimensions and remaining full-client/resource/release work continue separately.

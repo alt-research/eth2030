@@ -6,6 +6,10 @@ Actual HTTP now qualifies sequential calls/blocks, strict nonce/fee rules, uncap
 
 Separate branch `feat/glamsterdam-simulate-v1` implements the selected execution-apis 68d76a5b method on the explicitly selected current merged LIFO baseline. Actual sequential calls/blocks must retain isolated state and complete system, fee, receipt, BAL and header consumers. Validation-enabled and disabled modes differ in nonce/fee checks and execution/reservoir policy; default uncapped calls reserve the smaller remaining execution/state dimension. Header gaps are real simulated empty blocks. No simulator conformance or release completion is claimed before actual HTTP and independent commitment evidence.
 
+## Actual access discovery follow-up (2026-11-19)
+
+PR 85 additionally checks the actual HTTP-discovered storage list and its exact 131253 paid gas. A computation needing more than 2^24 execution gas is rejected by access-list simulation under transaction rules. Its compiling policy mutation is detected, bringing the review to eleven detected mutations. Five affected race packages, vet/build and restored-source HTTP checks pass; full/tagged/48-package race evidence belongs to the preceding unchanged production source. The user explicitly selected current merged LIFO implementation while retaining final design review.
+
 ## Qualified RPC method and opcode consumers (2026-11-19)
 
 Current source `28933241` passes full/tagged Go, affected race, vet/build and ten detected compiling mutations. Real HTTP verifies full call arguments, overrides, state/account estimates, creation, opcode traces, historical prefix/system replay, block traces and actual fork context. [Evidence](docs/verification/glamsterdam-rpc-gas-20261119.md). Simulator, nested callTracer/two-dimensional trace fields, independent full-client/API fixtures, resource and final release gates remain open. This branch is separate from the stable EL integration until composed qualification.

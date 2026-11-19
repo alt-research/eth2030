@@ -196,3 +196,13 @@ type refundChange struct {
 func (ch refundChange) revert(s *MemoryStateDB) {
 	s.refund = ch.prev
 }
+
+// touchAccountChange ensures reverted CALLs do not delete an earlier empty
+// account at the transaction boundary (EIP-161's 2017 addendum).
+type touchAccountChange struct{ addr types.Address }
+
+func (ch touchAccountChange) revert(s *MemoryStateDB) {
+	if obj := s.getStateObject(ch.addr); obj != nil {
+		obj.touched = false
+	}
+}

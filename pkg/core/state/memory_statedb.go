@@ -19,6 +19,7 @@ type stateObject struct {
 	dirtyStorage     map[types.Hash]types.Hash
 	committedStorage map[types.Hash]types.Hash
 	selfDestructed   bool
+	touched          bool // reverted with the transaction journal
 	deleted          bool // finalized deletion; retain a tombstone until durable commit
 
 	// dbStorageRoot caches the storage Merkle root as stored in the DB at the
@@ -75,6 +76,7 @@ func (s *MemoryStateDB) getLiveStateObject(addr types.Address) *stateObject {
 
 func (s *MemoryStateDB) getOrNewStateObject(addr types.Address) *stateObject {
 	if obj := s.stateObjects[addr]; obj != nil && !obj.deleted {
+		s.touchAccount(addr, obj)
 		return obj
 	}
 	s.journal.append(createAccountChange{addr: addr, prev: s.stateObjects[addr]})
@@ -82,6 +84,7 @@ func (s *MemoryStateDB) getOrNewStateObject(addr types.Address) *stateObject {
 	// Implicit creation is state-changing and must be undone by snapshots.
 	s.journal.append(createAccountChange{addr: addr})
 	s.stateObjects[addr] = obj
+	s.touchAccount(addr, obj)
 	return obj
 }
 
@@ -91,6 +94,7 @@ func (s *MemoryStateDB) CreateAccount(addr types.Address) {
 	prev := s.stateObjects[addr] // may be nil
 	s.journal.append(createAccountChange{addr: addr, prev: prev})
 	s.stateObjects[addr] = newStateObject()
+	s.touchAccount(addr, s.stateObjects[addr])
 }
 
 func (s *MemoryStateDB) SubBalance(addr types.Address, amount *big.Int) {
@@ -649,6 +653,7 @@ func copyMemoryStateObject(obj *stateObject) *stateObject {
 		committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
 		selfDestructed:   obj.selfDestructed,
 		deleted:          obj.deleted,
+		touched:          obj.touched,
 		dbStorageRoot:    obj.dbStorageRoot,
 	}
 	copy(newObj.account.CodeHash, obj.account.CodeHash)
@@ -715,14 +720,20 @@ func (s *MemoryStateDB) PrefetchStorage(addr types.Address, keys []types.Hash) {
 // GetCommittedState returns correct "original" values for SSTORE gas calculations.
 func (s *MemoryStateDB) FinalizePreState() {
 	for _, obj := range s.stateObjects {
+		obj.touched = false
 		for key, value := range obj.dirtyStorage {
 			obj.committedStorage[key] = value
 		}
 	}
 }
 
-func (s *MemoryStateDB) FinalizeTransaction() {
-	for _, obj := range s.stateObjects {
+func (s *MemoryStateDB) FinalizeTransaction() { s.Finalise(false) }
+
+func (s *MemoryStateDB) Finalise(deleteEmpty bool) {
+	for addr, obj := range s.stateObjects {
+		if deleteEmpty && obj.touched && !obj.deleted && isEmptyAccount(obj) {
+			s.SelfDestruct(addr)
+		}
 		if obj.selfDestructed {
 			obj.deleted = true
 		}
@@ -808,3 +819,10 @@ func (s *MemoryStateDB) Dup() StateDB {
 
 // Verify interface compliance at compile time.
 var _ StateDB = (*MemoryStateDB)(nil)
+
+func (s *MemoryStateDB) touchAccount(addr types.Address, obj *stateObject) {
+	if !obj.touched {
+		s.journal.append(touchAccountChange{addr: addr})
+		obj.touched = true
+	}
+}

@@ -559,3 +559,5 @@ func (s *SnapStateDB) ClearTransientStorage() { s.memory.ClearTransientStorage()
 func (s *SnapStateDB) FinalizePreState() { s.memory.FinalizePreState() }
 
 func (s *SnapStateDB) FinalizeTransaction() { s.memory.FinalizeTransaction() }
+
+func (s *SnapStateDB) Finalise(deleteEmpty bool) { s.memory.Finalise(deleteEmpty) }

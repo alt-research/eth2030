@@ -1111,3 +1111,5 @@ func (t *TrieStateDB) Dup() StateDB {
 var _ StateDB = (*TrieStateDB)(nil)
 
 func (t *TrieStateDB) FinalizeTransaction() { t.mem.FinalizeTransaction() }
+
+func (t *TrieStateDB) Finalise(deleteEmpty bool) { t.mem.Finalise(deleteEmpty) }

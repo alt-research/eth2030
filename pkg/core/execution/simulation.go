@@ -66,9 +66,7 @@ func SimulateMessageWithConfig(cfg *config.ChainConfig, getHash vm.GetHashFunc, 
 	if original, ok := db.(interface{ FinalizePreState() }); ok {
 		original.FinalizePreState()
 	}
-	if transaction, ok := db.(interface{ FinalizeTransaction() }); ok {
-		defer transaction.FinalizeTransaction()
-	}
+	defer db.Finalise(cfg.IsEIP158(header.Number))
 	db.ClearAccessList()
 	db.ClearTransientStorage()
 	db.SubRefund(db.GetRefund())

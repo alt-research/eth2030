@@ -679,6 +679,9 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 	// Select the correct jump table based on fork rules.
 	var precompileAddrs map[types.Address]vm.PrecompiledContract
 	if config != nil {
+		if config.ChainID != nil {
+			evm.Context.ChainID = new(big.Int).Set(config.ChainID)
+		}
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,

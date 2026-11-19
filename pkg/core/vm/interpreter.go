@@ -33,6 +33,7 @@ type GetHashFunc func(uint64) types.Hash
 type BlockContext struct {
 	GetHash     GetHashFunc
 	BlockNumber *big.Int
+	ChainID     *big.Int
 	Time        uint64
 	Coinbase    types.Address
 	GasLimit    uint64
@@ -119,7 +120,6 @@ type EVM struct {
 	TxContext            TxContext
 	Config               Config
 	StateDB              StateDB
-	chainID              uint64
 	depth                int
 	readOnly             bool
 	jumpTable            JumpTable
@@ -643,6 +643,10 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 		evm.recordETHTransfer(caller, addr, value)
 	}
 
+	if !transfersValue {
+		evm.StateDB.AddBalance(addr, new(big.Int))
+	}
+
 	// Execute precompile or contract code.
 	if isPrecompile {
 		ret, gasLeft, err := runPrecompile(p, input, gas)
@@ -899,6 +903,8 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 	snapshot := evm.StateDB.Snapshot()
 	createdSnapshot := len(evm.createdOrder)
 
+	evm.StateDB.AddBalance(addr, new(big.Int))
+
 	// Check for precompiled contract.
 	if p, ok := evm.precompile(addr); ok {
 		ret, gasLeft, err := runPrecompile(p, input, gas)
@@ -1152,7 +1158,7 @@ func gasEIP2929SlotCheck(evm *EVM, addr types.Address, slot types.Hash) uint64 {
 }
 
 // create is the shared implementation for Create and Create2.
-func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address, kind OpCode) ([]byte, types.Address, uint64, error) {
+func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address, kind OpCode) (ret []byte, created types.Address, left uint64, err error) {
 	if evm.amsterdamStateGasActive() {
 		return evm.createAmsterdam(caller, code, gas, value, contractAddr, kind)
 	}
@@ -1161,6 +1167,15 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	if len(code) > maxInit {
 		return nil, types.Address{}, gas, ErrMaxInitCodeSizeExceeded
 	}
+
+	// Only opcode-originated creations reserve parent gas. Top-level creation
+	// consumes its entire supplied child budget on an exceptional halt.
+	retained := uint64(0)
+	if evm.activeContract != nil {
+		retained = gas / CallGasFraction
+		gas -= retained
+	}
+	defer func() { left += retained }()
 
 	if evm.frame8141 != nil && evm.frame8141.PublicValidation && contractAddr != evm.frame8141.Tx.Sender {
 		evm.frameValidationErr = errors.New("Frame deployment created an account other than sender")
@@ -1171,6 +1186,7 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	if evm.balTracker != nil {
 		evm.balTracker.RecordAddressTouch(contractAddr)
 	}
+	evm.StateDB.AddAddressToAccessList(contractAddr)
 	contractHash := evm.StateDB.GetCodeHash(contractAddr)
 	if evm.StateDB.GetNonce(contractAddr) != 0 ||
 		(contractHash != (types.Hash{}) && contractHash != types.EmptyCodeHash) {
@@ -1191,11 +1207,11 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		}
 	}
 
-	// Only create a new account if it doesn't already exist.
-	// It's possible the contract code is deployed to a pre-existent
-	// account with non-zero balance.
-	if !evm.StateDB.Exist(contractAddr) {
-		evm.StateDB.CreateAccount(contractAddr)
+	// Reset an eligible existing account, retaining only its prefunding.
+	previousBalance := evm.StateDB.GetBalance(contractAddr)
+	evm.StateDB.CreateAccount(contractAddr)
+	if previousBalance.Sign() > 0 {
+		evm.StateDB.AddBalance(contractAddr, previousBalance)
 	}
 
 	evm.markContractCreated(contractAddr)
@@ -1230,34 +1246,28 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	// GasCreate and InitCodeWordGas are already charged by the jump table's
 	// constantGas and dynamicGas functions. Do not charge them again here.
 
-	// Apply the 63/64 rule (EIP-150) to gas available for init code.
-	callGas := gas - gas/CallGasFraction
-	gas -= callGas
-
-	// Create the contract for init code execution
-	contract := NewContract(caller, contractAddr, value, callGas)
+	// Parent retention remains outside the child, including code deposit.
+	contract := NewContract(caller, contractAddr, value, gas)
 	contract.Code = code
 
 	// Execute init code
 	evm.depth++
-	ret, err := evm.Run(contract, nil)
+	ret, err = evm.Run(contract, nil)
 	evm.depth--
 
 	if err != nil {
 		// On any error, revert state and return.
 		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		if !errors.Is(err, ErrExecutionReverted) {
-			// Non-revert error: all gas sent to subcall is consumed.
-			// Only the 1/64 retained by EIP-150 is returned.
-			return ret, types.Address{}, gas, err
+			return nil, types.Address{}, 0, err
 		}
-		// REVERT: return unused gas from subcall.
-		gas += contract.Gas
-		return ret, types.Address{}, gas, err
+		return ret, types.Address{}, contract.Gas, err
 	}
-
-	// Success: return unused gas from subcall.
-	gas += contract.Gas
+	gas = contract.Gas
+	if evm.forkRules.IsLondon && len(ret) > 0 && ret[0] == 0xef {
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
+		return nil, types.Address{}, 0, errors.New("invalid code prefix")
+	}
 
 	// Code deposit cost: 200 per byte of deployed code.
 	if len(ret) > 0 {

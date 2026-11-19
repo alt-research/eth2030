@@ -273,7 +273,19 @@ func (p *VerifiedPeer) RequestStorageRange(req statesync.StorageRangeRequest) (*
 	ok = ok && p.state.rootSet && p.state.stateRoot == req.Root
 	p.state.mu.Unlock()
 	if !ok {
-		return nil, fmt.Errorf("snap: storage account not verified")
+		// A moving-pivot adapter starts with a fresh root cache. Downloaded
+		// accounts absent from the BAL diff can still have pending storage;
+		// authenticate their unchanged leaf at the new root before using it.
+		if _, err := p.RequestAccountRange(statesync.AccountRangeRequest{Root: req.Root, Origin: account, Limit: account, Bytes: SoftResponseLimit}); err != nil {
+			return nil, err
+		}
+		p.state.mu.Lock()
+		root, ok = p.state.storageRoots[account]
+		ok = ok && p.state.rootSet && p.state.stateRoot == req.Root
+		p.state.mu.Unlock()
+		if !ok {
+			return nil, fmt.Errorf("snap: storage account not verified")
+		}
 	}
 	var response StorageRangesPacket
 	if err := p.request(p.ctx, GetStorageRangesMsg, func(id uint64) any {

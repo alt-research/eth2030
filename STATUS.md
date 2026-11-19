@@ -1,3 +1,7 @@
+## Shared PR tracking conflict cleanup (2026-11-19)
+
+PR 65 is now merged at master `98716284b049933888bcd68d64c1957004d759b2`. The remaining 22 Glamsterdam feature reviews all conflict in shared root tracking files; PRs 71/72 also have adjacent source conflicts and PR 82 has divergent snap evidence. Cleanup will preserve feature records in per-review documents and keep root tracking identical across the batch. CI, approval, Draft status and protocol release qualification remain separate gates; this task does not merge upstream PRs. The dated records below describe their original snapshots.
+
 ## PR 65 conflict resolution (2026-11-19)
 
 Merged current master `d6732d3c8f67b94d433a8d7b38d2e18e58a31fcc` (PR 64) into the existing contract-limit review from `a1008f472ca63950cfb22515ce8b795d21e913bd`. Resolved only CHECK.md and STATUS.md by retaining both the EIP-7954 feature evidence and the newer program/merge-review records. The complete `pkg/` tree remains identical to the prior PR 65 head; this update introduces no execution behavior changes.

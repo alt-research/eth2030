@@ -1,3 +1,7 @@
+## Authorized Glamsterdam completion program (2026-11-19)
+
+Active work continues against the merged master baseline 5fbc7c13. Independent corrective reviews 88–91 cover historical authorizations, Osaka ModExp, EIP-161 finalization and canonical CLZ. Lighthouse original review heads are retained and directly published to eth2030 as authorized; conditional envelope early returns were removed from qualification and explicit-fork runs are required. The complete modern official state corpus exposed additional adapter/execution/validation work, which remains open. [Current thirteen-package progress and evidence boundaries](docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md). No EL master merge or release completion is claimed.
+
 ## Glamsterdam post-merge audit (2026-11-19)
 
 Verified upstream master `5fbc7c133b0e57352ca2a3d6fdd9a63726c42502`: all 24 EL reviews 64–87 are merged and no EL PR is open. The complete production module tree equals qualified PR 87; current mainline CI is 7/7 successful. RPC, simulation, nested/dimensional tracing, eth/72 and snap/2 are implemented on mainline and are no longer missing-code tasks.

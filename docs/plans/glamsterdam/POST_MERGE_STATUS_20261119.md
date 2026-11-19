@@ -1,3 +1,5 @@
+> Active continuation: [Completion progress](COMPLETION_PROGRESS_20261119.md). This audit remains the historical master-5fbc7c13 baseline.
+
 # Glamsterdam post-merge status and remaining work
 
 Snapshot: 2026-11-19. Audited EL master: [`5fbc7c13`](https://github.com/alt-research/eth2030/commit/5fbc7c133b0e57352ca2a3d6fdd9a63726c42502). [Structured inventory](post-merge-status-20261119.json). This report supersedes historical pending/absent labels in the development tracker; it does not erase their original evidence.

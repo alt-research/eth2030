@@ -41,7 +41,7 @@ func TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation(t *testin
 		t.Run(method, func(t *testing.T) {
 			backend, db, target := cancellationBackend(t)
 			root := db.GetRoot()
-			gas, to := "0x5f5e100", target.Hex()
+			gas, to := "0x3b9aca00", target.Hex()
 			args := rpctypes.CallArgs{To: &to, Gas: &gas}
 			header := backend.HeaderByNumber(rpc.LatestBlockNumber)
 			ctx, cancel := context.WithCancel(context.Background())
@@ -115,7 +115,7 @@ func TestHTTPDisconnectCancelsActualNativeSingleAndBatchCalls(t *testing.T) {
 				handler.ServeHTTP(w, r)
 			}))
 			defer server.Close()
-			payload := `{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{"to":"` + target.Hex() + `","gas":"0x5f5e100"},{"blockHash":"` + backend.HeaderByNumber(rpc.LatestBlockNumber).Hash().Hex() + `","requireCanonical":true}]}`
+			payload := `{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{"to":"` + target.Hex() + `","gas":"0x3b9aca00"},{"blockHash":"` + backend.HeaderByNumber(rpc.LatestBlockNumber).Hash().Hex() + `","requireCanonical":true}]}`
 			if mode == "batch" {
 				payload = "[" + payload + "," + strings.Replace(payload, `"id":1`, `"id":2`, 1) + "]"
 			}

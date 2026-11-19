@@ -1,3 +1,10 @@
+## Sequential master/CI repair (2026-11-19)
+
+- [x] Inspect original all-green CI and compare the exact branch with current master.
+- [ ] Merge current master without importing unrelated unmerged blob or gas features.
+- [ ] Verify source composition, real snap recovery tests, full default suite, integration, race/vet, formatting and build.
+- [ ] Publish the existing branch without force and require fresh exact-head CI verification.
+
 # PR 81 tracking cleanup
 
 - [x] Preserve original tracking diff and changed sections from `6ce3eceeef539e69d5f2a20428aa7f88e651a661`.

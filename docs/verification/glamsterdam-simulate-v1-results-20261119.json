@@ -1,0 +1,129 @@
+{
+  "tested_production_commit": "6daa66787bf9e66ab8f0dba49b45fda7470a46b8",
+  "composition_commit": "206e14acbf79ed4d9ffaf2fe09a3b31cfd4b592e",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "execution_apis_commit": "68d76a5b1c09dff023782d97eec6ce87a6f6505e",
+  "reference_sdk": "go-ethereum v1.17.10; unmodified EVM, transitions, state, BAL, receipts and header/body encoding",
+  "checks": {
+    "full_packages": 212,
+    "tagged_packages": 27,
+    "race_packages": 48
+  },
+  "vet": "passed",
+  "local_build": "passed",
+  "independent_blocks": [
+    {
+      "hash": "0x06c5fd2da645b30a3cfcfc710ce3d584f93813871e1a02ab4209cf2086962e19",
+      "root": "0xca74de1e35cc6890eafad1f4dfedd734fb0df7b4d09e6134e5db6dfbdd9b77c5",
+      "receipt": "0x6da5c497126be71066c2f3bdf7c951113c9440b9ed43909ee96be23b297f4520",
+      "BAL": "0x4e230126eca105e2c5ac9262619816944601ea4a074cd4ed2877d4b0e260e725",
+      "gas": "97920"
+    },
+    {
+      "hash": "0xf5a24aca10821205cab926cd546be653faeaecfc581ae2963b6f764d975bf7df",
+      "root": "0x8bd9ffd2abdb7405ee5c653b8782639c7ac04bb59521f7860b836d54d06615b9",
+      "receipt": "0xdc0aea1d7f46b77a56a0460a219b5126bb780023b2ae52a56b581058afb5b339",
+      "BAL": "0x441de31c9cf89aa131bdc2705f1bb841738e9c0af03207926a6b9ff9b96d751d",
+      "gas": "44887"
+    }
+  ],
+  "mutations": [
+    {
+      "name": "validation-gas-policy",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-validation-gas-policy.log"
+    },
+    {
+      "name": "nonce-validation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-nonce-validation.log"
+    },
+    {
+      "name": "uncapped-default-reservation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-uncapped-default-reservation.log"
+    },
+    {
+      "name": "global-gas-budget",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-global-gas-budget.log"
+    },
+    {
+      "name": "cross-block-state",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-cross-block-state.log"
+    },
+    {
+      "name": "preblock-system-calls",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-preblock-system-calls.log"
+    },
+    {
+      "name": "postblock-withdrawals",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-postblock-withdrawals.log"
+    },
+    {
+      "name": "call-bal-index",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-call-bal-index.log"
+    },
+    {
+      "name": "actual-rlp-size",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-actual-rlp-size.log"
+    },
+    {
+      "name": "precompile-relocation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-precompile-relocation.log"
+    },
+    {
+      "name": "transfer-rollback",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-transfer-rollback.log"
+    },
+    {
+      "name": "fork-transfer-deduplication",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-fork-transfer-deduplication.log"
+    },
+    {
+      "name": "hash-selected-ancestry",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-hash-selected-ancestry.log"
+    },
+    {
+      "name": "uint256-overridden-balance",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-uint256-overridden-balance.log"
+    },
+    {
+      "name": "execution-cancellation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-simulate-v1-mutation-execution-cancellation.log"
+    }
+  ],
+  "release_qualified": false,
+  "composed_followup": {
+    "race_packages": 5,
+    "vet": "passed",
+    "build": "passed",
+    "log": "/projects/eth2030/glamsterdam-simulate-v1-composed-followup.log"
+  }
+}

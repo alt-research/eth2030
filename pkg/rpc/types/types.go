@@ -2,6 +2,7 @@
 package rpctypes
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -58,10 +59,26 @@ func (bn *BlockNumber) UnmarshalJSON(data []byte) error {
 
 // Request is a JSON-RPC 2.0 request.
 type Request struct {
+	ctx     context.Context
 	JSONRPC string            `json:"jsonrpc"`
 	Method  string            `json:"method"`
 	Params  []json.RawMessage `json:"params"`
 	ID      json.RawMessage   `json:"id"`
+}
+
+// Context returns local transport cancellation metadata, never a JSON-RPC field.
+func (r *Request) Context() context.Context {
+	if r.ctx != nil {
+		return r.ctx
+	}
+	return context.Background()
+}
+
+// WithContext returns a request copy with its own immutable transport context.
+func (r *Request) WithContext(ctx context.Context) *Request {
+	clone := *r
+	clone.ctx = ctx
+	return &clone
 }
 
 // Response is a JSON-RPC 2.0 response.

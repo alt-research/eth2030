@@ -59,8 +59,11 @@ func simulationValidationError(err error) error {
 // Simulate executes only request-owned state. No pool, forkchoice, raw database,
 // canonical block cache or persisted configuration is modified.
 func (b *RPCBackend) Simulate(options rpctypes.SimulateOptions, base *types.Header) ([]rpctypes.SimulateBlockResult, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
 	defer cancel()
+	if ctx.Err() != nil {
+		return nil, simulationError(-32016, "simulation timeout")
+	}
 	if len(options.BlockStateCalls) == 0 {
 		return nil, simulationError(-32602, "no blocks to simulate")
 	}

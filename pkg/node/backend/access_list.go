@@ -2,10 +2,12 @@ package backend
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"math/big"
 	"reflect"
 	"sort"
+	"time"
 
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gaspool"
@@ -94,6 +96,12 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 	return b.CreateAccessListAtHeader(args, header)
 }
 func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *types.Header) (*rpcbackend.AccessListResult, error) {
+	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
 	base, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
@@ -105,6 +113,9 @@ func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *ty
 	from, to, nonce, limit, list := msg.From, msg.To, msg.Nonce, msg.GasLimit, msg.AccessList
 	cfg := b.node.Blockchain().Config()
 	for attempt := 0; attempt < 64; attempt++ {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		tracked := &accessedState{StateDB: &simulationBalanceState{StateDB: base.Dup()}, items: make(map[types.Address]map[types.Hash]struct{})}
 		excluded := map[types.Address]bool{from: true, header.Coinbase: true}
 		if to != nil {
@@ -122,7 +133,10 @@ func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *ty
 		}
 		candidate := *msg
 		candidate.AccessList = list
-		result, err := execution.SimulateMessage(cfg, b.traceHashFn(header), tracked, header, &candidate, new(gaspool.GasPool).AddGas(limit), true, vm.Config{})
+		result, err := execution.SimulateMessageWithConfig(cfg, b.traceHashFn(header), tracked, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Context: ctx}})
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		if err != nil {
 			return nil, err
 		}

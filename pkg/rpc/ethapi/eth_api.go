@@ -41,6 +41,15 @@ func NewEthAPI(backend Backend, subs SubscriptionService) *EthAPI {
 // This is primarily used by tests in dependent packages.
 func (api *EthAPI) Subs() SubscriptionService { return api.subs }
 
+// executionAPI creates a stateless view only for execution handlers. Shared API
+// maps, subscription services and locks stay with their original owner.
+func (api *EthAPI) executionAPI(req *Request) *EthAPI {
+	if backend, ok := api.backend.(rpcbackend.ContextBackend); ok {
+		return &EthAPI{backend: backend.WithContext(req.Context())}
+	}
+	return api
+}
+
 // HandleRequest dispatches a JSON-RPC request to the appropriate method.
 func (api *EthAPI) HandleRequest(req *Request) *Response {
 	switch req.Method {
@@ -67,11 +76,11 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 	case "eth_getTransactionReceipt":
 		return api.getTransactionReceipt(req)
 	case "eth_simulateV1":
-		return api.simulateV1(req)
+		return api.executionAPI(req).simulateV1(req)
 	case "eth_call":
-		return api.ethCall(req)
+		return api.executionAPI(req).ethCall(req)
 	case "eth_estimateGas":
-		return api.estimateGas(req)
+		return api.executionAPI(req).estimateGas(req)
 	case "eth_sendRawTransaction":
 		return api.sendRawTransaction(req)
 	case "eth_sendUserOperation":
@@ -89,7 +98,7 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 	case "eth_syncing":
 		return api.syncing(req)
 	case "eth_createAccessList":
-		return api.createAccessList(req)
+		return api.executionAPI(req).createAccessList(req)
 	case "eth_subscribe":
 		return api.ethSubscribe(req)
 	case "eth_unsubscribe":
@@ -141,13 +150,13 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 	case "eth_blobBaseFee":
 		return api.getBlobBaseFee(req)
 	case "debug_traceTransaction":
-		return api.debugTraceTransaction(req)
+		return api.executionAPI(req).debugTraceTransaction(req)
 	case "debug_traceCall":
-		return api.debugTraceCall(req)
+		return api.executionAPI(req).debugTraceCall(req)
 	case "debug_traceBlockByNumber":
-		return api.debugTraceBlockByNumber(req)
+		return api.executionAPI(req).debugTraceBlockByNumber(req)
 	case "debug_traceBlockByHash":
-		return api.debugTraceBlockByHash(req)
+		return api.executionAPI(req).debugTraceBlockByHash(req)
 	case "web3_clientVersion":
 		return api.clientVersion(req)
 	case "web3_sha3":

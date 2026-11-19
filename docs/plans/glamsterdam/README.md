@@ -46,3 +46,7 @@ The first implementation batch is GL-001/002/003, followed by GL-010/011: establ
 The plan uses existing fork scheduling, without adding environment variables or feature toggles for accepted functionality. A fork activates the agreed feature set together on the test/release schedule. Do not schedule an unannounced public-network fork or bundle later-fork experimental behavior into that feature set.
 
 Track delivery in [CHECK.md](../../../CHECK.md) and [STATUS.md](../../../STATUS.md), using the GL task IDs. Every completed task needs a scoped commit and an evidence record; no implementation task is marked complete by creating this plan.
+
+## Implementation checkpoint
+
+Implementation reviews and the combined development test results are tracked in [IMPLEMENTATION.md](IMPLEMENTATION.md), with exact branch heads in [feature-reviews.json](feature-reviews.json). The original gap matrix and plan describe the audited scope; they are not overwritten to imply that open release gates have passed.

@@ -1,0 +1,3 @@
+# Historical receipt recovery in progress
+
+The first real rolling upgrade restores consensus execution commitments and converges with unchanged Geth. Replaying the same original signed application transactions then finds the retained contract-deployment receipt reports effectiveGasPrice 0, no creation address, and an empty from field. Its consensus receipt gas/logs still agree. The persistent receipt reader restores location/gas/log indices and private frame/PQ fee data but omits standard transaction-derived values. The corresponding decoded historical transaction also lacks its recovered sender. This independent review owns that production persistence/readback boundary; no consumer comparison is weakened.

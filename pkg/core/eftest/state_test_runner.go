@@ -39,7 +39,7 @@ type stEnv struct {
 	CurrentGasLimit   string `json:"currentGasLimit"`
 	CurrentNumber     string `json:"currentNumber"`
 	CurrentTimestamp  string `json:"currentTimestamp"`
-	CurrentSlotNumber string `json:"currentSlotNumber"`
+	CurrentSlotNumber string `json:"slotNumber"`
 	PreviousHash      string `json:"previousHash"`
 	CurrentBaseFee    string `json:"currentBaseFee"`
 	CurrentRandom     string `json:"currentRandom"`
@@ -451,6 +451,8 @@ func ForkConfig(fork string) *coreconfig.ChainConfig {
 		c.OsakaTime = &ts
 	}
 	if level >= 14 {
+		c.BPO1Time = &ts
+		c.BPO2Time = &ts
 		c.AmsterdamTime = &ts
 	}
 	return c

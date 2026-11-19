@@ -202,11 +202,15 @@ func nativeConfig(amsterdam bool) *config.ChainConfig {
 	cfg.ChainID = big.NewInt(1337)
 	zero := uint64(0)
 	cfg.OsakaTime = &zero
+	cfg.BPO1Time = nil
+	cfg.BPO2Time = nil
 	cfg.AmsterdamTime = nil
 	cfg.GlamsterdanTime = nil
 	cfg.HogotaTime = nil
 	cfg.IPlusTime = nil
 	if amsterdam {
+		cfg.BPO1Time = &zero
+		cfg.BPO2Time = &zero
 		cfg.AmsterdamTime = &zero
 	}
 	return &cfg
@@ -215,6 +219,8 @@ func referenceConfig(amsterdam bool) *params.ChainConfig {
 	cfg := bridge.AmsterdamFixtureConfig()
 	cfg.ChainID = big.NewInt(1337)
 	if !amsterdam {
+		cfg.BPO1Time = nil
+		cfg.BPO2Time = nil
 		cfg.AmsterdamTime = nil
 	}
 	return cfg

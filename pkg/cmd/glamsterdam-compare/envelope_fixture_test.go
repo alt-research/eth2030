@@ -81,7 +81,7 @@ func TestAmsterdamFiveSignedEnvelopeFixtureConsumersMatchIndependentSDK(t *testi
 		if !ok {
 			t.Fatal("bad base fee")
 		}
-		env := map[string]any{"currentCoinbase": c.Input.Coinbase, "currentGasLimit": hexutil.EncodeUint64(c.Input.BlockGasLimit), "currentNumber": hexutil.EncodeUint64(c.Input.BlockNumber), "currentTimestamp": hexutil.EncodeUint64(c.Input.Timestamp), "currentSlotNumber": hexutil.EncodeUint64(c.Input.Slot), "currentBaseFee": hexutil.EncodeBig(baseFee), "currentRandom": (gethcommon.Hash{}).Hex(), "currentDifficulty": "0x0"}
+		env := map[string]any{"currentCoinbase": c.Input.Coinbase, "currentGasLimit": hexutil.EncodeUint64(c.Input.BlockGasLimit), "currentNumber": hexutil.EncodeUint64(c.Input.BlockNumber), "currentTimestamp": hexutil.EncodeUint64(c.Input.Timestamp), "slotNumber": hexutil.EncodeUint64(c.Input.Slot), "currentBaseFee": hexutil.EncodeBig(baseFee), "currentRandom": (gethcommon.Hash{}).Hex(), "currentDifficulty": "0x0"}
 		if c.Input.ExcessBlobGas != nil {
 			env["currentExcessBlobGas"] = hexutil.EncodeUint64(*c.Input.ExcessBlobGas)
 		}

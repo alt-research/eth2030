@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto"
 )
 
@@ -68,16 +70,21 @@ func (st *StateTest) RunSigned(sub StateSubtest) (result *RunResult) {
 	if tx.Type() > types.SetCodeTxType {
 		return fail(fmt.Errorf("unsupported fixture envelope %d", tx.Type()))
 	}
-	sender, err := types.MakeSigner(1, tx.Type()).Sender(tx)
-	if err != nil {
-		return fail(fmt.Errorf("recover signed envelope: %w", err))
+	sender, recoveryErr := types.MakeSigner(1, tx.Type()).Sender(tx)
+	var signatureErr error
+	if recoveryErr != nil {
+		kind := errFixtureSignature
+		if recoveryErr.Error() == "invalid chain ID for signer" {
+			kind = errFixtureChainID
+		}
+		signatureErr = fmt.Errorf("%w: %v", kind, recoveryErr)
 	}
 	if st.json.Tx.Sender != "" {
 		b, e := fixtureBytes(st.json.Tx.Sender, 20)
 		if e != nil {
 			return fail(e)
 		}
-		if sender != types.BytesToAddress(b) {
+		if signatureErr == nil && sender != types.BytesToAddress(b) {
 			return fail(errors.New("fixture sender disagrees with signed envelope"))
 		}
 	}
@@ -173,7 +180,10 @@ func (st *StateTest) RunSigned(sub StateSubtest) (result *RunResult) {
 	}
 	header := st.buildHeader(cfg)
 	db.SetTxContext(tx.Hash(), 0)
-	applyErr := gas.ValidateTransactionGasForFork(cfg, header.Time, tx)
+	applyErr := signatureErr
+	if applyErr == nil {
+		applyErr = gas.ValidateTransactionGasForFork(cfg, header.Time, tx)
+	}
 	if applyErr == nil {
 		_, _, applyErr = execution.ApplyTransactionWithBALGetHash(cfg, func(n uint64) types.Hash { return crypto.Keccak256Hash([]byte(strconv.FormatUint(n, 10))) }, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil)
 	}
@@ -224,6 +234,10 @@ func fixtureNumber(s string, bits int) (*big.Int, error) {
 	}
 	return n, nil
 }
+
+var errFixtureSignature = errors.New("native signed-envelope recovery rejected signature")
+var errFixtureChainID = errors.New("native signed-envelope recovery rejected chain ID")
+
 func fixtureExceptionMatches(expected string, err error, tx *types.Transaction, cfg *config.ChainConfig, header *types.Header) bool {
 	if err == nil {
 		return false
@@ -253,15 +267,81 @@ func fixtureExceptionMatches(expected string, err error, tx *types.Transaction, 
 			for _, tuple := range tx.AccessList() {
 				intrinsic += 2400 + 1900*uint64(len(tuple.StorageKeys))
 			}
+
+			floor := execution.CalldataFloorGas(tx.Data(), tx.To() == nil)
+			if cfg.IsAmsterdam(header.Time) {
+				sender, err := types.MakeSigner(1, tx.Type()).Sender(tx)
+				if err != nil {
+					return false
+				}
+				cost, err := gas.CalculateAmsterdamIntrinsic(sender, tx.To(), tx.Value(), tx.Data(), tx.AccessList(), uint64(len(tx.AuthorizationList())))
+				if err != nil {
+					return false
+				}
+				intrinsic, floor = cost.Gas, cost.Floor
+			}
 			// The legacy executor exposes the same error text for these two guards;
 			// classify the actual violated bound, not merely any non-nil error.
 			if strings.HasPrefix(err.Error(), "intrinsic gas too low: have ") || errors.Is(err, execution.ErrIntrinsicGasTooLow) {
 				if item == "TransactionException.INTRINSIC_GAS_TOO_LOW" && tx.Gas() < intrinsic {
 					return true
 				}
-				if item == "TransactionException.INTRINSIC_GAS_BELOW_FLOOR_GAS_COST" && tx.Gas() >= intrinsic && tx.Gas() < execution.CalldataFloorGas(tx.Data(), tx.To() == nil) {
+				if item == "TransactionException.INTRINSIC_GAS_BELOW_FLOOR_GAS_COST" && tx.Gas() >= intrinsic && tx.Gas() < floor {
 					return true
 				}
+			}
+
+		case "TransactionException.INVALID_SIGNATURE_VRS":
+			if errors.Is(err, errFixtureSignature) {
+				return true
+			}
+		case "TransactionException.INVALID_CHAINID":
+			if errors.Is(err, errFixtureChainID) {
+				return true
+			}
+		case "TransactionException.SENDER_NOT_EOA":
+			if strings.HasPrefix(err.Error(), "sender not an EOA") {
+				return true
+			}
+		case "TransactionException.NONCE_IS_MAX":
+			if tx.Nonce() == math.MaxUint64 && err.Error() == "sender nonce overflow" {
+				return true
+			}
+		case "TransactionException.INITCODE_SIZE_EXCEEDED":
+			if tx.To() == nil && errors.Is(err, vm.ErrMaxInitCodeSizeExceeded) {
+				return true
+			}
+		case "TransactionException.INSUFFICIENT_MAX_FEE_PER_GAS":
+			if header.BaseFee != nil && tx.GasFeeCap().Cmp(header.BaseFee) < 0 && strings.HasPrefix(err.Error(), "max fee per gas less than block base fee") {
+				return true
+			}
+		case "TransactionException.PRIORITY_GREATER_THAN_MAX_FEE_PER_GAS":
+			if tx.GasTipCap().Cmp(tx.GasFeeCap()) > 0 && (strings.HasPrefix(err.Error(), "max priority fee per gas higher") || err.Error() == "invalid transaction fee caps") {
+				return true
+			}
+		case "TransactionException.TYPE_3_TX_ZERO_BLOBS":
+			if tx.Type() == types.BlobTxType && len(tx.BlobHashes()) == 0 && err.Error() == "invalid blob transaction recipient or count" {
+				return true
+			}
+		case "TransactionException.TYPE_3_TX_INVALID_BLOB_VERSIONED_HASH":
+			if tx.Type() == types.BlobTxType && err.Error() == "invalid blob versioned hash" {
+				for _, hash := range tx.BlobHashes() {
+					if hash[0] != 1 {
+						return true
+					}
+				}
+			}
+		case "TransactionException.INSUFFICIENT_MAX_FEE_PER_BLOB_GAS":
+			if tx.Type() == types.BlobTxType && strings.HasPrefix(err.Error(), "blob fee cap below active blob base fee") {
+				return true
+			}
+		case "TransactionException.TYPE_4_EMPTY_AUTHORIZATION_LIST":
+			if tx.Type() == types.SetCodeTxType && tx.To() != nil && len(tx.AuthorizationList()) == 0 && err.Error() == "set-code transaction requires destination and authorizations" {
+				return true
+			}
+		case "TransactionException.GAS_ALLOWANCE_EXCEEDED":
+			if tx.Gas() > header.GasLimit && err.Error() == "gas pool exhausted" {
+				return true
 			}
 		case "TransactionException.TYPE_3_TX_BLOB_COUNT_EXCEEDED":
 			if err.Error() == "invalid blob transaction recipient or count" && tx.Type() == types.BlobTxType && uint64(len(tx.BlobHashes())) > gas.MaxBlobsPerTransaction(cfg, header.Time) && uint64(len(tx.BlobHashes())) <= gas.MaxBlobsForBlock(cfg, header.Time) {

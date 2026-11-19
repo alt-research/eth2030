@@ -2,6 +2,7 @@ package eftest
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"github.com/eth2030/eth2030/core/types"
 	"path/filepath"
@@ -97,5 +98,21 @@ func TestCanonicalNativeFixtureForkContexts(t *testing.T) {
 	osaka, amsterdam := ForkConfig("Osaka"), ForkConfig("Amsterdam")
 	if osaka == nil || amsterdam == nil || !osaka.IsOsaka(0) || osaka.IsAmsterdam(0) || !amsterdam.IsAmsterdam(0) || !amsterdam.IsOsaka(0) || amsterdam.IsGlamsterdan(0) {
 		t.Fatal("incoherent native fixture fork context")
+	}
+}
+
+func TestOfficialSlotNumberAndAmsterdamBlobContext(t *testing.T) {
+	var env stEnv
+	if err := json.Unmarshal([]byte(`{"slotNumber":"0xc0ffee"}`), &env); err != nil {
+		t.Fatal(err)
+	}
+	st := &StateTest{json: stJSON{Env: env}}
+	header := st.buildHeader(ForkConfig("Amsterdam"))
+	if header.SlotNumber == nil || *header.SlotNumber != 0xc0ffee {
+		t.Fatal("official slotNumber lost at native fixture boundary")
+	}
+	osaka, amsterdam := ForkConfig("Osaka").BlobConfigAt(0), ForkConfig("Amsterdam").BlobConfigAt(0)
+	if osaka.Target != 6 || osaka.Max != 9 || amsterdam.Target != 14 || amsterdam.Max != 21 {
+		t.Fatalf("fixture BPO contexts osaka=%+v amsterdam=%+v", osaka, amsterdam)
 	}
 }

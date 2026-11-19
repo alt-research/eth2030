@@ -637,7 +637,7 @@ func New(config *Config) (*Node, error) {
 		BootstrapNodes: config.Bootnodes,
 		DiscoveryPort:  config.EffectiveDiscoveryPort(),
 		NAT:            config.NAT,
-		Protocols:      append(n.ethHandler.Protocols(), n.snapHandler.Protocol()),
+		Protocols:      append(n.ethHandler.Protocols(), n.snapHandler.Protocols()...),
 	}
 	if n.nativeConsensus != nil {
 		p2pCfg.Protocols = append(p2pCfg.Protocols, n.nativeProtocol())

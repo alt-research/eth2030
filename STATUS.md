@@ -6,6 +6,10 @@ Actual HTTP qualifies real call trees across call/create/selfdestruct, frame gas
 
 Separate branch `feat/glamsterdam-nested-traces` follows the qualified simulator and RPC method work. The current callTracer fabricates a root from receipts and has no real nested frames; the opcode path still reports physical gas differences including spilled state gas. Development targets are call-frame schema 855 at `d8409a1d`, dimensional schema 852 at `cc1852a7`, and merged Geth hook behavior 35970 (`bf8ae65c`). The schemas and settlement PR 35954 remain open; issue 976's alternative nested state usage is not silently mixed into the selected root-only policy. Actual observer/replay tests are required before completion; final trace API adoption stays open.
 
+## Stateful simulation review submitted (2026-11-19)
+
+[PR 86](https://github.com/alt-research/eth2030/pull/86) publishes the independently qualified simulator. All selected full/tagged/race/vet/build, complete SDK commitment controls and fifteen mutations pass; final API/historical/process/resource/release gates remain explicit in the evidence. Nested tracing continues separately.
+
 ## Qualified stateful simulation implementation (2026-11-19)
 
 Source `6daa6678` and composition `206e14ac` qualify actual stateful HTTP simulation against two complete unmodified SDK block reconstructions, fifteen detected compiling mutations and final full 212/tagged 27/affected race 48/vet/build. Five additional race packages plus vet/build qualify the PR 85 test-only follow-up. [Evidence](docs/verification/glamsterdam-simulate-v1-20261119.md). Publication follows separately; nested tracing, broader fixture/process/resource and final release gates remain open.

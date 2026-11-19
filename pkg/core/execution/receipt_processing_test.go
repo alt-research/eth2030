@@ -5,14 +5,13 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
 
 // TestCumulativeGasUsed verifies that receipts correctly accumulate gas used
 // across multiple transactions in a block.
 func TestCumulativeGasUsed(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 
@@ -77,7 +76,7 @@ func TestCumulativeGasUsed(t *testing.T) {
 // TestReceiptStatusField verifies that post-Byzantium receipt status is
 // correctly set to 1 (success) or 0 (failure).
 func TestReceiptStatusField(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	contractAddr := types.HexToAddress("0xcccc")
 
@@ -157,7 +156,7 @@ func TestReceiptStatusField(t *testing.T) {
 // TestReceiptLogsFromEVM verifies that logs emitted during EVM execution
 // are properly captured in receipts with correct context fields.
 func TestReceiptLogsFromEVM(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 
 	hundredETH := new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18))
@@ -281,7 +280,7 @@ func TestReceiptLogsFromEVM(t *testing.T) {
 // TestReceiptBloomFilter verifies that the bloom filter on each receipt
 // contains the correct log address and topic entries.
 func TestReceiptBloomFilter(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 
 	hundredETH := new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18))
@@ -349,7 +348,7 @@ func TestReceiptBloomFilter(t *testing.T) {
 // TestReceiptTransactionIndex verifies that each receipt has the correct
 // TransactionIndex set during block processing.
 func TestReceiptTransactionIndex(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 
@@ -395,7 +394,7 @@ func TestReceiptTransactionIndex(t *testing.T) {
 // TestReceiptBlockContextFields verifies that BlockHash and BlockNumber
 // are set on receipts produced during block processing.
 func TestReceiptBlockContextFields(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 
@@ -441,7 +440,7 @@ func TestReceiptBlockContextFields(t *testing.T) {
 // TestCumulativeGasWithMixedTxTypes verifies cumulative gas accumulation
 // when the block has a mix of simple transfers and contract calls.
 func TestCumulativeGasWithMixedTxTypes(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 	contractAddr := types.HexToAddress("0xcccc")
@@ -529,7 +528,7 @@ func TestCumulativeGasWithMixedTxTypes(t *testing.T) {
 // TestGlobalLogIndex verifies that log indices are globally sequential
 // across multiple transactions in a block.
 func TestGlobalLogIndex(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 
 	hundredETH := new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18))
@@ -755,7 +754,7 @@ func TestDeriveReceiptFields(t *testing.T) {
 
 // TestReceiptSimpleTransferProtocolLog verifies post-Amsterdam receipt logs and bloom.
 func TestReceiptSimpleTransferProtocolLog(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 

@@ -12,7 +12,7 @@ import (
 )
 
 func TestEIP2935_IntegratedWithProcessor(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 
 	// Fund a sender for the block.
 	sender := types.HexToAddress("0x1111")

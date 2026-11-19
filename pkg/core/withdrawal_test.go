@@ -13,7 +13,7 @@ import (
 // TestWithdrawalProcessing verifies that EIP-4895 beacon chain withdrawals
 // correctly credit recipient addresses during block processing.
 func TestWithdrawalProcessing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 
 	addr1 := types.HexToAddress("0xaaaa")
 	addr2 := types.HexToAddress("0xbbbb")
@@ -92,7 +92,7 @@ func TestWithdrawalProcessing(t *testing.T) {
 // TestWithdrawalProcessingWithTransactions verifies that withdrawals are
 // correctly applied after transaction processing in the same block.
 func TestWithdrawalProcessingWithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 
 	sender := types.HexToAddress("0x1111")
 	recipient := types.HexToAddress("0x2222")

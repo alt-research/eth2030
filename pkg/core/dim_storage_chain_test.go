@@ -54,7 +54,7 @@ func newCallTx(nonce uint64, sender types.Address) *types.Transaction {
 // newSSTOREState returns a statedb with a funded sender and the SSTORE
 // contract pre-deployed at contractAddr.
 func newSSTOREState() (state.StateDB, types.Address) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xabcd")
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(100), big.NewInt(1e18)))
 	statedb.SetCode(contractAddr, sstoreContractCode)
@@ -190,7 +190,7 @@ func TestBlockBuilder_DimStorageCap_Accumulates(t *testing.T) {
 // transactions that would push blockDimStorageUsed past DimStorageBlockGasCap,
 // even when sufficient DimCompute gas remains in the block (GAP-2.2).
 func TestBlockBuilder_DimStorageCap_RejectExcess(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xdead")
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(1_000_000), big.NewInt(1e18)))
 
@@ -256,7 +256,7 @@ func TestBlockBuilder_DimStorageCap_RejectExcess(t *testing.T) {
 // before Glamsterdam the DimStorage cap is not enforced: all txs that fit in
 // compute gas are included regardless of their DimStorageGas values.
 func TestBlockBuilder_DimStorageCap_NoEnforcementPreGlamsterdam(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xbeef")
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(10_000), big.NewInt(1e18)))
 

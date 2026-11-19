@@ -8,14 +8,13 @@ import (
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
 
 // testChainWithFunds creates a blockchain with a funded sender account.
 func testChainWithFunds(t *testing.T) (*chain.Blockchain, types.Address, types.Address) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	receiver := types.HexToAddress("0xbbbb")
 
@@ -183,7 +182,7 @@ func TestGetLogs(t *testing.T) {
 }
 
 func TestGetLogsWithContract(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaa")
 	contractAddr := types.HexToAddress("0xcccc")
 

@@ -7,7 +7,6 @@ import (
 	coreblock "github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
@@ -22,7 +21,7 @@ func TestRestoreFailurePreservesDurableHead(t *testing.T) {
 	if err := rawdb.DeleteBody(bc.db, 3, want); err != nil {
 		t.Fatal(err)
 	}
-	reopened, err := NewBlockchain(config.TestConfig, bc.Genesis(), state.NewMemoryStateDB(), bc.db)
+	reopened, err := NewBlockchain(config.TestConfig, bc.Genesis(), newBuilderRequestTestState(), bc.db)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +48,7 @@ func TestNonCanonicalBlockhashExecutionAndReadback(t *testing.T) {
 	}
 	sender := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
 	contract := types.BytesToAddress([]byte{0x12, 0x34})
-	initial := state.NewMemoryStateDB()
+	initial := newBuilderRequestTestState()
 	initial.AddBalance(sender, new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil))
 	initial.SetCode(contract, []byte{0x60, 1, 0x40, 0x60, 0, 0x55, 0}) // SSTORE(0, BLOCKHASH(1))
 	genesisHeader := makeGenesis(30_000_000, big.NewInt(1)).Header()
@@ -143,7 +142,7 @@ func TestForkchoiceRejectsCorruptCachedState(t *testing.T) {
 	if err := bc.InsertSyncedBlock(block); err != nil {
 		t.Fatal(err)
 	}
-	wrong := state.NewMemoryStateDB()
+	wrong := newBuilderRequestTestState()
 	wrong.AddBalance(types.BytesToAddress([]byte{1}), big.NewInt(1))
 	bc.sc.remove(block.Hash())
 	bc.sc.put(block.Hash(), block.NumberU64(), wrong)
@@ -156,7 +155,7 @@ func TestForkchoiceRejectsCorruptCachedState(t *testing.T) {
 }
 
 func TestMinimalBlockCacheMakesProgress(t *testing.T) {
-	stateDB := state.NewMemoryStateDB()
+	stateDB := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	bc, err := NewBlockchain(config.TestConfig, genesis, stateDB, rawdb.NewMemoryDB(), BlockchainOpts{BlockCacheSize: 1, StateCacheSize: 1})
 	if err != nil {

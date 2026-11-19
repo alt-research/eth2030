@@ -713,7 +713,7 @@ func TestForkchoiceUpdated_TimestampValidation_RealBackend(t *testing.T) {
 // --- Full round-trip test: forkchoice -> getPayload with response format ---
 
 func TestFullRoundtrip_ForkchoiceToGetPayload(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()

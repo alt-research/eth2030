@@ -38,6 +38,7 @@ func TestCanonicalOsakaAndAmsterdamCLZIndependentExecution(t *testing.T) {
 			}
 			cfg := *params.AllDevChainProtocolChanges
 			cfg.AmsterdamTime = nil
+			cfg.BogotaTime = nil
 			zero := uint64(0)
 			cfg.OsakaTime = &zero
 			want, _, err := runtime.Execute(code, nil, &runtime.Config{ChainConfig: &cfg, GasLimit: 100000, Origin: gethcommon.Address{}})

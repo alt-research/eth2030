@@ -289,7 +289,15 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 	traced := &simulationLogState{StateDB: &simulationBalanceState{StateDB: db}, synthetic: options.TraceTransfers && !cfg.IsAmsterdam(header.Time), snapshots: make(map[int]int)}
 	db = traced
 	var displayLogs [][]*types.Log
-	fail := func(err error) (rpctypes.SimulateBlockResult, error) { return rpctypes.SimulateBlockResult{}, err }
+	fail := func(err error) (rpctypes.SimulateBlockResult, error) {
+		// A system call or transaction may return the context error before the
+		// following phase check. Classify the deadline before generic RPC wrapping.
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) ||
+			(overrides.Context != nil && overrides.Context.Err() != nil) {
+			err = simulationError(-32016, "simulation timeout")
+		}
+		return rpctypes.SimulateBlockResult{}, err
+	}
 	var blockBAL *bal.BlockAccessList
 	var pre *bal.AccessTracker
 	if cfg.IsAmsterdam(header.Time) {

@@ -692,25 +692,25 @@ func TestJournalLength(t *testing.T) {
 		t.Fatalf("expected journal length 0, got %d", initial)
 	}
 
-	db.CreateAccount(addr)              // +1
-	db.AddBalance(addr, big.NewInt(10)) // +1
-	db.SetNonce(addr, 1)                // +1
+	db.CreateAccount(addr)              // account creation and reversible touch
+	db.AddBalance(addr, big.NewInt(10)) // balance change
+	db.SetNonce(addr, 1)                // nonce change
 
-	if db.journal.length() != 3 {
-		t.Fatalf("expected journal length 3, got %d", db.journal.length())
+	if db.journal.length() != 4 {
+		t.Fatalf("expected journal length 4, got %d", db.journal.length())
 	}
 
 	snap := db.Snapshot()
 	db.AddBalance(addr, big.NewInt(5)) // +1
 	db.SetNonce(addr, 2)               // +1
 
-	if db.journal.length() != 5 {
-		t.Fatalf("expected journal length 5, got %d", db.journal.length())
+	if db.journal.length() != 6 {
+		t.Fatalf("expected journal length 6, got %d", db.journal.length())
 	}
 
 	db.RevertToSnapshot(snap)
-	if db.journal.length() != 3 {
-		t.Fatalf("expected journal length 3 after revert, got %d", db.journal.length())
+	if db.journal.length() != 4 {
+		t.Fatalf("expected journal length 4 after revert, got %d", db.journal.length())
 	}
 }
 

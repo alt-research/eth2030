@@ -210,9 +210,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	evm.StateDB.AddBalance(payer, settlement.Refund)
 	evm.StateDB.AddBalance(header.Coinbase, settlement.Tip)
 	evm.FinalizeSelfDestructs()
-	if finalizer, ok := db.(interface{ FinalizeTransaction() }); ok {
-		finalizer.FinalizeTransaction()
-	}
+	db.Finalise(config.IsEIP158(header.Number))
 	evm.FlushFrameBAL8141()
 	blockExecution := max(beforeRefund-stateGas, budget.CalldataFloor)
 	gp.RefundFrame(budget.ExecutionReservation-blockExecution, budget.StateReservation-stateGas)

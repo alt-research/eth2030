@@ -1,0 +1,5 @@
+ok  	github.com/eth2030/eth2030/core/types	0.777s
+ok  	github.com/eth2030/eth2030/core/rawdb	0.074s
+ok  	github.com/eth2030/eth2030/engine/payload	0.827s
+ok  	github.com/eth2030/eth2030/node/backend	0.713s
+ok  	github.com/eth2030/eth2030/rpc/ethapi	0.707s

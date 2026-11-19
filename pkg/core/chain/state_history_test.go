@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -58,6 +59,7 @@ func (p *historyReadProbe) Get(key []byte) ([]byte, error) {
 func newHistoryChain(t *testing.T) (*Blockchain, *historyReadProbe, []*types.Block) {
 	t.Helper()
 	source := newBuilderRequestTestState()
+	source.SetCode(eips.HistoryStorageAddress, eips.HistoryStorageRuntime())
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	probe := &historyReadProbe{Database: rawdb.NewMemoryDB()}
 	chain, err := NewBlockchain(config.TestConfig, genesis, source, probe, BlockchainOpts{BlockCacheSize: 1, StateCacheSize: 1})
@@ -73,6 +75,11 @@ func newHistoryChain(t *testing.T) (*Blockchain, *historyReadProbe, []*types.Blo
 		}
 		blocks = append(blocks, block)
 		parent = block
+	}
+	for i := 1; i < len(blocks); i++ {
+		if blocks[i].Root() == blocks[i-1].Root() {
+			t.Fatal("history fixture did not execute distinct EIP-2935 storage transitions")
+		}
 	}
 	return chain, probe, blocks
 }
@@ -128,6 +135,69 @@ func TestExclusiveHistoryBuildUpgradesLegacyIndexAndIsIdempotent(t *testing.T) {
 	result, err = chain.BuildTrieHistory(context.Background())
 	if err != nil || result.Indexed != 0 || result.Existing != 6 {
 		t.Fatalf("history build not idempotent: %+v %v", result, err)
+	}
+}
+
+type interruptedHistoryDB struct {
+	rawdb.Database
+	cancel context.CancelFunc
+}
+type interruptedHistoryBatch struct {
+	rawdb.Batch
+	cancel context.CancelFunc
+}
+
+func (d interruptedHistoryDB) NewBatch() rawdb.Batch {
+	return interruptedHistoryBatch{Batch: d.Database.NewBatch(), cancel: d.cancel}
+}
+func (b interruptedHistoryBatch) Write() error {
+	err := b.Batch.Write()
+	if err == nil {
+		b.cancel()
+	}
+	return err
+}
+
+func TestOfflineHistoryUsesDurableHeadWithoutStartupReplayAndResumesCancellation(t *testing.T) {
+	original, probe, blocks := newHistoryChain(t)
+	iterator := probe.NewIterator([]byte("mpt-history-root/"))
+	var keys [][]byte
+	for iterator.Next() {
+		keys = append(keys, bytes.Clone(iterator.Key()))
+	}
+	iterator.Release()
+	for _, key := range keys {
+		if err := probe.Delete(key); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// The maintenance chain intentionally has only genesis in memory. Replaying
+	// Node startup here would do the expensive work before cancellation can act.
+	offline, err := NewBlockchain(config.TestConfig, original.genesis, original.execGenesisState.Copy(), probe)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if offline.CurrentBlock().Hash() != original.genesis.Hash() {
+		t.Fatal("constructor unexpectedly replayed history")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	offline.db = interruptedHistoryDB{Database: probe, cancel: cancel}
+	partial, err := offline.BuildTrieHistory(ctx)
+	if err != context.Canceled || partial.Indexed != 1 || partial.Number != 6 {
+		t.Fatalf("interrupted migration ignored durable target/cancellation: %+v %v", partial, err)
+	}
+	if available, err := state.HistoryStateAvailable(probe, blocks[0].Root()); err != nil || !available {
+		t.Fatalf("completed prefix lost on cancellation: %t %v", available, err)
+	}
+	offline.db = probe
+	resumed, err := offline.BuildTrieHistory(context.Background())
+	if err != nil || resumed.Indexed != 5 || resumed.Existing != 1 || resumed.Head != blocks[5].Hash() {
+		t.Fatalf("migration did not resume exact durable path: %+v %v", resumed, err)
+	}
+	storedHead, err := rawdb.ReadHeadBlockHash(probe)
+	if err != nil || storedHead != original.CurrentBlock().Hash() || offline.CurrentBlock().Hash() != original.genesis.Hash() {
+		t.Fatalf("maintenance selected or rewrote canonical authority: %v", err)
 	}
 }
 func TestHistoryPreparationQueueCancelsWithoutBlockingCachedState(t *testing.T) {

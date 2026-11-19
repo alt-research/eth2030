@@ -28,7 +28,14 @@ func (bc *Blockchain) BuildTrieHistory(ctx context.Context) (StateHistoryResult,
 	}
 	bc.insertMu.Lock()
 	defer bc.insertMu.Unlock()
-	head := bc.CurrentBlock()
+	headHash, err := rawdb.ReadHeadBlockHash(bc.db)
+	if err != nil {
+		return StateHistoryResult{}, storageFailure(err)
+	}
+	head := bc.GetBlock(headHash)
+	if head == nil || head.Hash() != headHash {
+		return StateHistoryResult{}, fmt.Errorf("state history: missing durable head")
+	}
 	result := StateHistoryResult{Head: head.Hash(), Number: head.NumberU64()}
 	var base state.StateDB
 	parent := bc.genesis
@@ -87,7 +94,11 @@ func (bc *Blockchain) BuildTrieHistory(ctx context.Context) (StateHistoryResult,
 		}
 		parent = block
 	}
-	if bc.CurrentBlock().Hash() != result.Head {
+	finalHead, err := rawdb.ReadHeadBlockHash(bc.db)
+	if err != nil {
+		return result, storageFailure(err)
+	}
+	if finalHead != result.Head {
 		return result, fmt.Errorf("state history: canonical head changed during exclusive maintenance")
 	}
 	return result, nil

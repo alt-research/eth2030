@@ -30,15 +30,7 @@ func build(ctx context.Context, datadir, genesis string) (chain.StateHistoryResu
 	if info, err := os.Stat(genesis); err != nil || !info.Mode().IsRegular() {
 		return chain.StateHistoryResult{}, fmt.Errorf("original genesis file is unavailable")
 	}
-	config := node.DefaultConfig()
-	config.DataDir = datadir
-	config.GenesisPath = genesis
-	instance, err := node.New(&config)
-	if err != nil {
-		return chain.StateHistoryResult{}, err
-	}
-	defer instance.Stop()
-	return instance.Blockchain().BuildTrieHistory(ctx)
+	return node.BuildStateHistory(ctx, datadir, genesis)
 }
 func main() {
 	datadir := flag.String("datadir", "", "existing exclusive native data directory")

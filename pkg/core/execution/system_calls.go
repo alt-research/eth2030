@@ -18,11 +18,14 @@ const systemExecutionGas = 30_000_000
 // The reservoir is separate from the execution budget and never debits a block.
 const systemStateGas = 16 * 64 * 1530
 
-func newSystemEVM(cfg *config.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, h *types.Header) (*vm.EVM, error) {
+func newSystemEVM(cfg *config.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, h *types.Header, overrides ...EVMOverrides) (*vm.EVM, error) {
 	context := vm.BlockContext{GetHash: getHash, BlockNumber: h.Number, Time: h.Time, Coinbase: h.Coinbase, GasLimit: h.GasLimit, BaseFee: h.BaseFee, PrevRandao: h.MixDigest, BlobBaseFee: gas.BlobBaseFeeForHeader(cfg, h)}
 	evm := vm.NewEVMWithState(context, vm.TxContext{Origin: types.SystemAddress, GasPrice: new(big.Int)}, vm.Config{}, db)
 	if _, err := ConfigureBlockEVM(cfg, h, evm); err != nil {
 		return nil, err
+	}
+	for _, override := range overrides {
+		override.apply(evm)
 	}
 	if cfg != nil && cfg.IsMerge() && cfg.IsAmsterdam(h.Time) {
 		evm.SetInitialReservoir(systemStateGas)
@@ -59,7 +62,7 @@ func executeSystemCall(evm *vm.EVM, db state.StateDB, address types.Address, inp
 // ApplyPreExecutionSystems is shared by construction and import. It executes
 // actual code, so absent or custom allocations cannot be silently replaced by
 // the mainnet direct-storage optimization. Neither operation runs at genesis.
-func ApplyPreExecutionSystems(cfg *config.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, h *types.Header, tracker *bal.AccessTracker) error {
+func ApplyPreExecutionSystems(cfg *config.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, h *types.Header, tracker *bal.AccessTracker, overrides ...EVMOverrides) error {
 	if cfg == nil || h.Number == nil || h.Number.Sign() == 0 {
 		return nil
 	}
@@ -75,7 +78,7 @@ func ApplyPreExecutionSystems(cfg *config.ChainConfig, getHash vm.GetHashFunc, d
 		operations = append(operations, operation{eips.HistoryStorageAddress, h.ParentHash.Bytes()})
 	}
 	for _, operation := range operations {
-		evm, err := newSystemEVM(cfg, getHash, db, h)
+		evm, err := newSystemEVM(cfg, getHash, db, h, overrides...)
 		if err != nil {
 			return err
 		}

@@ -76,6 +76,7 @@ type Response struct {
 type RPCError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // Error implements the error interface.
@@ -265,6 +266,9 @@ type RPCLog struct {
 
 // CallArgs represents the arguments for eth_call and eth_estimateGas.
 type CallArgs struct {
+	Type                 *string            `json:"type,omitempty"`
+	MaxFeePerBlobGas     *string            `json:"maxFeePerBlobGas,omitempty"`
+	BlobVersionedHashes  []string           `json:"blobVersionedHashes,omitempty"`
 	MaxFeePerGas         *string            `json:"maxFeePerGas,omitempty"`
 	MaxPriorityFeePerGas *string            `json:"maxPriorityFeePerGas,omitempty"`
 	AuthorizationList    []RPCAuthorization `json:"authorizationList,omitempty"`
@@ -989,9 +993,10 @@ func BlobBaseFeeForHeader(header *types.Header) *big.Int {
 // StateOverride contains isolated account substitutions for call methods.
 type StateOverride map[string]AccountOverride
 type AccountOverride struct {
-	Balance   *string           `json:"balance,omitempty"`
-	Nonce     *string           `json:"nonce,omitempty"`
-	Code      *string           `json:"code,omitempty"`
-	State     map[string]string `json:"state,omitempty"`
-	StateDiff map[string]string `json:"stateDiff,omitempty"`
+	MovePrecompileToAddress *string           `json:"movePrecompileToAddress,omitempty"`
+	Balance                 *string           `json:"balance,omitempty"`
+	Nonce                   *string           `json:"nonce,omitempty"`
+	Code                    *string           `json:"code,omitempty"`
+	State                   map[string]string `json:"state,omitempty"`
+	StateDiff               map[string]string `json:"stateDiff,omitempty"`
 }

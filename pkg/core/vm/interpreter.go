@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -102,6 +103,7 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
+	Context      context.Context // optional cancellation for isolated RPC execution
 	Debug        bool
 	Tracer       EVMLogger
 	MaxCallDepth int
@@ -359,7 +361,17 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 		debug = evm.Config.Debug && evm.Config.Tracer != nil
 	)
 
+	var steps uint64
+	cancellation := evm.Config.Context
 	for {
+		if cancellation != nil {
+			if steps&1023 == 0 {
+				if err := cancellation.Err(); err != nil {
+					return nil, err
+				}
+			}
+			steps++
+		}
 		op := contract.GetOp(pc)
 		operation := evm.jumpTable[op]
 		if operation == nil || operation.execute == nil {
@@ -544,9 +556,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 		}
 
 		// EIP-7708: emit transfer log for nonzero-value CALL to a different account.
-		if evm.forkRules.IsEIP7708 && caller != addr {
-			EmitTransferLog(evm.StateDB, caller, addr, value)
-		}
+		evm.recordETHTransfer(caller, addr, value)
 	}
 
 	// Execute precompile or contract code.
@@ -1091,9 +1101,7 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		}
 
 		// EIP-7708: emit transfer log for nonzero-value CREATE.
-		if evm.forkRules.IsEIP7708 {
-			EmitTransferLog(evm.StateDB, caller, contractAddr, value)
-		}
+		evm.recordETHTransfer(caller, contractAddr, value)
 	}
 
 	// GasCreate and InitCodeWordGas are already charged by the jump table's

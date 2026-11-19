@@ -74,3 +74,19 @@ func addressToTopic(addr types.Address) types.Hash {
 	copy(topic[12:], addr[:])
 	return topic
 }
+
+// recordETHTransfer also notifies an optional request-owned simulation observer.
+// The observer does not change fork activation or add logs to real receipts.
+func (evm *EVM) recordETHTransfer(from, to types.Address, amount *big.Int) {
+	if evm.StateDB == nil || amount == nil || amount.Sign() <= 0 || from == to {
+		return
+	}
+	if observer, ok := evm.StateDB.(interface {
+		RecordETHTransfer(types.Address, types.Address, *big.Int)
+	}); ok {
+		observer.RecordETHTransfer(from, to, amount)
+	}
+	if evm.forkRules.IsEIP7708 {
+		EmitTransferLog(evm.StateDB, from, to, amount)
+	}
+}

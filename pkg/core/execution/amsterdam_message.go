@@ -28,7 +28,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if value.Sign() < 0 || value.BitLen() > 256 {
 		return nil, errors.New("invalid transaction value")
 	}
-	if msg.Nonce == math.MaxUint64 && !options.simulation {
+	if msg.Nonce == math.MaxUint64 && (!options.simulation || options.validation) {
 		return nil, errors.New("sender nonce overflow")
 	}
 	nonce := db.GetNonce(msg.From)
@@ -72,7 +72,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if feeCap.Sign() < 0 || tipCap.Sign() < 0 || feeCap.BitLen() > 256 || tipCap.BitLen() > 256 || tipCap.Cmp(feeCap) > 0 {
 		return nil, errors.New("invalid transaction fee caps")
 	}
-	if header.BaseFee != nil && feeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && feeCap.Sign() == 0 && tipCap.Sign() == 0) {
+	if header.BaseFee != nil && feeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && !options.validation && feeCap.Sign() == 0 && tipCap.Sign() == 0) {
 		return nil, errors.New("max fee per gas less than block base fee")
 	}
 	intrinsic, err := gas.CalculateAmsterdamIntrinsic(msg.From, msg.To, value, msg.Data, msg.AccessList, uint64(len(msg.AuthList)))
@@ -243,7 +243,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	gp.RefundFrame(reserveExecution-blockExecution, msg.GasLimit-stateUsed)
 	included = true
 	evm.FinalizeSelfDestructs()
-	return &ExecutionResult{UsedGas: paid, BlockGasUsed: blockExecution, StateGasUsed: stateUsed, Err: executionError, ReturnData: output, ContractAddress: created}, nil
+	return &ExecutionResult{UsedGas: paid, MaxUsedGas: max(gross, intrinsic.Floor), GasRefund: refund, BlockGasUsed: blockExecution, StateGasUsed: stateUsed, Err: executionError, ReturnData: output, ContractAddress: created}, nil
 }
 
 func processAmsterdamAuthorizations(db state.StateDB, msg *corconfig.Message, chainID *big.Int, budget *vm.Contract, tracker vm.BALTracker) error {

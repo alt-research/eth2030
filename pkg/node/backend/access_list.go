@@ -95,14 +95,14 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 	if err != nil {
 		return nil, err
 	}
-	msg, err := parseSimulationMessage(args, header, base)
+	msg, err := parseSimulationMessage(args, header, base, b.node.Blockchain().Config())
 	if err != nil {
 		return nil, err
 	}
 	from, to, nonce, limit, list := msg.From, msg.To, msg.Nonce, msg.GasLimit, msg.AccessList
 	cfg := b.node.Blockchain().Config()
 	for attempt := 0; attempt < 64; attempt++ {
-		tracked := &accessedState{StateDB: base.Dup(), items: make(map[types.Address]map[types.Hash]struct{})}
+		tracked := &accessedState{StateDB: &simulationBalanceState{StateDB: base.Dup()}, items: make(map[types.Address]map[types.Hash]struct{})}
 		excluded := map[types.Address]bool{from: true, header.Coinbase: true}
 		if to != nil {
 			excluded[*to] = true

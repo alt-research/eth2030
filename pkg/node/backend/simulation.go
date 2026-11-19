@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
+	coregas "github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -16,7 +17,7 @@ import (
 )
 
 // parseSimulationMessage keeps complete call input for method-specific execution.
-func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base state.StateDB) (*config.Message, error) {
+func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base state.StateDB, cfg *config.ChainConfig) (*config.Message, error) {
 	var err error
 	invalid := func(field string, err error) error {
 		return fmt.Errorf("%w: %s: %v", rpcbackend.ErrInvalidCallArgs, field, err)
@@ -30,6 +31,28 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 			return types.Address{}, fmt.Errorf("address must contain 20 bytes")
 		}
 		return types.BytesToAddress(raw), nil
+	}
+
+	if cfg != nil {
+		rules := cfg.Rules(header.Number, cfg.IsMerge(), header.Time)
+		if args.AccessList != nil && !rules.IsBerlin {
+			return nil, invalid("accessList", fmt.Errorf("requires Berlin"))
+		}
+		if (args.MaxFeePerGas != nil || args.MaxPriorityFeePerGas != nil) && !rules.IsLondon {
+			return nil, invalid("dynamic fees", fmt.Errorf("requires London"))
+		}
+		if args.AuthorizationList != nil && !rules.IsPrague {
+			return nil, invalid("authorizationList", fmt.Errorf("requires Prague"))
+		}
+		if (args.BlobVersionedHashes != nil || args.MaxFeePerBlobGas != nil) && !rules.IsCancun {
+			return nil, invalid("blob fields", fmt.Errorf("requires Cancun"))
+		}
+	}
+	if args.Type != nil {
+		kind, err := hexutil.DecodeUint64(*args.Type)
+		if err != nil || kind > 255 {
+			return nil, invalid("type", fmt.Errorf("must be a byte"))
+		}
 	}
 	from := types.Address{}
 	if args.From != nil {
@@ -173,6 +196,27 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 			msg.AuthList = append(msg.AuthList, auth)
 		}
 	}
+
+	if args.BlobVersionedHashes != nil || args.MaxFeePerBlobGas != nil {
+		if len(args.BlobVersionedHashes) == 0 || to == nil || args.AuthorizationList != nil {
+			return nil, invalid("blob fields", fmt.Errorf("nonempty hashes and recipient required; authorizationList incompatible"))
+		}
+		msg.TxType = types.BlobTxType
+		for _, wire := range args.BlobVersionedHashes {
+			raw, err := hexutil.Decode(wire)
+			if err != nil || len(raw) != 32 || raw[0] != coregas.BlobTxHashVersion {
+				return nil, invalid("blobVersionedHashes", fmt.Errorf("invalid versioned hash"))
+			}
+			msg.BlobHashes = append(msg.BlobHashes, types.BytesToHash(raw))
+		}
+		msg.BlobGasFeeCap = new(big.Int)
+		if args.MaxFeePerBlobGas != nil {
+			msg.BlobGasFeeCap, err = hexutil.DecodeBig(*args.MaxFeePerBlobGas)
+			if err != nil || msg.BlobGasFeeCap.BitLen() > 256 {
+				return nil, invalid("maxFeePerBlobGas", fmt.Errorf("invalid uint256"))
+			}
+		}
+	}
 	return msg, nil
 }
 
@@ -195,7 +239,7 @@ func (b *RPCBackend) executeCall(args rpctypes.CallArgs, number rpctypes.BlockNu
 	if err := applySimulationOverrides(db, overrides...); err != nil {
 		return nil, err
 	}
-	msg, err := parseSimulationMessage(args, header, db)
+	msg, err := parseSimulationMessage(args, header, db, b.node.Blockchain().Config())
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +247,11 @@ func (b *RPCBackend) executeCall(args rpctypes.CallArgs, number rpctypes.BlockNu
 	if tracer != nil {
 		cfg = vm.Config{Debug: true, Tracer: tracer}
 	}
-	return execution.SimulateMessage(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), db, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), transactionRules, cfg)
+	runtime, err := simulationPrecompiles(b.node.Blockchain().Config(), header, db, mergeStateOverrides(overrides))
+	if err != nil {
+		return nil, err
+	}
+	return execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Precompiles: runtime}})
 }
 
 func (b *RPCBackend) Call(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) ([]byte, uint64, error) {
@@ -230,7 +278,7 @@ func (b *RPCBackend) EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNu
 	if err := applySimulationOverrides(base, overrides...); err != nil {
 		return 0, err
 	}
-	msg, err := parseSimulationMessage(args, header, base)
+	msg, err := parseSimulationMessage(args, header, base, b.node.Blockchain().Config())
 	if err != nil {
 		return 0, err
 	}
@@ -257,10 +305,14 @@ func (b *RPCBackend) EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNu
 			hi = min(hi, allowance.Uint64())
 		}
 	}
+	runtime, err := simulationPrecompiles(b.node.Blockchain().Config(), header, base, mergeStateOverrides(overrides))
+	if err != nil {
+		return 0, err
+	}
 	run := func(limit uint64) error {
 		candidate := *msg
 		candidate.GasLimit = limit
-		result, err := execution.SimulateMessage(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), base.Dup(), header, &candidate, new(gaspool.GasPool).AddGas(limit), true, vm.Config{})
+		result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), &simulationBalanceState{StateDB: base.Dup()}, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Precompiles: runtime}})
 		if err != nil {
 			return err
 		}
@@ -351,4 +403,14 @@ func applySimulationOverrides(db state.StateDB, overrides ...rpctypes.StateOverr
 		}
 	}
 	return nil
+}
+
+func mergeStateOverrides(overrides []rpctypes.StateOverride) rpctypes.StateOverride {
+	result := make(rpctypes.StateOverride)
+	for _, set := range overrides {
+		for address, value := range set {
+			result[address] = value
+		}
+	}
+	return result
 }

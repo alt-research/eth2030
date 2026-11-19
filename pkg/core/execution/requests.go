@@ -13,7 +13,7 @@ import (
 
 // FinalizeBlockExecution applies withdrawals and collects EIP-7685 requests
 // on the block's working state. Builders and replayers share this transition.
-func FinalizeBlockExecution(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, withdrawals []*types.Withdrawal, receipts []*types.Receipt, blockBAL *bal.BlockAccessList) (types.Requests, error) {
+func FinalizeBlockExecution(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, withdrawals []*types.Withdrawal, receipts []*types.Receipt, blockBAL *bal.BlockAccessList, overrides ...EVMOverrides) (types.Requests, error) {
 	snapshot := statedb.Snapshot()
 	var tracker *bal.AccessTracker
 	if blockBAL != nil {
@@ -38,7 +38,7 @@ func FinalizeBlockExecution(cfg *config.ChainConfig, getHash vm.GetHashFunc, sta
 		}
 	}
 
-	requests, err := collectRequests(cfg, getHash, statedb, header, receipts, tracker)
+	requests, err := collectRequests(cfg, getHash, statedb, header, receipts, tracker, overrides...)
 	if err != nil {
 		statedb.RevertToSnapshot(snapshot)
 		return nil, err
@@ -63,7 +63,7 @@ func ProcessRequests(cfg *config.ChainConfig, statedb state.StateDB, header *typ
 	return requests, err
 }
 
-func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, receipts []*types.Receipt, tracker *bal.AccessTracker) (types.Requests, error) {
+func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, receipts []*types.Receipt, tracker *bal.AccessTracker, overrides ...EVMOverrides) (types.Requests, error) {
 	if cfg == nil || !cfg.IsPrague(header.Time) {
 		return nil, nil
 	}
@@ -105,7 +105,7 @@ func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb st
 			}
 			continue
 		}
-		data, err := callRequestQueue(cfg, getHash, statedb, header, queue.address, tracker)
+		data, err := callRequestQueue(cfg, getHash, statedb, header, queue.address, tracker, overrides...)
 		if err != nil {
 			return nil, fmt.Errorf("request type %d system call: %w", queue.kind, err)
 		}
@@ -119,8 +119,8 @@ func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb st
 	return requests, nil
 }
 
-func callRequestQueue(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, address types.Address, tracker *bal.AccessTracker) ([]byte, error) {
-	evm, err := newSystemEVM(cfg, getHash, statedb, header)
+func callRequestQueue(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, address types.Address, tracker *bal.AccessTracker, overrides ...EVMOverrides) ([]byte, error) {
+	evm, err := newSystemEVM(cfg, getHash, statedb, header, overrides...)
 	if err != nil {
 		return nil, err
 	}

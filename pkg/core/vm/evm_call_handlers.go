@@ -97,9 +97,7 @@ func (ch *CallHandler) HandleCall(params *CallHandlerParams) *CallHandlerResult 
 			ch.evm.StateDB.SubBalance(params.Caller, params.Value)
 			ch.evm.StateDB.AddBalance(params.Target, params.Value)
 
-			if ch.evm.forkRules.IsEIP7708 && params.Caller != params.Target {
-				EmitTransferLog(ch.evm.StateDB, params.Caller, params.Target, params.Value)
-			}
+			ch.evm.recordETHTransfer(params.Caller, params.Target, params.Value)
 		}
 	}
 

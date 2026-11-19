@@ -1108,7 +1108,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 }
 
 func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, options messageOptions, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
-	if options.simulation {
+	if options.simulation && !options.validation {
 		copy := *msg
 		copy.Nonce = statedb.GetNonce(copy.From)
 		msg = &copy
@@ -1165,6 +1165,8 @@ func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFu
 		return nil, err
 	}
 
+	options.overrides.apply(evm)
+
 	// Validate blob obligations before consuming execution gas or changing state.
 	blobCost, blobMaxCost := new(big.Int), new(big.Int)
 	if msg.TxType == types.BlobTxType {
@@ -1179,11 +1181,11 @@ func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFu
 				return nil, fmt.Errorf("invalid blob versioned hash")
 			}
 		}
-		if msg.BlobGasFeeCap == nil || msg.BlobGasFeeCap.Sign() < 0 || msg.BlobGasFeeCap.BitLen() > 256 || msg.BlobGasFeeCap.Cmp(blockCtx.BlobBaseFee) < 0 {
+		if msg.BlobGasFeeCap == nil || msg.BlobGasFeeCap.Sign() < 0 || msg.BlobGasFeeCap.BitLen() > 256 || msg.BlobGasFeeCap.Cmp(evm.Context.BlobBaseFee) < 0 {
 			return nil, fmt.Errorf("blob fee cap below active blob base fee or invalid")
 		}
 		blobGas := new(big.Int).SetUint64(uint64(len(msg.BlobHashes)) * gas.GasPerBlob)
-		blobCost.Mul(blobGas, blockCtx.BlobBaseFee)
+		blobCost.Mul(blobGas, evm.Context.BlobBaseFee)
 		blobMaxCost.Mul(blobGas, msg.BlobGasFeeCap)
 	}
 
@@ -1235,7 +1237,7 @@ func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFu
 				return nil, fmt.Errorf("max priority fee per gas higher than max fee per gas: tip %s, cap %s", msg.GasTipCap, msg.GasFeeCap)
 			}
 			// Reject if MaxFeePerGas < BaseFee (applies to all tx types under London).
-			if msg.GasFeeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && msg.GasFeeCap.Sign() == 0 && msg.GasTipCap.Sign() == 0) {
+			if msg.GasFeeCap.Cmp(header.BaseFee) < 0 && !(options.simulation && !options.validation && msg.GasFeeCap.Sign() == 0 && msg.GasTipCap.Sign() == 0) {
 				gp.AddGas(msg.GasLimit)
 				return nil, fmt.Errorf("max fee per gas less than block base fee: fee %s, baseFee %s", msg.GasFeeCap, header.BaseFee)
 			}
@@ -1660,6 +1662,8 @@ func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFu
 
 	return &ExecutionResult{
 		UsedGas:         gasUsed,
+		MaxUsedGas:      gasUsedBeforeRefund,
+		GasRefund:       refund,
 		BlockGasUsed:    gasUsedBeforeRefund,
 		DimStorageGas:   dimStorageGas,
 		Err:             execErr,

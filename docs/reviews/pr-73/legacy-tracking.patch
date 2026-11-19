@@ -1,0 +1,29 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..8378ebc4 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,12 @@
+ # Lean4 Verification Check-list
+ 
++## Glamsterdam EIP-8024 current byte encoding (2026-11-18)
++
++- [x] Pin the current EIP and reproduce published execution vectors against the native VM.
++- [x] Correct legacy-bytecode immediate decoding and its invalid ranges.
++- [x] Verify every valid depth/pair, stack boundaries, code-end immediates, jumps and native transactions.
++- [x] Run affected tests, local build and vet; publish an isolated implementation PR (PR 73).
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..ea540757 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Glamsterdam EIP-8024 bytecode and activation (2026-11-18)
++
++Corrected native DUPN/SWAPN/EXCHANGE immediate permutations and reserved ranges, and activated the instructions at canonical Amsterdam. Published bytecode vectors, all valid depths/pairs, stack and jump boundaries, and native transactions/fork transitions pass. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-stack-opcodes-20261118.md). Independent-client and full release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

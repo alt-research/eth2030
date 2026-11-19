@@ -1130,6 +1130,7 @@ func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFu
 			return nil, fmt.Errorf("%w: size %d, limit %d", vm.ErrMaxInitCodeSizeExceeded, len(msg.Data), limit)
 		}
 	}
+
 	if len(balTracker) > 0 {
 		if tracker, ok := balTracker[0].(*bal.AccessTracker); ok {
 			tracker.SeedAccount(msg.From, statedb.GetBalance(msg.From), statedb.GetNonce(msg.From))

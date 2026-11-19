@@ -1,0 +1,29 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..31395e23 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,3 +1,10 @@
++## Glamsterdam EIP-7708 transfer logs
++
++- [x] Read both local legacy and pinned current EIP-7708, including fee/withdrawal exclusions and 8246 dependency.
++- [x] Add failing native fork-boundary, fees/self/zero-value, creation ordering and rollback regressions.
++- [x] Correct consensus emission and canonical Amsterdam activation without a new toggle.
++- [x] Verify affected consumers/roots and build; prepare a separate PR with the 8246 lifecycle gate explicit.
++
+ # Lean4 Verification Check-list
+ 
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..35a67427 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,9 @@
++## Glamsterdam protocol ETH transfer logs (2026-11-18)
++
++Branch `feat/glamsterdam-transfer-logs` activates 7708 at canonical Amsterdam independently of the private gas timestamp and removes extra fee-burn and self-beneficiary burn events. Specified transfers keep the ERC20-compatible system event; same-address/zero-value transfers are suppressed. Existing CREATE/CREATE2 endowment emission is retained and verified before constructor logs, with failed-call rollback preserved.
++
++Native regressions reproduce baseline extra fees, missing Amsterdam activation and incorrect creation log counts; after correction, fork-boundary, fees/self/zero-value, ordering and rollback cases pass. The new logs exposed the modern P2P decoder zero-bloom bug, fixed in shared review #70 and included here. Affected core/P2P/Engine/node/RPC/eiptest suites, full build and targeted vet passed. Full 8246 destruction/finalization and the remaining gas model are separate gates; use a fresh experimental chain to qualify corrected historical fork semantics.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -1,3 +1,7 @@
+## Current work complete; stopped for merge review (2026-11-19)
+
+PR 87 publishes nested/dimensional tracing with full 212/tagged 27/race 48/vet/build, nine independent SDK classic trees, seventeen mutations and a five-package composition repeat. Implementation is stopped at the user's request. [Merge review](docs/plans/glamsterdam/MERGE_REVIEW.md) records dependencies, Draft 83, lack of observed positive fork-head CI evidence and remaining CL/fixture/process/resource/release gates. No upstream PR is merged; the original checkout and unrelated dirt remain preserved.
+
 ## Stateful simulation feature review (2026-11-19)
 
 PR 86 publishes stateful eth_simulateV1 with two independently matching complete SDK blocks, fifteen detected mutations, full 212/tagged 27/race 48/vet/build and a five-package composition repeat. Nested/dimensional tracing continues separately. Stable integration and final API/CL/full-client/resource/release qualification are not inferred from feature review submission.

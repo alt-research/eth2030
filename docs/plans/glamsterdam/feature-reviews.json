@@ -305,6 +305,34 @@
         "independent full-client/devnet and resource campaign",
         "final API and release review"
       ]
+    },
+    {
+      "pr": 87,
+      "url": "https://github.com/alt-research/eth2030/pull/87",
+      "branch": "feat/glamsterdam-nested-traces",
+      "commit": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "remote_head": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "tested_source_commit": "9700ed6b",
+      "composition_commit": "217e0164607eaedd33b80f9ebb3dd85256b928e2",
+      "scope": "Actual nested call/opcode frames, dimensional settlement, log/options/prefix consumers and EIP-211/214 boundary fixes",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "composition_race_packages": 5,
+        "sdk_classic_trees": 9,
+        "mutations_detected": 17,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "final trace schema adoption",
+        "complete historical/API fixtures",
+        "independent full-client and measured operating capacity",
+        "full program release qualification"
+      ]
     }
   ],
   "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",

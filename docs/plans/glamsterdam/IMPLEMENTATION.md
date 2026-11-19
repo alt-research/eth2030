@@ -32,6 +32,7 @@ Implementation begins from fetched `origin/master` at `38ea9259`, not the older 
 | [PR #84](https://github.com/alt-research/eth2030/pull/84) — system transitions | Canonical EIP-2935/4788 actual-code callbacks, explicit pre-root genesis assets, independent roots and native Node recovery | Submitted; qualified with reviews 65–82; Gas draft/live full-client gates separate |
 | [PR #85](https://github.com/alt-research/eth2030/pull/85) — RPC methods and opcode replay | Actual call/estimate/access-list with current gas, full arguments/overrides, canonical historical/system/block replay | Submitted; full/tagged/48-package race/vet/build and eleven mutations pass; simulator/nested trace work separate |
 | [PR #86](https://github.com/alt-research/eth2030/pull/86) — stateful simulation | Actual sequential calls/blocks, complete system/withdrawal/request/BAL commitments, overrides, budgets/deadlines and independent SDK roots/hashes | Submitted; full/tagged/48-package race/vet/build and fifteen mutations pass; final broader validation remains open |
+| [PR #87](https://github.com/alt-research/eth2030/pull/87) — nested/dimensional traces | Real call/opcode events, settlement, log/options/fork consumers and preserved EIP-211/214 regressions | Submitted; full/tagged/race/vet/build, nine SDK trees and seventeen mutations pass; final broader qualification remains open |
 | CL lifecycle | Actual CL/builder and recovery acceptance | Pending |
 
 Each major change receives its own branch and PR; no unrelated changes are staged. Final task completion requires the acceptance evidence in DEVELOPMENT_PLAN.md. A submitted PR is not a merged or release-qualified feature.
@@ -189,3 +190,9 @@ The user explicitly selected the currently merged LIFO model first, with final d
 [PR 86](https://github.com/alt-research/eth2030/pull/86) adds actual eth_simulateV1 with isolated state across calls/blocks, correct validation and uncapped gas policies, overrides, precompile relocation/warming, gap blocks, complete commitments and resource limits. Two independent unmodified SDK block reconstructions agree on every root, paid/peak gas, full header hash and exact RLP size. Fifteen compiling mutations, full 212 packages, tagged 27, race 48 and the five-package PR 85 composition repeat pass, with vet/build. [Evidence](../../verification/glamsterdam-simulate-v1-20261119.md).
 
 Nested/dimensional tracing continues in separate branch `feat/glamsterdam-nested-traces`. Selected schemas 855/852 remain open proposals and are recorded as versioned development inputs; issue 976 is not silently mixed into them. Complete CL lifecycle, official fixture/full-client, capacity/recovery and final release gates remain unfinished.
+
+## Tracing review and requested merge handoff
+
+[PR 87](https://github.com/alt-research/eth2030/pull/87) completes the current nested/dimensional tracing implementation with actual HTTP, signed/block/receipt, nine independent SDK classic trees and seventeen compiling detected mutations. Full 212/tagged 27/race 48/vet/build and a five-package composition repeat pass. [Evidence](../../verification/glamsterdam-nested-trace-20261119.md).
+
+Further implementation is stopped at the user's request. [Merge review](MERGE_REVIEW.md) records exact current heads, functional ancestry, Draft 83, observed fork-head CI gaps, separate CL reviews and unfinished release gates. No upstream PR was merged. Broader CL/official fixture/full-client/recovery/capacity/final protocol qualification remains unfinished; PR submission does not close the full plan.

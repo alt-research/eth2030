@@ -1,3 +1,10 @@
+## Tracing review and merge handoff (2026-11-19)
+
+- [x] Record PR 87, exact local/SDK/mutation qualification and immutable heads.
+- [x] Fetch master and inspect PR states, Draft status, dependency ancestry and observed CI evidence.
+- [x] Prepare MERGE_REVIEW.md; leave upstream merge decisions for review.
+- [x] Stop further implementation after the current task as requested.
+
 ## Stateful simulation review tracking (2026-11-19)
 
 - [x] Record PR 86, its independent complete-block evidence, scope and fifteen detected mutations.

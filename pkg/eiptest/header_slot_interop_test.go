@@ -52,7 +52,7 @@ func TestEngineSlotAndBALIndependentReadback(t *testing.T) {
 			t.Fatal(err)
 		}
 		if independent.SlotNumber == nil || *independent.SlotNumber != slot || types.Hash(independent.Hash()) != built.ExecutionPayload.BlockHash {
-			t.Fatalf("payload/header mismatch: slot wanted=%d native=%v independent=%v native hash=%s independent hash=%s payload hash=%s",slot,header.SlotNumber,independent.SlotNumber,header.Hash(),independent.Hash(),built.ExecutionPayload.BlockHash)
+			t.Fatalf("payload/header mismatch: slot wanted=%d native=%v independent=%v native hash=%s independent hash=%s payload hash=%s", slot, header.SlotNumber, independent.SlotNumber, header.Hash(), independent.Hash(), built.ExecutionPayload.BlockHash)
 		}
 		raw := rpc.Call(t, "eth_getBlockByHash", []any{header.Hash().Hex(), false})
 		var block struct {

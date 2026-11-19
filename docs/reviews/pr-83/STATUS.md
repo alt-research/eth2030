@@ -1,3 +1,13 @@
+## Completion audit and separate TODO inventory (2026-11-19)
+
+[Remaining-work document](TODO.md) and [audit evidence](completion-audit-20261119.json) assess implementation head `a339283a` without changing business code or Draft status. This is a completion audit, not another merge/CI repair or implementation run.
+
+Fresh signed comparison at source-identical clean documentation checkpoint `23d127c` matches all 42 Amsterdam cases against unmodified Geth v1.17.10 with the selected fixed CPSB. Focused VM/intrinsic/execution/system/actual Node HTTP-restart tests and full local build pass. The filtered gaspool invocation matched no tests and is explicitly not counted as a new targeted pass. Existing exact-head CI is 7/7 green.
+
+Completion is not fully qualified: native official fixture configuration stops at Prague, and a valid Osaka wrong-authorization-nonce control still differs by 2500 gas (native 48605, SDK 46105), balances and state root. That case also appears in the clean archived PR checkpoint and must not be grouped with the six declared-cap-only controls. A memory-Engine cap probe was inconclusive because its producer included no transaction; it demonstrates no acceptance bug. The TODO separates these findings, unknown consumer coverage, missing independent envelope/application campaigns, already implemented method PRs 85–87, and final review/release gates.
+
+Live EIPs master `b055feec` has unchanged selected 2780/8037/8038 text; alternatives 12581/12582 remain open/unmerged. They are conditional final-design work, not an instruction to replace the explicitly selected LIFO target. PR 83 remains Draft. The standalone TODO preserves every open obligation with an acceptance condition and avoids classifying whole-program gates as missing core code.
+
 ## Sequential Draft gas dependency/CI repair (2026-11-19)
 
 Original head: `2f32762ab4d1ec5fdcc4f2921da63c06449e38ca`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing system-transition dependency PR 84 (`c2727d48`, including repaired 80–82). Draft status and the user-selected EIPs `3db38a3` LIFO development model are unchanged; unmerged alternatives and final release acceptance remain excluded.

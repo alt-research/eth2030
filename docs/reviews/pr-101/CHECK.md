@@ -9,3 +9,5 @@
 - [x] Preserve the independent Geth pruned-history control, then rebuild an archival oracle by replaying the original finalized raw blocks through unchanged Geth and resume the exact-hash application sequence.
 
 - [ ] Submit two distinct real blob rows through all actual ELs, retain their full CL columns and independently validate partial bitmap ordering before peer-fault qualification.
+
+- [ ] Add a validator-free fresh Native EL/Lighthouse pair with empty databases, drive actual independent-peer cold sync, then verify original historical state/receipts/BAL commitments and restart.

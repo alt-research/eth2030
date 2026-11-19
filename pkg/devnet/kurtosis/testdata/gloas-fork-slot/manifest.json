@@ -1,0 +1,29 @@
+{
+  "source": "owned private three-pair network attempt 3",
+  "lighthouse_runtime": "0262e8f90",
+  "lodestar_commit": "77088eb712e3580c17e59bfd85b2019de7057aad",
+  "lodestar_image": "ethpandaops/lodestar@sha256:d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad",
+  "spec_commit": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "pre_slot": 63,
+  "fork_slot": 64,
+  "block_slot": 65,
+  "pre_root": "0x9c5f14af283967e7e92b7f8fc6c34511caa1a0af4600c92746dd7b33979ddbfd",
+  "original_independent_post_root": "0xc92d5862822963e7d276aa6fb432b10671bf0c305400e01f405ff25340cc0b57",
+  "lighthouse_and_selected_spec_post_root": "0x1e4cb90b50e8e241d877f9cedeaae4a1e428e59fbf0065207ba6520e29c13dfa",
+  "original_independent_fork_root": "0x17d5b8139dfc35c8792f3596b476666f96d235512654cc0ef880917a514450a1",
+  "selected_spec_fork_root": "0xff5d0d6ad1d6e65bd96ab0ecdb85d9d1fe466c26ea3802f32c995e04a0e030e6",
+  "files": [
+    {
+      "path": "pre-state.ssz.gz",
+      "ssz_bytes": 2794785,
+      "ssz_sha256": "29df9fb1091723808c4867501bfb5a1ef93d9ce12edaf3a422f93c6dfa9c0b53",
+      "gzip_sha256": "1cc1d827d94d0ae5df82717b79aa2bb1398fcc2eaebd04df356c1f8bee9178ec"
+    },
+    {
+      "path": "block.ssz.gz",
+      "ssz_bytes": 2860,
+      "ssz_sha256": "6c8028408308e64f58679024877ad92278d661427df31e9e727b2277442036f6",
+      "gzip_sha256": "a23b82cc6421521c397eca9bfdfe0f0c2bf638de77382e5332a701a318b718dd"
+    }
+  ]
+}

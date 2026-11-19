@@ -376,3 +376,16 @@ func TestLegacyNativeBLSActivationBoundary(t *testing.T) {
 		t.Fatalf("legacy BLS before=%t at=%t Prague=%t", before.LegacyNativeBLS, at.LegacyNativeBLS, at.IsPrague)
 	}
 }
+
+func TestEIP7954UsesAmsterdamWithoutPrivateRepricing(t *testing.T) {
+	cfg := *TestConfig
+	at := uint64(100)
+	cfg.AmsterdamTime = &at
+	cfg.GlamsterdanTime = nil
+	if cfg.Rules(big.NewInt(1), true, 99).IsEIP7954 {
+		t.Fatal("code limit activated before Amsterdam")
+	}
+	if !cfg.Rules(big.NewInt(1), true, 100).IsEIP7954 {
+		t.Fatal("code limit waited for private gas repricing")
+	}
+}

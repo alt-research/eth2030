@@ -1,0 +1,9 @@
+# Method specific gas execution plan
+
+Development reference: EIPs `3db38a3725105cb67b8804ac3e147967113bc3ca`, execution-apis issue [977](https://github.com/ethereum/execution-apis/issues/977), and merged Geth [35845](https://github.com/ethereum/go-ethereum/pull/35845), merge `df4c52482b598933d691e3b0c1655f200ff9b7f1`. Issue 977 was rechecked on 2026-11-19 and remains open with no comments. This branch selects the concrete merged Geth method behavior for development; it does not claim an adopted execution-apis decision.
+
+Call and call tracing use all supplied gas after intrinsic gas for execution, with no initial reservoir or transaction gas cap. State creation, refill and frame forwarding still follow the chosen LIFO implementation. Estimation and access-list discovery use the transaction execution cap and overflow reservoir. Validation-enabled simulation uses transaction rules; validation-disabled simulation uses call rules and reserves its full budget in both dimensions. Defaults must use the actual smaller remaining dimension for consecutive uncapped calls, as reviewed and fixed in 35845.
+
+Historical transaction tracing must replay pre-block system operations and every preceding transaction through the normal fork-aware transition, including nonce, fees, storage originals, authorizations, rollback and creation. It must run against isolated historical state and report actual target steps and gas rather than fabricate empty logs or reuse raw Call output.
+
+Acceptance requires actual Node HTTP tests, signed inclusion/import where relevant, historical fork boundaries, high/low gas and creation, caught inner failure observations, complete non-mutation checks and compiling detected guard mutations. Trace schema issues 852/976 remain separately versioned release inputs; no unpublished fields are advertised as standard.

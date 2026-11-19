@@ -301,6 +301,12 @@ func (c *ChainConfig) IsEIP7981(time uint64) bool {
 	return c.IsGlamsterdan(time)
 }
 
+// IsEIP7954 follows the canonical Amsterdam activation, independently of
+// the legacy private gas-repricing timestamp.
+func (c *ChainConfig) IsEIP7954(time uint64) bool {
+	return c.IsAmsterdam(time) || c.IsGlamsterdan(time)
+}
+
 // IsEIP8037 returns whether EIP-8037 (state creation gas increase) is active.
 func (c *ChainConfig) IsEIP8037(time uint64) bool {
 	return c.IsGlamsterdan(time)
@@ -352,7 +358,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsEIP7904:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7706:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7708:        isMerge && c.IsGlamsterdan(timestamp),
-		IsEIP7954:        isMerge && c.IsGlamsterdan(timestamp),
+		IsEIP7954:        isMerge && c.IsEIP7954(timestamp),
 		IsEIP7778:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP2780:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7976:        isMerge && c.IsGlamsterdan(timestamp),

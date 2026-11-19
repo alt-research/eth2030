@@ -286,7 +286,6 @@ func SelectPrecompiles(rules ForkRules) map[types.Address]PrecompiledContract {
 	if rules.IsOsaka {
 		selected = maps.Clone(selected)
 		selected[types.Address{19: 5}] = &osakaModExp{}
-		selected[types.Address{18: 1}] = &p256Verify{}
 	}
 	return selected
 }

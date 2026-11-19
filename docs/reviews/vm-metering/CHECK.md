@@ -1,7 +1,8 @@
-## Native VM metering and exceptional boundaries (2026-11-19)
+# Native VM conformance qualification
 
-- [ ] Read selected execution/EIP semantics and reproduce complete official Osaka/Amsterdam state differences and memory panics.
-- [ ] Correct multiplication gas, failed-precompile gas, EIP-1052 empty-account results and overflow-safe memory sizing; qualify each with independent EVM execution.
-- [ ] Re-run full official corpora after composition, retain remaining categories and add behavioral mutation controls.
-- [ ] Run affected/full/integration/race/vet/build checks and publish a dedicated corrective PR.
-
+- [x] Reproduce official Osaka/Amsterdam execution differences and memory panics against unchanged independent execution.
+- [x] Correct opcode/precompile costs, full-width offsets and zero-length ranges, creation gas/return-data/address semantics, touches and CHAINID propagation.
+- [x] Harden the CREATE oracle: remove self-referential RLP expectations and compare independent nonce-boundary vectors.
+- [x] Pass 34 independent EVM controls, two full-width CHAINID contexts, the complete signed delegation-reentry fixture and eleven detected behavioral mutations.
+- [x] Re-run complete modern official state corpora after composition: no remaining post-state mismatches; remaining cases are separately tracked raw transaction validation failures.
+- [x] Pass full 212-package tests, Core integration, seven affected race packages, full vet and build; publish the dedicated corrective PR.

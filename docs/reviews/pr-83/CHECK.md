@@ -1,3 +1,10 @@
+## Completion audit and remaining-work inventory (2026-11-19)
+
+- [x] Freeze the live PR head, Draft/review state and current master; preserve unrelated work.
+- [ ] Trace pinned gas requirements through VM, transaction/block accounting, pool, Engine, startup/recovery and tests.
+- [ ] Distinguish implementation defects, missing qualification, separate method-consumer PRs and governance/release gates.
+- [ ] Write an independent TODO document with evidence, scope and acceptance conditions; update status and commit documentation only.
+
 ## Sequential Draft gas merge/CI repair (2026-11-19)
 
 - [x] Preserve Draft status and the user-selected merged LIFO specification baseline; do not adopt open alternatives.

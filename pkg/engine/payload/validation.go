@@ -364,7 +364,7 @@ func ValidateTransactions(txBytes [][]byte) ([]*types.Transaction, error) {
 				ErrTransactionTooLarge, i, len(raw))
 		}
 
-		tx, err := types.DecodeTxRLP(raw)
+		tx, err := types.DecodeBlockTransaction(raw)
 		if err != nil {
 			return nil, fmt.Errorf("%w at index %d: %v",
 				ErrTransactionDecode, i, err)

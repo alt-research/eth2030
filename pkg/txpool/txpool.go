@@ -588,6 +588,26 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 }
 
 func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
+	if err := types.ValidateOrdinaryEnvelope(tx); err != nil {
+		return err
+	}
+
+	// Raw ordinary envelopes must be authenticated before senderOf can cache a
+	// recovered address. Generic ecrecover accepts high-S values by design.
+	if tx.Type() <= types.SetCodeTxType && tx.Sender() == nil {
+		chain := pool.chainID
+		if chain == nil {
+			chain = tx.ChainId()
+		}
+		if chain == nil || chain.Sign() < 0 || !chain.IsUint64() {
+			return errors.New("invalid transaction chain ID")
+		}
+		sender, err := types.MakeSigner(chain.Uint64(), tx.Type()).Sender(tx)
+		if err != nil {
+			return fmt.Errorf("invalid transaction signature: %w", err)
+		}
+		tx.SetSender(sender)
+	}
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return pool.validateFrame8141(tx)
 	}

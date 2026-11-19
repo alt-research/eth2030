@@ -29,7 +29,7 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 		return nil, errors.New("invalid transaction value")
 	}
 	if msg.Nonce == math.MaxUint64 && (!options.simulation || options.validation) {
-		return nil, errors.New("sender nonce overflow")
+		return nil, types.ErrNonceMax
 	}
 	nonce := db.GetNonce(msg.From)
 	if nonce != msg.Nonce {
@@ -44,7 +44,10 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 		return nil, errors.New("sender not an EOA")
 	}
 	if msg.TxType == types.SetCodeTxType && (msg.To == nil || len(msg.AuthList) == 0) {
-		return nil, errors.New("set-code transaction requires destination and authorizations")
+		if msg.To == nil {
+			return nil, types.ErrSetCodeTxCreate
+		}
+		return nil, types.ErrEmptyAuthorizations
 	}
 	for _, auth := range msg.AuthList {
 		for _, field := range []*big.Int{auth.ChainID, auth.R, auth.S} {

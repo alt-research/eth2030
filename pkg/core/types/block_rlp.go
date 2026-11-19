@@ -144,7 +144,7 @@ func DecodeBlockRLP(data []byte) (*Block, error) {
 		if err != nil {
 			return nil, fmt.Errorf("reading tx: %w", err)
 		}
-		tx, err := DecodeTxRLP(txData)
+		tx, err := DecodeBlockTransaction(txData)
 		if err != nil {
 			return nil, fmt.Errorf("decoding tx: %w", err)
 		}

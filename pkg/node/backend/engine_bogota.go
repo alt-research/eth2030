@@ -211,7 +211,7 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 	}
 	var omitted []*types.Transaction
 	for _, raw := range list {
-		tx, err := types.DecodeTxRLP(raw)
+		tx, err := types.DecodeBlockTransaction(raw)
 		if err != nil {
 			continue
 		}

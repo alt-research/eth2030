@@ -1,3 +1,13 @@
+## Sequential dependency/CI repair (2026-11-19)
+
+Original head: `16da87174e5932237d4beb2bc9418ee316448275`. Merged current master `4f659fd096fe850b4a2dddaf906b05a853c59631`, followed by repaired existing blob dependency PR 80 (`9272ee39`) and snap dependency PR 81 (`0c8fd49b`). No Draft gas or later method feature is imported. The master's processor conflict was a blank line only; early initcode validation and subsequent BAL seeding remain in order. A mock-method relocation during the blob dependency merge keeps exactly one IsOsaka method and the access-list fixture.
+
+The original failed run 44477282847 listed `core/gas/blob_context.go` and `eiptest/header_slot_interop_test.go` as unformatted. The former is fixed by the repaired blob dependency, the latter by already merged PR 74. Fresh whole-module formatting is clean. Unlike the historical tracking note below, this update actually imports the latest PR 81 source repair for unchanged-account proof binding; that prior documentation-only limitation is superseded for this head.
+
+Go 1.26.11 validation passes: full default suite (`GOFLAGS=-p=4 go test ./... -timeout=15m -count=1`); integration (`./core ./p2p/... ./eiptest`); race (`./eth ./txpool/... ./engine/... ./node/... ./p2p/snap ./sync/statesync`); full vet/formatting/build. Real encrypted custody, sparse promotion, snap recovery and HTTP consumers remain exercised by their original assertions. Logs: `/tmp/eth2030-pr82-{full,integration,race}.log`. Shared root trackers are unchanged.
+
+Publication targets the existing branch without force. Exact-head, live mergeability and fresh required CI are verified before batch completion. Existing release and independent-client boundaries remain open.
+
 # PR 82 tracking cleanup status
 
 Original review head: `08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

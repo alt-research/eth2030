@@ -1,9 +1,9 @@
 ## Sequential master/CI repair (2026-11-19)
 
 - [x] Inspect exact original CI failures and existing blob/snap dependency boundaries.
-- [ ] Merge current master, preserving initcode validation before BAL tracking.
-- [ ] Reconcile repaired existing dependencies 80 and 81 without importing Draft 83 or later features.
-- [ ] Run full default tests, integration, relevant race/vet, formatting and build; publish and verify fresh CI.
+- [x] Merge current master, preserving initcode validation before BAL tracking.
+- [x] Reconcile repaired existing dependencies 80 and 81 without importing Draft 83 or later features.
+- [x] Run full default tests, integration, relevant race/vet, formatting and build; prepare publication and require fresh exact-head CI before completion.
 
 # PR 82 tracking cleanup
 

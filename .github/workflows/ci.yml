@@ -85,6 +85,28 @@ jobs:
         env:
           GOFLAGS: '-p=4'
 
+  application-sequences:
+    name: Published wallet and DEX application sequences
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Execute native and independent signed application workflows
+        working-directory: pkg
+        run: go test -json -count=1 ./core/applicationtest > application-sequence-results.jsonl
+      - name: Retain signed inputs, roots, logs and actual getter outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-sequence-results-${{ github.sha }}
+          path: pkg/application-sequence-results.jsonl
+          if-no-files-found: error
+          retention-days: 90
+
   native-state-tests:
     name: Native signed Osaka and Amsterdam state tests
     runs-on: ubuntu-latest

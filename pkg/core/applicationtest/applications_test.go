@@ -108,6 +108,7 @@ type sequence struct {
 	miner     types.Address
 	nonce     uint64
 	step      uint64
+	outerGas  uint64
 }
 
 func newSequence(t *testing.T, amsterdam bool) *sequence {
@@ -171,6 +172,9 @@ func (s *sequence) context(h *types.Header) gethvm.BlockContext {
 	return gethvm.BlockContext{CanTransfer: core.CanTransfer, Transfer: core.Transfer, GetHash: func(uint64) common.Hash { return common.Hash{} }, Coinbase: common.Address(s.miner), GasLimit: h.GasLimit, BlockNumber: h.Number, Time: h.Time, Difficulty: new(big.Int), BaseFee: h.BaseFee, Random: &random, SlotNum: *h.SlotNumber, BlobBaseFee: big.NewInt(1), CostPerStateByte: 1530}
 }
 func (s *sequence) limit() uint64 {
+	if s.outerGas != 0 {
+		return s.outerGas
+	}
 	if s.amsterdam {
 		return 100000000
 	}
@@ -305,6 +309,11 @@ func (s *sequence) query(a artifact, to common.Address, method string, args ...a
 	if !bytes.Equal(got, want) {
 		t.Fatalf("%s actual return bytes differ: %x/%x", method, got, want)
 	}
+	queryRecord, err := json.Marshal(map[string]any{"kind": "application_query", "method": method, "to": to, "input": "0x" + hex.EncodeToString(data), "native_output": "0x" + hex.EncodeToString(got), "independent_output": "0x" + hex.EncodeToString(want), "post_state_root": s.native.GetRoot()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(queryRecord))
 	decoded, err := a.ABI.Unpack(method, got)
 	if err != nil {
 		t.Fatal(err)
@@ -398,23 +407,44 @@ func runWallet(t *testing.T, s *sequence, token artifact, a, b common.Address) {
 	signature := make([]byte, 65)
 	copy(signature[12:32], s.owner[:])
 	signature[64] = 1
-	execute := func(name string, wallet, target common.Address, data []byte, operation uint8, forward uint64, wantSuccess bool) {
+	execute := func(name string, wallet, target common.Address, data []byte, operation uint8, forward uint64, wantSuccess bool) *types.Receipt {
 		t.Helper()
 		calldata := pack(t, safe, "execTransaction", target, new(big.Int), data, operation, new(big.Int).SetUint64(forward), new(big.Int), big.NewInt(1), zero, zero, signature)
+		walletBefore := new(big.Int).Set(s.native.GetBalance(types.Address(wallet)))
+		senderBefore := new(big.Int).Set(s.native.GetBalance(types.Address(s.owner)))
 		receipt := s.send(name, &wallet, calldata, nil, 1)
 		event := "ExecutionSuccess"
 		if !wantSuccess {
 			event = "ExecutionFailure"
 		}
+		var payment *big.Int
 		found := false
 		for _, log := range receipt.Logs {
 			if common.Address(log.Address) == wallet && len(log.Topics) > 0 && common.Hash(log.Topics[0]) == safe.ABI.Events[event].ID {
+				values, err := safe.ABI.Events[event].Inputs.NonIndexed().Unpack(log.Data)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if len(values) != 1 {
+					t.Fatalf("%s malformed published refund event", name)
+				}
+				payment = values[0].(*big.Int)
 				found = true
 			}
 		}
 		if !found {
 			t.Fatalf("%s did not emit %s", name, event)
 		}
+		walletPaid := new(big.Int).Sub(walletBefore, s.native.GetBalance(types.Address(wallet)))
+		if walletPaid.Cmp(payment) != 0 {
+			t.Fatalf("%s actual wallet refund %s differs from event %s", name, walletPaid, payment)
+		}
+		paidFee := new(big.Int).Mul(new(big.Int).SetUint64(receipt.GasUsed), big.NewInt(2))
+		senderDelta := new(big.Int).Sub(s.native.GetBalance(types.Address(s.owner)), senderBefore)
+		if senderDelta.Cmp(new(big.Int).Sub(payment, paidFee)) != 0 {
+			t.Fatalf("%s sender/refund/fee conservation failed", name)
+		}
+		return receipt
 	}
 	recipient := common.Address{19: 0x51}
 	execute("wallet bounded token transfer", wallet, a, pack(t, token, "transfer", recipient, amount), 0, 1000000, true)
@@ -422,15 +452,20 @@ func runWallet(t *testing.T, s *sequence, token artifact, a, b common.Address) {
 		t.Fatal("wallet transfer not paid")
 	}
 	fresh := common.Address{19: 0x52}
-	// A funded reservoir reaches a low-execution-gas child in full. The previous
-	// fork pays fresh storage from forwarded gas, so this intentionally differs.
-	execute("wallet low-forwarded-gas fresh storage", wallet, a, pack(t, token, "transfer", fresh, amount), 0, 30000, s.amsterdam)
-	want := new(big.Int)
-	if s.amsterdam {
-		want.Set(amount)
+	// Measure the actual published child, including repriced cold accesses.
+	// A 30k forwarded execution budget succeeds even though Amsterdam's state
+	// charge alone exceeds that budget; 15k fails on both selected forks.
+	bounded := execute("wallet 30k-forwarded-gas fresh storage", wallet, a, pack(t, token, "transfer", fresh, amount), 0, 30000, true)
+	if s.amsterdam && bounded.StateGasUsed <= 30000 {
+		t.Fatal("application did not exercise state gas beyond the forwarded execution budget")
 	}
-	if s.balance(token, a, fresh).Cmp(want) != 0 {
+	if s.balance(token, a, fresh).Cmp(amount) != 0 {
 		t.Fatal("bounded child storage outcome differs")
+	}
+	starved := common.Address{19: 0x55}
+	execute("wallet 15k-forwarded-gas failure handler", wallet, a, pack(t, token, "transfer", starved, amount), 0, 15000, false)
+	if s.balance(token, a, starved).Sign() != 0 {
+		t.Fatal("starved child leaked token side effects")
 	}
 	subcall := func(target common.Address, data []byte) []byte {
 		out := append([]byte{0}, target[:]...)
@@ -449,6 +484,22 @@ func runWallet(t *testing.T, s *sequence, token artifact, a, b common.Address) {
 	if s.balance(token, a, failedReceiver).Cmp(amount) != 0 || s.balance(token, b, failedReceiver).Cmp(amount) != 0 {
 		t.Fatal("successful nested batch did not pay both tokens")
 	}
+	// Two actual token subcalls touch the same originally-zero allowance.
+	// Below TX_MAX_GAS_LIMIT there is no initial reservoir: allocation and
+	// cross-frame clearing must refill the exact gas pools in LIFO order.
+	s.outerGas = 1000000
+	spender := common.Address{19: 0x58}
+	approvals := append(subcall(a, pack(t, token, "approve", spender, big.NewInt(1))), subcall(a, pack(t, token, "approve", spender, new(big.Int)))...)
+	execute("wallet no-reservoir sibling allowance refill", wallet, multi, pack(t, multisend, "multiSend", approvals), 1, 500000, true)
+	if s.query(token, a, "allowance", wallet, spender)[0].(*big.Int).Sign() != 0 {
+		t.Fatal("sibling refill retained a temporary allowance")
+	}
+	approvals = append(subcall(a, pack(t, token, "approve", spender, big.NewInt(1))), subcall(b, pack(t, token, "transfer", failedReceiver, new(big.Int).Exp(big.NewInt(10), big.NewInt(30), nil)))...)
+	execute("wallet no-reservoir nested rollback", wallet, multi, pack(t, multisend, "multiSend", approvals), 1, 500000, false)
+	if s.query(token, a, "allowance", wallet, spender)[0].(*big.Int).Sign() != 0 {
+		t.Fatal("nested revert retained a temporary allowance")
+	}
+	s.outerGas = 0
 	authKey, err := crypto.HexToECDSA(fmt.Sprintf("%064x", 2))
 	if err != nil {
 		t.Fatal(err)

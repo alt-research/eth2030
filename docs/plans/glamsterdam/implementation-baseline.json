@@ -1,0 +1,74 @@
+{
+  "status": "implementation baseline; not release-qualified",
+  "implementation_base": "38ea9259",
+  "plan_source": "6f60df69",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "consensus_specs_commit": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "core_eips": [
+    2780,
+    7688,
+    7708,
+    7732,
+    7778,
+    7843,
+    7928,
+    7954,
+    7976,
+    7981,
+    7997,
+    8024,
+    8037,
+    8038,
+    8045,
+    8061,
+    8246,
+    8282
+  ],
+  "ssz_dependencies": [
+    7495,
+    7916
+  ],
+  "network_eips": [
+    7975,
+    8159,
+    8070,
+    8189,
+    8136
+  ],
+  "open_choices": {
+    "gas_refills": {
+      "pr": 12581,
+      "head": "2ba9176f360c3c95641c6c1b5428ac3113335c4b"
+    },
+    "gas_allowance": {
+      "pr": 12582,
+      "head": "19d788c896ad35fc53dc5721dbe70ed91cb40069"
+    },
+    "payload_authentication": [
+      {
+        "pr": 5770,
+        "head": "dc75cee42b4b12edee8a56ff81da7b7f8f93de8d"
+      },
+      {
+        "pr": 5820,
+        "head": "7af0af3c80e123a09f9cf6058b1f6934ad3115d7"
+      }
+    ]
+  },
+  "release_inputs_still_required": [
+    "compatible Engine/devp2p and executable-spec fixture revisions",
+    "canonical system runtimes and exact client artifacts",
+    "upstream choice resolution and application compatibility clearance",
+    "qualified fork schedule and recovery/performance budgets"
+  ],
+  "gas_development_decision": {
+    "date": "2026-11-19",
+    "source": "explicit user instruction",
+    "model": "current merged LIFO",
+    "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+    "instruction": "Implement the currently merged LIFO model first; retain final design review.",
+    "unmerged_12581_adopted": false,
+    "unmerged_12582_adopted": false,
+    "final_release_review": "open"
+  }
+}

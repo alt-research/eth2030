@@ -1,0 +1,137 @@
+{
+  "tested_source_commit": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "amsterdam_signed_cases": 42,
+  "amsterdam_matches": 42,
+  "full_packages": 212,
+  "tagged_packages": 27,
+  "broad_race_packages": 96,
+  "final_affected_race_packages": 33,
+  "vet": "passed",
+  "build": "passed",
+  "mutations": [
+    {
+      "name": "state-byte-price",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-state-byte-price.log"
+    },
+    {
+      "name": "lifo-refill",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-lifo-refill.log"
+    },
+    {
+      "name": "ancestor-refill",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-ancestor-refill.log"
+    },
+    {
+      "name": "exceptional-baseline",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-exceptional-baseline.log"
+    },
+    {
+      "name": "authorization-frame-commit",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-authorization-frame-commit.log"
+    },
+    {
+      "name": "authorization-preexecution-rollback",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-authorization-preexecution-rollback.log"
+    },
+    {
+      "name": "gross-execution-excludes-state",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-gross-execution-excludes-state.log"
+    },
+    {
+      "name": "block-bottleneck",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-block-bottleneck.log"
+    },
+    {
+      "name": "import-state-reservation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-import-state-reservation.log"
+    },
+    {
+      "name": "actual-system-margin",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-actual-system-margin.log"
+    }
+  ],
+  "initial_mutations": [
+    {
+      "name": "state-byte-price",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-state-byte-price.log"
+    },
+    {
+      "name": "lifo-refill",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-lifo-refill.log"
+    },
+    {
+      "name": "ancestor-refill",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-ancestor-refill.log"
+    },
+    {
+      "name": "exceptional-baseline",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-exceptional-baseline.log"
+    },
+    {
+      "name": "authorization-frame-commit",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-authorization-frame-commit.log"
+    },
+    {
+      "name": "authorization-preexecution-rollback",
+      "detected": false,
+      "exit_code": 0,
+      "log": "/tmp/glamsterdam-state-gas-mutation-authorization-preexecution-rollback.log"
+    },
+    {
+      "name": "gross-execution-excludes-state",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-gross-execution-excludes-state.log"
+    },
+    {
+      "name": "block-bottleneck",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-block-bottleneck.log"
+    },
+    {
+      "name": "import-state-reservation",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-import-state-reservation.log"
+    },
+    {
+      "name": "actual-system-margin",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-state-gas-mutation-actual-system-margin.log"
+    }
+  ],
+  "release_qualified": false
+}

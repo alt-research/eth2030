@@ -1,0 +1,342 @@
+{
+  "implementation_base": "38ea9259",
+  "integration_tested_commit": "2f253d330465650bf360b0f6d2f8e8a836e928a4",
+  "status": "development integration passed; program incomplete",
+  "reviews": [
+    {
+      "pr": 65,
+      "url": "https://github.com/alt-research/eth2030/pull/65",
+      "branch": "feat/glamsterdam-contract-limits",
+      "commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "remote_head": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "scope": "EIP-7954 code/initcode and admission",
+      "release_qualified": false,
+      "tested_source_commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 66,
+      "url": "https://github.com/alt-research/eth2030/pull/66",
+      "branch": "feat/glamsterdam-bal-retention",
+      "commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "remote_head": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "scope": "Historical BAL retention and empty-cache recovery",
+      "release_qualified": false,
+      "tested_source_commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 67,
+      "url": "https://github.com/alt-research/eth2030/pull/67",
+      "branch": "feat/glamsterdam-factory",
+      "commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "remote_head": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "scope": "Canonical EIP-7997 factory",
+      "release_qualified": false,
+      "tested_source_commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 68,
+      "url": "https://github.com/alt-research/eth2030/pull/68",
+      "branch": "feat/glamsterdam-access-list",
+      "commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "remote_head": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "scope": "Actual access-list RPC discovery",
+      "release_qualified": false,
+      "tested_source_commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 69,
+      "url": "https://github.com/alt-research/eth2030/pull/69",
+      "branch": "feat/glamsterdam-eth71",
+      "commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "remote_head": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "scope": "Negotiated eth/69-71 and correlated history",
+      "release_qualified": false,
+      "tested_source_commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 70,
+      "url": "https://github.com/alt-research/eth2030/pull/70",
+      "branch": "fix/eth-receipt-bloom",
+      "commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "remote_head": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "scope": "Independent receipt bloom reconstruction",
+      "release_qualified": false,
+      "tested_source_commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 71,
+      "url": "https://github.com/alt-research/eth2030/pull/71",
+      "branch": "feat/glamsterdam-transfer-logs",
+      "commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "remote_head": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "scope": "Canonical EIP-7708 transfer logs",
+      "release_qualified": false,
+      "tested_source_commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 72,
+      "url": "https://github.com/alt-research/eth2030/pull/72",
+      "branch": "feat/glamsterdam-selfdestruct",
+      "commit": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "remote_head": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "scope": "EIP-8246 lifecycle and final BAL",
+      "release_qualified": false,
+      "tested_source_commit": "509a47ab41636e72c80adaf5353ff7d9d233d0cb",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 73,
+      "url": "https://github.com/alt-research/eth2030/pull/73",
+      "branch": "feat/glamsterdam-stack-opcodes",
+      "commit": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "remote_head": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "scope": "EIP-8024 encoding and Amsterdam activation",
+      "release_qualified": false,
+      "tested_source_commit": "408544c629f27812ebe1f2afb1d11ef3b71d0ef1",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 74,
+      "url": "https://github.com/alt-research/eth2030/pull/74",
+      "branch": "feat/glamsterdam-slot-commitment",
+      "commit": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "remote_head": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "scope": "Supplied slot commitments and independent headers",
+      "release_qualified": false,
+      "tested_source_commit": "61a245e30458258480d2d5986e81b5970cab4344",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 75,
+      "url": "https://github.com/alt-research/eth2030/pull/75",
+      "branch": "test/glamsterdam-gas-corpus",
+      "commit": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "remote_head": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "scope": "Independent signed current-text gas corpus",
+      "release_qualified": false,
+      "tested_source_commit": "54b2cf8023e56c9a2c21ecb54a383ec2cede1c1c",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 76,
+      "url": "https://github.com/alt-research/eth2030/pull/76",
+      "branch": "fix/glamsterdam-blob-validation",
+      "commit": "bc2f58506b637fa19e93a5d5f3aefc8f0c966686",
+      "scope": "Full blob authentication, proof exports and journal recovery",
+      "release_qualified": false,
+      "tested_source_commit": "85ad1bca9a34e26934b06bc46cf1b1c1e5fc2b6f",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 77,
+      "url": "https://github.com/alt-research/eth2030/pull/77",
+      "branch": "feat/glamsterdam-builder-requests",
+      "commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "remote_head": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "scope": "Mandatory EIP-8282 contracts, extraction and Engine/CL bytes",
+      "release_qualified": false,
+      "tested_source_commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 78,
+      "url": "https://github.com/alt-research/eth2030/pull/78",
+      "branch": "feat/glamsterdam-fork-schema",
+      "commit": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "remote_head": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "tested_source_commit": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "scope": "Canonical startup schedules, Engine version/field bounds and actual HTTP",
+      "source_in_tested_integration": true,
+      "release_qualified": false
+    },
+    {
+      "pr": 79,
+      "url": "https://github.com/alt-research/eth2030/pull/79",
+      "branch": "feat/glamsterdam-config-recovery",
+      "commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "remote_head": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "tested_source_commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "scope": "Persisted configuration authority before actual Node restart/replay",
+      "release_qualified": false,
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 80,
+      "url": "https://github.com/alt-research/eth2030/pull/80",
+      "branch": "feat/glamsterdam-blob-schedule",
+      "commit": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "remote_head": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "tested_source_commit": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+      "scope": "Configured blob capacity, exact prices, fee burn and signed 21-blob consumers",
+      "dependencies": [
+        76,
+        79
+      ],
+      "review_delta": "https://github.com/fyInALT/eth2030/compare/review/glamsterdam-blob-foundation...feat/glamsterdam-blob-schedule",
+      "release_qualified": false,
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 81,
+      "url": "https://github.com/alt-research/eth2030/pull/81",
+      "branch": "feat/glamsterdam-snap2",
+      "commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "remote_head": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "tested_source_commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "dependencies": [
+        69,
+        77
+      ],
+      "scope": "Authenticated BAL pivot/reorg/cursor recovery, including fresh-root proof binding for unchanged partial storage",
+      "release_qualified": false,
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 82,
+      "url": "https://github.com/alt-research/eth2030/pull/82",
+      "branch": "feat/glamsterdam-eth72",
+      "commit": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "remote_head": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "tested_source_commit": "d72a8d35dd2bea6bcf6794c30efcd88c9968ec00",
+      "foundation_commit": "1efbd03a311e3c88c64837fa1aff7ec7b68066e2",
+      "review_delta": "https://github.com/fyInALT/eth2030/compare/review/glamsterdam-eth72-foundation...feat/glamsterdam-eth72",
+      "scope": "Sparse provider/sampler/custody relay, verified reconstruction and actual Engine/Node consumers",
+      "release_qualified": false,
+      "source_in_tested_integration": true
+    },
+    {
+      "pr": 83,
+      "url": "https://github.com/alt-research/eth2030/pull/83",
+      "branch": "feat/glamsterdam-state-gas",
+      "commit": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "remote_head": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "draft": true,
+      "scope": "Current merged LIFO development baseline; native signed transitions and initial high-state block consumers",
+      "tested_transaction_source_commit": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "remaining": [
+        "method-specific RPC/simulation/traces in separate feature branch",
+        "broader official EEST/application and full-client vectors",
+        "resource/performance campaigns",
+        "final gas choice and release qualification"
+      ],
+      "system_margin_composition": "eight/sixteen/seventeen actual new slots passed; independent 30M execution budget retained",
+      "signed_amsterdam_cases": 42,
+      "signed_matches": 42,
+      "mutations_detected": 10,
+      "initial_escaped_mutation": "early pre-execution rollback fixture had no earlier write; late-OOG case added and detects it",
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "broad_race_packages": 96,
+        "final_affected_race_packages": 33,
+        "vet": "passed",
+        "build": "passed"
+      }
+    },
+    {
+      "pr": 84,
+      "url": "https://github.com/alt-research/eth2030/pull/84",
+      "branch": "fix/glamsterdam-system-transitions",
+      "commit": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "remote_head": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "scope": "Canonical pre-block actual-code transitions, explicit genesis assets, independent roots and Node recovery",
+      "tested_source_commit": "3355156e45b16f11eef2acea20931fd77ab70ab9",
+      "source_in_tested_integration": true,
+      "release_qualified": false
+    },
+    {
+      "pr": 85,
+      "url": "https://github.com/alt-research/eth2030/pull/85",
+      "branch": "feat/glamsterdam-rpc-gas",
+      "commit": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "remote_head": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "tested_source_commit": "2893324130e142a9fd800648c8557de9757bb16c",
+      "scope": "Method-specific call/estimate/access-list, complete inputs/overrides, canonical transaction/block opcode replay",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "access_followup_race_packages": 5,
+        "mutations_detected": 11,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "eth_simulateV1",
+        "nested callTracer and dimensional trace fields",
+        "independent full-client/API fixtures",
+        "resource and release qualification"
+      ]
+    },
+    {
+      "pr": 86,
+      "url": "https://github.com/alt-research/eth2030/pull/86",
+      "branch": "feat/glamsterdam-simulate-v1",
+      "commit": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "remote_head": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "tested_source_commit": "6daa6678",
+      "composition_commit": "206e14ac",
+      "scope": "Stateful eth_simulateV1 with complete commitments, two gas policies, overrides and resource bounds",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "composition_race_packages": 5,
+        "independent_complete_blocks": 2,
+        "mutations_detected": 15,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "complete historical/API fixture campaign",
+        "independent full-client/devnet and resource campaign",
+        "final API and release review"
+      ]
+    },
+    {
+      "pr": 87,
+      "url": "https://github.com/alt-research/eth2030/pull/87",
+      "branch": "feat/glamsterdam-nested-traces",
+      "commit": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "remote_head": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "tested_source_commit": "9700ed6b",
+      "composition_commit": "217e0164607eaedd33b80f9ebb3dd85256b928e2",
+      "scope": "Actual nested call/opcode frames, dimensional settlement, log/options/prefix consumers and EIP-211/214 boundary fixes",
+      "source_in_tested_integration": false,
+      "release_qualified": false,
+      "checks": {
+        "full_packages": 212,
+        "tagged_packages": 27,
+        "race_packages": 48,
+        "composition_race_packages": 5,
+        "sdk_classic_trees": 9,
+        "mutations_detected": 17,
+        "vet": "passed",
+        "build": "passed"
+      },
+      "remaining": [
+        "final trace schema adoption",
+        "complete historical/API fixtures",
+        "independent full-client and measured operating capacity",
+        "full program release qualification"
+      ]
+    }
+  ],
+  "earlier_integration_tested_commit": "96a1994cc6c007b521517cd025a70627f5b6e3b2",
+  "integration_published_head": "b1a696d15e304cc0a388869d355e44ccccab360e",
+  "checked_at_utc": "2026-11-18 19:26:42 UTC",
+  "previous_integration_tested_commit": "c0df60625f45dab79f8940032aa7e4112e35d7d5"
+}

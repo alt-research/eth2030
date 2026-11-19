@@ -15,7 +15,6 @@ import (
 	"github.com/eth2030/eth2030/consensus"
 	"github.com/eth2030/eth2030/core/block"
 	coreconfig "github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/vdf"
 	"github.com/eth2030/eth2030/das"
@@ -34,7 +33,7 @@ import (
 // TestE2E_Roadmap_GlamsterdamRepricing verifies that 18-EIP repricing is
 // applied during block building and processing.
 func TestE2E_Roadmap_GlamsterdamRepricing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -127,7 +126,7 @@ func TestE2E_Roadmap_FOCILInclusionCompliance(t *testing.T) {
 // TestE2E_Roadmap_NativeAAExecution tests EIP-7701 account abstraction
 // transaction creation and basic processing.
 func TestE2E_Roadmap_NativeAAExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xAA})
 	receiver := types.BytesToAddress([]byte{0xBB})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -153,7 +152,7 @@ func TestE2E_Roadmap_NativeAAExecution(t *testing.T) {
 // TestE2E_Roadmap_BALParallelExecution tests that Block Access Lists track
 // state correctly for parallel execution validation.
 func TestE2E_Roadmap_BALParallelExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver1 := types.BytesToAddress([]byte{0x20})
 	receiver2 := types.BytesToAddress([]byte{0x30})
@@ -564,7 +563,7 @@ func TestE2E_Roadmap_ZkVMExecution(t *testing.T) {
 // TestE2E_Roadmap_MultidimGasPricing tests separate gas accounting for
 // calldata, execution, and blob gas dimensions.
 func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -606,7 +605,7 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 // TestE2E_Roadmap_GigagasParallelProcessing exercises parallel tx batch
 // execution: multiple independent transfers that can run concurrently.
 func TestE2E_Roadmap_GigagasParallelProcessing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	senders := make([]types.Address, 5)
 	receivers := make([]types.Address, 5)
 	for i := range senders {
@@ -659,7 +658,7 @@ func TestE2E_Roadmap_GigagasParallelProcessing(t *testing.T) {
 // TestE2E_Roadmap_FullBlockLifecycleWithConsensus tests the complete flow:
 // tx -> pool -> build -> execute -> attest -> finalize.
 func TestE2E_Roadmap_FullBlockLifecycleWithConsensus(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -712,7 +711,7 @@ func TestE2E_Roadmap_FullBlockLifecycleWithConsensus(t *testing.T) {
 // TestE2E_Roadmap_StatelessExecution tests building and verifying a block
 // where the state changes are tracked independently.
 func TestE2E_Roadmap_StatelessExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))

@@ -52,7 +52,7 @@ func FinalizeBlockExecution(cfg *config.ChainConfig, getHash vm.GetHashFunc, sta
 	return requests, nil
 }
 
-// ProcessRequests collects the EIP-6110 events and drains both Prague queues.
+// ProcessRequests collects EIP-6110 events and drains the active request queues.
 // Use FinalizeBlockExecution when processing a whole block.
 func ProcessRequests(cfg *config.ChainConfig, statedb state.StateDB, header *types.Header, receipts ...*types.Receipt) (types.Requests, error) {
 	snapshot := statedb.Snapshot()
@@ -81,18 +81,26 @@ func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb st
 		requests = append(requests, types.NewRequest(types.DepositRequestType, deposits))
 	}
 
-	queues := [...]struct {
-		address types.Address
-		kind    byte
-		size    int
-		limit   int
-	}{
-		{types.WithdrawalRequestAddress, types.WithdrawalRequestType, types.WithdrawalRequestSSZSize, types.MaxWithdrawalRequestsPerPayload},
-		{types.ConsolidationRequestAddress, types.ConsolidationRequestType, types.ConsolidationRequestSSZSize, types.MaxConsolidationRequestsPerPayload},
+	type requestQueue struct {
+		address  types.Address
+		kind     byte
+		size     int
+		limit    int
+		required bool
+	}
+	queues := []requestQueue{
+		{types.WithdrawalRequestAddress, types.WithdrawalRequestType, types.WithdrawalRequestSSZSize, types.MaxWithdrawalRequestsPerPayload, false},
+		{types.ConsolidationRequestAddress, types.ConsolidationRequestType, types.ConsolidationRequestSSZSize, types.MaxConsolidationRequestsPerPayload, false},
+	}
+	if cfg.IsAmsterdam(header.Time) {
+		queues = append(queues,
+			requestQueue{types.BuilderDepositRequestAddress, types.BuilderDepositRequestType, types.BuilderDepositRequestSSZSize, types.MaxBuilderDepositRequestsPerPayload, true},
+			requestQueue{types.BuilderExitRequestAddress, types.BuilderExitRequestType, types.BuilderExitRequestSSZSize, types.MaxBuilderExitRequestsPerPayload, true},
+		)
 	}
 	for _, queue := range queues {
 		if statedb.GetCodeSize(queue.address) == 0 {
-			if cfg.RequireRequestPredeploys {
+			if queue.required || cfg.RequireRequestPredeploys {
 				return nil, fmt.Errorf("request type %d: no code at %s", queue.kind, queue.address.Hex())
 			}
 			continue

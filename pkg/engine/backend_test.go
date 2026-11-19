@@ -56,7 +56,7 @@ func TestNewEngineBackend(t *testing.T) {
 }
 
 func TestProcessValidBlock(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 
@@ -166,7 +166,7 @@ func TestForkchoiceUpdated_UnknownHead(t *testing.T) {
 }
 
 func TestForkchoiceWithPayloadAttributes(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()
@@ -210,7 +210,7 @@ func TestForkchoiceWithPayloadAttributes(t *testing.T) {
 }
 
 func TestGetPayload(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()

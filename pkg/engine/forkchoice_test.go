@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine/backendapi"
 )
@@ -32,7 +31,7 @@ func makeGenesisAt(timestamp uint64) *types.Block {
 
 // newBackendWithGenesis creates a backend with a genesis block at timestamp ts.
 func newBackendWithGenesis(ts uint64) (backendapi.Backend, *types.Block) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisAt(ts)
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	return b, genesis

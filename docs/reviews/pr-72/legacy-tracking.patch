@@ -1,0 +1,30 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..f88986b4 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,13 @@
+ # Lean4 Verification Check-list
+ 
++## Glamsterdam EIP-8246 transaction lifecycle (2026-11-18)
++
++- [x] Pin EIP-8246 and read EIP-6780/161; reproduce missing native destruction cleanup.
++- [x] Journal same-transaction creations with nested rollback and preserve balances through finalization.
++- [x] Verify native CREATE/CREATE2, pre-funded targets, late credits, old contracts and reverted creation.
++- [x] Qualify BAL final-state changes and persistence; run affected tests and local build.
++- [x] Publish the isolated implementation branch and update program evidence (PR 72).
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..344d6823 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Glamsterdam EIP-8246 execution and BAL (2026-11-18)
++
++Implemented balance-preserving destruction, transaction-end account clearing, journaled native creations and rollback, correct CREATE2 creator nonce/prechecks, and final-state BAL reconciliation. Native and canonical Frame tests cover late credits, CREATE2 reuse, existing contracts, fork boundaries and four state backends. Affected suites, targeted race/vet and the local build pass. See [verification evidence](docs/verification/glamsterdam-selfdestruct-20261118.md). Independent-client and final gas qualification remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

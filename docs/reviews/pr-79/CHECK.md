@@ -1,9 +1,9 @@
 ## Master integration after PRs 66–78 (2026-11-19)
 
 - [x] Fetch the exact PR head and current master in an isolated worktree.
-- [ ] Reconcile canonical fork validation with persisted configuration authority before history replay.
-- [ ] Validate the combined startup/restart behavior, full default suite, integration, race/vet, formatting and build.
-- [ ] Prepare the existing PR branch for non-forced publication and verify exact remote head, mergeability and CI.
+- [x] Reconcile canonical fork validation with persisted configuration authority before history replay.
+- [x] Validate the combined startup/restart behavior, full default suite, integration, race/vet, formatting and build.
+- [x] Prepare the existing PR branch for non-forced publication; require exact remote-head, mergeability and CI verification before completion.
 
 # PR 79 tracking cleanup
 

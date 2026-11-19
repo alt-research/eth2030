@@ -95,20 +95,15 @@ func (api *EngineAPI) SetRequestTimeout(timeout time.Duration) {
 
 // NewPayloadV3 validates and executes a new Cancun/Deneb payload.
 // Per EIP-4844: blob versioned hashes must match commitments in transactions.
-// Per EIP-4788: parentBeaconBlockRoot must be provided (non-zero).
+// The wire handler requires a parentBeaconBlockRoot DATA value, including zero.
 func (api *EngineAPI) NewPayloadV3(
 	payload ExecutionPayloadV3,
 	expectedBlobVersionedHashes []types.Hash,
 	parentBeaconBlockRoot types.Hash,
 ) (PayloadStatusV1, error) {
 	// Validate that the payload timestamp falls within the Cancun fork.
-	if !api.backend.IsCancun(payload.Timestamp) {
+	if !api.backend.IsCancun(payload.Timestamp) || api.backend.IsPrague(payload.Timestamp) {
 		return PayloadStatusV1{}, ErrUnsupportedFork
-	}
-
-	// EIP-4788: parentBeaconBlockRoot must be provided.
-	if parentBeaconBlockRoot == (types.Hash{}) {
-		return PayloadStatusV1{}, ErrInvalidParams
 	}
 
 	// EIP-4844: validate blob versioned hashes match transaction contents.
@@ -132,10 +127,14 @@ func (api *EngineAPI) ForkchoiceUpdatedV3(
 ) (ForkchoiceUpdatedResult, error) {
 	if payloadAttributes != nil {
 		headTimestamp := api.backend.GetBlockTimestamp(state.HeadBlockHash)
-		if payloadAttributes.Timestamp == 0 || payloadAttributes.ParentBeaconBlockRoot == (types.Hash{}) ||
+		if payloadAttributes.Timestamp == 0 ||
 			payloadAttributes.Timestamp <= headTimestamp {
 			result, err := api.backend.ForkchoiceUpdated(state, nil)
 			return forkchoiceAttributeError(result, err, ErrInvalidPayloadAttributes)
+		}
+		if !api.backend.IsCancun(payloadAttributes.Timestamp) || api.backend.IsAmsterdam(payloadAttributes.Timestamp) {
+			result, err := api.backend.ForkchoiceUpdated(state, nil)
+			return forkchoiceAttributeError(result, err, ErrUnsupportedFork)
 		}
 	}
 	return api.backend.ForkchoiceUpdated(state, payloadAttributes)
@@ -147,6 +146,12 @@ func (api *EngineAPI) GetPayloadV3(payloadID PayloadID) (*GetPayloadV3Response, 
 	resp, err := api.backend.GetPayloadByID(payloadID)
 	if err != nil {
 		return nil, err
+	}
+	if resp == nil || resp.ExecutionPayload == nil {
+		return nil, ErrUnknownPayload
+	}
+	if !api.backend.IsCancun(resp.ExecutionPayload.Timestamp) || api.backend.IsPrague(resp.ExecutionPayload.Timestamp) {
+		return nil, ErrUnsupportedFork
 	}
 	if err := api.validateBlobsBundle(resp.BlobsBundle); err != nil {
 		return nil, fmt.Errorf("invalid blobs bundle: %w", err)
@@ -193,13 +198,8 @@ func (api *EngineAPI) NewPayloadV4(
 	executionRequests [][]byte,
 ) (PayloadStatusV1, error) {
 	// Validate that the payload timestamp falls within the Prague fork.
-	if !api.backend.IsPrague(payload.Timestamp) {
+	if !api.backend.IsPrague(payload.Timestamp) || api.backend.IsAmsterdam(payload.Timestamp) {
 		return PayloadStatusV1{}, ErrUnsupportedFork
-	}
-
-	// EIP-4788: parentBeaconBlockRoot must be provided.
-	if parentBeaconBlockRoot == (types.Hash{}) {
-		return PayloadStatusV1{}, ErrInvalidParams
 	}
 
 	// EIP-7685: executionRequests must be provided (can be empty list, not nil).
@@ -226,7 +226,33 @@ func (api *EngineAPI) GetPayloadV4(payloadID PayloadID) (*GetPayloadV4Response, 
 	if err != nil {
 		return nil, err
 	}
+	if resp == nil || resp.ExecutionPayload == nil {
+		return nil, ErrUnknownPayload
+	}
+	if !api.backend.IsPrague(resp.ExecutionPayload.Timestamp) || api.backend.IsOsaka(resp.ExecutionPayload.Timestamp) {
+		return nil, ErrUnsupportedFork
+	}
 	return resp, nil
+}
+
+// GetPayloadV5 serves the Osaka shape: V3 payload and cell-proof bundle.
+func (api *EngineAPI) GetPayloadV5(payloadID PayloadID) (*payload.GetPayloadV5Response, error) {
+	resp, err := api.backend.GetPayloadV6ByID(payloadID)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil || resp.ExecutionPayload == nil {
+		return nil, ErrUnknownPayload
+	}
+	timestamp := resp.ExecutionPayload.Timestamp
+	if !api.backend.IsOsaka(timestamp) || api.backend.IsAmsterdam(timestamp) {
+		return nil, ErrUnsupportedFork
+	}
+	return &payload.GetPayloadV5Response{
+		ExecutionPayload: &resp.ExecutionPayload.ExecutionPayloadV3,
+		BlockValue:       resp.BlockValue, BlobsBundle: resp.BlobsBundle,
+		Override: resp.Override, ExecutionRequests: resp.ExecutionRequests,
+	}, nil
 }
 
 // NewPayloadV5 validates and executes an Amsterdam payload with BAL.
@@ -260,11 +286,6 @@ func (api *EngineAPI) processAmsterdamPayloadWith(
 	executionRequests [][]byte,
 	process func(*ExecutionPayloadV5, []types.Hash, types.Hash, [][]byte) (PayloadStatusV1, error),
 ) (PayloadStatusV1, error) {
-	// EIP-4788: parentBeaconBlockRoot must be provided.
-	if parentBeaconBlockRoot == (types.Hash{}) {
-		return PayloadStatusV1{}, ErrInvalidParams
-	}
-
 	// EIP-7685: executionRequests must be provided.
 	if err := types.ValidateExecutionRequestsWire(executionRequests); err != nil {
 		return PayloadStatusV1{}, ErrInvalidParams
@@ -293,6 +314,12 @@ func (api *EngineAPI) GetPayloadV6(payloadID PayloadID) (*GetPayloadV6Response, 
 	resp, err := api.backend.GetPayloadV6ByID(payloadID)
 	if err != nil {
 		return nil, err
+	}
+	if resp == nil || resp.ExecutionPayload == nil {
+		return nil, ErrUnknownPayload
+	}
+	if !api.backend.IsAmsterdam(resp.ExecutionPayload.Timestamp) {
+		return nil, ErrUnsupportedFork
 	}
 	return resp, nil
 }
@@ -400,7 +427,6 @@ func (api *EngineAPI) ExchangeCapabilities(requested []string) []string {
 		"engine_getPayloadV6",
 		"engine_getPayloadV7",
 		"engine_newPayloadV7",
-		"engine_exchangeCapabilities",
 		"engine_getClientVersionV1",
 		"engine_getBlobsV1",
 		"engine_getBlobsV2",

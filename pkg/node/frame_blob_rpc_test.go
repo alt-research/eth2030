@@ -24,7 +24,7 @@ func TestFrameBlobSidecarThroughActualHTTPAdmission(t *testing.T) {
 	}
 	sender := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
 	var genesis map[string]any
-	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
 	}
 	fields := genesis["config"].(map[string]any)

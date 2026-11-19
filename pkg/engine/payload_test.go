@@ -17,6 +17,8 @@ func TestGetPayloadV4_Success(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 
 	backend := &mockBackend{
+		isOsakaFn:     func(uint64) bool { return false },
+		isAmsterdamFn: func(uint64) bool { return false },
 		getPayloadV4ByIDFn: func(id PayloadID) (*GetPayloadV4Response, error) {
 			if id != payloadID {
 				t.Errorf("unexpected payload ID")
@@ -73,10 +75,8 @@ func TestGetPayloadV4_Success(t *testing.T) {
 	}
 }
 
-// TestGetPayloadV4_AlwaysSucceeds verifies that GetPayloadV4 does not perform
-// fork validation - it simply returns whatever payload was built. Fork checks
-// belong in NewPayload, not GetPayload.
-func TestGetPayloadV4_AlwaysSucceeds(t *testing.T) {
+// TestGetPayloadV4_RejectsWrongFork verifies the built timestamp boundary.
+func TestGetPayloadV4_RejectsWrongFork(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 
 	backend := &mockBackend{
@@ -95,7 +95,7 @@ func TestGetPayloadV4_AlwaysSucceeds(t *testing.T) {
 			}, nil
 		},
 		isPragueFn: func(timestamp uint64) bool {
-			return false // Prague not active - GetPayloadV4 should still succeed
+			return false // Prague not active - GetPayloadV4 must reject the wrong fork
 		},
 	}
 
@@ -110,11 +110,8 @@ func TestGetPayloadV4_AlwaysSucceeds(t *testing.T) {
 	if err := json.Unmarshal(resp, &rpcResp); err != nil {
 		t.Fatalf("failed to unmarshal response: %v", err)
 	}
-	if rpcResp.Error != nil {
-		t.Fatalf("GetPayloadV4 returned unexpected error: %v", rpcResp.Error)
-	}
-	if rpcResp.Result == nil {
-		t.Fatal("expected non-nil result from GetPayloadV4")
+	if rpcResp.Error == nil || rpcResp.Error.Code != UnsupportedForkCode {
+		t.Fatalf("wrong-fork payload must be rejected: %+v", rpcResp.Error)
 	}
 }
 
@@ -141,8 +138,9 @@ func TestNewPayloadV5_ValidBAL(t *testing.T) {
 	api := NewEngineAPI(backend)
 
 	// Build a V5 payload with BAL.
-	balData, _ := json.Marshal([]byte{0xc0}) // minimal RLP (empty list)
+	balData, _ := json.Marshal("0xc0") // minimal RLP (empty list)
 	payload := ExecutionPayloadV5{
+		SlotNumber: "0x0",
 		ExecutionPayloadV4: ExecutionPayloadV4{
 			ExecutionPayloadV3: makeTestPayloadV3(blockHash, 100),
 		},
@@ -197,8 +195,9 @@ func TestNewPayloadV5_InvalidBAL(t *testing.T) {
 	api := NewEngineAPI(backend)
 
 	// Build a V5 payload with a wrong BAL.
-	wrongBALData, _ := json.Marshal([]byte{0xde, 0xad, 0xbe, 0xef})
+	wrongBALData, _ := json.Marshal("0xdeadbeef")
 	payload := ExecutionPayloadV5{
+		SlotNumber: "0x0",
 		ExecutionPayloadV4: ExecutionPayloadV4{
 			ExecutionPayloadV3: makeTestPayloadV3(blockHash, 100),
 		},
@@ -288,8 +287,9 @@ func TestNewPayloadV5_UnsupportedFork(t *testing.T) {
 
 	api := NewEngineAPI(backend)
 
-	balData, _ := json.Marshal([]byte{0xc0})
+	balData, _ := json.Marshal("0xc0")
 	payload := ExecutionPayloadV5{
+		SlotNumber: "0x0",
 		ExecutionPayloadV4: ExecutionPayloadV4{
 			ExecutionPayloadV3: makeTestPayloadV3(blockHash, 100),
 		},
@@ -568,10 +568,8 @@ func TestGetPayloadV6_Success(t *testing.T) {
 	}
 }
 
-// TestGetPayloadV6_AlwaysSucceeds verifies that GetPayloadV6 does not perform
-// fork validation - it simply returns whatever payload was built. Fork checks
-// belong in NewPayload, not GetPayload.
-func TestGetPayloadV6_AlwaysSucceeds(t *testing.T) {
+// TestGetPayloadV6_RejectsWrongFork verifies the built timestamp boundary.
+func TestGetPayloadV6_RejectsWrongFork(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 
 	backend := &mockBackend{
@@ -594,7 +592,7 @@ func TestGetPayloadV6_AlwaysSucceeds(t *testing.T) {
 			}, nil
 		},
 		isAmsterdamFn: func(timestamp uint64) bool {
-			return false // Amsterdam not active - GetPayloadV6 should still succeed
+			return false // Amsterdam not active - GetPayloadV6 must reject the wrong fork
 		},
 	}
 
@@ -609,11 +607,8 @@ func TestGetPayloadV6_AlwaysSucceeds(t *testing.T) {
 	if err := json.Unmarshal(resp, &rpcResp); err != nil {
 		t.Fatalf("failed to unmarshal response: %v", err)
 	}
-	if rpcResp.Error != nil {
-		t.Fatalf("GetPayloadV6 returned unexpected error: %v", rpcResp.Error)
-	}
-	if rpcResp.Result == nil {
-		t.Fatal("expected non-nil result from GetPayloadV6")
+	if rpcResp.Error == nil || rpcResp.Error.Code != UnsupportedForkCode {
+		t.Fatalf("wrong-fork payload must be rejected: %+v", rpcResp.Error)
 	}
 }
 
@@ -621,7 +616,7 @@ func TestGetPayloadV6_AlwaysSucceeds(t *testing.T) {
 
 func TestPayloadBuilder_BlockValue(t *testing.T) {
 	// Test block value calculation with the real EngineBackend.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()
@@ -676,7 +671,7 @@ func TestPayloadBuilder_BlockValue(t *testing.T) {
 
 func TestPayloadBuilder_GetPayloadV6(t *testing.T) {
 	// Test GetPayloadV6ByID with the real EngineBackend (Amsterdam config).
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()
@@ -729,7 +724,7 @@ func TestPayloadBuilder_GetPayloadV6(t *testing.T) {
 // --- TestForkchoiceUpdatedV4 with real backend ---
 
 func TestForkchoiceUpdatedV4_RealBackend(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()

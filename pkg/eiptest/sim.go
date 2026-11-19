@@ -9,6 +9,7 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
@@ -87,6 +88,20 @@ func newSim(o *simOptions) (*Sim, error) {
 	cfg, err := o.buildChainConfig()
 	if err != nil {
 		return nil, err
+	}
+	// Owned simulation genesis deploys request contracts before the scheduled fork.
+	// Explicit allocations (including deliberately missing/wrong code) remain authoritative.
+	if cfg.AmsterdamTime != nil {
+		if _, exists := o.alloc[types.BuilderDepositRequestAddress]; !exists {
+			o.alloc[types.BuilderDepositRequestAddress] = config.GenesisAccount{Nonce: 1, Code: eips.BuilderDepositRuntime()}
+		}
+		if _, exists := o.alloc[types.BuilderExitRequestAddress]; !exists {
+			inhibitor := types.Hash{}
+			for i := range inhibitor {
+				inhibitor[i] = 255
+			}
+			o.alloc[types.BuilderExitRequestAddress] = config.GenesisAccount{Nonce: 1, Code: eips.BuilderExitRuntime(), Storage: map[types.Hash]types.Hash{{}: inhibitor}}
+		}
 	}
 	baseFee := o.baseFee
 	if baseFee == nil {

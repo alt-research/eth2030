@@ -23,7 +23,7 @@ func ValidateMessageCode(code uint64) error {
 		GetBlockBodiesMsg, BlockBodiesMsg,
 		NewBlockMsg, NewPooledTransactionHashesMsg,
 		GetPooledTransactionsMsg, PooledTransactionsMsg,
-		GetReceiptsMsg, ReceiptsMsg,
+		GetReceiptsMsg, ReceiptsMsg, BlockRangeUpdateMsg,
 		GetBlockAccessListsMsg, BlockAccessListsMsg:
 		return nil
 	default:
@@ -60,6 +60,8 @@ func MessageName(code uint64) string {
 		return "GetReceipts"
 	case ReceiptsMsg:
 		return "Receipts"
+	case BlockRangeUpdateMsg:
+		return "BlockRangeUpdate"
 	case GetBlockAccessListsMsg:
 		return "GetBlockAccessLists"
 	case BlockAccessListsMsg:

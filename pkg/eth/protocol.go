@@ -7,6 +7,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/p2p"
+	"github.com/eth2030/eth2030/p2p/ethproto"
 )
 
 // Protocol version constants.
@@ -28,7 +29,7 @@ const MaxBodies = 512
 const MaxReceiptsResponseSize = 10 << 20
 
 // MaxAccessLists is the maximum number of block access lists returned in a single response.
-const MaxAccessLists = 64
+const MaxAccessLists = ethproto.MaxBlockAccessLists
 
 // Blockchain defines the interface for blockchain operations needed by the handler.
 type Blockchain interface {

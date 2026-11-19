@@ -613,7 +613,11 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
 	}
 
 	// Gas limit check.
-	if pool.config.IsOsaka {
+	if pool.frameConfig != nil {
+		if err := gas.ValidateTransactionGasForFork(pool.frameConfig, pool.frameTime, tx); err != nil {
+			return err
+		}
+	} else if pool.config.IsOsaka {
 		if err := gas.ValidateTransactionGasLimit(tx.Gas()); err != nil {
 			return err
 		}
@@ -791,30 +795,38 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
 		}
 	}
 
-	// EIP-2930 access list gas accounting: include access list cost in intrinsic gas.
-	// Use Glamsterdam costs when active to match the builder's intrinsic gas check.
-	intrinsicGas := pool.intrinsicGas(tx)
-	// EIP-7702: charge both base cost and empty-account cost per authorization.
-	// The pool cannot recover each authority from state, so it conservatively
-	// charges PerEmptyAccountCost for every entry. This matches the worst case
-	// in the builder (all authorities absent from state) and prevents txs that
-	// can never be mined from entering the pool.
-	if tx.Type() == types.SetCodeTxType {
-		authList := tx.AuthorizationList()
-		intrinsicGas += uint64(len(authList)) * (PerAuthBaseCost + PerEmptyAccountCost)
-	}
-	if tx.Gas() < intrinsicGas {
-		return ErrIntrinsicGas
-	}
-
-	// EIP-7623 / EIP-7976: enforce calldata floor gas (Prague+).
-	// The block processor enforces this floor; txs that fail it are
-	// silently skipped by the builder, wasting pool space. Reject them here.
-	if pool.config.IsPrague && tx.Type() != types.AATxType {
-		floor := CalldataFloorGas(tx.Data(), tx.To() == nil, pool.config.IsGlamsterdan, tx.AccessList())
-		if tx.Gas() < floor {
+	if pool.amsterdamOrdinary(tx) {
+		params, err := gas.CalculateAmsterdamIntrinsic(pool.senderOf(tx), tx.To(), tx.Value(), tx.Data(), tx.AccessList(), uint64(len(tx.AuthorizationList())))
+		if err != nil || params.Validate(tx.Gas()) != nil {
 			return ErrIntrinsicGas
 		}
+	} else {
+		// EIP-2930 access list gas accounting: include access list cost in intrinsic gas.
+		// Use Glamsterdam costs when active to match the builder's intrinsic gas check.
+		intrinsicGas := pool.intrinsicGas(tx)
+		// EIP-7702: charge both base cost and empty-account cost per authorization.
+		// The pool cannot recover each authority from state, so it conservatively
+		// charges PerEmptyAccountCost for every entry. This matches the worst case
+		// in the builder (all authorities absent from state) and prevents txs that
+		// can never be mined from entering the pool.
+		if tx.Type() == types.SetCodeTxType {
+			authList := tx.AuthorizationList()
+			intrinsicGas += uint64(len(authList)) * (PerAuthBaseCost + PerEmptyAccountCost)
+		}
+		if tx.Gas() < intrinsicGas {
+			return ErrIntrinsicGas
+		}
+
+		// EIP-7623 / EIP-7976: enforce calldata floor gas (Prague+).
+		// The block processor enforces this floor; txs that fail it are
+		// silently skipped by the builder, wasting pool space. Reject them here.
+		if pool.config.IsPrague && tx.Type() != types.AATxType {
+			floor := CalldataFloorGas(tx.Data(), tx.To() == nil, pool.config.IsGlamsterdan, tx.AccessList())
+			if tx.Gas() < floor {
+				return ErrIntrinsicGas
+			}
+		}
+
 	}
 
 	// Minimum gas price check.
@@ -909,6 +921,13 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
 }
 
 func (pool *TxPool) intrinsicGas(tx *types.Transaction) uint64 {
+	if pool.amsterdamOrdinary(tx) {
+		params, err := gas.CalculateAmsterdamIntrinsic(pool.senderOf(tx), tx.To(), tx.Value(), tx.Data(), tx.AccessList(), uint64(len(tx.AuthorizationList())))
+		if err != nil {
+			return ^uint64(0)
+		}
+		return params.Gas
+	}
 	if tx.Type() == types.AATxType {
 		gas := types.AABaseCost
 		if aatx, ok := tx.Inner().(*types.AATx); ok {
@@ -1705,4 +1724,8 @@ func (pool *TxPool) SetBlobBaseFee(blobBaseFee *big.Int) {
 	defer pool.mu.Unlock()
 	pool.blobBaseFee = new(big.Int).Set(blobBaseFee)
 	pool.revalidateFrames8141()
+}
+
+func (pool *TxPool) amsterdamOrdinary(tx *types.Transaction) bool {
+	return pool.frameConfig != nil && pool.frameConfig.IsMerge() && pool.frameConfig.IsAmsterdam(pool.frameTime) && tx.Type() <= types.SetCodeTxType
 }

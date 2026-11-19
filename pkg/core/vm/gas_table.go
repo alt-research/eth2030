@@ -637,8 +637,12 @@ func gasCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory, mem
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -657,8 +661,12 @@ func gasCallCodeEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory,
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -673,8 +681,12 @@ func gasDelegateCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Mem
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -689,8 +701,12 @@ func gasStaticCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memor
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -848,8 +864,12 @@ func gasCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memo
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -866,8 +886,12 @@ func gasCallCodeGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory, 
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -881,8 +905,12 @@ func gasDelegateCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -896,8 +924,12 @@ func gasStaticCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }

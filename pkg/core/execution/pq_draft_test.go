@@ -38,6 +38,8 @@ func TestPQDraftActivationAndStateLookup(t *testing.T) {
 	activation := uint64(1000)
 	cfg := *config.TestConfig
 	cfg.PragueTime = nil
+	// Isolate the draft precompile price from the later calldata floor.
+	cfg.AmsterdamTime = nil
 	cfg.GlamsterdanTime = nil
 	cfg.PQDraft = &config.PQDraftConfig{
 		Time: &activation, SigRecover: types.Address{18: 0x70, 19: 1},

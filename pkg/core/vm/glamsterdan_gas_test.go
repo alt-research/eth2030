@@ -273,7 +273,7 @@ func TestGlamsterdanUnchangedPrecompiles(t *testing.T) {
 // inherits all Prague opcodes and only modifies the EIP-7904 opcodes.
 func TestGlamsterdanJumpTableInheritance(t *testing.T) {
 	glamsterdan := NewGlamsterdanJumpTable()
-	prague := NewPragueJumpTable()
+	amsterdam := NewAmsterdamJumpTable()
 
 	// EIP-7904 modified opcodes + EIP-8038/7778/2780 state access opcodes.
 	modified := map[OpCode]bool{
@@ -298,13 +298,13 @@ func TestGlamsterdanJumpTableInheritance(t *testing.T) {
 		if modified[op] {
 			continue
 		}
-		pOp := prague[op]
+		pOp := amsterdam[op]
 		gOp := glamsterdan[op]
 		if pOp == nil && gOp == nil {
 			continue
 		}
 		if pOp == nil || gOp == nil {
-			t.Errorf("opcode 0x%02x: Prague nil=%v Glamsterdan nil=%v",
+			t.Errorf("opcode 0x%02x: Amsterdam nil=%v Glamsterdan nil=%v",
 				i, pOp == nil, gOp == nil)
 			continue
 		}

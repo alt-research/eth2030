@@ -787,8 +787,12 @@ func opCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Sta
 	}
 
 	// GAP-1.2: forward the entire state-creation reservoir to the sub-call.
-	evm.callReservoirForward = contract.StateGasReservoir
-	contract.StateGasReservoir = 0
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	} else {
+		evm.callReservoirForward = contract.StateGasReservoir
+		contract.StateGasReservoir = 0
+	}
 
 	ret, returnGas, err := evm.Call(contract.Address, addr, args, callGas, value)
 	if errors.Is(err, ErrFrameStateGas) {
@@ -796,11 +800,13 @@ func opCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Sta
 	}
 
 	// GAP-1.2: restore parent reservoir with whatever the child did not consume.
-	contract.StateGasReservoir += evm.callReservoirReturn
-	evm.callReservoirReturn = 0
-
-	// Refund unused gas to caller (matching go-ethereum: no stipend subtraction).
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.StateGasReservoir += evm.callReservoirReturn
+		evm.callReservoirReturn = 0
+		contract.Gas += returnGas
+	}
 
 	// Push success/failure
 	if err != nil {
@@ -850,10 +856,17 @@ func opCallCode(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 		callGas += CallStipend
 	}
 
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
 	ret, returnGas, err := evm.CallCode(contract.Address, addr, args, callGas, value)
 
 	// Refund unused gas to caller (matching go-ethereum: no stipend subtraction).
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -894,9 +907,16 @@ func opDelegateCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	// The Run loop already deducted callGasTemp from contract.Gas (as part of dynamic gas).
 	callGas := evm.callGasTemp
 
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
 	ret, returnGas, err := evm.delegateCall(contract.CallerAddress, contract.Address, contract.Value, addr, args, callGas)
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -937,9 +957,16 @@ func opStaticCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stac
 	// The Run loop already deducted callGasTemp from contract.Gas (as part of dynamic gas).
 	callGas := evm.callGasTemp
 
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
 	ret, returnGas, err := evm.StaticCall(contract.Address, addr, args, callGas)
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -979,13 +1006,21 @@ func opCreate(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *S
 	// rule and base gas deductions internally.
 	gas := contract.Gas
 	contract.Gas = 0
+	if evm.amsterdamStateGasActive() {
+		contract.pendingAccountStateGas = 0
+		evm.returnedStateGas = &Contract{StateGasReservoir: contract.StateGasReservoir, StateGasBaseline: contract.StateGasReservoir}
+	}
 
 	ret, addr, returnGas, err := evm.Create(contract.Address, initCode, gas, value)
 	if errors.Is(err, ErrFrameStateGas) {
 		return nil, ErrOutOfGas
 	}
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 	evm.returnData = ret
 
 	if err != nil {
@@ -1018,13 +1053,21 @@ func opCreate2(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *
 	// rule and base gas deductions internally.
 	gas := contract.Gas
 	contract.Gas = 0
+	if evm.amsterdamStateGasActive() {
+		contract.pendingAccountStateGas = 0
+		evm.returnedStateGas = &Contract{StateGasReservoir: contract.StateGasReservoir, StateGasBaseline: contract.StateGasReservoir}
+	}
 
 	ret, addr, returnGas, err := evm.Create2(contract.Address, initCode, gas, value, salt)
 	if errors.Is(err, ErrFrameStateGas) {
 		return nil, ErrOutOfGas
 	}
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 	evm.returnData = ret
 
 	if err != nil {

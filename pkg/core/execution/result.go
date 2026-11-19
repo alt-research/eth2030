@@ -5,6 +5,7 @@ import "github.com/eth2030/eth2030/core/types"
 // ExecutionResult holds the outcome of a transaction execution.
 type ExecutionResult struct {
 	UsedGas         uint64
+	StateGasUsed    uint64 // EIP-8037 net durable state gas
 	BlockGasUsed    uint64 // EIP-7778: pre-refund gas used for block accounting
 	DimStorageGas   uint64 // GAP-2.2: DimStorage gas used (SSTORE state-creation premium)
 	Err             error

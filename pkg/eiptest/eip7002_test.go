@@ -30,6 +30,15 @@ func nativeWithdrawal(s *eiptest.Sim, nonce uint64) (*types.Transaction, []byte)
 	var input [56]byte
 	copy(input[:48], request.ValidatorPubkey[:])
 	binary.BigEndian.PutUint64(input[48:], request.Amount)
-	tx := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), nonce, eiptest.ToPtr(types.WithdrawalRequestAddress), eiptest.Wei(1), input[:], 200_000, bigFeeCap, bigTipCap)
+	tx := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), nonce, eiptest.ToPtr(types.WithdrawalRequestAddress), eiptest.Wei(1), input[:], nativeRequestGas(s), bigFeeCap, bigTipCap)
 	return tx, request.Encode()
+}
+
+// nativeRequestGas budgets the current state-creation charges as well as execution.
+// Keep the Prague lane's original allowance and exercise both through the same queue consumer.
+func nativeRequestGas(s *eiptest.Sim) uint64 {
+	if s.Config().IsAmsterdam(s.CurrentBlock().Time() + 12) {
+		return 1_000_000
+	}
+	return 200_000
 }

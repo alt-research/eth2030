@@ -458,12 +458,12 @@ func TestCumulativeGasWithMixedTxTypes(t *testing.T) {
 
 	// tx1: simple transfer (21000 gas).
 	tx1 := types.NewTransaction(&types.LegacyTx{
-		Nonce: 0, GasPrice: big.NewInt(1), Gas: 21000,
+		Nonce: 0, GasPrice: big.NewInt(1), Gas: 300000,
 		To: &receiver, Value: big.NewInt(1),
 	})
 	tx1.SetSender(sender)
 
-	// tx2: contract call (more than 21000 gas).
+	// tx2: contract call (more than its 15000 intrinsic gas).
 	tx2 := types.NewTransaction(&types.LegacyTx{
 		Nonce: 1, GasPrice: big.NewInt(1), Gas: 100000,
 		To: &contractAddr, Value: big.NewInt(0),
@@ -501,6 +501,9 @@ func TestCumulativeGasWithMixedTxTypes(t *testing.T) {
 	// Verify cumulative gas is monotonically increasing.
 	var prevCum uint64
 	for i, r := range receipts {
+		if r.Status != types.ReceiptStatusSuccessful {
+			t.Fatalf("mixed transaction %d failed", i)
+		}
 		if r.CumulativeGasUsed <= prevCum && i > 0 {
 			t.Errorf("receipt[%d].CumulativeGasUsed (%d) should be > receipt[%d] (%d)",
 				i, r.CumulativeGasUsed, i-1, prevCum)
@@ -518,9 +521,9 @@ func TestCumulativeGasWithMixedTxTypes(t *testing.T) {
 		}
 	}
 
-	// The contract call should use more gas than 21000.
-	if receipts[1].GasUsed <= 21000 {
-		t.Errorf("contract call receipt should use more than 21000 gas, used %d",
+	// The contract call exceeds its current 15000 zero-value intrinsic cost.
+	if receipts[1].GasUsed <= 15000 {
+		t.Errorf("contract call receipt should use more than its 15000 intrinsic gas, used %d",
 			receipts[1].GasUsed)
 	}
 }

@@ -648,7 +648,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	for _, r := range receipts {
 		totalBlockGasUsed += r.BlockGasUsed
 	}
-	totalGasUsed = types.BlockGasTotal(receipts, isGlamsterdan)
+	totalGasUsed = types.BlockGasTotal(receipts, isGlamsterdan || isAmsterdam)
 	if header.GasUsed != totalGasUsed {
 		err := fmt.Errorf("%w: header=%d computed=%d", block.ErrInvalidGasUsedTotal, header.GasUsed, totalGasUsed)
 		blockchainLog.Warn("block_gas_mismatch",

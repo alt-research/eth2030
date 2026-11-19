@@ -30,7 +30,7 @@ func TestE2EFullBlockLifecycle(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -269,7 +269,7 @@ func TestE2EContractDeployAndCall(t *testing.T) {
 	createTx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(10),
-		Gas:      100000,
+		Gas:      300_000,
 		To:       nil, // contract creation
 		Value:    big.NewInt(0),
 		Data:     initCode,

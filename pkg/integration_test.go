@@ -116,7 +116,7 @@ func TestFullTransactionLifecycle(t *testing.T) {
 	tx := signLegacyTxInteg(t, key, chainID, &types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(10),
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &recipient,
 		Value:    etherI(1),
 	})
@@ -144,8 +144,8 @@ func TestFullTransactionLifecycle(t *testing.T) {
 	if receipts[0].Status != types.ReceiptStatusSuccessful {
 		t.Fatalf("receipt status = %d, want success", receipts[0].Status)
 	}
-	if receipts[0].GasUsed != 21000 {
-		t.Errorf("gas used = %d, want 21000", receipts[0].GasUsed)
+	if receipts[0].GasUsed != 204600 {
+		t.Errorf("gas used = %d, want 204600", receipts[0].GasUsed)
 	}
 
 	// Verify state changes.
@@ -180,7 +180,7 @@ func TestMultipleTransactionsInBlock(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: gasPrice,
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    transferAmount,
 		})
@@ -223,10 +223,10 @@ func TestMultipleTransactionsInBlock(t *testing.T) {
 		t.Errorf("sender nonce = %d, want 5", nonce)
 	}
 
-	// Cumulative gas: 5 * 21000 = 105000.
+	// First transfer creates a leaf; subsequent transfers pay the 21000 intrinsic.
 	lastReceipt := receipts[len(receipts)-1]
-	if lastReceipt.CumulativeGasUsed != 5*21000 {
-		t.Errorf("cumulative gas = %d, want %d", lastReceipt.CumulativeGasUsed, 5*21000)
+	if lastReceipt.CumulativeGasUsed != (204600 + 4*21000) {
+		t.Errorf("cumulative gas = %d, want %d", lastReceipt.CumulativeGasUsed, (204600 + 4*21000))
 	}
 }
 
@@ -253,7 +253,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    0,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -289,7 +289,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 			ChainID:  chainID,
 			Nonce:    0,
 			GasPrice: big.NewInt(10),
-			Gas:      25000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 			AccessList: types.AccessList{
@@ -329,7 +329,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 			Nonce:     0,
 			GasTipCap: big.NewInt(2),
 			GasFeeCap: big.NewInt(20),
-			Gas:       21000,
+			Gas:       300_000,
 			To:        &receiver,
 			Value:     big.NewInt(100),
 		})
@@ -367,7 +367,7 @@ func TestTransactionTypeMatrix(t *testing.T) {
 			Nonce:      0,
 			GasTipCap:  big.NewInt(2),
 			GasFeeCap:  big.NewInt(20),
-			Gas:        21000,
+			Gas:        300_000,
 			To:         receiver,
 			Value:      big.NewInt(100),
 			BlobFeeCap: big.NewInt(100),
@@ -440,7 +440,7 @@ func TestBlockBuildAndValidate(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -485,17 +485,17 @@ func TestBlockBuildAndValidate(t *testing.T) {
 		}
 	}
 
-	// Gas used should be 3 * 21000.
+	// First transfer creates a leaf; the next two reuse it.
 	totalGas := uint64(0)
 	for _, r := range receipts {
 		totalGas += r.GasUsed
 	}
-	if totalGas != 3*21000 {
-		t.Errorf("total gas = %d, want %d", totalGas, 3*21000)
+	if totalGas != (204600 + 2*21000) {
+		t.Errorf("total gas = %d, want %d", totalGas, (204600 + 2*21000))
 	}
 
 	// Sender balance: initial - 3*value - 3*gas*price
-	gasCost := 3 * 21000 * 10
+	gasCost := (204600 + 2*21000) * 10
 	valueCost := 3 * 100
 	expectedBal := int64(1_000_000_000_000 - gasCost - valueCost)
 	if bal := statedb.GetBalance(sender); bal.Int64() != expectedBal {
@@ -521,7 +521,7 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    0,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -537,7 +537,9 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 		block := types.NewBlock(header, &types.Body{Transactions: []*types.Transaction{tx}})
 
 		// Pre-Glamsterdam config.
-		processor := execution.NewStateProcessor(coreconfig.TestConfig)
+		cfg := *coreconfig.TestConfig
+		cfg.AmsterdamTime = nil
+		processor := execution.NewStateProcessor(&cfg)
 		receipts, err := processor.Process(block, statedb)
 		if err != nil {
 			t.Fatalf("Process (pre-Glamsterdam): %v", err)
@@ -554,14 +556,13 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 	t.Run("Glamsterdam", func(t *testing.T) {
 		statedb := newBuilderRequestTestState()
 		statedb.AddBalance(sender, big.NewInt(1_000_000_000_000))
-		// Pre-create receiver so EIP-2780 GAS_NEW_ACCOUNT (25000) surcharge
-		// does not apply -- we want to test the reduced base gas path.
-		statedb.AddBalance(receiver, big.NewInt(0))
+		// A nonce-one receiver is live under EIP-161 and needs no new account leaf.
+		statedb.SetNonce(receiver, 1)
 
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    0,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -576,7 +577,7 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 		}
 		block := types.NewBlock(header, &types.Body{Transactions: []*types.Transaction{tx}})
 
-		// Glamsterdam config has reduced base gas (4500 vs 21000).
+		// Canonical Amsterdam selects the current merged EIP-2780 schedule.
 		processor := execution.NewStateProcessor(coreconfig.TestConfigGlamsterdan)
 		receipts, err := processor.Process(block, statedb)
 		if err != nil {
@@ -585,11 +586,9 @@ func TestGlamsterdamForkTransition(t *testing.T) {
 		if receipts[0].Status != types.ReceiptStatusSuccessful {
 			t.Errorf("Glamsterdam tx failed: status = %d", receipts[0].Status)
 		}
-		// Under Glamsterdam (EIP-2780), intrinsic gas is reduced (4500 base
-		// vs legacy 21000). Gas used should be well under 21000 for a
-		// simple transfer to an existing account.
-		if receipts[0].GasUsed >= 21000 {
-			t.Errorf("Glamsterdam gas used = %d, want < 21000", receipts[0].GasUsed)
+		// The current schedule charges 12000 + 3000 + 6000 for this value transfer.
+		if receipts[0].GasUsed != 21000 {
+			t.Errorf("Glamsterdam gas used = %d, want 21000 (12k sender + 3k recipient + 6k value)", receipts[0].GasUsed)
 		}
 		if receipts[0].GasUsed == 0 {
 			t.Error("Glamsterdam gas used should not be 0")
@@ -617,7 +616,7 @@ func TestMixedTypedTransactionsBlock(t *testing.T) {
 	legacyTx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(20),
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiver,
 		Value:    big.NewInt(1000),
 	})
@@ -629,7 +628,7 @@ func TestMixedTypedTransactionsBlock(t *testing.T) {
 		Nonce:     0,
 		GasTipCap: big.NewInt(2),
 		GasFeeCap: big.NewInt(30),
-		Gas:       21000,
+		Gas:       300_000,
 		To:        &receiver,
 		Value:     big.NewInt(2000),
 	})

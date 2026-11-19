@@ -76,7 +76,7 @@ func TestEIP8025_BALAnchoredExecutionProof(t *testing.T) {
 		0x00,
 	})
 	tx := eiptest.DynamicFee(s.Config().ChainID, s.Alice(), s.Nonce(s.Alice().Address),
-		eiptest.ToPtr(c), nil, nil, 100_000, bigFeeCap, bigTipCap)
+		eiptest.ToPtr(c), nil, nil, 300_000, bigFeeCap, bigTipCap)
 	r := s.Commit(tx)
 	eiptest.ExpectSuccess(t, r, 0)
 	eiptest.ExpectBAL(t, r)

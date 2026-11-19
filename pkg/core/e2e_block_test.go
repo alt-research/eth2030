@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
@@ -36,7 +35,7 @@ func TestE2E_BlockCreation(t *testing.T) {
 		tx := signLegacyTx(t, key, config.TestConfig.ChainID, &types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &recipient,
 			Value:    big.NewInt(int64((i + 1) * 1000)),
 		})
@@ -76,23 +75,31 @@ func TestE2E_BlockCreation(t *testing.T) {
 		if r.Status != types.ReceiptStatusSuccessful {
 			t.Errorf("receipt[%d] status = %d, want success", i, r.Status)
 		}
-		if r.GasUsed != execution.TxGas {
-			t.Errorf("receipt[%d] gas used = %d, want %d", i, r.GasUsed, execution.TxGas)
+		wantGas := uint64(21000)
+		if i == 0 {
+			wantGas = 204600
+		}
+		if r.GasUsed != wantGas {
+			t.Errorf("receipt[%d] gas used = %d, want %d", i, r.GasUsed, wantGas)
 		}
 	}
 
 	// Verify cumulative gas is correct: 21000, 42000, 63000.
 	expectedCumGas := uint64(0)
 	for i, r := range receipts {
-		expectedCumGas += execution.TxGas
+		if i == 0 {
+			expectedCumGas += 204600
+		} else {
+			expectedCumGas += 21000
+		}
 		if r.CumulativeGasUsed != expectedCumGas {
 			t.Errorf("receipt[%d] cumulative gas = %d, want %d", i, r.CumulativeGasUsed, expectedCumGas)
 		}
 	}
 
 	// Verify block gas used matches total.
-	if block.GasUsed() != 3*execution.TxGas {
-		t.Errorf("block gas used = %d, want %d", block.GasUsed(), 3*execution.TxGas)
+	if block.GasUsed() != uint64(183600) {
+		t.Errorf("block gas used = %d, want %d", block.GasUsed(), uint64(183600))
 	}
 
 	// Verify recipient balance.

@@ -147,7 +147,7 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 				t.Helper()
 				input := make([]byte, 64)
 				input[31], input[63] = byte(slot), byte(value)
-				tx, err := gethtypes.SignTx(gethtypes.NewTransaction(nonce, gethcommon.Address(contract), new(big.Int), 100_000, big.NewInt(2_000_000_000), input), gethtypes.LatestSignerForChainID(big.NewInt(1337)), key)
+				tx, err := gethtypes.SignTx(gethtypes.NewTransaction(nonce, gethcommon.Address(contract), new(big.Int), 200_000, big.NewInt(2_000_000_000), input), gethtypes.LatestSignerForChainID(big.NewInt(1337)), key)
 				if err != nil {
 					t.Fatal(err)
 				}

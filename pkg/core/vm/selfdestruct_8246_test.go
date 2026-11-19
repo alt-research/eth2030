@@ -16,6 +16,7 @@ func TestEIP8246CreationJournalRollback(t *testing.T) {
 	db.SetCode(parent, []byte{0x60, 0, 0x60, 0, 0x60, 0, 0xf0, 0x50, 0x60, 0, 0x60, 0, 0xfd})
 	evm := NewEVMWithState(BlockContext{}, TxContext{}, Config{}, db)
 	evm.SetForkRules(ForkRules{IsAmsterdam: true})
+	evm.SetJumpTable(SelectJumpTable(ForkRules{IsAmsterdam: true}))
 	if _, _, err := evm.Call(sender, parent, nil, 200000, new(big.Int)); err != ErrExecutionReverted {
 		t.Fatalf("want revert, got %v", err)
 	}

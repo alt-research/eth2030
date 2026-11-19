@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -249,7 +250,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 		return nil, 0, ErrOutOfGas
 	}
 	output, err := p.Run(input)
-	if _, standardBLS := p.(eip2537Precompile); standardBLS && err != nil {
+	if err != nil {
 		return nil, 0, err
 	}
 	return output, gas - gasCost, err
@@ -451,6 +452,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 			}
 			// Align to 32-byte words.
 			if memSize > 0 {
+				if memSize > math.MaxUint64-31 {
+					return nil, ErrOutOfGas
+				}
 				memorySize = (memSize + 31) / 32 * 32
 			}
 		}

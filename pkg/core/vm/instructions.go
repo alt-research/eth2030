@@ -1138,7 +1138,7 @@ func opExtcodehash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 		if evm.balTracker != nil {
 			evm.balTracker.RecordAddressTouch(addr)
 		}
-		if !evm.StateDB.Exist(addr) {
+		if evm.StateDB.Empty(addr) {
 			slot.SetUint64(0)
 		} else {
 			hash := evm.StateDB.GetCodeHash(addr)

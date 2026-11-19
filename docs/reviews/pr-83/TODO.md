@@ -1,5 +1,7 @@
 # PR 83: remaining work and completion criteria
 
+> Post-merge update, 2026-11-19: PR 83 and method reviews 85–87 are now merged at EL master `5fbc7c13`. A83-06 is closed for the demonstrated development integration, and the former Draft/PR-readiness part of A83-07 is past. Final protocol/release acceptance remains open. The [deduplicated whole-program inventory](../../plans/glamsterdam/POST_MERGE_STATUS_20261119.md) supersedes the old pending-PR statements below. Fresh master still reproduces A83-01, and A83-02 remains absent. The original audit snapshot is retained.
+
 Audit date: 2026-11-19. Audited implementation head: `a339283acb74c71377da7a50ce734d3bcaa1ba71`. PR 83 is open and Draft. Master observed at `d31bd720` includes PRs 80–82. This document is a work inventory, not permission to merge or a new gas-model choice. [Machine-readable audit evidence](completion-audit-20261119.json).
 
 ## Verdict and evidence boundaries
@@ -65,7 +67,7 @@ The 42 signed Amsterdam cases comprise 32 type-2 and 10 type-4 envelopes. A type
 
 ### A83-06 — Integrate already implemented method consumers (P1, integration/review)
 
-- [ ] Review and compose #85 → #86 → #87 with the exact accepted gas head; refresh Draft/PR-description claims about unfinished method implementation.
+- [x] Development integration: PR 83 and #85–#87 merged into `5fbc7c13`; the combined selected HTTP/historical/override/gas tests pass on the current mainline source. Complete official API/full-client qualification remains open under R04/R10, with no obligation waived.
 
 **Evidence:** all three remain separate open PRs at audit. They implement method-specific call/estimate/access-list execution, stateful simulation and real nested/dimensional tracing. Their code and CI exist. PR 83 itself still has the older method routes.
 
@@ -73,7 +75,7 @@ The 42 signed Amsterdam cases comprise 32 type-2 and 10 type-4 envelopes. A type
 
 ### A83-07 — Final protocol and merge-readiness decision (P0 review gate, not an automatic rewrite)
 
-- [ ] Complete the independent gas review, state the accepted revision and application implications, and update Draft/description only after an explicit readiness decision.
+- [ ] Final protocol/release review remains open as R13. The development target and PR merge/readiness decision are already recorded by the user's selection and merge; do not request that authorization again or keep counting Draft status as unfinished.
 
 The standing user decision is to implement the currently merged LIFO model and retain final design review. At audit, upstream master `b055feec` has identical 2780/8037/8038 text to selected pin `3db38a3`; there is no observed drift in those files to repair. [12581](https://github.com/ethereum/EIPs/pull/12581) and [12582](https://github.com/ethereum/EIPs/pull/12582) are still open/unmerged. Implementing them now is **not** an unconditional missing task. If adopted later, isolate the model change in a feature PR and regenerate all normative/reference/application evidence. No final public-network activation timestamp is invented here. PR 83 has no submitted review at the audit snapshot; green CI does not resolve that review decision.
 

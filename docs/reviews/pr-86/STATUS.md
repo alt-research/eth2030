@@ -1,3 +1,13 @@
+## Sequential simulation dependency/CI repair (2026-11-19)
+
+Original head: `50be550b75e595598cbde969f4d0aed433d5c3a7`. Merged master `4f659fd096fe850b4a2dddaf906b05a853c59631`, then repaired existing method dependency PR 85 (`c41e61d6`). No nested-tracing feature is imported. Existing Draft gas and selected API/development boundaries are retained.
+
+Conflict resolution keeps canonical EIP-7778 activation, the ordinary zero-policy wrapper and validation-aware simulation setup. Disabled validation may normalize the nonce; enabled validation retains its checks. Master's early ordinary creation-input rejection remains before BAL/fees/nonce mutation. SELFDESTRUCT uses the existing request-owned recordETHTransfer observer, whose self/zero/fork guards preserve normal consensus logs while retaining pre-Amsterdam synthetic simulation observations. It does not reintroduce Burn events or emit transfers twice.
+
+Original failed CI 44477274675 listed the inherited blob/header formatting files. Repaired dependencies/master remove those exact failures. Full Go 1.26.11 tests, integration (`./core/... ./p2p/... ./eiptest`), race (`./core/vm ./core/execution ./rpc/... ./node/... ./eiptest`), whole-module formatting/vet/build all pass. Existing actual HTTP validation modes, signed/override/ancestry, complete commitments, virtual transfer rollback and canonical-state isolation assertions are preserved. Logs: `/tmp/eth2030-pr86-{full,integration,race}.log`.
+
+Shared root tracking is unchanged. The branch is prepared for non-forced publication and exact-head/no-conflict/fresh-CI verification before completion. No upstream merge or final API/protocol adoption is performed.
+
 # PR 86 tracking cleanup status
 
 Original review head: `7d79bbc5cd610cacca29d72285c664a6e5d1b19c`. Merge base for preserved records: `a1008f472ca63950cfb22515ce8b795d21e913bd`. Target master: `98716284b049933888bcd68d64c1957004d759b2`. Shared tracking policy: `42a9ceb86dea2fe4a74f01fd5e2360d6f21af0e7`. The sections below preserve this branch snapshot, including any inherited feature records; their historical validation is not a new result for this cleanup. The exact original diff, including removed text, is in [legacy-tracking.patch](legacy-tracking.patch).

@@ -15,7 +15,7 @@ import (
 )
 
 func TestOriginalRecoveringCLWireBindsIndependentCanonicalHeaders(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("..", "..", "docs", "reviews", "stale-canonical-forkchoice", "ORIGINAL_WIRE.json"))
+	data, err := os.ReadFile(filepath.Join("..", "..", "docs", "reviews", "pr-104", "ORIGINAL_WIRE.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

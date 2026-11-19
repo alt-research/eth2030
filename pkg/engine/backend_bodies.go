@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"github.com/eth2030/eth2030/bal"
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
 )
@@ -48,4 +50,34 @@ func (b *EngineBackend) GetPayloadBodiesByHash(hashes []types.Hash) ([]*enginepa
 // P1: Uses fine-grained locks for better concurrency.
 func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*enginepayload.ExecutionPayloadBodyV2, error) {
 	return b.loadPayloadBodiesByRange(start, count), nil
+}
+
+// isBALRetainedForBlocks uses actual beacon slots when both are known.
+// A block-number fallback conservatively keeps more data across missed slots.
+func isBALRetainedForBlocks(head, block *types.Block) bool {
+	if head == nil {
+		return true
+	}
+	h, b := head.Header(), block.Header()
+	if h.SlotNumber != nil && b.SlotNumber != nil {
+		return rawdb.IsBALRetained(*h.SlotNumber, *b.SlotNumber)
+	}
+	return rawdb.IsBALRetained(head.NumberU64(), block.NumberU64())
+}
+
+// historicalBALBytes can recover the canonical empty list from its commitment
+// when no cache entry exists (notably an Amsterdam genesis). Other cache misses
+// remain unavailable: an empty list must never stand in for unknown BAL data.
+func historicalBALBytes(head, block *types.Block, cached *bal.BlockAccessList) []byte {
+	if !isBALRetainedForBlocks(head, block) {
+		return nil
+	}
+	if cached != nil {
+		encoded, _ := cached.EncodeRLP()
+		return encoded
+	}
+	if commit := block.Header().BlockAccessListHash; commit != nil && *commit == bal.NewBlockAccessList().Hash() {
+		return []byte{0xc0}
+	}
+	return nil
 }

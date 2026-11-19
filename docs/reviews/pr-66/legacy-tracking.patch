@@ -1,0 +1,41 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..9f79e0f2 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,18 @@
++## Glamsterdam historical BAL retention
++
++- [x] Revalidate merged canonical body wire/storage and read the current EIP-7928 retention requirement.
++- [x] Reproduce the obsolete availability window through the real Engine body consumer.
++- [x] Use the 14,299-epoch slot window, preserve conservative fallback and body availability.
++- [x] Verify affected consumers, storage regressions, build and prepare a separate PR.
++
+ # Lean4 Verification Check-list
+ 
++## Empty committed historical BAL recovery (2026-11-18)
++
++- [x] Reproduce an empty BAL cache miss without hiding its execution body.
++- [x] Regenerate only the header-committed empty list inside retention, for hash and range APIs.
++- [x] Verify affected suites and local build, then update PR 66.
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..99ab7ec1 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,13 @@
++## Historical empty BAL cache recovery (2026-11-18)
++
++The bounded native Engine backend now regenerates the canonical empty BAL only when its header commitment matches, even without a cached BAL object. Both historical body APIs retain the execution body; nonempty/unknown commitments stay unavailable. This extends PR 66's slot-based retention qualification.
++
++## Glamsterdam BAL availability window (2026-11-18)
++
++Branch `feat/glamsterdam-bal-retention` updates EIP-7928 availability to 14,299 epochs. The bounded Engine backend uses actual header slots when available, with a conservative block-number fallback for legacy headers; both ByHash and ByRange preserve the body when BAL is unavailable. The production chain backend already persists validated canonical BALs on mainline and retains them beyond the minimum window.
++
++Tests exercise the prior-window gap, exact cutoff, outside cutoff and missed slots through both Engine body APIs. A targeted mutation restoring 3,533 epochs fails the intended availability assertions. Affected storage/Engine/node/eiptest suites, build and targeted vet passed. This closes the obsolete-window subtask of GL-040; physical pruning, complete independent CL/recovery and full network qualification remain separate gates. [Evidence](docs/verification/glamsterdam-bal-retention-20261118.md).
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

@@ -1,3 +1,17 @@
+## PR 65 conflict resolution (2026-11-19)
+
+- [x] Fetch and verify the exact PR head and current master without changing the original checkout.
+- [x] Merge current master while preserving the EIP-7954 review and latest program documentation.
+- [x] Run affected tests, race/vet and local build; update STATUS.md.
+- [x] Push only the updated PR 65 branch and confirm GitHub mergeability (mergeable=true; CI pending).
+
+## Glamsterdam EIP-7954 contract limits
+
+- [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
+- [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.
+- [x] Correct fork-gated limits and reject oversized creation transactions before mutation.
+- [x] Verify affected packages, build and prepare the separate feature review.
+
 ## Tracing review and merge handoff (2026-11-19)
 
 - [x] Record PR 87, exact local/SDK/mutation qualification and immutable heads.

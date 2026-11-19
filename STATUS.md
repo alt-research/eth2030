@@ -1,3 +1,9 @@
+## PR 65 conflict resolution (2026-11-19)
+
+Merged current master `d6732d3c8f67b94d433a8d7b38d2e18e58a31fcc` (PR 64) into the existing contract-limit review from `a1008f472ca63950cfb22515ce8b795d21e913bd`. Resolved only CHECK.md and STATUS.md by retaining both the EIP-7954 feature evidence and the newer program/merge-review records. The complete `pkg/` tree remains identical to the prior PR 65 head; this update introduces no execution behavior changes.
+
+Validation passed: `go test -count=1 ./core/config ./core/vm ./core/execution ./txpool`, the same four packages with `-race`, `go vet` for those packages, and `go build ./...`, all from `pkg/`. Work was isolated in `fix/pr65-conflicts`; the original dirty checkout and other feature worktrees were preserved. Merge commit `97fecbf78ca49725fa86e9e2bc525e525ebeba16` was pushed to the existing PR 65 branch. GitHub confirmed `mergeable=true` against master `d6732d3c`; seven CI check runs were still in progress, with merge state `blocked` and no submitted review at verification. This confirms conflict resolution, not completion of CI or approval. No upstream merge was performed.
+
 ## Current work complete; stopped for merge review (2026-11-19)
 
 PR 87 publishes nested/dimensional tracing with full 212/tagged 27/race 48/vet/build, nine independent SDK classic trees, seventeen mutations and a five-package composition repeat. Implementation is stopped at the user's request. [Merge review](docs/plans/glamsterdam/MERGE_REVIEW.md) records dependencies, Draft 83, lack of observed positive fork-head CI evidence and remaining CL/fixture/process/resource/release gates. No upstream PR is merged; the original checkout and unrelated dirt remain preserved.
@@ -73,6 +79,12 @@ No review is marked merged or release-qualified here. The [implementation tracke
 Started the 33-task completion plan on isolated branch `feat/glamsterdam-baseline`, based on freshly fetched `origin/master` at `38ea9259`. Imported the dated plan/audits without replacing newer mainline work. [Implementation tracker](docs/plans/glamsterdam/IMPLEMENTATION.md).
 
 Revalidation finds BAL/slot canonical headers, execution-slot propagation, canonical persisted Engine bodies and the old tagged expectation already repaired on mainline. Those defects must not be reimplemented from the stale audit branch. The latest targeted core/Engine/node/eiptest suite is green; source/spec decisions and remaining size/factory/retention/RPC/gas/network work remain under qualification. Large functional changes will use separate branches and PRs.
+
+## Glamsterdam EIP-7954 limits (2026-11-18)
+
+Branch `feat/glamsterdam-contract-limits` updates deployed/initcode limits to the published 64/128 KiB EIP-7954 revision, retaining pre-fork limits. Activation follows canonical Amsterdam independently of the private gas-repricing timestamp. Oversized Shanghai+ creation transactions are rejected before fees/nonce/gas-pool mutation, and post-fork pool envelope policy leaves space for a valid maximum-size initcode transaction.
+
+New CREATE/CREATE2 exact-limit tests and transaction/pool boundary regressions first failed on the baseline for the intended limits/admission reasons, then passed. Affected core/txpool/Engine/node/RPC/eiptest suites, local full build and targeted vet passed. This closes the size/admission portion of GL-030; the coherent gas model, complete 8024 qualification and independent-client release gates remain separate work. [Evidence](docs/verification/glamsterdam-7954-20261118.md).
 
 ## Merged roadmap and homepage progress (2026-11-18)
 

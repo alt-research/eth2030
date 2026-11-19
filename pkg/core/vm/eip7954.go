@@ -3,15 +3,15 @@ package vm
 // EIP-7954: Increase Maximum Contract Size.
 //
 // Raises the deployed contract code size limit from 24,576 bytes (24 KiB) to
-// 32,768 bytes (32 KiB) and the init code size limit from 49,152 bytes (48 KiB)
-// to 65,536 bytes (64 KiB).
+// 65,536 bytes (64 KiB) and the init code size limit from 49,152 bytes (48 KiB)
+// to 131,072 bytes (128 KiB).
 
 const (
-	// MaxCodeSizeGlamsterdam is the EIP-7954 max deployed code size (32 KiB).
-	MaxCodeSizeGlamsterdam = 32768 // 0x8000
+	// MaxCodeSizeGlamsterdam is the EIP-7954 max deployed code size (64 KiB).
+	MaxCodeSizeGlamsterdam = 65536 // 0x10000
 
-	// MaxInitCodeSizeGlamsterdam is the EIP-7954 max init code size (64 KiB).
-	MaxInitCodeSizeGlamsterdam = 65536 // 0x10000
+	// MaxInitCodeSizeGlamsterdam is the EIP-7954 max init code size (128 KiB).
+	MaxInitCodeSizeGlamsterdam = 131072 // 0x20000
 )
 
 // MaxCodeSizeForFork returns the maximum deployed contract code size for the

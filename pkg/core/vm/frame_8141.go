@@ -689,9 +689,5 @@ func opFrameSelfdestruct8141(pc *uint64, evm *EVM, contract *Contract, memory *M
 			return nil, err
 		}
 	}
-	ret, err := opSelfdestruct(pc, evm, contract, memory, stack)
-	if err == nil && evm.frame8141.created[contract.Address] {
-		evm.StateDB.SelfDestruct(contract.Address)
-	}
-	return ret, err
+	return opSelfdestruct(pc, evm, contract, memory, stack)
 }

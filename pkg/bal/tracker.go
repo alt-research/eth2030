@@ -1,6 +1,7 @@
 package bal
 
 import (
+	"bytes"
 	"math/big"
 	"sort"
 
@@ -19,23 +20,27 @@ type slotKey struct {
 // AccessTracker records state accesses during block execution and
 // produces a BlockAccessList from the recorded data.
 type AccessTracker struct {
-	reads          map[slotKey]types.Hash    // slot -> value read
-	changes        map[slotKey][2]types.Hash // slot -> [old, new]
-	balanceChanges map[addrKey]*BalanceChange
-	nonceChanges   map[addrKey]*NonceChange
-	codeChanges    map[addrKey]*CodeChange
-	touchedAddrs   map[addrKey]struct{}
+	initialBalances map[types.Address]*big.Int
+	initialNonces   map[types.Address]uint64
+	reads           map[slotKey]types.Hash    // slot -> value read
+	changes         map[slotKey][2]types.Hash // slot -> [old, new]
+	balanceChanges  map[addrKey]*BalanceChange
+	nonceChanges    map[addrKey]*NonceChange
+	codeChanges     map[addrKey]*CodeChange
+	touchedAddrs    map[addrKey]struct{}
 }
 
 // NewTracker creates a new AccessTracker with initialized maps.
 func NewTracker() *AccessTracker {
 	return &AccessTracker{
-		reads:          make(map[slotKey]types.Hash),
-		changes:        make(map[slotKey][2]types.Hash),
-		balanceChanges: make(map[addrKey]*BalanceChange),
-		nonceChanges:   make(map[addrKey]*NonceChange),
-		codeChanges:    make(map[addrKey]*CodeChange),
-		touchedAddrs:   make(map[addrKey]struct{}),
+		initialBalances: make(map[types.Address]*big.Int),
+		initialNonces:   make(map[types.Address]uint64),
+		reads:           make(map[slotKey]types.Hash),
+		changes:         make(map[slotKey][2]types.Hash),
+		balanceChanges:  make(map[addrKey]*BalanceChange),
+		nonceChanges:    make(map[addrKey]*NonceChange),
+		codeChanges:     make(map[addrKey]*CodeChange),
+		touchedAddrs:    make(map[addrKey]struct{}),
 	}
 }
 
@@ -49,12 +54,21 @@ func (t *AccessTracker) RecordStorageRead(addr types.Address, slot types.Hash, v
 // RecordStorageChange records a storage slot modification.
 func (t *AccessTracker) RecordStorageChange(addr types.Address, slot, oldVal, newVal types.Hash) {
 	key := slotKey{Addr: addr, Slot: slot}
+	if previous, ok := t.changes[key]; ok {
+		oldVal = previous[0]
+	}
 	t.changes[key] = [2]types.Hash{oldVal, newVal}
 	t.touchedAddrs[addr] = struct{}{}
 }
 
 // RecordBalanceChange records a balance modification.
 func (t *AccessTracker) RecordBalanceChange(addr types.Address, oldBal, newBal *big.Int) {
+	if initial, ok := t.initialBalances[addr]; ok {
+		oldBal = initial
+	}
+	if previous, ok := t.balanceChanges[addr]; ok {
+		oldBal = previous.OldValue
+	}
 	t.balanceChanges[addr] = &BalanceChange{
 		OldValue: new(big.Int).Set(oldBal),
 		NewValue: new(big.Int).Set(newBal),
@@ -64,6 +78,12 @@ func (t *AccessTracker) RecordBalanceChange(addr types.Address, oldBal, newBal *
 
 // RecordNonceChange records a nonce modification.
 func (t *AccessTracker) RecordNonceChange(addr types.Address, oldNonce, newNonce uint64) {
+	if initial, ok := t.initialNonces[addr]; ok {
+		oldNonce = initial
+	}
+	if previous, ok := t.nonceChanges[addr]; ok {
+		oldNonce = previous.OldValue
+	}
 	t.nonceChanges[addr] = &NonceChange{OldValue: oldNonce, NewValue: newNonce}
 	t.touchedAddrs[addr] = struct{}{}
 }
@@ -77,6 +97,9 @@ func (t *AccessTracker) RecordAddressTouch(addr types.Address) {
 
 // RecordCodeChange records a code modification.
 func (t *AccessTracker) RecordCodeChange(addr types.Address, oldCode, newCode []byte) {
+	if previous, ok := t.codeChanges[addr]; ok {
+		oldCode = previous.OldCode
+	}
 	cc := &CodeChange{}
 	if oldCode != nil {
 		cc.OldCode = make([]byte, len(oldCode))
@@ -155,6 +178,8 @@ func (t *AccessTracker) Build(txIndex uint64) *BlockAccessList {
 
 // Reset clears all recorded accesses so the tracker can be reused.
 func (t *AccessTracker) Reset() {
+	t.initialBalances = make(map[types.Address]*big.Int)
+	t.initialNonces = make(map[types.Address]uint64)
 	t.reads = make(map[slotKey]types.Hash)
 	t.changes = make(map[slotKey][2]types.Hash)
 	t.balanceChanges = make(map[addrKey]*BalanceChange)
@@ -181,4 +206,54 @@ func hashLess(a, b types.Hash) bool {
 		}
 	}
 	return false
+}
+
+// SeedAccount retains a transaction-boundary baseline without recording an
+// access. Upfront fees and the transaction nonce can precede EVM BAL hooks.
+func (t *AccessTracker) SeedAccount(address types.Address, balance *big.Int, nonce uint64) {
+	if _, ok := t.initialBalances[address]; !ok {
+		t.initialBalances[address] = new(big.Int).Set(balance)
+	}
+	if _, ok := t.initialNonces[address]; !ok {
+		t.initialNonces[address] = nonce
+	}
+}
+
+// Reconcile discards rolled-back writes and transient changes using finalized
+// transaction state. Accesses remain recorded, including no-op and reverted
+// SSTOREs, which become storage reads under EIP-7928.
+func (t *AccessTracker) Reconcile(db interface {
+	GetState(types.Address, types.Hash) types.Hash
+	GetBalance(types.Address) *big.Int
+	GetNonce(types.Address) uint64
+	GetCode(types.Address) []byte
+}) {
+	for key, change := range t.changes {
+		change[1] = db.GetState(key.Addr, key.Slot)
+		if change[0] == change[1] {
+			delete(t.changes, key)
+			t.reads[key] = change[0]
+		} else {
+			t.changes[key] = change
+			delete(t.reads, key)
+		}
+	}
+	for address, change := range t.balanceChanges {
+		change.NewValue = new(big.Int).Set(db.GetBalance(address))
+		if change.OldValue.Cmp(change.NewValue) == 0 {
+			delete(t.balanceChanges, address)
+		}
+	}
+	for address, change := range t.nonceChanges {
+		change.NewValue = db.GetNonce(address)
+		if change.OldValue == change.NewValue {
+			delete(t.nonceChanges, address)
+		}
+	}
+	for address, change := range t.codeChanges {
+		change.NewCode = bytes.Clone(db.GetCode(address))
+		if bytes.Equal(change.OldCode, change.NewCode) {
+			delete(t.codeChanges, address)
+		}
+	}
 }

@@ -1144,6 +1144,17 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		}
 	}
 
+	if len(balTracker) > 0 {
+		if tracker, ok := balTracker[0].(*bal.AccessTracker); ok {
+			tracker.SeedAccount(msg.From, statedb.GetBalance(msg.From), statedb.GetNonce(msg.From))
+			tracker.SeedAccount(header.Coinbase, statedb.GetBalance(header.Coinbase), statedb.GetNonce(header.Coinbase))
+			if msg.To != nil {
+				tracker.SeedAccount(*msg.To, statedb.GetBalance(*msg.To), statedb.GetNonce(*msg.To))
+			}
+			defer tracker.Reconcile(statedb)
+		}
+	}
+
 	// Create EVM
 	blockCtx := vm.BlockContext{
 		GetHash:     getHash,
@@ -1622,6 +1633,9 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		coinbasePayment := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(gasUsed))
 		statedb.AddBalance(header.Coinbase, coinbasePayment)
 	}
+
+	// EIP-8246 must run after late transaction fee credits.
+	evm.FinalizeSelfDestructs()
 
 	// GAP-2.2: capture DimStorage gas used by this transaction.
 	var dimStorageGas uint64

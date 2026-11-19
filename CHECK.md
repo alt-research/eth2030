@@ -1,3 +1,10 @@
+## PR 65 conflict resolution (2026-11-19)
+
+- [x] Fetch and verify the exact PR head and current master without changing the original checkout.
+- [ ] Merge current master while preserving the EIP-7954 review and latest program documentation.
+- [ ] Run affected tests, race/vet and local build; update STATUS.md.
+- [ ] Push only the updated PR 65 branch and confirm GitHub mergeability.
+
 ## Glamsterdam EIP-7954 contract limits
 
 - [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.

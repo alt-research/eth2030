@@ -181,6 +181,8 @@ func pause(ctx context.Context) error {
 	}
 }
 
+var errAwaitCanonical = errors.New("execution block selection is converging")
+
 func verifyBlock(ctx context.Context, clients []client, hash common.Hash) (*types.Header, error) {
 	var commonHeader *types.Header
 	for _, c := range clients {
@@ -194,6 +196,20 @@ func verifyBlock(ctx context.Context, clients []client, hash common.Hash) (*type
 		}
 		if header.Hash() != hash {
 			return nil, errors.New("RPC returned a different block than requested")
+		}
+		canonicalRaw, err := c.call(ctx, "eth_getBlockByNumber", hexutil.EncodeBig(header.Number), false)
+		if err != nil {
+			return nil, err
+		}
+		if null(canonicalRaw) {
+			return nil, errAwaitCanonical
+		}
+		canonical, err := verifyHeader(canonicalRaw)
+		if err != nil {
+			return nil, err
+		}
+		if canonical.Hash() != hash {
+			return nil, errAwaitCanonical
 		}
 		if commonHeader != nil && (header.Hash() != commonHeader.Hash() || header.Root != commonHeader.Root || header.ReceiptHash != commonHeader.ReceiptHash) {
 			return nil, errors.New("independently imported block commitments differ")
@@ -271,19 +287,32 @@ func submit(ctx context.Context, clients []client, tx *types.Transaction, wantSt
 			if err = json.Unmarshal(raw, &receipt); err != nil {
 				return nil, err
 			}
-			if receipt.TxHash != tx.Hash() || receipt.Status != wantStatus {
-				return nil, fmt.Errorf("%s unexpected receipt identity/status: %s/%d", c.url, receipt.TxHash, receipt.Status)
+			if receipt.TxHash != tx.Hash() {
+				return nil, errors.New("receipt transaction identity differs")
 			}
-			if first != nil && (receipt.BlockHash != first.BlockHash || receipt.GasUsed != first.GasUsed || receipt.CumulativeGasUsed != first.CumulativeGasUsed || !reflect.DeepEqual(receipt.Logs, first.Logs)) {
-				return nil, errors.New("independent receipt gas/logs differ")
+			if first != nil && receipt.BlockHash != first.BlockHash {
+				complete = false
+				if err := json.NewEncoder(c.record.writer).Encode(map[string]any{"kind": "receipt_fork_observed", "transaction": tx.Hash(), "endpoint": c.url, "first_block": first.BlockHash, "other_block": receipt.BlockHash}); err != nil {
+					return nil, err
+				}
+				continue
+			}
+			if first != nil && (receipt.Status != first.Status || receipt.GasUsed != first.GasUsed || receipt.CumulativeGasUsed != first.CumulativeGasUsed || !reflect.DeepEqual(receipt.Logs, first.Logs) || receipt.EffectiveGasPrice == nil || first.EffectiveGasPrice == nil || receipt.EffectiveGasPrice.Cmp(first.EffectiveGasPrice) != 0) {
+				return nil, errors.New("same-block independent receipt status/gas/logs/price differ")
 			}
 			first = &receipt
 		}
 		if complete && first != nil {
 			if _, err := verifyBlock(ctx, clients, first.BlockHash); err != nil {
-				return nil, err
+				if !errors.Is(err, errAwaitCanonical) {
+					return nil, err
+				}
+			} else {
+				if first.Status != wantStatus {
+					return nil, fmt.Errorf("common canonical receipt status %d, expected %d", first.Status, wantStatus)
+				}
+				return first, nil
 			}
-			return first, nil
 		}
 		if err := pause(ctx); err != nil {
 			return nil, err

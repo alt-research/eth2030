@@ -1,0 +1,66 @@
+{
+  "original_head": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+  "target_master": "98716284b049933888bcd68d64c1957004d759b2",
+  "checks": [
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.3,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-0.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.97,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-1.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.17,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-2.log"
+    },
+    {
+      "pr": 71,
+      "command": [
+        "go",
+        "vet",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./txpool"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.01,
+      "log": "/tmp/eth2030-pr-tracking-logs/pr-71-3.log"
+    }
+  ],
+  "source_conflict_resolution": [
+    "pkg/core/config/chain_config.go"
+  ],
+  "publication": "Verify live remote head and mergeability after fast-forward push; CI and approval remain separate."
+}

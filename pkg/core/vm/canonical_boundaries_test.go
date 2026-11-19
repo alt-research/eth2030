@@ -35,6 +35,11 @@ func TestNativeVMIndependentCanonicalBoundaries(t *testing.T) {
 	collisionProgram := []byte{byte(PUSH0), byte(PUSH0), byte(PUSH0), byte(CREATE), byte(POP), byte(GAS)}
 	collisionProgram = append(collisionProgram, finishWord...)
 
+	wideCopy := func(op OpCode) []byte {
+		code := append([]byte{byte(PUSH1), 1}, wideOffset...)
+		return append(code, byte(PUSH0), byte(op), byte(PUSH1), 32, byte(PUSH0), byte(RETURN))
+	}
+
 	programs := []struct {
 		name      string
 		code      []byte
@@ -45,8 +50,8 @@ func TestNativeVMIndependentCanonicalBoundaries(t *testing.T) {
 		collision bool
 	}{
 		{name: "calldata_load_wide_source", code: append(append(bytes.Clone(wideOffset), byte(CALLDATALOAD)), finishWord...), input: []byte{255}},
-		{name: "calldata_copy_wide_source", code: append(append(append([]byte{byte(PUSH1), 1}, wideOffset...), byte(PUSH0), byte(CALLDATACOPY), byte(PUSH1), 32, byte(PUSH0), byte(RETURN))), input: []byte{255}},
-		{name: "code_copy_wide_source", code: append(append(append([]byte{byte(PUSH1), 1}, wideOffset...), byte(PUSH0), byte(CODECOPY), byte(PUSH1), 32, byte(PUSH0), byte(RETURN)))},
+		{name: "calldata_copy_wide_source", code: wideCopy(CALLDATACOPY), input: []byte{255}},
+		{name: "code_copy_wide_source", code: wideCopy(CODECOPY)},
 		{name: "zero_returndata_copy_checks_source", code: []byte{byte(PUSH0), byte(PUSH1), 1, byte(PUSH0), byte(RETURNDATACOPY), byte(STOP)}},
 		{name: "sstore_stipend_sentry", code: []byte{byte(PUSH1), 0, byte(PUSH1), 0, byte(SSTORE), byte(STOP)}, gas: 2306},
 		{name: "create_success_clears_return_buffer", code: createProgram, gas: 500000},

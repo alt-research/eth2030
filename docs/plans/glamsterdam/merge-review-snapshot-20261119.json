@@ -1,0 +1,984 @@
+{
+  "master": "38ea9259901c7873f483752ea390962e26563648",
+  "observed_at_utc": "2026-11-19 04:45 UTC",
+  "el_reviews": [
+    {
+      "number": 86,
+      "url": "https://github.com/alt-research/eth2030/pull/86",
+      "title": "feat(rpc): execute stateful simulation with complete block commitments",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-simulate-v1",
+      "head_sha": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c"
+    },
+    {
+      "number": 85,
+      "url": "https://github.com/alt-research/eth2030/pull/85",
+      "title": "feat(rpc): apply method-specific gas and canonical opcode replay",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-rpc-gas",
+      "head_sha": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54"
+    },
+    {
+      "number": 84,
+      "url": "https://github.com/alt-research/eth2030/pull/84",
+      "title": "system: execute canonical history and beacon transitions",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "fix/glamsterdam-system-transitions",
+      "head_sha": "6ed6f2562cb1c34329462196b65b12b41a56a922"
+    },
+    {
+      "number": 83,
+      "url": "https://github.com/alt-research/eth2030/pull/83",
+      "title": "feat(gas): implement current merged LIFO state and execution accounting",
+      "state": "open",
+      "merged_at": null,
+      "draft": true,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-state-gas",
+      "head_sha": "bd0f33577c0d343abb7057894d9702a27d7ff157"
+    },
+    {
+      "number": 82,
+      "url": "https://github.com/alt-research/eth2030/pull/82",
+      "title": "eth: implement sparse blob relay and custody Engine APIs",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-eth72",
+      "head_sha": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad"
+    },
+    {
+      "number": 81,
+      "url": "https://github.com/alt-research/eth2030/pull/81",
+      "title": "snap: implement BAL pivot catch-up and reorg recovery",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-snap2",
+      "head_sha": "6ce3eceeef539e69d5f2a20428aa7f88e651a661"
+    },
+    {
+      "number": 80,
+      "url": "https://github.com/alt-research/eth2030/pull/80",
+      "title": "feat(blob): enforce configured fork capacity, prices and fee settlement",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-blob-schedule",
+      "head_sha": "12e22aac2f7853092d8270beb644caaf1883f94d"
+    },
+    {
+      "number": 79,
+      "url": "https://github.com/alt-research/eth2030/pull/79",
+      "title": "feat(node): validate persisted fork configuration before history replay",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-config-recovery",
+      "head_sha": "901ec06331bd5290c733adf23c10d9e670dabd2c"
+    },
+    {
+      "number": 78,
+      "url": "https://github.com/alt-research/eth2030/pull/78",
+      "title": "feat(engine): enforce canonical fork schedules and Engine version schemas",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-fork-schema",
+      "head_sha": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7"
+    },
+    {
+      "number": 77,
+      "url": "https://github.com/alt-research/eth2030/pull/77",
+      "title": "feat(core): implement mandatory EIP-8282 builder execution requests",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-builder-requests",
+      "head_sha": "6c86693815e154a092e6321e08d16109c86e49a2"
+    },
+    {
+      "number": 76,
+      "url": "https://github.com/alt-research/eth2030/pull/76",
+      "title": "blob: authenticate ordinary sidecars and preserve valid proof consumers",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "fix/glamsterdam-blob-validation",
+      "head_sha": "bc2f58506b637fa19e93a5d5f3aefc8f0c966686"
+    },
+    {
+      "number": 75,
+      "url": "https://github.com/alt-research/eth2030/pull/75",
+      "title": "test: add independent signed Glamsterdam gas corpus",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "test/glamsterdam-gas-corpus",
+      "head_sha": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0"
+    },
+    {
+      "number": 74,
+      "url": "https://github.com/alt-research/eth2030/pull/74",
+      "title": "engine: commit supplied beacon slots including zero across native backends",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-slot-commitment",
+      "head_sha": "2505e9947e2dc07f62e3cb54be48d43f022291c7"
+    },
+    {
+      "number": 73,
+      "url": "https://github.com/alt-research/eth2030/pull/73",
+      "title": "vm: implement current EIP-8024 byte encoding at Amsterdam",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-stack-opcodes",
+      "head_sha": "3ec63b64dd2b963a6829fcf3fccf57db3729b326"
+    },
+    {
+      "number": 72,
+      "url": "https://github.com/alt-research/eth2030/pull/72",
+      "title": "core: preserve SELFDESTRUCT balances and finalize native creation state",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-selfdestruct",
+      "head_sha": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf"
+    },
+    {
+      "number": 71,
+      "url": "https://github.com/alt-research/eth2030/pull/71",
+      "title": "core: emit canonical Amsterdam ETH transfer logs",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-transfer-logs",
+      "head_sha": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c"
+    },
+    {
+      "number": 70,
+      "url": "https://github.com/alt-research/eth2030/pull/70",
+      "title": "p2p: rebuild modern receipt blooms from decoded logs",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "fix/eth-receipt-bloom",
+      "head_sha": "86a3322133a00d0ba36928decedc859299c9abc9"
+    },
+    {
+      "number": 69,
+      "url": "https://github.com/alt-research/eth2030/pull/69",
+      "title": "eth: negotiate canonical eth/69-71 and verify historical consumers",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-eth71",
+      "head_sha": "5ab6ce83f58f02e1531bc017c23a81975cfaa470"
+    },
+    {
+      "number": 68,
+      "url": "https://github.com/alt-research/eth2030/pull/68",
+      "title": "rpc: implement native transaction access-list discovery",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-access-list",
+      "head_sha": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8"
+    },
+    {
+      "number": 67,
+      "url": "https://github.com/alt-research/eth2030/pull/67",
+      "title": "core: align deterministic factory with EIP-7997 deployment semantics",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-factory",
+      "head_sha": "8bac2058c11f55406b3ba34ee1cda5806ea645b3"
+    },
+    {
+      "number": 66,
+      "url": "https://github.com/alt-research/eth2030/pull/66",
+      "title": "engine: honor historical BAL retention by beacon slot",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-bal-retention",
+      "head_sha": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03"
+    },
+    {
+      "number": 65,
+      "url": "https://github.com/alt-research/eth2030/pull/65",
+      "title": "core: enforce published Glamsterdam contract and initcode limits",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-contract-limits",
+      "head_sha": "a1008f472ca63950cfb22515ce8b795d21e913bd"
+    },
+    {
+      "number": 64,
+      "url": "https://github.com/alt-research/eth2030/pull/64",
+      "title": "docs: revalidate Glamsterdam completion program on current mainline",
+      "state": "open",
+      "merged_at": null,
+      "draft": false,
+      "base": "master",
+      "base_sha": "38ea9259901c7873f483752ea390962e26563648",
+      "head_repo": "fyInALT/eth2030",
+      "head_ref": "feat/glamsterdam-baseline",
+      "head_sha": "48a1c7c990dd50ef514a56f77bdd91a6f2c88925"
+    }
+  ],
+  "functional_dependencies": [
+    {
+      "pr": 65,
+      "parents": []
+    },
+    {
+      "pr": 66,
+      "parents": []
+    },
+    {
+      "pr": 67,
+      "parents": []
+    },
+    {
+      "pr": 68,
+      "parents": []
+    },
+    {
+      "pr": 69,
+      "parents": []
+    },
+    {
+      "pr": 70,
+      "parents": []
+    },
+    {
+      "pr": 71,
+      "parents": []
+    },
+    {
+      "pr": 72,
+      "parents": []
+    },
+    {
+      "pr": 73,
+      "parents": []
+    },
+    {
+      "pr": 74,
+      "parents": []
+    },
+    {
+      "pr": 75,
+      "parents": []
+    },
+    {
+      "pr": 76,
+      "parents": []
+    },
+    {
+      "pr": 77,
+      "parents": []
+    },
+    {
+      "pr": 78,
+      "parents": []
+    },
+    {
+      "pr": 79,
+      "parents": []
+    },
+    {
+      "pr": 80,
+      "parents": [
+        76,
+        79
+      ]
+    },
+    {
+      "pr": 81,
+      "parents": [
+        69,
+        77
+      ]
+    },
+    {
+      "pr": 82,
+      "parents": [
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        77,
+        78,
+        80
+      ]
+    },
+    {
+      "pr": 83,
+      "parents": [
+        84
+      ]
+    },
+    {
+      "pr": 84,
+      "parents": [
+        81,
+        82
+      ]
+    },
+    {
+      "pr": 85,
+      "parents": [
+        83
+      ]
+    },
+    {
+      "pr": 86,
+      "parents": [
+        85
+      ]
+    }
+  ],
+  "trace_candidate_ancestry": [
+    {
+      "pr": 65,
+      "scope": "EIP-7954 code/initcode and admission",
+      "ancestry": {
+        "review_head": {
+          "commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 66,
+      "scope": "Historical BAL retention and empty-cache recovery",
+      "ancestry": {
+        "review_head": {
+          "commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 67,
+      "scope": "Canonical EIP-7997 factory",
+      "ancestry": {
+        "review_head": {
+          "commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 68,
+      "scope": "Actual access-list RPC discovery",
+      "ancestry": {
+        "review_head": {
+          "commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 69,
+      "scope": "Negotiated eth/69-71 and correlated history",
+      "ancestry": {
+        "review_head": {
+          "commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 70,
+      "scope": "Independent receipt bloom reconstruction",
+      "ancestry": {
+        "review_head": {
+          "commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "86a3322133a00d0ba36928decedc859299c9abc9",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 71,
+      "scope": "Canonical EIP-7708 transfer logs",
+      "ancestry": {
+        "review_head": {
+          "commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 72,
+      "scope": "EIP-8246 lifecycle and final BAL",
+      "ancestry": {
+        "review_head": {
+          "commit": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "509a47ab41636e72c80adaf5353ff7d9d233d0cb",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 73,
+      "scope": "EIP-8024 encoding and Amsterdam activation",
+      "ancestry": {
+        "review_head": {
+          "commit": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+          "ancestor": false
+        },
+        "tested_source_commit": {
+          "commit": "408544c629f27812ebe1f2afb1d11ef3b71d0ef1",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 74,
+      "scope": "Supplied slot commitments and independent headers",
+      "ancestry": {
+        "review_head": {
+          "commit": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+          "ancestor": false
+        },
+        "tested_source_commit": {
+          "commit": "61a245e30458258480d2d5986e81b5970cab4344",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 75,
+      "scope": "Independent signed current-text gas corpus",
+      "ancestry": {
+        "review_head": {
+          "commit": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "54b2cf8023e56c9a2c21ecb54a383ec2cede1c1c",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 76,
+      "scope": "Full blob authentication, proof exports and journal recovery",
+      "ancestry": {
+        "review_head": {
+          "commit": "bc2f58506b637fa19e93a5d5f3aefc8f0c966686",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "85ad1bca9a34e26934b06bc46cf1b1c1e5fc2b6f",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 77,
+      "scope": "Mandatory EIP-8282 contracts, extraction and Engine/CL bytes",
+      "ancestry": {
+        "review_head": {
+          "commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "6c86693815e154a092e6321e08d16109c86e49a2",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 78,
+      "scope": "Canonical startup schedules, Engine version/field bounds and actual HTTP",
+      "ancestry": {
+        "review_head": {
+          "commit": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 79,
+      "scope": "Persisted configuration authority before actual Node restart/replay",
+      "ancestry": {
+        "review_head": {
+          "commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 80,
+      "scope": "Configured blob capacity, exact prices, fee burn and signed 21-blob consumers",
+      "ancestry": {
+        "review_head": {
+          "commit": "12e22aac2f7853092d8270beb644caaf1883f94d",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 81,
+      "scope": "Authenticated BAL pivot/reorg/cursor recovery, including fresh-root proof binding for unchanged partial storage",
+      "ancestry": {
+        "review_head": {
+          "commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 82,
+      "scope": "Sparse provider/sampler/custody relay, verified reconstruction and actual Engine/Node consumers",
+      "ancestry": {
+        "review_head": {
+          "commit": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "d72a8d35dd2bea6bcf6794c30efcd88c9968ec00",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 83,
+      "scope": "Current merged LIFO development baseline; native signed transitions and initial high-state block consumers",
+      "ancestry": {
+        "review_head": {
+          "commit": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+          "ancestor": true
+        },
+        "tested_transaction_source_commit": {
+          "commit": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 84,
+      "scope": "Canonical pre-block actual-code transitions, explicit genesis assets, independent roots and Node recovery",
+      "ancestry": {
+        "review_head": {
+          "commit": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+          "ancestor": false
+        },
+        "tested_source_commit": {
+          "commit": "3355156e45b16f11eef2acea20931fd77ab70ab9",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 85,
+      "scope": "Method-specific call/estimate/access-list, complete inputs/overrides, canonical transaction/block opcode replay",
+      "ancestry": {
+        "review_head": {
+          "commit": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+          "ancestor": true
+        },
+        "tested_source_commit": {
+          "commit": "2893324130e142a9fd800648c8557de9757bb16c",
+          "ancestor": true
+        }
+      }
+    },
+    {
+      "pr": 86,
+      "scope": "Stateful eth_simulateV1 with complete commitments, two gas policies, overrides and resource bounds",
+      "ancestry": {
+        "review_head": {
+          "commit": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+          "ancestor": false
+        },
+        "tested_source_commit": {
+          "commit": "6daa6678",
+          "ancestor": true
+        },
+        "composition_commit": {
+          "commit": "206e14ac",
+          "ancestor": true
+        }
+      }
+    }
+  ],
+  "top_fork_head_checks": [
+    {
+      "pr": 86,
+      "head": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "repository": "fyInALT/eth2030",
+      "status": {
+        "state": "pending",
+        "contexts": []
+      },
+      "checks": []
+    },
+    {
+      "pr": 85,
+      "head": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "repository": "fyInALT/eth2030",
+      "status": {
+        "state": "pending",
+        "contexts": []
+      },
+      "checks": []
+    },
+    {
+      "pr": 84,
+      "head": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "repository": "fyInALT/eth2030",
+      "status": {
+        "state": "pending",
+        "contexts": []
+      },
+      "checks": []
+    },
+    {
+      "pr": 83,
+      "head": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "repository": "fyInALT/eth2030",
+      "status": {
+        "state": "pending",
+        "contexts": []
+      },
+      "checks": []
+    }
+  ],
+  "cl_reviews": [
+    {
+      "number": 3,
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/3",
+      "state": "open",
+      "draft": false,
+      "head_sha": "cb72ff1530715c2323aae17b03ceca2710a4cf66",
+      "head_ref": "test/glamsterdam-builder-request-wire",
+      "base_ref": "unstable"
+    },
+    {
+      "number": 2,
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/2",
+      "state": "open",
+      "draft": false,
+      "head_sha": "b57d54d45ec45b47d940a6689a2f2f8fb39b8f8a",
+      "head_ref": "fix/glamsterdam-builder-onboarding",
+      "base_ref": "unstable"
+    },
+    {
+      "number": 1,
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/1",
+      "state": "open",
+      "draft": false,
+      "head_sha": "9b27d866c2c747abb28b760a8c52c0602c8d0d1f",
+      "head_ref": "fix/glamsterdam-first-slot",
+      "base_ref": "unstable"
+    }
+  ],
+  "merged_by_this_task": false,
+  "trace_candidate_final": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+  "trace_review": {
+    "number": 87,
+    "url": "https://github.com/alt-research/eth2030/pull/87",
+    "state": "open",
+    "draft": false,
+    "head_sha": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+    "base": "master",
+    "checks": "not queried on final documentation head"
+  },
+  "trace_candidate_final_ancestry": [
+    {
+      "pr": 65,
+      "review_head": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "review_head_ancestor": true,
+      "functional_source": "a1008f472ca63950cfb22515ce8b795d21e913bd",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 66,
+      "review_head": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "review_head_ancestor": true,
+      "functional_source": "632853ed13073d6b061e0f6fb0e3d7a3fc38ab03",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 67,
+      "review_head": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "review_head_ancestor": true,
+      "functional_source": "8bac2058c11f55406b3ba34ee1cda5806ea645b3",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 68,
+      "review_head": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "review_head_ancestor": true,
+      "functional_source": "323bf8fda9bf6caf356a2ecc42427f7a850a98e8",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 69,
+      "review_head": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "review_head_ancestor": true,
+      "functional_source": "5ab6ce83f58f02e1531bc017c23a81975cfaa470",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 70,
+      "review_head": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "review_head_ancestor": true,
+      "functional_source": "86a3322133a00d0ba36928decedc859299c9abc9",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 71,
+      "review_head": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "review_head_ancestor": true,
+      "functional_source": "4d82484fe510a2fbea71db3a0be59fb8cc219d9c",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 72,
+      "review_head": "8cf3f9afde17acabeaffc2884580ae7ba3bb55bf",
+      "review_head_ancestor": true,
+      "functional_source": "509a47ab41636e72c80adaf5353ff7d9d233d0cb",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 73,
+      "review_head": "3ec63b64dd2b963a6829fcf3fccf57db3729b326",
+      "review_head_ancestor": false,
+      "functional_source": "408544c629f27812ebe1f2afb1d11ef3b71d0ef1",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 74,
+      "review_head": "2505e9947e2dc07f62e3cb54be48d43f022291c7",
+      "review_head_ancestor": false,
+      "functional_source": "61a245e30458258480d2d5986e81b5970cab4344",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 75,
+      "review_head": "3ee4dae928a86f1d378dc3ced2e31ce4a8e3bfd0",
+      "review_head_ancestor": true,
+      "functional_source": "54b2cf8023e56c9a2c21ecb54a383ec2cede1c1c",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 76,
+      "review_head": "bc2f58506b637fa19e93a5d5f3aefc8f0c966686",
+      "review_head_ancestor": true,
+      "functional_source": "85ad1bca9a34e26934b06bc46cf1b1c1e5fc2b6f",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 77,
+      "review_head": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "review_head_ancestor": true,
+      "functional_source": "6c86693815e154a092e6321e08d16109c86e49a2",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 78,
+      "review_head": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "review_head_ancestor": true,
+      "functional_source": "9ad2d9d61bd05885bc7c6703d8df9b9a1228fec7",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 79,
+      "review_head": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "review_head_ancestor": true,
+      "functional_source": "901ec06331bd5290c733adf23c10d9e670dabd2c",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 80,
+      "review_head": "12e22aac2f7853092d8270beb644caaf1883f94d",
+      "review_head_ancestor": true,
+      "functional_source": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 81,
+      "review_head": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "review_head_ancestor": true,
+      "functional_source": "6ce3eceeef539e69d5f2a20428aa7f88e651a661",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 82,
+      "review_head": "08534b6dd5ddbb478aebf55c6ee0ab6664cb9fad",
+      "review_head_ancestor": true,
+      "functional_source": "d72a8d35dd2bea6bcf6794c30efcd88c9968ec00",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 83,
+      "review_head": "bd0f33577c0d343abb7057894d9702a27d7ff157",
+      "review_head_ancestor": true,
+      "functional_source": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 84,
+      "review_head": "6ed6f2562cb1c34329462196b65b12b41a56a922",
+      "review_head_ancestor": false,
+      "functional_source": "3355156e45b16f11eef2acea20931fd77ab70ab9",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 85,
+      "review_head": "eb3ae4f10d9f1111d13a0d3bfb02ea5d84c89a54",
+      "review_head_ancestor": true,
+      "functional_source": "2893324130e142a9fd800648c8557de9757bb16c",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 86,
+      "review_head": "7d79bbc5cd610cacca29d72285c664a6e5d1b19c",
+      "review_head_ancestor": true,
+      "functional_source": "6daa6678",
+      "functional_source_ancestor": true
+    },
+    {
+      "pr": 87,
+      "review_head": "0a1aa9374c061aacfb429fbfd1942d17c5faf1e5",
+      "review_head_ancestor": true,
+      "functional_source": "9700ed6b",
+      "functional_source_ancestor": true
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "tested_source_commit": "2893324130e142a9fd800648c8557de9757bb16c",
+  "eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "geth_merged_call_policy": "df4c52482b598933d691e3b0c1655f200ff9b7f1",
+  "execution_apis_977": "open; zero comments at live recheck",
+  "trace_852_head": "cc1852a702a84dbcb7d149d010345114bf95cff8; open/unmerged",
+  "checks": {
+    "full_packages": 212,
+    "tagged_packages": 27,
+    "race_packages": 48
+  },
+  "vet": "passed",
+  "build": "passed",
+  "mutations": [
+    {
+      "name": "call-execution-cap",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-call-execution-cap.log"
+    },
+    {
+      "name": "call-intrinsic",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-call-intrinsic.log"
+    },
+    {
+      "name": "estimate-transaction-policy",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-estimate-transaction-policy.log"
+    },
+    {
+      "name": "access-list-input",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-access-list-input.log"
+    },
+    {
+      "name": "authorization-input",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-authorization-input.log"
+    },
+    {
+      "name": "replace-complete-storage",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-replace-complete-storage.log"
+    },
+    {
+      "name": "opcode-tracer-hooks",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-opcode-tracer-hooks.log"
+    },
+    {
+      "name": "historical-prefix",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-historical-prefix.log"
+    },
+    {
+      "name": "preblock-system-replay",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-preblock-system-replay.log"
+    },
+    {
+      "name": "historical-fork-context",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/tmp/glamsterdam-rpc-gas-mutation-historical-fork-context.log"
+    },
+    {
+      "name": "access-discovery-transaction-policy",
+      "detected": true,
+      "exit_code": 1,
+      "log": "/projects/eth2030/glamsterdam-rpc-access-policy-mutation.log"
+    }
+  ],
+  "release_qualified": false,
+  "access_followup": {
+    "race_packages": 5,
+    "vet": "passed",
+    "build": "passed",
+    "race_log": "/projects/eth2030/glamsterdam-rpc-access-followup-race.log"
+  }
+}

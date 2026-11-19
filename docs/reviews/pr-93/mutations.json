@@ -1,0 +1,72 @@
+{
+  "source_revision": "b708028af3caa227781598c7de983207b53d1898",
+  "oracle": "unchanged Geth v1.17.10",
+  "mutations": [
+    {
+      "mutation": "multiplication-undercharge",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/multiplication_gas"
+    },
+    {
+      "mutation": "zero-memory-offset",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/zero_length"
+    },
+    {
+      "mutation": "precompile-leftover",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/failed_ecadd"
+    },
+    {
+      "mutation": "empty-account-codehash",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/extcodehash"
+    },
+    {
+      "mutation": "memory-rounding-overflow",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/memory_word_rounding"
+    },
+    {
+      "mutation": "create-success-return-buffer",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/create_success"
+    },
+    {
+      "mutation": "top-create-retention",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/top_create"
+    },
+    {
+      "mutation": "nonce-address-truncation",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestCreate_AddressCalculation"
+    },
+    {
+      "mutation": "delegation-entry-warmth",
+      "detected": true,
+      "package": "./core/execution",
+      "test_pattern": "TestOfficialOsakaDelegationReentryMatchesIndependentState"
+    },
+    {
+      "mutation": "chain-context-zero",
+      "detected": true,
+      "package": "./core/execution",
+      "test_pattern": "TestCanonicalChainIDContextMatchesIndependentExecution"
+    },
+    {
+      "mutation": "sstore-stipend",
+      "detected": true,
+      "package": "./core/vm",
+      "test_pattern": "TestNativeVMIndependentCanonicalBoundaries/sstore_stipend"
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## Stateful simulation implementation (2026-11-19)
+
+Separate branch `feat/glamsterdam-simulate-v1` implements the selected execution-apis 68d76a5b method on the explicitly selected current merged LIFO baseline. Actual sequential calls/blocks must retain isolated state and complete system, fee, receipt, BAL and header consumers. Validation-enabled and disabled modes differ in nonce/fee checks and execution/reservoir policy; default uncapped calls reserve the smaller remaining execution/state dimension. Header gaps are real simulated empty blocks. No simulator conformance or release completion is claimed before actual HTTP and independent commitment evidence.
+
 ## Qualified RPC method and opcode consumers (2026-11-19)
 
 Current source `28933241` passes full/tagged Go, affected race, vet/build and ten detected compiling mutations. Real HTTP verifies full call arguments, overrides, state/account estimates, creation, opcode traces, historical prefix/system replay, block traces and actual fork context. [Evidence](docs/verification/glamsterdam-rpc-gas-20261119.md). Simulator, nested callTracer/two-dimensional trace fields, independent full-client/API fixtures, resource and final release gates remain open. This branch is separate from the stable EL integration until composed qualification.

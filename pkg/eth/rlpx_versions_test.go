@@ -9,13 +9,15 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/p2p"
+	gethcommon "github.com/ethereum/go-ethereum/common"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
+	getheth "github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/p2p/rlpx"
 	gethrlp "github.com/ethereum/go-ethereum/rlp"
 )
 
 func TestNegotiatedEthVersionsAgainstIndependentCodec(t *testing.T) {
-	for _, version := range []uint{68, 69, 70, 71} {
+	for _, version := range []uint{68, 69, 70, 71, 72} {
 		t.Run(fmt.Sprint(version), func(t *testing.T) {
 			key, err := gethcrypto.GenerateKey()
 			if err != nil {
@@ -91,7 +93,25 @@ func TestNegotiatedEthVersionsAgainstIndependentCodec(t *testing.T) {
 			if _, err := remote.Write(0x10, raw); err != nil {
 				t.Fatal(err)
 			}
-			if version == 71 {
+			if version == 72 {
+				request := getheth.GetCellsRequestPacket{RequestId: 91, Hashes: []gethcommon.Hash{{1}}, Mask: types.CellMask{1}}
+				raw, err = gethrlp.EncodeToBytes(request)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if _, err := remote.Write(0x10+GetCellsMsg, raw); err != nil {
+					t.Fatal(err)
+				}
+				code, raw, _, err = remote.Read()
+				if err != nil || code != 0x10+CellsMsg {
+					t.Fatalf("encrypted SDK cells reply: %x %v", code, err)
+				}
+				var reply getheth.CellsPacket
+				if err := gethrlp.DecodeBytes(raw, &reply); err != nil || reply.RequestId != 91 || len(reply.Hashes) != 0 {
+					t.Fatalf("encrypted flat SDK cell response: %x %v", raw, err)
+				}
+			}
+			if version >= 71 {
 				request := struct {
 					ID     uint64
 					Hashes []types.Hash

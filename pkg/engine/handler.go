@@ -189,6 +189,8 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleGetBlobsV1(params)
 	case "engine_getBlobsV2":
 		return api.handleGetBlobsV2(params)
+	case "engine_getBlobsV4":
+		return api.handleGetBlobsV4(params)
 	case "engine_getBlobsV3":
 		return api.handleGetBlobsV3(params)
 	default:
@@ -565,7 +567,7 @@ func (api *EngineAPI) handleNewPayloadV7(params []json.RawMessage) (any, *jsonrp
 // handleForkchoiceUpdatedV4 processes an engine_forkchoiceUpdatedV4 request
 // (Amsterdam). Lighthouse >= 8.4 adds an optional third `custodyColumns`
 // bitarray param (Fulu/PeerDAS custody set, may be null) — accepted and
-// validated here, not yet consumed (see lighthouse_compat.go).
+// validated and consumed by the sparse blob relay.
 func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, *jsonrpcError) {
 	return api.handleAmsterdamForkchoice(params, false)
 }
@@ -591,10 +593,13 @@ func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota
 	}
 
 	if len(params) == 3 {
-		if err := validateCustodyColumns(params[2]); err != nil {
-			return nil, &jsonrpcError{
-				Code:    InvalidParamsCode,
-				Message: err.Error(),
+		mask, err := parseCellMask(params[2])
+		if err != nil {
+			return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+		}
+		if mask != nil {
+			if consumer, ok := api.backend.(interface{ SetCustodyColumns(types.CellMask) }); ok {
+				consumer.SetCustodyColumns(*mask)
 			}
 		}
 	}

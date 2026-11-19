@@ -78,3 +78,48 @@ func verifyCellProofSidecar(sidecar *types.BlobSidecarData) error {
 	}
 	return nil
 }
+
+// ValidateSparseBlobMetadata applies ordinary economic and nonce checks without
+// admitting a transaction or treating absent blob data as authenticated. The
+// relay must separately bind commitments, recover the signed sender and verify
+// cells; complete promotion still uses AddRemote and full-sidecar validation.
+func (pool *TxPool) ValidateSparseBlobMetadata(tx *types.Transaction) error {
+	if tx == nil || tx.Type() != types.BlobTxType {
+		return errors.New("sparse metadata requires a blob transaction")
+	}
+	pool.mu.RLock()
+	defer pool.mu.RUnlock()
+	if pool.chainID != nil && (tx.ChainId() == nil || tx.ChainId().Cmp(pool.chainID) != 0) {
+		return errors.New("blob transaction chain ID mismatch")
+	}
+	if err := pool.validateTxData(tx, false); err != nil {
+		return err
+	}
+	from := pool.senderOf(tx)
+	nonce := pool.state.GetNonce(from)
+	if tx.Nonce() < nonce {
+		return ErrNonceTooLow
+	}
+	if tx.Nonce()-nonce > MaxNonceGap {
+		return ErrNonceTooHigh
+	}
+	return nil
+}
+
+// BlobTransactions returns both executable and future-nonce full-data entries
+// for blob relay/Engine lookup. The transaction objects are immutable after add.
+func (pool *TxPool) BlobTransactions() []*types.Transaction {
+	pool.mu.RLock()
+	defer pool.mu.RUnlock()
+	var out []*types.Transaction
+	for _, set := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
+		for _, list := range set {
+			for _, tx := range list.items {
+				if tx.Type() == types.BlobTxType {
+					out = append(out, tx)
+				}
+			}
+		}
+	}
+	return out
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"log/slog"
 	"math/big"
 	"time"
@@ -493,4 +494,39 @@ func (b *EngineBackend) GetPayloadV7ByID(id payload.PayloadID) (*payload.GetPayl
 	resp.SSZPayload = json.RawMessage(`"` + "0x" + hex.EncodeToString(enc) + `"`)
 	resp.SSZBlockHash = &root
 	return resp, nil
+}
+
+func (b *EngineBackend) SetCustodyColumns(mask types.CellMask) {
+	if h, ok := b.node.EthHandler().(interface{ SetCustodyColumns(types.CellMask) }); ok {
+		h.SetCustodyColumns(mask)
+	}
+}
+func (b *EngineBackend) GetBlobsV4ByVersionedHashes(hashes []types.Hash, mask types.CellMask) []*payload.BlobCellsAndProofsV1 {
+	cells := make([]types.BlobCells, len(hashes))
+	if h, ok := b.node.EthHandler().(interface {
+		GetBlobCells([]types.Hash, types.CellMask) []types.BlobCells
+	}); ok {
+		cells = h.GetBlobCells(hashes, mask)
+	}
+	result := make([]*payload.BlobCellsAndProofsV1, len(hashes))
+	for i := range result {
+		if i >= len(cells) || cells[i].Cells == nil {
+			continue
+		}
+		item := &payload.BlobCellsAndProofsV1{BlobCells: make([]*hexutil.Bytes, mask.OneCount()), Proofs: make([]*hexutil.Bytes, mask.OneCount())}
+		if i < len(cells) {
+			for j := range item.BlobCells {
+				if j < len(cells[i].Cells) && cells[i].Cells[j] != nil {
+					value := hexutil.Bytes(cells[i].Cells[j])
+					item.BlobCells[j] = &value
+				}
+				if j < len(cells[i].Proofs) && cells[i].Proofs[j] != nil {
+					value := hexutil.Bytes(cells[i].Proofs[j])
+					item.Proofs[j] = &value
+				}
+			}
+		}
+		result[i] = item
+	}
+	return result
 }

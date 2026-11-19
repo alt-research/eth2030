@@ -108,3 +108,11 @@ type BlockTraceBackend interface {
 type SimulateBackend interface {
 	Simulate(options rpctypes.SimulateOptions, base *types.Header) ([]rpctypes.SimulateBlockResult, error)
 }
+
+// ExecutionTraceBackend returns observations from actual replay, with one pass
+// for a block and complete prefix replay for a selected transaction.
+type ExecutionTraceBackend interface {
+	TraceCallDetailed(args rpctypes.CallArgs, header *types.Header, options rpctypes.TraceOptions) (vm.EVMLogger, error)
+	TraceTransactionDetailed(hash types.Hash, options rpctypes.TraceOptions) (vm.EVMLogger, error)
+	TraceBlockDetailed(hash types.Hash, options rpctypes.TraceOptions) ([]vm.EVMLogger, error)
+}

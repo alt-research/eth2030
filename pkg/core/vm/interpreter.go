@@ -345,7 +345,7 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 // Run executes the contract bytecode using the interpreter loop.
 // Gas charging order follows go-ethereum: constant gas -> dynamic gas
 // (which includes memory expansion cost) -> resize memory -> execute.
-func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
+func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError error) {
 	previousContract := evm.activeContract
 	evm.activeContract = contract
 	defer func() { evm.activeContract = previousContract }()
@@ -361,6 +361,21 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 		debug = evm.Config.Debug && evm.Config.Tracer != nil
 	)
 
+	var tracePC, traceGas, traceReservoir uint64
+	var traceOp OpCode
+	traceLogged := true
+	if debug {
+		defer func() {
+			if runError != nil && !traceLogged {
+				if observer, ok := evm.Config.Tracer.(OpcodeLoggerV2); ok {
+					if context, ok := evm.Config.Tracer.(OpcodeContextLogger); ok {
+						context.CaptureOpcodeContext(evm, contract, traceOp, stack)
+					}
+					observer.CaptureStateV2(tracePC, traceOp, traceGas, 0, 0, traceReservoir, stack, mem, evm.depth, runError)
+				}
+			}
+		}()
+	}
 	var steps uint64
 	cancellation := evm.Config.Context
 	for {
@@ -373,6 +388,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 			steps++
 		}
 		op := contract.GetOp(pc)
+		if debug {
+			tracePC, traceOp, traceGas, traceReservoir, traceLogged = pc, op, contract.Gas, contract.StateGasReservoir, false
+		}
 		operation := evm.jumpTable[op]
 		if operation == nil || operation.execute == nil {
 			return nil, ErrInvalidOpCode
@@ -392,8 +410,16 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 			return nil, err
 		}
 
+		// EIP-214 forbids the write before memory/access/state metering. CALLCODE
+		// may carry value because it does not transfer value to another account.
+		if evm.readOnly && (operation.writes || (op == CALL && stack.Back(2).Sign() != 0)) {
+			return nil, ErrWriteProtection
+		}
+
 		// Calculate total gas cost for this step (for tracing).
 		var stepCost uint64
+		executionCost := operation.constantGas
+		stateBefore, reservoirBefore := contract.StateGasUsed, contract.StateGasReservoir
 		gasBefore := contract.Gas
 
 		// Constant gas deduction
@@ -424,6 +450,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 			}
 			cost, err := operation.dynamicGas(evm, contract, stack, mem, memorySize)
 			paid := err == nil && contract.UseGas(cost)
+			if paid {
+				executionCost += cost
+			}
 			if evm.witnessGas != nil {
 				evm.witnessGas.finishGasCalculation(paid)
 				if !paid {
@@ -438,21 +467,54 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 			}
 		}
 
-		// Resize memory AFTER gas has been charged (by dynamic gas function).
-		if memorySize > 0 && uint64(mem.Len()) < memorySize {
-			mem.Resize(memorySize)
-		}
-
 		// Compute the total cost for this step (difference before/after gas charging).
 		stepCost = gasBefore - contract.Gas
 
 		// Trace: capture state before executing the opcode.
 		if debug {
-			evm.Config.Tracer.CaptureState(pc, op, gasBefore, stepCost, stack, mem, evm.depth, nil)
+			if context, ok := evm.Config.Tracer.(OpcodeContextLogger); ok {
+				context.CaptureOpcodeContext(evm, contract, op, stack)
+			}
+			if observer, ok := evm.Config.Tracer.(OpcodeLoggerV2); ok {
+				stateCost, reservoir := int64(0), uint64(0)
+				if evm.forkRules.IsAmsterdam {
+					stateCost = contract.StateGasUsed - stateBefore
+					if op == SSTORE {
+						stateCost += evm.pendingTraceStorage(contract, stack)
+					}
+					reservoir = reservoirBefore
+					if op == CREATE || op == CREATE2 {
+						stateCost += int64(evm.pendingTraceCreation(op, contract, stack, mem))
+					}
+				}
+				observer.CaptureStateV2(pc, op, gasBefore, executionCost, stateCost, reservoir, stack, mem, evm.depth, nil)
+			} else {
+				evm.Config.Tracer.CaptureState(pc, op, gasBefore, stepCost, stack, mem, evm.depth, nil)
+			}
 		}
 
 		// Execute the opcode
+		if debug {
+			if logger, ok := evm.Config.Tracer.(TraceFailureLogger); ok && logger.TraceError() != nil {
+				return nil, logger.TraceError()
+			}
+			traceLogged = true
+		}
+		if memorySize > 0 && uint64(mem.Len()) < memorySize {
+			mem.Resize(memorySize)
+		}
 		ret, err := operation.execute(&pc, evm, contract, mem, stack)
+		if debug {
+			if context, ok := evm.Config.Tracer.(OpcodeContextLogger); ok {
+				context.CaptureOpcodeResult(evm, contract, op, err)
+			}
+		}
+
+		if debug {
+			if logger, ok := evm.Config.Tracer.(TraceFailureLogger); ok && logger.TraceError() != nil {
+				return nil, logger.TraceError()
+			}
+		}
 
 		if err != nil {
 			if errors.Is(err, ErrExecutionReverted) {
@@ -475,6 +537,11 @@ func (evm *EVM) Run(contract *Contract, input []byte) ([]byte, error) {
 
 // Call executes a message call to the given address with the given input, gas, and value.
 func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas uint64, value *big.Int) (ret []byte, gasLeft uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if trace := evm.traceFrame(CALL, caller, addr, input, gas, value); trace != nil {
+		defer func() { trace(ret, gasLeft, err) }()
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, gas, ErrMaxCallDepthExceeded
 	}
@@ -663,6 +730,11 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 // CallCode executes a CALLCODE operation. Runs the callee's code in the caller's context.
 func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte, gas uint64, value *big.Int) (ret []byte, gasLeft uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if trace := evm.traceFrame(CALLCODE, caller, addr, input, gas, value); trace != nil {
+		defer func() { trace(ret, gasLeft, err) }()
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, gas, ErrMaxCallDepthExceeded
 	}
@@ -724,6 +796,11 @@ func (evm *EVM) DelegateCall(caller types.Address, addr types.Address, input []b
 }
 
 func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int, addr types.Address, input []byte, gas uint64) (ret []byte, gasLeft uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if trace := evm.traceFrame(DELEGATECALL, executionAddr, addr, input, gas, value); trace != nil {
+		defer func() { trace(ret, gasLeft, err) }()
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, gas, ErrMaxCallDepthExceeded
 	}
@@ -776,6 +853,11 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 
 // StaticCall executes a read-only message call. Any state modifications will cause an error.
 func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byte, gas uint64) (ret []byte, gasLeft uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if trace := evm.traceFrame(STATICCALL, caller, addr, input, gas, nil); trace != nil {
+		defer func() { trace(ret, gasLeft, err) }()
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, gas, ErrMaxCallDepthExceeded
 	}
@@ -923,7 +1005,20 @@ func create2Address(caller types.Address, salt *big.Int, initCodeHash []byte) ty
 }
 
 // Create creates a new contract with the given code.
-func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big.Int) ([]byte, types.Address, uint64, error) {
+func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big.Int) (ret []byte, created types.Address, left uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if !evm.amsterdamStateGasActive() && !evm.readOnly && evm.Config.Debug {
+		if _, ok := evm.Config.Tracer.(FrameLogger); ok {
+			address := types.Address{}
+			if evm.StateDB != nil {
+				address = createAddress(caller, evm.StateDB.GetNonce(caller))
+			}
+			if finish := evm.traceFrame(CREATE, caller, address, code, gas, value); finish != nil {
+				defer func() { finish(ret, left, err) }()
+			}
+		}
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, types.Address{}, gas, ErrMaxCallDepthExceeded
 	}
@@ -946,11 +1041,22 @@ func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big
 	evm.recordCreationNonce(caller, nonce, nonce+1)
 	contractAddr := createAddress(caller, nonce)
 
-	return evm.create(caller, code, gas, value, contractAddr)
+	return evm.create(caller, code, gas, value, contractAddr, CREATE)
 }
 
 // Create2 creates a new contract using CREATE2 with the given salt.
-func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment *big.Int, salt *big.Int) ([]byte, types.Address, uint64, error) {
+func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment *big.Int, salt *big.Int) (ret []byte, created types.Address, left uint64, err error) {
+	evm.returnData = nil // EIP-211: a new call-like operation starts with an empty buffer.
+
+	if !evm.amsterdamStateGasActive() && !evm.readOnly && evm.Config.Debug {
+		if _, ok := evm.Config.Tracer.(FrameLogger); ok {
+			address := types.Address{}
+			address = create2Address(caller, salt, crypto.Keccak256(code))
+			if finish := evm.traceFrame(CREATE2, caller, address, code, gas, endowment); finish != nil {
+				defer func() { finish(ret, left, err) }()
+			}
+		}
+	}
 	if evm.depth > evm.Config.MaxCallDepth {
 		return nil, types.Address{}, gas, ErrMaxCallDepthExceeded
 	}
@@ -973,7 +1079,7 @@ func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment
 	initCodeHash := crypto.Keccak256(code)
 	contractAddr := create2Address(caller, salt, initCodeHash)
 
-	return evm.create(caller, code, gas, endowment, contractAddr)
+	return evm.create(caller, code, gas, endowment, contractAddr, CREATE2)
 }
 
 // PreWarmAccessList pre-warms the access list with the sender, recipient, and
@@ -1029,9 +1135,9 @@ func gasEIP2929SlotCheck(evm *EVM, addr types.Address, slot types.Hash) uint64 {
 }
 
 // create is the shared implementation for Create and Create2.
-func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address) ([]byte, types.Address, uint64, error) {
+func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address, kind OpCode) ([]byte, types.Address, uint64, error) {
 	if evm.amsterdamStateGasActive() {
-		return evm.createAmsterdam(caller, code, gas, value, contractAddr)
+		return evm.createAmsterdam(caller, code, gas, value, contractAddr, kind)
 	}
 	// EIP-3860 / EIP-7954: max init code size check.
 	maxInit := MaxInitCodeSizeForFork(evm.forkRules)

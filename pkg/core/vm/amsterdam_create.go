@@ -8,7 +8,7 @@ import (
 
 // createAmsterdam keeps the parent reservation outside the child frame. In
 // particular, code-deposit OOG cannot consume the parent's EIP-150 retained gas.
-func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, value *big.Int, address types.Address) (ret []byte, created types.Address, left uint64, err error) {
+func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, value *big.Int, address types.Address, kind OpCode) (ret []byte, created types.Address, left uint64, err error) {
 	if len(code) > MaxInitCodeSizeForFork(evm.forkRules) {
 		return nil, types.Address{}, gas, ErrMaxInitCodeSizeExceeded
 	}
@@ -36,6 +36,15 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 	if parent != nil {
 		retained = gas / CallGasFraction
 		gas -= retained
+	}
+	if finish := evm.traceFrame(kind, caller, address, code, gas, value); finish != nil {
+		defer func() {
+			childLeft := left
+			if childLeft >= retained {
+				childLeft -= retained
+			}
+			finish(ret, childLeft, err)
+		}()
 	}
 	frame := evm.beginStateGasFrame(caller, address, value, gas)
 	// Top-level callers outside transaction processing still pay the state they

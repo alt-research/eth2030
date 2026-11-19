@@ -1108,6 +1108,26 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 }
 
 func applyMessageWithOptions(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, options messageOptions, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+	observer, observing := options.vmConfig.Tracer.(vm.TransactionLogger)
+	if !observing {
+		return executeMessage(config, getHash, statedb, header, msg, gp, options, balTracker...)
+	}
+	amsterdam := config != nil && config.IsMerge() && config.IsAmsterdam(header.Time)
+	reservoir := uint64(0)
+	if amsterdam && !options.uncapped && msg.GasLimit > vm.AmsterdamMaxExecutionGas {
+		reservoir = msg.GasLimit - vm.AmsterdamMaxExecutionGas
+	}
+	observer.CaptureTransactionStart(vm.TraceTransaction{From: msg.From, To: msg.To, Value: msg.Value, Input: msg.Data, Gas: msg.GasLimit, Amsterdam: amsterdam, Reservoir: reservoir})
+	oldLogs := len(statedb.GetLogs(msg.TxHash))
+	result, err := executeMessage(config, getHash, statedb, header, msg, gp, options, balTracker...)
+	if err == nil {
+		observer.CaptureTransactionEnd(vm.TraceGasUsage{UsedGas: result.UsedGas, RegularGasUsed: result.BlockGasUsed, StateGasUsed: result.StateGasUsed, GasRefund: result.GasRefund, Amsterdam: amsterdam}, result.ReturnData, result.Err, len(statedb.GetLogs(msg.TxHash))-oldLogs)
+	}
+	return result, err
+}
+
+func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, msg *corconfig.Message, gp *gaspool.GasPool, options messageOptions, balTracker ...vm.BALTracker) (*ExecutionResult, error) {
+
 	if options.simulation && !options.validation {
 		copy := *msg
 		copy.Nonce = statedb.GetNonce(copy.From)

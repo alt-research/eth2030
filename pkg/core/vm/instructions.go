@@ -740,11 +740,9 @@ func makeLog(n int) executionFunc {
 		}
 		data := memory.Get(int64(offset.Uint64()), int64(size.Uint64()))
 		if evm.StateDB != nil {
-			evm.StateDB.AddLog(&types.Log{
-				Address: contract.Address,
-				Topics:  topics,
-				Data:    data,
-			})
+			entry := &types.Log{Address: contract.Address, Topics: topics, Data: data}
+			evm.StateDB.AddLog(entry)
+			evm.traceLog(entry)
 		}
 		return nil, nil
 	}
@@ -1263,9 +1261,15 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 
 	if evm.StateDB != nil {
 		balance := evm.StateDB.GetBalance(contract.Address)
+		// The implicit transfer log belongs to the executing frame, before the
+		// synthetic zero-gas SELFDESTRUCT child is recorded (SDK hook ordering).
+		evm.recordETHTransfer(contract.Address, beneficiary, balance)
+		if finish := evm.traceFrame(SELFDESTRUCT, contract.Address, beneficiary, nil, 0, balance); finish != nil {
+			defer finish(nil, 0, nil)
+		}
 		if balance.Sign() > 0 {
 			// EIP-7708: only a transfer to a different beneficiary is logged.
-			evm.recordETHTransfer(contract.Address, beneficiary, balance)
+
 			// EIP-7928: capture pre-transfer balances for BAL tracking.
 			var preSelfBal, preBenBal *big.Int
 			if evm.balTracker != nil {

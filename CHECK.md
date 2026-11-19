@@ -1,3 +1,10 @@
+## Osaka precompile activation and bounds (2026-11-19)
+
+- [ ] Read EIPs 7823/7883 and reproduce missing native fork activation against independent vectors.
+- [ ] Implement bounded Osaka ModExp pricing/execution and wire canonical fork selection without altering earlier pricing.
+- [ ] Verify direct and signed consumer fork boundaries, official state roots, full/integration/race/vet/build checks.
+- [ ] Record status and publish a separate corrective PR.
+
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 - [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.

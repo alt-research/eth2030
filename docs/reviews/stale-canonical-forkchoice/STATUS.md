@@ -1,0 +1,3 @@
+# Recovering CL forkchoice interoperability in progress
+
+The independent Lodestar control is OOM-killed under its declared original memory budget, then restarts from an older persisted checkpoint. It downloads actual block/envelope ranges from Lighthouse but Native Engine responds -38002 (finalized block regresses) to its older canonical forkchoice notifications and catch-up stalls. The old heads are execution-validated canonical ancestors; Engine Paris forkchoice rule 2 permits skipping their update with VALID/latestValidHash and no build. This review owns that explicit stale-notification path while preserving actual finalized boundaries, off-chain checkpoint rejection and atomic forkchoice publication. No finalized safety check is removed as a workaround.

@@ -12,8 +12,9 @@ Current bundles:
 | provenance.tar.zst | 33 | 5122689 | 363665 | Public genesis/trusted bootstrap, exact source/fixture pins, source/license/lock inventories and byte-identical native rebuild. |
 | network-recovery.tar.zst | 54 | 9690942 | 113352 | Installed dependency race, original failed adapters, exact module deployment and three automatic provider-loss recoveries. |
 | final-operating.tar.zst | 22 | 27539344 | 1088606 | Final compatible 400-slot steady and 60-slot pressure measurements, independent finality/offline replays, 270 account proofs and exactly reproducible Engine selections. |
+| final-cold.tar.zst | 19 | 1069298 | 71400 | Final-source empty-database full/snap completion, original BAL readback, four independent account proofs and original factory getter on both roles. |
 
-Final cold-source and registry continuation inputs are being added as separate bundles. These pending cases are not represented as completed by the archives above.
+The registry continuation inputs are being added as a separate bundle. This pending case is not represented as completed by the archives above.
 
 Verify an archive from the repository root:
 

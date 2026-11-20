@@ -2,7 +2,6 @@
   "baseline": "7068cd97394570bb7b459eb88a5bbdc613911db4",
   "finding": "F1",
   "range_test_blocks": 65537,
-  "moving_target_changes": 96,
   "header_lru_limit": 65536,
   "body_cache_bytes": 67108864,
   "retained_paths": 2,
@@ -17,5 +16,6 @@
   "full_vet": true,
   "native_build": true,
   "toolchain": "go1.26.11",
-  "authority": "CL-nominated head only; staged headers never execution authority"
+  "authority": "CL-nominated head only; staged headers never execution authority",
+  "configured_head_change_limit": 96
 }

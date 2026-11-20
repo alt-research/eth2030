@@ -1,0 +1,10 @@
+{
+  "declared_at": "2026-11-20T01:22:25.289871+00:00",
+  "source_el": "d4bdb8d39a4e13928b6548b5049f865f6ce59556",
+  "source_cl": "d547ba984",
+  "scope": "A separately named fresh empty-database snap pair, after preserving and stopping the original failed pair. Same independent Geth and private genesis; no database transplant or frozen target.",
+  "completion_deadline_seconds": 600,
+  "memory_per_process_bytes": 4096000000,
+  "cpus_per_process": 2,
+  "requires": "Actual authenticated state/pivot import, nonoptimistic CL and common independent execution hash/finality. API readiness alone is insufficient."
+}

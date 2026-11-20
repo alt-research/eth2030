@@ -369,6 +369,13 @@ func (s *SnapStateDB) Commit() (types.Hash, error) {
 }
 func (s *SnapStateDB) Dup() StateDB { return &SnapStateDB{s.memory.Copy(), s.base, s.db} }
 
+// ExecutionCopy keeps the authenticated bootstrap base and a private journal.
+// New canonical states are persisted by the chain's validated block batch;
+// committing execution must not duplicate the entire downloaded flat snapshot.
+func (s *SnapStateDB) ExecutionCopy() *SnapStateDB {
+	return &SnapStateDB{memory: s.memory.Copy(), base: s.base}
+}
+
 func (s *SnapStateDB) CreateAccount(addr types.Address) {
 	s.load(addr)
 	s.memory.CreateAccount(addr)

@@ -120,6 +120,9 @@ func (bc *Blockchain) adoptSnapPivot(pivot *types.Block, st state.StateDB, heade
 func (bc *Blockchain) RestoreSnapPivot() error {
 	encoded, err := bc.db.Get(snapPivotKey)
 	if err == rawdb.ErrNotFound {
+		if restored, err := bc.restoreIndexedHead(); err != nil || restored {
+			return err
+		}
 		return bc.replayStoredAfter(bc.genesis)
 	}
 	if err != nil {

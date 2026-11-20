@@ -144,7 +144,11 @@ func TestSparseSamplerTwoProvidersCustodyExpansionAndEagerPromotion(t *testing.T
 		}
 	}
 	target.PrepareBlobBuilding()
-	awaitRelay(t, "eager reconstruction", func() bool { return targetPool.Get(native.Hash()) != nil })
+	// Pool admission publishes the reconstructed blob before the response worker
+	// removes its staging entry. Observe completion of both asynchronous effects.
+	awaitRelay(t, "eager reconstruction and staged cleanup", func() bool {
+		return targetPool.Get(native.Hash()) != nil && target.relay.store.Get(native.Hash()) == nil
+	})
 	full := targetPool.Get(native.Hash())
 	if !types.HasFullBlobSidecar(full) || !bytes.Equal(full.BlobSidecar().Blobs[0], blob) {
 		t.Fatal("eager builder did not reconstruct full signed data")

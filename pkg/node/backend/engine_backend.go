@@ -297,7 +297,7 @@ func (b *EngineBackend) processBlockInternal(
 	// Decode transactions from raw bytes.
 	var txs []*types.Transaction
 	for _, raw := range p.Transactions {
-		tx, err := types.DecodeTxRLP(raw)
+		tx, err := types.DecodeBlockTransaction(raw)
 		if err != nil {
 			return payload.PayloadStatusV1{
 				Status:          engine.StatusInvalid,

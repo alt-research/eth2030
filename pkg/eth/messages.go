@@ -445,6 +445,12 @@ func decodeBodyListFromRLP(data []byte) ([]BlockBodyData, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decode txs: %w", err)
 		}
+		for _, tx := range txs {
+			if tx.BlobSidecar() != nil {
+				return nil, fmt.Errorf("blob network wrapper is not valid in a block body")
+			}
+		}
+
 		// Uncles list.
 		uncleListBytes, err := s.RawItem()
 		if err != nil {

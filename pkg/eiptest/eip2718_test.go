@@ -9,7 +9,8 @@ import (
 )
 
 // TestEIP2718_TypedEnvelopeMatrix verifies the typed transaction envelope:
-// every supported tx type commits successfully, and the type byte round-trips.
+// non-blob controls commit and their type bytes round-trip; the sidecar-less
+// blob row is an explicit pool/builder exclusion control.
 func TestEIP2718_TypedEnvelopeMatrix(t *testing.T) {
 	s := eiptest.New(t)
 	enc := s.Encoding()
@@ -39,24 +40,30 @@ func TestEIP2718_TypedEnvelopeMatrix(t *testing.T) {
 			return eiptest.UnsignedBlob(alice.Address, chainID, s.Nonce(alice.Address), s.Bob().Address, one, gas, feeCap, tip, big.NewInt(1_000_000_000), []types.Hash{eiptest.BlobHash(1)})
 		}},
 		{"setcode-7702", func() *types.Transaction {
-			return eiptest.UnsignedSetCode(alice.Address, chainID, s.Nonce(alice.Address), s.Bob().Address, gas, feeCap, tip, nil)
+			authority := s.Charlie()
+			auth := eiptest.Auth(chainID, authority, s.Bob().Address, s.Nonce(authority.Address))
+			return eiptest.UnsignedSetCode(alice.Address, chainID, s.Nonce(alice.Address), s.Bob().Address, gas, feeCap, tip, []types.Authorization{auth})
 		}},
 	}
-	sentTypes := map[uint8]bool{}
+	seenTypes := map[uint8]bool{}
 	for _, tc := range cases {
 		tx := tc.build()
 		r := s.Commit(tc.build()) // one block per tx (distinct nonces)
-		// Documented builder behavior (b683107): sidecar-less blob txs are
-		// excluded from payloads until BlobsBundle support is wired.
+		// A sidecar-less blob row cannot be admitted as a pooled blob. Real
+		// sidecar-backed HTTP/import cases are covered by the Node regressions.
 		if tx.Type() == types.BlobTxType {
 			if r.TxCount() != 0 {
 				t.Fatalf("%s: sidecar-less blob tx unexpectedly included", tc.name)
 			}
-			sentTypes[tx.Type()] = true
+			seenTypes[tx.Type()] = true
 			continue
 		}
 		eiptest.ExpectSuccess(t, r, 0)
-		sentTypes[tx.Type()] = true
+		if tx.Type() == types.SetCodeTxType {
+			eiptest.ExpectDelegateAt(t, s, s.Charlie().Address, s.Bob().Address)
+		}
+
+		seenTypes[tx.Type()] = true
 		// RLP roundtrip preserves the type byte (EIP-2718 envelope core).
 		enc.RLPRoundTrip(t, tx)
 		if got := r.Block.Transactions()[0].Type(); got != tx.Type() {
@@ -64,7 +71,7 @@ func TestEIP2718_TypedEnvelopeMatrix(t *testing.T) {
 		}
 	}
 	for _, want := range []uint8{types.LegacyTxType, types.AccessListTxType, types.DynamicFeeTxType, types.BlobTxType, types.SetCodeTxType} {
-		if !sentTypes[want] {
+		if !seenTypes[want] {
 			t.Fatalf("type 0x%02x missing from matrix", want)
 		}
 	}

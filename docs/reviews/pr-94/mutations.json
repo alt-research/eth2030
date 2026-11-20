@@ -1,0 +1,51 @@
+{
+  "source_revision": "d06fadc968f94483d69891d347ffca761669cfd1",
+  "mutations": [
+    {
+      "mutation": "legacy-high-S",
+      "detected": true,
+      "package": "./core/types",
+      "test_pattern": "TestNativeSignerRejectsMalleabilityAndFullWidthAliases/0"
+    },
+    {
+      "mutation": "typed-chain-width",
+      "detected": true,
+      "package": "./core/types",
+      "test_pattern": "TestNativeSignerRejectsMalleabilityAndFullWidthAliases/2"
+    },
+    {
+      "mutation": "typed-parity-width",
+      "detected": true,
+      "package": "./core/types",
+      "test_pattern": "TestNativeSignerRejectsMalleabilityAndFullWidthAliases/2"
+    },
+    {
+      "mutation": "normalize-blob-creation",
+      "detected": true,
+      "package": "./core/types",
+      "test_pattern": "TestSignedEnvelopeRecipientsAreNotNormalizedFromCreation"
+    },
+    {
+      "mutation": "block-wrapper-ingress",
+      "detected": true,
+      "package": "./node",
+      "test_pattern": "TestSignedOrdinaryAdmissionAndBoundEngineRejections"
+    },
+    {
+      "mutation": "pool-nonce-max",
+      "detected": true,
+      "package": "./node",
+      "test_pattern": "TestSignedOrdinaryAdmissionAndBoundEngineRejections"
+    },
+    {
+      "mutation": "pool-empty-authorization",
+      "detected": true,
+      "package": "./node",
+      "test_pattern": "TestSignedOrdinaryAdmissionAndBoundEngineRejections"
+    }
+  ],
+  "redundant_guard_control": {
+    "mutation": "omit only specific empty-recipient error while retaining exact-address-length rejection",
+    "outcome": "survived because the remaining guard rejects the prohibited envelope"
+  }
+}

@@ -77,7 +77,7 @@ func BlobTxHash(tx *BlobTx) Hash {
 		GasTipCap:  bigOrZero(tx.GasTipCap),
 		GasFeeCap:  bigOrZero(tx.GasFeeCap),
 		Gas:        tx.Gas,
-		To:         tx.To,
+		To:         tx.To[:],
 		Value:      bigOrZero(tx.Value),
 		Data:       tx.Data,
 		AccessList: encodeAccessList(tx.AccessList),
@@ -131,7 +131,7 @@ func EncodeBlobTx(tx *BlobTx) ([]byte, error) {
 		GasTipCap:  bigOrZero(tx.GasTipCap),
 		GasFeeCap:  bigOrZero(tx.GasFeeCap),
 		Gas:        tx.Gas,
-		To:         tx.To,
+		To:         tx.To[:],
 		Value:      bigOrZero(tx.Value),
 		Data:       tx.Data,
 		AccessList: encodeAccessList(tx.AccessList),
@@ -164,13 +164,20 @@ func DecodeBlobTx(data []byte) (*BlobTx, error) {
 	if err := rlp.DecodeBytes(data[1:], &dec); err != nil {
 		return nil, fmt.Errorf("decode blob tx: %w", err)
 	}
+	if len(dec.To) == 0 {
+		return nil, ErrBlobTxCreate
+	}
+	if len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	return &BlobTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
 		GasTipCap:  dec.GasTipCap,
 		GasFeeCap:  dec.GasFeeCap,
 		Gas:        dec.Gas,
-		To:         dec.To,
+		To:         BytesToAddress(dec.To),
 		Value:      dec.Value,
 		Data:       dec.Data,
 		AccessList: decodeAccessList(dec.AccessList),

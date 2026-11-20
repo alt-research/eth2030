@@ -672,10 +672,10 @@ func validateBlobHashes(payload *ExecutionPayloadV3, expected []types.Hash) erro
 	// Collect all blob versioned hashes from transactions in the payload.
 	var actual []types.Hash
 	for _, txBytes := range payload.Transactions {
-		tx, err := types.DecodeTxRLP(txBytes)
+		tx, err := types.DecodeBlockTransaction(txBytes)
 		if err != nil {
-			// Invalid transaction encoding will be caught later during block processing.
-			continue
+			// A malformed envelope cannot supply a trustworthy blob-hash list.
+			return fmt.Errorf("invalid transaction encoding: %w", err)
 		}
 		hashes := tx.BlobHashes()
 		if len(hashes) > 0 {

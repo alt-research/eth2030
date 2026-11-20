@@ -53,10 +53,13 @@ func (s EIP155Signer) ChainID() uint64 { return s.chainID }
 
 // Hash returns the signing hash for a legacy transaction.
 func (s EIP155Signer) Hash(tx *Transaction) Hash {
-	if tx.Type() != LegacyTxType {
+	legacy, ok := tx.Inner().(*LegacyTx)
+	if !ok {
 		return Hash{}
 	}
-	return tx.SigningHash()
+	copy := *legacy
+	copy.V = new(big.Int).Add(new(big.Int).Lsh(new(big.Int).Set(s.chainIDBig), 1), big.NewInt(35))
+	return signingHashLegacy(&copy)
 }
 
 // SignatureValues parses a 65-byte [R||S||V] signature.
@@ -69,25 +72,30 @@ func (s EIP155Signer) Sender(tx *Transaction) (Address, error) {
 	if tx.Type() != LegacyTxType {
 		return Address{}, errTxTypeNotSupported
 	}
-	v, r, rs := tx.RawSignatureValues()
-	if v == nil || r == nil || rs == nil {
+	v, r, scalar := tx.RawSignatureValues()
+	if v == nil || r == nil || scalar == nil || v.Sign() < 0 || scalar.Cmp(new(big.Int).Rsh(new(big.Int).Set(secp256k1NCopy), 1)) > 0 {
 		return Address{}, errInvalidSig
 	}
-
-	var recovery byte
-	vVal := v.Uint64()
-	if vVal == 27 || vVal == 28 {
-		recovery = byte(vVal - 27)
+	var parity uint64
+	if v.Cmp(big.NewInt(27)) == 0 || v.Cmp(big.NewInt(28)) == 0 {
+		parity = v.Uint64() - 27
 	} else {
-		// EIP-155: V = chainID*2 + 35 + recoveryID
-		recovery = byte(vVal - 35 - 2*s.chainID)
+		if v.Cmp(big.NewInt(35)) < 0 {
+			return Address{}, errInvalidSig
+		}
+		derived := deriveChainID(v)
+		if !derived.IsUint64() {
+			return Address{}, errInvalidSig
+		}
+		if derived.Cmp(s.chainIDBig) != 0 {
+			return Address{}, errInvalidChainID
+		}
+		parity = new(big.Int).Sub(v, new(big.Int).Add(new(big.Int).Lsh(new(big.Int).Set(s.chainIDBig), 1), big.NewInt(35))).Uint64()
 	}
-	if recovery > 1 {
+	if parity > 1 {
 		return Address{}, errInvalidSig
 	}
-
-	sigHash := tx.SigningHash()
-	return RecoverPlain(sigHash, r, rs, recovery)
+	return RecoverPlain(tx.SigningHash(), r, scalar, byte(parity))
 }
 
 // LondonSigner implements Signer for EIP-1559 dynamic fee transactions
@@ -110,6 +118,9 @@ func (s LondonSigner) ChainID() uint64 { return s.chainID }
 
 // Hash returns the signing hash for the given transaction.
 func (s LondonSigner) Hash(tx *Transaction) Hash {
+	if tx.Type() == LegacyTxType {
+		return NewEIP155Signer(s.chainID).Hash(tx)
+	}
 	return tx.SigningHash()
 }
 
@@ -120,43 +131,30 @@ func (s LondonSigner) SignatureValues(sig []byte) (r, s2 *big.Int, v byte, err e
 
 // Sender recovers the sender address from the transaction's signature.
 func (s LondonSigner) Sender(tx *Transaction) (Address, error) {
-	v, r, rs := tx.RawSignatureValues()
-	if r == nil || rs == nil {
-		return Address{}, errInvalidSig
+	if tx.Type() == LegacyTxType {
+		return NewEIP155Signer(s.chainID).Sender(tx)
 	}
-
-	var recovery byte
 	switch tx.Type() {
-	case LegacyTxType:
-		if v == nil {
-			return Address{}, errInvalidSig
-		}
-		vVal := v.Uint64()
-		if vVal == 27 || vVal == 28 {
-			recovery = byte(vVal - 27)
-		} else {
-			recovery = byte(vVal - 35 - 2*s.chainID)
-		}
 	case AccessListTxType, DynamicFeeTxType, BlobTxType, SetCodeTxType, MultiDimFeeTxType:
-		if v == nil {
-			recovery = 0
-		} else {
-			recovery = byte(v.Uint64())
-		}
-		txChainID := tx.ChainId()
-		if txChainID != nil && txChainID.Uint64() != s.chainID {
-			return Address{}, errInvalidChainID
-		}
 	default:
 		return Address{}, errTxTypeNotSupported
 	}
-
-	if recovery > 1 {
+	v, r, scalar := tx.RawSignatureValues()
+	if r == nil || scalar == nil || scalar.Cmp(new(big.Int).Rsh(new(big.Int).Set(secp256k1NCopy), 1)) > 0 {
 		return Address{}, errInvalidSig
 	}
-
-	sigHash := tx.SigningHash()
-	return RecoverPlain(sigHash, r, rs, recovery)
+	if v != nil && (v.Sign() < 0 || !v.IsUint64() || v.Uint64() > 1) {
+		return Address{}, errInvalidSig
+	}
+	chain := tx.ChainId()
+	if chain == nil || chain.Cmp(s.chainIDBig) != 0 {
+		return Address{}, errInvalidChainID
+	}
+	parity := byte(0)
+	if v != nil {
+		parity = byte(v.Uint64())
+	}
+	return RecoverPlain(tx.SigningHash(), r, scalar, parity)
 }
 
 // LatestSigner returns the most feature-complete signer for the given chain ID.

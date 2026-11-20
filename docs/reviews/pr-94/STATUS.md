@@ -1,0 +1,11 @@
+# Native transaction validation qualified
+
+Signed ordinary transactions now enforce low-S, exact parity and full-width chain comparisons before sender caching. Pre-Homestead high-S and generic ecrecover behavior remain intact. Canonical RLP decoding retains exact recipient lengths and rejects prohibited blob/set-code creation, oversized authorization fields and the unassigned typed-legacy prefix. Standard envelopes reject nonce overflow and empty authorization lists. Consensus block ingress rejects pooled blob wrappers, while raw RPC transport retains valid sidecars.
+
+The actual Node RPC/Engine regression executes both Osaka and Amsterdam with independently signed envelopes and independently reconstructed complete header commitments. A positive payload is imported and selected on a second native node; six named invalid envelopes per fork reach their intended guards without changing head/state or persisting a block. A real KZG-valid blob wrapper is accepted by raw admission and rejected in a block body. This includes the outer declared-gas caps and parent-specific latestValidHash checks. Engine blob-hash validation now propagates malformed transaction decoding errors instead of masking them as a hash-count mismatch.
+
+The composed independent official EELS tests@v21.0.2 state campaign passes all 14,665 Osaka and 16,908 Amsterdam cases at native-fixture branch revision 654fbbd8cb286ac687437473e5fecb3a55df738c, including this branch's source d06fadc968f94483d69891d347ffca761669cfd1. The native adapter and complete-corpus CI are a separate review.
+
+Validation: full Go tests, core integration, full vet and build pass. Seven affected packages pass race checking after serializing the node run. The first concurrent-worktree run hit existing deterministic metrics/WS test ports; its failure logs are retained and excluded. Seven behavioral mutations are detected; removing only the specific empty-recipient error still rejects through the independent exact-length guard (retained redundant-guard control). See mutations.json.
+
+This closes the discovered signed-envelope/import defects. The broader R04 historical RPC/block-override/estimation matrix and R03 real application sequence campaign remain separate integration obligations; this review does not claim those campaigns complete.

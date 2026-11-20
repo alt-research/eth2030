@@ -528,9 +528,9 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 	}, nil
 }
 
-func cacheTransactionSender(cfg *corconfig.ChainConfig, tx *types.Transaction) {
+func cacheTransactionSender(cfg *corconfig.ChainConfig, tx *types.Transaction) error {
 	if tx.Sender() != nil {
-		return
+		return nil
 	}
 	switch inner := tx.Inner().(type) {
 	case *types.AATx:
@@ -543,11 +543,17 @@ func cacheTransactionSender(cfg *corconfig.ChainConfig, tx *types.Transaction) {
 		tx.SetSender(types.PQPubKeyToAddress(inner.PQPublicKey))
 	default:
 		if cfg != nil && cfg.ChainID != nil {
-			if addr, err := types.MakeSigner(cfg.ChainID.Uint64(), tx.Type()).Sender(tx); err == nil {
-				tx.SetSender(addr)
+			addr, err := types.MakeSigner(cfg.ChainID.Uint64(), tx.Type()).Sender(tx)
+			if err != nil {
+				if tx.Type() <= types.SetCodeTxType {
+					return err
+				}
+				return nil
 			}
+			tx.SetSender(addr)
 		}
 	}
+	return nil
 }
 
 // capturePreState captures balance and nonce values for addresses involved
@@ -558,7 +564,7 @@ func capturePreState(cfg *corconfig.ChainConfig, statedb state.StateDB, tx *type
 	nonces := make(map[types.Address]uint64)
 
 	// Resolve wire-decoded transactions before recording the pre-state.
-	cacheTransactionSender(cfg, tx)
+	_ = cacheTransactionSender(cfg, tx)
 	if sender := tx.Sender(); sender != nil {
 		balances[*sender] = new(big.Int).Set(statedb.GetBalance(*sender))
 		nonces[*sender] = statedb.GetNonce(*sender)
@@ -800,7 +806,49 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 		tx.SetSender(types.PQPubKeyToAddress(pq.PQPublicKey))
 	}
 
-	cacheTransactionSender(config, tx)
+	if tx.Type() <= types.SetCodeTxType {
+		_, r, scalar := tx.RawSignatureValues()
+		signed := r != nil && r.Sign() != 0 || scalar != nil && scalar.Sign() != 0 || tx.Sender() == nil
+		if signed {
+			active := true
+			switch tx.Type() {
+			case types.AccessListTxType:
+				active = rules.IsBerlin
+			case types.DynamicFeeTxType:
+				active = rules.IsLondon
+			case types.BlobTxType:
+				active = rules.IsCancun
+			case types.SetCodeTxType:
+				active = rules.IsPrague
+			}
+			if !active {
+				return nil, 0, fmt.Errorf("transaction type %d is not active", tx.Type())
+			}
+			if tx.Type() == types.LegacyTxType && !rules.IsEIP155 {
+				v, _, _ := tx.RawSignatureValues()
+				if v != nil && v.Cmp(big.NewInt(35)) >= 0 {
+					return nil, 0, errors.New("protected legacy transaction before EIP-155")
+				}
+			}
+		}
+	}
+	if err := types.ValidateOrdinaryEnvelope(tx); err != nil {
+		return nil, 0, err
+	}
+	if tx.Sender() == nil && tx.Type() == types.LegacyTxType && !config.IsHomestead(header.Number) {
+		v, r, scalar := tx.RawSignatureValues()
+		if v == nil || !v.IsUint64() || (v.Uint64() != 27 && v.Uint64() != 28) {
+			return nil, 0, errors.New("invalid pre-Homestead legacy signature")
+		}
+		sender, err := types.RecoverPlain(tx.SigningHash(), r, scalar, byte(v.Uint64()-27))
+		if err != nil {
+			return nil, 0, err
+		}
+		tx.SetSender(sender)
+	}
+	if err := cacheTransactionSender(config, tx); err != nil {
+		return nil, 0, err
+	}
 	msg := corconfig.TransactionToMessage(tx)
 	// AA-1.3: wire slasher so applyMessage can slash paymasters on bad settlement.
 	msg.Slasher = slasher
@@ -1189,6 +1237,17 @@ func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, state
 
 	options.overrides.apply(evm)
 
+	if msg.TxType <= types.SetCodeTxType && msg.Nonce == ^uint64(0) && (!options.simulation || options.validation) {
+		return nil, types.ErrNonceMax
+	}
+	if msg.TxType == types.SetCodeTxType {
+		if msg.To == nil {
+			return nil, types.ErrSetCodeTxCreate
+		}
+		if len(msg.AuthList) == 0 {
+			return nil, types.ErrEmptyAuthorizations
+		}
+	}
 	// Validate blob obligations before consuming execution gas or changing state.
 	blobCost, blobMaxCost := new(big.Int), new(big.Int)
 	if msg.TxType == types.BlobTxType {

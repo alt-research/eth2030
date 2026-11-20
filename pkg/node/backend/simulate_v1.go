@@ -20,6 +20,7 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
+	gethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
@@ -123,7 +124,7 @@ func (b *RPCBackend) Simulate(options rpctypes.SimulateOptions, base *types.Head
 			}
 		}
 		if number <= parent.Number.Uint64() {
-			return nil, simulationError(-38020, "block number must increase")
+			return nil, simulationError(-38020, "block numbers must be in order: %d <= %d", number, parent.Number.Uint64())
 		}
 		if number-base.Number.Uint64() > simulationMaxBlocks {
 			return nil, simulationError(-38026, "too many simulated blocks including gaps")
@@ -172,6 +173,10 @@ func makeSimulationHeader(cfg *config.ChainConfig, parent *types.Header, overrid
 		return nil, nil, nil, simulationError(-38021, "timestamp overflow")
 	}
 	header := &types.Header{ParentHash: parent.Hash(), Number: new(big.Int).Add(parent.Number, big.NewInt(1)), Time: parent.Time + 12, GasLimit: parent.GasLimit, UncleHash: coreblock.EmptyUncleHash, Difficulty: new(big.Int), TxHash: types.EmptyRootHash, ReceiptHash: types.EmptyRootHash}
+	header.Coinbase = parent.Coinbase
+	if parent.Difficulty != nil {
+		header.Difficulty.Set(parent.Difficulty)
+	}
 	if parent.SlotNumber != nil {
 		if *parent.SlotNumber == math.MaxUint64 {
 			return nil, nil, nil, simulationError(-32602, "slot overflow")
@@ -215,7 +220,7 @@ func makeSimulationHeader(cfg *config.ChainConfig, parent *types.Header, overrid
 		}
 	}
 	if header.Time <= parent.Time {
-		return nil, nil, nil, simulationError(-38021, "block timestamp must increase")
+		return nil, nil, nil, simulationError(-38021, "block timestamps must be in order: %d <= %d", header.Time, parent.Time)
 	}
 	if cfg.IsLondon(header.Number) {
 		header.BaseFee = new(big.Int)
@@ -284,6 +289,9 @@ func makeSimulationHeader(cfg *config.ChainConfig, parent *types.Header, overrid
 		header.WithdrawalsHash = &root
 	} else if len(withdrawals) > 0 {
 		return nil, nil, nil, simulationError(-32602, "withdrawals before Shanghai")
+	}
+	if !cfg.IsShanghai(header.Time) {
+		withdrawals = nil
 	}
 	return header, withdrawals, blobPrice, nil
 }
@@ -355,8 +363,17 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 		if err != nil {
 			return fail(simulationValidationError(err))
 		}
-		if db.GetNonce(msg.From) == math.MaxUint64 {
-			return fail(simulationError(-32603, "sender nonce at maximum"))
+		if options.Validation {
+			if db.GetNonce(msg.From) == math.MaxUint64 {
+				return fail(simulationError(-32603, "err: nonce has max value: address %s, nonce: %d (supplied gas %d)", gethcommon.Address(msg.From).Hex(), uint64(math.MaxUint64), requested))
+			}
+			fee := msg.GasFeeCap
+			if fee == nil {
+				fee = msg.GasPrice
+			}
+			if header.BaseFee != nil && fee.Cmp(header.BaseFee) < 0 {
+				return fail(simulationError(-32602, "err: max fee per gas less than block base fee: address %s, maxFeePerGas: %s, baseFee: %s (supplied gas %d)", gethcommon.Address(msg.From).Hex(), fee, header.BaseFee, requested))
+			}
 		}
 		tx := simulationTransaction(cfg, msg, input)
 		msg.TxHash = tx.Hash()
@@ -376,6 +393,12 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 		}
 		result, err := execution.SimulateMessageWithConfig(cfg, getHash, db, header, msg, pool, settings)
 		if err != nil {
+			if errors.Is(err, execution.ErrInsufficientBalance) {
+				return fail(simulationError(-38014, "err: insufficient funds for gas * price + value: address %s have %s want %s (supplied gas %d)", gethcommon.Address(msg.From).Hex(), db.GetBalance(msg.From), msg.Value, requested))
+			}
+			if strings.Contains(err.Error(), "intrinsic") {
+				return fail(simulationError(-38013, "err: %s (supplied gas %d)", err, requested))
+			}
 			return fail(simulationValidationError(err))
 		}
 		if overrides.Context != nil && overrides.Context.Err() != nil {
@@ -391,9 +414,7 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 			status = 0
 			failure = &rpctypes.RPCError{Code: -32015, Message: result.Err.Error()}
 			if errors.Is(result.Err, vm.ErrExecutionReverted) {
-				failure.Code = 3
-				failure.Message = "execution reverted"
-				failure.Data = hexutil.Encode(result.ReturnData)
+				failure = rpctypes.NewRevertError(result.ReturnData)
 			}
 		}
 		receipt := types.NewReceipt(status, cumulative+result.UsedGas)
@@ -408,6 +429,9 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 		cumulative += result.UsedGas
 		blobGasUsed += tx.BlobGas()
 		outputs = append(outputs, rpctypes.SimulateCallResult{ReturnData: hexutil.Encode(result.Return()), GasUsed: hexutil.EncodeUint64(result.UsedGas), MaxUsedGas: hexutil.EncodeUint64(result.MaxUsedGas), Status: hexutil.EncodeUint64(status), Logs: make([]*rpctypes.RPCLog, 0), Error: failure})
+		if !cfg.IsAmsterdam(header.Time) {
+			outputs[len(outputs)-1].MaxUsedGas = ""
+		}
 		displayLogs = append(displayLogs, append([]*types.Log(nil), traced.events...))
 		receipts = append(receipts, receipt)
 		transactions = append(transactions, tx)
@@ -437,6 +461,16 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 		*header.BlobGasUsed = blobGasUsed
 	}
 	header.Bloom = types.CreateBloom(receipts)
+	if header.Difficulty != nil && header.Difficulty.Sign() > 0 {
+		reward := int64(5)
+		if cfg.IsByzantium(header.Number) {
+			reward = 3
+		}
+		if cfg.IsConstantinople(header.Number) {
+			reward = 2
+		}
+		db.AddBalance(header.Coinbase, new(big.Int).Mul(big.NewInt(reward), big.NewInt(1_000_000_000_000_000_000)))
+	}
 	header.TxHash = coreblock.DeriveTxsRoot(transactions)
 	header.ReceiptHash = coreblock.DeriveReceiptsRoot(receipts)
 	if err := execution.FinalizeOverlayState(db); err != nil {
@@ -445,14 +479,11 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 	header.Root = db.GetRoot()
 	block := types.NewBlock(header, &types.Body{Transactions: transactions, Withdrawals: withdrawals})
 	types.DeriveReceiptFields(receipts, block.Hash(), header.Number.Uint64(), header.BaseFee, transactions)
-	var logIndex uint
 	for i, logs := range displayLogs {
 		for _, log := range logs {
 			log.BlockHash = block.Hash()
 			log.BlockNumber = header.Number.Uint64()
 			log.BlockTimestamp = header.Time
-			log.Index = logIndex
-			logIndex++
 			outputs[i].Logs = append(outputs[i].Logs, rpctypes.FormatLog(log))
 		}
 	}

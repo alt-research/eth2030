@@ -88,7 +88,7 @@ func TestSimulateV1ActualHTTP(t *testing.T) {
 	})
 	t.Run("explicit-nonce-validation", func(t *testing.T) {
 		var result []blockResult
-		err := rpc.invoke("eth_simulateV1", &result, map[string]any{"validation": true, "blockStateCalls": []any{map[string]any{"calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "nonce": "0x1"}}}}}, "latest")
+		err := rpc.invoke("eth_simulateV1", &result, map[string]any{"validation": true, "blockStateCalls": []any{map[string]any{"blockOverrides": map[string]any{"baseFeePerGas": "0x0"}, "calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "nonce": "0x1"}}}}}, "latest")
 		failure, ok := err.(*track4RPCError)
 		if !ok || failure.Code != -38011 {
 			t.Fatalf("wrong nonce error: %v", err)
@@ -295,12 +295,12 @@ func TestSimulateV1ActualHTTP(t *testing.T) {
 			{"post-merge-difficulty", -32602, false, map[string]any{"blockOverrides": map[string]any{"difficulty": "0x0"}}},
 			{"unknown-state-key", -32602, false, map[string]any{"stateOverrides": map[string]any{sender.Hex(): map[string]any{"unsupported": "0x1"}}}},
 			{"state-key-aliases", -32602, false, map[string]any{"stateOverrides": map[string]any{sender.Hex(): map[string]any{"code": "0x", "Code": "0x"}}}},
-			{"nonce-low", -38010, true, map[string]any{"stateOverrides": map[string]any{sender.Hex(): map[string]any{"nonce": "0x1"}}, "calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "nonce": "0x0"}}}},
+			{"nonce-low", -38010, true, map[string]any{"blockOverrides": map[string]any{"baseFeePerGas": "0x0"}, "stateOverrides": map[string]any{sender.Hex(): map[string]any{"nonce": "0x1"}}, "calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "nonce": "0x0"}}}},
 			{"intrinsic", -38013, false, map[string]any{"calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "gas": "0x3a97"}}}},
-			{"fee", -38012, true, map[string]any{"calls": []any{good()}}},
+			{"fee", -32602, true, map[string]any{"calls": []any{good()}}},
 			{"value", -38014, false, map[string]any{"calls": []any{map[string]any{"to": writer.Hex(), "value": "0x1"}}}},
 			{"block-gas", -38015, false, map[string]any{"calls": []any{map[string]any{"from": sender.Hex(), "to": writer.Hex(), "gas": "0x1c9c381"}}}},
-			{"nonce-max", -32603, false, map[string]any{"stateOverrides": map[string]any{sender.Hex(): map[string]any{"nonce": "0xffffffffffffffff"}}, "calls": []any{good()}}},
+			{"nonce-max", -32603, true, map[string]any{"stateOverrides": map[string]any{sender.Hex(): map[string]any{"nonce": "0xffffffffffffffff"}}, "calls": []any{good()}}},
 			{"move-self", -38022, false, map[string]any{"stateOverrides": map[string]any{types.HexToAddress("0x02").Hex(): map[string]any{"movePrecompileToAddress": types.HexToAddress("0x02").Hex()}}}},
 			{"initcode-limit", -38025, false, map[string]any{"calls": []any{map[string]any{"from": sender.Hex(), "input": "0x" + strings.Repeat("00", 131073)}}}},
 		}

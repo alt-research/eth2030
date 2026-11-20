@@ -16,6 +16,7 @@ type simulationLogState struct {
 	snapshots map[int]int
 	hash      types.Hash
 	index     int
+	count     uint
 }
 
 func (s *simulationLogState) beginCall() { s.events = nil; s.snapshots = make(map[int]int) }
@@ -37,7 +38,10 @@ func (s *simulationLogState) RevertToSnapshot(id int) {
 }
 func (s *simulationLogState) AddLog(log *types.Log) {
 	s.StateDB.AddLog(log)
-	s.events = append(s.events, log)
+	observed := *log
+	observed.Index = s.count
+	s.count++
+	s.events = append(s.events, &observed)
 }
 func (s *simulationLogState) SetTxContext(hash types.Hash, index int) {
 	s.StateDB.SetTxContext(hash, index)
@@ -63,5 +67,6 @@ func (s *simulationLogState) RecordETHTransfer(from, to types.Address, value *bi
 	source, destination := types.Hash{}, types.Hash{}
 	copy(source[12:], from[:])
 	copy(destination[12:], to[:])
-	s.events = append(s.events, &types.Log{Address: types.HexToAddress("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"), Topics: []types.Hash{vm.TransferEventTopic, source, destination}, Data: amount, TxHash: s.hash, TxIndex: uint(s.index)})
+	s.events = append(s.events, &types.Log{Address: types.HexToAddress("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"), Topics: []types.Hash{vm.TransferEventTopic, source, destination}, Data: amount, TxHash: s.hash, TxIndex: uint(s.index), Index: s.count})
+	s.count++
 }

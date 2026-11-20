@@ -69,7 +69,7 @@ func (o *AccountOverride) UnmarshalJSON(data []byte) error {
 type SimulateCallResult struct {
 	ReturnData string    `json:"returnData"`
 	GasUsed    string    `json:"gasUsed"`
-	MaxUsedGas string    `json:"maxUsedGas"`
+	MaxUsedGas string    `json:"maxUsedGas,omitempty"`
 	Status     string    `json:"status"`
 	Logs       []*RPCLog `json:"logs"`
 	Error      *RPCError `json:"error,omitempty"`

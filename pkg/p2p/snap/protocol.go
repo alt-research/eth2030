@@ -81,7 +81,8 @@ type AccountData struct {
 	Body []byte     // RLP-encoded account (nonce, balance, root, codehash).
 }
 
-// AccountRangePacket is the response to GetAccountRangePacket.
+// AccountRangePacket is the response to GetAccountRangePacket. Its wire encoding
+// uses EncodeRLP/DecodeRLP to preserve raw account lists rather than byte strings.
 type AccountRangePacket struct {
 	ID       uint64        // Echoed request identifier.
 	Accounts []AccountData // Accounts in the requested range.

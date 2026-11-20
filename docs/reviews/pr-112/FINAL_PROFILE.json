@@ -1,0 +1,11 @@
+{
+  "declared_at": "2026-11-20T01:37:17.291259+00:00",
+  "budget_anchor": "actual execution process StartedAt",
+  "source_el": "14c5289c",
+  "source_cl": "d547ba984",
+  "completion_deadline_seconds": 600,
+  "memory_per_process_bytes": 4096000000,
+  "cpus_per_process": 2,
+  "scope": "A third, separately named fresh empty-database snap pair after retaining both earlier failures. Same unchanged independent Geth, live CL target, private genesis and normal fallback. No data transplant.",
+  "requires": "Authenticated state/pivot import and ordinary post-pivot execution catch up to the independent live chain with a nonoptimistic online CL."
+}

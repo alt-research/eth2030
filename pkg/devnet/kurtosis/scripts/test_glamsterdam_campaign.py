@@ -9,6 +9,16 @@ import glamsterdam_process_lifecycle as lifecycle
 
 
 class CampaignTests(unittest.TestCase):
+    def test_private_arguments_are_excluded_from_publishable_inventory(self):
+        command = ["run", "--wallet-privkey", "private-key-value", "--builder-privkey=another-secret", "--cl-client=http://beacon"]
+        public = campaign.public_command(command)
+        self.assertNotIn("private-key-value", str(public))
+        self.assertNotIn("another-secret", str(public))
+        self.assertIn("--cl-client=http://beacon", public)
+        shell = campaign.public_command(['tool --builder-mnemonic="private words here" --api-port=8080'])
+        self.assertNotIn("private words", str(shell))
+        self.assertIn("--api-port=8080", shell[0])
+
     def test_percentiles_include_tail_and_runtime_identity_tracks_restart(self):
         self.assertEqual(campaign.percentile(list(range(1, 101)), .99), 99)
         node = {"container": "a", "image_id": "image", "command": [], "entrypoint": [],

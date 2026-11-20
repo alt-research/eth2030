@@ -4,6 +4,7 @@ import argparse
 import base64
 import json
 import math
+import re
 import subprocess
 import time
 import urllib.error
@@ -15,6 +16,26 @@ from concurrent.futures import ThreadPoolExecutor
 ENCLAVE = "99429150b4714b2ea7746343b97175e7"
 GENESIS = "0xfdf84ec05edbc77e24c84bc6882b6f0b634c070b03ea52b284695e04002c6c24"
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+SECRET_FLAGS = ["wallet-privkey", "builder-privkey", "builder-mnemonic", "txpool-auth-token", "rpc.auth_secret", "engine.auth_secret"]
+
+
+def public_command(arguments):
+    if arguments is None:
+        return None
+    result, hide_next = [], False
+    for argument in arguments:
+        if hide_next:
+            result.append("[redacted]")
+            hide_next = False
+            continue
+        if argument in ["--"+name for name in SECRET_FLAGS]:
+            result.append(argument)
+            hide_next = True
+            continue
+        for name in SECRET_FLAGS:
+            argument = re.sub(r"(--"+re.escape(name)+r"(?:=|\s+))(?:\"[^\"]*\"|'[^']*'|[^\s;]+)", r"\1[redacted]", argument)
+        result.append(argument)
+    return result
 
 
 def now():
@@ -41,7 +62,7 @@ def inventory():
             continue
         nodes[service] = {
             "container": item["Id"], "image_name": item["Config"]["Image"],
-            "image_id": item["Image"], "command": item["Config"]["Cmd"],
+            "image_id": item["Image"], "command": public_command(item["Config"]["Cmd"]),
             "entrypoint": item["Config"]["Entrypoint"],
             "memory_limit": item["HostConfig"]["Memory"],
             "nano_cpus": item["HostConfig"]["NanoCpus"],

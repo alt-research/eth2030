@@ -1,4 +1,5 @@
 import json
+import base64
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,21 @@ import glamsterdam_process_lifecycle as lifecycle
 
 
 class CampaignTests(unittest.TestCase):
+    def test_engine_window_detects_unfinished_request_before_sealing_traffic(self):
+        def record(sequence, stamp):
+            return {"session": "real-session", "sequence": sequence, "started": stamp,
+                    "elapsed_ns": 1000, "complete": True, "http_status": 200,
+                    "request_body": base64.b64encode(b'{"method":"engine_newPayloadV5"}').decode(),
+                    "response_body": base64.b64encode(b'{"result":{"status":"VALID"}}').decode()}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "engine.jsonl"
+            first, last = record(1, "1970-01-01T00:00:01Z"), record(3, "1970-01-01T00:00:03Z")
+            path.write_text(json.dumps(first)+"\n"+json.dumps(last)+"\n")
+            result = campaign.engine_window(path, 0, 2)
+            self.assertEqual(result["sequence_gaps"], {"real-session": [2]})
+            path.write_text(json.dumps(first)+"\n")
+            self.assertEqual(campaign.engine_window(path, 0, 2)["unsealed_sessions"], ["real-session"])
+
     def test_private_arguments_are_excluded_from_publishable_inventory(self):
         command = ["run", "--wallet-privkey", "private-key-value", "--builder-privkey=another-secret", "--cl-client=http://beacon"]
         public = campaign.public_command(command)

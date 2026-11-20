@@ -170,6 +170,61 @@ def stable_identity(nodes):
             | {"started_at": node["state"]["StartedAt"]} for name, node in nodes.items()}
 
 
+def engine_window(path, begin, end):
+    times, failed, inside, completed, after, statuses = [], [], {}, {}, {}, {}
+    with path.open() as stream:
+        for index, line in enumerate(stream):
+            try:
+                rec = json.loads(line)
+                stamp = datetime.fromisoformat(rec["started"].replace("Z", "+00:00")).timestamp()
+                session, sequence = rec["session"], rec["sequence"]
+                completed.setdefault(session, set()).add(sequence)
+                if stamp >= end:
+                    after[session] = min(after.get(session, sequence), sequence)
+                if not begin <= stamp < end:
+                    continue
+                inside.setdefault(session, []).append(sequence)
+                times.append(rec["elapsed_ns"] / 1e6)
+                reply = json.loads(base64.b64decode(rec["response_body"]))
+                request = json.loads(base64.b64decode(rec["request_body"]))
+                result = reply.get("result", {})
+                if isinstance(result, dict):
+                    result = result.get("payloadStatus", result)
+                status = result.get("status", "success") if isinstance(result, dict) else "success"
+                label = request["method"] + ":" + status
+                statuses[label] = statuses.get(label, 0) + 1
+                if not rec["complete"] or rec["http_status"] != 200 or reply.get("error"):
+                    failed.append(index + 1)
+            except (ValueError, KeyError, TypeError):
+                failed.append(index + 1)
+    gaps, unsealed = {}, []
+    for session, sequences in inside.items():
+        boundary = after.get(session)
+        if boundary is None:
+            unsealed.append(session)
+        upper = boundary if boundary is not None else max(sequences)
+        missing = sorted(set(range(min(sequences), upper + 1)) - completed[session])
+        if missing:
+            gaps[session] = missing
+    return {"count": len(times), "failed_lines": failed, "sequence_gaps": gaps,
+            "unsealed_sessions": unsealed, "statuses": statuses,
+            "p95_ms": percentile(times, .95) if times else None,
+            "p99_ms": percentile(times, .99) if times else None}
+
+
+def capture_engine_window(output, nodes, begin, end):
+    # Let the normal next-slot traffic seal sequence coverage. Missing or
+    # unfinished requests cannot disappear from the end of the measured window.
+    time.sleep(max(0, end + 10 - time.time()))
+    result = {}
+    for name, node in nodes.items():
+        path = output / (name + "-engine.jsonl")
+        with path.open("wb") as dest:
+            subprocess.run(["docker", "exec", "--user", "root", node["container"], "cat", "/data/engine-exchanges.jsonl"], stdout=dest, check=True, timeout=60)
+        result[name] = engine_window(path, begin, end)
+    return result
+
+
 def steady(output, duration):
     output.mkdir(parents=True, exist_ok=False)
     nodes = inventory()
@@ -210,31 +265,10 @@ def steady(output, duration):
     # incomplete records as failures instead of filtering them out of results.
     begin = datetime.fromisoformat(profile["declared_at"]).timestamp()
     end = begin + duration
-    report["engine"] = {}
-    for name, node in el.items():
-        capture = output / (name + "-engine.jsonl")
-        with capture.open("wb") as dest:
-            subprocess.run(["docker", "exec", "--user", "root", node["container"], "cat", "/data/engine-exchanges.jsonl"], stdout=dest, check=True, timeout=60)
-        times, failed = [], []
-        with capture.open() as source:
-            for index, line in enumerate(source):
-                try:
-                    rec = json.loads(line)
-                    stamp = datetime.fromisoformat(rec["started"].replace("Z", "+00:00")).timestamp()
-                    if not begin <= stamp < end:
-                        continue
-                    times.append(rec["elapsed_ns"] / 1e6)
-                    reply = json.loads(base64.b64decode(rec["response_body"]))
-                    if not rec["complete"] or rec["http_status"] != 200 or "error" in reply:
-                        failed.append(index + 1)
-                except (ValueError, KeyError, TypeError):
-                    failed.append(index + 1)
-        report["engine"][name] = {"count": len(times), "failed_lines": failed,
-                                   "p95_ms": percentile(times, .95) if times else None,
-                                   "p99_ms": percentile(times, .99) if times else None}
+    report["engine"] = capture_engine_window(output, el, begin, end)
     report["latency_passed"] = (not errors and report["identity_unchanged"] and samples >= duration // 3
                                 and all(v["p95_ms"] <= 500 and v["p99_ms"] <= 2000 for v in report["rpc"].values())
-                                and all(v["count"] > 100 and not v["failed_lines"] and v["p95_ms"] <= 1000 and v["p99_ms"] <= 3000 for v in report["engine"].values()))
+                                and all(v["count"] > 100 and not v["failed_lines"] and not v["sequence_gaps"] and not v["unsealed_sessions"] and v["p95_ms"] <= 1000 and v["p99_ms"] <= 3000 for v in report["engine"].values()))
     (output / "latency-result.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report))
 

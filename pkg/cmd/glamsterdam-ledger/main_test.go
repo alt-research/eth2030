@@ -5,8 +5,56 @@ import (
 	"compress/gzip"
 	_ "embed"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 )
+
+func TestPressureProofStreamBindsActualRequestAndIndependentHeader(t *testing.T) {
+	input := capturedPayment(t)
+	var proofIndex, headerIndex = -1, -1
+	for i, record := range input.RPC {
+		if record.Method == "eth_getProof" && proofIndex < 0 {
+			proofIndex = i
+		}
+		if record.Method == "eth_getBlockByHash" && len(record.Params) > 0 && string(record.Params[0]) == `"`+input.Hashes[0].Hex()+`"` {
+			headerIndex = i
+		}
+	}
+	if proofIndex < 0 || headerIndex < 0 {
+		t.Fatal("missing actual proof/header fixture")
+	}
+	proof := input.RPC[proofIndex]
+	line := map[string]any{"kind": "proof", "expected_hash": input.Hashes[0], "header": input.RPC[headerIndex].Reply.Result,
+		"request": map[string]any{"method": proof.Method, "params": proof.Params}, "response": proof.Reply}
+	// Reply uses exported Go field names; JSON-RPC capture is lower-case.
+	line["response"] = map[string]any{"result": proof.Reply.Result}
+	path := filepath.Join(t.TempDir(), "proofs.jsonl")
+	write := func() {
+		t.Helper()
+		data, err := json.Marshal(line)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, append(data, '\n'), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write()
+	if count, err := verifyPressureProofs(path); err != nil || count != 1 {
+		t.Fatalf("actual proof stream = %d, %v", count, err)
+	}
+	line["expected_hash"] = input.Hashes[1]
+	write()
+	if _, err := verifyPressureProofs(path); err == nil {
+		t.Fatal("accepted an independently valid proof bound to the wrong requested block")
+	}
+	line["kind"] = "unrelated"
+	write()
+	if _, err := verifyPressureProofs(path); err == nil {
+		t.Fatal("vacuous proof stream passed")
+	}
+}
 
 //go:embed testdata/actual-builder-payment.json.gz
 var actualPayment []byte

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -50,6 +51,95 @@ type observation struct {
 	Before  map[string]string `json:"before_wei"`
 	After   map[string]string `json:"after_wei"`
 	PaidWei string            `json:"paid_wei"`
+}
+
+func verifyAccount(root common.Hash, address common.Address, proof accountProof) (*big.Int, error) {
+	if proof.Address != address || proof.Balance == nil {
+		return nil, fmt.Errorf("proof does not bind the requested account")
+	}
+	db := memorydb.New()
+	for _, node := range proof.AccountProof {
+		if err := db.Put(crypto.Keccak256(node), node); err != nil {
+			return nil, err
+		}
+	}
+	encoded, err := trie.VerifyProof(root, crypto.Keccak256(address[:]), db)
+	if err != nil {
+		return nil, fmt.Errorf("independent account proof: %w", err)
+	}
+	var account types.StateAccount
+	if err := rlp.DecodeBytes(encoded, &account); err != nil {
+		return nil, err
+	}
+	balance := account.Balance.ToBig()
+	if balance.Cmp((*big.Int)(proof.Balance)) != 0 || account.Nonce != uint64(proof.Nonce) || account.Root != proof.StorageHash || common.BytesToHash(account.CodeHash) != proof.CodeHash {
+		return nil, fmt.Errorf("account proof contradicts claimed fields")
+	}
+	return balance, nil
+}
+
+func verifyPressureProofs(path string) (int, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+	scan := bufio.NewScanner(file)
+	scan.Buffer(make([]byte, 64<<10), 16<<20)
+	count := 0
+	for scan.Scan() {
+		var record struct {
+			Kind    string          `json:"kind"`
+			Hash    common.Hash     `json:"expected_hash"`
+			Header  json.RawMessage `json:"header"`
+			Request struct {
+				Method string
+				Params []json.RawMessage
+			} `json:"request"`
+			Response struct {
+				Result accountProof
+				Error  json.RawMessage
+			} `json:"response"`
+		}
+		if err := json.Unmarshal(scan.Bytes(), &record); err != nil {
+			return count, err
+		}
+		if record.Kind != "proof" {
+			continue
+		}
+		if record.Request.Method != "eth_getProof" || len(record.Request.Params) != 3 || (len(record.Response.Error) > 0 && string(record.Response.Error) != "null") {
+			return count, fmt.Errorf("invalid captured proof RPC")
+		}
+		var address common.Address
+		var selector struct {
+			Hash      common.Hash `json:"blockHash"`
+			Canonical bool        `json:"requireCanonical"`
+		}
+		var header types.Header
+		if err := json.Unmarshal(record.Request.Params[0], &address); err != nil {
+			return count, err
+		}
+		if err := json.Unmarshal(record.Request.Params[2], &selector); err != nil {
+			return count, err
+		}
+		if err := json.Unmarshal(record.Header, &header); err != nil {
+			return count, err
+		}
+		if !selector.Canonical || selector.Hash != record.Hash || header.Hash() != record.Hash {
+			return count, fmt.Errorf("proof is not bound to the frozen canonical header")
+		}
+		if _, err := verifyAccount(header.Root, address, record.Response.Result); err != nil {
+			return count, err
+		}
+		count++
+	}
+	if err := scan.Err(); err != nil {
+		return count, err
+	}
+	if count == 0 {
+		return 0, fmt.Errorf("no actual proof controls captured")
+	}
+	return count, nil
 }
 
 func verify(input capture) ([]observation, error) {
@@ -174,23 +264,9 @@ func verify(input capture) ([]observation, error) {
 				if !ok || proof.Balance == nil {
 					return nil, fmt.Errorf("missing original account proof")
 				}
-				db := memorydb.New()
-				for _, node := range proof.AccountProof {
-					if err := db.Put(crypto.Keccak256(node), node); err != nil {
-						return nil, err
-					}
-				}
-				encoded, err := trie.VerifyProof(block.Header.Root, crypto.Keccak256(address[:]), db)
+				balance, err := verifyAccount(block.Header.Root, address, proof)
 				if err != nil {
-					return nil, fmt.Errorf("independent account proof: %w", err)
-				}
-				var account types.StateAccount
-				if err := rlp.DecodeBytes(encoded, &account); err != nil {
 					return nil, err
-				}
-				balance := account.Balance.ToBig()
-				if balance.Cmp((*big.Int)(proof.Balance)) != 0 || account.Nonce != uint64(proof.Nonce) || account.Root != proof.StorageHash || common.BytesToHash(account.CodeHash) != proof.CodeHash {
-					return nil, fmt.Errorf("account proof contradicts claimed fields")
 				}
 				balances = append(balances, balance)
 			}
@@ -205,6 +281,15 @@ func verify(input capture) ([]observation, error) {
 }
 
 func main() {
+	if len(os.Args) == 3 && os.Args[1] == "proof-stream" {
+		count, err := verifyPressureProofs(os.Args[2])
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{"passed": true, "independent_proofs": count})
+		return
+	}
 	if len(os.Args) != 2 {
 		fmt.Fprintln(os.Stderr, "usage: glamsterdam-ledger captured-ledger.json")
 		os.Exit(2)

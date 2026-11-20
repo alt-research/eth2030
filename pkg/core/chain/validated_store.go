@@ -18,6 +18,14 @@ func storageFailure(err error) error {
 	return fmt.Errorf("%w: %w", ErrStorageFailure, err)
 }
 
+// CheckStorage preserves a fenced/unreadable database error before callers use
+// cache-only or boolean lookup paths. A missing durable head is also a local
+// storage error, not evidence that a peer needs to provide an unknown block.
+func (bc *Blockchain) CheckStorage() error {
+	_, err := rawdb.ReadHeadBlockHash(bc.db)
+	return storageFailure(err)
+}
+
 func validatedKey(hash types.Hash) []byte { return append([]byte("validated-block/"), hash[:]...) }
 
 // HasValidatedBlock distinguishes execution-validated blocks from headers and

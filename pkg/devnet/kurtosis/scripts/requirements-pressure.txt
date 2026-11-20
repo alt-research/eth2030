@@ -1,0 +1,2 @@
+# Actual bounded process campaign WebSocket transport.
+websockets==15.0.1

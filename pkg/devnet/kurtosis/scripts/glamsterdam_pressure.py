@@ -15,7 +15,6 @@ from pathlib import Path
 from urllib.parse import urlsplit
 import urllib.request
 
-from websockets.sync.client import connect
 import glamsterdam_campaign as c
 
 ACCOUNT = "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf"
@@ -43,6 +42,7 @@ def jwt(secret):
 
 
 def run(output, duration):
+    from websockets.sync.client import connect
     output.mkdir(parents=True, exist_ok=False)
     nodes = c.inventory()
     c.assert_private_network(nodes)

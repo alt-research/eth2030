@@ -1,6 +1,7 @@
 package node
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -1059,11 +1060,7 @@ func (n *Node) Start() error {
 
 	// Start WebSocket RPC server if enabled.
 	if n.config.WSEnabled {
-		wsHandler := buildWSHandler(n.rpcHandler, n.config.WSOrigins)
-		n.wsServer = &http.Server{
-			Addr:    n.config.WSListenAddr(),
-			Handler: wsHandler,
-		}
+		n.wsServer = newWSServer(n.rpcHandler.Handler(), n.config.WSListenAddr(), n.config.WSOrigins)
 		go func() {
 			slog.Info("WebSocket RPC server listening", "addr", n.config.WSListenAddr())
 			if err := n.wsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -1348,11 +1345,24 @@ func ensureJWTSecret(config *Config) error {
 	return nil
 }
 
+// newWSServer owns the parent lifetime for upgraded connections as well as HTTP.
+func newWSServer(handler http.Handler, address string, origins []string) *http.Server {
+	ctx, cancel := context.WithCancel(context.Background())
+	server := &http.Server{
+		Addr:        address,
+		Handler:     buildWSHandler(handler, origins),
+		BaseContext: func(net.Listener) context.Context { return ctx },
+	}
+	// HTTP shutdown does not close hijacked WebSockets by itself.
+	server.RegisterOnShutdown(cancel)
+	return server
+}
+
 // buildWSHandler creates an http.Handler that accepts WebSocket upgrade
 // requests and serves JSON-RPC 2.0 over the persistent connection.
 // The origins list restricts which Origin headers are allowed;
 // an empty list or ["*"] allows all origins.
-func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
+func buildWSHandler(handler http.Handler, origins []string) http.Handler {
 	allowAll := len(origins) == 0 || (len(origins) == 1 && origins[0] == "*")
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  4096,
@@ -1364,7 +1374,7 @@ func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
 			return sliceContains(origins, r.Header.Get("Origin"))
 		},
 	}
-	httpHandler := handler.Handler()
+	httpHandler := handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !websocket.IsWebSocketUpgrade(r) {
 			httpHandler.ServeHTTP(w, r)
@@ -1375,42 +1385,70 @@ func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
 			slog.Debug("ws upgrade error", "err", err)
 			return
 		}
-		defer conn.Close()
-		serveWSConn(conn, handler)
+		serveWSConn(r.Context(), conn, handler)
 	})
 }
 
-// serveWSConn processes JSON-RPC requests over a WebSocket connection by
-// forwarding each message to the rpc.Server handler via an in-memory HTTP round-trip.
-func serveWSConn(conn *websocket.Conn, handler *rpc.Server) {
-	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			if !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				slog.Debug("ws read error", "err", err)
+// maxPendingWSRequests bounds frames retained while the current request executes.
+const maxPendingWSRequests = 16
+
+// serveWSConn has exactly one reader and one writer. Reading continues while
+// execution runs so a remote close cancels the actual request, including when
+// other frames have already been queued.
+func serveWSConn(parent context.Context, conn *websocket.Conn, handler http.Handler) {
+	ctx, cancel := context.WithCancel(parent)
+	messages := make(chan []byte, maxPendingWSRequests)
+	readerDone := make(chan struct{})
+	stop := func() { cancel(); _ = conn.Close() }
+	defer func() { stop(); <-readerDone }()
+	conn.SetReadLimit(rpc.WSMaxMessageSize)
+	go func() {
+		defer close(readerDone)
+		defer stop()
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				return
 			}
-			return
+			select {
+			case messages <- message:
+			default:
+				_ = conn.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "RPC request queue limit"), time.Now().Add(50*time.Millisecond))
+				return
+			}
 		}
-		// Forward the JSON-RPC request to the handler and capture the response.
-		// We use an in-memory ResponseWriter to collect the output.
-		respBytes := dispatchWSRequest(handler, msg)
-		if err := conn.WriteMessage(websocket.TextMessage, respBytes); err != nil {
-			slog.Debug("ws write error", "err", err)
+	}()
+	for {
+		select {
+		case <-ctx.Done():
 			return
+		case message := <-messages:
+			if ctx.Err() != nil {
+				return
+			}
+			response := dispatchWSRequest(ctx, handler, message)
+			if ctx.Err() != nil {
+				return
+			}
+			if err := conn.SetWriteDeadline(time.Now().Add(rpc.WSWriteTimeout)); err != nil {
+				return
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, response); err != nil {
+				return
+			}
 		}
 	}
 }
 
-// dispatchWSRequest routes a single JSON-RPC payload through the rpc.Server
-// and returns the serialised response.
-func dispatchWSRequest(handler *rpc.Server, body []byte) []byte {
-	req, err := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+// dispatchWSRequest carries connection lifetime through the existing HTTP RPC path.
+func dispatchWSRequest(ctx context.Context, handler http.Handler, body []byte) []byte {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", strings.NewReader(string(body)))
 	if err != nil {
 		return errorResponse("parse error")
 	}
 	req.Header.Set("Content-Type", "application/json")
 	rw := &bufResponseWriter{header: make(http.Header)}
-	handler.Handler().ServeHTTP(rw, req)
+	handler.ServeHTTP(rw, req)
 	return rw.buf
 }
 

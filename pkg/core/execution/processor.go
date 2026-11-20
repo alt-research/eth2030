@@ -1,6 +1,7 @@
 package execution
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -137,6 +138,7 @@ var (
 
 // StateProcessor processes blocks by applying transactions sequentially.
 type StateProcessor struct {
+	ctx                context.Context
 	config             *corconfig.ChainConfig
 	getHash            vm.GetHashFunc
 	slasher            corconfig.PaymasterSlasher // optional: slashes paymasters on bad settlement (AA-1.3)
@@ -146,6 +148,20 @@ type StateProcessor struct {
 // NewStateProcessor creates a new state processor.
 func NewStateProcessor(config *corconfig.ChainConfig) *StateProcessor {
 	return &StateProcessor{config: config}
+}
+
+// WithContext owns cancellation only for this processor copy, such as historical replay.
+func (p *StateProcessor) WithContext(ctx context.Context) StateProcessor {
+	clone := *p
+	clone.ctx = ctx
+	return clone
+}
+
+func (p *StateProcessor) contextError() error {
+	if p.ctx != nil {
+		return p.ctx.Err()
+	}
+	return nil
 }
 
 // SetGetHash sets the block hash lookup function for the BLOCKHASH opcode.
@@ -226,6 +242,9 @@ func (p *StateProcessor) Process(block *types.Block, statedb state.StateDB) ([]*
 // along with the computed Block Access List (EIP-7928). The BAL is populated
 // only when the Amsterdam fork is active; otherwise it is nil.
 func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateDB) (*ProcessResult, error) {
+	if err := p.contextError(); err != nil {
+		return nil, err
+	}
 	var (
 		receipts []*types.Receipt
 		gasPool  = new(gaspool.GasPool).AddGas(block.GasLimit())
@@ -258,7 +277,10 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		preTracker = bal.NewTracker()
 	}
 
-	if err := ApplyPreExecutionSystems(p.config, p.getHash, statedb, header, preTracker); err != nil {
+	if err := ApplyPreExecutionSystems(p.config, p.getHash, statedb, header, preTracker, EVMOverrides{Context: p.ctx}); err != nil {
+		if cancelled := p.contextError(); cancelled != nil {
+			return nil, cancelled
+		}
 		return nil, err
 	}
 
@@ -284,6 +306,9 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 	}
 
 	for i, tx := range block.Transactions() {
+		if err := p.contextError(); err != nil {
+			return nil, err
+		}
 		statedb.SetTxContext(tx.Hash(), i)
 
 		// Log TX execution start with key fields for traceability.
@@ -344,7 +369,10 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 			}
 		}
 
-		receipt, usedGas, err := applyTransactionFull(p.config, p.getHash, statedb, header, tx, gasPool, balTrackerOrNil(tracker), p.slasher)
+		receipt, usedGas, err := applyTransactionFull(p.config, p.getHash, statedb, header, tx, gasPool, balTrackerOrNil(tracker), p.slasher, vm.Config{Context: p.ctx})
+		if cancelled := p.contextError(); cancelled != nil {
+			return nil, cancelled
+		}
 		if err != nil {
 			fromHex = txSenderHex(tx)
 			execLog.Error("tx_evm_error",
@@ -498,7 +526,10 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		}
 	}
 
-	requests, err := FinalizeBlockExecution(p.config, p.getHash, statedb, header, block.Withdrawals(), receipts, blockBAL)
+	requests, err := FinalizeBlockExecution(p.config, p.getHash, statedb, header, block.Withdrawals(), receipts, blockBAL, EVMOverrides{Context: p.ctx})
+	if cancelled := p.contextError(); cancelled != nil {
+		return nil, cancelled
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -770,8 +801,8 @@ func applyTransactionWithBAL(config *corconfig.ChainConfig, getHash vm.GetHashFu
 
 // applyTransactionFull is like applyTransactionWithBAL but also accepts a
 // corconfig.PaymasterSlasher for EIP-8141 paymaster slashing (AA-1.3).
-func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher) (*types.Receipt, uint64, error) {
-	return applyTransactionInternal(config, getHash, statedb, header, tx, gp, tracker, slasher)
+func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher, tracing ...vm.Config) (*types.Receipt, uint64, error) {
+	return applyTransactionInternal(config, getHash, statedb, header, tx, gp, tracker, slasher, tracing...)
 }
 
 // applyTransactionInternal is the shared implementation for all applyTransaction
@@ -779,7 +810,7 @@ func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc,
 // paymaster slashing on bad gas settlement.
 func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher, tracing ...vm.Config) (*types.Receipt, uint64, error) {
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
-		return applyFrame8141(config, getHash, statedb, header, tx, gp, tracker)
+		return applyFrame8141(config, getHash, statedb, header, tx, gp, tracker, tracing...)
 	}
 	if tx.Type() == types.FrameTxType && config != nil && config.IsHogota(header.Time) {
 		return nil, 0, errors.New("historical Frame envelope is not valid at Bogotá")

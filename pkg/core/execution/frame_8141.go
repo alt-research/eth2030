@@ -15,9 +15,9 @@ import (
 
 // applyFrame8141 is shared by payload construction, import and historical replay.
 func applyFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
-	header *types.Header, transaction *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker,
+	header *types.Header, transaction *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
-	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, false, nil)
+	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, false, nil, tracing...)
 }
 
 func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int) (types.Address, error) {
@@ -39,7 +39,7 @@ func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, he
 
 func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
 	header *types.Header, transaction *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker,
-	prefixOnly bool, blobBaseFee *big.Int,
+	prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
 	tx := transaction.Inner().(*types.FrameTx8141)
 	if config == nil || !config.IsMerge() || !config.IsHogota(header.Time) {
@@ -97,9 +97,13 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	if header.SlotNumber != nil {
 		blockCtx.SlotNumber = *header.SlotNumber
 	}
+	vmConfig := vm.Config{}
+	if len(tracing) > 0 {
+		vmConfig = tracing[0]
+	}
 	evm := vm.NewEVMWithState(blockCtx, vm.TxContext{
 		GasPrice: payment.GasPrice(), BlobHashes: tx.BlobVersionedHashes,
-	}, vm.Config{}, db)
+	}, vmConfig, db)
 	precompiles, err := ConfigureBlockEVM(config, header, evm)
 	if err != nil {
 		return nil, 0, err

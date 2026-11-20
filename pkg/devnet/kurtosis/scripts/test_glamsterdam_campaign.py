@@ -1,6 +1,8 @@
 import json
 import base64
 import tempfile
+import tarfile
+import io
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -32,6 +34,28 @@ class CampaignTests(unittest.TestCase):
             ]:
                 with self.subTest(names=names), self.assertRaises(ValueError):
                     artifacts.bundle(root, names, root / "unqualified.tar.gz")
+
+    def test_artifact_rejects_a_changed_committed_capture_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            body = b"original signed bytes"
+            (root / "capture.bin").write_bytes(body)
+            original = root / "original.tar.gz"
+            artifacts.bundle(root, ["capture.bin"], original)
+            with tarfile.open(original, "r:*") as source:
+                manifest = json.load(source.extractfile("MANIFEST.json"))
+            manifest["files"][0]["sha256"] = "00" * 32
+            altered = root / "altered.tar.gz"
+            with tarfile.open(altered, "w:gz") as archive:
+                for name, value in [
+                    ("MANIFEST.json", json.dumps(manifest).encode()),
+                    ("capture.bin", body),
+                ]:
+                    header = tarfile.TarInfo(name)
+                    header.size = len(value)
+                    archive.addfile(header, io.BytesIO(value))
+            with self.assertRaisesRegex(ValueError, "captured bytes changed"):
+                artifacts.verify(altered)
 
     def test_zstd_artifact_preserves_original_signed_bytes(self):
         with tempfile.TemporaryDirectory() as directory:

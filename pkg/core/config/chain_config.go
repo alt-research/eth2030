@@ -352,6 +352,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsCancun:         isMerge && c.IsCancun(timestamp),
 		IsEIP4844:        isMerge && c.IsCancun(timestamp),
 		IsPrague:         isMerge && c.IsPrague(timestamp),
+		IsOsaka:          isMerge && c.IsOsaka(timestamp),
 		IsEIP7702:        isMerge && c.IsPrague(timestamp),
 		IsAmsterdam:      isMerge && c.IsAmsterdam(timestamp),
 		IsGlamsterdan:    isMerge && c.IsGlamsterdan(timestamp),
@@ -384,6 +385,7 @@ type Rules struct {
 	IsShanghai                                              bool
 	IsCancun, IsEIP4844                                     bool
 	IsPrague, IsEIP7702                                     bool
+	IsOsaka                                                 bool
 	IsAmsterdam                                             bool
 	IsGlamsterdan, IsEIP7904, IsEIP7706, IsEIP7708          bool
 	IsEIP7954                                               bool

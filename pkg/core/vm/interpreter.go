@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -262,6 +263,7 @@ type ForkRules struct {
 	IsGlamsterdan    bool
 	IsAmsterdam      bool
 	IsPrague         bool
+	IsOsaka          bool
 	IsCancun         bool
 	IsShanghai       bool
 	IsMerge          bool
@@ -280,6 +282,15 @@ type ForkRules struct {
 
 // SelectPrecompiles returns the correct precompile map for the given fork rules.
 func SelectPrecompiles(rules ForkRules) map[types.Address]PrecompiledContract {
+	selected := selectPrecompileBase(rules)
+	if rules.IsOsaka {
+		selected = maps.Clone(selected)
+		selected[types.Address{19: 5}] = &osakaModExp{}
+	}
+	return selected
+}
+
+func selectPrecompileBase(rules ForkRules) map[types.Address]PrecompiledContract {
 	if rules.LegacyNativeBLS {
 		switch {
 		case rules.IsIPlus:

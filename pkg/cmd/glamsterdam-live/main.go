@@ -352,29 +352,39 @@ func query(ctx context.Context, clients []client, s step, block common.Hash) err
 	}
 	return nil
 }
-func blobTransaction(nonce uint64) (*types.Transaction, error) {
-	var blob kzg4844.Blob
-	blob[31] = 1
-	commitment, err := kzg4844.BlobToCommitment(&blob)
-	if err != nil {
-		return nil, err
+func blobTransaction(nonce uint64, markers ...byte) (*types.Transaction, error) {
+	if len(markers) == 0 {
+		markers = []byte{1}
 	}
-	proofs, err := kzg4844.ComputeCellProofs(&blob)
-	if err != nil {
-		return nil, err
+	sidecar := &types.BlobTxSidecar{Version: types.BlobSidecarVersion1}
+	hashes := make([]common.Hash, 0, len(markers))
+	for _, marker := range markers {
+		var blob kzg4844.Blob
+		blob[31] = marker
+		commitment, err := kzg4844.BlobToCommitment(&blob)
+		if err != nil {
+			return nil, err
+		}
+		proofs, err := kzg4844.ComputeCellProofs(&blob)
+		if err != nil {
+			return nil, err
+		}
+		sidecar.Blobs = append(sidecar.Blobs, blob)
+		sidecar.Commitments = append(sidecar.Commitments, commitment)
+		sidecar.Proofs = append(sidecar.Proofs, proofs[:]...)
+		hashes = append(hashes, kzg4844.CalcBlobHashV1(sha256.New(), &commitment))
 	}
-	hash := kzg4844.CalcBlobHashV1(sha256.New(), &commitment)
 	signingKey, err := crypto.HexToECDSA(fmt.Sprintf("%064x", 1))
 	if err != nil {
 		return nil, err
 	}
 	to := crypto.PubkeyToAddress(signingKey.PublicKey)
-	tx := types.NewTx(&types.BlobTx{ChainID: uint256.NewInt(1337), Nonce: nonce, Gas: 500000, GasFeeCap: uint256.NewInt(8000000000), GasTipCap: uint256.NewInt(1000000000), BlobFeeCap: uint256.NewInt(1000000000), To: to, Value: new(uint256.Int), BlobHashes: []common.Hash{hash}, Sidecar: &types.BlobTxSidecar{Version: types.BlobSidecarVersion1, Blobs: []kzg4844.Blob{blob}, Commitments: []kzg4844.Commitment{commitment}, Proofs: proofs[:]}})
+	tx := types.NewTx(&types.BlobTx{ChainID: uint256.NewInt(1337), Nonce: nonce, Gas: 500000, GasFeeCap: uint256.NewInt(8000000000), GasTipCap: uint256.NewInt(1000000000), BlobFeeCap: uint256.NewInt(1000000000), To: to, Value: new(uint256.Int), BlobHashes: hashes, Sidecar: sidecar})
 	return types.SignTx(tx, types.LatestSignerForChainID(big.NewInt(1337)), signingKey)
 }
-func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writer) error {
+func campaignClients(ctx context.Context, urls []string, genesis common.Hash, writer io.Writer) ([]client, error) {
 	if len(urls) < 2 || genesis == (common.Hash{}) {
-		return errors.New("at least two RPC endpoints and the expected private genesis hash are required")
+		return nil, errors.New("at least two RPC endpoints and the expected private genesis hash are required")
 	}
 	record := &recorder{writer: writer}
 	clients := make([]client, len(urls))
@@ -384,22 +394,22 @@ func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writ
 	for _, c := range clients {
 		raw, err := c.call(ctx, "eth_chainId")
 		if err != nil {
-			return err
+			return nil, err
 		}
 		var chain hexutil.Big
 		if err = json.Unmarshal(raw, &chain); err != nil || (*big.Int)(&chain).Cmp(big.NewInt(1337)) != 0 {
-			return errors.New("refusing a network other than the private chain 1337")
+			return nil, errors.New("refusing a network other than the private chain 1337")
 		}
 		raw, err = c.call(ctx, "eth_getBlockByNumber", "0x0", false)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		h, err := verifyHeader(raw)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if h.Hash() != genesis {
-			return errors.New("private genesis identity mismatch")
+			return nil, errors.New("private genesis identity mismatch")
 		}
 	}
 	// Wait for every real EL to have imported an Amsterdam header before publishing fixtures.
@@ -408,11 +418,11 @@ func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writ
 		for _, c := range clients {
 			raw, err := c.call(ctx, "eth_getBlockByNumber", "latest", false)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			h, err := verifyHeader(raw)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			if h.SlotNumber == nil || h.BlockAccessListHash == nil {
 				ready = false
@@ -422,8 +432,15 @@ func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writ
 			break
 		}
 		if err := pause(ctx); err != nil {
-			return err
+			return nil, err
 		}
+	}
+	return clients, nil
+}
+func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writer) error {
+	clients, err := campaignClients(ctx, urls, genesis, writer)
+	if err != nil {
+		return err
 	}
 	corpus, err := loadCorpus()
 	if err != nil {
@@ -463,12 +480,55 @@ func run(ctx context.Context, urls []string, genesis common.Hash, writer io.Writ
 	}
 	return json.NewEncoder(writer).Encode(map[string]any{"kind": "completed_application_campaign", "application_transactions": count, "getter_queries": 17, "blob_transaction": blob.Hash(), "last_block": receipt.BlockHash, "qualified_fixture_source": corpus.QualifiedSource})
 }
+
+// runBlobs adds two distinct real blob rows to the same private network, using
+// the live common nonce and the same complete canonical receipt/trie consumers.
+func runBlobs(ctx context.Context, urls []string, genesis common.Hash, writer io.Writer) error {
+	clients, err := campaignClients(ctx, urls, genesis, writer)
+	if err != nil {
+		return err
+	}
+	key, err := crypto.HexToECDSA(fmt.Sprintf("%064x", 1))
+	if err != nil {
+		return err
+	}
+	address := crypto.PubkeyToAddress(key.PublicKey)
+	var nonce hexutil.Uint64
+	for i, c := range clients {
+		raw, err := c.call(ctx, "eth_getTransactionCount", address, "pending")
+		if err != nil {
+			return err
+		}
+		var candidate hexutil.Uint64
+		if err := json.Unmarshal(raw, &candidate); err != nil {
+			return err
+		}
+		if i > 0 && nonce != candidate {
+			return errors.New("private sender nonce has not converged across actual ELs")
+		}
+		nonce = candidate
+	}
+	tx, err := blobTransaction(uint64(nonce), 2, 3)
+	if err != nil {
+		return err
+	}
+	receipt, err := submit(ctx, clients, tx, 1)
+	if err != nil {
+		return fmt.Errorf("actual multi-row blob envelope: %w", err)
+	}
+	return json.NewEncoder(writer).Encode(map[string]any{"kind": "completed_multi_blob_campaign", "blob_rows": 2, "blob_transaction": tx.Hash(), "blob_versioned_hashes": tx.BlobHashes(), "last_block": receipt.BlockHash, "nonce": uint64(nonce)})
+}
+
 func main() {
 	endpoints := flag.String("rpc", "", "comma-separated real native/independent EL endpoints")
 	expected := flag.String("genesis", "", "exact expected private genesis hash")
 	output := flag.String("output", "", "new complete RPC trace file (required)")
 	timeout := flag.Duration("timeout", 15*time.Minute, "overall bounded campaign duration")
 	flag.Parse()
+	if flag.NArg() > 1 || (flag.NArg() == 1 && flag.Arg(0) != "blobs") {
+		fmt.Fprintln(os.Stderr, "the optional scenario is blobs; flags precede the scenario")
+		os.Exit(2)
+	}
 	if *output == "" {
 		fmt.Fprintln(os.Stderr, "output path required")
 		os.Exit(2)
@@ -485,7 +545,11 @@ func main() {
 	defer file.Close()
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
-	if err = run(ctx, strings.Split(*endpoints, ","), common.HexToHash(*expected), file); err != nil {
+	campaign := run
+	if flag.Arg(0) == "blobs" {
+		campaign = runBlobs
+	}
+	if err = campaign(ctx, strings.Split(*endpoints, ","), common.HexToHash(*expected), file); err != nil {
 		_ = json.NewEncoder(file).Encode(map[string]any{"kind": "campaign_failed", "error": err.Error()})
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

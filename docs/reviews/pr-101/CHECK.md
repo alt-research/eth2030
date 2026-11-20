@@ -7,3 +7,9 @@
 - [ ] Retain failures and recovery, update the remaining completion inventory and submit an independent campaign review; do not claim release acceptance before all gates pass.
 
 - [x] Preserve the independent Geth pruned-history control, then rebuild an archival oracle by replaying the original finalized raw blocks through unchanged Geth and resume the exact-hash application sequence.
+
+- [ ] Submit two distinct real blob rows through all actual ELs, retain their full CL columns and independently validate partial bitmap ordering before peer-fault qualification.
+
+- [ ] Add a validator-free fresh Native EL/Lighthouse pair with empty databases, drive actual independent-peer cold sync, then verify original historical state/receipts/BAL commitments and restart.
+
+- [ ] Capture an actual nonzero builder payment at matched CL/EL states, independently verify complete execution headers and account proofs, reconcile the exact once-only debit/credit, and retain counterexamples and a replayable offline consumer.

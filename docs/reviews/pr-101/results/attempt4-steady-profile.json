@@ -1,0 +1,18 @@
+{
+  "declared_at": "2026-11-19T19:44:13.365993+00:00",
+  "phase": "corrected_tuple_steady_20_minutes",
+  "steady_window_started": true,
+  "end_not_before": "2026-11-19T20:04:13.365993+00:00",
+  "duration_seconds": 1200,
+  "control_profile": "attempt4-control-memory-profile-revision.json",
+  "changes_during_window": "No container, consensus, workload configuration or binary changes. Host compilation may contend for shared host resources and is not excluded.",
+  "workload": "384 actual validators, private mainnet preset, 3-second slots, live external builder lifecycle; existing monitor samples each EL eth_blockNumber every 3 seconds. No synthetic application workload is claimed.",
+  "slo": {
+    "rpc_p95_ms": 500,
+    "rpc_p99_ms": 2000,
+    "engine_upstream_p95_ms": 1000,
+    "engine_upstream_p99_ms": 3000,
+    "steady_missing_slot_fraction_max": 0.1
+  },
+  "evaluation": "Enumerate canonical beacon headers by slot under a finalized common end checkpoint, never infer missing beacon slots from EL block count; retain exact complete Engine exchanges including failed/rejected requests."
+}

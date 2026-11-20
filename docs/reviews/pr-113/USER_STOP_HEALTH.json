@@ -1,0 +1,61 @@
+{
+  "captured_at": "2026-11-20T02:42:29.617954+00:00",
+  "scope": "Read-only final health after restoring original pair 2. No new qualification workload.",
+  "cl": {
+    "lighthouse-1": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "13078",
+      "sync_distance": "0"
+    },
+    "lodestar-2": {
+      "head_slot": "13078",
+      "sync_distance": "0",
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false
+    },
+    "lighthouse-3": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "13078",
+      "sync_distance": "0"
+    }
+  },
+  "geth_finalized": {
+    "number": "0x2d53",
+    "hash": "0xe7af8ad9b281e834a2a33a1272f7a355905c88a0b1a28a51b62b36376b17ff28",
+    "stateRoot": "0xc496f4cc748dc90713e6a2aec8448a6197ef3204cc49bb0ca617cadba222daaf"
+  },
+  "el": {
+    "geth-1": {
+      "latest": "0x2daa",
+      "common_finalized_block": {
+        "number": "0x2d53",
+        "hash": "0xe7af8ad9b281e834a2a33a1272f7a355905c88a0b1a28a51b62b36376b17ff28",
+        "stateRoot": "0xc496f4cc748dc90713e6a2aec8448a6197ef3204cc49bb0ca617cadba222daaf"
+      },
+      "matches_geth_finalized": true
+    },
+    "native-2": {
+      "latest": "0x2daa",
+      "common_finalized_block": {
+        "number": "0x2d53",
+        "hash": "0xe7af8ad9b281e834a2a33a1272f7a355905c88a0b1a28a51b62b36376b17ff28",
+        "stateRoot": "0xc496f4cc748dc90713e6a2aec8448a6197ef3204cc49bb0ca617cadba222daaf"
+      },
+      "matches_geth_finalized": true
+    },
+    "native-3": {
+      "latest": "0x2daa",
+      "common_finalized_block": {
+        "number": "0x2d53",
+        "hash": "0xe7af8ad9b281e834a2a33a1272f7a355905c88a0b1a28a51b62b36376b17ff28",
+        "stateRoot": "0xc496f4cc748dc90713e6a2aec8448a6197ef3204cc49bb0ca617cadba222daaf"
+      },
+      "matches_geth_finalized": true
+    }
+  }
+}

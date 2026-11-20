@@ -1,3 +1,11 @@
+## User stop and PR merge handoff (2026-11-20)
+
+- [x] Finish and separately publish the current official RPC conformance correction as PR 114.
+- [x] Check every open EL PR against its fetched current target and simulate dependency-ordered merge commits; preserve the squash-conflict control.
+- [x] Publish frozen heads, merge procedure, actual runtime health and explicit deferred acceptance work.
+- [x] Restore the in-flight original pair 2 maintenance and stop completed auxiliary qualification roles while retaining their data.
+- [x] Verify the frozen remote PR refs and documentation-only handoff; require the final post-push check and stop all further development as requested.
+
 ## Authorized complete Glamsterdam continuation (2026-11-19)
 
 - [x] Preserve the original dirty checkout and freeze the merged master/audit baseline.

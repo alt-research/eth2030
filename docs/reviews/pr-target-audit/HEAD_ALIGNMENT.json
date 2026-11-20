@@ -1,0 +1,961 @@
+{
+  "captured_at": "2026-11-20T03:25:04.956036+00:00",
+  "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+  "records": [
+    {
+      "number": 92,
+      "branch": "integration/glamsterdam-conformance-foundation",
+      "original_head": "c9bd022a0d813010de40860fa08db2e79ed7a6ea",
+      "aligned_head": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 14.113,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t0.738s\nok  \tgithub.com/eth2030/eth2030/eth\t8.519s\n",
+          "operator_log_name": "eth2030-target-align-92-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 2.762,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-92-build.log"
+        }
+      ]
+    },
+    {
+      "number": 93,
+      "branch": "fix/native-vm-metering-boundaries",
+      "original_head": "3661d79d6c6a69a5b989aefe7cceeda955691fdb",
+      "aligned_head": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 11.941,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t0.740s\nok  \tgithub.com/eth2030/eth2030/eth\t8.518s\n",
+          "operator_log_name": "eth2030-target-align-93-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 2.59,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-93-build.log"
+        }
+      ]
+    },
+    {
+      "number": 94,
+      "branch": "fix/native-transaction-validation",
+      "original_head": "328c8f044fcc1e270c0fbca476580160a281e89b",
+      "aligned_head": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 13.851,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t0.739s\nok  \tgithub.com/eth2030/eth2030/eth\t8.524s\n",
+          "operator_log_name": "eth2030-target-align-94-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 2.662,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-94-build.log"
+        }
+      ]
+    },
+    {
+      "number": 95,
+      "branch": "test/glamsterdam-native-fixtures",
+      "original_head": "7aee734154065de97c08f564da0385d518dcaffb",
+      "aligned_head": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 0.161,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t(cached)\nok  \tgithub.com/eth2030/eth2030/eth\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-95-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 1.907,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-95-build.log"
+        }
+      ]
+    },
+    {
+      "number": 97,
+      "branch": "fix/ordinary-transaction-context",
+      "original_head": "e90baab4eaf1a72d7efceaffbcc298716d89908f",
+      "aligned_head": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 2.977,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t0.738s\nok  \tgithub.com/eth2030/eth2030/eth\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-97-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 2.517,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-97-build.log"
+        }
+      ]
+    },
+    {
+      "number": 98,
+      "branch": "test/glamsterdam-application-compatibility",
+      "original_head": "103dfefae6913cc042015b30b1d7f63af1253f87",
+      "aligned_head": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [
+        "pkg/eth/sparse_relay_test.go",
+        "pkg/node/backend/simulate_timeout_test.go",
+        "pkg/node/backend/simulate_v1.go"
+      ],
+      "validation": [
+        {
+          "kind": "affected",
+          "passed": true,
+          "elapsed_seconds": 0.817,
+          "output": "ok  \tgithub.com/eth2030/eth2030/node/backend\t(cached)\nok  \tgithub.com/eth2030/eth2030/eth\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-98-affected.log"
+        },
+        {
+          "kind": "build",
+          "passed": true,
+          "elapsed_seconds": 1.893,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-98-build.log"
+        }
+      ]
+    },
+    {
+      "number": 100,
+      "branch": "integration/glamsterdam-runtime-candidate",
+      "original_head": "9a612c21ddc61bf48c4216ad6e24e4206bcb5ae8",
+      "aligned_head": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 102,
+      "branch": "fix/rpc-block-hash-call-selectors",
+      "original_head": "85fb43a0d849b2ea8e97f4b2baaf6b345a58bd43",
+      "aligned_head": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 103,
+      "branch": "fix/historical-receipt-derived-fields",
+      "original_head": "53ee0b0106975704635e74b147c351604157c8ff",
+      "aligned_head": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 104,
+      "branch": "fix/engine-stale-canonical-forkchoice",
+      "original_head": "aef7f8a1107d70328ba2b78126e8d52721dd6764",
+      "aligned_head": "119ce54c47b16a3bac930175283d03d9284a6efd",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 105,
+      "branch": "fix/historical-state-header-readback",
+      "original_head": "ed8558dee04c52eaff46df7ea1392157b20d7284",
+      "aligned_head": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 101,
+      "branch": "test/glamsterdam-multiclient-gate",
+      "original_head": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "aligned_head": "27d7f0099e9c1f4fd30c67bfc44b6cdb441f7689",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "number": 106,
+      "branch": "fix/rpc-request-execution-cancellation",
+      "original_head": "4918d9738ee7852cb9f29fb2e2de8699129ceefa",
+      "aligned_head": "58b988325008205eb797924d1861de97c4a176e7",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "101": "27d7f0099e9c1f4fd30c67bfc44b6cdb441f7689",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 2.776,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t0.008s\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t2.186s\n",
+          "operator_log_name": "eth2030-target-align-106-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 3.707,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-106-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 107,
+      "branch": "fix/websocket-execution-disconnect",
+      "original_head": "8896b32b07d1b0c49a597e509f00345b3c71d2a0",
+      "aligned_head": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.081,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-107-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 2.297,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-107-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 108,
+      "branch": "fix/full-sync-target-progress",
+      "original_head": "8d329335e736fed7550144ce8835c11022ac38f2",
+      "aligned_head": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.098,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-108-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 2.421,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-108-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 109,
+      "branch": "fix/merkle-state-history",
+      "original_head": "2838fb0b1a87b8f8b9ecb6d513b0aa5d8056d9e7",
+      "aligned_head": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.099,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-109-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 5.504,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-109-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 110,
+      "branch": "fix/filedb-wal-recovery",
+      "original_head": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+      "aligned_head": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "109": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.094,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-110-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 5.522,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-110-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 111,
+      "branch": "fix/verified-history-restart",
+      "original_head": "5ab3c2ce65bc534b86bc768404096756db50579a",
+      "aligned_head": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "109": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+        "110": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.094,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-111-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 3.368,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-111-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 112,
+      "branch": "fix/snap-pivot-peer-recovery",
+      "original_head": "ad92af00dcd0ab06b416f79c09d6a5fa4908b52e",
+      "aligned_head": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "109": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+        "110": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+        "111": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.089,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-112-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 5.555,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-112-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 114,
+      "branch": "fix/official-rpc-conformance",
+      "original_head": "ae6e0eb5121f0e3dca036ac0a4c19fec559e6a1a",
+      "aligned_head": "8dc8cab45b35172a47d25aa893ef137a01bc386d",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "109": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+        "110": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+        "111": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+        "112": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": false,
+      "late_pr101_exact_tool_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "late_tool_source": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "production_test_delta": [
+        "pkg/cmd/glamsterdam-ledger/main.go",
+        "pkg/cmd/glamsterdam-ledger/main_test.go",
+        "pkg/cmd/glamsterdam-ledger/testdata/actual-builder-payment.json.gz",
+        "pkg/cmd/glamsterdam-live/main.go",
+        "pkg/cmd/glamsterdam-live/main_test.go",
+        "pkg/devnet/kurtosis/qualification/reference/README.md",
+        "pkg/devnet/kurtosis/qualification/reference/reference-builder-ledger.py",
+        "pkg/devnet/kurtosis/qualification/reference/reference-period1-finality.py",
+        "pkg/devnet/kurtosis/scripts/glamsterdam-cold-observer.star"
+      ],
+      "validation": [
+        {
+          "kind": "existing-pr101-consumers",
+          "passed": true,
+          "elapsed_seconds": 0.086,
+          "output": "ok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-ledger\t(cached)\nok  \tgithub.com/eth2030/eth2030/cmd/glamsterdam-live\t(cached)\n",
+          "operator_log_name": "eth2030-target-align-114-existing-pr101-consumers.log"
+        },
+        {
+          "kind": "native-and-consumer-build",
+          "passed": true,
+          "elapsed_seconds": 5.608,
+          "output": "",
+          "operator_log_name": "eth2030-target-align-114-native-and-consumer-build.log"
+        }
+      ]
+    },
+    {
+      "number": 113,
+      "branch": "integration/glamsterdam-final-acceptance",
+      "original_head": "b18ddd6e229ff55becceb1d5a354e33ddc9a2fd2",
+      "aligned_head": "e896af6e0ad6474b4248c9a37cdc7c84e5d44d53",
+      "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+      "updated_prerequisites": {
+        "92": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+        "93": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+        "94": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+        "95": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+        "97": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+        "98": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+        "100": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+        "101": "27d7f0099e9c1f4fd30c67bfc44b6cdb441f7689",
+        "102": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+        "103": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+        "104": "119ce54c47b16a3bac930175283d03d9284a6efd",
+        "105": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+        "106": "58b988325008205eb797924d1861de97c4a176e7",
+        "107": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+        "108": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+        "109": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+        "110": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+        "111": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+        "112": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+        "114": "8dc8cab45b35172a47d25aa893ef137a01bc386d",
+        "115": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d"
+      },
+      "original_head_retained": true,
+      "master_is_ancestor": true,
+      "source_tree_matches_predicted_master_merge": true,
+      "late_pr101_exact_tool_delta": [],
+      "late_tool_source": null,
+      "production_test_delta": [],
+      "validation": [
+        {
+          "kind": "production/test tree unchanged; original qualification retained",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

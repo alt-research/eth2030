@@ -1,3 +1,11 @@
+## Direct-master delivery correction and stop (2026-11-20)
+
+- [x] Prepare and publish independent PR 115 for original PR 91 against current master; retain exact source/test bytes and original ancestry.
+- [x] Verify affected tests/race/vet/build and audit every open/recently merged review for stranded delivery.
+- [x] Retarget all remaining open reviews to master, retain Draft status and clarify code prerequisites; close already-delivered PR 99.
+- [x] Verify clean current-master and cumulative dependency-ordered merges, preserve exact target evidence and publish the updated handoff.
+- [x] Require final post-push remote-head verification and stop without merging EL master or resuming feature work.
+
 ## User stop and PR merge handoff (2026-11-20)
 
 - [x] Finish and separately publish the current official RPC conformance correction as PR 114.

@@ -1,5 +1,7 @@
 # PR merge and user-stop handoff — 2026-11-20
 
+> Target-branch and merge-order instructions below are historical. The subsequent user-requested [direct-master delivery correction](PR_TARGETS_MASTER_20261120.md) opens PR 115, routes every open PR to master and supersedes the earlier stacked-base procedure. Original evidence and unfinished release gates remain retained.
+
 The current official RPC work is submitted as [PR 114](https://github.com/alt-research/eth2030/pull/114). All **27 open EL PRs** are clean against their fetched current declared targets, and the complete dependency-ordered **merge-commit** simulation has **zero conflicts**. Work stops here as requested; no EL PR has been merged into master.
 
 This is a merge-preparation result, not complete Glamsterdam release acceptance. [PR 113](https://github.com/alt-research/eth2030/pull/113) remains draft and carries the explicit unfinished gates below. Draft reviews 92, 100 and 101 also retain their status.

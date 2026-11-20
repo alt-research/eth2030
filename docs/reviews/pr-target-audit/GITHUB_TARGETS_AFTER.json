@@ -1,0 +1,225 @@
+{
+  "captured_at": "2026-11-20T03:26:31.418222+00:00",
+  "pull_requests": [
+    {
+      "number": 92,
+      "head": "integration/glamsterdam-conformance-foundation",
+      "head_sha": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 93,
+      "head": "fix/native-vm-metering-boundaries",
+      "head_sha": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 94,
+      "head": "fix/native-transaction-validation",
+      "head_sha": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 95,
+      "head": "test/glamsterdam-native-fixtures",
+      "head_sha": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 97,
+      "head": "fix/ordinary-transaction-context",
+      "head_sha": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 98,
+      "head": "test/glamsterdam-application-compatibility",
+      "head_sha": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 100,
+      "head": "integration/glamsterdam-runtime-candidate",
+      "head_sha": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 101,
+      "head": "test/glamsterdam-multiclient-gate",
+      "head_sha": "27d7f0099e9c1f4fd30c67bfc44b6cdb441f7689",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 102,
+      "head": "fix/rpc-block-hash-call-selectors",
+      "head_sha": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 103,
+      "head": "fix/historical-receipt-derived-fields",
+      "head_sha": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 104,
+      "head": "fix/engine-stale-canonical-forkchoice",
+      "head_sha": "119ce54c47b16a3bac930175283d03d9284a6efd",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 105,
+      "head": "fix/historical-state-header-readback",
+      "head_sha": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 106,
+      "head": "fix/rpc-request-execution-cancellation",
+      "head_sha": "58b988325008205eb797924d1861de97c4a176e7",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 107,
+      "head": "fix/websocket-execution-disconnect",
+      "head_sha": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 108,
+      "head": "fix/full-sync-target-progress",
+      "head_sha": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 109,
+      "head": "fix/merkle-state-history",
+      "head_sha": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 110,
+      "head": "fix/filedb-wal-recovery",
+      "head_sha": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 111,
+      "head": "fix/verified-history-restart",
+      "head_sha": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 112,
+      "head": "fix/snap-pivot-peer-recovery",
+      "head_sha": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 113,
+      "head": "integration/glamsterdam-final-acceptance",
+      "head_sha": "e896af6e0ad6474b4248c9a37cdc7c84e5d44d53",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 114,
+      "head": "fix/official-rpc-conformance",
+      "head_sha": "8dc8cab45b35172a47d25aa893ef137a01bc386d",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 115,
+      "head": "fix/osaka-clz-master",
+      "head_sha": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    }
+  ]
+}

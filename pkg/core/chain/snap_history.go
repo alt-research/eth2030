@@ -35,8 +35,11 @@ func (bc *Blockchain) snapHistoryCursor() (anchor, cursor *types.Block, err erro
 		return nil, nil, fmt.Errorf("snap history: pivot is not finalized and validated")
 	}
 	canonical, err := rawdb.ReadCanonicalHash(bc.db, anchor.NumberU64())
-	if err != nil || canonical != anchor.Hash() {
-		return nil, nil, fmt.Errorf("snap history: original pivot is not canonical: %w", err)
+	if err != nil {
+		return nil, nil, storageFailure(err)
+	}
+	if canonical != anchor.Hash() {
+		return nil, nil, fmt.Errorf("snap history: original pivot is not canonical")
 	}
 	cursor = anchor
 	data, err = bc.db.Get(snapHistoryCursorKey)
@@ -95,8 +98,11 @@ func (bc *Blockchain) SnapHistoryCursor(ctx context.Context) (*types.Block, erro
 		}
 		if parent.Header().BlockAccessListHash != nil {
 			data, err := bc.BlockAccessList(parent.Hash())
-			if err != nil || data == nil {
-				return nil, fmt.Errorf("snap history: incomplete committed BAL prefix: %w", err)
+			if err != nil {
+				return nil, err
+			}
+			if data == nil {
+				return nil, fmt.Errorf("snap history: incomplete committed BAL prefix")
 			}
 		}
 		block = parent
@@ -186,14 +192,21 @@ func (bc *Blockchain) CompleteSnapHistoryBlock(hash types.Hash) error {
 		return fmt.Errorf("snap history: missing completed body")
 	}
 	if hash != anchor.Hash() {
-		if ready, err := bc.snapHistoryBlock(hash); err != nil || !ready {
-			return fmt.Errorf("snap history: unauthenticated completed body: %w", err)
+		ready, err := bc.snapHistoryBlock(hash)
+		if err != nil {
+			return err
+		}
+		if !ready {
+			return fmt.Errorf("snap history: unauthenticated completed body")
 		}
 	}
 	if block.Header().BlockAccessListHash != nil {
 		data, err := bc.BlockAccessList(hash)
-		if err != nil || data == nil {
-			return fmt.Errorf("snap history: incomplete completed BAL: %w", err)
+		if err != nil {
+			return err
+		}
+		if data == nil {
+			return fmt.Errorf("snap history: incomplete completed BAL")
 		}
 	}
 	return storageFailure(bc.db.Put(snapHistoryCursorKey, append(anchor.Hash().Bytes(), hash.Bytes()...)))

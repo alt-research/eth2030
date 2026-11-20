@@ -20,8 +20,11 @@
     "missing-storage-journal"
   ],
   "validation": {
-    "full_packages": 218,
+    "full_packages": 217,
     "affected_race_packages": 24,
-    "integration_packages": 49
+    "integration_packages": 49,
+    "full_test_source": "ad38817f153072421d7b3a023dfbce9f44088048",
+    "original_composed_full_packages": 218,
+    "github_ci_jobs_passed": 9
   }
 }

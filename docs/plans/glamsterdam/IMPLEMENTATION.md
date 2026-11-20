@@ -1,5 +1,7 @@
 # Glamsterdam implementation tracking
 
+> Current post-merge assessment (2026-11-19): [remaining-work inventory](POST_MERGE_STATUS_20261119.md). EL reviews 64–87 are merged at `5fbc7c13`; 13 deduplicated work packages remain across correctness, test infrastructure, CL integration and acceptance/release. Earlier statuses, baseline labels and effort estimates below are historical snapshots, not a current missing-code count.
+
 Implementation begins from fetched `origin/master` at `38ea9259`, not the older audit checkout. The original checkout and unrelated dirty submodule/generated directories are preserved. The working branch is `feat/glamsterdam-baseline` in an isolated worktree. The source plan is imported from `6f60df69`; historical audit outputs remain dated observations, not current-mainline failures.
 
 ## Revalidation

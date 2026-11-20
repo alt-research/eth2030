@@ -1,3 +1,19 @@
+## Authorized complete Glamsterdam continuation (2026-11-19)
+
+- [x] Preserve the original dirty checkout and freeze the merged master/audit baseline.
+- [x] Compose separately reviewed prerequisite corrections and retain all task/source ancestry.
+- [ ] Close R02/R03/R04 native fixture, application and entrypoint obligations with actual independent consumers.
+- [ ] Close R06/R07/R08/R09 CL adversarial, payment, proof and peer obligations; retain explicit-fork evidence.
+- [ ] Complete R10/R11/R12 independent process, recovery and operating-budget campaigns.
+- [ ] Close R13 compatible artifacts/runbooks and publish every major EL change as a separate PR.
+
+## Glamsterdam post-merge completion audit (2026-11-19)
+
+- [x] Fetch latest master and verify all EL reviews 64–87 are merged; preserve original dirty worktree.
+- [x] Reconcile the 33-task plan against merged implementations and actual evidence rather than historic pending labels.
+- [x] Revalidate concrete defects, native fixture infrastructure, CL/client boundaries and open qualification gates.
+- [x] Produce a deduplicated remaining-work inventory with exact sources, priorities and completion conditions; update integration status without business changes.
+
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 - [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.

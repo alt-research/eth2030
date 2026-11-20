@@ -1,5 +1,7 @@
 # Glamsterdam completion program
 
+> Current post-merge assessment (2026-11-19): [remaining-work inventory](POST_MERGE_STATUS_20261119.md). EL reviews 64–87 are merged at `5fbc7c13`; 13 deduplicated work packages remain across correctness, test infrastructure, CL integration and acceptance/release. Earlier statuses, baseline labels and effort estimates below are historical snapshots, not a current missing-code count.
+
 Status: implementation started in an isolated current-mainline worktree; revalidation is in progress.
 
 The original audit baseline below is historical. Implementation starts from `origin/master` at `38ea9259` on 2026-11-18. That mainline already contains Amsterdam header/slot repairs and canonical persisted Engine bodies; these must be revalidated rather than reimplemented. See [implementation tracking](IMPLEMENTATION.md).

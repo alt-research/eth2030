@@ -1,3 +1,19 @@
+## Completion continuation (2026-11-19)
+
+Independent feature reviews #93 (VM), #94 (signed transaction admission/import), and #95 (strict native official-state runner/CI) are published. The complete modern official corpus passes 31,573/31,573 at clean composed source 654fbbd8; historical Osaka passes 1,223/1,223. All affected local full/integration/race/vet/build checks pass after excluding and separately repeating an existing fixed-port collision. #91/#93 remote CI each passed all seven jobs. CL correctly signed inconsistency/cache admission and a reproduced ignored crash-recovery regression remain active investigation. See the current thirteen-package progress inventory; full release acceptance is not claimed.
+
+## Authorized Glamsterdam completion program (2026-11-19)
+
+Active work continues against the merged master baseline 5fbc7c13. Independent corrective reviews 88–91 cover historical authorizations, Osaka ModExp, EIP-161 finalization and canonical CLZ. Lighthouse original review heads are retained and directly published to eth2030 as authorized; conditional envelope early returns were removed from qualification and explicit-fork runs are required. The complete modern official state corpus exposed additional adapter/execution/validation work, which remains open. [Current thirteen-package progress and evidence boundaries](docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md). No EL master merge or release completion is claimed.
+
+## Glamsterdam post-merge audit (2026-11-19)
+
+Verified upstream master `5fbc7c133b0e57352ca2a3d6fdd9a63726c42502`: all 24 EL reviews 64–87 are merged and no EL PR is open. The complete production module tree equals qualified PR 87; current mainline CI is 7/7 successful. RPC, simulation, nested/dimensional tracing, eth/72 and snap/2 are implemented on mainline and are no longer missing-code tasks.
+
+The [current remaining-work inventory](docs/plans/glamsterdam/POST_MERGE_STATUS_20261119.md) reconciles all 33 plan IDs and defines 13 deduplicated packages. Fresh signed execution preserves 42/42 Amsterdam matches and reproduces the historical Osaka authorization warming mismatch (2500 gas and post-root difference). Native fixture registration still stops at Prague. Separate Lighthouse reviews 1–3 remain open. Remaining security/CL/official-fixture/application/full-client/recovery/capacity and final artifact/decision gates are not closed by PR merging.
+
+The PR 83 method-integration TODO is closed for the demonstrated merged scope; its remaining obligations map to the shared inventory. Earlier root and plan sections below are dated historical snapshots. This audit edits documentation only, preserves unrelated work and opens no new PR.
+
 ## Shared PR tracking conflict cleanup (2026-11-19)
 
 PR 65 is now merged at master `98716284b049933888bcd68d64c1957004d759b2`. The remaining 22 Glamsterdam feature reviews all conflict in shared root tracking files; PRs 71/72 also have adjacent source conflicts and PR 82 has divergent snap evidence. Cleanup preserves feature records in per-review documents and keeps root tracking identical across the batch. All 22 branches pass four-package tests and full local builds; 71/72 additionally pass race/vet, with reviewed source resolutions retaining both sides. The source trees in 82–87 are unchanged. A sequential dry run finds a genuine instructions.go conflict at 72 after 71, while shared trackers stay clean; later functional merge steps remain unqualified. [Batch validation and boundaries](docs/reviews/conflict-cleanup-20261119.md). Existing PR branches are prepared for fast-forward publication, with exact live head/conflict verification required afterward. CI, approval, Draft status and protocol release qualification remain separate gates; this task does not merge upstream PRs. The dated records below describe their original snapshots.

@@ -1,0 +1,33 @@
+{
+  "original_head": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+  "original_ci_run": 44667681558,
+  "failed_job_url": "https://github.com/alt-research/eth2030/actions/runs/44667681558/job/136060877368",
+  "failed_test": "TestEth72ActualNodeFullPromotionAndEngineCells",
+  "failed_assertion": "Engine cells/order/DATA/null changed",
+  "failure_location": "pkg/node/sparse_blob_relay_test.go:111",
+  "root_cause": "Same complete/sparse result-row overwrite repaired in PR98, observed at the first Engine projection rather than after restart.",
+  "correction_source": "c64ac1505937b35ca6387fbe6851cdf56ffcc7d2",
+  "merged_master": "48248fe6",
+  "method": "Normal master merge retaining original PR112 and correction ancestry; no cherry-pick, force push or merge into master.",
+  "implementation_test_delta": [
+    "pkg/eth/sparse_relay.go",
+    "pkg/eth/blob_projection_test.go"
+  ],
+  "delta_matches_c64ac150_exactly": true,
+  "validation": {
+    "toolchain": "go1.26.11",
+    "full_command": "GOFLAGS=-p=4 go test ./... -timeout=15m -count=1",
+    "full_packages_passed": 218,
+    "affected_race_packages": [
+      "eth",
+      "node",
+      "node/backend"
+    ],
+    "original_native_test_repetitions": 10,
+    "original_native_test_unchanged": true,
+    "original_deadlines_unchanged": true,
+    "vet": "go vet ./...",
+    "build": "go build ./cmd/eth2030"
+  },
+  "scope": "No snap codec/proof/state rule changes. Only existing PR112 is published; new-head CI is verified after push and reported in its PR description."
+}

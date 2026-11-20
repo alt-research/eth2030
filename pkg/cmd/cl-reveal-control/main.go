@@ -80,6 +80,15 @@ func (c *controller) signatureProbe(ctx context.Context, input []byte, headers h
 			if err != nil || status < 400 || status >= 500 {
 				return fmt.Errorf("observer did not reject replaced-key signature: %d %v", status, err)
 			}
+			root, _, err := envelopeIdentity(input, headers)
+			if err != nil {
+				return err
+			}
+			body, status, err = c.request(deadline, "GET", c.observer+"/eth/v1/beacon/execution_payload_envelopes/"+root, nil)
+			c.record("replaced-key-availability-after-rejection", nil, body, status, err)
+			if err != nil || status != http.StatusNotFound {
+				return fmt.Errorf("rejected signature became available: %d %v", status, err)
+			}
 			return nil
 		}
 		if !os.IsNotExist(err) {

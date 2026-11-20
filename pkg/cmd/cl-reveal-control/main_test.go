@@ -31,6 +31,10 @@ func TestSignatureProbeCanChangeOnlyBLSFieldAndRequiresRealRejection(t *testing.
 				t.Fatal(err)
 			}
 			observer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == "GET" {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
 				body, _ := io.ReadAll(r.Body)
 				if !bytes.Equal(body[:offset+4], input[:offset+4]) || !bytes.Equal(body[offset+100:], input[offset+100:]) || !bytes.Equal(body[offset+4:offset+100], signature) {
 					t.Error("probe changed signed message or did not replace its exact signature")

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "spec_revision": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "reference_source_unmodified": true,
+  "bls_active": true,
+  "progress": {
+    "trusted_slot": 96,
+    "signature_slot": 10150,
+    "signature_period": 1,
+    "finalized_slot": 10080,
+    "finalized_root": "0x391df558cb335cba29019218ecf039776fd4f1586d6c0a71fad68c102531bf61",
+    "participation": 512,
+    "next_committee_known_after_rotation": false
+  },
+  "actual_payment_finalized_ancestor": {
+    "slot": 9601,
+    "root": "0x3f604ab4ec9ce59b6e21732b5308bd4671c15924f0b4dc2df452cca9c22474f4",
+    "independent_parent_hash_links": 462
+  },
+  "rejected_controls": [
+    "period1_finality_branch",
+    "period1_signature",
+    "period1_genesis_domain"
+  ]
+}

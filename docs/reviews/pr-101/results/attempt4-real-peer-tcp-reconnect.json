@@ -1,0 +1,944 @@
+{
+  "started_at": "2026-11-19T20:16:11.288522+00:00",
+  "scope": "Owned devnet control peer reconnect through existing debug API; no scoring, signatures or consensus checks are disabled.",
+  "declared_recovery_seconds": 90,
+  "passed": true,
+  "observations": [
+    {
+      "at": "2026-11-19T20:16:11.340131+00:00",
+      "gossip": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": false,
+          "mesh_topics": 0
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": false,
+          "mesh_topics": 0
+        }
+      ],
+      "committee_participation": 336,
+      "attested_slot": "5347"
+    },
+    {
+      "at": "2026-11-19T20:16:13.346984+00:00",
+      "gossip": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": true,
+          "mesh_topics": 74
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": false,
+          "mesh_topics": 0
+        }
+      ],
+      "committee_participation": 336,
+      "attested_slot": "5347"
+    },
+    {
+      "at": "2026-11-19T20:16:15.352234+00:00",
+      "gossip": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": true,
+          "mesh_topics": 74
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": true,
+          "mesh_topics": 0
+        }
+      ],
+      "committee_participation": 336,
+      "attested_slot": "5350"
+    },
+    {
+      "at": "2026-11-19T20:16:17.359015+00:00",
+      "gossip": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": true,
+          "mesh_topics": 74
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": true,
+          "mesh_topics": 0
+        }
+      ],
+      "committee_participation": 336,
+      "attested_slot": "5350"
+    },
+    {
+      "at": "2026-11-19T20:16:19.365819+00:00",
+      "gossip": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": true,
+          "mesh_topics": 74
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": false,
+          "mesh_topics": 0
+        }
+      ],
+      "committee_participation": 474,
+      "attested_slot": "5353"
+    }
+  ],
+  "before": {
+    "peers": {
+      "data": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "enr": null,
+          "last_seen_p2p_address": "/ip4/172.16.0.15/udp/9001/quic-v1/p2p/16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "state": "connected",
+          "direction": "inbound"
+        }
+      ],
+      "meta": {
+        "count": 1
+      }
+    },
+    "gossip": {
+      "data": [
+        {
+          "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+          "connected": false,
+          "expire": 1795126766546,
+          "topics": {
+            "_eth2_d65ba395_beacon_attestation_11_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830536,
+              "mesh_time": 98242,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.8512377871468266,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_41_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830536,
+              "mesh_time": 98242,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_5_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830536,
+              "mesh_time": 98242,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.7014438062919632,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_voluntary_exit_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_25_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.233857941237516,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_27_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.4690702010852528,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_42_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_14_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.9292213308871466,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_28_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830537,
+              "mesh_time": 98241,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.4913783610687394,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_20_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.0916454845699297,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_52_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_execution_payload_bid_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_37_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_block_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0.20547574227169588,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_61_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_execution_payload_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830538,
+              "mesh_time": 98240,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0.20547574227169588,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_17_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.009337784454109,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_55_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_16_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.9823917413363725,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_proposer_slashing_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_13_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.90299266201148,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_56_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_30_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.536601167773559,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_0_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.5826448462809997,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_proposer_preferences_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_26_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.4469617915730812,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_attester_slashing_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_63_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_8_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830539,
+              "mesh_time": 98239,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.7753303695872673,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_53_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_23_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.1762043635109896,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_33_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.09768124909568941,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_40_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_43_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_payload_attestation_message_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830550,
+              "mesh_time": 98228,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_58_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_46_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_54_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_50_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_10_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.825707394132034,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_19_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.06396244647353,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_62_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830551,
+              "mesh_time": 98227,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_2_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.6295242968275887,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_3_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.6532821667611013,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_aggregate_and_proof_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0.03695617858699358,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_35_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_bls_to_execution_change_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_32_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830552,
+              "mesh_time": 98226,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_59_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830553,
+              "mesh_time": 98225,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_21_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830553,
+              "mesh_time": 98225,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.1195786401568775,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_48_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830553,
+              "mesh_time": 98225,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_6_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.7258514722184617,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_18_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.036527286279714,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_49_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_34_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.09768124909568941,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_31_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.559519473069261,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_15_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830574,
+              "mesh_time": 98204,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.9556869769622365,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_7_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.750479662501081,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_47_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_22_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.1477641730571166,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_38_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_29_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.513888076278007,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_9_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830575,
+              "mesh_time": 98203,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.800405603926319,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_45_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_57_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_51_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_12_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.8769988484073274,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_39_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_1_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 1.5806652263843457,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_4_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 2.6772546901148004,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_36_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_44_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830576,
+              "mesh_time": 98202,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_60_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830577,
+              "mesh_time": 98201,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 0,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0.08464633537753068,
+              "invalid_message_deliveries": 0
+            },
+            "_eth2_d65ba395_beacon_attestation_24_ssz_snappy": {
+              "in_mesh": false,
+              "graft_time": 1795116830577,
+              "mesh_time": 98201,
+              "first_message_deliveries": 0,
+              "mesh_message_deliveries": 3.2049015123609124,
+              "mesh_message_deliveries_active": false,
+              "mesh_failure_penalty": 0,
+              "invalid_message_deliveries": 0
+            }
+          },
+          "known_i_ps": {},
+          "behaviour_penalty": 0
+        },
+        {
+          "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+          "connected": false,
+          "expire": 1795128947222,
+          "topics": {},
+          "known_i_ps": {},
+          "behaviour_penalty": 0
+        }
+      ]
+    },
+    "finalized": {
+      "epoch": "162",
+      "root": "0x2a857cb40aa97acbff1511203cb8f0e31aed52369ce030b2dbb805c98ac791b3"
+    }
+  },
+  "actions": [
+    {
+      "path": "/eth/v1/lodestar/disconnect_peer",
+      "parameters": {
+        "peerId": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz"
+      },
+      "status": 200,
+      "response": ""
+    },
+    {
+      "path": "/eth/v1/lodestar/connect_peer",
+      "parameters": {
+        "peerId": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+        "multiaddr": [
+          "/ip4/172.16.0.15/tcp/9000/p2p/16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz"
+        ]
+      },
+      "status": 200,
+      "response": ""
+    }
+  ],
+  "after_peers": {
+    "data": [
+      {
+        "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+        "enr": null,
+        "last_seen_p2p_address": "/ip4/172.16.0.15/udp/9001/quic-v1/p2p/16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+        "state": "connected",
+        "direction": "outbound"
+      }
+    ],
+    "meta": {
+      "count": 1
+    }
+  },
+  "after_score": {
+    "data": [
+      {
+        "peer_id": "16Uiu2HAmG1BLG1Nto5rrHYM8n7FDEaUf617LrBvpQjfknfXoxeGo",
+        "lodestar_score": -19.61914498763245,
+        "gossip_score": -4473.673028213702,
+        "ignore_negative_gossip_score": false,
+        "score": -24.93163170863622,
+        "last_update": 1795119678518
+      },
+      {
+        "peer_id": "16Uiu2HAm2VjcWz91PsJVNzaRzMkjbHxbhNgoEWiWpmE3AzhCPaNz",
+        "lodestar_score": 0,
+        "gossip_score": 4.555530830422576,
+        "ignore_negative_gossip_score": false,
+        "score": 0,
+        "last_update": 1795119378769
+      }
+    ]
+  },
+  "retained_finalized_root": {
+    "root": "0x2a857cb40aa97acbff1511203cb8f0e31aed52369ce030b2dbb805c98ac791b3",
+    "canonical": true,
+    "header": {
+      "message": {
+        "slot": "5184",
+        "proposer_index": "63",
+        "parent_root": "0x61cba28e82916e3dd116881467fce272a0df7381e307821ba671dcdca0ca1d84",
+        "state_root": "0xd1f05c2c7f6d10e35a1369c1532f3e10e33db29ff40eb91886162d4258670c0a",
+        "body_root": "0x09061c244c3029c1cafd80603fb30840f145f2750b557ee96d2d2687d8fd3ff5"
+      },
+      "signature": "0xb796b12b3f8e84c11ece923afcf33cd0cff2eb82a01bac93f33802a8968cca711618556bb8f4534b3e8a1e749527c84b0782f02c6c977c6ad9c12c68adeb4547266dae0ae09e2b5e8890cd15808cf1c4836db0a544577487727b4d05c4aacafa"
+    }
+  },
+  "completed_at": "2026-11-19T20:16:19.376618+00:00"
+}

@@ -1,0 +1,278 @@
+{
+  "passed": false,
+  "scope": "Local durable restart after complete offline indexing; CL remains stopped. This is not moving-target cold sync.",
+  "deadline_seconds": 300,
+  "native_source": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+  "samples": [
+    {
+      "elapsed_seconds": 100.8728449344635,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 103.88060975074768,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 106.881591796875,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 109.88258409500122,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 112.88351678848267,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 115.89029693603516,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 118.89116430282593,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 121.89781546592712,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 124.89869046211243,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 127.89959216117859,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 130.90050745010376,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 133.90141248703003,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 136.90234422683716,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 139.90898871421814,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 142.9099133014679,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 145.9165370464325,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 148.91741585731506,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 151.91838455200195,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 154.91928553581238,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 157.9201636314392,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 160.92099452018738,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 163.92196702957153,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 166.92285919189453,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 169.9295403957367,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 172.93045949935913,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 175.9313564300537,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 178.93220233917236,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 181.9388177394867,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 184.93971395492554,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 187.94637989997864,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 190.94733810424805,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 193.94817423820496,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 196.94909358024597,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 199.9499707221985,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 202.9509072303772,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 205.9575514793396,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 208.95848965644836,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 211.96514129638672,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 214.96622443199158,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 217.96715331077576,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 220.96809697151184,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 223.96907138824463,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 226.97007727622986,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 229.97683000564575,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 232.97781205177307,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 235.97879791259766,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 238.97968912124634,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 241.9805748462677,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 244.98159313201904,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 247.98834776878357,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 250.98967862129211,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 253.99637985229492,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 256.99733304977417,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 259.99825525283813,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 262.999223947525,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 266.0001525878906,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 269.0010941028595,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 272.00782346725464,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 275.00880908966064,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 278.00968861579895,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 281.01060152053833,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 284.01156878471375,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 287.012544631958,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 290.01352071762085,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 293.0145025253296,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 296.02121591567993,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "elapsed_seconds": 299.02218985557556,
+      "error": "[Errno 104] Connection reset by peer"
+    }
+  ],
+  "failure": "Original durable head was not available within the predeclared 300-second local restart budget",
+  "elapsed_seconds": 302.0231649875641
+}

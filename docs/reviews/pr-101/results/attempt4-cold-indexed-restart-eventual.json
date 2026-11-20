@@ -1,0 +1,7 @@
+{
+  "node_started": "2026-11-20T00:01:07.795169+00:00",
+  "startup_seconds": 352.866266,
+  "original_300_second_budget_passed": false,
+  "original_failure_retained": true,
+  "scope": "Actual eventual startup after the already failed fixed 300-second local recovery control."
+}

@@ -1,0 +1,942 @@
+{
+  "scope": "Qualified frozen private development tuple; final public protocol/model review remains reserved. This manifest does not authorize an EL master merge or public-network activation.",
+  "specifications": {
+    "eips": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+    "gas_model": "merged LIFO, explicitly selected by the user",
+    "consensus_specs": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "engine_execution_apis": "68d76a5b1c09dff023782d97eec6ce87a6f6505e",
+    "official_rpc_execution_apis": "a9e9095c453d7b3c95b89abfcf46afb2eff4e1b7",
+    "devp2p": "88f1c80800d622cc3a542a2125bbe33cc18c9f9c",
+    "rpc_method_development_reference": "merged Geth 35845, df4c52482b598933d691e3b0c1655f200ff9b7f1",
+    "native_eels_fixture": {
+      "official_release": "ethereum/execution-specs tests@v21.0.2",
+      "official_archive_url": "https://github.com/ethereum/execution-specs/releases/download/tests%40v21.0.2/fixtures.tar.gz",
+      "official_archive_sha256": "e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9",
+      "independent_executor": "official EELS state/root/log oracle; no oracle patches",
+      "results": [
+        {
+          "native_revision": "654fbbd8cb286ac687437473e5fecb3a55df738c",
+          "native_dirty": false,
+          "executor": "eth2030-native-signed-state-transition",
+          "fork": "Osaka",
+          "passed": 14665,
+          "failed": 0,
+          "errors": [],
+          "report_sha256": "c5b62cf6a9d6c1149368021e8b54ea1da5f960a9c20aec183e528cfa21deb7b4",
+          "selected_cases": 14665
+        },
+        {
+          "native_revision": "654fbbd8cb286ac687437473e5fecb3a55df738c",
+          "native_dirty": false,
+          "executor": "eth2030-native-signed-state-transition",
+          "fork": "Amsterdam",
+          "passed": 16908,
+          "failed": 0,
+          "errors": [],
+          "report_sha256": "6a835bec5f925d1c3506059d72fde576e09717f2cd6b9b00cb3c2ea11e57ed69",
+          "selected_cases": 16908
+        }
+      ]
+    }
+  },
+  "clients": {
+    "native_el": {
+      "compiled_source": "eff0b823fdf3e0e4d6262bc093b44e8a77787067",
+      "source_branch": "qualification/glamsterdam-runtime-20261120",
+      "source_url": "https://github.com/alt-research/eth2030/tree/eff0b823fdf3e0e4d6262bc093b44e8a77787067",
+      "executable_sha256": "78d75b0fb0a1c74cca3ad31322b5ccf9cd6db3b299e4edd711926dd63b5cf2dc",
+      "toolchain": "go1.26.11",
+      "independent_second_build_byte_identical": true,
+      "production_scope": "Both original native pairs and both validator-free full/snap roles. Test-only tools and later review documents have separate source heads."
+    },
+    "lighthouse": {
+      "bn_compiled_source": "d547ba984",
+      "bn_executable_sha256": "56143d366dee843d1a9410752588ce7c8125ae0b6f9984e1fdad7783588ba3f1",
+      "authorized_eth2030_head": "42f6fc26e5c48c4c1ec16368a0a7df705bcc3e69",
+      "later_delta": "cfg(test) captured consumers, dev dependencies/lock edges, fixtures and documents; running source is not relabelled as the later head.",
+      "original_validator_clients_source": "6666199",
+      "transport_fork": "fyInALT/rust-libp2p 12b1ee829d7a109d85ed8d543265c2a36b33bbc3"
+    },
+    "lodestar": {
+      "source": "cf705b46b08ba8172d2e32225964ecb9bb1d2b95",
+      "repository": "fyInALT/lodestar",
+      "base_image": "ethpandaops/lodestar@sha256:d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad",
+      "source_runtime_package_and_lock_files_identical": true
+    },
+    "independent_geth": {
+      "version": "v1.17.10",
+      "unmodified": true,
+      "executable_sha256": "487d2b950b9ba0e9d1e31e4762d03c08e4b7abd6709a16e90c08b52c33ff5e57"
+    },
+    "buildoor": {
+      "source": "aa3bbaf543dd2072e2c6026f60af122727810355",
+      "module": "v0.0.0-20261115114542-aa3bbaf543dd",
+      "go_eth2_client": "v0.1.12",
+      "image": "ethpandaops/buildoor@sha256:19ff85b450287867390f367f8061eae8a6f5d0bc52421cb50719fca5d4b4d0af",
+      "instrumentation": "Temporary test-only literal-IP CL endpoint wrapper and an observer transport proxy. Original executable/configuration are restored after each completed case."
+    }
+  },
+  "network": {
+    "chain_id": 1337,
+    "execution_genesis": "0xfdf84ec05edbc77e24c84bc6882b6f0b634c070b03ea52b284695e04002c6c24",
+    "genesis_validators_root": "0x0888cde6ee0c51578046793b377d6f6474908f7812b8db4d87a736d73e539d2c",
+    "genesis_time": 1795103315,
+    "seconds_per_slot": 3,
+    "slots_per_epoch": 32,
+    "validators": 384,
+    "fulu_epoch": 0,
+    "gloas_epoch": 2,
+    "gloas_version": "0x80000038",
+    "heze_epoch": "FAR_FUTURE_EPOCH",
+    "native_amsterdam": "active from the supplied genesis",
+    "factory_route": "Exact EIP-7997 explicit genesis allocation at 0x4e59b44847b379578588920cA78FbF26c0B4956C, nonce 1; no fork insertion."
+  },
+  "wire_decisions": {
+    "envelope": "Selected signed Gloas envelope, not unmerged 5770/5820 alternatives. POST v1 stateless SSZ Contents with Eth-Blob-Data-Included:true; envelope-only JSON with false; GET v1.",
+    "partial_group_version": "0x01",
+    "actual_custody": "Main supernodes 128; validator-free observer expands 4 to 8 to 16 through normal proposer-preparation declarations and retains 16 across restart.",
+    "engine_actual_traffic": [
+      "engine_newPayloadV5",
+      "engine_forkchoiceUpdatedV4",
+      "engine_forkchoiceUpdatedV5",
+      "engine_getPayloadV6"
+    ],
+    "historical_engine": [
+      "engine_getPayloadBodiesByHashV2",
+      "engine_getPayloadBodiesByRangeV2"
+    ],
+    "network_support": "Negotiated eth/68\u201372 and snap/2; real socket/codec consumer regressions and actual independent-peer cold sync are distinct evidence classes.",
+    "rpc_scope": "Finite official 107-file/108-request corpus, native admission/history/trace/cancellation consumers, 31 published signed transactions/17 getters, blobs and canonical factory. Unexecuted blockchain fixture formats and ecosystem-wide application compatibility are not inferred."
+  },
+  "original_main_services": {
+    "buildoor": {
+      "container": "e27480353d072d190318a42427abf4c8313cbed97c367a543e014a4b0f2136d9",
+      "image_name": "ethpandaops/buildoor@sha256:19ff85b450287867390f367f8061eae8a6f5d0bc52421cb50719fca5d4b4d0af",
+      "image_id": "sha256:9ec64e1cf283c6273a5eb1dbd399bc098dc1e6be8c0f3aa933c20d71720d1287",
+      "command": [
+        "run",
+        "--cl-client=http://172.16.0.13:4000",
+        "--el-rpc=http://172.16.0.10:8545",
+        "--el-engine-api=http://172.16.0.10:8551",
+        "--el-jwt-secret=/jwt/jwtsecret",
+        "--builder-privkey=[redacted]",
+        "--wallet-privkey=[redacted]",
+        "--api-port=8080",
+        "--builder-api-enabled",
+        "--epbs-enabled"
+      ],
+      "entrypoint": [
+        "buildoor"
+      ],
+      "memory_limit": 1024000000,
+      "nano_cpus": 1000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 634407,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T10:12:59.322855951Z",
+        "FinishedAt": "2026-11-20T10:12:59.042125042Z"
+      },
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33120"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33120"
+          }
+        ],
+        "9000/tcp": null
+      },
+      "running_executable_hashes": ""
+    },
+    "vc-2-geth-lodestar": {
+      "container": "d96b94434ce106ca3faf18b82332617429ec5b1aa435649a9e36819fb1e5fe10",
+      "image_name": "eth2030-lodestar:qualification-cf705b4",
+      "image_id": "sha256:24785cda051a06288707d68258c78455d5303c7622ab92fb8d33c20a35f80ba4",
+      "command": [
+        "validator",
+        "--logLevel=debug",
+        "--paramsFile=/network-configs/config.yaml",
+        "--beaconNodes=http://cl-2-lodestar-geth:4000",
+        "--suggestedFeeRecipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776",
+        "--metrics",
+        "--metrics.address=0.0.0.0",
+        "--metrics.port=8080",
+        "--useProduceBlockV3",
+        "--disableKeystoresThreadPool",
+        "--keystoresDir=/validator-keys/keys",
+        "--secretsDir=/validator-keys/secrets",
+        "--defaultGasLimit=150000000",
+        "--builder"
+      ],
+      "entrypoint": [
+        "node",
+        "./packages/cli/bin/lodestar"
+      ],
+      "memory_limit": 1024000000,
+      "nano_cpus": 500000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 3804223,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T02:28:14.251350678Z",
+        "FinishedAt": "2026-11-20T01:44:35.472253159Z"
+      },
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32984"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32984"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/node d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9  /proc/7/exe\n"
+    },
+    "vc-1-geth-lighthouse": {
+      "container": "2a97e3e0910fc951425e1a9cbf6c874c8bb6b3aff36fb0a7a87b4643811a474d",
+      "image_name": "eth2030-lighthouse:qualification-0262e8f",
+      "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+      "command": [
+        "lighthouse",
+        "vc",
+        "--debug-level=debug",
+        "--testnet-dir=/network-configs",
+        "--validators-dir=/validator-keys/keys",
+        "--secrets-dir=/validator-keys/secrets",
+        "--init-slashing-protection",
+        "--beacon-nodes=http://cl-1-lighthouse-geth:4000",
+        "--suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776",
+        "--metrics",
+        "--metrics-address=0.0.0.0",
+        "--metrics-allow-origin=*",
+        "--metrics-port=8080",
+        "--gas-limit=150000000",
+        "--builder-proposals"
+      ],
+      "entrypoint": null,
+      "memory_limit": 1024000000,
+      "nano_cpus": 500000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 3047282,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-19T18:45:03.765872315Z",
+        "FinishedAt": "2026-11-19T18:45:03.484748395Z"
+      },
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32911"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32911"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/lighthouse 26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8  /proc/7/exe\n"
+    },
+    "vc-3-geth-lighthouse": {
+      "container": "9ff7332cc9543e53d3739802650f23954562a4b836664bb94783b6c0a116376a",
+      "image_name": "eth2030-lighthouse:qualification-0262e8f",
+      "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+      "command": [
+        "lighthouse",
+        "vc",
+        "--debug-level=debug",
+        "--testnet-dir=/network-configs",
+        "--validators-dir=/validator-keys/keys",
+        "--secrets-dir=/validator-keys/secrets",
+        "--init-slashing-protection",
+        "--beacon-nodes=http://cl-3-lighthouse-geth:4000",
+        "--suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776",
+        "--metrics",
+        "--metrics-address=0.0.0.0",
+        "--metrics-allow-origin=*",
+        "--metrics-port=8080",
+        "--gas-limit=150000000",
+        "--builder-proposals"
+      ],
+      "entrypoint": null,
+      "memory_limit": 1024000000,
+      "nano_cpus": 500000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 3048226,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-19T18:45:08.78801944Z",
+        "FinishedAt": "2026-11-19T18:45:08.561967314Z"
+      },
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32915"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32915"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/lighthouse 26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8  /proc/7/exe\n"
+    },
+    "cl-2-lodestar-geth": {
+      "container": "d01ee49c0c9e8423afdf76c19e7d5f1feaaf0c6ab7a3c0829df252d4ec24a00b",
+      "image_name": "eth2030-lodestar:qualification-cf705b4",
+      "image_id": "sha256:24785cda051a06288707d68258c78455d5303c7622ab92fb8d33c20a35f80ba4",
+      "command": [
+        "exec node ./packages/cli/bin/lodestar beacon --logLevel=debug --port=9000 --discoveryPort=9000 --dataDir=/data/lodestar/beacon-data --chain.persistInvalidSszObjects=true --eth1.depositContractDeployBlock=0 --network.connectToDiscv5Bootnodes=true --discv5=true --eth1=true --eth1.providerUrls=http://el-2-geth-lodestar:8545 --execution.urls=http://el-2-geth-lodestar:8551 --rest=true --rest.address=0.0.0.0 --rest.namespace=* --rest.port=4000 --nat=true --jwt-secret=/jwt/jwtsecret --enr.ip=172.16.0.14 --enr.tcp=9000 --enr.udp=9000 --metrics --metrics.address=0.0.0.0 --metrics.port=8008 --paramsFile=/network-configs/config.yaml --genesisStateFile=/network-configs/genesis.ssz --bootnodes=enr:-NK4QHRaIu3ZtkHBAHwQDLsMZUF7wJfwyGBVw6Uq69a9Ium5NRSX3tu9jHsb9Zp0b_tBXvnS28PiEGCHqCRAtomzvyBBh2F0dG5ldHOI__________-DY2djBIRldGgykJDwJH-AAAA4AgAAAAAAAACCaWSCdjSCaXCErBAADYNuZmSE1lujlYRxdWljgiMpiXNlY3AyNTZrMaEDMb8YOKFBth2QzDiXsSaIVeXC4hXuzYXTNWGNYnmbZwCIc3luY25ldHMAg3RjcIIjKIN1ZHCCIyg --builder --builder.urls=http://mev-boost-2-lodestar-geth:18550"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 12288000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 3804023,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T02:28:14.052807689Z",
+        "FinishedAt": "2026-11-20T01:44:37.100418719Z"
+      },
+      "ports": {
+        "4000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32981"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32981"
+          }
+        ],
+        "8008/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32982"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32982"
+          }
+        ],
+        "9000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32983"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32983"
+          }
+        ],
+        "9000/udp": null
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/node d931c649850ffa7155b8ceffb400dc916ef325866e509cc52ae36e33e8fbb9a9  /proc/7/exe\n"
+    },
+    "cl-3-lighthouse-geth": {
+      "container": "a6e54fb93e7c7f8197c55c7d02ae29a208574769df21e7cfeb2d581595a1b356",
+      "image_name": "eth2030-lighthouse:qualification-0262e8f",
+      "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+      "command": [
+        "exec lighthouse beacon_node --debug-level=debug --datadir=/data/lighthouse/beacon-data --listen-address=0.0.0.0 --port=9000 --http --http-address=0.0.0.0 --http-port=4000 --disable-packet-filter --execution-endpoints=http://el-3-geth-lighthouse:8551 --jwt-secrets=/jwt/jwtsecret --suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776 --disable-enr-auto-update --enr-address=172.16.0.15 --enr-tcp-port=9000 --enr-udp-port=9000 --enr-quic-port=9001 --quic-port=9001 --metrics --metrics-address=0.0.0.0 --metrics-allow-origin=* --metrics-port=5054 --enable-private-discovery --allow-insecure-genesis-sync --testnet-dir=/network-configs --boot-nodes=enr:-NK4QHRaIu3ZtkHBAHwQDLsMZUF7wJfwyGBVw6Uq69a9Ium5NRSX3tu9jHsb9Zp0b_tBXvnS28PiEGCHqCRAtomzvyBBh2F0dG5ldHOI__________-DY2djBIRldGgykJDwJH-AAAA4AgAAAAAAAACCaWSCdjSCaXCErBAADYNuZmSE1lujlYRxdWljgiMpiXNlY3AyNTZrMaEDMb8YOKFBth2QzDiXsSaIVeXC4hXuzYXTNWGNYnmbZwCIc3luY25ldHMAg3RjcIIjKIN1ZHCCIyg --subscribe-all-subnets --target-peers=2 --builder=http://mev-boost-3-lighthouse-geth:18550"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 465410,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T08:18:16.346821634Z",
+        "FinishedAt": "2026-11-20T08:18:16.137888491Z"
+      },
+      "ports": {
+        "4000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33131"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33131"
+          }
+        ],
+        "5054/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33132"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33132"
+          }
+        ],
+        "9000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33133"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33133"
+          }
+        ],
+        "9000/udp": null,
+        "9001/udp": null
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/lighthouse-final-candidate 56143d366dee843d1a9410752588ce7c8125ae0b6f9984e1fdad7783588ba3f1  /proc/7/exe\n"
+    },
+    "cl-1-lighthouse-geth": {
+      "container": "87799773fc5749e549738700c7fb30acca04da5a3d3e6ef27e211604f65c9eab",
+      "image_name": "eth2030-lighthouse:qualification-0262e8f",
+      "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+      "command": [
+        "exec lighthouse beacon_node --debug-level=debug --datadir=/data/lighthouse/beacon-data --listen-address=0.0.0.0 --port=9000 --http --http-address=0.0.0.0 --http-port=4000 --disable-packet-filter --execution-endpoints=http://el-1-geth-lighthouse:8551 --jwt-secrets=/jwt/jwtsecret --suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776 --disable-enr-auto-update --enr-address=172.16.0.13 --enr-tcp-port=9000 --enr-udp-port=9000 --enr-quic-port=9001 --quic-port=9001 --metrics --metrics-address=0.0.0.0 --metrics-allow-origin=* --metrics-port=5054 --enable-private-discovery --allow-insecure-genesis-sync --testnet-dir=/network-configs --subscribe-all-subnets --target-peers=2 --builder=http://mev-boost-1-lighthouse-geth:18550"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 584615,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T09:35:51.247901529Z",
+        "FinishedAt": "2026-11-20T09:35:51.009873325Z"
+      },
+      "ports": {
+        "4000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33075"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33075"
+          }
+        ],
+        "5054/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33076"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33076"
+          }
+        ],
+        "9000/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33077"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33077"
+          }
+        ],
+        "9000/udp": null,
+        "9001/udp": null
+      },
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/lighthouse-final-candidate 56143d366dee843d1a9410752588ce7c8125ae0b6f9984e1fdad7783588ba3f1  /proc/7/exe\n"
+    },
+    "el-3-geth-lighthouse": {
+      "container": "b82d79245970c835e99c86ea8b15e87cd02869c5a502beecbc698ee1e8104ec8",
+      "image_name": "eth2030-native:wire-qualification-7e2c66e1",
+      "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+      "command": [
+        "geth  --override.genesis=/network-configs/genesis.json --verbosity=4 --datadir=/data/geth/execution-data --http --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug,txpool --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug,txpool --ws.origins=* --nat=extip:172.16.0.12 --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0 --metrics.port=9001 --discovery.port=30303 --port=30303 --miner.gasprice=1 --miner.gaslimit=150000000 --bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303 --networkid=1337 --rpc.rate_limit=0"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 525854,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T08:49:26.970205176Z",
+        "FinishedAt": "2026-11-20T08:47:46.985945236Z"
+      },
+      "ports": {
+        "30303/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33036"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33036"
+          }
+        ],
+        "30303/udp": null,
+        "8545/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33032"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33032"
+          }
+        ],
+        "8546/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33033"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33033"
+          }
+        ],
+        "8551/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33034"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33034"
+          }
+        ],
+        "9001/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33035"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33035"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 78d75b0fb0a1c74cca3ad31322b5ccf9cd6db3b299e4edd711926dd63b5cf2dc  /proc/8/exe\n"
+    },
+    "el-2-geth-lodestar": {
+      "container": "b7ca3b40e3527cb493d4635572f30e181097732e3fae50f52744e002e76b6d02",
+      "image_name": "eth2030-native:wire-qualification-7e2c66e1",
+      "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+      "command": [
+        "geth  --override.genesis=/network-configs/genesis.json --verbosity=4 --datadir=/data/geth/execution-data --http --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug,txpool --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug,txpool --ws.origins=* --nat=extip:172.16.0.11 --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0 --metrics.port=9001 --discovery.port=30303 --port=30303 --miner.gasprice=1 --miner.gaslimit=150000000 --bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303 --networkid=1337 --rpc.rate_limit=0"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 521632,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-20T08:45:44.08536145Z",
+        "FinishedAt": "2026-11-20T08:44:17.765201529Z"
+      },
+      "ports": {
+        "30303/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33031"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33031"
+          }
+        ],
+        "30303/udp": null,
+        "8545/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33027"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33027"
+          }
+        ],
+        "8546/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33028"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33028"
+          }
+        ],
+        "8551/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33029"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33029"
+          }
+        ],
+        "9001/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "33030"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "33030"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 78d75b0fb0a1c74cca3ad31322b5ccf9cd6db3b299e4edd711926dd63b5cf2dc  /proc/8/exe\n"
+    },
+    "el-1-geth-lighthouse": {
+      "container": "4c43bad3ffae394d72d4579b0e6a32afff5faafea84eef8d5a58b095638aef30",
+      "image_name": "eth2030-independent-geth:wire-qualification-1.17.10",
+      "image_id": "sha256:9a516f080510b117332aa6d7d654e5ea66b1812d9054a68859eff8ba98388dec",
+      "command": [
+        "geth  --override.genesis=/network-configs/genesis.json --verbosity=4 --datadir=/data/geth/execution-data --http --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug,txpool --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug,txpool --ws.origins=* --nat=extip:172.16.0.10 --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0 --metrics.port=9001 --discovery.port=30303 --port=30303 --miner.gasprice=1 --miner.gaslimit=150000000 --bootnodes= --networkid=1337 --rpc.gascap=150000000"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "state": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 2904611,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-19T17:34:20.614973999Z",
+        "FinishedAt": "2026-11-19T17:34:20.287560783Z"
+      },
+      "ports": {
+        "30303/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32894"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32894"
+          }
+        ],
+        "30303/udp": null,
+        "8545/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32890"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32890"
+          }
+        ],
+        "8546/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32891"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32891"
+          }
+        ],
+        "8551/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32892"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32892"
+          }
+        ],
+        "9001/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "32893"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "32893"
+          }
+        ]
+      },
+      "running_executable_hashes": "/proc/15/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/15/exe\n/proc/8/exe /usr/local/bin/geth-real 487d2b950b9ba0e9d1e31e4762d03c08e4b7abd6709a16e90c08b52c33ff5e57  /proc/8/exe\n"
+    }
+  },
+  "co_resident_snapshot": {
+    "at": "2026-11-20T11:33:42.580987+00:00",
+    "roles": [
+      {
+        "container": "6ed016ca8d5033aa5d8fb6684b02f4b1675fe2e89c809ea7dad25b77f455adde",
+        "role": "glamsterdam-qualified-snap-cl",
+        "image_id": "sha256:4ba0858d4835dc96a7fd81af70a0709cb69950ef3f7ec878d83ff4ebacb0a9ca",
+        "image_name": "eth2030-lighthouse:qualification-d547ba9",
+        "started_at": "2026-11-20T11:28:36.641718694Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "1503a09c0f2565bb50ddb680389b873bed4882417c8f26cee761ff81371a448f",
+        "role": "glamsterdam-qualified-snap-el",
+        "image_id": "sha256:7e28a791e2375932bceb6e9d8b1b46aa0a0d48ddf7e5c0db841b96044a076b82",
+        "image_name": "eth2030-native:qualification-e61ea843",
+        "started_at": "2026-11-20T11:31:37.246973866Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "ba050f1c95658f77bbc998dc2ac859b1fb44ffe26cd234b8ea116d9ba4122f86",
+        "role": "glamsterdam-qualified-full-cl",
+        "image_id": "sha256:4ba0858d4835dc96a7fd81af70a0709cb69950ef3f7ec878d83ff4ebacb0a9ca",
+        "image_name": "eth2030-lighthouse:qualification-d547ba9",
+        "started_at": "2026-11-20T08:09:13.124561886Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "768b44be606bfef244704517a421c54a6c68e8b7d2a67ebf5acf58f36f665479",
+        "role": "glamsterdam-qualified-full-el",
+        "image_id": "sha256:7e28a791e2375932bceb6e9d8b1b46aa0a0d48ddf7e5c0db841b96044a076b82",
+        "image_name": "eth2030-native:qualification-e61ea843",
+        "started_at": "2026-11-20T11:28:59.783522126Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "651405166c2d2bc5ee54b23682e8bdf7991ce0eb7d1f81f59723402cc62714f6",
+        "role": "mev-boost-3-lighthouse-geth",
+        "image_id": "sha256:404d21772a9a9d57e8572e1b9e04d0fd3cc46044d0cc311223b8d393e2e35b71",
+        "image_name": "ethpandaops/mev-boost:develop",
+        "started_at": "2026-11-19T15:47:09.928057727Z",
+        "memory": 256000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "12e07a05d2921493bcb52456a9931e2181e200c8fab415b5980e21fb87ef6d6c",
+        "role": "mev-boost-2-lodestar-geth",
+        "image_id": "sha256:404d21772a9a9d57e8572e1b9e04d0fd3cc46044d0cc311223b8d393e2e35b71",
+        "image_name": "ethpandaops/mev-boost:develop",
+        "started_at": "2026-11-19T15:47:09.122863011Z",
+        "memory": 256000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "7a39a4d6e98f524ef56df6cde3d0699770d81a95683ec5aba46d70d73a8f2dc5",
+        "role": "mev-boost-1-lighthouse-geth",
+        "image_id": "sha256:404d21772a9a9d57e8572e1b9e04d0fd3cc46044d0cc311223b8d393e2e35b71",
+        "image_name": "ethpandaops/mev-boost:develop",
+        "started_at": "2026-11-19T15:47:08.322527395Z",
+        "memory": 256000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "e27480353d072d190318a42427abf4c8313cbed97c367a543e014a4b0f2136d9",
+        "role": "buildoor",
+        "image_id": "sha256:9ec64e1cf283c6273a5eb1dbd399bc098dc1e6be8c0f3aa933c20d71720d1287",
+        "image_name": "ethpandaops/buildoor@sha256:19ff85b450287867390f367f8061eae8a6f5d0bc52421cb50719fca5d4b4d0af",
+        "started_at": "2026-11-20T10:12:59.322855951Z",
+        "memory": 1024000000,
+        "nano_cpus": 1000000000
+      },
+      {
+        "container": "d96b94434ce106ca3faf18b82332617429ec5b1aa435649a9e36819fb1e5fe10",
+        "role": "vc-2-geth-lodestar",
+        "image_id": "sha256:24785cda051a06288707d68258c78455d5303c7622ab92fb8d33c20a35f80ba4",
+        "image_name": "eth2030-lodestar:qualification-cf705b4",
+        "started_at": "2026-11-20T02:28:14.251350678Z",
+        "memory": 1024000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "2a97e3e0910fc951425e1a9cbf6c874c8bb6b3aff36fb0a7a87b4643811a474d",
+        "role": "vc-1-geth-lighthouse",
+        "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+        "image_name": "eth2030-lighthouse:qualification-0262e8f",
+        "started_at": "2026-11-19T18:45:03.765872315Z",
+        "memory": 1024000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "9ff7332cc9543e53d3739802650f23954562a4b836664bb94783b6c0a116376a",
+        "role": "vc-3-geth-lighthouse",
+        "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+        "image_name": "eth2030-lighthouse:qualification-0262e8f",
+        "started_at": "2026-11-19T18:45:08.78801944Z",
+        "memory": 1024000000,
+        "nano_cpus": 500000000
+      },
+      {
+        "container": "d01ee49c0c9e8423afdf76c19e7d5f1feaaf0c6ab7a3c0829df252d4ec24a00b",
+        "role": "cl-2-lodestar-geth",
+        "image_id": "sha256:24785cda051a06288707d68258c78455d5303c7622ab92fb8d33c20a35f80ba4",
+        "image_name": "eth2030-lodestar:qualification-cf705b4",
+        "started_at": "2026-11-20T02:28:14.052807689Z",
+        "memory": 12288000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "a6e54fb93e7c7f8197c55c7d02ae29a208574769df21e7cfeb2d581595a1b356",
+        "role": "cl-3-lighthouse-geth",
+        "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+        "image_name": "eth2030-lighthouse:qualification-0262e8f",
+        "started_at": "2026-11-20T08:18:16.346821634Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "87799773fc5749e549738700c7fb30acca04da5a3d3e6ef27e211604f65c9eab",
+        "role": "cl-1-lighthouse-geth",
+        "image_id": "sha256:5dba8d84d4acebe662ab5d7936427705cd54d859198b9e15e8e7a6c4d08ef4f9",
+        "image_name": "eth2030-lighthouse:qualification-0262e8f",
+        "started_at": "2026-11-20T09:35:51.247901529Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "b82d79245970c835e99c86ea8b15e87cd02869c5a502beecbc698ee1e8104ec8",
+        "role": "el-3-geth-lighthouse",
+        "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+        "image_name": "eth2030-native:wire-qualification-7e2c66e1",
+        "started_at": "2026-11-20T08:49:26.970205176Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "b7ca3b40e3527cb493d4635572f30e181097732e3fae50f52744e002e76b6d02",
+        "role": "el-2-geth-lodestar",
+        "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+        "image_name": "eth2030-native:wire-qualification-7e2c66e1",
+        "started_at": "2026-11-20T08:45:44.08536145Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "4c43bad3ffae394d72d4579b0e6a32afff5faafea84eef8d5a58b095638aef30",
+        "role": "el-1-geth-lighthouse",
+        "image_id": "sha256:9a516f080510b117332aa6d7d654e5ea66b1812d9054a68859eff8ba98388dec",
+        "image_name": "eth2030-independent-geth:wire-qualification-1.17.10",
+        "started_at": "2026-11-19T17:34:20.614973999Z",
+        "memory": 4096000000,
+        "nano_cpus": 2000000000
+      },
+      {
+        "container": "778900f07c7f41e3a5b038dfbbcc10987bc169bd8fbd0d0358784874dba58837",
+        "role": "validator-key-generation-cl-validator-keystore",
+        "image_id": "sha256:8b55992bfa303a3c05d12fbc222a54db850b58a0eb601f4fe269c1cdd0621333",
+        "image_name": "protolambda/eth2-val-tools:latest",
+        "started_at": "2026-11-19T15:46:44.928961115Z",
+        "memory": 0,
+        "nano_cpus": 0
+      },
+      {
+        "container": "6f814c2d34c01b08335db0b464ec75b073c508c2b6f4be2f0f62f025cc0f3534",
+        "role": null,
+        "image_id": "sha256:88218c87ece494d0bb862e34c0bcc8e5ee2e8cafc278a79f65a75062d29911e2",
+        "image_name": "kurtosistech/core:1.15.2",
+        "started_at": "2026-11-19T15:46:37.855506742Z",
+        "memory": 0,
+        "nano_cpus": 0
+      },
+      {
+        "container": "28862e1075899545c09f917eebf1adcb4aa82759bf066a23134c8729d1ea88ae",
+        "role": null,
+        "image_id": "sha256:003ce0104bc57c7311770705ecf9760ef556e30b74f7e73d38a81dbfc695d54e",
+        "image_name": "fluent/fluent-bit:4.0.0",
+        "started_at": "2026-11-19T15:46:37.495205751Z",
+        "memory": 0,
+        "nano_cpus": 0
+      }
+    ]
+  },
+  "phase_boundaries": {
+    "steady_and_pressure": "Original main three pairs plus two unchanged validator-free observer pairs; observer custody count 4. Original service limits remain unchanged within each window.",
+    "later_peer_campaign": "Observer custody changes and provider network interruptions happen after accepted operating windows; they are not folded into those unchanged-tuple claims.",
+    "registry": "Live default 64-epoch withdrawal, index reuse and retired-key process acceptance is still being completed. Original fleet target is one."
+  },
+  "public_release_review": {
+    "status": "open, reserved by the user",
+    "alternative_gas_prs_adopted": false,
+    "unsigned_envelope_alternative_adopted": false,
+    "external_transport_and_lodestar_prs_represented_as_upstream_merged": false,
+    "frozen_forks": "Explicit compatible private development input; upstream adoption remains separately recorded."
+  }
+}

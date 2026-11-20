@@ -1,0 +1,3 @@
+# Official API fixtures in progress
+
+The pinned execution-apis repository includes 107 files/108 requests for eth_call, eth_estimateGas, eth_createAccessList and eth_simulateV1. The supplied fixture chain crosses historical PoW forks through Prague, and its published authenticated head-state dump is available. This is a finite missing R04 wire/schema qualification input, distinct from the already executed 31,573 modern native state fixtures and genuine native Node cap/rejection/historical/trace consumers. The fixture adapter must declare any supplied authenticated pre-state and must not claim native historical PoW import from an independently verified fixture setup.

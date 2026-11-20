@@ -1,3 +1,7 @@
+## Runtime and independent-client continuation (2026-11-19)
+
+Latest CI for PRs 90 and 96-100 passes. The real application review passes 31 signed transactions and 17 getter queries per selected fork; the composed native runtime source is 7e2c66e1. Draft PR 101 retains actual three-pair startup, original failures, live commitment driver and the exact first independent Gloas state-root divergence. It is traced to stock Lodestar omitting the selected normative fork-slot availability clear; a separate TypeScript/native Zig compatibility correction is being qualified. Lighthouse component/payment controls and source checks pass, but process, lifecycle/proof/network, recovery/resource and final release gates remain open.
+
 ## Completion continuation (2026-11-19)
 
 Independent feature reviews #93 (VM), #94 (signed transaction admission/import), and #95 (strict native official-state runner/CI) are published. The complete modern official corpus passes 31,573/31,573 at clean composed source 654fbbd8; historical Osaka passes 1,223/1,223. All affected local full/integration/race/vet/build checks pass after excluding and separately repeating an existing fixed-port collision. #91/#93 remote CI each passed all seven jobs. CL correctly signed inconsistency/cache admission and a reproduced ignored crash-recovery regression remain active investigation. See the current thirteen-package progress inventory; full release acceptance is not claimed.

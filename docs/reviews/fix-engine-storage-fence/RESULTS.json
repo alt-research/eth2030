@@ -1,0 +1,38 @@
+{
+  "scope": "Post-WAL actual OS EISDIR materialization error; subsequent Engine request must remain storage failure, not SYNCING or cached VALID.",
+  "corrected_composition": "e61ea84392e1d2b2a8ed60225ed00db5c003de80",
+  "process": {
+    "passed": true,
+    "scope": "actual independent EL processes, not complete CL lifecycle",
+    "cases": [
+      "missing payload nomination never publishes unknown head",
+      "invalid slot rejected; valid duplicate stable; import awaits forkchoice",
+      "same-height canonical reorg both ways preserves exact heads",
+      "finality blocks competing branch and survives duplicate forkchoice",
+      "actual materialization failure returns resource error and fences retry",
+      "SIGKILL and WAL recovery restore committed head with original finality",
+      "normal indexed restart preserves recovered exact head"
+    ],
+    "wal_bytes_before_crash": 97096,
+    "genesis_hash": "0x6888bb834459396259429730d9cd020374cdb1f1e095118dfae2cc0c271a65d0",
+    "final_head": "0x7c82df3537a1e465a541065fa5edd80571c9d5b8a8565b0c95ee7d08087faa5a",
+    "finalized": "0x4e95fd44e7daec1decad2514e60aaf8347b32541bea85a467948ca78d1d88c23"
+  },
+  "full": {
+    "exit_code": 0,
+    "seconds": 40.76719108200632,
+    "packages": 218,
+    "failures": []
+  },
+  "affected_packages": [
+    "node/backend",
+    "core/chain",
+    "node",
+    "engine"
+  ],
+  "affected_race": true,
+  "affected_vet": true,
+  "native_build": true,
+  "original_process_failure": "process-lifecycle-02: second fenced forkchoice incorrectly returns SYNCING",
+  "limits": "The process fixture validates EL lifecycle and durable head/finality; complete CL FULL/EMPTY/PENDING and larger devnet/pressure campaigns remain separate."
+}

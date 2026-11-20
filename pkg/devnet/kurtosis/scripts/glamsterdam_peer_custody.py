@@ -110,7 +110,9 @@ def run(output, binary):
                 break
             time.sleep(0.1)
         else:
-            raise RuntimeError("normal custody change was not advertised within 10 seconds")
+            raise RuntimeError(
+                "normal custody change was not advertised within 10 seconds"
+            )
         while time.monotonic() - start < 600:
             health = get(base + "/eth/v1/node/syncing")["data"]
             if int(health["head_slot"]) >= effective_epoch * 32 + 2 and not any(

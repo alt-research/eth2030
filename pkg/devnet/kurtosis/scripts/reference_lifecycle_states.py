@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, json, io, copy, argparse
+import sys, json, io, copy, argparse, base64
 from pathlib import Path
 from frozendict import frozendict
 from eth_consensus_specs.gloas import mainnet as spec
@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("--capture", type=Path, required=True)
 parser.add_argument("--output", type=Path, required=True)
+parser.add_argument("--invalid-slot", type=int)
+parser.add_argument("--invalid-engine", type=Path)
 args = parser.parse_args()
 root = args.capture
 out = args.output
@@ -150,6 +152,68 @@ try:
         (root / "reference-progress.json").write_text(
             json.dumps({"transitions": len(report["transitions"])}) + "\n"
         )
+    if args.invalid_slot is not None:
+        assert args.invalid_engine is not None
+        slot = args.invalid_slot
+        envelope = parsed(
+            json.loads((root / f"{slot}-builder-envelope.json").read_text())["data"],
+            spec.SignedExecutionPayloadEnvelope,
+        )
+        state = max(
+            (state for state in states.values() if int(state.slot) < slot),
+            key=lambda state: int(state.slot),
+        )
+        pubkey = state.builders[int(envelope.message.builder_index)].pubkey
+        domain = spec.get_domain(state, spec.DOMAIN_BEACON_BUILDER)
+        assert bls.Verify(
+            pubkey,
+            spec.compute_signing_root(envelope.message, domain),
+            envelope.signature,
+        )
+        expected_hash = hx(envelope.message.payload.block_hash)
+        expected_root = hx(envelope.message.payload.state_root)
+        assert (
+            int(envelope.message.payload.slot_number) == slot
+            and expected_root == "0x" + "00" * 32
+        )
+        labels = []
+        for line in args.invalid_engine.read_text().splitlines():
+            record = json.loads(line)
+            request = json.loads(
+                base64.b64decode(record["request_body"], validate=True)
+            )
+            response = json.loads(
+                base64.b64decode(record["response_body"], validate=True)
+            )
+            assert record["complete"] and record["http_status"] == 200
+            assert (
+                request["method"] == "engine_newPayloadV5"
+                and request["params"][0]["blockHash"] == expected_hash
+            )
+            assert (
+                request["params"][0]["stateRoot"] == expected_root
+                and response["result"]["status"] == "INVALID"
+            )
+            labels.append(record["service"])
+        assert sorted(labels) == [
+            "el-1-geth-lighthouse-engine.jsonl",
+            "el-2-geth-lodestar-engine.jsonl",
+            "el-3-geth-lighthouse-engine.jsonl",
+        ]
+        observation = json.loads(
+            (root / "invalid-root-process-result.json").read_text()
+        )
+        assert len(observation["no_imported_invalid_block"]) == 3
+        assert all(
+            json.loads(rec["response"])["result"] is None
+            for rec in observation["no_imported_invalid_block"].values()
+        )
+        report["invalid_signed_root"] = {
+            "slot": slot,
+            "original_builder_signature": True,
+            "actual_engine_rejections": labels,
+            "invalid_block_unavailable_on_three_els": True,
+        }
     assert (
         report["transitions"]
         and any(x["parent_status"] == "EMPTY" for x in report["transitions"])

@@ -3,6 +3,7 @@
 package rpcbackend
 
 import (
+	"context"
 	"errors"
 	"math/big"
 
@@ -128,4 +129,9 @@ type ExecutionTraceBackend interface {
 	TraceCallDetailed(args rpctypes.CallArgs, header *types.Header, options rpctypes.TraceOptions) (vm.EVMLogger, error)
 	TraceTransactionDetailed(hash types.Hash, options rpctypes.TraceOptions) (vm.EVMLogger, error)
 	TraceBlockDetailed(hash types.Hash, options rpctypes.TraceOptions) ([]vm.EVMLogger, error)
+}
+
+// ContextBackend binds local request lifetime without changing shared backend state.
+type ContextBackend interface {
+	WithContext(context.Context) Backend
 }

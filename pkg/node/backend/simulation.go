@@ -2,6 +2,7 @@ package backend
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
@@ -14,6 +15,7 @@ import (
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"math/big"
+	"time"
 )
 
 // parseSimulationMessage keeps complete call input for method-specific execution.
@@ -221,6 +223,12 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 }
 
 func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.Header, transactionRules bool, tracer *vm.StructLogTracer, overrides ...rpctypes.StateOverride) (*execution.ExecutionResult, error) {
+	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
 	base, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
@@ -241,7 +249,11 @@ func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.H
 	if err != nil {
 		return nil, err
 	}
-	return execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Precompiles: runtime}})
+	result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Context: ctx, Precompiles: runtime}})
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	return result, err
 }
 
 func (b *RPCBackend) Call(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) ([]byte, uint64, error) {
@@ -282,6 +294,12 @@ func (b *RPCBackend) EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNu
 	return b.EstimateGasAtHeader(args, header, overrides...)
 }
 func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) (uint64, error) {
+	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return 0, err
+	}
+
 	stateDB, err := b.StateAtHeader(header)
 	if err != nil {
 		return 0, err
@@ -322,9 +340,15 @@ func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.H
 		return 0, err
 	}
 	run := func(limit uint64) error {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		candidate := *msg
 		candidate.GasLimit = limit
-		result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: base.Dup()}, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Precompiles: runtime}})
+		result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: base.Dup()}, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Context: ctx, Precompiles: runtime}})
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 		if err != nil {
 			return err
 		}
@@ -336,7 +360,10 @@ func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.H
 	lo := uint64(0)
 	for lo+1 < hi {
 		mid := lo + (hi-lo)/2
-		if run(mid) != nil {
+		if err := run(mid); err != nil {
+			if ctx.Err() != nil {
+				return 0, ctx.Err()
+			}
 			lo = mid
 		} else {
 			hi = mid

@@ -33,7 +33,7 @@ func newExecutionTracer(options rpctypes.TraceOptions) (vm.EVMLogger, error) {
 		return nil, simulationError(-32602, "unsupported tracer %q", options.Tracer)
 	}
 }
-func traceContext(options rpctypes.TraceOptions) (context.Context, context.CancelFunc, error) {
+func traceContext(parent context.Context, options rpctypes.TraceOptions) (context.Context, context.CancelFunc, error) {
 	duration := 5 * time.Second
 	if options.Timeout != "" {
 		var err error
@@ -42,7 +42,7 @@ func traceContext(options rpctypes.TraceOptions) (context.Context, context.Cance
 			return nil, nil, simulationError(-32602, "invalid trace timeout")
 		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), duration)
+	ctx, cancel := context.WithTimeout(parent, duration)
 	return ctx, cancel, nil
 }
 func traceCompleted(logger vm.EVMLogger) error {
@@ -60,11 +60,14 @@ func (b *RPCBackend) TraceCallDetailed(args rpctypes.CallArgs, base *types.Heade
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel, err := traceContext(options)
+	ctx, cancel, err := traceContext(b.executionContext(), options)
 	if err != nil {
 		return nil, err
 	}
 	defer cancel()
+	if ctx.Err() != nil {
+		return nil, simulationError(-32016, "trace timeout")
+	}
 	db, err := b.StateAtHeader(base)
 	if err != nil {
 		return nil, err
@@ -187,11 +190,14 @@ func (b *RPCBackend) replayExecutionTraces(block *types.Block, target *uint64, o
 	if _, err := newExecutionTracer(options); err != nil {
 		return nil, err
 	}
-	ctx, cancel, err := traceContext(options)
+	ctx, cancel, err := traceContext(b.executionContext(), options)
 	if err != nil {
 		return nil, err
 	}
 	defer cancel()
+	if ctx.Err() != nil {
+		return nil, simulationError(-32016, "trace timeout")
+	}
 	bc := b.node.Blockchain()
 	txs := block.Transactions()
 	if len(txs) == 0 {

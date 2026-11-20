@@ -203,6 +203,7 @@ func (s *Server) handleRPC(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req = *req.WithContext(r.Context())
 	var resp *rpctypes.Response
 	switch {
 	case isAdminMethod(req.Method) && s.adminAPI != nil:
@@ -462,7 +463,7 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rpcbatch.IsBatchRequest(body) {
-		s.handleBatch(w, body)
+		s.handleBatch(w, r.Context(), body)
 		return
 	}
 
@@ -486,6 +487,7 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 		"remote", r.RemoteAddr,
 	)
 
+	req = *req.WithContext(r.Context())
 	var resp *rpctypes.Response
 	switch {
 	case isAdminMethod(req.Method) && s.adminAPI != nil:
@@ -534,10 +536,10 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, resp)
 }
 
-func (s *ExtServer) handleBatch(w http.ResponseWriter, body []byte) {
+func (s *ExtServer) handleBatch(w http.ResponseWriter, ctx context.Context, body []byte) {
 	seq := s.requestCount.Load()
 	batchStart := time.Now()
-	responses, err := s.batch.HandleBatch(body)
+	responses, err := s.batch.HandleBatchContext(ctx, body)
 	if err != nil {
 		writeError(w, nil, rpctypes.ErrCodeInvalidRequest, err.Error())
 		return

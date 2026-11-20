@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"math/big"
@@ -20,6 +21,7 @@ import (
 
 // RPCBackend adapts NodeDeps to the rpc.Backend interface.
 type RPCBackend struct {
+	ctx    context.Context
 	node   NodeDeps
 	engine *EngineBackend
 }
@@ -431,4 +433,16 @@ func (b *RPCBackend) traceTransactions(block *types.Block, target *uint64) ([]*v
 // IsOsaka supplies the fork rule used by blob fee forecasts.
 func (b *RPCBackend) IsOsaka(timestamp uint64) bool {
 	return b.node.Blockchain().Config().IsOsaka(timestamp)
+}
+
+// WithContext returns a request-scoped backend; Node and Engine ownership remain shared.
+func (b *RPCBackend) WithContext(ctx context.Context) rpc.Backend {
+	return &RPCBackend{node: b.node, engine: b.engine, ctx: ctx}
+}
+
+func (b *RPCBackend) executionContext() context.Context {
+	if b.ctx != nil {
+		return b.ctx
+	}
+	return context.Background()
 }

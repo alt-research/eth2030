@@ -2,6 +2,7 @@ package applicationtest
 
 import (
 	"bytes"
+	"context"
 	"crypto/ecdsa"
 	"crypto/sha256"
 	"embed"
@@ -16,6 +17,7 @@ import (
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -99,7 +101,8 @@ func TestPublishedApplicationArtifactIntegrity(t *testing.T) {
 type sequence struct {
 	t         *testing.T
 	amsterdam bool
-	native    *state.MemoryStateDB
+	native    state.StateDB
+	historyDB rawdb.Database
 	reference *bridge.StateTestState
 	cfg       *config.ChainConfig
 	oracle    *params.ChainConfig
@@ -251,6 +254,21 @@ func (s *sequence) apply(name string, tx *gethtypes.Transaction, status uint64) 
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	if s.historyDB != nil {
+		batch := s.historyDB.NewBatch()
+		if err := state.StoreTrieHistory(s.historyDB, batch, root, s.native); err != nil {
+			t.Fatal(err)
+		}
+		if err := batch.Write(); err != nil {
+			t.Fatal(err)
+		}
+		lazy, err := state.OpenTrieHistory(context.Background(), s.historyDB, root)
+		if err != nil {
+			t.Fatal(err)
+		}
+		s.native = lazy
+	}
 	wantRoot := s.reference.StateDB.IntermediateRoot(rules)
 	if root != types.Hash(wantRoot) {
 		t.Fatalf("%s complete post-state root native=%s independent=%s", name, root, wantRoot)
@@ -334,8 +352,33 @@ func TestPublishedWalletAndDEXSignedSequences(t *testing.T) {
 		t.Run(name, func(t *testing.T) { runApplications(t, amsterdam) })
 	}
 }
-func runApplications(t *testing.T, amsterdam bool) {
+func TestPublishedWalletAndDEXLazyHistorySequences(t *testing.T) {
+	for _, amsterdam := range []bool{false, true} {
+		name := "Osaka"
+		if amsterdam {
+			name = "Amsterdam"
+		}
+		t.Run(name, func(t *testing.T) { runApplications(t, amsterdam, true) })
+	}
+}
+func runApplications(t *testing.T, amsterdam bool, lazyHistory ...bool) {
 	s := newSequence(t, amsterdam)
+	if len(lazyHistory) > 0 && lazyHistory[0] {
+		s.historyDB = rawdb.NewMemoryDB()
+		root := s.native.GetRoot()
+		batch := s.historyDB.NewBatch()
+		if err := state.StoreTrieHistory(s.historyDB, batch, root, s.native); err != nil {
+			t.Fatal(err)
+		}
+		if err := batch.Write(); err != nil {
+			t.Fatal(err)
+		}
+		lazy, err := state.OpenTrieHistory(context.Background(), s.historyDB, root)
+		if err != nil {
+			t.Fatal(err)
+		}
+		s.native = lazy
+	}
 	token := loadArtifact(t, "uniswap-v2-erc20")
 	factoryCode := loadArtifact(t, "uniswap-v2-factory")
 	pairCode := loadArtifact(t, "uniswap-v2-pair")

@@ -8,6 +8,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
@@ -73,6 +74,7 @@ func (b *RPCBackend) TraceCallDetailed(args rpctypes.CallArgs, base *types.Heade
 		return nil, err
 	}
 	db = db.Dup()
+	state.SetReadContext(db, ctx)
 	if err := applySimulationOverrides(db, options.StateOverrides); err != nil {
 		return nil, err
 	}
@@ -220,6 +222,7 @@ func (b *RPCBackend) replayExecutionTraces(block *types.Block, target *uint64, o
 		return nil, err
 	}
 	db = db.Dup()
+	state.SetReadContext(db, ctx)
 	if err := execution.ApplyPreExecutionSystems(bc.Config(), b.traceHashFn(header), db, header, nil, execution.EVMOverrides{Context: ctx}); err != nil {
 		return nil, err
 	}

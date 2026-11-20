@@ -181,7 +181,7 @@ func TestMerkleHistoryRejectsCorruptNodesCodeAndMarkers(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			if _, err := OpenTrieHistory(context.Background(), db, root); err == nil || errors.Is(err, rawdb.ErrNotFound) {
+			if err := AuditTrieHistory(context.Background(), db, root); err == nil || errors.Is(err, rawdb.ErrNotFound) {
 				t.Fatalf("corruption was accepted or hidden as absent history: %v", err)
 			}
 		})

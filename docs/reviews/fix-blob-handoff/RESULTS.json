@@ -1,0 +1,20 @@
+{
+  "baseline": "7068cd97394570bb7b459eb88a5bbdc613911db4",
+  "finding": "F2",
+  "test": "TestBlobPromotionKeepsCellsAcrossPoolSnapshot",
+  "previous_red": "audit/post-merge-closure-20261120 14c7b96c BLOB_HANDOFF.txt",
+  "toolchain": "go1.26.11",
+  "full_packages": 218,
+  "race_packages": [
+    "eth",
+    "txpool/sparse",
+    "node",
+    "node/backend"
+  ],
+  "original_peer_repeats": 10,
+  "deadlines_unchanged": true,
+  "full_vet": true,
+  "native_build": true,
+  "selected_spec": "EIP-8070",
+  "source_snapshot": "Own authenticated requested staged cell/proof bytes under staging lock before destination pool read"
+}

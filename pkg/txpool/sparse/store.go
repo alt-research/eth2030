@@ -275,6 +275,39 @@ func (s *Store) Cells(hash types.Hash, mask types.CellMask) ([][]byte, types.Cel
 	}
 	return out, mask
 }
+
+// BlobCells snapshots authenticated requested cells and their proofs under the
+// staging lock. Readers retain the bytes even when promotion removes an entry.
+func (s *Store) BlobCells(hashes []types.Hash, mask types.CellMask) []types.BlobCells {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.prune()
+	result := make([]types.BlobCells, len(hashes))
+	indices := mask.Indices()
+	for _, entry := range s.entries {
+		side := entry.tx.BlobSidecar()
+		for blob, hash := range entry.tx.BlobHashes() {
+			for row, wanted := range hashes {
+				if hash != wanted {
+					continue
+				}
+				if result[row].Cells == nil {
+					result[row].Cells = make([][]byte, len(indices))
+					result[row].Proofs = make([][]byte, len(indices))
+				}
+				for column, index := range indices {
+					if !entry.mask.IsSet(index) {
+						continue
+					}
+					result[row].Cells[column] = bytes.Clone(entry.cells[index][blob])
+					result[row].Proofs[column] = bytes.Clone(side.Proofs[blob*128+int(index)])
+				}
+			}
+		}
+	}
+	return result
+}
+
 func (s *Store) Remove(hash types.Hash) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -174,7 +174,7 @@ class ReferenceNode(Node):
                 "--http", "--http.addr=127.0.0.1", "--http.port="+str(self.rpc_port),
                 "--authrpc.addr=127.0.0.1", "--authrpc.port="+str(self.engine_port),
                 "--authrpc.jwtsecret="+str(self.jwt), "--port="+str(self.p2p_port),
-                "--nodiscover", "--maxpeers=0", "--gcmode=archive", "--state.scheme=hash"]
+                "--nodiscover", "--maxpeers=0", "--syncmode=full", "--gcmode=archive", "--state.scheme=hash"]
 
     def choose(self, head, safe=ZERO, final=ZERO, attrs=None, allow_error=False):
         return self.call("engine_forkchoiceUpdatedV4", [{"headBlockHash": head, "safeBlockHash": safe, "finalizedBlockHash": final}, attrs, None], allow_error)

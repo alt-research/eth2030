@@ -601,6 +601,9 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		return nil, nil, err
 	}
 	header.Root = statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return nil, nil, err
+	}
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
 	// Sort entries into lexicographic order before hashing (EIP-7928 §ordering).
@@ -857,6 +860,9 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		return nil, nil, err
 	}
 	header.Root = statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return nil, nil, err
+	}
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
 	// Sort entries into lexicographic order before hashing (EIP-7928 §ordering).

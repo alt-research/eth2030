@@ -443,6 +443,9 @@ func (bc *Blockchain) executeStateContext(ctx context.Context, blk *types.Block,
 		}
 	}
 	result, err := processor.ProcessWithBAL(blk, next)
+	if readErr := state.ReadError(next); readErr != nil {
+		return nil, nil, storageFailure(readErr)
+	}
 	if err != nil {
 		return nil, nil, err
 	}
@@ -758,6 +761,9 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 
 	// Validate state root.
 	computedRoot := statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return storageFailure(err)
+	}
 	if header.Root != computedRoot {
 		err := fmt.Errorf("%w: header=%s computed=%s", block.ErrInvalidStateRoot,
 			header.Root.Hex(), computedRoot.Hex())
@@ -878,6 +884,20 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 	}
 	if err := batch.Write(); err != nil {
 		return storageFailure(err)
+	}
+	// Published history becomes the immutable base for the next working set;
+	// do not retain a full legacy state copy per block or per cache entry.
+	if !overlayConfigured {
+		// Preserve explicitly complete in-memory simulator backends (and
+		// their storage preimages). Persistent native nodes use lazy roots.
+		switch bc.genesisState.(type) {
+		case *state.TrieStateDB, *state.SnapStateDB:
+			view, err := state.OpenTrieHistory(context.Background(), bc.db, header.Root)
+			if err != nil {
+				return storageFailure(err)
+			}
+			statedb = view
+		}
 	}
 	bc.sc.put(hash, num, statedb)
 	bc.memSC.put(hash, num, statedb)
@@ -1334,9 +1354,11 @@ func (bc *Blockchain) StateAtBlockContext(ctx context.Context, blk *types.Block)
 		return nil, fmt.Errorf("%w: block is not execution validated", ErrStateNotFound)
 	}
 	if cached, ok := bc.sc.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
 	if cached, ok := bc.memSC.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
 	select {
@@ -1363,9 +1385,11 @@ func (bc *Blockchain) replayStateContext(ctx context.Context, blk *types.Block, 
 		return nil, fmt.Errorf("%w: block is not execution validated", ErrStateNotFound)
 	}
 	if cached, ok := bc.sc.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
 	if cached, ok := bc.memSC.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
 	replay := func() (interface{}, error) {
@@ -1423,7 +1447,11 @@ func (bc *Blockchain) replayStateContext(ctx context.Context, blk *types.Block, 
 				return nil, err
 			}
 			base = next
-			if base.GetRoot() != block.Header().Root {
+			root := base.GetRoot()
+			if err := state.ReadError(base); err != nil {
+				return nil, storageFailure(err)
+			}
+			if root != block.Header().Root {
 				return nil, fmt.Errorf("state readback root mismatch at block %d", block.NumberU64())
 			}
 			if err := ctx.Err(); err != nil {

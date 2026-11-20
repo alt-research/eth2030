@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -69,4 +70,9 @@ func (s *simulationLogState) RecordETHTransfer(from, to types.Address, value *bi
 	copy(destination[12:], to[:])
 	s.events = append(s.events, &types.Log{Address: types.HexToAddress("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"), Topics: []types.Hash{vm.TransferEventTopic, source, destination}, Data: amount, TxHash: s.hash, TxIndex: uint(s.index), Index: s.count})
 	s.count++
+}
+
+func (s *simulationLogState) Error() error { return state.ReadError(s.StateDB) }
+func (s *simulationLogState) SetReadContext(ctx context.Context) {
+	state.SetReadContext(s.StateDB, ctx)
 }

@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import glamsterdam_campaign as campaign
 import glamsterdam_process_lifecycle as lifecycle
+import glamsterdam_pressure as pressure
 
 
 class CampaignTests(unittest.TestCase):
@@ -24,6 +25,18 @@ class CampaignTests(unittest.TestCase):
             self.assertEqual(result["sequence_gaps"], {"real-session": [2]})
             path.write_text(json.dumps(first)+"\n")
             self.assertEqual(campaign.engine_window(path, 0, 2)["unsealed_sessions"], ["real-session"])
+
+    def test_pressure_mutates_only_hash_and_keeps_original_request(self):
+        original = {"method": "engine_newPayloadV5", "params": [{"blockHash": "0x"+"11"*32, "stateRoot": "0x22"}, [], "0x33", []]}
+        before = json.dumps(original, sort_keys=True)
+        altered = pressure.invalid_payload(original)
+        self.assertEqual(json.dumps(original, sort_keys=True), before)
+        self.assertNotEqual(altered["params"][0]["blockHash"], original["params"][0]["blockHash"])
+        altered["params"][0]["blockHash"] = original["params"][0]["blockHash"]
+        self.assertEqual(altered, original)
+        params = pressure.call_params("0x44", 22000, "0x5b600056")
+        self.assertEqual(params[1], {"blockHash": "0x44", "requireCanonical": True})
+        self.assertEqual(int(params[0]["gas"], 16), 22000)
 
     def test_private_arguments_are_excluded_from_publishable_inventory(self):
         command = ["run", "--wallet-privkey", "private-key-value", "--builder-privkey=another-secret", "--cl-client=http://beacon"]

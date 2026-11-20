@@ -159,6 +159,27 @@ class TmpfsNode(Node):
             subprocess.run(["docker", "rm", "-f", self.container], check=True, capture_output=True, timeout=30)
 
 
+class ReferenceNode(Node):
+    """Run the unchanged pinned Geth executable against the same owned genesis."""
+    initialized = False
+
+    def command(self):
+        if not self.initialized:
+            init = subprocess.run([str(self.binary), "--datadir="+str(self.directory/"data"),
+                                   "--state.scheme=hash", "init", str(self.genesis)],
+                                  stdout=self.log, stderr=subprocess.STDOUT, timeout=30)
+            assert init.returncode == 0
+            self.initialized = True
+        return [str(self.binary), "--datadir="+str(self.directory/"data"), "--networkid=1337",
+                "--http", "--http.addr=127.0.0.1", "--http.port="+str(self.rpc_port),
+                "--authrpc.addr=127.0.0.1", "--authrpc.port="+str(self.engine_port),
+                "--authrpc.jwtsecret="+str(self.jwt), "--port="+str(self.p2p_port),
+                "--nodiscover", "--maxpeers=0", "--gcmode=archive", "--state.scheme=hash"]
+
+    def choose(self, head, safe=ZERO, final=ZERO, attrs=None, allow_error=False):
+        return self.call("engine_forkchoiceUpdatedV4", [{"headBlockHash": head, "safeBlockHash": safe, "finalizedBlockHash": final}, attrs, None], allow_error)
+
+
 def committed_head(wal, initial):
     """Decode actual durable WAL commits; discard only an incomplete suffix."""
     position, pending, head = 0, {}, initial
@@ -187,7 +208,7 @@ def committed_head(wal, initial):
     return head
 
 
-def run(binary, genesis_path, output, fault_kind="materialization"):
+def run(binary, genesis_path, output, fault_kind="materialization", geth=None):
     output.mkdir(parents=True, exist_ok=False)
     genesis = json.loads(genesis_path.read_text())
     assert int(str(genesis["config"]["chainId"]), 0) == 1337
@@ -199,6 +220,7 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
     trace = (output/"exchanges.jsonl").open("x")
     proposer = Node(binary, output/"proposer", owned_genesis, trace)
     verifier = (TmpfsNode if fault_kind == "disk-full" else Node)(binary, output/"verifier", owned_genesis, trace)
+    reference = ReferenceNode(geth, output/"geth", owned_genesis, trace) if geth else None
     def save():
         (output/"result.json").write_text(json.dumps(report, indent=2)+"\n")
     def case(name):
@@ -217,6 +239,8 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         first = proposer.start()
         assert verifier.start()["hash"] == first["hash"]
         genesis_hash = first["hash"]
+        if reference:
+            assert reference.start()["hash"] == genesis_hash
         one = build(genesis_hash, 1, 1)
         h1 = one["executionPayload"]["blockHash"]
         # Keep the unavailable nominated hash distinct from h1. If h1 had
@@ -231,6 +255,9 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         assert submit(verifier, one)["status"] == "VALID"
         assert verifier.call("eth_getBlockByNumber", ["latest", False])["hash"] == genesis_hash
         assert verifier.choose(h1)["payloadStatus"]["status"] == "VALID"
+        if reference:
+            assert submit(reference, one)["status"] == "VALID"
+            assert reference.choose(h1)["payloadStatus"]["status"] == "VALID"
         case("invalid slot rejected; valid duplicate stable; import awaits forkchoice")
         assert submit(proposer, one)["status"] == "VALID"
         assert proposer.choose(h1)["payloadStatus"]["status"] == "VALID"
@@ -240,6 +267,9 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         assert h2 != other
         assert submit(verifier, left)["status"] == "VALID"
         assert submit(verifier, right)["status"] == "VALID"
+        if reference:
+            assert submit(reference, left)["status"] == "VALID"
+            assert submit(reference, right)["status"] == "VALID"
         for head in [h2, other, h2]:
             assert verifier.choose(head, safe=h1)["payloadStatus"]["status"] == "VALID"
             assert verifier.call("eth_getBlockByNumber", ["latest", False])["hash"] == head
@@ -293,6 +323,15 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         assert verifier.call("eth_getBlockByNumber", ["finalized", False])["hash"] == h2
         assert verifier.choose(h3, safe=h2, final=h2)["payloadStatus"]["status"] == "VALID"
         assert submit(verifier, three)["status"] == "VALID"
+        if reference:
+            assert submit(reference, three)["status"] == "VALID"
+            assert reference.choose(h3, safe=h2, final=h2)["payloadStatus"]["status"] == "VALID"
+            ours = verifier.call("eth_getBlockByNumber", ["latest", False])
+            independent = reference.call("eth_getBlockByNumber", ["latest", False])
+            for key in ["hash", "parentHash", "stateRoot", "transactionsRoot", "receiptsRoot", "withdrawalsRoot", "requestsHash", "blockAccessListHash", "slotNumber"]:
+                assert ours[key] == independent[key], (key, ours[key], independent[key])
+            report["independent_geth_sha256"] = hashlib.file_digest(geth.open("rb"), "sha256").hexdigest()
+            case("unchanged Geth executes all original branches and agrees on recovered full commitments")
         case("SIGKILL and WAL recovery restore committed head with original finality")
         verifier.stop()
         assert verifier.start()["hash"] == h3
@@ -306,6 +345,8 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
     finally:
         proposer.cleanup()
         verifier.cleanup()
+        if reference:
+            reference.cleanup()
         trace.close()
     print(json.dumps(report))
 
@@ -316,5 +357,6 @@ if __name__ == "__main__":
     parser.add_argument("--genesis", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--fault", choices=["materialization", "short-write", "disk-full"], default="materialization")
+    parser.add_argument("--geth", type=Path)
     args = parser.parse_args()
-    run(args.binary, args.genesis, args.output, args.fault)
+    run(args.binary, args.genesis, args.output, args.fault, args.geth)

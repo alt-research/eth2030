@@ -126,6 +126,9 @@ def run(output, duration):
         "engine_p95_ms": 1000,
         "engine_p99_ms": 3000,
         "missing_slot_fraction_max": 0.1,
+        "valid_control_interval_seconds": 2,
+        "required_control_rounds": duration // 2,
+        "resource_interval_seconds": 3,
         "anchors": anchors,
     }
     (output / "profile.json").write_text(json.dumps(profile, indent=2) + "\n")
@@ -232,7 +235,37 @@ def run(output, duration):
             emit(row)
             stop.wait(1)
 
+    def resources():
+        while not stop.is_set():
+            sample_started = time.monotonic()
+            try:
+                emit(
+                    {
+                        "kind": "resources",
+                        "containers": [
+                            json.loads(line)
+                            for line in c.docker(
+                                "stats",
+                                "--no-stream",
+                                "--format",
+                                "{{json .}}",
+                                *[node["container"] for node in nodes.values()]
+                            ).splitlines()
+                        ],
+                    }
+                )
+            except Exception as error:
+                row = {
+                    "kind": "resources",
+                    "error": {"class": type(error).__name__, "message": str(error)},
+                }
+                with lock:
+                    failures.append(row)
+                emit(row)
+            stop.wait(max(0, 3 - (time.monotonic() - sample_started)))
+
     begin = time.monotonic()
+    control_rounds = 0
     try:
         with ThreadPoolExecutor(max_workers=16) as executor:
             jobs = [
@@ -243,6 +276,7 @@ def run(output, duration):
             jobs += [
                 executor.submit(invalid, name, node) for name, node in native.items()
             ]
+            jobs.append(executor.submit(resources))
             try:
                 while time.monotonic() - begin < duration:
                     for name, node in el.items():
@@ -292,22 +326,14 @@ def run(output, duration):
                                     {"service": name, "kind": kind, "error": str(error)}
                                 )
                             emit(row)
-                    emit(
-                        {
-                            "kind": "resources",
-                            "containers": [
-                                json.loads(line)
-                                for line in c.docker(
-                                    "stats",
-                                    "--no-stream",
-                                    "--format",
-                                    "{{json .}}",
-                                    *[n["container"] for n in nodes.values()]
-                                ).splitlines()
-                            ],
-                        }
+                    control_rounds += 1
+                    stop.wait(
+                        max(
+                            0,
+                            min(begin + duration, begin + control_rounds * 2)
+                            - time.monotonic(),
+                        )
                     )
-                    stop.wait(min(2, max(0, duration - (time.monotonic() - begin))))
             finally:
                 stop.set()
             for job in jobs:
@@ -319,6 +345,8 @@ def run(output, duration):
     report = {
         "window_ended_at": c.now(),
         "counts": counts,
+        "control_rounds": control_rounds,
+        "required_control_rounds": duration // 2,
         "failures": failures,
         "identity_unchanged": identity == c.stable_identity(c.inventory()),
         "rpc": {
@@ -337,6 +365,7 @@ def run(output, duration):
     report["engine"] = c.capture_engine_window(output, el, started, ended)
     report["latency_passed"] = (
         not failures
+        and control_rounds >= duration // 2
         and report["identity_unchanged"]
         and not any(key.endswith(":transport_error") for key in counts)
         and counts.get("ws-disconnect:socket_closed_while_pending", 0) > 100

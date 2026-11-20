@@ -1,3 +1,7 @@
+## Completion continuation (2026-11-19)
+
+Independent feature reviews #93 (VM), #94 (signed transaction admission/import), and #95 (strict native official-state runner/CI) are published. The complete modern official corpus passes 31,573/31,573 at clean composed source 654fbbd8; historical Osaka passes 1,223/1,223. All affected local full/integration/race/vet/build checks pass after excluding and separately repeating an existing fixed-port collision. #91/#93 remote CI each passed all seven jobs. CL correctly signed inconsistency/cache admission and a reproduced ignored crash-recovery regression remain active investigation. See the current thirteen-package progress inventory; full release acceptance is not claimed.
+
 ## Authorized Glamsterdam completion program (2026-11-19)
 
 Active work continues against the merged master baseline 5fbc7c13. Independent corrective reviews 88–91 cover historical authorizations, Osaka ModExp, EIP-161 finalization and canonical CLZ. Lighthouse original review heads are retained and directly published to eth2030 as authorized; conditional envelope early returns were removed from qualification and explicit-fork runs are required. The complete modern official state corpus exposed additional adapter/execution/validation work, which remains open. [Current thirteen-package progress and evidence boundaries](docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md). No EL master merge or release completion is claimed.

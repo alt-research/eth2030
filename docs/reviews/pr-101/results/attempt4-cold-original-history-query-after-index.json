@@ -1,0 +1,59 @@
+{
+  "time": "2026-11-20T00:13:29.592643+00:00",
+  "native_source": "eth2030 v0.1.0-dev (commit 878a799fe55841303b2cf3e706e54ee1121ebe25)",
+  "original_15_second_client_deadline": 15,
+  "normal_runtime_path_restored": true,
+  "records": [
+    {
+      "port": 32890,
+      "elapsed_seconds": 0.009096339010284282,
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_call",
+        "params": [
+          {
+            "to": "0x1ec453f0bd1bd657454c1dc83c09a079c9607f67",
+            "data": "0x0902f1ac",
+            "gas": "0x2dc6c0"
+          },
+          {
+            "blockHash": "0x6060e18d676d76f01ba298918fb37af96938b4489afe7dda01336d0649b65151",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x00000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000006aff3f3d"
+      }
+    },
+    {
+      "port": 32932,
+      "elapsed_seconds": 0.036244075003196485,
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_call",
+        "params": [
+          {
+            "to": "0x1ec453f0bd1bd657454c1dc83c09a079c9607f67",
+            "data": "0x0902f1ac",
+            "gas": "0x2dc6c0"
+          },
+          {
+            "blockHash": "0x6060e18d676d76f01ba298918fb37af96938b4489afe7dda01336d0649b65151",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "result": "0x00000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000006aff3f3d",
+        "id": 1
+      }
+    }
+  ],
+  "passed": true
+}

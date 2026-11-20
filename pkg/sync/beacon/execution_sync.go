@@ -2,7 +2,9 @@ package beacon
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -250,6 +252,9 @@ func (s *ExecutionSyncer) loop(ctx context.Context, done chan struct{}) {
 		s.mu.Unlock()
 		err := s.synchronize(requestCtx, target)
 		cancel()
+		if err != nil && !errors.Is(err, context.Canceled) {
+			slog.Warn("execution sync failed", "head", target.Head.Hex(), "finalized", target.Finalized.Hex(), "err", err)
+		}
 		s.mu.Lock()
 		if s.target == target {
 			s.lastErr, s.complete = err, err == nil

@@ -10,6 +10,6 @@
 ## PR 98 CI Engine projection correction (2026-11-20)
 
 - [x] Inspect the exact failed native-node CI log and trace full-pool/staging/Engine consumers against selected EIP-8070 getBlobs semantics.
-- [ ] Reproduce sparse staging shadowing authenticated full cells with deterministic state and real KZG proof assertions.
-- [ ] Preserve available cells/proofs when overlapping full and partial entries refer to the same versioned hash; keep missing cells null and existing network/restart expectations unchanged.
-- [ ] Verify targeted red/green, repeated original native-node test, affected race/full tests, local build and current-head CI; push only the existing PR 98 branch.
+- [x] Reproduce sparse staging shadowing authenticated full cells with deterministic state and real KZG proof assertions.
+- [x] Preserve available cells/proofs when overlapping full and partial entries refer to the same versioned hash; keep missing cells null and existing network/restart expectations unchanged.
+- [x] Verify targeted red/green, ten repeated original native-node tests, affected race/full tests, vet and local build; publish only PR 98 and require remote-head CI verification before reporting completion.

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import sys, json, copy, time, math, argparse
+import sys, json, copy, time, math, argparse, hashlib
+from urllib.parse import urlsplit
 from pathlib import Path
 from datetime import datetime, timezone
 from eth_consensus_specs.gloas import mainnet as spec
@@ -15,13 +16,26 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("--capture", type=Path, required=True)
 parser.add_argument("--trusted-bootstrap", type=Path, required=True)
+parser.add_argument(
+    "--replay",
+    action="store_true",
+    help="Use original captured exchanges only; do not discover Docker or access a server",
+)
+parser.add_argument("--output", type=Path)
 args = parser.parse_args()
+if args.replay and args.output is None:
+    parser.error("--replay requires a new --output path")
 root = args.capture
 profile = json.loads((root / "profile.json").read_text())
 latency = json.loads((root / "latency-result.json").read_text())
-out = root / "finality-result.json"
+out = args.output or root / "finality-result.json"
 assert not out.exists()
-trace = (root / "reference-finality-exchanges.jsonl").open("x")
+trace_path = (
+    out.with_suffix(".exchanges.jsonl")
+    if args.replay
+    else root / "reference-finality-exchanges.jsonl"
+)
+trace = trace_path.open("x")
 report = {
     "passed": False,
     "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
@@ -38,15 +52,46 @@ def hx(v):
     return "0x" + bytes(v).hex()
 
 
-nodes = c.inventory()
-base = c.endpoint(nodes["cl-1-lighthouse-geth"], "4000/tcp")
+replay_clock = None
+if args.replay:
+    original_trace = root / "reference-finality-exchanges.jsonl"
+    original_records = [
+        json.loads(line) for line in original_trace.read_text().splitlines()
+    ]
+    records = iter(
+        record
+        for record in original_records
+        if "original_trusted_bootstrap" not in record
+    )
+    first_url = urlsplit(original_records[0]["url"])
+    base = first_url.scheme + "://" + first_url.netloc
+    nodes = None
+    report["replay_input_sha256"] = hashlib.sha256(
+        original_trace.read_bytes()
+    ).hexdigest()
+else:
+    nodes = c.inventory()
+    base = c.endpoint(nodes["cl-1-lighthouse-geth"], "4000/tcp")
+
+
+def captured_exchange(url):
+    global replay_clock
+    if args.replay:
+        record = next(records)
+        wanted, actual = urlsplit(url), urlsplit(record["url"])
+        assert (wanted.path, wanted.query) == (actual.path, actual.query)
+        replay_clock = datetime.fromisoformat(
+            record["started"].replace("Z", "+00:00")
+        ).timestamp()
+    else:
+        record = c.exchange(url)
+    trace.write(json.dumps(record) + "\n")
+    trace.flush()
+    return record
 
 
 def get(path):
-    r = c.exchange(base + path)
-    trace.write(json.dumps(r) + "\n")
-    trace.flush()
-    return c.decoded(r)
+    return c.decoded(captured_exchange(base + path))
 
 
 try:
@@ -88,7 +133,13 @@ try:
 
     def current_slot():
         return spec.Slot(
-            int((time.time() - int(genesis["genesis_time"])) * 1000)
+            int(
+                (
+                    (replay_clock if args.replay else time.time())
+                    - int(genesis["genesis_time"])
+                )
+                * 1000
+            )
             // int(network["SLOT_DURATION_MS"])
         )
 
@@ -127,7 +178,8 @@ try:
         if int(store.finalized_header.beacon.slot) >= stop - 1:
             break
         save()
-        time.sleep(3)
+        if not args.replay:
+            time.sleep(3)
     else:
         raise RuntimeError("original 420-second authenticated finality wait failed")
     finalized = store.finalized_header.beacon
@@ -159,14 +211,18 @@ try:
         "missing_slots": missing,
         "missing_fraction": len(missing) / (stop - first),
     }
+    canonical_urls = []
     for role in ["cl-2-lodestar-geth", "cl-3-lighthouse-geth"]:
-        rec = c.exchange(
-            c.endpoint(nodes[role], "4000/tcp") + "/eth/v1/beacon/headers/" + anchor
-        )
-        trace.write(json.dumps(rec) + "\n")
-        trace.flush()
+        role_base = base if args.replay else c.endpoint(nodes[role], "4000/tcp")
+        rec = captured_exchange(role_base + "/eth/v1/beacon/headers/" + anchor)
+        canonical_urls.append(rec["url"])
         d = c.decoded(rec)["data"]
         assert d["canonical"] and d["root"] == anchor
+    assert len(set(canonical_urls)) == 2 and all(
+        not value.startswith(base + "/") for value in canonical_urls
+    )
+    if args.replay:
+        assert next(records, None) is None, "unconsumed original finality exchanges"
     rejects = []
     for name in ["signature", "finality_branch", "genesis_domain"]:
         altered = copy.deepcopy(raw["data"])

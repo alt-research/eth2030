@@ -54,11 +54,17 @@ type ExecutionSyncer struct {
 	downloadHeaders   *lru.Cache[types.Hash, downloadedHeader]
 	downloadBodies    *lru.SizeConstrainedCache[types.Hash, []byte]
 	downloadBodyLimit uint64
+	ancestry          ancestrySpool
 }
 
-func NewExecutionSyncer(chain ExecutionChain, fetcher ExecutionFetcher, apply func(ExecutionTarget) error) *ExecutionSyncer {
+func NewExecutionSyncer(chain ExecutionChain, fetcher ExecutionFetcher, apply func(ExecutionTarget) error, stagingDirectory ...string) *ExecutionSyncer {
+	dir := ""
+	if len(stagingDirectory) > 0 {
+		dir = stagingDirectory[0]
+	}
 	return &ExecutionSyncer{
 		chain: chain, fetcher: fetcher, apply: apply, wake: make(chan struct{}, 1),
+		ancestry:          ancestrySpool{dir: dir},
 		downloadHeaders:   lru.NewCache[types.Hash, downloadedHeader](maxExecutionAncestry),
 		downloadBodyLimit: executionBodyCacheBytes,
 		downloadBodies:    lru.NewSizeConstrainedCacheWithKeySize[types.Hash, []byte](executionBodyCacheBytes, func(types.Hash) uint64 { return 32 }),
@@ -92,6 +98,7 @@ func (s *ExecutionSyncer) Start() {
 func (s *ExecutionSyncer) Stop() {
 	s.mu.Lock()
 	if s.done == nil {
+		s.ancestry.clear()
 		s.mu.Unlock()
 		return
 	}
@@ -314,33 +321,95 @@ func (s *ExecutionSyncer) downloadedHeader(ctx context.Context, hash types.Hash)
 	return downloadedHeader{hash: hash, parent: block.ParentHash(), number: block.NumberU64()}, nil
 }
 
-func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarget) error {
-	var ancestry []downloadedHeader
+func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarget) (result error) {
+	path := &ancestryPath{}
+	usable := true
+	defer func() {
+		if !usable || path.count == 0 {
+			s.ancestry.clear()
+			return
+		}
+		if err := s.ancestry.retain(path); err != nil {
+			s.ancestry.clear()
+			if result == nil {
+				result = err
+			}
+		}
+	}()
 	next := target.Head
-	// Keep only hash-linked header records on the walk. Body bytes have their own
-	// strict budget and are reloaded on forward validation if evicted.
+	var expected uint64
+	known := false
+	// Snap adoption still requires observing the CL-finalized hash on this
+	// exact target path. Keep its original guarded behavior until adoption.
+	reuse := s.pivotSync == nil || s.validated(target.Finalized)
 	for !s.validated(next) {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if len(ancestry) >= maxExecutionAncestry {
-			return fmt.Errorf("beacon execution sync: ancestry exceeds limit")
+		if reuse {
+			cached, err := s.ancestry.find(next, expected, known)
+			if err != nil {
+				usable = false
+				return err
+			}
+			if cached != nil {
+				if path.count == 0 {
+					s.mu.Lock()
+					if s.target == target {
+						s.targetHeight = cached.headNumber
+					}
+					s.mu.Unlock()
+				}
+				if err := path.join(cached); err != nil {
+					return err
+				}
+				next = path.parent
+				expected = path.headNumber - path.count
+				known = true
+				continue
+			}
 		}
 		header, err := s.downloadedHeader(ctx, next)
 		if err != nil {
 			return err
 		}
-		if len(ancestry) > 0 && (header.number == ^uint64(0) || ancestry[len(ancestry)-1].number != header.number+1) {
+		if known && header.number != expected {
 			return fmt.Errorf("beacon execution sync: non-contiguous ancestry")
 		}
-		if len(ancestry) == 0 {
+		if path.count == 0 {
 			s.mu.Lock()
 			if s.target == target {
 				s.targetHeight = header.number
 			}
 			s.mu.Unlock()
 		}
-		ancestry = append(ancestry, header)
+		if reuse {
+			cached, err := s.ancestry.find(header.hash, header.number, true)
+			if err != nil {
+				usable = false
+				return err
+			}
+			if cached != nil {
+				if path.count == 0 {
+					s.mu.Lock()
+					if s.target == target {
+						s.targetHeight = cached.headNumber
+					}
+					s.mu.Unlock()
+				}
+				if err := path.join(cached); err != nil {
+					return err
+				}
+				next = path.parent
+				expected = path.headNumber - path.count
+				known = true
+				continue
+			}
+		}
+		if err := s.ancestry.append(path, header); err != nil {
+			usable = false
+			return err
+		}
 		if s.pivotSync != nil && header.hash == target.Finalized {
 			block, err := s.downloadedBlock(ctx, header.hash)
 			if err != nil {
@@ -357,20 +426,56 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 				return err
 			}
 			if adopted {
+				path.pop(header)
+				next = header.hash
 				break
 			}
 		}
 		next = header.parent
+		expected = header.number - 1
+		known = true
 	}
-	for i := len(ancestry) - 1; i >= 0; i-- {
+	ancestor := s.chain.GetBlock(next)
+	if ancestor == nil || ancestor.Header().Number == nil || !ancestor.Header().Number.IsUint64() {
+		return fmt.Errorf("beacon execution sync: missing validated anchor")
+	}
+	parentHash, parentNumber := ancestor.Hash(), ancestor.NumberU64()
+	for path.count > 0 {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if !s.validated(ancestry[i].hash) {
-			block, err := s.downloadedBlock(ctx, ancestry[i].hash)
+		header, err := path.at(path.count - 1)
+		if err != nil {
+			usable = false
+			return err
+		}
+		if header.parent != parentHash || parentNumber == ^uint64(0) || header.number != parentNumber+1 {
+			usable = false
+			return fmt.Errorf("beacon execution sync: disconnected forward ancestry")
+		}
+
+		if path.count > 1 {
+			child, err := path.at(path.count - 2)
 			if err != nil {
+				usable = false
 				return err
 			}
+			if child.parent != header.hash {
+				usable = false
+				return fmt.Errorf("beacon execution sync: corrupt staged hash linkage")
+			}
+		} else if header.hash != path.headHash {
+			usable = false
+			return fmt.Errorf("beacon execution sync: corrupt staged head")
+		}
+		block, err := s.downloadedBlock(ctx, header.hash)
+		if err != nil {
+			return err
+		}
+		if block.ParentHash() != header.parent || block.NumberU64() != header.number {
+			return fmt.Errorf("beacon execution sync: corrupt staged block linkage")
+		}
+		if !s.validated(header.hash) {
 			insert := s.chain.InsertBlock
 			if chain, ok := s.chain.(interface{ InsertSyncedBlock(*types.Block) error }); ok {
 				insert = chain.InsertSyncedBlock
@@ -379,9 +484,13 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 				return fmt.Errorf("beacon execution sync: block %d: %w", block.NumberU64(), err)
 			}
 		}
-		s.downloadHeaders.Remove(ancestry[i].hash)
+		parentHash, parentNumber = block.Hash(), block.NumberU64()
+		path.pop(header)
+		s.downloadHeaders.Remove(header.hash)
 	}
-
+	if parentHash != target.Head {
+		return fmt.Errorf("beacon execution sync: staged path did not reach nominated head")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}

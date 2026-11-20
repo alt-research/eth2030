@@ -800,7 +800,7 @@ func New(config *Config) (*Node, error) {
 	}
 
 	// Initialize beacon syncer and blob sync manager.
-	n.executionSync = syncbeacon.NewExecutionSyncer(bc, n.ethHandler, n.applyExecutionTarget)
+	n.executionSync = syncbeacon.NewExecutionSyncer(bc, n.ethHandler, n.applyExecutionTarget, config.DataDir)
 	if config.SyncMode == "snap" {
 		n.executionSync.SetPivotSync(n.syncFinalizedPivot)
 	}

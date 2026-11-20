@@ -10,6 +10,7 @@ import (
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/gas"
+	corestate "github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto"
@@ -387,6 +388,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Check nonce relative to state to decide pending vs queue.
 	stateNonce := pool.state.GetNonce(from)
+	if err := corestate.ReadError(pool.state); err != nil {
+		return fmt.Errorf("txpool state: %w", err)
+	}
 
 	if tx.Nonce() < stateNonce {
 		txpoolLog.Debug("tx_rejected",
@@ -587,7 +591,13 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 	return pool.validateTxData(tx, true)
 }
 
-func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) error {
+func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) (result error) {
+	defer func() {
+		if err := corestate.ReadError(pool.state); err != nil {
+			result = fmt.Errorf("txpool state: %w", err)
+		}
+	}()
+
 	if err := types.ValidateOrdinaryEnvelope(tx); err != nil {
 		return err
 	}

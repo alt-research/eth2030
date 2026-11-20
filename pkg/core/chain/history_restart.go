@@ -38,6 +38,9 @@ func (bc *Blockchain) restoreIndexedHead() (bool, error) {
 	}
 	// A published but corrupt index is an error even if a legacy validation
 	// marker is missing. Do not turn unreadable committed state into zero state.
+	if err := state.AuditTrieHistory(context.Background(), bc.db, head.Root()); err != nil {
+		return false, storageFailure(err)
+	}
 	current, err := state.OpenTrieHistory(context.Background(), bc.db, head.Root())
 	if err != nil {
 		return false, storageFailure(err)

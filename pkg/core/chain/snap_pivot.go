@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/eth2030/eth2030/core/rawdb"
@@ -88,10 +89,20 @@ func (bc *Blockchain) ImportSnapPivot(pivot *types.Block, history []*types.Heade
 	if err := rawdb.WriteFinalizedBlockHash(batch, pivot.Hash()); err != nil {
 		return err
 	}
+
+	// Index the already authenticated checkpoint once. Subsequent execution
+	// and point proofs must not keep copying/materializing its complete map.
+	if err := state.StoreTrieHistory(bc.db, batch, pivot.Root(), st.ExecutionCopy()); err != nil {
+		return err
+	}
 	if err := batch.Write(); err != nil {
 		return err
 	}
-	bc.adoptSnapPivot(pivot, st, headers)
+	lazy, err := state.OpenTrieHistory(context.Background(), bc.db, pivot.Root())
+	if err != nil {
+		return err
+	}
+	bc.adoptSnapPivot(pivot, lazy, headers)
 	bc.currentFinalBlock = pivot
 	return nil
 }
@@ -164,11 +175,23 @@ func (bc *Blockchain) RestoreSnapPivot() error {
 	if err := bc.validator.ValidateBody(pivot); err != nil {
 		return err
 	}
-	if err := bc.db.Put(validatedKey(pivot.Hash()), []byte{1}); err != nil {
+
+	batch := bc.db.NewBatch()
+	if err := state.StoreTrieHistory(bc.db, batch, pivot.Root(), st.ExecutionCopy()); err != nil {
+		return err
+	}
+	if err := batch.Put(validatedKey(pivot.Hash()), []byte{1}); err != nil {
+		return err
+	}
+	if err := batch.Write(); err != nil {
+		return err
+	}
+	lazy, err := state.OpenTrieHistory(context.Background(), bc.db, pivot.Root())
+	if err != nil {
 		return err
 	}
 	bc.mu.Lock()
-	bc.adoptSnapPivot(pivot, st, headers)
+	bc.adoptSnapPivot(pivot, lazy, headers)
 	bc.mu.Unlock()
 	return bc.replayStoredAfter(pivot)
 }

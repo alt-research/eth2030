@@ -486,7 +486,10 @@ func (h *Handler) PrepareBlobBuilding() { h.relay.mu.Lock(); h.relay.eager = tru
 // missing data as zeros. Complete ordinary data and authenticated sparse data
 // share this production consumer.
 func (h *Handler) GetBlobCells(hashes []types.Hash, mask types.CellMask) []types.BlobCells {
-	result := make([]types.BlobCells, len(hashes))
+	// Capture the source before the destination of promotion. The staging
+	// snapshot owns its cells/proofs, so removal after this point cannot create
+	// an availability gap; promotions completed earlier are in the pool below.
+	result := h.relay.store.BlobCells(hashes, mask)
 	indices := mask.Indices()
 
 	var txs []*types.Transaction
@@ -497,12 +500,10 @@ func (h *Handler) GetBlobCells(hashes []types.Hash, mask types.CellMask) []types
 			txs = append(txs, list...)
 		}
 	}
-	for _, hash := range h.relay.store.Hashes() {
-		if tx := h.relay.store.Get(hash); tx != nil {
-			txs = append(txs, tx)
-		}
-	}
 	for _, tx := range txs {
+		if !types.HasFullBlobSidecar(tx) {
+			continue
+		}
 		for b, hash := range tx.BlobHashes() {
 			for i, wanted := range hashes {
 				if wanted != hash {
@@ -521,38 +522,25 @@ func (h *Handler) GetBlobCells(hashes []types.Hash, mask types.CellMask) []types
 				}
 				var all [][2048]byte
 				var proofs [][]byte
-				if types.HasFullBlobSidecar(tx) {
-					var err error
-					all, err = bls.DefaultKZGBackend().ComputeCells(side.Blobs[b])
+				var err error
+				all, err = bls.DefaultKZGBackend().ComputeCells(side.Blobs[b])
+				if err != nil {
+					continue
+				}
+				if side.Version == 1 {
+					proofs = side.Proofs[b*128 : (b+1)*128]
+				} else {
+					_, generated, err := bls.DefaultKZGBackend().ComputeCellsAndProofs(side.Blobs[b])
 					if err != nil {
 						continue
 					}
-					if side.Version == 1 {
-						proofs = side.Proofs[b*128 : (b+1)*128]
-					} else {
-						_, generated, err := bls.DefaultKZGBackend().ComputeCellsAndProofs(side.Blobs[b])
-						if err != nil {
-							continue
-						}
-						for _, p := range generated {
-							proofs = append(proofs, append([]byte(nil), p[:]...))
-						}
+					for _, p := range generated {
+						proofs = append(proofs, append([]byte(nil), p[:]...))
 					}
-					for j, index := range indices {
-						result[i].Cells[j] = append([]byte(nil), all[index][:]...)
-						result[i].Proofs[j] = append([]byte(nil), proofs[index]...)
-					}
-				} else {
-					cells, available := h.relay.store.Cells(tx.Hash(), mask)
-					served := available.Indices()
-					for k, index := range served {
-						for j, requested := range indices {
-							if index == requested {
-								result[i].Cells[j] = cells[b*len(served)+k]
-								result[i].Proofs[j] = append([]byte(nil), side.Proofs[b*128+int(index)]...)
-							}
-						}
-					}
+				}
+				for j, index := range indices {
+					result[i].Cells[j] = append([]byte(nil), all[index][:]...)
+					result[i].Proofs[j] = append([]byte(nil), proofs[index]...)
 				}
 			}
 		}

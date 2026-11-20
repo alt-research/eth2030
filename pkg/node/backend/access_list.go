@@ -117,6 +117,7 @@ func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *ty
 			return nil, ctx.Err()
 		}
 		tracked := &accessedState{StateDB: &simulationBalanceState{StateDB: base.Dup()}, items: make(map[types.Address]map[types.Hash]struct{})}
+		state.SetReadContext(tracked, ctx)
 		excluded := map[types.Address]bool{from: true, header.Coinbase: true}
 		if to != nil {
 			excluded[*to] = true
@@ -152,3 +153,6 @@ func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *ty
 	}
 	return nil, fmt.Errorf("access-list discovery did not converge after 64 executions")
 }
+
+func (s *accessedState) Error() error                       { return state.ReadError(s.StateDB) }
+func (s *accessedState) SetReadContext(ctx context.Context) { state.SetReadContext(s.StateDB, ctx) }

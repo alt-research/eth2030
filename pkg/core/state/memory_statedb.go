@@ -40,6 +40,10 @@ func newStateObject() *stateObject {
 // MemoryStateDB is an in-memory implementation of the StateDB interface.
 type MemoryStateDB struct {
 	stateObjects     map[types.Address]*stateObject
+	historyBase      *historyView
+	historyDirty     map[types.Address]struct{}
+	historySlots     map[types.Address]map[types.Hash]struct{}
+	historyRevision  uint64
 	journal          *journal
 	logs             map[types.Hash][]*types.Log
 	refund           uint64
@@ -163,6 +167,7 @@ func (s *MemoryStateDB) GetCodeSize(addr types.Address) int {
 // --- Self-destruct ---
 
 func (s *MemoryStateDB) SelfDestruct(addr types.Address) {
+	s.markHistory(addr)
 	obj := s.getLiveStateObject(addr)
 	if obj == nil {
 		return
@@ -217,6 +222,7 @@ func (s *MemoryStateDB) StorageSnapshot(addr types.Address) map[types.Hash]types
 }
 
 func (s *MemoryStateDB) SetState(addr types.Address, key types.Hash, value types.Hash) {
+	s.markHistorySlot(addr, key)
 	obj := s.getOrNewStateObject(addr)
 	prevDirty, prevExists := obj.dirtyStorage[key]
 	var prev types.Hash
@@ -615,6 +621,24 @@ func (s *MemoryStateDB) Copy() *MemoryStateDB {
 		cp.stateObjects[addr] = copyMemoryStateObject(obj)
 	}
 
+	cp.historyBase = s.historyBase
+	cp.historyRevision = s.historyRevision
+	if s.historyDirty != nil {
+		cp.historyDirty = make(map[types.Address]struct{}, len(s.historyDirty))
+		for a := range s.historyDirty {
+			cp.historyDirty[a] = struct{}{}
+		}
+	}
+	if s.historySlots != nil {
+		cp.historySlots = make(map[types.Address]map[types.Hash]struct{}, len(s.historySlots))
+		for a, slots := range s.historySlots {
+			cp.historySlots[a] = make(map[types.Hash]struct{}, len(slots))
+			for k := range slots {
+				cp.historySlots[a][k] = struct{}{}
+			}
+		}
+	}
+
 	for txHash, logs := range s.logs {
 		cpLogs := make([]*types.Log, len(logs))
 		for i, log := range logs {
@@ -680,6 +704,7 @@ func (s *MemoryStateDB) Merge(src *MemoryStateDB) {
 		copy(dstObj.code, srcObj.code)
 		dstObj.selfDestructed = srcObj.selfDestructed
 		for k, v := range srcObj.dirtyStorage {
+			s.markHistorySlot(addr, k)
 			dstObj.dirtyStorage[k] = v
 		}
 	}
@@ -821,6 +846,7 @@ func (s *MemoryStateDB) Dup() StateDB {
 var _ StateDB = (*MemoryStateDB)(nil)
 
 func (s *MemoryStateDB) touchAccount(addr types.Address, obj *stateObject) {
+	s.markHistory(addr)
 	if !obj.touched {
 		s.journal.append(touchAccountChange{addr: addr})
 		obj.touched = true

@@ -61,7 +61,21 @@
       "source": "cf705b46b08ba8172d2e32225964ecb9bb1d2b95",
       "repository": "fyInALT/lodestar",
       "base_image": "ethpandaops/lodestar@sha256:d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad",
-      "source_runtime_package_and_lock_files_identical": true
+      "source_runtime_package_and_lock_files_identical": true,
+      "network_dependency_override": {
+        "version": "libp2p@3.4.0",
+        "source_review": "https://github.com/ChainSafe/lodestar/pull/10693",
+        "functional_source": "fa03d654b8b09ee4c02df73efcaff9282e6a4fc9",
+        "patch_sha256": "0631b733bc0a2774aad1d83452ee3ebaf28a711eca4481deab0a4f0f71a94736",
+        "actual_runtime_module_sha256": {
+          "src/registrar.ts": "4856df1b3a8fadc3cce9301efc28a08a5eccbd0d5e059f79cc4f80646f7cd189",
+          "dist/src/registrar.js": "7b7086837d455706ecaf28deac33124376940ccd0c043ce7b3dbf9edf5887f30",
+          "dist/src/registrar.js.map": "b340d77aaac187c1889737c5860e5e994feb6fe82e4b4dda65022d18880d6de0",
+          "dist/src/registrar.d.ts": "4d05cca911a7fd5bd78f9855c12e21d42a0cc04501758086895718183fc28cca"
+        },
+        "reproducible_image_id": "sha256:1da27a6e17530c4e7000a3d3f769d5f4a9de21937fee1abe5c9761d0ba0333c0",
+        "scope": "Beacon-node dependency override only. Application/native addons/validator client remain at explicitly recorded sources. The CLI application version and original image label are not used to infer this module identity."
+      }
     },
     "independent_geth": {
       "version": "v1.17.10",
@@ -930,7 +944,8 @@
   "phase_boundaries": {
     "steady_and_pressure": "Original main three pairs plus two unchanged validator-free observer pairs; observer custody count 4. Original service limits remain unchanged within each window.",
     "later_peer_campaign": "Observer custody changes and provider network interruptions happen after accepted operating windows; they are not folded into those unchanged-tuple claims.",
-    "registry": "Live default 64-epoch withdrawal, index reuse and retired-key process acceptance is still being completed. Original fleet target is one."
+    "registry": "First actual epoch766 sweep and index reuse independently replayed. The first retired-key driver is unqualified after CLI target reset triggered an ordinary exit. A distinct same-budget continuation waits for normal epoch833 and restores fleet size before enabling lifecycle.",
+    "final_operating_windows": "Post-network-correction composition, main three pairs plus two fixed validator-free observer pairs; observer custody count16. No configuration, peer injection, source, image/resource or workload change within a measured window."
   },
   "public_release_review": {
     "status": "open, reserved by the user",

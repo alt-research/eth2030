@@ -28,6 +28,7 @@ import (
 type controller struct {
 	upstream, observer string
 	slot               uint64
+	slotFile           string
 	client             *http.Client
 	proxy              *httputil.ReverseProxy
 	mu                 sync.Mutex
@@ -36,8 +37,22 @@ type controller struct {
 	output             io.Writer
 }
 
+// The producer rebuilds its signed-preference cache after reconnecting. Keep
+// transport forwarding normal during warm-up, then select one actual future
+// duty without restarting the producer and losing that cache again.
+func (c *controller) controlSlot() uint64 {
+	if c.slotFile != "" {
+		if data, err := os.ReadFile(c.slotFile); err == nil {
+			if slot, err := strconv.ParseUint(strings.TrimSpace(string(data)), 10, 64); err == nil && slot > 0 {
+				return slot
+			}
+		}
+	}
+	return c.slot
+}
+
 func (c *controller) record(action string, input, output []byte, status int, err error) {
-	record := map[string]any{"at": time.Now().UTC(), "action": action, "slot": c.slot, "request_body": input, "response_body": output, "http_status": status, "complete": err == nil}
+	record := map[string]any{"at": time.Now().UTC(), "action": action, "slot": c.controlSlot(), "request_body": input, "response_body": output, "http_status": status, "complete": err == nil}
 	if err != nil {
 		record["error"] = err.Error()
 	}
@@ -239,7 +254,7 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	c.mu.Lock()
-	chosen := decodeErr == nil && slot == c.slot && !c.routed
+	chosen := decodeErr == nil && slot == c.controlSlot() && !c.routed
 	if chosen {
 		c.routed = true
 	}
@@ -299,7 +314,7 @@ func (c *controller) mirrorHeads(ctx context.Context) {
 				return
 			}
 			_, block, err := c.block(requestCtx, header.Data.Root)
-			if err == nil && block.Message.Slot != strconv.FormatUint(c.slot, 10) {
+			if err == nil && block.Message.Slot != strconv.FormatUint(c.controlSlot(), 10) {
 				_ = c.mirrorEnvelope(requestCtx, header.Data.Root)
 			}
 		}()
@@ -311,6 +326,7 @@ func main() {
 	upstream := flag.String("upstream", "", "original private CL REST endpoint")
 	observer := flag.String("observer", "", "isolated observer CL REST endpoint")
 	slot := flag.Uint64("slot", 0, "the single selected development slot")
+	slotFile := flag.String("slot-file", "", "owned target selected after actual signed-preference warm-up")
 	output := flag.String("output", "", "new exact signed-body evidence file")
 	flag.Parse()
 	if *upstream == "" || *observer == "" || *slot == 0 || *output == "" {
@@ -325,7 +341,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer file.Close()
-	c := &controller{upstream: *upstream, observer: *observer, slot: *slot, output: file,
+	c := &controller{upstream: *upstream, observer: *observer, slot: *slot, slotFile: *slotFile, output: file,
 		client: &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{Proxy: nil}},
 		proxy:  httputil.NewSingleHostReverseProxy(target)}
 	c.proxy.Transport = c.client.Transport

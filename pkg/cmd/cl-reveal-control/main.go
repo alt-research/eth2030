@@ -18,6 +18,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -29,12 +30,67 @@ type controller struct {
 	upstream, observer string
 	slot               uint64
 	slotFile           string
+	signatureProbeDir  string
 	client             *http.Client
 	proxy              *httputil.ReverseProxy
 	mu                 sync.Mutex
 	routed             bool
 	logMu              sync.Mutex
 	output             io.Writer
+}
+
+// signatureProbe permits an offline signer to replace only the fixed BLS
+// signature of the chosen original SSZ message. The real observer must reject
+// it before the untouched producer bytes are delivered normally.
+func (c *controller) signatureProbe(ctx context.Context, input []byte, headers http.Header) error {
+	if c.signatureProbeDir == "" {
+		return nil
+	}
+	if headers.Get("Content-Type") != "application/octet-stream" || headers.Get("Eth-Blob-Data-Included") != "true" || len(input) < 12 {
+		return fmt.Errorf("signature probe requires original stateless SSZ Contents")
+	}
+	offset := uint64(binary.LittleEndian.Uint32(input[:4]))
+	if offset < 12 || offset+100 > uint64(len(input)) {
+		return fmt.Errorf("signature probe Contents offset is invalid")
+	}
+	file, err := os.OpenFile(filepath.Join(c.signatureProbeDir, "probe-input.ssz"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	_, writeErr := file.Write(input)
+	closeErr := file.Close()
+	if writeErr != nil {
+		return writeErr
+	}
+	if closeErr != nil {
+		return closeErr
+	}
+	deadline, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	for {
+		signature, err := os.ReadFile(filepath.Join(c.signatureProbeDir, "probe-signature.bin"))
+		if err == nil {
+			if len(signature) != 96 || bytes.Equal(signature, input[offset+4:offset+100]) {
+				return fmt.Errorf("probe needs one distinct 96-byte BLS signature")
+			}
+			altered := bytes.Clone(input)
+			copy(altered[offset+4:offset+100], signature)
+			body, status, err := c.requestHeaders(deadline, "POST", c.observer+"/eth/v1/beacon/execution_payload_envelopes?broadcast_validation=consensus", altered, headers)
+			c.record("replaced-key-signature-probe", altered, body, status, err)
+			if err != nil || status < 400 || status >= 500 {
+				return fmt.Errorf("observer did not reject replaced-key signature: %d %v", status, err)
+			}
+			return nil
+		}
+		if !os.IsNotExist(err) {
+			return err
+		}
+		select {
+		case <-deadline.Done():
+			return deadline.Err()
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
 }
 
 // The producer rebuilds its signed-preference cache after reconnecting. Keep
@@ -271,6 +327,11 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 502)
 		return
 	}
+	if err := c.signatureProbe(r.Context(), input, r.Header); err != nil {
+		c.record("signature-probe-failed", input, nil, 502, err)
+		http.Error(w, err.Error(), 502)
+		return
+	}
 	body, status, err := c.requestHeaders(r.Context(), "POST", c.observer+r.URL.RequestURI(), input, r.Header)
 	c.record("first-envelope-to-observer", input, body, status, err)
 	if err != nil || status < 200 || status >= 300 {
@@ -327,6 +388,7 @@ func main() {
 	observer := flag.String("observer", "", "isolated observer CL REST endpoint")
 	slot := flag.Uint64("slot", 0, "the single selected development slot")
 	slotFile := flag.String("slot-file", "", "owned target selected after actual signed-preference warm-up")
+	probeDir := flag.String("signature-probe-dir", "", "optional owned directory for one replaced-key signature probe")
 	output := flag.String("output", "", "new exact signed-body evidence file")
 	flag.Parse()
 	if *upstream == "" || *observer == "" || *slot == 0 || *output == "" {
@@ -341,7 +403,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer file.Close()
-	c := &controller{upstream: *upstream, observer: *observer, slot: *slot, slotFile: *slotFile, output: file,
+	c := &controller{upstream: *upstream, observer: *observer, slot: *slot, slotFile: *slotFile, signatureProbeDir: *probeDir, output: file,
 		client: &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{Proxy: nil}},
 		proxy:  httputil.NewSingleHostReverseProxy(target)}
 	c.proxy.Transport = c.client.Transport

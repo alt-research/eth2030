@@ -3,16 +3,52 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestSignatureProbeCanChangeOnlyBLSFieldAndRequiresRealRejection(t *testing.T) {
+	input, err := os.ReadFile("testdata/actual-gloas-contents.ssz")
+	if err != nil {
+		t.Fatal(err)
+	}
+	offset := int(binary.LittleEndian.Uint32(input[:4]))
+	headers := http.Header{"Content-Type": {"application/octet-stream"}, "Eth-Blob-Data-Included": {"true"}}
+	for _, status := range []int{400, 200, 503} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			dir := t.TempDir()
+			signature := bytes.Repeat([]byte{0x42}, 96)
+			if err := os.WriteFile(filepath.Join(dir, "probe-signature.bin"), signature, 0600); err != nil {
+				t.Fatal(err)
+			}
+			observer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				body, _ := io.ReadAll(r.Body)
+				if !bytes.Equal(body[:offset+4], input[:offset+4]) || !bytes.Equal(body[offset+100:], input[offset+100:]) || !bytes.Equal(body[offset+4:offset+100], signature) {
+					t.Error("probe changed signed message or did not replace its exact signature")
+				}
+				w.WriteHeader(status)
+			}))
+			defer observer.Close()
+			c := &controller{observer: observer.URL, signatureProbeDir: dir, client: observer.Client(), output: io.Discard}
+			if err := c.signatureProbe(context.Background(), input, headers); (err == nil) != (status == 400) {
+				t.Fatalf("probe status %d: %v", status, err)
+			}
+			captured, err := os.ReadFile(filepath.Join(dir, "probe-input.ssz"))
+			if err != nil || !bytes.Equal(captured, input) {
+				t.Fatal("original producer evidence was changed")
+			}
+		})
+	}
+}
 
 func TestChosenEnvelopeKeepsExactSignedBytesAndRoutesOnlyFirstDelivery(t *testing.T) {
 	input := []byte(`{"message":{"beacon_block_root":"original-root","payload":{"slot_number":"42","extra_signed_field":"keep this"}},"signature":"original-signature"}`)

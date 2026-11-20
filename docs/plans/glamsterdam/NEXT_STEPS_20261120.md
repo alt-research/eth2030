@@ -1,5 +1,7 @@
 # Glamsterdam remaining work and next development plan — 2026-11-20
 
+> Historical plan/checkpoint. The remaining frozen-development engineering work is reconciled as complete in the [2026-11-20 final handoff](COMPLETION_HANDOFF_20261120.md), with exact process evidence, PRs and reserved public protocol/model review. Earlier pending rows below retain their original observation date.
+
 ## Baseline and scope
 
 Master baseline: `7068cd97394570bb7b459eb88a5bbdc613911db4`. All original EL review heads 64–115 are delivered, including the original CLZ correction and later Engine projection fix. This is source delivery, not completion of all release gates. The post-merge audit found three concrete engineering issues, which the user has now authorized fixing with separate PRs. This plan also records the remaining integration, operating and target-selection work; it does not silently start new live pressure/fault campaigns.

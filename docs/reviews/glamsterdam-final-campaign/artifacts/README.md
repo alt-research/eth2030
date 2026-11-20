@@ -13,8 +13,11 @@ Current bundles:
 | network-recovery.tar.zst | 54 | 9690942 | 113352 | Installed dependency race, original failed adapters, exact module deployment and three automatic provider-loss recoveries. |
 | final-operating.tar.zst | 22 | 27539344 | 1088606 | Final compatible 400-slot steady and 60-slot pressure measurements, independent finality/offline replays, 270 account proofs and exactly reproducible Engine selections. |
 | final-cold.tar.zst | 19 | 1069298 | 71400 | Final-source empty-database full/snap completion, original BAL readback, four independent account proofs and original factory getter on both roles. |
+| registry.tar.zst | 645 | 908552079 | 2513228 | Both actual default-delay sweep/reuse cycles, original failed driver, exact payouts, signed states/blocks and retired/current signature plus positive-availability controls. |
 
-The registry continuation inputs are being added as a separate bundle. This pending case is not represented as completed by the archives above.
+| handoff.tar.zst | 25 | 20821694 | 1189883 | Original composed test/build evidence, final source/runtime/restoration inventory, frozen GitHub observations and fresh public-archive replays. |
+
+All nine bundles are complete for the frozen development target. ARCHIVES.json records each archive digest and complete byte-verification result. Earlier CI/merge observations inside the handoff bundle retain their exact observed heads; the final PR head and live CI are checked separately at delivery.
 
 Verify an archive from the repository root:
 
@@ -36,7 +39,9 @@ go build -o /tmp/glamsterdam-ledger ./cmd/glamsterdam-ledger
 python pkg/devnet/kurtosis/scripts/reference_lifecycle_states.py --capture /fresh/artifacts/builder-lifecycle-03 --output /fresh/replay-lifecycle.json --invalid-slot 20709 --invalid-engine /fresh/artifacts/builder-lifecycle-03/invalid-root-engine-exchanges-02.jsonl
 python pkg/devnet/kurtosis/scripts/reference_reorg.py --capture /fresh/artifacts/controlled-reorg-05 --genesis /fresh/artifacts/genesis-beacon.ssz --output /fresh/replay-reorg.json
 python pkg/devnet/kurtosis/scripts/reference_partial_columns.py --anchor /fresh/artifacts/peer-custody-process-01/cgc-16/anchor.json --bundle /fresh/artifacts/peer-custody-process-01/cgc-16/bundle.json --genesis /fresh/artifacts/genesis-beacon.ssz --output /fresh/replay-partials.json
-python pkg/devnet/kurtosis/scripts/reference_operating_window.py --capture /fresh/artifacts/steady-final-01 --trusted-bootstrap /fresh/artifacts/trusted-bootstrap.jsonl --replay --output /fresh/replay-finality.json
+python pkg/devnet/kurtosis/scripts/reference_operating_window.py --capture /fresh/artifacts/steady-final-02 --trusted-bootstrap /fresh/artifacts/trusted-bootstrap.jsonl --replay --output /fresh/replay-finality.json
+python pkg/devnet/kurtosis/scripts/reference_builder_registry.py --capture /fresh/artifacts/registry-live-retry --output /fresh/replay-registry.json
+python pkg/devnet/kurtosis/scripts/reference_operating_window.py --capture /fresh/artifacts/registry-finality --trusted-bootstrap /fresh/artifacts/trusted-bootstrap.jsonl --replay --output /fresh/replay-registry-finality.json
 ```
 
 The genesis and original trusted bootstrap belong to the provenance bundle. The captured finality replay performs no Docker discovery or server access. Authentication-only spans report that no operating budget was evaluated; they do not convert controlled network-fault intervals into steady-window passes.

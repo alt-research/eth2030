@@ -72,14 +72,20 @@ class Node:
             return reply["result"]
         return reply
 
-    def start(self):
+    def command(self):
         args = [str(self.binary), "--datadir="+str(self.directory/"data"), "--override.genesis="+str(self.genesis),
                 "--networkid=1337", "--http.addr=127.0.0.1", "--http.port="+str(self.rpc_port),
                 "--authrpc.addr=127.0.0.1", "--authrpc.port="+str(self.engine_port),
                 "--authrpc.jwtsecret="+str(self.jwt), "--port="+str(self.p2p_port),
                 "--discovery.port=0", "--maxpeers=0", "--bootnodes=", "--rpc.rate_limit=0"]
+        return args
+
+    def launch(self, args):
+        return subprocess.Popen(args, stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
+
+    def start(self):
         self.log = (self.directory/"node.log").open("ab")
-        self.process = subprocess.Popen(args, stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
+        self.process = self.launch(self.command())
         deadline = time.monotonic()+60
         while time.monotonic()<deadline:
             if self.process.poll() is not None:
@@ -99,6 +105,58 @@ class Node:
 
     def choose(self, head, safe=ZERO, final=ZERO, attrs=None, allow_error=False):
         return self.call("engine_forkchoiceUpdatedV4", [{"headBlockHash": head, "safeBlockHash": safe, "finalizedBlockHash": final}, attrs], allow_error)
+
+    def read_wal(self):
+        return (self.directory/"data"/"chaindata"/"wal").read_bytes()
+
+    def cleanup(self):
+        self.stop()
+
+
+class TmpfsNode(Node):
+    """Keep the limited filesystem alive across actual node process crashes."""
+    container = None
+
+    def launch(self, args):
+        if self.container is None:
+            image = subprocess.check_output(["docker", "image", "inspect", "eth2030-native:wire-qualification-7e2c66e1", "--format", "{{.Id}}"], text=True).strip()
+            self.container = subprocess.check_output([
+                "docker", "run", "-d", "--network", "host", "--memory", "1g", "--cpus", "2",
+                "--label", "eth2030.qualification=final-20261120-enospc",
+                "--mount", "type=bind,source="+str(self.directory.parent)+",target="+str(self.directory.parent),
+                "--mount", "type=bind,source="+str(self.binary)+",target="+str(self.binary)+",readonly",
+                "--tmpfs", str(self.directory/"data")+":rw,size=4m", "--entrypoint", "sleep", image, "86400"
+            ], text=True).strip()
+        pidfile = str(self.directory/"node.pid")
+        return subprocess.Popen(["docker", "exec", self.container, "sh", "-c",
+                                 'echo $$ > "$1"; shift; exec "$@"', "owned-node", pidfile, *args],
+                                stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
+
+    def stop(self, crash=False):
+        if self.process is not None and self.process.poll() is None:
+            subprocess.run(["docker", "exec", self.container, "sh", "-c",
+                            'kill -'+("KILL" if crash else "TERM")+' "$(cat "$1")"',
+                            "owned-node", str(self.directory/"node.pid")], check=True, capture_output=True, timeout=10)
+            self.process.wait(timeout=30)
+        if hasattr(self, "log"):
+            self.log.close()
+
+    def read_wal(self):
+        return subprocess.check_output(["docker", "exec", self.container, "cat", str(self.directory/"data"/"chaindata"/"wal")], timeout=10)
+
+    def fill(self):
+        path = str(self.directory/"data"/"qualification-fill")
+        result = subprocess.run(["docker", "exec", self.container, "dd", "if=/dev/zero", "of="+path, "bs=4096"], capture_output=True, text=True, timeout=30)
+        assert result.returncode != 0 and "No space left" in result.stderr, result
+        return result.stderr
+
+    def unfill(self):
+        subprocess.run(["docker", "exec", self.container, "rm", str(self.directory/"data"/"qualification-fill")], check=True, timeout=10)
+
+    def cleanup(self):
+        self.stop()
+        if self.container:
+            subprocess.run(["docker", "rm", "-f", self.container], check=True, capture_output=True, timeout=30)
 
 
 def committed_head(wal, initial):
@@ -140,7 +198,7 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
     report = {"passed": False, "fault_kind": fault_kind, "scope": "actual independent EL processes, not complete CL lifecycle", "cases": []}
     trace = (output/"exchanges.jsonl").open("x")
     proposer = Node(binary, output/"proposer", owned_genesis, trace)
-    verifier = Node(binary, output/"verifier", owned_genesis, trace)
+    verifier = (TmpfsNode if fault_kind == "disk-full" else Node)(binary, output/"verifier", owned_genesis, trace)
     def save():
         (output/"result.json").write_text(json.dumps(report, indent=2)+"\n")
     def case(name):
@@ -199,34 +257,37 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         h3 = three["executionPayload"]["blockHash"]
         assert submit(verifier, three)["status"] == "VALID"
         fault = verifier.directory/"data"/"chaindata"/"data"/(b"hb".hex()+".tmp")
-        wal = verifier.directory/"data"/"chaindata"/"wal"
-        before_size = wal.stat().st_size
+        before_size = len(verifier.read_wal())
         if fault_kind == "materialization":
             fault.mkdir()
-        else:
+        elif fault_kind == "short-write":
             # Allow exactly one more WAL byte. The real write then returns a
             # short count/EFBIG; no FileDB hook or crafted WAL substitutes it.
             soft, hard = resource.prlimit(verifier.process.pid, resource.RLIMIT_FSIZE)
             resource.prlimit(verifier.process.pid, resource.RLIMIT_FSIZE, (before_size + 1, hard))
+        else:
+            report["actual_enospc"] = verifier.fill()
         rejected = verifier.choose(h3, safe=h2, final=h2, allow_error=True)
         assert "error" in rejected, rejected
         fenced = verifier.choose(h3, safe=h2, final=h2, allow_error=True)
         assert "error" in fenced, fenced
-        report["wal_bytes_before_crash"] = wal.stat().st_size
+        actual_wal = verifier.read_wal()
+        report["wal_bytes_before_crash"] = len(actual_wal)
         assert report["wal_bytes_before_crash"] > 0
-        actual_wal = wal.read_bytes()
         (output/"fault-wal.bin").write_bytes(actual_wal)
         expected_head = committed_head(actual_wal, h2)
         report["expected_head_from_actual_wal"] = expected_head
         if fault_kind == "short-write":
             assert len(actual_wal) == before_size + 1
             assert expected_head == h2
-        else:
+        elif fault_kind == "materialization":
             assert expected_head == h3
         case("actual OS write failure returns resource error and fences retry")
         verifier.stop(crash=True)
         if fault_kind == "materialization":
             fault.rmdir()
+        elif fault_kind == "disk-full":
+            verifier.unfill()
         recovered = verifier.start()
         assert recovered["hash"] == expected_head
         assert verifier.call("eth_getBlockByNumber", ["finalized", False])["hash"] == h2
@@ -243,8 +304,8 @@ def run(binary, genesis_path, output, fault_kind="materialization"):
         save()
         raise
     finally:
-        proposer.stop()
-        verifier.stop()
+        proposer.cleanup()
+        verifier.cleanup()
         trace.close()
     print(json.dumps(report))
 
@@ -254,6 +315,6 @@ if __name__ == "__main__":
     parser.add_argument("--binary", required=True, type=Path)
     parser.add_argument("--genesis", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--fault", choices=["materialization", "short-write"], default="materialization")
+    parser.add_argument("--fault", choices=["materialization", "short-write", "disk-full"], default="materialization")
     args = parser.parse_args()
     run(args.binary, args.genesis, args.output, args.fault)

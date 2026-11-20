@@ -3,7 +3,7 @@ def run(plan, args):
     mode = args.get("syncmode", "full")
     if mode not in ["full", "snap"]:
         fail("observer syncmode must be full or snap")
-    prefix = "glamsterdam-cold-" + mode
+    prefix = args.get("name_prefix", "glamsterdam-cold") + "-" + mode
     el_name = prefix + "-el"
     cl_name = prefix + "-cl"
     if not args.get("reuse_existing_el", False):
@@ -52,13 +52,15 @@ def run(plan, args):
                 "--enr-tcp-port=9000", "--enr-udp-port=9000", "--enr-quic-port=9001",
                 "--boot-nodes=" + args["cl_bootnodes"], "--target-peers=3",
                 "--enable-private-discovery", "--disable-packet-filter",
-            ],
+                "--metrics", "--metrics-address=0.0.0.0", "--metrics-port=5054",
+            ] + (["--disable-get-blobs"] if args.get("disable_get_blobs", False) else []),
             private_ip_address_placeholder="KURTOSIS_IP_ADDR_PLACEHOLDER",
             ports={
                 "http": PortSpec(number=4000, transport_protocol="TCP", application_protocol="http"),
                 "p2p-tcp": PortSpec(number=9000, transport_protocol="TCP"),
                 "p2p-udp": PortSpec(number=9000, transport_protocol="UDP"),
                 "quic": PortSpec(number=9001, transport_protocol="UDP"),
+                "metrics": PortSpec(number=5054, transport_protocol="TCP", application_protocol="http"),
             },
             ready_conditions=ReadyCondition(recipe=GetHttpRequestRecipe(port_id="http", endpoint="/eth/v1/node/health"), field="code", assertion="IN", target_value=[200, 206], timeout="5m"),
         ),

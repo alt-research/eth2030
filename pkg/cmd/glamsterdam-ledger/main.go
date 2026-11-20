@@ -104,7 +104,7 @@ func verifyPressureProofs(path string) (int, error) {
 		if err := json.Unmarshal(scan.Bytes(), &record); err != nil {
 			return count, err
 		}
-		if record.Kind != "proof" {
+		if record.Kind != "proof" && record.Kind != "historical-proof" {
 			continue
 		}
 		if record.Request.Method != "eth_getProof" || len(record.Request.Params) != 3 || (len(record.Response.Error) > 0 && string(record.Response.Error) != "null") {
@@ -125,8 +125,8 @@ func verifyPressureProofs(path string) (int, error) {
 		if err := json.Unmarshal(record.Header, &header); err != nil {
 			return count, err
 		}
-		if !selector.Canonical || selector.Hash != record.Hash || header.Hash() != record.Hash {
-			return count, fmt.Errorf("proof is not bound to the frozen canonical header")
+		if selector.Canonical != (record.Kind == "proof") || selector.Hash != record.Hash || header.Hash() != record.Hash {
+			return count, fmt.Errorf("proof is not bound to its requested header and canonicality")
 		}
 		if _, err := verifyAccount(header.Root, address, record.Response.Result); err != nil {
 			return count, err

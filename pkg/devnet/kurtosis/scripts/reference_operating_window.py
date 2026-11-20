@@ -22,12 +22,46 @@ parser.add_argument(
     help="Use original captured exchanges only; do not discover Docker or access a server",
 )
 parser.add_argument("--output", type=Path)
+parser.add_argument(
+    "--authenticate-from",
+    type=int,
+    help="Authenticate a known block span without evaluating operating budgets",
+)
+parser.add_argument("--authenticate-through", type=int)
 args = parser.parse_args()
 if args.replay and args.output is None:
     parser.error("--replay requires a new --output path")
 root = args.capture
+if args.authenticate_from is not None:
+    if (
+        args.replay
+        or args.authenticate_through is None
+        or args.authenticate_through < args.authenticate_from
+    ):
+        parser.error(
+            "live authentication needs both bounds in order; replay reads its original profile"
+        )
+    root.mkdir(exist_ok=False)
+    (root / "profile.json").write_text(
+        json.dumps(
+            {
+                "authentication_only": True,
+                "declared_at": c.now(),
+                "first": args.authenticate_from,
+                "stop": args.authenticate_through + 1,
+                "scope": "Cryptographic finality and full parent-hash ancestry of a specified observed block span. No RPC latency, pressure or missing-slot operating budget is evaluated.",
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 profile = json.loads((root / "profile.json").read_text())
-latency = json.loads((root / "latency-result.json").read_text())
+authentication_only = profile.get("authentication_only", False)
+latency = (
+    {"latency_passed": None}
+    if authentication_only
+    else json.loads((root / "latency-result.json").read_text())
+)
 out = args.output or root / "finality-result.json"
 assert not out.exists()
 trace_path = (
@@ -41,6 +75,7 @@ report = {
     "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
     "bls_active": bls.bls_active,
     "latency_passed": latency["latency_passed"],
+    "operating_budgets_evaluated": not authentication_only,
 }
 
 
@@ -157,17 +192,24 @@ try:
             else parsed(raw["data"], spec.LightClientUpdate)
         )
         spec.process_light_client_update(store, full, current_slot(), gvr)
-    begin = datetime.fromisoformat(profile["declared_at"]).timestamp()
-    end = begin + profile["duration_seconds"]
-    first = math.ceil(
-        (begin - int(genesis["genesis_time"])) * 1000 / int(network["SLOT_DURATION_MS"])
-    )
-    stop = math.ceil(
-        (end - int(genesis["genesis_time"])) * 1000 / int(network["SLOT_DURATION_MS"])
-    )
-    assert stop - first == int(
-        profile["duration_seconds"] * 1000 / int(network["SLOT_DURATION_MS"])
-    )
+    if authentication_only:
+        first, stop = profile["first"], profile["stop"]
+    else:
+        begin = datetime.fromisoformat(profile["declared_at"]).timestamp()
+        end = begin + profile["duration_seconds"]
+        first = math.ceil(
+            (begin - int(genesis["genesis_time"]))
+            * 1000
+            / int(network["SLOT_DURATION_MS"])
+        )
+        stop = math.ceil(
+            (end - int(genesis["genesis_time"]))
+            * 1000
+            / int(network["SLOT_DURATION_MS"])
+        )
+        assert stop - first == int(
+            profile["duration_seconds"] * 1000 / int(network["SLOT_DURATION_MS"])
+        )
     deadline = time.monotonic() + 420
     while time.monotonic() < deadline:
         raw = get("/eth/v1/beacon/light_client/finality_update")
@@ -250,8 +292,12 @@ try:
             raise AssertionError("unchanged reference accepted mutated " + name)
     report["rejected_controls"] = rejects
     report["passed"] = (
-        bool(latency["latency_passed"])
-        and len(missing) / (stop - first) <= profile["missing_slot_fraction_max"]
+        (first in present and stop - 1 in present)
+        if authentication_only
+        else (
+            bool(latency["latency_passed"])
+            and len(missing) / (stop - first) <= profile["missing_slot_fraction_max"]
+        )
     )
     save()
     print(json.dumps(report), flush=True)

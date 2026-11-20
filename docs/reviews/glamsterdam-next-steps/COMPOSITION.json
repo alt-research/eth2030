@@ -1,0 +1,99 @@
+{
+  "tested_source": {
+    "HEAD": "b52d3460754c6572d5ebd04738e125861478ed28",
+    "refs/remotes/fix-audit/master": "7068cd97394570bb7b459eb88a5bbdc613911db4",
+    "fix/atomic-blob-promotion-read": "a5924e67a0edf268884295034386e32c2ed4b79d",
+    "fix/full-sync-spooled-ancestry": "141e44d450c415495382cd48e13e4925434bc5ad",
+    "docs/glamsterdam-next-steps": "8ac85a02f359b5c049dc0f21c152d07e8fdc8a25",
+    "fix/incremental-merkle-history": "293a3178306a0ddb5067ff6e43005c573190c4ef",
+    "tree": "ab6e11e8ca54a7f8b89ee05b579ae1f1ed5c9270"
+  },
+  "tested_pkg_tree": "8b3e30d6d0f72e551f5c85702d43038f7f46dc95",
+  "full": {
+    "code": 0,
+    "seconds": 91.78,
+    "packages": 218,
+    "failures": []
+  },
+  "race_packages": [
+    "sync/beacon",
+    "eth",
+    "txpool/sparse",
+    "core/state",
+    "core/chain",
+    "core/execution",
+    "core/block",
+    "core/applicationtest",
+    "node",
+    "node/backend",
+    "rpc/ethapi",
+    "txpool",
+    "eiptest"
+  ],
+  "race_passed": true,
+  "full_vet": true,
+  "native_build": true,
+  "normal_merge_conflicts": 0,
+  "code_review_heads": {
+    "116": "a5924e67a0edf268884295034386e32c2ed4b79d",
+    "117": "141e44d450c415495382cd48e13e4925434bc5ad",
+    "119": "293a3178306a0ddb5067ff6e43005c573190c4ef"
+  },
+  "state_review_checks": [
+    {
+      "name": "Go tests (integration)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179606"
+    },
+    {
+      "name": "Go tests (goethkzg)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179604"
+    },
+    {
+      "name": "Go tests (race)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179501"
+    },
+    {
+      "name": "Go tests (blst)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179476"
+    },
+    {
+      "name": "Consensus fixture and control regressions",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179475"
+    },
+    {
+      "name": "Native signed Osaka and Amsterdam state tests",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179435"
+    },
+    {
+      "name": "Build, Vet, Lint, Test",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179344"
+    },
+    {
+      "name": "Published wallet and DEX application sequences",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179337"
+    },
+    {
+      "name": "Geth-backed EF state tests",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alt-research/eth2030/actions/runs/44686872292/job/136123179309"
+    }
+  ],
+  "documentation_scope": "The tested composition includes the original plan head 8ac85a02; later plan/evidence commits change no production Go package. Final current-head merge checks and identical package-tree checks are recorded in the PR descriptions."
+}

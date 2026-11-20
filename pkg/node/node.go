@@ -226,6 +226,8 @@ type Node struct {
 
 	// Beacon sync manager and blob recovery.
 	executionSync   *syncbeacon.ExecutionSyncer
+	historyCancel   context.CancelFunc
+	historyDone     chan struct{}
 	nativeConsensus *consensus.NodeRuntime
 	nativePeers     *nativeConsensusPeers
 	nativeObserveMu sync.Mutex
@@ -1034,6 +1036,7 @@ func (n *Node) Start() error {
 	}
 
 	// Bootstrap peers from DNS discovery (EIP-1459) if configured.
+	n.startSnapHistory()
 	if n.config.DNSDiscovery != "" {
 		go n.runDNSDiscovery(n.config.DNSDiscovery)
 	}
@@ -1096,6 +1099,11 @@ func (n *Node) Start() error {
 func (n *Node) Stop() error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
+	if n.historyCancel != nil {
+		n.historyCancel()
+		<-n.historyDone
+		n.historyCancel = nil
+	}
 	if n.executionSync != nil {
 		n.executionSync.Stop()
 	}

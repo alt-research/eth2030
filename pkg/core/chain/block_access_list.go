@@ -41,8 +41,17 @@ func (bc *Blockchain) BlockAccessList(hash types.Hash) ([]byte, error) {
 // execution-validated block and only when it matches that block's commitment.
 func (bc *Blockchain) StoreBlockAccessListRLP(hash types.Hash, encoded []byte) error {
 	block := bc.GetBlock(hash)
-	if block == nil || !bc.HasValidatedBlock(hash) {
-		return fmt.Errorf("BAL target is not execution-validated")
+	if block == nil {
+		return fmt.Errorf("BAL target is unknown")
+	}
+	if !bc.HasValidatedBlock(hash) {
+		anchored, err := bc.snapHistoryBlock(hash)
+		if err != nil {
+			return err
+		}
+		if !anchored {
+			return fmt.Errorf("BAL target is not execution-validated or a finalized pivot ancestor")
+		}
 	}
 	expected := block.Header().BlockAccessListHash
 	if expected == nil || crypto.Keccak256Hash(encoded) != *expected {

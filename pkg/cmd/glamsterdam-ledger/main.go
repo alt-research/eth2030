@@ -88,6 +88,17 @@ func verifyPressureProofs(path string) (int, error) {
 	scan.Buffer(make([]byte, 64<<10), 16<<20)
 	count := 0
 	for scan.Scan() {
+		// The stream also contains headers (whose nonce is an 8-byte value),
+		// EVM results and disconnected transports. Decode proof fields only
+		// after selecting an actual proof record, keeping strict quantity
+		// validation for its account nonce unchanged.
+		var kind struct{ Kind string }
+		if err := json.Unmarshal(scan.Bytes(), &kind); err != nil {
+			return count, err
+		}
+		if kind.Kind != "proof" && kind.Kind != "historical-proof" {
+			continue
+		}
 		var record struct {
 			Kind    string          `json:"kind"`
 			Hash    common.Hash     `json:"expected_hash"`
@@ -103,9 +114,6 @@ func verifyPressureProofs(path string) (int, error) {
 		}
 		if err := json.Unmarshal(scan.Bytes(), &record); err != nil {
 			return count, err
-		}
-		if record.Kind != "proof" && record.Kind != "historical-proof" {
-			continue
 		}
 		if record.Request.Method != "eth_getProof" || len(record.Request.Params) != 3 || (len(record.Response.Error) > 0 && string(record.Response.Error) != "null") {
 			return count, fmt.Errorf("invalid captured proof RPC")

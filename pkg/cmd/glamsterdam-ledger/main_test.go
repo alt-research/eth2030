@@ -36,7 +36,10 @@ func TestPressureProofStreamBindsActualRequestAndIndependentHeader(t *testing.T)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(path, append(data, '\n'), 0600); err != nil {
+		prefix := []byte("{\"kind\":\"header\",\"response\":{\"result\":{\"nonce\":\"0x0000000000000000\"}}}\n" +
+			"{\"kind\":\"finite-call\",\"response\":{\"result\":\"0x2a\"}}\n" +
+			"{\"kind\":\"ws-disconnect\",\"response\":\"raw transport reply\"}\n")
+		if err := os.WriteFile(path, append(prefix, append(data, '\n')...), 0600); err != nil {
 			t.Fatal(err)
 		}
 	}

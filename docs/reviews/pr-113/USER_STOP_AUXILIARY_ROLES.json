@@ -1,0 +1,38 @@
+[
+  {
+    "time": "2026-11-20T02:36:35.062311+00:00",
+    "role": "glamsterdam-cold-full-cl",
+    "container": "388b54654c79",
+    "action": "stop completed auxiliary qualification role; retain data"
+  },
+  {
+    "time": "2026-11-20T02:36:35.599455+00:00",
+    "role": "glamsterdam-cold-full-el",
+    "container": "205dc9792464",
+    "action": "stop completed auxiliary qualification role; retain data"
+  },
+  {
+    "time": "2026-11-20T02:36:35.899540+00:00",
+    "role": "glamsterdam-final-full-cl",
+    "container": "57f939cad905",
+    "action": "stop completed auxiliary qualification role; retain data"
+  },
+  {
+    "time": "2026-11-20T02:36:36.920105+00:00",
+    "role": "glamsterdam-final-full-el",
+    "container": "46b876749717",
+    "action": "stop completed auxiliary qualification role; retain data"
+  },
+  {
+    "time": "2026-11-20T02:36:37.196926+00:00",
+    "role": "glamsterdam-finalized-snap-cl",
+    "container": "0109d8b86528",
+    "action": "stop completed auxiliary qualification role; retain data"
+  },
+  {
+    "time": "2026-11-20T02:36:37.826440+00:00",
+    "role": "glamsterdam-finalized-snap-el",
+    "container": "b8fc6d7a573a",
+    "action": "stop completed auxiliary qualification role; retain data"
+  }
+]

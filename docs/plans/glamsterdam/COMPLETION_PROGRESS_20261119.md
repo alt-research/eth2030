@@ -49,3 +49,15 @@ The independent process run uses native source 7e2c66e1, unchanged Geth 1.17.10,
 PRs 102–105 are separate production reviews; composed source `1bba8a12d5e3a9f05a62638a636decc144f53d0e` runs on both Native nodes. The independent Geth 1.17.10 binary is unchanged and now uses an explicitly archival hash-state database rebuilt by its own CLI from the original finalized raw blocks. Original pruned-control and native cold-read failures remain historical evidence, not current failures after the final successful replay.
 
 [PR 101 public results](../../reviews/pr-101/results/manifest.json) retain compressed original application/CL/SSZ inputs, successful independent consumer reports, original stale-FCU wire replay and sequential historical-state recovery. [Independent consumer tools](../../../pkg/devnet/kurtosis/qualification/reference/README.md) use the unchanged selected specification, authentic BLS and C-KZG; one blob and full-column readback do not close the remaining real-peer fault obligations. No EL master merge or full release-completion claim is made.
+
+
+## 2026-11-20 stop boundary and merge handoff
+
+The latest user instruction narrows this continuation to finishing the current official RPC work, submitting PRs and checking all merge conflicts, then stopping. [PR 114](https://github.com/alt-research/eth2030/pull/114) publishes the 107-file/108-request exact native HTTP/RPC qualification separately from draft acceptance PR 113. The original pair 2 maintenance is restored; the final health check records common independently finalized execution hash/state and three non-optimistic online CLs. Completed auxiliary roles are stopped with data retained. Pair 3 upgrade and new qualification campaigns are deferred.
+
+The earlier inventory remains an acceptance inventory; later concrete results and remaining work are reconciled in the [2026-11-20 merge and stop handoff](PR_MERGE_HANDOFF_20261120.md). All 27 open EL PRs are clean against fetched current bases and the dependency-ordered merge-commit simulation. Repeated squash merges are not qualified and demonstrate a conflict at PR 93. This does not promote draft gates or claim complete Glamsterdam release acceptance.
+
+
+## Subsequent direct-master delivery correction (2026-11-20)
+
+The user requested a separate direct-master follow-up for original PR 91 and correction of the other PR destinations. PR 115 supplies the original CLZ source/test changes, and all 22 open reviews now target master. Ordinary master/prerequisite merges retain original ancestry, resolve the observed local/GitHub mergeability discrepancy and pass scoped source/build checks. All 22 server mergeability flags are true at the published alignment; PR 115 passes seven CI jobs. Redundant PR 99 is closed because its full head already reached master through PR 90. The [latest target audit and merge order](PR_TARGETS_MASTER_20261120.md) supersedes earlier stacked-base instructions. No EL master merge or further feature work is performed, and unfinished release gates remain open.

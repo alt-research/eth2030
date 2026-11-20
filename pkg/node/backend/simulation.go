@@ -3,6 +3,7 @@ package backend
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
@@ -14,6 +15,7 @@ import (
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"math"
 	"math/big"
 	"time"
 )
@@ -199,7 +201,7 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 		}
 	}
 
-	if args.BlobVersionedHashes != nil || args.MaxFeePerBlobGas != nil {
+	if len(args.BlobVersionedHashes) > 0 {
 		if len(args.BlobVersionedHashes) == 0 || to == nil || args.AuthorizationList != nil {
 			return nil, invalid("blob fields", fmt.Errorf("nonempty hashes and recipient required; authorizationList incompatible"))
 		}
@@ -241,6 +243,12 @@ func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.H
 	if err != nil {
 		return nil, err
 	}
+	// Standard zero-fee call context preserves BASEFEE/GASPRICE invariants
+	// without changing the selected canonical header or consensus execution.
+	if msg.GasPrice.Sign() == 0 {
+		header = types.NewBlock(header, nil).Header()
+		header.BaseFee = new(big.Int)
+	}
 	cfg := vm.Config{}
 	if tracer != nil {
 		cfg = vm.Config{Debug: true, Tracer: tracer}
@@ -267,6 +275,9 @@ func (b *RPCBackend) CallAtHeader(args rpctypes.CallArgs, header *types.Header, 
 	result, err := b.executeCallAtHeader(args, header, false, nil, overrides...)
 	if err != nil {
 		return nil, 0, err
+	}
+	if errors.Is(result.Err, vm.ErrExecutionReverted) {
+		return result.ReturnData, result.UsedGas, rpctypes.NewRevertError(result.ReturnData)
 	}
 	return result.ReturnData, result.UsedGas, result.Err
 }
@@ -339,6 +350,7 @@ func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.H
 	if err != nil {
 		return 0, err
 	}
+	var last *execution.ExecutionResult
 	run := func(limit uint64) error {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -352,14 +364,46 @@ func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.H
 		if err != nil {
 			return err
 		}
+		last = result
 		return result.Err
 	}
 	if err := run(hi); err != nil {
+		if errors.Is(err, vm.ErrExecutionReverted) && last != nil {
+			return 0, rpctypes.NewRevertError(last.ReturnData)
+		}
 		return 0, err
 	}
 	lo := uint64(0)
+	classic := !b.node.Blockchain().Config().IsAmsterdam(header.Time)
+	if classic {
+		if len(msg.Data) == 0 && msg.To != nil && base.GetCodeSize(*msg.To) == 0 && run(21000) == nil {
+			return 21000, nil
+		}
+		if err := run(hi); err != nil {
+			return 0, err
+		}
+		if last.UsedGas > 0 {
+			lo = last.UsedGas - 1
+		}
+		if last.MaxUsedGas < (math.MaxUint64-2300)/64 {
+			optimistic := (last.MaxUsedGas + 2300) * 64 / 63
+			if optimistic < hi {
+				if run(optimistic) == nil {
+					hi = optimistic
+				} else {
+					lo = optimistic
+				}
+			}
+		}
+	}
 	for lo+1 < hi {
+		if classic && float64(hi-lo)/float64(hi) < 0.015 {
+			break
+		}
 		mid := lo + (hi-lo)/2
+		if classic && lo > 0 && mid/2 > lo {
+			mid = lo * 2
+		}
 		if err := run(mid); err != nil {
 			if ctx.Err() != nil {
 				return 0, ctx.Err()
@@ -418,14 +462,20 @@ func applySimulationOverrides(db state.StateDB, overrides ...rpctypes.StateOverr
 			values := ov.StateDiff
 			if ov.State != nil {
 				values = ov.State
-				source, ok := db.(interface {
-					StorageSnapshot(types.Address) map[types.Hash]types.Hash
-				})
-				if !ok {
-					return invalid(fmt.Errorf("state backend cannot replace complete storage"))
-				}
-				for slot := range source.StorageSnapshot(address) {
-					db.SetState(address, slot, types.Hash{})
+				if target, ok := db.(interface {
+					SetStorage(types.Address, map[types.Hash]types.Hash)
+				}); ok {
+					target.SetStorage(address, nil)
+				} else {
+					source, ok := db.(interface {
+						StorageSnapshot(types.Address) map[types.Hash]types.Hash
+					})
+					if !ok {
+						return invalid(fmt.Errorf("state backend cannot replace complete storage"))
+					}
+					for slot := range source.StorageSnapshot(address) {
+						db.SetState(address, slot, types.Hash{})
+					}
 				}
 			}
 			for key, value := range values {

@@ -1,0 +1,243 @@
+[
+  {
+    "number": 92,
+    "old_base": "master",
+    "new_base": "master",
+    "head_sha": "c9bd022a0d813010de40860fa08db2e79ed7a6ea",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:16Z"
+  },
+  {
+    "number": 93,
+    "old_base": "integration/glamsterdam-conformance-foundation",
+    "new_base": "master",
+    "head_sha": "3661d79d6c6a69a5b989aefe7cceeda955691fdb",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:19Z"
+  },
+  {
+    "number": 94,
+    "old_base": "fix/native-vm-metering-boundaries",
+    "new_base": "master",
+    "head_sha": "328c8f044fcc1e270c0fbca476580160a281e89b",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:23Z"
+  },
+  {
+    "number": 95,
+    "old_base": "fix/native-transaction-validation",
+    "new_base": "master",
+    "head_sha": "7aee734154065de97c08f564da0385d518dcaffb",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:26Z"
+  },
+  {
+    "number": 97,
+    "old_base": "test/glamsterdam-native-fixtures",
+    "new_base": "master",
+    "head_sha": "e90baab4eaf1a72d7efceaffbcc298716d89908f",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:30Z"
+  },
+  {
+    "number": 98,
+    "old_base": "fix/ordinary-transaction-context",
+    "new_base": "master",
+    "head_sha": "103dfefae6913cc042015b30b1d7f63af1253f87",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:14:34Z"
+  },
+  {
+    "number": 99,
+    "skipped_state": "closed",
+    "head_sha": "c4dc26ae3eaee0540ba4005f5048875c23a172ec",
+    "old_base": "fix/simulation-system-timeout",
+    "new_base": "fix/simulation-system-timeout",
+    "state": "closed",
+    "action": "closed as already delivered through PR90; historical base retained",
+    "already_in_master": true
+  },
+  {
+    "number": 100,
+    "old_base": "test/glamsterdam-application-compatibility",
+    "new_base": "master",
+    "head_sha": "9a612c21ddc61bf48c4216ad6e24e4206bcb5ae8",
+    "state": "open",
+    "draft": true,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:19Z"
+  },
+  {
+    "number": 101,
+    "old_base": "integration/glamsterdam-runtime-candidate",
+    "new_base": "master",
+    "head_sha": "f57b582ecb664934db982c4e3f796d9a097c731a",
+    "state": "open",
+    "draft": true,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:22Z"
+  },
+  {
+    "number": 102,
+    "old_base": "integration/glamsterdam-runtime-candidate",
+    "new_base": "master",
+    "head_sha": "85fb43a0d849b2ea8e97f4b2baaf6b345a58bd43",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:26Z"
+  },
+  {
+    "number": 103,
+    "old_base": "integration/glamsterdam-runtime-candidate",
+    "new_base": "master",
+    "head_sha": "53ee0b0106975704635e74b147c351604157c8ff",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:29Z"
+  },
+  {
+    "number": 104,
+    "old_base": "integration/glamsterdam-runtime-candidate",
+    "new_base": "master",
+    "head_sha": "aef7f8a1107d70328ba2b78126e8d52721dd6764",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:32Z"
+  },
+  {
+    "number": 105,
+    "old_base": "integration/glamsterdam-runtime-candidate",
+    "new_base": "master",
+    "head_sha": "ed8558dee04c52eaff46df7ea1392157b20d7284",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:36Z"
+  },
+  {
+    "number": 106,
+    "old_base": "test/glamsterdam-multiclient-gate",
+    "new_base": "master",
+    "head_sha": "4918d9738ee7852cb9f29fb2e2de8699129ceefa",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:39Z"
+  },
+  {
+    "number": 107,
+    "old_base": "fix/rpc-request-execution-cancellation",
+    "new_base": "master",
+    "head_sha": "8896b32b07d1b0c49a597e509f00345b3c71d2a0",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:42Z"
+  },
+  {
+    "number": 108,
+    "old_base": "fix/websocket-execution-disconnect",
+    "new_base": "master",
+    "head_sha": "8d329335e736fed7550144ce8835c11022ac38f2",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:45Z"
+  },
+  {
+    "number": 109,
+    "old_base": "fix/full-sync-target-progress",
+    "new_base": "master",
+    "head_sha": "2838fb0b1a87b8f8b9ecb6d513b0aa5d8056d9e7",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:49Z"
+  },
+  {
+    "number": 110,
+    "old_base": "fix/merkle-state-history",
+    "new_base": "master",
+    "head_sha": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:52Z"
+  },
+  {
+    "number": 111,
+    "old_base": "fix/filedb-wal-recovery",
+    "new_base": "master",
+    "head_sha": "5ab3c2ce65bc534b86bc768404096756db50579a",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:56Z"
+  },
+  {
+    "number": 112,
+    "old_base": "fix/verified-history-restart",
+    "new_base": "master",
+    "head_sha": "ad92af00dcd0ab06b416f79c09d6a5fa4908b52e",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:15:59Z"
+  },
+  {
+    "number": 113,
+    "old_base": "fix/snap-pivot-peer-recovery",
+    "new_base": "master",
+    "head_sha": "b18ddd6e229ff55becceb1d5a354e33ddc9a2fd2",
+    "state": "open",
+    "draft": true,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:16:03Z"
+  },
+  {
+    "number": 114,
+    "old_base": "fix/snap-pivot-peer-recovery",
+    "new_base": "master",
+    "head_sha": "ae6e0eb5121f0e3dca036ac0a4c19fec559e6a1a",
+    "state": "open",
+    "draft": false,
+    "already_in_master": false,
+    "action": "target master and clarify dependencies",
+    "updated_at": "2026-11-20T03:16:06Z"
+  }
+]

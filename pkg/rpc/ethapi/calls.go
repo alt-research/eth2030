@@ -2,12 +2,21 @@ package ethapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 )
+
+func executionFailureResponse(id json.RawMessage, err error, prefix string) *Response {
+	var typed *RPCError
+	if errors.As(err, &typed) {
+		return &Response{JSONRPC: "2.0", ID: id, Error: typed}
+	}
+	return errorResponse(id, ErrCodeExecution, prefix+err.Error())
+}
 
 // CallRequest wraps the full parameter set for eth_call and eth_estimateGas,
 // including the optional state overrides and block number resolution.
@@ -213,7 +222,7 @@ func (api *EthAPI) ethCallFull(req *Request) *Response {
 		}
 		result, _, err := backend.CallAtHeader(cr.Args, header, cr.Overrides)
 		if err != nil {
-			return errorResponse(req.ID, ErrCodeExecution, "execution error: "+err.Error())
+			return executionFailureResponse(req.ID, err, "execution error: ")
 		}
 		return successResponse(req.ID, encodeBytes(result))
 	}
@@ -226,7 +235,7 @@ func (api *EthAPI) ethCallFull(req *Request) *Response {
 	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
 		result, _, err := backend.Call(cr.Args, cr.BlockNum, cr.Overrides)
 		if err != nil {
-			return errorResponse(req.ID, ErrCodeExecution, "execution error: "+err.Error())
+			return executionFailureResponse(req.ID, err, "execution error: ")
 		}
 		return successResponse(req.ID, encodeBytes(result))
 	}
@@ -296,7 +305,7 @@ func (api *EthAPI) estimateGasFull(req *Request) *Response {
 		}
 		estimate, err := backend.EstimateGasAtHeader(cr.Args, header, cr.Overrides)
 		if err != nil {
-			return errorResponse(req.ID, ErrCodeExecution, "gas estimation failed: "+err.Error())
+			return executionFailureResponse(req.ID, err, "gas estimation failed: ")
 		}
 		return successResponse(req.ID, encodeUint64(estimate))
 	}
@@ -309,7 +318,7 @@ func (api *EthAPI) estimateGasFull(req *Request) *Response {
 	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
 		estimate, err := backend.EstimateGas(cr.Args, cr.BlockNum, cr.Overrides)
 		if err != nil {
-			return errorResponse(req.ID, ErrCodeExecution, "gas estimation failed: "+err.Error())
+			return executionFailureResponse(req.ID, err, "gas estimation failed: ")
 		}
 		return successResponse(req.ID, encodeUint64(estimate))
 	}

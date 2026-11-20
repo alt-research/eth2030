@@ -25,6 +25,9 @@ func (api *EthAPI) simulateV1(req *Request) *Response {
 	}
 	header, selectorErr := resolveRawBlockHeader(api.backend, selector)
 	if selectorErr != nil {
+		if selectorErr.Code == -32001 {
+			return errorResponse(req.ID, -32000, "header not found")
+		}
 		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 	backend, ok := api.backend.(rpcbackend.SimulateBackend)

@@ -1,0 +1,30 @@
+{
+  "upstream_commit": "a9e9095c453d7b3c95b89abfcf46afb2eff4e1b7",
+  "official_files": 107,
+  "executed_requests": 108,
+  "all_expected_responses_unchanged": true,
+  "passed_files": 107,
+  "requests_by_method": {
+    "eth_call": 6,
+    "eth_estimateGas": 7,
+    "eth_createAccessList": 4,
+    "eth_simulateV1": 91
+  },
+  "wire_file": "official-rpc-wire.jsonl.gz",
+  "uncompressed_wire_sha256": "dd8aa934450abfd1bcaccd55740a44cc0d3ae6a47c37b159ca7ab2994a77f83b",
+  "scope": "Real native HTTP/RPC/EVM consumers with independently SDK-authenticated fixture pre-states and exact state-root validation; native historical PoW chain import is not inferred.",
+  "controls": [
+    "fixed-fee-floor",
+    "early-p256",
+    "lost-revert-payload",
+    "missing-storage-journal"
+  ],
+  "validation": {
+    "full_packages": 217,
+    "affected_race_packages": 24,
+    "integration_packages": 49,
+    "full_test_source": "ad38817f153072421d7b3a023dfbce9f44088048",
+    "original_composed_full_packages": 218,
+    "github_ci_jobs_passed": 9
+  }
+}

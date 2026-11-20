@@ -679,6 +679,9 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 	// Select the correct jump table based on fork rules.
 	var precompileAddrs map[types.Address]vm.PrecompiledContract
 	if config != nil {
+		if config.ChainID != nil {
+			evm.Context.ChainID = new(big.Int).Set(config.ChainID)
+		}
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,
@@ -1423,6 +1426,14 @@ func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, state
 		}
 		if err := eips.ProcessAuthorizations(statedb, msg.AuthList, chainID); err != nil {
 			return nil, fmt.Errorf("processing EIP-7702 authorizations: %w", err)
+		}
+	}
+
+	// EIP-7702 warms the final transaction destination's delegation target
+	// after processing all authorizations. Reentrant code sees that access.
+	if msg.To != nil && config.IsPrague(header.Time) {
+		if target, delegated := types.ParseDelegation(statedb.GetCode(*msg.To)); delegated {
+			statedb.AddAddressToAccessList(target)
 		}
 	}
 

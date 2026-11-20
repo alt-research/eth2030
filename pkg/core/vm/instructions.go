@@ -303,7 +303,7 @@ func opCalldataLoad(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	x := stack.Peek()
 	offset := x.Uint64()
 	data := make([]byte, 32)
-	if offset < uint64(len(contract.Input)) {
+	if x.IsUint64() && offset < uint64(len(contract.Input)) {
 		copy(data, contract.Input[offset:])
 	}
 	x.SetBytes(data)
@@ -323,7 +323,7 @@ func opCalldataCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	}
 	dOff := dataOffset.Uint64()
 	data := make([]byte, l)
-	if dOff < uint64(len(contract.Input)) {
+	if dataOffset.IsUint64() && dOff < uint64(len(contract.Input)) {
 		copy(data, contract.Input[dOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -343,7 +343,7 @@ func opCodeCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 	}
 	cOff := codeOffset.Uint64()
 	data := make([]byte, l)
-	if cOff < uint64(len(contract.Code)) {
+	if codeOffset.IsUint64() && cOff < uint64(len(contract.Code)) {
 		copy(data, contract.Code[cOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -419,7 +419,11 @@ func opGasLimit(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 }
 
 func opChainID(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	stack.Push(new(big.Int).SetUint64(evm.chainID))
+	value := new(big.Int)
+	if evm.Context.ChainID != nil {
+		value.Set(evm.Context.ChainID)
+	}
+	stack.Push(value)
 	return nil, nil
 }
 
@@ -675,8 +679,8 @@ func opReturndataSize(pc *uint64, evm *EVM, contract *Contract, memory *Memory, 
 func opReturndataCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	memOffset, dataOffset, length := stack.Pop(), stack.Pop(), stack.Pop()
 	l := length.Uint64()
-	if l == 0 {
-		return nil, nil
+	if !dataOffset.IsUint64() || !length.IsUint64() {
+		return nil, ErrReturnDataOutOfBounds
 	}
 	dOff := dataOffset.Uint64()
 	end := dOff + l
@@ -1019,7 +1023,11 @@ func opCreate(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *S
 	} else {
 		contract.Gas += returnGas
 	}
-	evm.returnData = ret
+	if errors.Is(err, ErrExecutionReverted) {
+		evm.returnData = ret
+	} else {
+		evm.returnData = nil
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -1066,7 +1074,11 @@ func opCreate2(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *
 	} else {
 		contract.Gas += returnGas
 	}
-	evm.returnData = ret
+	if errors.Is(err, ErrExecutionReverted) {
+		evm.returnData = ret
+	} else {
+		evm.returnData = nil
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -1122,7 +1134,7 @@ func opExtcodecopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 
 	cOff := codeOffset.Uint64()
 	data := make([]byte, l)
-	if cOff < uint64(len(code)) {
+	if codeOffset.IsUint64() && cOff < uint64(len(code)) {
 		copy(data, code[cOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -1138,7 +1150,7 @@ func opExtcodehash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 		if evm.balTracker != nil {
 			evm.balTracker.RecordAddressTouch(addr)
 		}
-		if !evm.StateDB.Exist(addr) {
+		if evm.StateDB.Empty(addr) {
 			slot.SetUint64(0)
 		} else {
 			hash := evm.StateDB.GetCodeHash(addr)
@@ -1286,6 +1298,10 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 				}
 			}
 		}
+		if balance.Sign() == 0 {
+			evm.StateDB.AddBalance(beneficiary, new(big.Int))
+		}
+
 		if evm.createdInTransaction(contract.Address) {
 			// The StateDB marker clears the balance as a legacy side effect.
 			// Restore it so repeated destruction and later credits never burn ETH.

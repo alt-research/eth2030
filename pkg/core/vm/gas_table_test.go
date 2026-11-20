@@ -997,6 +997,7 @@ func TestGasSstoreEIP2929_ColdSlot(t *testing.T) {
 	contract := &Contract{
 		Address: types.BytesToAddress([]byte{0x42}),
 	}
+	contract.Gas = 100000 // exercise metering above the EIP-2200 stipend sentry
 	mem := NewMemory()
 
 	// Mark the address as existing but the slot is cold.
@@ -1019,6 +1020,7 @@ func TestGasSstoreEIP2929_WarmSlot(t *testing.T) {
 	contract := &Contract{
 		Address: types.BytesToAddress([]byte{0x42}),
 	}
+	contract.Gas = 100000 // exercise metering above the EIP-2200 stipend sentry
 	mem := NewMemory()
 
 	db.exists[contract.Address] = true
@@ -1041,6 +1043,7 @@ func TestGasSstoreEIP2929_NoOp(t *testing.T) {
 	contract := &Contract{
 		Address: types.BytesToAddress([]byte{0x42}),
 	}
+	contract.Gas = 100000 // exercise metering above the EIP-2200 stipend sentry
 	mem := NewMemory()
 
 	db.exists[contract.Address] = true
@@ -1076,8 +1079,8 @@ func TestGasSelfdestructEIP2929_ColdBeneficiary(t *testing.T) {
 	stack := testStack(new(big.Int).Set(beneficiaryInt))
 	gas, _ := gasSelfdestructEIP2929(evm, contract, stack, mem, 0)
 
-	// Cold beneficiary: ColdAccountAccessCost - WarmStorageReadCost = 2500.
-	expectedCold := ColdAccountAccessCost - WarmStorageReadCost
+	// Cold beneficiary: ColdAccountAccessCost = 2600.
+	expectedCold := ColdAccountAccessCost
 	if gas != expectedCold {
 		t.Errorf("SELFDESTRUCT cold beneficiary = %d, want %d", gas, expectedCold)
 	}
@@ -1109,7 +1112,7 @@ func TestGasSelfdestructEIP2929_ColdNewAccount(t *testing.T) {
 	gas, _ := gasSelfdestructEIP2929(evm, contract, stack, mem, 0)
 
 	// Cold + new account: cold penalty + CreateBySelfdestructGas.
-	expectedGas := (ColdAccountAccessCost - WarmStorageReadCost) + CreateBySelfdestructGas
+	expectedGas := (ColdAccountAccessCost) + CreateBySelfdestructGas
 	if gas != expectedGas {
 		t.Errorf("SELFDESTRUCT cold+new = %d, want %d", gas, expectedGas)
 	}
@@ -1368,7 +1371,6 @@ func TestYellowPaperGasTiers(t *testing.T) {
 	}{
 		{ADD, "ADD"},
 		{SUB, "SUB"},
-		{MUL, "MUL"},
 		{LT, "LT"},
 		{GT, "GT"},
 		{SLT, "SLT"},
@@ -1402,6 +1404,7 @@ func TestYellowPaperGasTiers(t *testing.T) {
 		op   OpCode
 		name string
 	}{
+		{MUL, "MUL"},
 		{DIV, "DIV"},
 		{SDIV, "SDIV"},
 		{MOD, "MOD"},
@@ -1929,8 +1932,8 @@ func TestGasSelfdestructEIP2929_ColdExistingNoBalance(t *testing.T) {
 	stack.Push(new(big.Int).SetBytes(beneficiary[:]))
 
 	gas, _ := gasSelfdestructEIP2929(evm, contract, stack, nil, 0)
-	// Cold address, existing: ColdAccountAccessCost - WarmStorageReadCost = 2500
-	wantGas := ColdAccountAccessCost - WarmStorageReadCost
+	// Cold address, existing: ColdAccountAccessCost = 2600
+	wantGas := ColdAccountAccessCost
 	if gas != wantGas {
 		t.Errorf("selfdestruct cold existing: gas = %d, want %d", gas, wantGas)
 	}
@@ -1952,9 +1955,9 @@ func TestGasSelfdestructEIP2929_ColdNonExistentWithBalance(t *testing.T) {
 
 	gas, _ := gasSelfdestructEIP2929(evm, contract, stack, nil, 0)
 	// Cold + non-existent beneficiary with contract having balance:
-	// (ColdAccountAccessCost - WarmStorageReadCost) + CreateBySelfdestructGas
-	// = 2500 + 25000 = 27500
-	wantGas := (ColdAccountAccessCost - WarmStorageReadCost) + CreateBySelfdestructGas
+	// (ColdAccountAccessCost) + CreateBySelfdestructGas
+	// = 2600 + 26000 = 27600
+	wantGas := (ColdAccountAccessCost) + CreateBySelfdestructGas
 	if gas != wantGas {
 		t.Errorf("selfdestruct cold nonexistent with balance: gas = %d, want %d", gas, wantGas)
 	}

@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math"
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/rlp"
 	"github.com/eth2030/eth2030/zkvm"
 )
 
@@ -32,6 +34,7 @@ type GetHashFunc func(uint64) types.Hash
 type BlockContext struct {
 	GetHash     GetHashFunc
 	BlockNumber *big.Int
+	ChainID     *big.Int
 	Time        uint64
 	Coinbase    types.Address
 	GasLimit    uint64
@@ -118,7 +121,6 @@ type EVM struct {
 	TxContext            TxContext
 	Config               Config
 	StateDB              StateDB
-	chainID              uint64
 	depth                int
 	readOnly             bool
 	jumpTable            JumpTable
@@ -249,7 +251,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 		return nil, 0, ErrOutOfGas
 	}
 	output, err := p.Run(input)
-	if _, standardBLS := p.(eip2537Precompile); standardBLS && err != nil {
+	if err != nil {
 		return nil, 0, err
 	}
 	return output, gas - gasCost, err
@@ -451,6 +453,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 			}
 			// Align to 32-byte words.
 			if memSize > 0 {
+				if memSize > math.MaxUint64-31 {
+					return nil, ErrOutOfGas
+				}
 				memorySize = (memSize + 31) / 32 * 32
 			}
 		}
@@ -637,6 +642,10 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 		// EIP-7708: emit transfer log for nonzero-value CALL to a different account.
 		evm.recordETHTransfer(caller, addr, value)
+	}
+
+	if !transfersValue {
+		evm.StateDB.AddBalance(addr, new(big.Int))
 	}
 
 	// Execute precompile or contract code.
@@ -895,6 +904,8 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 	snapshot := evm.StateDB.Snapshot()
 	createdSnapshot := len(evm.createdOrder)
 
+	evm.StateDB.AddBalance(addr, new(big.Int))
+
 	// Check for precompiled contract.
 	if p, ok := evm.precompile(addr); ok {
 		ret, gasLeft, err := runPrecompile(p, input, gas)
@@ -935,69 +946,10 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 // createAddress computes the address of a contract created with CREATE.
 // Per the Yellow Paper: addr = keccak256(rlp([sender, nonce]))[12:]
 func createAddress(caller types.Address, nonce uint64) types.Address {
-	// RLP-encode the list [sender_address, nonce].
-	// sender_address is a 20-byte string, nonce is an integer.
-	addrEnc := encodeRLPBytes(caller[:])
-	nonceEnc := encodeRLPUint(nonce)
-
-	// Wrap both items in an RLP list.
-	payload := append(addrEnc, nonceEnc...)
-	data := wrapRLPList(payload)
-
-	hash := crypto.Keccak256(data)
+	// Both fixed scalar types are supported by the canonical RLP encoder.
+	encoded, _ := rlp.EncodeToBytes([]interface{}{caller, nonce})
+	hash := crypto.Keccak256(encoded)
 	return types.BytesToAddress(hash[12:])
-}
-
-// encodeRLPBytes encodes a byte slice as an RLP string.
-func encodeRLPBytes(b []byte) []byte {
-	if len(b) == 1 && b[0] < 0x80 {
-		return b
-	}
-	if len(b) < 56 {
-		return append([]byte{byte(0x80 + len(b))}, b...)
-	}
-	lenBytes := uintToMinBytes(uint64(len(b)))
-	header := append([]byte{byte(0xb7 + len(lenBytes))}, lenBytes...)
-	return append(header, b...)
-}
-
-// encodeRLPUint encodes a uint64 as an RLP integer.
-func encodeRLPUint(v uint64) []byte {
-	if v == 0 {
-		return []byte{0x80}
-	}
-	if v < 128 {
-		return []byte{byte(v)}
-	}
-	b := uintToMinBytes(v)
-	return append([]byte{byte(0x80 + len(b))}, b...)
-}
-
-// wrapRLPList wraps payload bytes in an RLP list header.
-func wrapRLPList(payload []byte) []byte {
-	if len(payload) < 56 {
-		return append([]byte{byte(0xc0 + len(payload))}, payload...)
-	}
-	lenBytes := uintToMinBytes(uint64(len(payload)))
-	header := append([]byte{byte(0xf7 + len(lenBytes))}, lenBytes...)
-	return append(header, payload...)
-}
-
-// uintToMinBytes encodes a uint64 as big-endian bytes with no leading zeros.
-func uintToMinBytes(v uint64) []byte {
-	if v == 0 {
-		return nil
-	}
-	var buf [8]byte
-	n := 0
-	for i := 7; i >= 0; i-- {
-		buf[i] = byte(v)
-		v >>= 8
-		if buf[i] != 0 || n > 0 {
-			n = 8 - i
-		}
-	}
-	return buf[8-n:]
 }
 
 // create2Address computes the address of a contract created with CREATE2.
@@ -1148,7 +1100,7 @@ func gasEIP2929SlotCheck(evm *EVM, addr types.Address, slot types.Hash) uint64 {
 }
 
 // create is the shared implementation for Create and Create2.
-func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address, kind OpCode) ([]byte, types.Address, uint64, error) {
+func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big.Int, contractAddr types.Address, kind OpCode) (ret []byte, created types.Address, left uint64, err error) {
 	if evm.amsterdamStateGasActive() {
 		return evm.createAmsterdam(caller, code, gas, value, contractAddr, kind)
 	}
@@ -1157,6 +1109,15 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	if len(code) > maxInit {
 		return nil, types.Address{}, gas, ErrMaxInitCodeSizeExceeded
 	}
+
+	// Only opcode-originated creations reserve parent gas. Top-level creation
+	// consumes its entire supplied child budget on an exceptional halt.
+	retained := uint64(0)
+	if evm.activeContract != nil {
+		retained = gas / CallGasFraction
+		gas -= retained
+	}
+	defer func() { left += retained }()
 
 	if evm.frame8141 != nil && evm.frame8141.PublicValidation && contractAddr != evm.frame8141.Tx.Sender {
 		evm.frameValidationErr = errors.New("Frame deployment created an account other than sender")
@@ -1167,6 +1128,7 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	if evm.balTracker != nil {
 		evm.balTracker.RecordAddressTouch(contractAddr)
 	}
+	evm.StateDB.AddAddressToAccessList(contractAddr)
 	contractHash := evm.StateDB.GetCodeHash(contractAddr)
 	if evm.StateDB.GetNonce(contractAddr) != 0 ||
 		(contractHash != (types.Hash{}) && contractHash != types.EmptyCodeHash) {
@@ -1187,11 +1149,11 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		}
 	}
 
-	// Only create a new account if it doesn't already exist.
-	// It's possible the contract code is deployed to a pre-existent
-	// account with non-zero balance.
-	if !evm.StateDB.Exist(contractAddr) {
-		evm.StateDB.CreateAccount(contractAddr)
+	// Reset an eligible existing account, retaining only its prefunding.
+	previousBalance := evm.StateDB.GetBalance(contractAddr)
+	evm.StateDB.CreateAccount(contractAddr)
+	if previousBalance.Sign() > 0 {
+		evm.StateDB.AddBalance(contractAddr, previousBalance)
 	}
 
 	evm.markContractCreated(contractAddr)
@@ -1226,34 +1188,28 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	// GasCreate and InitCodeWordGas are already charged by the jump table's
 	// constantGas and dynamicGas functions. Do not charge them again here.
 
-	// Apply the 63/64 rule (EIP-150) to gas available for init code.
-	callGas := gas - gas/CallGasFraction
-	gas -= callGas
-
-	// Create the contract for init code execution
-	contract := NewContract(caller, contractAddr, value, callGas)
+	// Parent retention remains outside the child, including code deposit.
+	contract := NewContract(caller, contractAddr, value, gas)
 	contract.Code = code
 
 	// Execute init code
 	evm.depth++
-	ret, err := evm.Run(contract, nil)
+	ret, err = evm.Run(contract, nil)
 	evm.depth--
 
 	if err != nil {
 		// On any error, revert state and return.
 		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		if !errors.Is(err, ErrExecutionReverted) {
-			// Non-revert error: all gas sent to subcall is consumed.
-			// Only the 1/64 retained by EIP-150 is returned.
-			return ret, types.Address{}, gas, err
+			return nil, types.Address{}, 0, err
 		}
-		// REVERT: return unused gas from subcall.
-		gas += contract.Gas
-		return ret, types.Address{}, gas, err
+		return ret, types.Address{}, contract.Gas, err
 	}
-
-	// Success: return unused gas from subcall.
-	gas += contract.Gas
+	gas = contract.Gas
+	if evm.forkRules.IsLondon && len(ret) > 0 && ret[0] == 0xef {
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
+		return nil, types.Address{}, 0, errors.New("invalid code prefix")
+	}
 
 	// Code deposit cost: 200 per byte of deployed code.
 	if len(ret) > 0 {

@@ -6,6 +6,8 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
+	gethcommon "github.com/ethereum/go-ethereum/common"
+	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 // TestDivisionByZero verifies that DIV and MOD return 0 when dividing by zero.
@@ -216,7 +218,7 @@ func (m *selfDestructMockState) SlotInAccessList(types.Address, types.Hash) (boo
 // address: keccak256(rlp([sender, nonce]))[12:].
 func TestCreate_AddressCalculation(t *testing.T) {
 	// Test known vectors. CREATE address = keccak256(rlp([sender, nonce]))[12:]
-	// We verify against manually RLP-encoded inputs.
+	// Use an independent implementation rather than the native encoding helpers.
 
 	tests := []struct {
 		caller types.Address
@@ -229,18 +231,15 @@ func TestCreate_AddressCalculation(t *testing.T) {
 		{types.Address{0xDE, 0xAD}, 128},  // nonce = 128 (2-byte RLP)
 		{types.Address{0xDE, 0xAD}, 256},  // nonce > 255
 		{types.Address{0xDE, 0xAD}, 1000}, // larger nonce
+		{types.Address{0xDE, 0xAD}, 1<<32 - 1},
+		{types.Address{0xDE, 0xAD}, 1 << 63},
+		{types.Address{0xDE, 0xAD}, ^uint64(0)},
 	}
 
 	for _, tt := range tests {
 		addr := createAddress(tt.caller, tt.nonce)
 
-		// Compute expected using the RLP encoding package.
-		rlpData, err := rlpEncodeList(tt.caller[:], tt.nonce)
-		if err != nil {
-			t.Fatalf("RLP encode failed: %v", err)
-		}
-		hash := crypto.Keccak256(rlpData)
-		expected := types.BytesToAddress(hash[12:])
+		expected := types.Address(gethcrypto.CreateAddress(gethcommon.Address(tt.caller), tt.nonce))
 
 		if addr != expected {
 			t.Errorf("CREATE(%x, %d) = %x, want %x", tt.caller, tt.nonce, addr, expected)
@@ -259,17 +258,6 @@ func TestCreate_AddressCalculation(t *testing.T) {
 	if a1 == a3 {
 		t.Error("CREATE with different nonce should produce different address")
 	}
-}
-
-// rlpEncodeList manually RLP-encodes [address, nonce] for test verification.
-func rlpEncodeList(addr []byte, nonce uint64) ([]byte, error) {
-	// Encode address as RLP string (20 bytes).
-	addrEnc := encodeRLPBytes(addr)
-	// Encode nonce as RLP uint.
-	nonceEnc := encodeRLPUint(nonce)
-
-	payload := append(addrEnc, nonceEnc...)
-	return wrapRLPList(payload), nil
 }
 
 // TestCreate2_AddressCalculation verifies that CREATE2 produces the correct

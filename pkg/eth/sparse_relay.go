@@ -512,8 +512,13 @@ func (h *Handler) GetBlobCells(hashes []types.Hash, mask types.CellMask) []types
 				if side == nil {
 					continue
 				}
-				result[i].Cells = make([][]byte, len(indices))
-				result[i].Proofs = make([][]byte, len(indices))
+				// Full-pool and staged entries can overlap during promotion,
+				// and distinct transactions may reference the same blob. Merge
+				// available cells instead of erasing an earlier authenticated row.
+				if result[i].Cells == nil {
+					result[i].Cells = make([][]byte, len(indices))
+					result[i].Proofs = make([][]byte, len(indices))
+				}
 				var all [][2048]byte
 				var proofs [][]byte
 				if types.HasFullBlobSidecar(tx) {

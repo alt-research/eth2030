@@ -1,0 +1,3 @@
+# Campaign in progress
+
+The user authorized completing all remaining Glamsterdam work. Initial inventory confirms the original three-pair private chain is running, all three CLs are nonoptimistic and all ELs agree at finalized hash 0x9fa623c4b827529a4f92dabb822a3f3d386dc1ee3b164f2deafbe70063fb7a86. Master remains 7068cd97394570bb7b459eb88a5bbdc613911db4; correction PRs 116/117/119 and plan 118 remain open. Freeze executable provenance and declared campaign inputs before upgrades or fault tests. This review adds independent process qualification and evidence; existing unpublished or unrelated work is preserved.

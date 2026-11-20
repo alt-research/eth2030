@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Capture public RPC/Beacon inputs and running executables, never credentials."""
 import argparse
+import base64
 import json
+import math
 import subprocess
 import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 ENCLAVE = "99429150b4714b2ea7746343b97175e7"
 GENESIS = "0xfdf84ec05edbc77e24c84bc6882b6f0b634c070b03ea52b284695e04002c6c24"
@@ -132,11 +135,97 @@ def snapshot(output):
     print(json.dumps({"snapshot": str(output), "services": len(nodes), "exchanges": len(records)}))
 
 
+def percentile(values, fraction):
+    if not values:
+        raise ValueError("no latency samples")
+    return sorted(values)[max(0, math.ceil(len(values) * fraction) - 1)]
+
+
+def stable_identity(nodes):
+    return {name: {key: node[key] for key in ["container", "image_id", "command", "entrypoint", "memory_limit", "nano_cpus"]}
+            | {"started_at": node["state"]["StartedAt"]} for name, node in nodes.items()}
+
+
+def steady(output, duration):
+    output.mkdir(parents=True, exist_ok=False)
+    nodes = inventory()
+    assert_private_network(nodes)
+    before = stable_identity(nodes)
+    profile = {"declared_at": now(), "duration_seconds": duration, "sample_interval_seconds": 3,
+               "identities": before, "rpc_p95_ms": 500, "rpc_p99_ms": 2000,
+               "engine_p95_ms": 1000, "engine_p99_ms": 3000,
+               "missing_slot_fraction_max": 0.1,
+               "scope": "Unchanged running validators/builder; no synthetic workload. Finality and missing-slot acceptance require a separate unchanged-reference verification."}
+    (output / "profile.json").write_text(json.dumps(profile, indent=2) + "\n")
+    el = {name: node for name, node in nodes.items() if name.startswith("el-")}
+    latencies = {name: [] for name in el}
+    errors = []
+    started = time.monotonic()
+    deadline = started + duration
+    samples = 0
+    with (output / "samples.jsonl").open("x") as stream, ThreadPoolExecutor(max_workers=8) as executor:
+        while time.monotonic() < deadline:
+            calls = {name: executor.submit(exchange, endpoint(node, "8545/tcp"), "eth_blockNumber", []) for name, node in el.items()}
+            row = {"at": now(), "rpc": {name: call.result() for name, call in calls.items()}}
+            row["containers"] = [json.loads(line) for line in docker("stats", "--no-stream", "--format", "{{json .}}", *[n["container"] for n in nodes.values()]).splitlines()]
+            for name, call in row["rpc"].items():
+                latencies[name].append(call["elapsed_ms"])
+                try:
+                    int(decoded(call)["result"], 16)
+                except (RuntimeError, ValueError, KeyError) as error:
+                    errors.append({"service": name, "sample": samples, "error": str(error)})
+            stream.write(json.dumps(row) + "\n")
+            stream.flush()
+            samples += 1
+            time.sleep(max(0, min(deadline - time.monotonic(), started + samples * 3 - time.monotonic())))
+    report = {"window_ended_at": now(), "samples": samples, "rpc_errors": errors,
+              "rpc": {name: {"count": len(v), "p95_ms": percentile(v, .95), "p99_ms": percentile(v, .99)} for name, v in latencies.items()},
+              "identity_unchanged": before == stable_identity(inventory()),
+              "finality_evaluated": False, "passed": False}
+    # Capture exact exchanges for the declared window, retaining malformed or
+    # incomplete records as failures instead of filtering them out of results.
+    begin = datetime.fromisoformat(profile["declared_at"]).timestamp()
+    end = begin + duration
+    report["engine"] = {}
+    for name, node in el.items():
+        capture = output / (name + "-engine.jsonl")
+        with capture.open("wb") as dest:
+            subprocess.run(["docker", "exec", "--user", "root", node["container"], "cat", "/data/engine-exchanges.jsonl"], stdout=dest, check=True, timeout=60)
+        times, failed = [], []
+        with capture.open() as source:
+            for index, line in enumerate(source):
+                try:
+                    rec = json.loads(line)
+                    stamp = datetime.fromisoformat(rec["started"].replace("Z", "+00:00")).timestamp()
+                    if not begin <= stamp < end:
+                        continue
+                    times.append(rec["elapsed_ns"] / 1e6)
+                    reply = json.loads(base64.b64decode(rec["response_body"]))
+                    if not rec["complete"] or rec["http_status"] != 200 or "error" in reply:
+                        failed.append(index + 1)
+                except (ValueError, KeyError, TypeError):
+                    failed.append(index + 1)
+        report["engine"][name] = {"count": len(times), "failed_lines": failed,
+                                   "p95_ms": percentile(times, .95) if times else None,
+                                   "p99_ms": percentile(times, .99) if times else None}
+    report["latency_passed"] = (not errors and report["identity_unchanged"] and samples >= duration // 3
+                                and all(v["p95_ms"] <= 500 and v["p99_ms"] <= 2000 for v in report["rpc"].values())
+                                and all(v["count"] > 100 and not v["failed_lines"] and v["p95_ms"] <= 1000 and v["p99_ms"] <= 3000 for v in report["engine"].values()))
+    (output / "latency-result.json").write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--steady-seconds", type=int)
     args = parser.parse_args()
-    snapshot(args.output)
+    if args.steady_seconds is not None:
+        if args.steady_seconds < 1200:
+            parser.error("the declared steady campaign requires at least 1200 seconds")
+        steady(args.output, args.steady_seconds)
+    else:
+        snapshot(args.output)
 
 
 if __name__ == "__main__":

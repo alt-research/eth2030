@@ -37,7 +37,7 @@ func TestChosenEnvelopeKeepsExactSignedBytesAndRoutesOnlyFirstDelivery(t *testin
 	var evidence bytes.Buffer
 	c := &controller{upstream: main.URL, observer: observer.URL, slot: 42, client: main.Client(), proxy: httputil.NewSingleHostReverseProxy(target), output: &evidence}
 	for index, want := range []string{"observer", "main"} {
-		req := httptest.NewRequest("POST", "/eth/v1/beacon/execution_payload_envelopes?broadcast_validation=consensus", bytes.NewReader(input))
+		req := httptest.NewRequest("POST", "/eth/v2/beacon/execution_payload_envelopes?broadcast_validation=consensus", bytes.NewReader(input))
 		req.Header.Set("Authorization", "Bearer never-log-credentials")
 		response := httptest.NewRecorder()
 		c.ServeHTTP(response, req)
@@ -99,5 +99,35 @@ func TestControlRequestHonorsCancellation(t *testing.T) {
 	defer cancel()
 	if _, _, err := c.request(ctx, "GET", server.URL, nil); err == nil {
 		t.Fatal("cancelled upstream request succeeded")
+	}
+}
+
+func TestRejectedObserverDeliveryCannotLeakAProducerRetryToMain(t *testing.T) {
+	var observerPosts, mainPosts int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mainPosts++
+	}))
+	defer upstream.Close()
+	observer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			return
+		}
+		observerPosts++
+		if observerPosts == 1 {
+			w.WriteHeader(503)
+		}
+	}))
+	defer observer.Close()
+	target, _ := url.Parse(upstream.URL)
+	c := &controller{upstream: upstream.URL, observer: observer.URL, slot: 42, client: upstream.Client(), proxy: httputil.NewSingleHostReverseProxy(target), output: io.Discard}
+	for index, want := range []int{503, 200, 200} {
+		response := httptest.NewRecorder()
+		c.ServeHTTP(response, httptest.NewRequest("POST", "/eth/v2/beacon/execution_payload_envelopes", strings.NewReader(`{"message":{"beacon_block_root":"root","payload":{"slot_number":"42"}}}`)))
+		if response.Code != want {
+			t.Fatalf("delivery %d: status %d want %d", index, response.Code, want)
+		}
+	}
+	if observerPosts != 2 || mainPosts != 1 {
+		t.Fatalf("retry routing: observer=%d main=%d", observerPosts, mainPosts)
 	}
 }

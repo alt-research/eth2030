@@ -98,6 +98,13 @@ func (c *controller) block(ctx context.Context, root string) (json.RawMessage, s
 }
 
 func (c *controller) mirrorEnvelope(ctx context.Context, root string) error {
+	// Re-importing an already available envelope is unnecessary and API
+	// versions may classify that duplicate differently. This does not set
+	// availability: the observer still validates every subsequent child.
+	_, known, _ := c.request(ctx, "GET", c.observer+"/eth/v1/beacon/execution_payload_envelopes/"+root, nil)
+	if known == 200 {
+		return nil
+	}
 	data, status, err := c.request(ctx, "GET", c.upstream+"/eth/v1/beacon/execution_payload_envelopes/"+root, nil)
 	if err != nil || status != 200 {
 		return fmt.Errorf("original envelope %s unavailable: %d %v", root, status, err)
@@ -106,7 +113,7 @@ func (c *controller) mirrorEnvelope(ctx context.Context, root string) error {
 	if err := json.Unmarshal(data, &wrapper); err != nil {
 		return err
 	}
-	body, status, err := c.request(ctx, "POST", c.observer+"/eth/v1/beacon/execution_payload_envelopes?broadcast_validation=consensus", wrapper.Data)
+	body, status, err := c.request(ctx, "POST", c.observer+"/eth/v2/beacon/execution_payload_envelopes?broadcast_validation=consensus", wrapper.Data)
 	c.record("mirror-original-envelope", wrapper.Data, body, status, err)
 	if err != nil || status < 200 || status >= 300 {
 		return fmt.Errorf("observer envelope: %d %v", status, err)
@@ -150,7 +157,7 @@ func (c *controller) ensureBlock(ctx context.Context, root string, depth int) er
 }
 
 func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" || r.URL.Path != "/eth/v1/beacon/execution_payload_envelopes" {
+	if r.Method != "POST" || r.URL.Path != "/eth/v2/beacon/execution_payload_envelopes" {
 		c.proxy.ServeHTTP(w, r)
 		return
 	}
@@ -190,10 +197,12 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	body, status, err := c.request(r.Context(), "POST", c.observer+r.URL.RequestURI(), input)
 	c.record("first-envelope-to-observer", input, body, status, err)
-	if err != nil {
+	if err != nil || status < 200 || status >= 300 {
 		c.mu.Lock()
 		c.routed = false
 		c.mu.Unlock()
+	}
+	if err != nil {
 		http.Error(w, err.Error(), 502)
 		return
 	}

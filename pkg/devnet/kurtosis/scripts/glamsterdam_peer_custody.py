@@ -103,8 +103,14 @@ def run(output, binary):
                 for i in range(count)
             ],
         )
-        identity = get(base + "/eth/v1/node/identity")
-        assert int(identity["data"]["metadata"]["custody_group_count"]) == count
+        advertised_deadline = time.monotonic() + 10
+        while time.monotonic() < advertised_deadline:
+            identity = get(base + "/eth/v1/node/identity")
+            if int(identity["data"]["metadata"]["custody_group_count"]) == count:
+                break
+            time.sleep(0.1)
+        else:
+            raise RuntimeError("normal custody change was not advertised within 10 seconds")
         while time.monotonic() - start < 600:
             health = get(base + "/eth/v1/node/syncing")["data"]
             if int(health["head_slot"]) >= effective_epoch * 32 + 2 and not any(

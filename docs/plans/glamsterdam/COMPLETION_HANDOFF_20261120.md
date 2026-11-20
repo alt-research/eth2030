@@ -1,0 +1,41 @@
+# Glamsterdam development completion handoff
+
+Status: final campaign in progress. The selected development target remains the user's merged LIFO EIPs revision and signed Gloas envelope. The final public protocol/model review remains reserved. This document reconciles all 33 original GL task IDs and the 13 deduplicated work packages; it does not express a release-completion percentage.
+
+## Delivery and source identity
+
+PRs 116–119 are verified merged into master a7c1ebc5. The new independent master-targeted reviews are [121](https://github.com/alt-research/eth2030/pull/121) (persistent storage-fence errors), [122](https://github.com/alt-research/eth2030/pull/122) (snap historical bodies/BAL download), and [120](https://github.com/alt-research/eth2030/pull/120) (final process consumers, faults, operators and artifacts). The user retains EL merge control.
+
+A separately published [Lodestar review 10693](https://github.com/ChainSafe/lodestar/pull/10693) targets upstream unstable. Its pinned libp2p patch prevents obsolete asynchronous topology cleanup from removing a newer peer/identify. Seven dependency regressions, TypeScript build/type checks and three actual automatic provider-loss recoveries pass. Final operating qualification of that composition is running.
+
+The actual native runtime is [eff0b823](https://github.com/alt-research/eth2030/tree/eff0b823fdf3e0e4d6262bc093b44e8a77787067), published on qualification/glamsterdam-runtime-20261120. An isolated clean Go 1.26.11 rebuild produces the same SHA-256 as the actual running executable: 78d75b0fb0a1c74cca3ad31322b5ccf9cd6db3b299e4edd711926dd63b5cf2dc. Later qualification-tool/review commits are identified separately from this unchanged production source.
+
+The [protocol manifest](../../reviews/glamsterdam-final-campaign/PROTOCOL_MANIFEST.json) distinguishes source commits, actual executable/module hashes, image labels, original validator clients, compiler/reference dependencies, genesis, fork schedule, wire formats and phase resources. The network uses chain 1337, 384 validators, three-second slots, Fulu epoch zero and Gloas epoch two. These are qualified private development inputs.
+
+## Gate reconciliation
+
+| Gate | Concrete retained evidence | Current status |
+| --- | --- | --- |
+| G0 audit corrections | Original promotion, 65,537-block ancestry and path-bounded history corrections are delivered. Composed source f407bdd2 passes 219 fresh package suites, 11 affected race suites, full vet and native/tool builds. Later changed command suites are checked separately and current-head CI is rechecked before handoff. | Source corrections complete; final current-head merge/CI snapshot remains. |
+| G1 compatible inputs | Exact merged EIPs/consensus/Engine/devp2p/API fixtures, running native/CL/builder identities, compatible frozen forks and byte-identical native rebuild. | Development tuple frozen; final artifact/source inventory is being reconciled. |
+| G2 lifecycle/settlement | 73 complete original signed state transitions; actual FULL/EMPTY, withheld/late/duplicate/invalid-header cases; two same-height process head switches; actual state-root rejection with independently recomputed matching header hash; six matched payments and real OS crash/restart. Another 112 complete signed transitions independently reproduce the actual 50-ETH sweep and index reuse. | Remaining retired-key process control is being repeated after a documented producer-runtime restore failure. |
+| G3 peer/custody | Actual verified partial-cell acquisition with getBlobs disabled; independent 2,360 KZG proof checks across four new two-row campaigns; real TCP group/version/row/loss controls; actual 4→8→16 custody growth, provider loss and restart persistence; three new automatic gossip recoveries in 6.605/0.082/2.241 seconds. | Process and crypto controls pass; final compatible operating window is running. |
+| G4 sync/storage | Original pair-3 exclusive history upgrade in 1,470.836 seconds; final original-native restarts 27.489/33.511 seconds; independent-peer full/snap sync observations 551.170/115.549 seconds on their recorded sources; final full/snap observer restarts 24.529/46.686 seconds; interrupted actual body/BAL backfill to genesis, exact retained 361-byte BAL/range readback and no pre-pivot state authority; three real storage faults with independent Geth execution. | Recovery controls pass; fresh cold final-source repetition is queued after operating measurements. |
+| G5 operating/scale | Earlier 129/400 failure stays failed. A later original final-source window passes 7/400, and its corrected pressure window passes 1/60 with 270 independent account proofs, 14,198 real disconnects and 358 invalid-hash submissions. DB-work scale cases remain separate from sampled physical I/O/CPU/memory. | Final compatible post-network-fix steady/pressure windows are running/queued with unchanged budgets. |
+| G6 operators/release | Source/binary manifest, archived raw inputs with per-file byte hashes, offline signed finality replays, recovery/upgrade/rollback procedures and the 33-ID reconciliation. | Final artifacts and all preceding engineering gates are being closed. Public protocol/model review remains open as previously reserved. |
+
+## Actual registry continuation
+
+The first live extra builder registers through an ordinary deposit, exits at epoch 702 and becomes withdrawable at 766 under the unchanged default 64-epoch delay. All three CLs observe its balance reach zero at slot 24512. Independent complete signed transitions reproduce the debit, and all three EL account proofs credit exactly 50 ETH against the original consecutive execution pair. At slot 24521 the same index is assigned a different public key; the reference replays that replacement and its actual deposit signature.
+
+The retired-key transport attempt remains unqualified: producer restart reapplied CLI fleet target one, and the old driver enabled lifecycle before restoring target two. That caused the new key's ordinary irreversible exit. The driver now restores fleet size before enabling lifecycle; a stateful regression and the actual disabled-lifecycle target endpoint preflight verify the order. The failed attempt, its real cleanup and every original input remain retained.
+
+A distinct continuation keeps the same 7200-second per-attempt budget and observes the next normal epoch-833 sweep/index reuse. It will then submit a valid retired-key signature over the exact untouched current message before delivering the original correct current-key envelope. The required acceptance remains explicit: retired signature fails in the actual node, availability stays absent, and the same original message with the correct new signature succeeds. Chain time, withdrawability delay, peer scores and consensus/cryptographic validation remain unchanged.
+
+## Evidence and support boundaries
+
+The [review record](../../reviews/glamsterdam-final-campaign/STATUS.md) and [operator runbook](../../operations/glamsterdam-recovery.md) retain original failures, source amendments and preparation versus daemon-start timing. The [artifact directory](../../reviews/glamsterdam-final-campaign/artifacts) contains original protocol, recovery and operating inputs with complete byte manifests. Final provenance/network/registry bundles are being added.
+
+Selected official qualification remains finite: 31,573 modern native state cases, 1,223 historical cases, 107 files/108 official RPC requests, 31 published signed application transactions and 17 getters. A separate real canonical factory campaign checks the exact genesis code/nonce, 20-byte CREATE2 address, value forwarding, collision/short-input failure, three independent receipt/transaction commitments and six account proofs. Unexecuted blockchain-fixture formats, ecosystem-wide application compatibility, every lifetime payment/issuance and mainnet capacity are not inferred.
+
+The source register still lists unmerged gas/authentication/trace alternatives and external-client upstream adoption separately. The development target already selected by the user is retained; a future public fork or alternative model needs its own final review. Artifact readiness and PR delivery do not silently change that decision.

@@ -120,7 +120,7 @@ def executable_hashes(node):
     script = '''for f in /proc/[0-9]*/exe; do
 p=$(readlink "$f" 2>/dev/null) || continue
 case "$p" in
- /usr/local/bin/eth2030*|/usr/local/bin/geth-real*|/usr/local/bin/lighthouse*|/usr/local/bin/engine-capture*)
+ /usr/local/bin/eth2030*|/usr/local/bin/geth-real*|/usr/local/bin/lighthouse*|/usr/local/bin/engine-capture*|/usr/local/bin/buildoor*|/usr/local/bin/node*)
   printf '%s %s ' "$f" "$p"; sha256sum "$f" || exit 1;;
 esac
 done'''

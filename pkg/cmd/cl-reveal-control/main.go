@@ -270,10 +270,16 @@ func main() {
 	c.proxy.Transport = c.client.Transport
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	go c.mirrorHeads(ctx)
+	mirrorDone := make(chan struct{})
+	go func() {
+		defer close(mirrorDone)
+		c.mirrorHeads(ctx)
+	}()
 	server := &http.Server{Addr: *listen, Handler: c, ReadHeaderTimeout: 5 * time.Second}
 	go func() { <-ctx.Done(); _ = server.Close() }()
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+	stop()
+	<-mirrorDone
 }

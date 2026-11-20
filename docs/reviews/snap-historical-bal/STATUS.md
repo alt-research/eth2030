@@ -1,0 +1,3 @@
+# Confirmed snap retained-body/BAL gap
+
+The final source fresh snap process catches up in 115.549 seconds under the unchanged 600-second budget, but engine_getPayloadBodiesByHashV2 returns null for original slot-5747 application block 0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc. Independent Geth and the upgraded original native node both return its exact 361-byte BAL. The block remains within the selected 14,299-epoch retention horizon. Preserve the snap state's explicit pre-pivot pruning boundary while acquiring authenticated historical bodies/BALs; do not label header/body download execution validation.

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/trie"
 	"io"
@@ -17,6 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto/kzg4844"
 )
 
 func TestRPCResponseIdentityAndFailures(t *testing.T) {
@@ -168,9 +170,11 @@ func TestLiveCampaignRefusesOtherChainsBeforePublishing(t *testing.T) {
 		_ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc": "2.0", "id": req.ID, "result": "0x1"})
 	}))
 	defer server.Close()
-	err := run(context.Background(), []string{server.URL, server.URL}, common.Hash{31: 1}, io.Discard)
-	if err == nil || published {
-		t.Fatalf("chain guard: %v published=%v", err, published)
+	for _, campaign := range []func(context.Context, []string, common.Hash, io.Writer) error{run, runBlobs} {
+		err := campaign(context.Background(), []string{server.URL, server.URL}, common.Hash{31: 1}, io.Discard)
+		if err == nil || published {
+			t.Fatalf("chain guard: %v published=%v", err, published)
+		}
 	}
 }
 
@@ -242,5 +246,40 @@ func TestLiveReceiptWaitsForCanonicalConvergence(t *testing.T) {
 	}
 	if !strings.Contains(evidence.String(), "receipt_fork_observed") {
 		t.Fatal("transient fork evidence was hidden")
+	}
+}
+
+func TestMultiBlobRowsRetainDistinctCommitmentsProofsAndPooledWire(t *testing.T) {
+	tx, err := blobTransaction(17, 2, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sidecar := tx.BlobTxSidecar()
+	if tx.Nonce() != 17 || len(tx.BlobHashes()) != 2 || sidecar.Version != types.BlobSidecarVersion1 || len(sidecar.Blobs) != 2 || len(sidecar.Commitments) != 2 || len(sidecar.Proofs) != 256 {
+		t.Fatal("incomplete multi-row transaction")
+	}
+	if sidecar.Blobs[0] == sidecar.Blobs[1] || tx.BlobHashes()[0] == tx.BlobHashes()[1] {
+		t.Fatal("multi-row fixture is degenerate")
+	}
+	for index, commitment := range sidecar.Commitments {
+		if kzg4844.CalcBlobHashV1(sha256.New(), &commitment) != tx.BlobHashes()[index] {
+			t.Fatal("row commitment order differs from transaction")
+		}
+	}
+	if err := kzg4844.VerifyCellProofs(sidecar.Blobs, sidecar.Commitments, sidecar.Proofs); err != nil {
+		t.Fatal(err)
+	}
+	wrong := append([]kzg4844.Proof(nil), sidecar.Proofs...)
+	wrong[0] = wrong[128]
+	if kzg4844.VerifyCellProofs(sidecar.Blobs, sidecar.Commitments, wrong) == nil {
+		t.Fatal("accepted proof from the other row")
+	}
+	raw, err := tx.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded types.Transaction
+	if err := decoded.UnmarshalBinary(raw); err != nil || decoded.Hash() != tx.Hash() || len(decoded.BlobTxSidecar().Proofs) != 256 {
+		t.Fatalf("pooled multi-row wire: %v", err)
 	}
 }

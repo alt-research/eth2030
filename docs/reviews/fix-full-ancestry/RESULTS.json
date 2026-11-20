@@ -1,0 +1,21 @@
+{
+  "baseline": "7068cd97394570bb7b459eb88a5bbdc613911db4",
+  "finding": "F1",
+  "range_test_blocks": 65537,
+  "header_lru_limit": 65536,
+  "body_cache_bytes": 67108864,
+  "retained_paths": 2,
+  "retained_segments_per_path": 32,
+  "staging_bytes_per_header": 72,
+  "staging_disk": "Linear in retained unvalidated range; unlinked open temporary files under existing datadir",
+  "full_packages": 218,
+  "race_packages": [
+    "sync/beacon",
+    "node"
+  ],
+  "full_vet": true,
+  "native_build": true,
+  "toolchain": "go1.26.11",
+  "authority": "CL-nominated head only; staged headers never execution authority",
+  "configured_head_change_limit": 96
+}

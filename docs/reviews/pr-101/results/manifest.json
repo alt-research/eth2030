@@ -3,7 +3,7 @@
   "active_node_sources": {
     "native": "1bba8a12d5e3a9f05a62638a636decc144f53d0e",
     "lighthouse_node": "66661993f219136627e4d68ab4d9e8cd65870b8d",
-    "lighthouse_authorized_integration": "c76da1e11",
+    "lighthouse_authorized_integration": "1fb9876b8",
     "lodestar": "cf705b46b08ba8172d2e32225964ecb9bb1d2b95",
     "geth": "v1.17.10 unchanged binary"
   },
@@ -53,9 +53,121 @@
       "uncompressed_bytes": 58810,
       "sha256": "69c099a7da8d038915dcf3c5ab42929d5939674fbde5f01782a504b73ed8a738",
       "compressed_bytes": 30817
+    },
+    {
+      "file": "attempt4-lodestar-pubsub-disconnected.json.gz",
+      "uncompressed_file": "attempt4-lodestar-pubsub-disconnected.json",
+      "uncompressed_bytes": 32008,
+      "sha256": "cd9d19ab88a0a8dadd4f7feaf7d2559627d0258467dc5b81ed418206629c02d9",
+      "compressed_bytes": 1638
+    },
+    {
+      "file": "attempt4-steady-beacon-consumers.jsonl.gz",
+      "uncompressed_file": "attempt4-steady-beacon-consumers.jsonl",
+      "uncompressed_bytes": 640032,
+      "sha256": "d3313de05943efc871b0d8c6563bd6a7f13614636abc6366aef31b98b9a9d054",
+      "compressed_bytes": 130128
+    },
+    {
+      "file": "attempt4-actual-multi-row-cl-consumers.json.gz",
+      "uncompressed_file": "attempt4-actual-multi-row-cl-consumers.json",
+      "uncompressed_bytes": 3398421,
+      "sha256": "8f7c3378d26e9d716fb316a8a54a063f4eab97ff7e9bf39dcbd8249c7bc2f163",
+      "compressed_bytes": 967652
+    },
+    {
+      "file": "attempt4-live-two-blob-rows.jsonl.gz",
+      "uncompressed_file": "attempt4-live-two-blob-rows.jsonl",
+      "uncompressed_bytes": 1978465,
+      "sha256": "68a3e9a6da569caf56dcae4a652561f01ab32311f450259cb4d9696656424bc3",
+      "compressed_bytes": 61478
+    },
+    {
+      "file": "actual-gloas-384-state.ssz.gz",
+      "uncompressed_file": "actual-gloas-384-state.ssz",
+      "uncompressed_bytes": 3232746,
+      "sha256": "fb33df1a9a1fc9e592701abf8ff859b95ce3c092b7c765b76a7441ab8bfe8edf",
+      "compressed_bytes": 400409
+    },
+    {
+      "file": "attempt4-steady-beacon-consumers-after-peer-recovery.jsonl.gz",
+      "uncompressed_file": "attempt4-steady-beacon-consumers-after-peer-recovery.jsonl",
+      "uncompressed_bytes": 613608,
+      "sha256": "7cecf2a5bb1206c8cfd8e82d3702d4e92b6013cf930bd8c6df41bee193e5d545",
+      "compressed_bytes": 204175
+    },
+    {
+      "file": "attempt4-corrected-operating-samples.jsonl.gz",
+      "uncompressed_file": "attempt4-corrected-operating-samples.jsonl",
+      "uncompressed_bytes": 12228721,
+      "sha256": "acd22d753076bd8585f925f7187233b3881474e29354f4683af816c42f460139",
+      "compressed_bytes": 917876
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z.json.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z.json",
+      "uncompressed_bytes": 59747,
+      "sha256": "f324101a7d658861fb27d7c796f8c8d9edaa4bb2ac63bd05fa293c80fc0d1fc4",
+      "compressed_bytes": 7029
+    },
+    {
+      "file": "attempt4-reference-period1-finality.jsonl.gz",
+      "uncompressed_file": "attempt4-reference-period1-finality.jsonl",
+      "uncompressed_bytes": 419589,
+      "sha256": "df865ba05316829f5cf3a95550175d7daab1faab809ea57f86eb067fcd87220c",
+      "compressed_bytes": 128721
+    },
+    {
+      "file": "actual-builder-ledger-network-spec.json.gz",
+      "uncompressed_file": "actual-builder-ledger-network-spec.json",
+      "uncompressed_bytes": 7752,
+      "sha256": "a65eaaedb6cfbed35a6542b383f549e1a3a0587af64233082e6ba3a30d6ec17d",
+      "compressed_bytes": 2272
+    },
+    {
+      "file": "actual-multi-row-partial-vectors.json.gz",
+      "uncompressed_file": "actual-multi-row-partial-vectors.json",
+      "uncompressed_bytes": 26226,
+      "sha256": "17e7a70e3dcd296b66d0809658662a4a25a672a6b2f0dfd4c6a565c11d12c447",
+      "compressed_bytes": 714
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z-before.ssz.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z-before.ssz",
+      "uncompressed_bytes": 3287890,
+      "sha256": "67c90e8e64ea2399fe24e7b78010bb296ae07b136ed8127c8705a605d7a97bea",
+      "compressed_bytes": 627191
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z-after.ssz.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z-after.ssz",
+      "uncompressed_bytes": 3288006,
+      "sha256": "a0024e005fbcd83be6642605f6d3fc82420fb1e288d02b1d8c32bcacdfe018df",
+      "compressed_bytes": 627243
+    },
+    {
+      "file": "attempt4-blob-post-state-87799773fc57.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-87799773fc57.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
+    },
+    {
+      "file": "attempt4-blob-post-state-d01ee49c0c9e.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-d01ee49c0c9e.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
+    },
+    {
+      "file": "attempt4-blob-post-state-a6e54fb93e7c.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-a6e54fb93e7c.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
     }
   ],
-  "scope_limit": "Complete app and single-blob consumers and original checkpoint recovery; remaining peer faults, settlement ledger, storage and operating gates stay open. No runtime secrets, node keys, private databases or authentication headers are included.",
+  "scope_limit": "Original successful application/single-blob/proof consumers plus actual multi-row inputs and the failed first operating window with explicit peer recovery. Multi-row peer and final storage/resource gates remain open. No runtime secrets or private databases are included.",
   "native_binary_sha256": "2d8e07e5c04779356c2a8b5e3d1c1fbf248c15ccc57f7ca7c71312c25c068ef9",
   "native_image": {
     "tag": "eth2030-native:wire-qualification-1bba8a12",
@@ -67,5 +179,33 @@
     "gzip_and_uncompressed_sha256_verified": true,
     "actual_blob_consumer_passed": true,
     "progressive_state_consumer_passed": true
+  },
+  "new_qualified_reviews": {
+    "106": {
+      "head": "4918d9738ee7852cb9f29fb2e2de8699129ceefa",
+      "ci_passed": 9,
+      "runtime_deployed": false
+    },
+    "107": {
+      "head": "8896b32b07d1b0c49a597e509f00345b3c71d2a0",
+      "runtime_deployed": false
+    }
+  },
+  "source_tuple_scope": "The original active_node_sources describe the original three-pair application/blob inputs. Later auxiliary and reference cases below retain their own exact tuples and do not rewrite that original dataset.",
+  "subsequent_cases": {
+    "actual_multi_row_slot": 5747,
+    "actual_builder_ledger_slots": [
+      9600,
+      9601
+    ],
+    "independent_period1_signature_slot": 10150,
+    "independent_period1_finalized_slot": 10080,
+    "auxiliary_history_query_native": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+    "auxiliary_fast_restart_native": "ca45d52424b94f9f1ea40c5aa4ca1fed76fa2534",
+    "auxiliary_partial_cl_production": "d547ba984",
+    "lighthouse_published_test_head": "19c4ff36d",
+    "original_failed_snap_source": "ca45d52424b94f9f1ea40c5aa4ca1fed76fa2534",
+    "corrected_snap_review": 112,
+    "corrected_snap_runtime_result": "pending"
   }
 }

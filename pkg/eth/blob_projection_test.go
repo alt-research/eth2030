@@ -160,6 +160,14 @@ func TestGetBlobCellsPreservesAvailableData(t *testing.T) {
 					}
 				}
 			}
+			if scenario == "sparse-missing" {
+				got[0].Cells[0][0] ^= 1
+				got[0].Proofs[0][0] ^= 1
+				fresh := handler.GetBlobCells([]types.Hash{types.Hash(hash)}, requested)
+				if !bytes.Equal(fresh[0].Cells[0], cells[0][:]) || !bytes.Equal(fresh[0].Proofs[0], proofs[0][:]) {
+					t.Fatal("caller mutated authenticated staging data through its snapshot")
+				}
+			}
 		})
 	}
 }

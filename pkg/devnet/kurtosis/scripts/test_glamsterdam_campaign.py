@@ -8,9 +8,31 @@ from unittest.mock import patch
 import glamsterdam_campaign as campaign
 import glamsterdam_process_lifecycle as lifecycle
 import glamsterdam_pressure as pressure
+import glamsterdam_artifacts as artifacts
 
 
 class CampaignTests(unittest.TestCase):
+    def test_artifact_requires_complete_original_files_and_never_replaces_prior_evidence(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = b"actual signed bytes\x00\xff"
+            (root / "capture.bin").write_bytes(original)
+            output = root / "evidence.tar.gz"
+            result = artifacts.bundle(root, ["capture.bin"], output)
+            self.assertTrue(result["passed"])
+            self.assertEqual(result["uncompressed_bytes"], len(original))
+            with self.assertRaises(FileExistsError):
+                artifacts.bundle(root, ["capture.bin"], output)
+            for names in [
+                ["missing.json"],
+                ["../capture.bin"],
+                ["capture.bin", "capture.bin"],
+            ]:
+                with self.subTest(names=names), self.assertRaises(ValueError):
+                    artifacts.bundle(root, names, root / "unqualified.tar.gz")
+
     def test_engine_window_detects_unfinished_request_before_sealing_traffic(self):
         def record(sequence, stamp):
             return {

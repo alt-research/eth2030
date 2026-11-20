@@ -5,9 +5,28 @@ from pathlib import Path
 from unittest.mock import patch
 
 import glamsterdam_campaign as campaign
+import glamsterdam_process_lifecycle as lifecycle
 
 
 class CampaignTests(unittest.TestCase):
+    def test_percentiles_include_tail_and_runtime_identity_tracks_restart(self):
+        self.assertEqual(campaign.percentile(list(range(1, 101)), .99), 99)
+        node = {"container": "a", "image_id": "image", "command": [], "entrypoint": [],
+                "memory_limit": 100, "nano_cpus": 2, "state": {"StartedAt": "original"}}
+        before = campaign.stable_identity({"node": node})
+        node["state"]["StartedAt"] = "restarted"
+        self.assertNotEqual(before, campaign.stable_identity({"node": node}))
+
+    def test_only_complete_wal_commit_can_change_expected_head(self):
+        def put(value):
+            return b"\x01" + (2).to_bytes(4,"big") + b"hb" + len(value).to_bytes(4,"big") + value
+        old, new = b"a"*32, b"b"*32
+        initial = "0x"+old.hex()
+        prepared = put(new)
+        self.assertEqual(lifecycle.committed_head(prepared, initial), initial)
+        self.assertEqual(lifecycle.committed_head(prepared+b"\x03", initial), "0x"+new.hex())
+        self.assertEqual(lifecycle.committed_head(prepared+b"\x03\x01", initial), "0x"+new.hex())
+
     def test_rpc_errors_and_wrong_identity_cannot_pass_as_a_sample(self):
         record = {"http_status": 200, "request": {"id": 1}}
         for response in [

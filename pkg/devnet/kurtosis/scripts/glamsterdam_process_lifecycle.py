@@ -12,6 +12,7 @@ import hashlib
 import hmac
 import json
 import os
+import resource
 import signal
 import socket
 import subprocess
@@ -100,7 +101,35 @@ class Node:
         return self.call("engine_forkchoiceUpdatedV4", [{"headBlockHash": head, "safeBlockHash": safe, "finalizedBlockHash": final}, attrs], allow_error)
 
 
-def run(binary, genesis_path, output):
+def committed_head(wal, initial):
+    """Decode actual durable WAL commits; discard only an incomplete suffix."""
+    position, pending, head = 0, {}, initial
+    while position < len(wal):
+        operation = wal[position]
+        position += 1
+        if operation == 3:
+            if b"hb" in pending:
+                head = "0x" + pending[b"hb"].hex()
+            pending = {}
+            continue
+        if operation not in [1, 2] or position + 4 > len(wal):
+            break
+        key_size = int.from_bytes(wal[position:position+4], "big")
+        position += 4
+        if position + key_size + 4 > len(wal):
+            break
+        key = wal[position:position+key_size]
+        position += key_size
+        value_size = int.from_bytes(wal[position:position+4], "big")
+        position += 4
+        if position + value_size > len(wal):
+            break
+        pending[key] = wal[position:position+value_size]
+        position += value_size
+    return head
+
+
+def run(binary, genesis_path, output, fault_kind="materialization"):
     output.mkdir(parents=True, exist_ok=False)
     genesis = json.loads(genesis_path.read_text())
     assert int(str(genesis["config"]["chainId"]), 0) == 1337
@@ -108,7 +137,7 @@ def run(binary, genesis_path, output):
     original_time = int(str(genesis["timestamp"]), 0)
     owned_genesis = output/"genesis.json"
     owned_genesis.write_text(json.dumps(genesis))
-    report = {"passed": False, "scope": "actual independent EL processes, not complete CL lifecycle", "cases": []}
+    report = {"passed": False, "fault_kind": fault_kind, "scope": "actual independent EL processes, not complete CL lifecycle", "cases": []}
     trace = (output/"exchanges.jsonl").open("x")
     proposer = Node(binary, output/"proposer", owned_genesis, trace)
     verifier = Node(binary, output/"verifier", owned_genesis, trace)
@@ -170,19 +199,36 @@ def run(binary, genesis_path, output):
         h3 = three["executionPayload"]["blockHash"]
         assert submit(verifier, three)["status"] == "VALID"
         fault = verifier.directory/"data"/"chaindata"/"data"/(b"hb".hex()+".tmp")
-        fault.mkdir()
+        wal = verifier.directory/"data"/"chaindata"/"wal"
+        before_size = wal.stat().st_size
+        if fault_kind == "materialization":
+            fault.mkdir()
+        else:
+            # Allow exactly one more WAL byte. The real write then returns a
+            # short count/EFBIG; no FileDB hook or crafted WAL substitutes it.
+            soft, hard = resource.prlimit(verifier.process.pid, resource.RLIMIT_FSIZE)
+            resource.prlimit(verifier.process.pid, resource.RLIMIT_FSIZE, (before_size + 1, hard))
         rejected = verifier.choose(h3, safe=h2, final=h2, allow_error=True)
         assert "error" in rejected, rejected
         fenced = verifier.choose(h3, safe=h2, final=h2, allow_error=True)
         assert "error" in fenced, fenced
-        wal = verifier.directory/"data"/"chaindata"/"wal"
         report["wal_bytes_before_crash"] = wal.stat().st_size
         assert report["wal_bytes_before_crash"] > 0
-        case("actual materialization failure returns resource error and fences retry")
+        actual_wal = wal.read_bytes()
+        (output/"fault-wal.bin").write_bytes(actual_wal)
+        expected_head = committed_head(actual_wal, h2)
+        report["expected_head_from_actual_wal"] = expected_head
+        if fault_kind == "short-write":
+            assert len(actual_wal) == before_size + 1
+            assert expected_head == h2
+        else:
+            assert expected_head == h3
+        case("actual OS write failure returns resource error and fences retry")
         verifier.stop(crash=True)
-        fault.rmdir()
+        if fault_kind == "materialization":
+            fault.rmdir()
         recovered = verifier.start()
-        assert recovered["hash"] == h3
+        assert recovered["hash"] == expected_head
         assert verifier.call("eth_getBlockByNumber", ["finalized", False])["hash"] == h2
         assert verifier.choose(h3, safe=h2, final=h2)["payloadStatus"]["status"] == "VALID"
         assert submit(verifier, three)["status"] == "VALID"
@@ -208,5 +254,6 @@ if __name__ == "__main__":
     parser.add_argument("--binary", required=True, type=Path)
     parser.add_argument("--genesis", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--fault", choices=["materialization", "short-write"], default="materialization")
     args = parser.parse_args()
-    run(args.binary, args.genesis, args.output)
+    run(args.binary, args.genesis, args.output, args.fault)

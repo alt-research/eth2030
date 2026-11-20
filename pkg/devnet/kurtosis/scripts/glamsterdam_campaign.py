@@ -108,9 +108,9 @@ def snapshot(output):
     nodes = inventory()
     records = []
     for service, node in sorted(nodes.items()):
+        node["running_executable_hashes"] = executable_hashes(node)
         if not service.startswith(("el-", "cl-")):
             continue
-        node["running_executable_hashes"] = executable_hashes(node)
         if service.startswith("el-"):
             url = endpoint(node, "8545/tcp")
             for method, params in [("web3_clientVersion", []), ("eth_chainId", []),

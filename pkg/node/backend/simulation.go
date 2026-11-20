@@ -224,7 +224,7 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 	return msg, nil
 }
 
-func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.Header, transactionRules bool, tracer *vm.StructLogTracer, overrides ...rpctypes.StateOverride) (*execution.ExecutionResult, error) {
+func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.Header, transactionRules bool, tracer *vm.StructLogTracer, overrides ...rpctypes.StateOverride) (result *execution.ExecutionResult, err error) {
 	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
 	defer cancel()
 	if err := ctx.Err(); err != nil {
@@ -236,6 +236,13 @@ func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.H
 		return nil, err
 	}
 	db := base.Dup()
+	state.SetReadContext(db, ctx)
+	defer func() {
+		if readErr := state.ReadError(db); readErr != nil {
+			result = nil
+			err = readErr
+		}
+	}()
 	if err := applySimulationOverrides(db, overrides...); err != nil {
 		return nil, err
 	}
@@ -257,7 +264,7 @@ func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.H
 	if err != nil {
 		return nil, err
 	}
-	result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Context: ctx, Precompiles: runtime}})
+	result, err = execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Context: ctx, Precompiles: runtime}})
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -316,6 +323,7 @@ func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.H
 		return 0, err
 	}
 	base := stateDB.Dup()
+	state.SetReadContext(base, ctx)
 	if err := applySimulationOverrides(base, overrides...); err != nil {
 		return 0, err
 	}

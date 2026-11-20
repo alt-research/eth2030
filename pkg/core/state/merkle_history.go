@@ -32,8 +32,9 @@ func HistoryStateAvailable(db rawdb.KeyValueReader, root types.Hash) (bool, erro
 }
 
 type historyNodeWriter struct {
-	db    rawdb.KeyValueReader
-	batch rawdb.Batch
+	db      rawdb.KeyValueReader
+	batch   rawdb.Batch
+	pending map[types.Hash][]byte
 }
 
 func immutableHistoryPut(db rawdb.KeyValueReader, batch rawdb.Batch, key, value []byte) error {
@@ -53,7 +54,13 @@ func (w historyNodeWriter) Put(hash types.Hash, data []byte) error {
 	if crypto.Keccak256Hash(data) != hash {
 		return fmt.Errorf("state history: encoded node commitment mismatch")
 	}
-	return immutableHistoryPut(w.db, w.batch, historyNodeKey(hash), data)
+	if err := immutableHistoryPut(w.db, w.batch, historyNodeKey(hash), data); err != nil {
+		return err
+	}
+	if w.pending != nil {
+		w.pending[hash] = bytes.Clone(data)
+	}
+	return nil
 }
 
 // StoreTrieHistory adds immutable account/storage trie nodes and code to the
@@ -61,6 +68,47 @@ func (w historyNodeWriter) Put(hash types.Hash, data []byte) error {
 func StoreTrieHistory(db rawdb.KeyValueReader, batch rawdb.Batch, root types.Hash, source StateDB) error {
 	if available, err := HistoryStateAvailable(db, root); err != nil || available {
 		return err
+	}
+
+	if err := ReadError(source); err != nil {
+		return err
+	}
+	var base *historyView
+	var memory *MemoryStateDB
+	switch st := source.(type) {
+	case *MemoryStateDB:
+		base, memory = st.historyBase, st
+	case *TrieBackedStateDB:
+		base, memory = st.historyBase, st.MemoryStateDB
+	case *SnapStateDB:
+		if st.history != nil {
+			base, memory = st.history, st.memory
+		}
+	}
+	if base != nil {
+		view, err := prepareHistory(context.Background(), base, memory)
+		if err != nil {
+			return err
+		}
+		if view.root == root {
+			if err := flushHistoryView(db, batch, view); err != nil {
+				return err
+			}
+			if err := memory.bindHistory(view); err != nil {
+				return err
+			}
+			if st, ok := source.(*SnapStateDB); ok {
+				st.history = view
+				st.historyPrepared = nil
+			}
+			return nil
+		}
+		// Legacy complete-memory helpers may mutate their owned maps directly.
+		// They retain the fully authenticated import path, never a lazy-zero or
+		// corrupt-history fallback. Normal lazy execution must match exactly.
+		if _, ok := source.(*SnapStateDB); ok {
+			return fmt.Errorf("state history: incremental root mismatch")
+		}
 	}
 	snapshot, err := ExportStateSnapshot(source)
 	if err != nil {
@@ -90,7 +138,8 @@ func StoreTrieHistory(db rawdb.KeyValueReader, batch rawdb.Batch, root types.Has
 	if computed != root {
 		return fmt.Errorf("state history: account commitment mismatch")
 	}
-	if err := nodes.Commit(historyNodeWriter{db: db, batch: batch}); err != nil {
+	pending := make(map[types.Hash][]byte)
+	if err := nodes.Commit(historyNodeWriter{db: db, batch: batch, pending: pending}); err != nil {
 		return err
 	}
 	for hash, code := range snapshot.Codes {
@@ -101,7 +150,33 @@ func StoreTrieHistory(db rawdb.KeyValueReader, batch rawdb.Batch, root types.Has
 			return err
 		}
 	}
-	return batch.Put(historyRootKey(root), []byte{1})
+	if err := batch.Put(historyRootKey(root), []byte{1}); err != nil {
+		return err
+	}
+	database, ok := db.(rawdb.Database)
+	if ok {
+		view := &historyView{db: database, root: root, nodes: pending, codes: snapshot.Codes}
+		switch st := source.(type) {
+		case *MemoryStateDB:
+			if err := st.bindHistory(view); err != nil {
+				return err
+			}
+		case *TrieBackedStateDB:
+			if err := st.MemoryStateDB.bindHistory(view); err != nil {
+				return err
+			}
+		case *SnapStateDB:
+			if st.db == nil {
+				st.history = view
+				st.base = nil
+				if err := st.memory.bindHistory(view); err != nil {
+					return err
+				}
+				st.historyPrepared = nil
+			}
+		}
+	}
+	return nil
 }
 
 type historyNodeReader struct {
@@ -146,7 +221,7 @@ func historyLeaves(ctx context.Context, nodes *mpt.NodeDatabase, root types.Hash
 
 // OpenTrieHistory materializes a verified native secure snapshot at exactly the
 // original root. It never consults mutable current-state account/storage keys.
-func OpenTrieHistory(ctx context.Context, db rawdb.Database, root types.Hash) (*SnapStateDB, error) {
+func openFullTrieHistory(ctx context.Context, db rawdb.Database, root types.Hash) (*SnapStateDB, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -206,4 +281,11 @@ func OpenTrieHistory(ctx context.Context, db rawdb.Database, root types.Hash) (*
 	// owned by StoreTrieHistory and its caller's atomic block batch, rather than
 	// writing a duplicate full flat snapshot for each intermediate replay root.
 	return &SnapStateDB{memory: NewMemoryStateDB(), base: snapshot}, nil
+}
+
+// AuditTrieHistory checks complete retained state availability and commitments.
+// Point lookups use OpenTrieHistory and fail on any unreadable accessed path.
+func AuditTrieHistory(ctx context.Context, db rawdb.Database, root types.Hash) error {
+	_, err := openFullTrieHistory(ctx, db, root)
+	return err
 }

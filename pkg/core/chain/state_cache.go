@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"context"
 	"sync"
 
 	"github.com/eth2030/eth2030/core/state"
@@ -88,9 +89,11 @@ func (sc *stateCache) put(blockHash types.Hash, blockNumber uint64, stateDB stat
 		checked = 0
 	}
 
+	cached := stateDB.Dup()
+	state.SetReadContext(cached, context.Background())
 	sc.snapshots[blockHash] = &stateCacheEntry{
 		blockNumber: blockNumber,
-		stateDB:     stateDB.Dup(),
+		stateDB:     cached,
 	}
 	sc.order = append(sc.order, blockHash)
 }

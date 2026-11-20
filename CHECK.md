@@ -1,3 +1,11 @@
+## Authorized post-merge corrections and next-step plan (2026-11-20)
+
+- [x] Isolate F1/F2/F3 corrections from the original dirty checkout and retain their red controls/specification authority.
+- [x] Publish cells handoff PR 116 and full-range sync PR 117 directly to master; both pass all nine CI jobs.
+- [x] Publish separate remaining-work/acceptance plan PR 118 without starting new live campaigns.
+- [x] Qualify incremental state/history and exact point consumers with roots/proofs/application/error/scale controls; prepare its separate master-targeted PR.
+- [x] Require final current-head CI and cumulative composition/merge verification before reporting completion; do not merge EL master.
+
 ## Direct-master delivery correction and stop (2026-11-20)
 
 - [x] Prepare and publish independent PR 115 for original PR 91 against current master; retain exact source/test bytes and original ancestry.

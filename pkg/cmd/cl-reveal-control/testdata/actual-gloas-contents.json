@@ -1,0 +1,6 @@
+{
+  "beacon_root": "0x7ba11c7c7fb0b5a8e099586871102982c3578873edafcc8357ec48811f7d0690",
+  "slot": 20696,
+  "source": "actual Buildoor aa3bbaf543dd, successful duplicate-delivery slot 20696",
+  "scope": "Original signed envelope serialized by unchanged selected consensus reference; empty blob/proof Contents wrapper as sent by go-eth2-client v0.1.12."
+}

@@ -6,6 +6,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -17,6 +19,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -46,13 +49,20 @@ func (c *controller) record(action string, input, output []byte, status int, err
 }
 
 func (c *controller) request(ctx context.Context, method, target string, body []byte) ([]byte, int, error) {
+	return c.requestHeaders(ctx, method, target, body, nil)
+}
+
+func (c *controller) requestHeaders(ctx context.Context, method, target string, body []byte, headers http.Header) ([]byte, int, error) {
 	req, err := http.NewRequestWithContext(ctx, method, target, bytes.NewReader(body))
 	if err != nil {
 		return nil, 0, err
 	}
-	if body != nil {
+	if headers != nil {
+		req.Header = headers.Clone()
+	} else if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Eth-Consensus-Version", "gloas")
+		req.Header.Set("Eth-Blob-Data-Included", "false")
 	}
 	response, err := c.client.Do(req)
 	if err != nil {
@@ -113,7 +123,7 @@ func (c *controller) mirrorEnvelope(ctx context.Context, root string) error {
 	if err := json.Unmarshal(data, &wrapper); err != nil {
 		return err
 	}
-	body, status, err := c.request(ctx, "POST", c.observer+"/eth/v2/beacon/execution_payload_envelopes?broadcast_validation=consensus", wrapper.Data)
+	body, status, err := c.request(ctx, "POST", c.observer+"/eth/v1/beacon/execution_payload_envelopes?broadcast_validation=consensus", wrapper.Data)
 	c.record("mirror-original-envelope", wrapper.Data, body, status, err)
 	if err != nil || status < 200 || status >= 300 {
 		return fmt.Errorf("observer envelope: %d %v", status, err)
@@ -156,8 +166,58 @@ func (c *controller) ensureBlock(ctx context.Context, root string, depth int) er
 	return nil
 }
 
+// envelopeIdentity projects only routing metadata. The receiving real client
+// still validates the complete SSZ/JSON, signature, state and execution hash.
+func envelopeIdentity(input []byte, headers http.Header) (root string, slot uint64, err error) {
+	if strings.HasPrefix(headers.Get("Content-Type"), "application/octet-stream") {
+		signed := input
+		if headers.Get("Eth-Blob-Data-Included") == "true" {
+			if len(input) < 12 {
+				return "", 0, fmt.Errorf("incomplete Contents offsets")
+			}
+			offset := uint64(binary.LittleEndian.Uint32(input[:4]))
+			if offset < 12 || offset > uint64(len(input)) {
+				return "", 0, fmt.Errorf("invalid signed-envelope offset")
+			}
+			signed = input[offset:]
+		}
+		if len(signed) < 100 {
+			return "", 0, fmt.Errorf("incomplete signed envelope")
+		}
+		offset := uint64(binary.LittleEndian.Uint32(signed[:4]))
+		if offset < 100 || offset+80 > uint64(len(signed)) {
+			return "", 0, fmt.Errorf("invalid message offset")
+		}
+		// Gloas message: payload offset, requests offset, builder index,
+		// beacon root, parent beacon root. Do not re-encode the signed bytes.
+		return "0x" + hex.EncodeToString(signed[offset+16:offset+48]), 0, nil
+	}
+	var contents struct {
+		Envelope json.RawMessage `json:"signed_execution_payload_envelope"`
+	}
+	if headers.Get("Eth-Blob-Data-Included") == "true" {
+		if err := json.Unmarshal(input, &contents); err != nil {
+			return "", 0, err
+		}
+		input = contents.Envelope
+	}
+	var envelope struct {
+		Message struct {
+			Root    string `json:"beacon_block_root"`
+			Payload struct {
+				Slot string `json:"slot_number"`
+			} `json:"payload"`
+		} `json:"message"`
+	}
+	if err := json.Unmarshal(input, &envelope); err != nil {
+		return "", 0, err
+	}
+	slot, err = strconv.ParseUint(envelope.Message.Payload.Slot, 10, 64)
+	return envelope.Message.Root, slot, err
+}
+
 func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" || r.URL.Path != "/eth/v2/beacon/execution_payload_envelopes" {
+	if r.Method != "POST" || r.URL.Path != "/eth/v1/beacon/execution_payload_envelopes" {
 		c.proxy.ServeHTTP(w, r)
 		return
 	}
@@ -167,18 +227,19 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.Body = io.NopCloser(bytes.NewReader(input))
-	var envelope struct {
-		Message struct {
-			Root    string `json:"beacon_block_root"`
-			Payload struct {
-				Slot string `json:"slot_number"`
-			} `json:"payload"`
-		} `json:"message"`
+	root, slot, decodeErr := envelopeIdentity(input, r.Header)
+	if decodeErr == nil && slot == 0 {
+		// SSZ identifies the authenticated beacon block; its public signed
+		// header supplies the slot without assuming payload field offsets.
+		_, block, err := c.block(r.Context(), root)
+		if err != nil {
+			decodeErr = err
+		} else {
+			slot, decodeErr = strconv.ParseUint(block.Message.Slot, 10, 64)
+		}
 	}
-	decodeErr := json.Unmarshal(input, &envelope)
-	slot, slotErr := strconv.ParseUint(envelope.Message.Payload.Slot, 10, 64)
 	c.mu.Lock()
-	chosen := decodeErr == nil && slotErr == nil && slot == c.slot && !c.routed
+	chosen := decodeErr == nil && slot == c.slot && !c.routed
 	if chosen {
 		c.routed = true
 	}
@@ -187,7 +248,7 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		c.proxy.ServeHTTP(w, r)
 		return
 	}
-	if err := c.ensureBlock(r.Context(), envelope.Message.Root, 0); err != nil {
+	if err := c.ensureBlock(r.Context(), root, 0); err != nil {
 		c.mu.Lock()
 		c.routed = false
 		c.mu.Unlock()
@@ -195,7 +256,7 @@ func (c *controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 502)
 		return
 	}
-	body, status, err := c.request(r.Context(), "POST", c.observer+r.URL.RequestURI(), input)
+	body, status, err := c.requestHeaders(r.Context(), "POST", c.observer+r.URL.RequestURI(), input, r.Header)
 	c.record("first-envelope-to-observer", input, body, status, err)
 	if err != nil || status < 200 || status >= 300 {
 		c.mu.Lock()

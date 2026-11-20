@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -37,7 +38,7 @@ func TestChosenEnvelopeKeepsExactSignedBytesAndRoutesOnlyFirstDelivery(t *testin
 	var evidence bytes.Buffer
 	c := &controller{upstream: main.URL, observer: observer.URL, slot: 42, client: main.Client(), proxy: httputil.NewSingleHostReverseProxy(target), output: &evidence}
 	for index, want := range []string{"observer", "main"} {
-		req := httptest.NewRequest("POST", "/eth/v2/beacon/execution_payload_envelopes?broadcast_validation=consensus", bytes.NewReader(input))
+		req := httptest.NewRequest("POST", "/eth/v1/beacon/execution_payload_envelopes?broadcast_validation=consensus", bytes.NewReader(input))
 		req.Header.Set("Authorization", "Bearer never-log-credentials")
 		response := httptest.NewRecorder()
 		c.ServeHTTP(response, req)
@@ -102,6 +103,52 @@ func TestControlRequestHonorsCancellation(t *testing.T) {
 	}
 }
 
+func TestActualStatelessSSZContentsRoutesWithoutReencodingOrLosingDiscriminator(t *testing.T) {
+	input, err := os.ReadFile("testdata/actual-gloas-contents.ssz")
+	if err != nil {
+		t.Fatal(err)
+	}
+	const wantRoot = "0x7ba11c7c7fb0b5a8e099586871102982c3578873edafcc8357ec48811f7d0690"
+	headers := http.Header{"Content-Type": {"application/octet-stream"}, "Eth-Blob-Data-Included": {"true"}, "Eth-Consensus-Version": {"gloas"}}
+	root, slot, err := envelopeIdentity(input, headers)
+	if err != nil || root != wantRoot || slot != 0 {
+		t.Fatalf("actual SSZ identity: %s %d %v", root, slot, err)
+	}
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, wantRoot) {
+			t.Errorf("unexpected upstream request: %s", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"data":{"message":{"slot":"20696"}}}`))
+	}))
+	defer upstream.Close()
+	var received []byte
+	observer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			return
+		}
+		if r.Header.Get("Content-Type") != "application/octet-stream" || r.Header.Get("Eth-Blob-Data-Included") != "true" || r.Header.Get("Eth-Consensus-Version") != "gloas" {
+			t.Error("lost the actual stateless submission headers")
+		}
+		received, _ = io.ReadAll(r.Body)
+	}))
+	defer observer.Close()
+	c := &controller{upstream: upstream.URL, observer: observer.URL, slot: 20696, client: upstream.Client(), output: io.Discard}
+	req := httptest.NewRequest("POST", "/eth/v1/beacon/execution_payload_envelopes", bytes.NewReader(input))
+	req.Header = headers
+	response := httptest.NewRecorder()
+	c.ServeHTTP(response, req)
+	if response.Code != 200 || !bytes.Equal(received, input) {
+		t.Fatalf("actual signed SSZ forwarding changed bytes: %d", response.Code)
+	}
+	broken := bytes.Clone(input)
+	for i := 0; i < 4; i++ {
+		broken[i] = 0xff
+	}
+	if _, _, err := envelopeIdentity(broken, headers); err == nil {
+		t.Fatal("accepted an out-of-bounds Contents offset")
+	}
+}
+
 func TestRejectedObserverDeliveryCannotLeakAProducerRetryToMain(t *testing.T) {
 	var observerPosts, mainPosts int
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +169,7 @@ func TestRejectedObserverDeliveryCannotLeakAProducerRetryToMain(t *testing.T) {
 	c := &controller{upstream: upstream.URL, observer: observer.URL, slot: 42, client: upstream.Client(), proxy: httputil.NewSingleHostReverseProxy(target), output: io.Discard}
 	for index, want := range []int{503, 200, 200} {
 		response := httptest.NewRecorder()
-		c.ServeHTTP(response, httptest.NewRequest("POST", "/eth/v2/beacon/execution_payload_envelopes", strings.NewReader(`{"message":{"beacon_block_root":"root","payload":{"slot_number":"42"}}}`)))
+		c.ServeHTTP(response, httptest.NewRequest("POST", "/eth/v1/beacon/execution_payload_envelopes", strings.NewReader(`{"message":{"beacon_block_root":"root","payload":{"slot_number":"42"}}}`)))
 		if response.Code != want {
 			t.Fatalf("delivery %d: status %d want %d", index, response.Code, want)
 		}

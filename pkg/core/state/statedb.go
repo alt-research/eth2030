@@ -63,6 +63,9 @@ type StateDB interface {
 	GetRoot() types.Hash
 	StorageRoot(addr types.Address) types.Hash
 
+	// Finalise applies fork-aware transaction-boundary deletion.
+	Finalise(deleteEmpty bool)
+
 	// Commit
 	Commit() (types.Hash, error)
 

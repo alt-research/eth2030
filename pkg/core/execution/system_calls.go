@@ -47,9 +47,7 @@ func executeSystemCall(evm *vm.EVM, db state.StateDB, address types.Address, inp
 	}
 	output, _, err := evm.Call(types.SystemAddress, address, input, systemExecutionGas, new(big.Int))
 	evm.FinalizeSelfDestructs()
-	if transaction, ok := db.(interface{ FinalizeTransaction() }); ok {
-		transaction.FinalizeTransaction()
-	}
+	db.Finalise(evm.GetForkRules().IsEIP158)
 	if tracker != nil {
 		tracker.Reconcile(db)
 	}

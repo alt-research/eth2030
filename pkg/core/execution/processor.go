@@ -781,9 +781,7 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 	if state, ok := statedb.(interface{ FinalizePreState() }); ok {
 		state.FinalizePreState()
 	}
-	if state, ok := statedb.(interface{ FinalizeTransaction() }); ok {
-		defer state.FinalizeTransaction()
-	}
+	defer statedb.Finalise(config.IsEIP158(header.Number))
 	// Enforce I+ fork guard for PQ transactions.
 	rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 	if pq, ok := tx.Inner().(*types.PQTransaction); ok {

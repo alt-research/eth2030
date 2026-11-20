@@ -28,6 +28,9 @@ func (bc *Blockchain) InsertSyncedBlockWithResult(block *types.Block) (*executio
 func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) error {
 	bc.insertMu.Lock()
 	defer bc.insertMu.Unlock()
+	if err := bc.CheckStorage(); err != nil {
+		return err
+	}
 	head := bc.GetBlock(headHash)
 	if head == nil || !bc.HasValidatedBlock(headHash) {
 		return fmt.Errorf("%w: forkchoice head not validated", ErrStateNotFound)

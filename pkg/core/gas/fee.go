@@ -11,9 +11,8 @@ const (
 	// InitialBaseFee is the initial base fee for EIP-1559 (1 Gwei).
 	InitialBaseFee = 1_000_000_000
 
-	// MinBaseFee is the minimum base fee (7 wei, EIP-4844 era minimum).
-	// This prevents the base fee from reaching zero during periods of low
-	// network activity, ensuring that a minimum cost is always imposed.
+	// MinBaseFee is the default experimental-market setting. Canonical
+	// EIP-1559 calculation does not impose a fixed seven-wei floor.
 	MinBaseFee = 7
 )
 
@@ -24,7 +23,6 @@ const (
 //   - If parent gas used == target (limit/2): base fee unchanged
 //   - If parent gas used > target: increase proportionally (max 12.5%)
 //   - If parent gas used < target: decrease proportionally (max 12.5%)
-//   - Minimum base fee: 7 wei (EIP-4844 era)
 //
 // Constants: ElasticityMultiplier=2, BaseFeeChangeDenominator=8
 func CalcBaseFee(parent *types.Header) *big.Int {
@@ -61,10 +59,5 @@ func CalcBaseFee(parent *types.Header) *big.Int {
 
 	baseFee := new(big.Int).Sub(parent.BaseFee, baseFeeDelta)
 
-	// Enforce minimum base fee of 7 wei (EIP-4844 era).
-	minFee := big.NewInt(MinBaseFee)
-	if baseFee.Cmp(minFee) < 0 {
-		baseFee.Set(minFee)
-	}
 	return baseFee
 }

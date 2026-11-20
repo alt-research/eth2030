@@ -7,6 +7,7 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
+	gethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"maps"
 	"sort"
@@ -44,11 +45,11 @@ func simulationPrecompiles(cfg *config.ChainConfig, header *types.Header, db sta
 				return nil, simulationError(-32602, "invalid precompile destination")
 			}
 			destination := types.BytesToAddress(to)
+			if !exists {
+				return nil, simulationError(-32000, "account %s is not a precompile", gethcommon.Address(address).Hex())
+			}
 			if destination == address {
 				return nil, simulationError(-38022, "precompile destination references itself")
-			}
-			if !exists {
-				return nil, simulationError(-32602, "cannot move an inactive precompile")
 			}
 			for _, other := range names {
 				if strings.EqualFold(destination.Hex(), other) {

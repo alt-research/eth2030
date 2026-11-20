@@ -285,6 +285,10 @@ type ForkRules struct {
 // SelectPrecompiles returns the correct precompile map for the given fork rules.
 func SelectPrecompiles(rules ForkRules) map[types.Address]PrecompiledContract {
 	selected := selectPrecompileBase(rules)
+	if !rules.LegacyNativeBLS && !rules.IsOsaka && !rules.IsAmsterdam && !rules.IsGlamsterdan && !rules.IsIPlus {
+		selected = maps.Clone(selected)
+		delete(selected, types.Address{18: 1}) // EIP-7951 activates at Osaka, not Cancun/Prague.
+	}
 	if rules.IsOsaka {
 		selected = maps.Clone(selected)
 		selected[types.Address{19: 5}] = &osakaModExp{}

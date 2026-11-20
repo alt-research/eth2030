@@ -310,6 +310,21 @@ func (s *SnapStateDB) SetState(a types.Address, k, v types.Hash) {
 	s.memory.SetState(a, k, v)
 }
 
+// SetStorage replaces only this private account overlay's storage. The secure
+// snapshot base remains immutable and other account fields are retained.
+func (s *SnapStateDB) SetStorage(a types.Address, values map[types.Hash]types.Hash) {
+	s.load(a)
+	object := s.memory.getOrNewStateObject(a)
+	previous := *object
+	s.memory.journal.append(createAccountChange{addr: a, prev: &previous})
+	object.committedStorage = make(map[types.Hash]types.Hash)
+	object.dirtyStorage = make(map[types.Hash]types.Hash)
+	object.dbStorageRoot = types.Hash{}
+	for key, value := range values {
+		s.memory.SetState(a, key, value)
+	}
+}
+
 func (s *SnapStateDB) snapshot() *StateSnapshot {
 	out := s.base.copy()
 	applySnapshotOverlay(out, s.memory)

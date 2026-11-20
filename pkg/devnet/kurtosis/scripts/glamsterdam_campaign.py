@@ -26,7 +26,10 @@ def docker(*args):
 
 
 def inventory():
-    ids = docker("ps", "-aq", "--filter", "label=kurtosis_enclave_uuid=" + ENCLAVE).split()
+    # Stopped historical attempts are not part of the running tuple. Inspecting
+    # all of them can block live observations behind an unrelated old DB copy.
+    # A service disappearing still changes stable_identity and fails the window.
+    ids = docker("ps", "-q", "--filter", "label=kurtosis_enclave_uuid=" + ENCLAVE).split()
     if not ids:
         raise RuntimeError("the declared enclave has no containers")
     nodes = {}

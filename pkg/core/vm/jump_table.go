@@ -642,9 +642,16 @@ func NewPragueJumpTable() JumpTable {
 	return tbl
 }
 
-// NewAmsterdamJumpTable adds EIP-7843 and EIP-8024 to Amsterdam.
-func NewAmsterdamJumpTable() JumpTable {
+// NewOsakaJumpTable activates EIP-7939's count-leading-zeros opcode.
+func NewOsakaJumpTable() JumpTable {
 	tbl := NewPragueJumpTable()
+	tbl[CLZ] = &operation{execute: opCLZ, constantGas: GasFastStep, minStack: 1, maxStack: 1024}
+	return tbl
+}
+
+// NewAmsterdamJumpTable adds EIP-7843 and EIP-8024 to Osaka.
+func NewAmsterdamJumpTable() JumpTable {
+	tbl := NewOsakaJumpTable()
 	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
 	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
 	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}

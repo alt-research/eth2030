@@ -328,6 +328,8 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 		return table
 	case rules.IsAmsterdam:
 		return NewAmsterdamJumpTable()
+	case rules.IsOsaka:
+		return NewOsakaJumpTable()
 	case rules.IsPrague:
 		return NewPragueJumpTable()
 	case rules.IsCancun:

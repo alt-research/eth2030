@@ -46,6 +46,23 @@ func (j *journal) revertToSnapshot(id int, s *MemoryStateDB) {
 	}
 	// Revert in reverse order.
 	for i := len(j.entries) - 1; i >= idx; i-- {
+
+		switch change := j.entries[i].(type) {
+		case createAccountChange:
+			s.markHistory(change.addr)
+		case balanceChange:
+			s.markHistory(change.addr)
+		case nonceChange:
+			s.markHistory(change.addr)
+		case codeChange:
+			s.markHistory(change.addr)
+		case selfDestructChange:
+			s.markHistory(change.addr)
+		case touchAccountChange:
+			s.markHistory(change.addr)
+		case storageChange:
+			s.markHistorySlot(change.addr, change.key)
+		}
 		j.entries[i].revert(s)
 	}
 	j.entries = j.entries[:idx]

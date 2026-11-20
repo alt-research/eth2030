@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/eth2030/eth2030/core/state"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 	"sync"
@@ -299,6 +300,9 @@ func (api *EthAPI) getBalance(req *Request) *Response {
 
 	addr := types.HexToAddress(addrHex)
 	balance := statedb.GetBalance(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeBigInt(balance))
 }
 
@@ -324,6 +328,9 @@ func (api *EthAPI) getTransactionCount(req *Request) *Response {
 
 	addr := types.HexToAddress(addrHex)
 	nonce := statedb.GetNonce(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeUint64(nonce))
 }
 
@@ -349,6 +356,9 @@ func (api *EthAPI) getCode(req *Request) *Response {
 
 	addr := types.HexToAddress(addrHex)
 	code := statedb.GetCode(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeBytes(code))
 }
 
@@ -378,6 +388,9 @@ func (api *EthAPI) getStorageAt(req *Request) *Response {
 	addr := types.HexToAddress(addrHex)
 	slot := types.HexToHash(slotHex)
 	value := statedb.GetState(addr, slot)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeHash(value))
 }
 

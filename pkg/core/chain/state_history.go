@@ -101,5 +101,11 @@ func (bc *Blockchain) BuildTrieHistory(ctx context.Context) (StateHistoryResult,
 	if finalHead != result.Head {
 		return result, fmt.Errorf("state history: canonical head changed during exclusive maintenance")
 	}
+
+	if result.Number > 0 {
+		if err := state.AuditTrieHistory(ctx, bc.db, head.Root()); err != nil {
+			return result, storageFailure(err)
+		}
+	}
 	return result, nil
 }

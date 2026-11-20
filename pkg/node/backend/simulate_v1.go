@@ -299,6 +299,9 @@ func makeSimulationHeader(cfg *config.ChainConfig, parent *types.Header, overrid
 func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, header *types.Header, withdrawals []*types.Withdrawal, calls []rpctypes.CallArgs, options rpctypes.SimulateOptions, overrides execution.EVMOverrides, getHash vm.GetHashFunc, remaining *uint64) (rpctypes.SimulateBlockResult, error) {
 	traced := &simulationLogState{StateDB: &simulationBalanceState{StateDB: db}, synthetic: options.TraceTransfers && !cfg.IsAmsterdam(header.Time), snapshots: make(map[int]int)}
 	db = traced
+	if overrides.Context != nil {
+		state.SetReadContext(db, overrides.Context)
+	}
 	var displayLogs [][]*types.Log
 	fail := func(err error) (rpctypes.SimulateBlockResult, error) {
 		// A system call or transaction may return the context error before the
@@ -477,6 +480,9 @@ func (b *RPCBackend) simulateBlock(cfg *config.ChainConfig, db state.StateDB, he
 		return fail(err)
 	}
 	header.Root = db.GetRoot()
+	if err := state.ReadError(db); err != nil {
+		return fail(err)
+	}
 	block := types.NewBlock(header, &types.Body{Transactions: transactions, Withdrawals: withdrawals})
 	types.DeriveReceiptFields(receipts, block.Hash(), header.Number.Uint64(), header.BaseFee, transactions)
 	for i, logs := range displayLogs {

@@ -114,24 +114,26 @@ jobs:
                   passed.add(test)
           result = {'native_revision': os.environ['GITHUB_SHA'], 'oracle': 'unchanged Geth v1.17.10', 'eips_revision': '3db38a3725105cb67b8804ac3e147967113bc3ca', 'forks': {}}
           assert '' in passed and 'TestPublishedApplicationArtifactIntegrity' in passed
-          for fork in ['Osaka', 'Amsterdam']:
-              test = 'TestPublishedWalletAndDEXSignedSequences/' + fork
-              assert test in passed, test
-              records = []
-              # go test splits long signed deployment logs across Output events.
-              # Reassemble each test's output before decoding its JSON records.
-              for line in outputs[test].splitlines():
-                  start = line.find('{')
-                  if start < 0:
-                      continue
-                  record = json.loads(line[start:])
-                  records.append(record)
-              transactions = [r for r in records if 'transaction' in r]
-              queries = [r for r in records if r.get('kind') == 'application_query']
-              assert len(transactions) == 31 and len(queries) == 17, (fork, len(transactions), len(queries))
-              assert all(r['native_root'] == r['independent_root'] for r in transactions)
-              assert all(r['native_output'] == r['independent_output'] for r in queries)
-              result['forks'][fork] = {'transactions': transactions, 'queries': queries}
+          for lane, test_root in [('forks', 'TestPublishedWalletAndDEXSignedSequences'), ('lazy_history_forks', 'TestPublishedWalletAndDEXLazyHistorySequences')]:
+              result[lane] = {}
+              for fork in ['Osaka', 'Amsterdam']:
+                  test = test_root + '/' + fork
+                  assert test in passed, test
+                  records = []
+                  # go test splits long signed deployment logs across Output events.
+                  # Reassemble each test's output before decoding its JSON records.
+                  for line in outputs[test].splitlines():
+                      start = line.find('{')
+                      if start < 0:
+                          continue
+                      record = json.loads(line[start:])
+                      records.append(record)
+                  transactions = [r for r in records if 'transaction' in r]
+                  queries = [r for r in records if r.get('kind') == 'application_query']
+                  assert len(transactions) == 31 and len(queries) == 17, (fork, len(transactions), len(queries))
+                  assert all(r['native_root'] == r['independent_root'] for r in transactions)
+                  assert all(r['native_output'] == r['independent_output'] for r in queries)
+                  result[lane][fork] = {'transactions': transactions, 'queries': queries}
           Path('pkg/application-sequences.json').write_text(json.dumps(result, indent=2) + '\n')
           PYTHON
       - name: Retain signed inputs, roots, logs and actual getter outputs

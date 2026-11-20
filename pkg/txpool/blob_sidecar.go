@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	corestate "github.com/eth2030/eth2030/core/state"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
@@ -83,12 +84,17 @@ func verifyCellProofSidecar(sidecar *types.BlobSidecarData) error {
 // admitting a transaction or treating absent blob data as authenticated. The
 // relay must separately bind commitments, recover the signed sender and verify
 // cells; complete promotion still uses AddRemote and full-sidecar validation.
-func (pool *TxPool) ValidateSparseBlobMetadata(tx *types.Transaction) error {
+func (pool *TxPool) ValidateSparseBlobMetadata(tx *types.Transaction) (result error) {
 	if tx == nil || tx.Type() != types.BlobTxType {
 		return errors.New("sparse metadata requires a blob transaction")
 	}
-	pool.mu.RLock()
-	defer pool.mu.RUnlock()
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+	defer func() {
+		if err := corestate.ReadError(pool.state); err != nil {
+			result = err
+		}
+	}()
 	if pool.chainID != nil && (tx.ChainId() == nil || tx.ChainId().Cmp(pool.chainID) != 0) {
 		return errors.New("blob transaction chain ID mismatch")
 	}

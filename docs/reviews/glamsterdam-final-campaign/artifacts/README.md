@@ -10,8 +10,10 @@ Current bundles:
 | durability.tar.gz | 69 | 24286250 | 2029206 | Original process OS faults/WAL, cold sync, indexing, final-source startup and retained-history observations. |
 | operating.tar.gz | 37 | 41474947 | 3627478 | Original accepted pre-network-fix operating windows and the unqualified first pressure cadence attempt. |
 | provenance.tar.zst | 33 | 5122689 | 363665 | Public genesis/trusted bootstrap, exact source/fixture pins, source/license/lock inventories and byte-identical native rebuild. |
+| network-recovery.tar.zst | 54 | 9690942 | 113352 | Installed dependency race, original failed adapters, exact module deployment and three automatic provider-loss recoveries. |
+| final-operating.tar.zst | 22 | 27539344 | 1088606 | Final compatible 400-slot steady and 60-slot pressure measurements, independent finality/offline replays, 270 account proofs and exactly reproducible Engine selections. |
 
-Final network-recovery, final operating/cold-source and registry continuation inputs are being added as separate bundles. Those pending cases are not represented as completed by the three archives above.
+Final cold-source and registry continuation inputs are being added as separate bundles. These pending cases are not represented as completed by the archives above.
 
 Verify an archive from the repository root:
 

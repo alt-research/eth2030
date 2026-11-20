@@ -1,0 +1,89 @@
+{
+  "native_revision": "3dc08a931d804c58efa5a6c25c40d2d75eb25e7c",
+  "native_dirty": false,
+  "oracle": "unchanged Geth v1.17.10",
+  "eips_revision": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "raw_go_json_sha256": "eb2d539b822d2cda0b742c0a5b162b31c1ce9aef775347976bb65c3b0c5d0384",
+  "forks": {
+    "Osaka": {
+      "signed_transactions": 31,
+      "getter_queries": 17,
+      "final_root": "0x4f1bcca3308d3ecf6a65d18f6405ab3db378697c136d08bf4ce61242940a012d",
+      "failed_transaction_statuses": 2,
+      "gas_controls": [
+        {
+          "name": "wallet 30k-forwarded-gas fresh storage",
+          "gas_limit": 8000000,
+          "gas_paid": 85924,
+          "execution_gas": 85924,
+          "state_gas": 0,
+          "native_root": "0x73ef2b1d3ba498daf60ec050da19dfde664e2ba1f3a6c54cda4df14c52cad8e6"
+        },
+        {
+          "name": "wallet 15k-forwarded-gas failure handler",
+          "gas_limit": 8000000,
+          "gas_paid": 71155,
+          "execution_gas": 71155,
+          "state_gas": 0,
+          "native_root": "0xc48838545d68e0a2765d4ba055527413858dc1a2b76c3dd1e6d90375ea626369"
+        },
+        {
+          "name": "wallet no-reservoir sibling allowance refill",
+          "gas_limit": 1000000,
+          "gas_paid": 71194,
+          "execution_gas": 71194,
+          "state_gas": 0,
+          "native_root": "0xb3ab24c31193a8fd4cbcd85a28291c7ffb1bc7bd87c4a5e7e2875b120bea162d"
+        },
+        {
+          "name": "wallet no-reservoir nested rollback",
+          "gas_limit": 1000000,
+          "gas_paid": 91706,
+          "execution_gas": 91706,
+          "state_gas": 0,
+          "native_root": "0x0f8b95593526c6a117544ca7633c23942c2a55d70caf87f9a281a2e766b6b91e"
+        }
+      ]
+    },
+    "Amsterdam": {
+      "signed_transactions": 31,
+      "getter_queries": 17,
+      "final_root": "0x69cfbd6085e8662595d56e93e818299271dd005b9619cae88baf1f7caca88b49",
+      "failed_transaction_statuses": 2,
+      "gas_controls": [
+        {
+          "name": "wallet 30k-forwarded-gas fresh storage",
+          "gas_limit": 100000000,
+          "gas_paid": 185444,
+          "execution_gas": 87524,
+          "state_gas": 97920,
+          "native_root": "0xb459a1d1e5dababed5ab92ff7f9e31f43ca50111899d78ea950bf3436113d013"
+        },
+        {
+          "name": "wallet 15k-forwarded-gas failure handler",
+          "gas_limit": 100000000,
+          "gas_paid": 75455,
+          "execution_gas": 75455,
+          "state_gas": 0,
+          "native_root": "0x1a765b8e8564d77ccdff86f87df25a46b0f3c0cd175d7efe6bc49217d46fcbea"
+        },
+        {
+          "name": "wallet no-reservoir sibling allowance refill",
+          "gas_limit": 1000000,
+          "gas_paid": 73692,
+          "execution_gas": 83692,
+          "state_gas": 0,
+          "native_root": "0x008ec09ce9e9f750562e745d55488a09e8170706be531a7c1307f035ad353dad"
+        },
+        {
+          "name": "wallet no-reservoir nested rollback",
+          "gas_limit": 1000000,
+          "gas_paid": 86806,
+          "execution_gas": 86806,
+          "state_gas": 0,
+          "native_root": "0xf33583cda80cdffb949ecc1c6dee8f421f1acbe943a218f5c3a9f56174dd1bb1"
+        }
+      ]
+    }
+  }
+}

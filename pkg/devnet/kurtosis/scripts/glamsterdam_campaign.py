@@ -133,6 +133,49 @@ def decoded(record):
     return value
 
 
+def restore_builder_runtime(base, original, record):
+    """Restore fleet size before enabling the producer's lifecycle manager."""
+
+    def request(method, path, value=None):
+        data = None if value is None else json.dumps(value).encode()
+        req = urllib.request.Request(
+            base + path,
+            data,
+            {} if data is None else {"Content-Type": "application/json"},
+            method=method,
+        )
+        try:
+            response = OPENER.open(req, timeout=10)
+        except urllib.error.HTTPError as error:
+            response = error
+        with response:
+            row = {
+                "started": now(),
+                "url": base + path,
+                "method": method,
+                "request": value,
+                "http_status": response.status,
+                "response": response.read().decode(),
+            }
+        record(row)
+        if row["http_status"] != 200:
+            raise RuntimeError("builder runtime restore failed: " + json.dumps(row))
+        return json.loads(row["response"])
+
+    current = request("GET", "/api/v1/config")
+    target = original["builder_keys"]["target_count"]
+    if current["builder_keys"]["target_count"] != target:
+        request("POST", "/api/v1/builder-keys/target", {"target": target})
+    if current["lifecycle_enabled"] != original["lifecycle_enabled"]:
+        request(
+            "PATCH",
+            "/api/v1/config",
+            {"lifecycle_enabled": original["lifecycle_enabled"]},
+        )
+    if request("GET", "/api/v1/config") != original:
+        raise RuntimeError("builder restart changed other declared runtime settings")
+
+
 def assert_private_network(nodes):
     for service, node in nodes.items():
         if service.startswith("el-"):

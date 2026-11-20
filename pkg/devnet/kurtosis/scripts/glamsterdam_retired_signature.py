@@ -33,7 +33,7 @@ def child_bytes(entry, index):
     return scalar.to_bytes(32, "big")
 
 
-def old_key(builder_container):
+def old_key(builder_container, key_index, public_key):
     v = json.loads(
         subprocess.check_output(["docker", "inspect", builder_container], text=True)
     )[0]
@@ -44,10 +44,8 @@ def old_key(builder_container):
     assert match is not None
     # Frozen producer source and public-key checks bind this exact EIP-2333
     # child to the actual retired key. No secret is written to an artifact.
-    sk = int.from_bytes(child_bytes(bytes.fromhex(match.group(1)), 1), "big")
-    expected = bytes.fromhex(
-        "b49b274d74d615523a5591a22a37b4e9cdfb1fbaab95df7e8aae393d5823493011965f67213574ffcd7138c9689aa96e"
-    )
+    sk = int.from_bytes(child_bytes(bytes.fromhex(match.group(1)), key_index), "big")
+    expected = bytes.fromhex(public_key.removeprefix("0x"))
     assert bytes(bls.SkToPk(sk)) == expected
     return sk, expected
 
@@ -57,6 +55,11 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("--builder-container", required=True)
 parser.add_argument("--capture", type=Path)
+parser.add_argument("--retired-key-index", type=int, default=1)
+parser.add_argument(
+    "--retired-pubkey",
+    default="0xb49b274d74d615523a5591a22a37b4e9cdfb1fbaab95df7e8aae393d5823493011965f67213574ffcd7138c9689aa96e",
+)
 args = parser.parse_args()
 # Independent published EIP-2333 child derivation vectors, before private inputs.
 for master, index, child in [
@@ -84,7 +87,9 @@ for master, index, child in [
     assert (
         int.from_bytes(child_bytes(master.to_bytes(32, "big"), index), "big") == child
     )
-sk, expected = old_key(args.builder_container)
+sk, expected = old_key(
+    args.builder_container, args.retired_key_index, args.retired_pubkey
+)
 if args.capture is None:
     print(
         json.dumps(

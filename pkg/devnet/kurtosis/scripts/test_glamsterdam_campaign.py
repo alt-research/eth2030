@@ -3,6 +3,8 @@ import base64
 import tempfile
 import tarfile
 import io
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -56,6 +58,53 @@ class CampaignTests(unittest.TestCase):
                     archive.addfile(header, io.BytesIO(value))
             with self.assertRaisesRegex(ValueError, "captured bytes changed"):
                 artifacts.verify(altered)
+
+    def test_builder_fleet_is_restored_before_lifecycle_can_exit_a_live_key(self):
+        state = {"builder_keys": {"target_count": 1}, "lifecycle_enabled": False}
+        original = {"builder_keys": {"target_count": 2}, "lifecycle_enabled": True}
+        premature_exit = []
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+
+            def do_GET(self):
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(json.dumps(state).encode())
+
+            def do_POST(self):
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                state["builder_keys"]["target_count"] = body["target"]
+                self.do_GET()
+
+            def do_PATCH(self):
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                if (
+                    body["lifecycle_enabled"]
+                    and state["builder_keys"]["target_count"] != 2
+                ):
+                    premature_exit.append(True)
+                state["lifecycle_enabled"] = body["lifecycle_enabled"]
+                self.do_GET()
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever)
+        thread.start()
+        try:
+            rows = []
+            campaign.restore_builder_runtime(
+                "http://127.0.0.1:" + str(server.server_port), original, rows.append
+            )
+            self.assertEqual(state, original)
+            self.assertFalse(premature_exit)
+            self.assertEqual(
+                [row["method"] for row in rows], ["GET", "POST", "PATCH", "GET"]
+            )
+        finally:
+            server.shutdown()
+            thread.join()
+            server.server_close()
 
     def test_zstd_artifact_preserves_original_signed_bytes(self):
         with tempfile.TemporaryDirectory() as directory:

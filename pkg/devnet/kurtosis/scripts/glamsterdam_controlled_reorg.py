@@ -98,33 +98,11 @@ def post_plan(value):
 
 
 def restore_settings():
-    current = get(base + "/api/v1/config")
-    if current["lifecycle_enabled"] != original_config["lifecycle_enabled"]:
-        value = {"lifecycle_enabled": original_config["lifecycle_enabled"]}
-        req = urllib.request.Request(
-            base + "/api/v1/config",
-            json.dumps(value).encode(),
-            {"Content-Type": "application/json"},
-            method="PATCH",
-        )
-        with c.OPENER.open(req, timeout=10) as response:
-            body = response.read().decode()
-            status = response.status
-        trace.write(
-            json.dumps(
-                {
-                    "at": c.now(),
-                    "action": "restore-original-runtime-settings",
-                    "request": value,
-                    "status": status,
-                    "response": body,
-                }
-            )
-            + "\n"
-        )
+    def capture(row):
+        trace.write(json.dumps(row) + "\n")
         trace.flush()
-        assert status == 200
-    assert get(base + "/api/v1/config") == original_config
+
+    c.restore_builder_runtime(base, original_config, capture)
 
 
 original_config = get(base + "/api/v1/config")

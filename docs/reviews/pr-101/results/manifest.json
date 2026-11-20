@@ -102,6 +102,69 @@
       "uncompressed_bytes": 12228721,
       "sha256": "acd22d753076bd8585f925f7187233b3881474e29354f4683af816c42f460139",
       "compressed_bytes": 917876
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z.json.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z.json",
+      "uncompressed_bytes": 59747,
+      "sha256": "f324101a7d658861fb27d7c796f8c8d9edaa4bb2ac63bd05fa293c80fc0d1fc4",
+      "compressed_bytes": 7029
+    },
+    {
+      "file": "attempt4-reference-period1-finality.jsonl.gz",
+      "uncompressed_file": "attempt4-reference-period1-finality.jsonl",
+      "uncompressed_bytes": 419589,
+      "sha256": "df865ba05316829f5cf3a95550175d7daab1faab809ea57f86eb067fcd87220c",
+      "compressed_bytes": 128721
+    },
+    {
+      "file": "actual-builder-ledger-network-spec.json.gz",
+      "uncompressed_file": "actual-builder-ledger-network-spec.json",
+      "uncompressed_bytes": 7752,
+      "sha256": "a65eaaedb6cfbed35a6542b383f549e1a3a0587af64233082e6ba3a30d6ec17d",
+      "compressed_bytes": 2272
+    },
+    {
+      "file": "actual-multi-row-partial-vectors.json.gz",
+      "uncompressed_file": "actual-multi-row-partial-vectors.json",
+      "uncompressed_bytes": 26226,
+      "sha256": "17e7a70e3dcd296b66d0809658662a4a25a672a6b2f0dfd4c6a565c11d12c447",
+      "compressed_bytes": 714
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z-before.ssz.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z-before.ssz",
+      "uncompressed_bytes": 3287890,
+      "sha256": "67c90e8e64ea2399fe24e7b78010bb296ae07b136ed8127c8705a605d7a97bea",
+      "compressed_bytes": 627191
+    },
+    {
+      "file": "attempt4-builder-ledger-fresh-20261119T234834Z-after.ssz.gz",
+      "uncompressed_file": "attempt4-builder-ledger-fresh-20261119T234834Z-after.ssz",
+      "uncompressed_bytes": 3288006,
+      "sha256": "a0024e005fbcd83be6642605f6d3fc82420fb1e288d02b1d8c32bcacdfe018df",
+      "compressed_bytes": 627243
+    },
+    {
+      "file": "attempt4-blob-post-state-87799773fc57.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-87799773fc57.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
+    },
+    {
+      "file": "attempt4-blob-post-state-d01ee49c0c9e.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-d01ee49c0c9e.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
+    },
+    {
+      "file": "attempt4-blob-post-state-a6e54fb93e7c.ssz.gz",
+      "uncompressed_file": "attempt4-blob-post-state-a6e54fb93e7c.ssz",
+      "uncompressed_bytes": 3290514,
+      "sha256": "fcea435ebc712112cd4e2d9454a77fcbde4ea0a81222faf891d695bb30559bce",
+      "compressed_bytes": 459334
     }
   ],
   "scope_limit": "Original successful application/single-blob/proof consumers plus actual multi-row inputs and the failed first operating window with explicit peer recovery. Multi-row peer and final storage/resource gates remain open. No runtime secrets or private databases are included.",
@@ -127,5 +190,22 @@
       "head": "8896b32b07d1b0c49a597e509f00345b3c71d2a0",
       "runtime_deployed": false
     }
+  },
+  "source_tuple_scope": "The original active_node_sources describe the original three-pair application/blob inputs. Later auxiliary and reference cases below retain their own exact tuples and do not rewrite that original dataset.",
+  "subsequent_cases": {
+    "actual_multi_row_slot": 5747,
+    "actual_builder_ledger_slots": [
+      9600,
+      9601
+    ],
+    "independent_period1_signature_slot": 10150,
+    "independent_period1_finalized_slot": 10080,
+    "auxiliary_history_query_native": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+    "auxiliary_fast_restart_native": "ca45d52424b94f9f1ea40c5aa4ca1fed76fa2534",
+    "auxiliary_partial_cl_production": "d547ba984",
+    "lighthouse_published_test_head": "19c4ff36d",
+    "original_failed_snap_source": "ca45d52424b94f9f1ea40c5aa4ca1fed76fa2534",
+    "corrected_snap_review": 112,
+    "corrected_snap_runtime_result": "pending"
   }
 }

@@ -1,0 +1,74 @@
+{
+  "spec_revision": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "passed": true,
+  "nodes": [
+    {
+      "container": "87799773fc57",
+      "full_cell_proofs": 256,
+      "block_and_envelope_bls_verified": true,
+      "post_state_root_verified": true,
+      "transaction_keccak_and_two_ordered_versioned_hashes_verified": true
+    },
+    {
+      "container": "d01ee49c0c9e",
+      "full_cell_proofs": 256,
+      "block_and_envelope_bls_verified": true,
+      "post_state_root_verified": true,
+      "transaction_keccak_and_two_ordered_versioned_hashes_verified": true
+    },
+    {
+      "container": "a6e54fb93e7c",
+      "full_cell_proofs": 256,
+      "block_and_envelope_bls_verified": true,
+      "post_state_root_verified": true,
+      "transaction_keccak_and_two_ordered_versioned_hashes_verified": true
+    }
+  ],
+  "rejections": [
+    {
+      "case": "row_order_swapped",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "proof_rows_swapped",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "row1_claimed_as_row0",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "wrong_bitmap_length",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "empty_partial",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "missing_cell",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "missing_proof",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "wrong_column_index",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "group_slot_mismatch",
+      "expected": "GossipReject"
+    },
+    {
+      "case": "unseen_block",
+      "expected": "GossipIgnore"
+    },
+    {
+      "case": "known_invalid_block",
+      "expected": "GossipReject"
+    }
+  ],
+  "context_scope": "The unchanged normative partial validator receives only its two store maps, projected from the three actual non-optimistic imported block/state APIs, with independently verified signatures, full state roots, cells and commitments. No fork-choice transition is simulated."
+}

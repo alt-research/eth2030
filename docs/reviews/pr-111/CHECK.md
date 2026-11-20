@@ -4,4 +4,4 @@
 - [x] Restore only an indexed, fully authenticated original head after checking its durable execution-validation marker and complete canonical ancestry/header/body commitments.
 - [x] Preserve legacy/snap fallback, finality and forkchoice authority; keep initial network imports on normal execution validation.
 - [x] Exercise restart/exact historical readback, corrupted nodes/bodies/ancestry, missing validation markers, branch context and ordinary next-block import with independent roots/proofs.
-- [ ] Run affected/full/race/integration/vet/build checks, publish the separate review and repeat the unchanged actual restart budget.
+- [x] Run affected/full/race/integration/vet/build checks, publish the separate review and repeat the unchanged actual restart budget.

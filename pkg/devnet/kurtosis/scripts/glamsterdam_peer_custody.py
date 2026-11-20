@@ -134,6 +134,8 @@ def run(output, binary):
                     provider_id,
                 )
         time.sleep(12)
+        # Rediscover public bindings after changing a real container network.
+        nodes = c.inventory()
         metric_nodes = {
             "target": nodes["cl-1-lighthouse-geth"],
             "observer": {"ports": inspect(observer_id)["NetworkSettings"]["Ports"]},

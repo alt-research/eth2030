@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"math/big"
@@ -172,7 +173,12 @@ func (b *RPCBackend) StateAtHeader(header *types.Header) (state.StateDB, error) 
 	}
 	ctx, cancel := context.WithTimeout(b.executionContext(), 5*time.Second)
 	defer cancel()
-	return bc.StateAtBlockContext(ctx, blk)
+	st, err := bc.StateAtBlockContext(ctx, blk)
+	if err != nil {
+		return nil, err
+	}
+	state.SetReadContext(st, b.executionContext())
+	return st, nil
 }
 
 func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, blockNumber rpc.BlockNumber) (*trie.AccountProof, error) {
@@ -189,6 +195,20 @@ func (b *RPCBackend) GetProofAtHeader(addr types.Address, storageKeys []types.Ha
 		return nil, err
 	}
 
+	if lazy, ok := statedb.(*state.SnapStateDB); ok {
+		root := lazy.GetRoot()
+		if err := state.ReadError(lazy); err != nil {
+			return nil, err
+		}
+		if root != header.Root {
+			return nil, fmt.Errorf("proof state root differs from requested header")
+		}
+		if proof, err := lazy.HistoricalProof(addr, storageKeys); err == nil {
+			return proof, nil
+		} else if !errors.Is(err, state.ErrNoHistoryTrie) {
+			return nil, err
+		}
+	}
 	snapshot, err := state.ExportStateSnapshot(statedb)
 	if err != nil {
 		return nil, err

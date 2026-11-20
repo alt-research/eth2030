@@ -2,6 +2,7 @@ package state
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"math/big"
 	"sort"
@@ -244,9 +245,14 @@ func LoadStateSnapshot(db rawdb.Database, root types.Hash) (*StateSnapshot, erro
 // SnapStateDB executes on a verified hashed snapshot with a journalled native
 // dirty overlay. Snapshot data is immutable and shared across Dup copies.
 type SnapStateDB struct {
-	memory *MemoryStateDB
-	base   *StateSnapshot
-	db     rawdb.Database
+	memory          *MemoryStateDB
+	base            *StateSnapshot
+	db              rawdb.Database
+	history         *historyView
+	historyCtx      context.Context
+	historyErr      error
+	historyPrepared *historyView
+	historyRevision uint64
 }
 
 func OpenSnapState(db rawdb.Database, root types.Hash) (*SnapStateDB, error) {
@@ -254,11 +260,32 @@ func OpenSnapState(db rawdb.Database, root types.Hash) (*SnapStateDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SnapStateDB{NewMemoryStateDB(), snap, db}, nil
+	return &SnapStateDB{memory: NewMemoryStateDB(), base: snap, db: db}, nil
 }
 
 func (s *SnapStateDB) load(addr types.Address) {
 	if s.memory.stateObjects[addr] != nil {
+		return
+	}
+
+	if s.history != nil {
+		account, err := s.history.account(s.historyCtx, addr)
+		if err != nil {
+			s.historyFailure(err)
+			return
+		}
+		if account == nil {
+			absent := newStateObject()
+			absent.deleted = true
+			s.memory.stateObjects[addr] = absent
+			return
+		}
+		obj := newStateObject()
+		obj.account.Nonce = account.Nonce
+		obj.account.Balance = new(big.Int).Set(account.Balance)
+		obj.account.CodeHash = bytes.Clone(account.CodeHash)
+		obj.dbStorageRoot = types.BytesToHash(account.Root)
+		s.memory.stateObjects[addr] = obj
 		return
 	}
 	body := s.base.Accounts[crypto.Keccak256Hash(addr[:])]
@@ -287,6 +314,16 @@ func (s *SnapStateDB) loadSlot(addr types.Address, key types.Hash) {
 	}
 	// A newly created account must not inherit the old account's storage.
 	if obj.dbStorageRoot == (types.Hash{}) {
+		return
+	}
+
+	if s.history != nil {
+		value, err := s.history.storage(s.historyCtx, obj.dbStorageRoot, key)
+		if err != nil {
+			s.historyFailure(err)
+			return
+		}
+		obj.committedStorage[key] = value
 		return
 	}
 	enc := s.base.Storage[crypto.Keccak256Hash(addr[:])][crypto.Keccak256Hash(key[:])]
@@ -326,6 +363,14 @@ func (s *SnapStateDB) SetStorage(a types.Address, values map[types.Hash]types.Ha
 }
 
 func (s *SnapStateDB) snapshot() *StateSnapshot {
+	if s.history != nil {
+		snapshot, err := s.historySnapshot()
+		if err != nil {
+			s.historyFailure(err)
+			return NewStateSnapshot()
+		}
+		return snapshot
+	}
 	out := s.base.copy()
 	applySnapshotOverlay(out, s.memory)
 	return out
@@ -366,11 +411,45 @@ func applySnapshotOverlay(out *StateSnapshot, mem *MemoryStateDB) {
 	}
 }
 
-func (s *SnapStateDB) GetRoot() types.Hash { return s.snapshot().Root() }
+func (s *SnapStateDB) GetRoot() types.Hash {
+	if s.history != nil {
+		view, err := s.preparedHistory()
+		if err != nil {
+			return types.Hash{}
+		}
+		return view.root
+	}
+	return s.snapshot().Root()
+}
 func (s *SnapStateDB) StorageRoot(addr types.Address) types.Hash {
+	if s.history != nil {
+		v, err := s.preparedHistory()
+		if err != nil {
+			return types.Hash{}
+		}
+		account, err := v.account(s.historyCtx, addr)
+		if err != nil {
+			s.historyFailure(err)
+			return types.Hash{}
+		}
+		if account == nil {
+			return types.EmptyRootHash
+		}
+		return types.BytesToHash(account.Root)
+	}
 	return snapshotTrie(s.snapshot().Storage[crypto.Keccak256Hash(addr[:])]).Hash()
 }
 func (s *SnapStateDB) Commit() (types.Hash, error) {
+	if s.history != nil {
+		v, err := s.preparedHistory()
+		if err != nil {
+			return types.Hash{}, err
+		}
+		s.history = v
+		s.historyPrepared = nil
+		s.memory = NewMemoryStateDB()
+		return v.root, nil
+	}
 	snap := s.snapshot()
 	root := snap.Root()
 	if s.db != nil {
@@ -382,13 +461,17 @@ func (s *SnapStateDB) Commit() (types.Hash, error) {
 	s.memory = NewMemoryStateDB()
 	return root, nil
 }
-func (s *SnapStateDB) Dup() StateDB { return &SnapStateDB{s.memory.Copy(), s.base, s.db} }
+func (s *SnapStateDB) Dup() StateDB {
+	return &SnapStateDB{memory: s.memory.Copy(), base: s.base, db: s.db, history: s.history, historyCtx: s.historyCtx, historyErr: s.historyErr, historyPrepared: s.historyPrepared, historyRevision: s.historyRevision}
+}
 
 // ExecutionCopy keeps the authenticated bootstrap base and a private journal.
 // New canonical states are persisted by the chain's validated block batch;
 // committing execution must not duplicate the entire downloaded flat snapshot.
 func (s *SnapStateDB) ExecutionCopy() *SnapStateDB {
-	return &SnapStateDB{memory: s.memory.Copy(), base: s.base}
+	copy := s.Dup().(*SnapStateDB)
+	copy.db = nil
+	return copy
 }
 
 func (s *SnapStateDB) CreateAccount(addr types.Address) {
@@ -423,6 +506,7 @@ func (s *SnapStateDB) SetNonce(addr types.Address, nonce uint64) {
 
 func (s *SnapStateDB) GetCode(addr types.Address) []byte {
 	s.load(addr)
+	s.loadHistoryCode(addr)
 	return bytes.Clone(s.memory.GetCode(addr))
 }
 
@@ -438,6 +522,7 @@ func (s *SnapStateDB) GetCodeHash(addr types.Address) types.Hash {
 
 func (s *SnapStateDB) GetCodeSize(addr types.Address) int {
 	s.load(addr)
+	s.loadHistoryCode(addr)
 	return s.memory.GetCodeSize(addr)
 }
 
@@ -467,12 +552,18 @@ var _ StateDB = (*SnapStateDB)(nil)
 // leaves for snap serving. Callers obtain the copy through StateAtBlock.
 func ExportStateSnapshot(db StateDB) (*StateSnapshot, error) {
 	if s, ok := db.(*SnapStateDB); ok {
-		return s.snapshot(), nil
+		snapshot := s.snapshot()
+		if err := ReadError(s); err != nil {
+			return nil, err
+		}
+		return snapshot, nil
 	}
 	out := NewStateSnapshot()
 	switch s := db.(type) {
 	case *MemoryStateDB:
 		applySnapshotOverlay(out, s)
+	case *TrieBackedStateDB:
+		applySnapshotOverlay(out, s.MemoryStateDB)
 	case *TrieStateDB:
 		frozen := s.frozenAccounts
 		if frozen == nil {

@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/holiman/uint256"
@@ -51,4 +52,9 @@ func (s *simulationBalanceState) FinalizeTransaction() {
 	if target, ok := s.StateDB.(interface{ FinalizeTransaction() }); ok {
 		target.FinalizeTransaction()
 	}
+}
+
+func (s *simulationBalanceState) Error() error { return state.ReadError(s.StateDB) }
+func (s *simulationBalanceState) SetReadContext(ctx context.Context) {
+	state.SetReadContext(s.StateDB, ctx)
 }

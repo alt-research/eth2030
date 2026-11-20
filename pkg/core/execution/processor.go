@@ -242,6 +242,9 @@ func (p *StateProcessor) Process(block *types.Block, statedb state.StateDB) ([]*
 // along with the computed Block Access List (EIP-7928). The BAL is populated
 // only when the Amsterdam fork is active; otherwise it is nil.
 func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateDB) (*ProcessResult, error) {
+	if p.ctx != nil {
+		state.SetReadContext(statedb, p.ctx)
+	}
 	if err := p.contextError(); err != nil {
 		return nil, err
 	}
@@ -552,6 +555,9 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		}(),
 	)
 
+	if err := state.ReadError(statedb); err != nil {
+		return nil, err
+	}
 	return &ProcessResult{
 		Receipts:        receipts,
 		Requests:        requests,
@@ -1786,6 +1792,9 @@ func executeMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, state
 		dimStorageGas = dimUsage.DimStorage
 	}
 
+	if err := state.ReadError(statedb); err != nil {
+		return nil, err
+	}
 	return &ExecutionResult{
 		UsedGas:         gasUsed,
 		MaxUsedGas:      gasUsedBeforeRefund,

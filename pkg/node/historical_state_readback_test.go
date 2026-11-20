@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -212,6 +213,40 @@ func TestRetainedHistoricalHeaderReadsColdStateAndProofs(t *testing.T) {
 			n = newTestNode(t, &cfg)
 			rpc = track4NodeRPC(t, n, token)
 			read("restarted")
+
+			// Point readers must surface corrupt accessed content as an error,
+			// without returning a successful zero or poisoning another request.
+			backend := nodebackend.NewRPCBackend(toNodeDeps(n), n.engBackend).(*nodebackend.RPCBackend)
+			proof, err := backend.GetProof(reader, []types.Hash{slot}, 1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, fault := range []struct {
+				key    []byte
+				method string
+				params []any
+			}{
+				{append([]byte("mpt-history-node/"), proof.StorageHash[:]...), "eth_getStorageAt", []any{reader.Hex(), "0x0", "0x1"}},
+				{append([]byte("snap-code/"), proof.CodeHash[:]...), "eth_getCode", []any{reader.Hex(), "0x1"}},
+				{append([]byte("snap-code/"), proof.CodeHash[:]...), "eth_call", []any{map[string]any{"to": reader.Hex(), "gas": "0x493e0"}, "0x1"}},
+			} {
+				original, err := n.db.Get(fault.key)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := n.db.Put(fault.key, []byte{0x80}); err != nil {
+					t.Fatal(err)
+				}
+				var output string
+				err = rpc.invoke(fault.method, &output, fault.params...)
+				if restore := n.db.Put(fault.key, original); restore != nil {
+					t.Fatal(restore)
+				}
+				if err == nil || !strings.Contains(err.Error(), "state history") {
+					t.Fatalf("%s returned successful zero/empty or wrong fault: %s %v", fault.method, output, err)
+				}
+			}
+			read("restored after accessed-content faults")
 		})
 	}
 }

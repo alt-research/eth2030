@@ -16,6 +16,26 @@ import glamsterdam_artifacts as artifacts
 
 
 class CampaignTests(unittest.TestCase):
+    def test_runtime_identity_uses_original_container_uid_when_root_cannot_read_inode(
+        self,
+    ):
+        node = {"container": "builder-owned-process"}
+        expected = "/proc/7/exe /usr/local/bin/buildoor actual-inode-hash\n"
+        with patch.object(campaign, "docker", side_effect=["", expected]) as run:
+            self.assertEqual(campaign.executable_hashes(node), expected)
+        self.assertEqual(
+            run.call_args_list[0].args[:4],
+            ("exec", "--user", "root", node["container"]),
+        )
+        self.assertEqual(run.call_args_list[1].args[:2], ("exec", node["container"]))
+
+    def test_runtime_identity_rejects_an_unreadable_process_in_both_accounts(self):
+        with patch.object(campaign, "docker", return_value=""):
+            with self.assertRaisesRegex(
+                RuntimeError, "executable identity unavailable"
+            ):
+                campaign.executable_hashes({"container": "no-readable-inode"})
+
     def test_artifact_requires_complete_original_files_and_never_replaces_prior_evidence(
         self,
     ):

@@ -197,7 +197,16 @@ case "$p" in
   printf '%s %s ' "$f" "$p"; sha256sum "$f" || exit 1;;
 esac
 done"""
-    return docker("exec", "--user", "root", node["container"], "sh", "-c", script)
+    result = docker("exec", "--user", "root", node["container"], "sh", "-c", script)
+    if not result.strip():
+        # A container root without ptrace capability cannot read another UID's
+        # executable inode. Use the original process account, without changing it.
+        result = docker("exec", node["container"], "sh", "-c", script)
+    if not result.strip():
+        raise RuntimeError(
+            "running executable identity unavailable: " + node["container"]
+        )
+    return result
 
 
 def snapshot(output):

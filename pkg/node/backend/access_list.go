@@ -91,6 +91,9 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 	if header == nil {
 		return nil, fmt.Errorf("block not found")
 	}
+	return b.CreateAccessListAtHeader(args, header)
+}
+func (b *RPCBackend) CreateAccessListAtHeader(args rpctypes.CallArgs, header *types.Header) (*rpcbackend.AccessListResult, error) {
 	base, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
@@ -119,7 +122,7 @@ func (b *RPCBackend) CreateAccessList(args rpctypes.CallArgs, number rpctypes.Bl
 		}
 		candidate := *msg
 		candidate.AccessList = list
-		result, err := execution.SimulateMessage(cfg, b.node.Blockchain().GetHashFn(), tracked, header, &candidate, new(gaspool.GasPool).AddGas(limit), true, vm.Config{})
+		result, err := execution.SimulateMessage(cfg, b.traceHashFn(header), tracked, header, &candidate, new(gaspool.GasPool).AddGas(limit), true, vm.Config{})
 		if err != nil {
 			return nil, err
 		}

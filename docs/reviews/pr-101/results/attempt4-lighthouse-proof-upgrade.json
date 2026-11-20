@@ -1,0 +1,108 @@
+{
+  "started_at": "2026-11-19T18:44:59.196983+00:00",
+  "production_source": "66661993f219136627e4d68ab4d9e8cd65870b8d",
+  "binary_sha256": "26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8",
+  "declared_role_recovery_seconds": 180,
+  "roles": [
+    {
+      "container": "87799773fc57",
+      "role": "beacon",
+      "started_at": "2026-11-19T18:44:59.211709+00:00",
+      "before_finalized_checkpoint": {
+        "epoch": "107",
+        "root": "0x0e7cdfa8e9db1b37f57241cd3197218df98d776e7c737e700fd43585694491a1"
+      },
+      "clean_client_shutdown": true,
+      "version": "Lighthouse v8.4.0-rc.0-6666199\nBLS library: blst\nBLS hardware acceleration: true\nSHA256 hardware acceleration: true\nAllocator: jemalloc (4K)\nProfile: release\nSpecs: mainnet (true), minimal (false), gnosis (false)",
+      "sha256": "26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8",
+      "active_rpc": "http://127.0.0.1:32908",
+      "after_head": {
+        "root": "0x79d042c3ff51debe915d0803074636478c356053348387b7df4acabbffbc06dc",
+        "canonical": true,
+        "header": {
+          "message": {
+            "slot": "3528",
+            "proposer_index": "264",
+            "parent_root": "0xa513027c9298e75d6ce1ad30c76ee3ed62b9adb56249cdd65cf9207fea30c679",
+            "state_root": "0xa19c95900535e9ac9061fe81c19107d657f0251889cbcd54d0b811b770f0fb55",
+            "body_root": "0x03448aa176d68eb07d29b7c451d851d3eae960b804072f7c0c4c2ef539382c16"
+          },
+          "signature": "0x8c22593c1bed6c3d155af7c3ee696bd1c016299b06f38594394928e6568c8b179e11ba0208b55d98523ecbd0e9697d7b12ef97b69484c19309f36db3cff25fd64245702b8d2d51d0b725fc8eee4a88c4fb3a0debacde94968adfd2cc6521d57d"
+        }
+      },
+      "after_status": {
+        "is_syncing": false,
+        "is_optimistic": false,
+        "el_offline": false,
+        "head_slot": "3528",
+        "sync_distance": "1"
+      },
+      "daemon_version": {
+        "data": {
+          "version": "Lighthouse/v8.4.0-rc.0-6666199/x86_64-linux"
+        }
+      },
+      "completed_at": "2026-11-19T18:45:03.251543+00:00"
+    },
+    {
+      "container": "2a97e3e0910f",
+      "role": "validator",
+      "started_at": "2026-11-19T18:45:03.264944+00:00",
+      "clean_client_shutdown": true,
+      "version": "Lighthouse v8.4.0-rc.0-6666199\nBLS library: blst\nBLS hardware acceleration: true\nSHA256 hardware acceleration: true\nAllocator: jemalloc (4K)\nProfile: release\nSpecs: mainnet (true), minimal (false), gnosis (false)",
+      "sha256": "26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8",
+      "completed_at": "2026-11-19T18:45:04.350356+00:00"
+    },
+    {
+      "container": "a6e54fb93e7c",
+      "role": "beacon",
+      "started_at": "2026-11-19T18:45:04.363404+00:00",
+      "before_finalized_checkpoint": {
+        "epoch": "107",
+        "root": "0x0e7cdfa8e9db1b37f57241cd3197218df98d776e7c737e700fd43585694491a1"
+      },
+      "clean_client_shutdown": true,
+      "version": "Lighthouse v8.4.0-rc.0-6666199\nBLS library: blst\nBLS hardware acceleration: true\nSHA256 hardware acceleration: true\nAllocator: jemalloc (4K)\nProfile: release\nSpecs: mainnet (true), minimal (false), gnosis (false)",
+      "sha256": "26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8",
+      "active_rpc": "http://127.0.0.1:32912",
+      "after_head": {
+        "root": "0x79d042c3ff51debe915d0803074636478c356053348387b7df4acabbffbc06dc",
+        "canonical": true,
+        "header": {
+          "message": {
+            "slot": "3528",
+            "proposer_index": "264",
+            "parent_root": "0xa513027c9298e75d6ce1ad30c76ee3ed62b9adb56249cdd65cf9207fea30c679",
+            "state_root": "0xa19c95900535e9ac9061fe81c19107d657f0251889cbcd54d0b811b770f0fb55",
+            "body_root": "0x03448aa176d68eb07d29b7c451d851d3eae960b804072f7c0c4c2ef539382c16"
+          },
+          "signature": "0x8c22593c1bed6c3d155af7c3ee696bd1c016299b06f38594394928e6568c8b179e11ba0208b55d98523ecbd0e9697d7b12ef97b69484c19309f36db3cff25fd64245702b8d2d51d0b725fc8eee4a88c4fb3a0debacde94968adfd2cc6521d57d"
+        }
+      },
+      "after_status": {
+        "is_syncing": false,
+        "is_optimistic": false,
+        "el_offline": false,
+        "head_slot": "3528",
+        "sync_distance": "3"
+      },
+      "daemon_version": {
+        "data": {
+          "version": "Lighthouse/v8.4.0-rc.0-6666199/x86_64-linux"
+        }
+      },
+      "completed_at": "2026-11-19T18:45:08.338102+00:00"
+    },
+    {
+      "container": "9ff7332cc954",
+      "role": "validator",
+      "started_at": "2026-11-19T18:45:08.351859+00:00",
+      "clean_client_shutdown": true,
+      "version": "Lighthouse v8.4.0-rc.0-6666199\nBLS library: blst\nBLS hardware acceleration: true\nSHA256 hardware acceleration: true\nAllocator: jemalloc (4K)\nProfile: release\nSpecs: mainnet (true), minimal (false), gnosis (false)",
+      "sha256": "26f5aea5e3f1c7d2969bf3a9dacc54c0c7cd81dbedbfd8f234f097b81fb276b8",
+      "completed_at": "2026-11-19T18:45:09.377541+00:00"
+    }
+  ],
+  "passed": true,
+  "completed_at": "2026-11-19T18:45:09.377776+00:00"
+}

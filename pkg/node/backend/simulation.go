@@ -220,22 +220,12 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 	return msg, nil
 }
 
-func (b *RPCBackend) callState(number rpctypes.BlockNumber) (*types.Header, state.StateDB, error) {
-	header := b.HeaderByNumber(number)
-	if header == nil {
-		return nil, nil, fmt.Errorf("block not found")
-	}
-	db, err := b.StateAtHeader(header)
-	if err != nil {
-		return nil, nil, err
-	}
-	return header, db.Dup(), nil
-}
-func (b *RPCBackend) executeCall(args rpctypes.CallArgs, number rpctypes.BlockNumber, transactionRules bool, tracer *vm.StructLogTracer, overrides ...rpctypes.StateOverride) (*execution.ExecutionResult, error) {
-	header, db, err := b.callState(number)
+func (b *RPCBackend) executeCallAtHeader(args rpctypes.CallArgs, header *types.Header, transactionRules bool, tracer *vm.StructLogTracer, overrides ...rpctypes.StateOverride) (*execution.ExecutionResult, error) {
+	base, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err
 	}
+	db := base.Dup()
 	if err := applySimulationOverrides(db, overrides...); err != nil {
 		return nil, err
 	}
@@ -251,19 +241,33 @@ func (b *RPCBackend) executeCall(args rpctypes.CallArgs, number rpctypes.BlockNu
 	if err != nil {
 		return nil, err
 	}
-	return execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Precompiles: runtime}})
+	return execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: db}, header, msg, new(gaspool.GasPool).AddGas(msg.GasLimit), execution.SimulationConfig{TransactionRules: transactionRules, VMConfig: cfg, Overrides: execution.EVMOverrides{Precompiles: runtime}})
 }
 
 func (b *RPCBackend) Call(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) ([]byte, uint64, error) {
-	result, err := b.executeCall(args, number, false, nil, overrides...)
+	header := b.HeaderByNumber(number)
+	if header == nil {
+		return nil, 0, fmt.Errorf("block not found")
+	}
+	return b.CallAtHeader(args, header, overrides...)
+}
+func (b *RPCBackend) CallAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) ([]byte, uint64, error) {
+	result, err := b.executeCallAtHeader(args, header, false, nil, overrides...)
 	if err != nil {
 		return nil, 0, err
 	}
 	return result.ReturnData, result.UsedGas, result.Err
 }
 func (b *RPCBackend) TraceCall(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error) {
+	header := b.HeaderByNumber(number)
+	if header == nil {
+		return nil, fmt.Errorf("block not found")
+	}
+	return b.TraceCallAtHeader(args, header, overrides...)
+}
+func (b *RPCBackend) TraceCallAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) (*vm.StructLogTracer, error) {
 	tracer := vm.NewStructLogTracer()
-	result, err := b.executeCall(args, number, false, tracer, overrides...)
+	result, err := b.executeCallAtHeader(args, header, false, tracer, overrides...)
 	if err != nil {
 		return nil, err
 	}
@@ -271,10 +275,18 @@ func (b *RPCBackend) TraceCall(args rpctypes.CallArgs, number rpctypes.BlockNumb
 	return tracer, nil
 }
 func (b *RPCBackend) EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNumber, overrides ...rpctypes.StateOverride) (uint64, error) {
-	header, base, err := b.callState(number)
+	header := b.HeaderByNumber(number)
+	if header == nil {
+		return 0, fmt.Errorf("block not found")
+	}
+	return b.EstimateGasAtHeader(args, header, overrides...)
+}
+func (b *RPCBackend) EstimateGasAtHeader(args rpctypes.CallArgs, header *types.Header, overrides ...rpctypes.StateOverride) (uint64, error) {
+	stateDB, err := b.StateAtHeader(header)
 	if err != nil {
 		return 0, err
 	}
+	base := stateDB.Dup()
 	if err := applySimulationOverrides(base, overrides...); err != nil {
 		return 0, err
 	}
@@ -312,7 +324,7 @@ func (b *RPCBackend) EstimateGas(args rpctypes.CallArgs, number rpctypes.BlockNu
 	run := func(limit uint64) error {
 		candidate := *msg
 		candidate.GasLimit = limit
-		result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.node.Blockchain().GetHashFn(), &simulationBalanceState{StateDB: base.Dup()}, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Precompiles: runtime}})
+		result, err := execution.SimulateMessageWithConfig(b.node.Blockchain().Config(), b.traceHashFn(header), &simulationBalanceState{StateDB: base.Dup()}, header, &candidate, new(gaspool.GasPool).AddGas(limit), execution.SimulationConfig{TransactionRules: true, Overrides: execution.EVMOverrides{Precompiles: runtime}})
 		if err != nil {
 			return err
 		}

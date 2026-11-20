@@ -1,0 +1,5 @@
+FROM ethpandaops/lodestar@sha256:d210c407e21246c99804340792cdd20a253763c2b18fad5ff82173e61aacf1ad
+COPY state-transition-lib /usr/app/packages/state-transition/lib
+COPY bindings-mainnet.node bindings-minimal.node bindings-gnosis.node /usr/app/bindings/zig-out/lib/
+COPY cli-git-data.json /usr/app/packages/cli/.git-data.json
+LABEL source_repository="fyInALT/lodestar" source_commit="cf705b46b08ba8172d2e32225964ecb9bb1d2b95" base_commit="77088eb712e3580c17e59bfd85b2019de7057aad"

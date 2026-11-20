@@ -1,0 +1,66 @@
+{
+  "spec_revision": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "passed": true,
+  "bls_active": true,
+  "nodes": [
+    {
+      "container": "87799773fc57",
+      "slot": 3176,
+      "proposer": 128,
+      "columns": 128,
+      "cell_proofs": 128,
+      "block_signature": true,
+      "envelope_signature": true,
+      "versioned_hash_bound_to_el_transaction": true,
+      "rejected_mutations": [
+        "cell",
+        "index",
+        "proof",
+        "envelope_message",
+        "envelope_domain"
+      ]
+    },
+    {
+      "container": "d01ee49c0c9e",
+      "slot": 3176,
+      "proposer": 128,
+      "columns": 128,
+      "cell_proofs": 128,
+      "block_signature": true,
+      "envelope_signature": true,
+      "versioned_hash_bound_to_el_transaction": true,
+      "rejected_mutations": [
+        "cell",
+        "index",
+        "proof",
+        "envelope_message",
+        "envelope_domain"
+      ]
+    },
+    {
+      "container": "a6e54fb93e7c",
+      "slot": 3176,
+      "proposer": 128,
+      "columns": 128,
+      "cell_proofs": 128,
+      "block_signature": true,
+      "envelope_signature": true,
+      "versioned_hash_bound_to_el_transaction": true,
+      "rejected_mutations": [
+        "cell",
+        "index",
+        "proof",
+        "envelope_message",
+        "envelope_domain"
+      ]
+    }
+  ],
+  "beacon_root": "0x8f3f70cdaa709e79a5a00df948d1fb4a42f36b09c0f8f379aeb7fa5f15448921",
+  "execution_hash": "0x7de2dc814ebd714f42bf995d8bde51ee3f39bfc93545148e13bfa85d76bc0940",
+  "authenticated_finalized_ancestry": {
+    "finalized_root": "0x24c03af44b9f89a08fe47b47d5f9f49ab50f9284c7985a0814b1169d26b1dea0",
+    "parent_hash_links": 88,
+    "source": "unchanged reference light-client finality verification and original complete header captures"
+  },
+  "scope_limit": "One real blob, all columns; partial row/bitmap/loss/reconnect campaigns remain separate."
+}

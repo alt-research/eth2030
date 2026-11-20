@@ -159,15 +159,15 @@ func (b *RPCBackend) StateAtHeader(header *types.Header) (state.StateDB, error) 
 	if bc == nil {
 		return nil, fmt.Errorf("blockchain not available")
 	}
-	if cfg := bc.Config(); cfg != nil && cfg.BinaryOverlayTime != nil {
-		hash := header.Hash()
-		blk := bc.GetBlock(hash)
-		if blk == nil {
-			return nil, fmt.Errorf("block %s not found", hash)
-		}
-		return bc.StateAtBlock(blk)
+	if header == nil {
+		return nil, fmt.Errorf("block header not available")
 	}
-	return bc.StateAtRoot(header.Root)
+	hash := header.Hash()
+	blk := bc.GetBlock(hash)
+	if blk == nil {
+		return nil, fmt.Errorf("block %s not found", hash)
+	}
+	return bc.StateAtBlock(blk)
 }
 
 func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, blockNumber rpc.BlockNumber) (*trie.AccountProof, error) {
@@ -176,6 +176,9 @@ func (b *RPCBackend) GetProof(addr types.Address, storageKeys []types.Hash, bloc
 		return nil, fmt.Errorf("block not found")
 	}
 
+	return b.GetProofAtHeader(addr, storageKeys, header)
+}
+func (b *RPCBackend) GetProofAtHeader(addr types.Address, storageKeys []types.Hash, header *types.Header) (*trie.AccountProof, error) {
 	statedb, err := b.StateAtHeader(header)
 	if err != nil {
 		return nil, err

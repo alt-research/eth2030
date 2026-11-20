@@ -92,7 +92,13 @@ func TestVerifiedSnapPeerRejectsGapsAndTampering(t *testing.T) {
 					response.Accounts = append(response.Accounts, AccountData{key, gethtypes.SlimAccountRLP(account)})
 				}
 				if test == "tampered" {
-					response.Accounts[0].Body[len(response.Accounts[0].Body)-1] ^= 1
+					account, err := gethtypes.FullAccount(response.Accounts[0].Body)
+					if err != nil {
+						t.Error(err)
+						return
+					}
+					account.Balance.SetUint64(1000)
+					response.Accounts[0].Body = gethtypes.SlimAccountRLP(*account)
 				}
 				if test == "false-empty" {
 					response.Accounts = nil

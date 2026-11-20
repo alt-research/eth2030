@@ -5,3 +5,11 @@
 - [x] Execute actual signed deployment and multi-transaction application workflows through native and independent transitions; compare complete roots, logs, gas/payment, state effects and failure boundaries.
 - [x] Exercise gas-limited delegation and failure handling with funded reservoir and nested rollback, retaining actual GAS metering limitations.
 - [x] Qualify affected tests, race/vet/build and publish a dedicated application PR with reproducible evidence and remaining cross-process boundaries.
+
+
+## PR 98 CI Engine projection correction (2026-11-20)
+
+- [x] Inspect the exact failed native-node CI log and trace full-pool/staging/Engine consumers against selected EIP-8070 getBlobs semantics.
+- [ ] Reproduce sparse staging shadowing authenticated full cells with deterministic state and real KZG proof assertions.
+- [ ] Preserve available cells/proofs when overlapping full and partial entries refer to the same versioned hash; keep missing cells null and existing network/restart expectations unchanged.
+- [ ] Verify targeted red/green, repeated original native-node test, affected race/full tests, local build and current-head CI; push only the existing PR 98 branch.

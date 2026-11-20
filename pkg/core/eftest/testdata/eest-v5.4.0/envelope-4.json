@@ -1,0 +1,133 @@
+{
+  "tests/osaka/eip7825_transaction_gas_limit_cap/test_tx_gas_limit.py::test_transaction_gas_limit_cap[fork_Osaka-tx_gas_limit_cap_over0-state_test]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentGasLimit": "0x07270e00",
+      "currentNumber": "0x01",
+      "currentTimestamp": "0x03e8",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentDifficulty": "0x00",
+      "currentBaseFee": "0x07",
+      "currentExcessBlobGas": "0x00"
+    },
+    "pre": {
+      "0x43f51599d323bdd5c5a95255ce4585955ef48bcc": {
+        "nonce": "0x00",
+        "balance": "0x3635c9adc5dea00000",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x57839a927d61f571e6a788973815dab7d7beb2dd": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x600160005500",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "nonce": "0x00",
+      "maxPriorityFeePerGas": "0x00",
+      "maxFeePerGas": "0x07",
+      "gasLimit": [
+        "0x01000000"
+      ],
+      "to": "0x57839a927d61f571e6a788973815dab7d7beb2dd",
+      "value": [
+        "0x00"
+      ],
+      "data": [
+        "0x"
+      ],
+      "accessLists": [
+        [
+          {
+            "address": "0x57839a927d61f571e6a788973815dab7d7beb2dd",
+            "storageKeys": [
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ]
+          }
+        ]
+      ],
+      "authorizationList": [
+        {
+          "chainId": "0x00",
+          "address": "0x0000000000000000000000000000000000000000",
+          "nonce": "0x00",
+          "v": "0x00",
+          "r": "0x7ab44d3fd3cc93152e3c787259f137e0d18783dd9dce2b57b41bbe594e008cef",
+          "s": "0x61c902c7df65fef382980a1017e7f7631247265fdcca07c5e4d829cff68e5264",
+          "signer": "0x19a5467c7eb770a973cee1d595d106dfd1aa425e",
+          "yParity": "0x00"
+        }
+      ],
+      "sender": "0x43f51599d323bdd5c5a95255ce4585955ef48bcc",
+      "secretKey": "0xb01eebc1ab075b24a95c49ae57839a927d61f571e6a788973815dab7d7beb2dd"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0xdcca27523a7cf43515be4f4f3182801469e480d9d266d5e9e858a56cfa468827",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "txbytes": "0x04f8fb0180800784010000009457839a927d61f571e6a788973815dab7d7beb2dd8080f838f79457839a927d61f571e6a788973815dab7d7beb2dde1a00000000000000000000000000000000000000000000000000000000000000000f85cf85a809400000000000000000000000000000000000000008080a07ab44d3fd3cc93152e3c787259f137e0d18783dd9dce2b57b41bbe594e008cefa061c902c7df65fef382980a1017e7f7631247265fdcca07c5e4d829cff68e526480a0a40c693b2916688479acfd0f1944ee531e841c0bb64aa680ff84ade590f4e7dea064cdeb0ec1dd04696a29e5e407f8d4fd92244605b021d1fcb4ef29188d098dbd",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          },
+          "state": {
+            "0x43f51599d323bdd5c5a95255ce4585955ef48bcc": {
+              "nonce": "0x01",
+              "balance": "0x3635c9adc5de987d92",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x57839a927d61f571e6a788973815dab7d7beb2dd": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x600160005500",
+              "storage": {
+                "0x00": "0x01"
+              }
+            },
+            "0x19a5467c7eb770a973cee1d595d106dfd1aa425e": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x",
+              "storage": {}
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "blobSchedule": {
+        "Cancun": {
+          "target": "0x03",
+          "max": "0x06",
+          "baseFeeUpdateFraction": "0x32f0ed"
+        },
+        "Prague": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        },
+        "Osaka": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        }
+      },
+      "chainid": "0x01"
+    },
+    "_info": {
+      "hash": "0x2c84b832a1bfe41a444c87ff4776a057aa68fb78f8b13ff6149a7d7aa6cad4ce",
+      "comment": "`execution-specs` generated test",
+      "filling-transition-tool": "2.18.0rc6",
+      "description": "Test the transaction gas limit cap behavior for all transaction types.",
+      "url": "https://github.com/ethereum/execution-specs/blob/tests-v5.4.0/tests/osaka/eip7825_transaction_gas_limit_cap/test_tx_gas_limit.py#L65",
+      "fixture-format": "state_test",
+      "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7825.md",
+      "reference-spec-version": "1ed95cbac750539c2aac67c8cbbcc2d77974231c"
+    }
+  }
+}

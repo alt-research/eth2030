@@ -45,6 +45,9 @@ type scenario struct {
 	Creation, NewTarget   bool
 	ZeroBaseFee           bool
 	AuthorizationCase     string
+	Envelope              string
+	ChainID               uint64
+	BlobCase              string
 	Code, Data, ChildCode []byte
 	DelegateCode          []byte
 	InitialSlot           uint64
@@ -87,6 +90,8 @@ type input struct {
 	PreState          map[string]accountView `json:"pre_state"`
 	NativeConfig      *config.ChainConfig    `json:"native_config"`
 	ReferenceConfig   *params.ChainConfig    `json:"reference_config"`
+	BlobBaseFee       string                 `json:"blob_base_fee,omitempty"`
+	ExcessBlobGas     *uint64                `json:"excess_blob_gas,omitempty"`
 	ReferenceCPSB     uint64                 `json:"reference_cost_per_state_byte"`
 }
 
@@ -137,6 +142,15 @@ func scenarios() []scenario {
 
 	return []scenario{
 		{Name: "existing_zero_value", Gas: 100000},
+		{Name: "envelope_dynamic_fee", ChainID: 1, Gas: 500000, Code: []byte{0x60, 1, 0x60, 0, 0x55, 0}},
+		{Name: "envelope_set_code", ChainID: 1, Gas: 500000, AuthorizationCase: "existing"},
+		{Name: "envelope_legacy", Gas: 500000, ChainID: 1, Envelope: "legacy", Code: []byte{0x60, 1, 0x60, 0, 0x55, 0}},
+		{Name: "envelope_access_list", Gas: 500000, ChainID: 1, Envelope: "access_list", Code: []byte{0x60, 1, 0x60, 0, 0x55, 0}, AccessList: gethtypes.AccessList{{Address: gethcommon.Address(target), StorageKeys: []gethcommon.Hash{{}}}}},
+		{Name: "envelope_blob", Gas: 500000, ChainID: 1, Envelope: "blob", Code: []byte{0x60, 1, 0x60, 0, 0x55, 0}},
+		{Name: "envelope_blob_invalid_version", Gas: 500000, ChainID: 1, Envelope: "blob", BlobCase: "invalid_version"},
+		{Name: "envelope_blob_empty", Gas: 500000, ChainID: 1, Envelope: "blob", BlobCase: "empty"},
+		{Name: "envelope_blob_underpriced", Gas: 500000, ChainID: 1, Envelope: "blob", BlobCase: "underpriced"},
+
 		{Name: "authorization_existing", Gas: 500000, AuthorizationCase: "existing"},
 		{Name: "authorization_new", Gas: 500000, AuthorizationCase: "new"},
 		{Name: "authorization_preexecution_oog", Gas: 50000, AuthorizationCase: "preexecution_oog"},
@@ -188,11 +202,15 @@ func nativeConfig(amsterdam bool) *config.ChainConfig {
 	cfg.ChainID = big.NewInt(1337)
 	zero := uint64(0)
 	cfg.OsakaTime = &zero
+	cfg.BPO1Time = nil
+	cfg.BPO2Time = nil
 	cfg.AmsterdamTime = nil
 	cfg.GlamsterdanTime = nil
 	cfg.HogotaTime = nil
 	cfg.IPlusTime = nil
 	if amsterdam {
+		cfg.BPO1Time = &zero
+		cfg.BPO2Time = &zero
 		cfg.AmsterdamTime = &zero
 	}
 	return &cfg
@@ -201,11 +219,19 @@ func referenceConfig(amsterdam bool) *params.ChainConfig {
 	cfg := bridge.AmsterdamFixtureConfig()
 	cfg.ChainID = big.NewInt(1337)
 	if !amsterdam {
+		cfg.BPO1Time = nil
+		cfg.BPO2Time = nil
 		cfg.AmsterdamTime = nil
 	}
 	return cfg
 }
 func runScenario(sc scenario, amsterdam bool) (comparison, error) {
+	chain := sc.ChainID
+	if chain == 0 {
+		chain = 1337
+	}
+	ncfg := nativeConfig(amsterdam)
+	ncfg.ChainID = new(big.Int).SetUint64(chain)
 	key, err := gethcrypto.HexToECDSA(strings.Repeat("0", 63) + "1")
 	if err != nil {
 		return comparison{}, err
@@ -276,7 +302,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 			}{{0, types.Address{}}, {1, delegate}}
 		}
 		for _, tuple := range tuples {
-			auth, err := gethtypes.SignSetCode(authorityKey, gethtypes.SetCodeAuthorization{ChainID: *uint256.NewInt(1337), Address: gethcommon.Address(tuple.target), Nonce: tuple.nonce})
+			auth, err := gethtypes.SignSetCode(authorityKey, gethtypes.SetCodeAuthorization{ChainID: *uint256.NewInt(chain), Address: gethcommon.Address(tuple.target), Nonce: tuple.nonce})
 			if err != nil {
 				return comparison{}, err
 			}
@@ -294,16 +320,36 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 		addr := gethcommon.Address(target)
 		to = &addr
 	}
-	tx := gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: big.NewInt(1337), To: to, Gas: sc.Gas, GasFeeCap: big.NewInt(2), GasTipCap: big.NewInt(1), Value: big.NewInt(sc.Value), Data: sc.Data, AccessList: sc.AccessList})
+	tx := gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: new(big.Int).SetUint64(chain), To: to, Gas: sc.Gas, GasFeeCap: big.NewInt(2), GasTipCap: big.NewInt(1), Value: big.NewInt(sc.Value), Data: sc.Data, AccessList: sc.AccessList})
+	switch sc.Envelope {
+	case "legacy":
+		tx = gethtypes.NewTx(&gethtypes.LegacyTx{To: to, Gas: sc.Gas, GasPrice: big.NewInt(2), Value: big.NewInt(sc.Value), Data: sc.Data})
+	case "access_list":
+		tx = gethtypes.NewTx(&gethtypes.AccessListTx{ChainID: new(big.Int).SetUint64(chain), To: to, Gas: sc.Gas, GasPrice: big.NewInt(2), Value: big.NewInt(sc.Value), Data: sc.Data, AccessList: sc.AccessList})
+	case "blob":
+		hashes := []gethcommon.Hash{{0: 1, 31: 1}}
+		fee := uint256.NewInt(1)
+		if sc.BlobCase == "invalid_version" {
+			hashes[0][0] = 2
+		}
+		if sc.BlobCase == "empty" {
+			hashes = nil
+		}
+		if sc.BlobCase == "underpriced" {
+			fee = new(uint256.Int)
+		}
+		tx = gethtypes.NewTx(&gethtypes.BlobTx{ChainID: uint256.NewInt(chain), To: *to, Gas: sc.Gas, GasFeeCap: uint256.NewInt(2), GasTipCap: uint256.NewInt(1), Value: uint256.NewInt(uint64(sc.Value)), Data: sc.Data, AccessList: sc.AccessList, BlobFeeCap: fee, BlobHashes: hashes})
+	}
+
 	if sc.AuthorizationCase != "" {
 		recipient := gethcommon.Address(authority)
 		if sc.AuthorizationCase == "bad_nonce" || sc.AuthorizationCase == "max_nonce" || sc.AuthorizationCase == "late_preexecution_oog" {
 			recipient = gethcommon.Address(target)
 		}
-		tx = gethtypes.NewTx(&gethtypes.SetCodeTx{ChainID: uint256.NewInt(1337), To: recipient, Gas: sc.Gas, GasFeeCap: uint256.NewInt(2), GasTipCap: uint256.NewInt(1), Value: uint256.NewInt(uint64(sc.Value)), Data: sc.Data, AccessList: sc.AccessList, AuthList: authorizations})
+		tx = gethtypes.NewTx(&gethtypes.SetCodeTx{ChainID: uint256.NewInt(chain), To: recipient, Gas: sc.Gas, GasFeeCap: uint256.NewInt(2), GasTipCap: uint256.NewInt(1), Value: uint256.NewInt(uint64(sc.Value)), Data: sc.Data, AccessList: sc.AccessList, AuthList: authorizations})
 	}
 
-	tx, err = gethtypes.SignTx(tx, gethtypes.LatestSignerForChainID(big.NewInt(1337)), key)
+	tx, err = gethtypes.SignTx(tx, gethtypes.LatestSignerForChainID(new(big.Int).SetUint64(chain)), key)
 	if err != nil {
 		return comparison{}, err
 	}
@@ -313,6 +359,9 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	}
 	slot := uint64(7)
 	header := &types.Header{Number: big.NewInt(1), Time: 12, SlotNumber: &slot, GasLimit: blockGas, BaseFee: big.NewInt(1), Coinbase: miner, Difficulty: new(big.Int)}
+	if sc.Envelope == "blob" {
+		header.ExcessBlobGas = new(uint64)
+	}
 	if sc.ZeroBaseFee {
 		header.BaseFee.SetUint64(0)
 	}
@@ -338,7 +387,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	// custom opcode table, custom Geth precompile injection or native fee hooks.
 	npool := new(gaspool.GasPool).AddGas(blockGas)
 	ndb.SetTxContext(ntx.Hash(), 0)
-	nr, _, nerr := execution.ApplyTransaction(nativeConfig(amsterdam), ndb, header, ntx, npool)
+	nr, _, nerr := execution.ApplyTransaction(ncfg, ndb, header, ntx, npool)
 	native := observation{Valid: nerr == nil, Logs: []logView{}}
 	if nerr != nil {
 		native.ValidationError = nerr.Error()
@@ -376,9 +425,11 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	}
 	defer gst.Close()
 	rcfg := referenceConfig(amsterdam)
+	rcfg.ChainID = new(big.Int).SetUint64(chain)
 	random := gethcommon.Hash{}
-	context := gethvm.BlockContext{CanTransfer: gethcore.CanTransfer, Transfer: gethcore.Transfer, GetHash: func(uint64) gethcommon.Hash { return gethcommon.Hash{} }, Coinbase: gethcommon.Address(miner), GasLimit: blockGas, BlockNumber: big.NewInt(1), Time: 12, Difficulty: new(big.Int), BaseFee: new(big.Int).Set(header.BaseFee), Random: &random, SlotNum: slot, CostPerStateByte: params.CostPerStateByte}
+	context := gethvm.BlockContext{CanTransfer: gethcore.CanTransfer, Transfer: gethcore.Transfer, GetHash: func(uint64) gethcommon.Hash { return gethcommon.Hash{} }, Coinbase: gethcommon.Address(miner), GasLimit: blockGas, BlockNumber: big.NewInt(1), Time: 12, Difficulty: new(big.Int), BaseFee: new(big.Int).Set(header.BaseFee), Random: &random, SlotNum: slot, BlobBaseFee: big.NewInt(1), CostPerStateByte: params.CostPerStateByte}
 	evm := gethvm.NewEVM(context, gst.StateDB, rcfg, gethvm.Config{})
+	defer evm.Release()
 	msg, err := gethcore.TransactionToMessage(tx, gethtypes.MakeSigner(rcfg, header.Number, header.Time), header.BaseFee)
 	if err != nil {
 		return comparison{}, err
@@ -421,7 +472,7 @@ func runScenario(sc scenario, amsterdam bool) (comparison, error) {
 	if amsterdam {
 		fork = "amsterdam_merged_text_candidate"
 	}
-	out := comparison{Name: sc.Name, Input: input{Fork: fork, BlockNumber: 1, Timestamp: 12, Slot: 7, BlockGasLimit: blockGas, BaseFee: header.BaseFee.String(), Coinbase: miner.Hex(), SignedTransaction: hexData(raw), PreState: freezePreState(pre), NativeConfig: nativeConfig(amsterdam), ReferenceConfig: rcfg, ReferenceCPSB: context.CostPerStateByte}, Native: native, Reference: reference, Differences: []string{}}
+	out := comparison{Name: sc.Name, Input: input{Fork: fork, BlockNumber: 1, Timestamp: 12, Slot: 7, BlockGasLimit: blockGas, BaseFee: header.BaseFee.String(), Coinbase: miner.Hex(), SignedTransaction: hexData(raw), PreState: freezePreState(pre), NativeConfig: ncfg, ReferenceConfig: rcfg, ReferenceCPSB: context.CostPerStateByte, BlobBaseFee: "1", ExcessBlobGas: header.ExcessBlobGas}, Native: native, Reference: reference, Differences: []string{}}
 	for _, field := range []struct {
 		name              string
 		native, reference any

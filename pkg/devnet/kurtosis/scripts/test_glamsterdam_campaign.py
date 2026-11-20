@@ -33,6 +33,15 @@ class CampaignTests(unittest.TestCase):
                 with self.subTest(names=names), self.assertRaises(ValueError):
                     artifacts.bundle(root, names, root / "unqualified.tar.gz")
 
+    def test_zstd_artifact_preserves_original_signed_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            body = b"signed SSZ bytes\x00\xff" * 1024
+            (root / "capture.ssz").write_bytes(body)
+            result = artifacts.bundle(root, ["capture.ssz"], root / "evidence.tar.zst")
+            self.assertTrue(result["passed"])
+            self.assertEqual(result["uncompressed_bytes"], len(body))
+
     def test_engine_window_detects_unfinished_request_before_sealing_traffic(self):
         def record(sequence, stamp):
             return {

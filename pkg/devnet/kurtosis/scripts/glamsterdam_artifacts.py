@@ -52,9 +52,24 @@ def bundle(root, names, output):
         json.dumps({"format": 1, "files": entries}, sort_keys=True, indent=2).encode()
         + b"\n"
     )
-    with output.open("xb") as stream, gzip.GzipFile(
-        fileobj=stream, mode="wb", filename="", mtime=0
-    ) as compressed, tarfile.open(fileobj=compressed, mode="w|") as archive:
+
+    def compressor(stream):
+        if output.suffix == ".zst":
+            from compression import zstd
+
+            return zstd.ZstdFile(
+                stream,
+                "wb",
+                options={
+                    zstd.CompressionParameter.compression_level: 19,
+                    zstd.CompressionParameter.window_log: 27,
+                },
+            )
+        return gzip.GzipFile(fileobj=stream, mode="wb", filename="", mtime=0)
+
+    with output.open("xb") as stream, compressor(stream) as compressed, tarfile.open(
+        fileobj=compressed, mode="w|"
+    ) as archive:
         for name, body in [("MANIFEST.json", manifest)]:
             entry = tarfile.TarInfo(name)
             entry.size, entry.mode = len(body), 0o644
@@ -73,7 +88,7 @@ def bundle(root, names, output):
 
 
 def verify(path):
-    with tarfile.open(path, "r:gz") as archive:
+    with tarfile.open(path, "r:*") as archive:
         members = archive.getmembers()
         names = [member.name for member in members]
         if len(names) != len(set(names)) or any(

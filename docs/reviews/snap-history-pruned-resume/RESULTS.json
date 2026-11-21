@@ -73,5 +73,9 @@
       "exit": 0
     }
   ],
-  "scope": "Ordinary executed sparse-slot fixtures and real FileDB close/reopen. The live retained network is below the expiry window; no live two-week expiry observation is inferred."
+  "scope": "Ordinary executed sparse-slot fixtures and real FileDB close/reopen. The live retained network is below the expiry window; no live two-week expiry observation is inferred.",
+  "review": "https://github.com/alt-research/eth2030/pull/123",
+  "verified_preceding_published_head": "b5dbd445815e44f7d77fdace82af0c6217a4f0cb",
+  "preceding_published_ci_jobs_passed": 9,
+  "publication_note": "Later record-only heads retain the same production/test source and are rechecked at final delivery."
 }

@@ -1,0 +1,8 @@
+{
+  "combined-final-full.log": {
+    "passed_packages": 219,
+    "failed": false,
+    "official_fixture_files": 107,
+    "official_requests": 108
+  }
+}

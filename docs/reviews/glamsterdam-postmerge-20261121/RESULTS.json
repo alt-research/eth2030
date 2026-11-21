@@ -1,0 +1,404 @@
+{
+  "scope": "Final frozen development composition, not public protocol approval or upstream hosted CI. Original source phases/failures remain immutable in the archive.",
+  "master": "c27a5bb09507461bb6e9f2ca72c2456d04072f80",
+  "qualified_source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+  "native_sha256": "8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec",
+  "feature_prs": [
+    123,
+    124
+  ],
+  "lodestar_pr": 10693,
+  "lodestar_functional_source": "cad22db26b2c0d9b3bef1998ea998a1c2be21329",
+  "lodestar_patch_sha256": "b1b03520dcf17504a10641301d16abca4e8434c02b1c9e81dd5e7baf9fc8e156",
+  "checks": [
+    {
+      "name": "full",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "seconds": 49.906057749001775,
+      "exit": 0
+    },
+    {
+      "name": "race",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/rawdb",
+        "./core/chain",
+        "./node",
+        "./node/backend",
+        "./engine",
+        "./eth"
+      ],
+      "seconds": 74.44678991899127,
+      "exit": 0
+    },
+    {
+      "name": "vet",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "seconds": 3.1098133890191093,
+      "exit": 0
+    },
+    {
+      "name": "build",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "build",
+        "./cmd/eth2030",
+        "./cmd/eth2030-state-history"
+      ],
+      "seconds": 1.9124257289804518,
+      "exit": 0
+    }
+  ],
+  "operating": {
+    "steady-reviewed-02": {
+      "latency": {
+        "window_ended_at": "2026-11-21T16:54:30.669351+00:00",
+        "samples": 400,
+        "rpc_errors": [],
+        "rpc": {
+          "el-3-geth-lighthouse": {
+            "count": 400,
+            "p95_ms": 1.2905019975733012,
+            "p99_ms": 1.3487410033121705
+          },
+          "el-2-geth-lodestar": {
+            "count": 400,
+            "p95_ms": 1.1113490036223084,
+            "p99_ms": 1.185564004117623
+          },
+          "el-1-geth-lighthouse": {
+            "count": 400,
+            "p95_ms": 1.1092020140495151,
+            "p99_ms": 1.2137710000388324
+          }
+        },
+        "identity_unchanged": true,
+        "finality_evaluated": false,
+        "passed": false,
+        "engine": {
+          "el-3-geth-lighthouse": {
+            "count": 2012,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV5:VALID": 809,
+              "engine_newPayloadV5:VALID": 400,
+              "eth_syncing:success": 400,
+              "engine_forkchoiceUpdatedV4:VALID": 269,
+              "engine_getPayloadV6:success": 131,
+              "engine_getClientVersionV1:success": 2,
+              "engine_exchangeCapabilities:success": 1
+            },
+            "p95_ms": 90.487683,
+            "p99_ms": 198.940078
+          },
+          "el-2-geth-lodestar": {
+            "count": 1464,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV4:VALID": 932,
+              "engine_newPayloadV5:VALID": 400,
+              "engine_getPayloadV6:success": 132
+            },
+            "p95_ms": 94.261279,
+            "p99_ms": 198.231874
+          },
+          "el-1-geth-lighthouse": {
+            "count": 2586,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV4:VALID": 1367,
+              "eth_syncing:success": 400,
+              "engine_getPayloadV6:success": 411,
+              "engine_newPayloadV5:VALID": 400,
+              "engine_getClientVersionV1:success": 6,
+              "engine_exchangeCapabilities:success": 2
+            },
+            "p95_ms": 1.645656,
+            "p99_ms": 1.902084
+          }
+        },
+        "latency_passed": true
+      },
+      "finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "beacon_window": {
+          "first": 58519,
+          "stop": 58919,
+          "slots": 400,
+          "finalized_root": "0xbbd95d7882f272290f19983f40e502b52003598d33c6849a52881ed183613fa1",
+          "finalized_slot": 58944,
+          "signature_slot": 59009,
+          "signature_participants": 512,
+          "parent_hash_links": 426,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      },
+      "offline": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "replay_input_sha256": "d2b0928fd969673a11d7f6320e2623040eddfc8655edda2e633f72e80cb683b1",
+        "beacon_window": {
+          "first": 58519,
+          "stop": 58919,
+          "slots": 400,
+          "finalized_root": "0xbbd95d7882f272290f19983f40e502b52003598d33c6849a52881ed183613fa1",
+          "finalized_slot": 58944,
+          "signature_slot": 59009,
+          "signature_participants": 512,
+          "parent_hash_links": 426,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      }
+    },
+    "pressure-reviewed-02": {
+      "latency": {
+        "window_ended_at": "2026-11-21T17:02:08.345495+00:00",
+        "counts": {
+          "invalid-payload:completed": 356,
+          "header:completed": 270,
+          "http-disconnect:socket_closed_after_send": 7166,
+          "ws-disconnect:socket_closed_while_pending": 6998,
+          "proof:completed": 270,
+          "finite-call:completed": 270,
+          "resources:completed": 60
+        },
+        "control_rounds": 90,
+        "required_control_rounds": 90,
+        "failures": [],
+        "identity_unchanged": true,
+        "rpc": {
+          "el-3-geth-lighthouse": {
+            "count": 270,
+            "p95_ms": 28.700333001324907,
+            "p99_ms": 57.09379000472836
+          },
+          "el-2-geth-lodestar": {
+            "count": 270,
+            "p95_ms": 24.303638987476006,
+            "p99_ms": 54.36526000266895
+          },
+          "el-1-geth-lighthouse": {
+            "count": 270,
+            "p95_ms": 0.8207199862226844,
+            "p99_ms": 1.1684840137604624
+          }
+        },
+        "engine": {
+          "el-3-geth-lighthouse": {
+            "count": 470,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_newPayloadV5:INVALID": 178,
+              "eth_syncing:success": 60,
+              "engine_forkchoiceUpdatedV5:VALID": 119,
+              "engine_newPayloadV5:VALID": 59,
+              "engine_forkchoiceUpdatedV4:VALID": 36,
+              "engine_getPayloadV6:success": 18
+            },
+            "p95_ms": 133.84824,
+            "p99_ms": 285.800974
+          },
+          "el-2-geth-lodestar": {
+            "count": 409,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_newPayloadV5:INVALID": 178,
+              "engine_forkchoiceUpdatedV4:VALID": 145,
+              "engine_newPayloadV5:VALID": 59,
+              "engine_getPayloadV6:success": 27
+            },
+            "p95_ms": 132.057958,
+            "p99_ms": 318.362351
+          },
+          "el-1-geth-lighthouse": {
+            "count": 344,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV4:VALID": 180,
+              "eth_syncing:success": 60,
+              "engine_getPayloadV6:success": 45,
+              "engine_newPayloadV5:VALID": 59
+            },
+            "p95_ms": 1.721471,
+            "p99_ms": 1.972412
+          }
+        },
+        "latency_passed": true
+      },
+      "finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "beacon_window": {
+          "first": 59012,
+          "stop": 59072,
+          "slots": 60,
+          "finalized_root": "0x8535c490f69f1f86dfcd4fe3836629e0b62ba37df736b7bd8383cfc5d27760fb",
+          "finalized_slot": 59072,
+          "signature_slot": 59137,
+          "signature_participants": 512,
+          "parent_hash_links": 61,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      },
+      "offline": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "replay_input_sha256": "a96d6bbceca9b84bca3ea2e5b6f9f1395a01f96080fd16fcd2a2e3e19ad00d97",
+        "beacon_window": {
+          "first": 59012,
+          "stop": 59072,
+          "slots": 60,
+          "finalized_root": "0x8535c490f69f1f86dfcd4fe3836629e0b62ba37df736b7bd8383cfc5d27760fb",
+          "finalized_slot": 59072,
+          "signature_slot": 59137,
+          "signature_participants": 512,
+          "parent_hash_links": 61,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      }
+    }
+  },
+  "readback": {
+    "passed": true,
+    "scope": "Readonly final-source retained historical native state/proofs and original snap bodies/BAL. Historical header is bound to the original frozen witness and current independent Geth canonical mapping. No new transaction or forkchoice submission.",
+    "independent_historical_proofs": {
+      "independent_proofs": 4,
+      "passed": true
+    },
+    "old_factory_hash": "0xc6d6973aff1480aa6672f01be7aa4b6b4fdf3f4ec3883c3a07bb67a2ee260020",
+    "old_factory_getter": 42,
+    "original_bal_bytes": 361,
+    "original_hash_and_range_bytes_equal": true,
+    "unknown_body_null": true,
+    "pre_pivot_state_still_unavailable": true
+  },
+  "blob": {
+    "slot": 59163,
+    "two_rows": true,
+    "cell_proofs": 544,
+    "target_partial_useful_cells": 228,
+    "target_completed_columns": 114,
+    "observer_useful_cells": 32,
+    "observer_completed_columns": 16,
+    "finality": {
+      "passed": true,
+      "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+      "bls_active": true,
+      "latency_passed": null,
+      "operating_budgets_evaluated": false,
+      "beacon_window": {
+        "first": 59162,
+        "stop": 59164,
+        "slots": 2,
+        "finalized_root": "0x56f87c3173d319b99c88937fd2f2da3143f313e348dc72bfb9ee843b3c836873",
+        "finalized_slot": 59168,
+        "signature_slot": 59233,
+        "signature_participants": 512,
+        "parent_hash_links": 7,
+        "missing_slots": [],
+        "missing_fraction": 0.0
+      },
+      "rejected_controls": [
+        "signature",
+        "finality_branch",
+        "genesis_domain"
+      ]
+    },
+    "finality_offline": {
+      "passed": true,
+      "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+      "bls_active": true,
+      "latency_passed": null,
+      "operating_budgets_evaluated": false,
+      "replay_input_sha256": "988059d88bfd9ca349bec05a5ce2e2743d02cd57128a2eb9a5b3eaa272d0c450",
+      "beacon_window": {
+        "first": 59162,
+        "stop": 59164,
+        "slots": 2,
+        "finalized_root": "0x56f87c3173d319b99c88937fd2f2da3143f313e348dc72bfb9ee843b3c836873",
+        "finalized_slot": 59168,
+        "signature_slot": 59233,
+        "signature_participants": 512,
+        "parent_hash_links": 7,
+        "missing_slots": [],
+        "missing_fraction": 0.0
+      },
+      "rejected_controls": [
+        "signature",
+        "finality_branch",
+        "genesis_domain"
+      ]
+    }
+  },
+  "reserved": [
+    "EL review and merge to master",
+    "Upstream Lodestar lockfile review and full hosted CI",
+    "User final public protocol/model decision"
+  ]
+}

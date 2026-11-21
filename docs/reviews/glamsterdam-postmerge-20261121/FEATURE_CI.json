@@ -1,0 +1,148 @@
+{
+  "123": {
+    "number": 123,
+    "head": "3f670eaec017d47fab4ad94c6be47c8e0f6c14a6",
+    "base": "master",
+    "base_sha": "c27a5bb09507461bb6e9f2ca72c2456d04072f80",
+    "draft": false,
+    "state": "open",
+    "mergeable": true,
+    "mergeable_state": "blocked",
+    "checks": [
+      {
+        "name": "Go tests (blst)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640630"
+      },
+      {
+        "name": "Go tests (race)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640628"
+      },
+      {
+        "name": "Go tests (goethkzg)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640596"
+      },
+      {
+        "name": "Published wallet and DEX application sequences",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640543"
+      },
+      {
+        "name": "Consensus fixture and control regressions",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640468"
+      },
+      {
+        "name": "Go tests (integration)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640453"
+      },
+      {
+        "name": "Native signed Osaka and Amsterdam state tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640435"
+      },
+      {
+        "name": "Build, Vet, Lint, Test",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640430"
+      },
+      {
+        "name": "Geth-backed EF state tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44917996799/job/136887640263"
+      }
+    ]
+  },
+  "124": {
+    "number": 124,
+    "head": "14edd71c8d491e25be23015d76a8139798157c61",
+    "base": "master",
+    "base_sha": "c27a5bb09507461bb6e9f2ca72c2456d04072f80",
+    "draft": false,
+    "state": "open",
+    "mergeable": true,
+    "mergeable_state": "blocked",
+    "checks": [
+      {
+        "name": "Go tests (goethkzg)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677609"
+      },
+      {
+        "name": "Go tests (blst)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677566"
+      },
+      {
+        "name": "Go tests (race)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677486"
+      },
+      {
+        "name": "Published wallet and DEX application sequences",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677452"
+      },
+      {
+        "name": "Build, Vet, Lint, Test",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677443"
+      },
+      {
+        "name": "Geth-backed EF state tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677440"
+      },
+      {
+        "name": "Go tests (integration)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677428"
+      },
+      {
+        "name": "Native signed Osaka and Amsterdam state tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677386"
+      },
+      {
+        "name": "Consensus fixture and control regressions",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44926512787/job/136913677210"
+      }
+    ]
+  },
+  "open_el_prs": [
+    {
+      "number": 124,
+      "head": "14edd71c8d491e25be23015d76a8139798157c61",
+      "base": "master",
+      "draft": false
+    },
+    {
+      "number": 123,
+      "head": "3f670eaec017d47fab4ad94c6be47c8e0f6c14a6",
+      "base": "master",
+      "draft": false
+    }
+  ]
+}

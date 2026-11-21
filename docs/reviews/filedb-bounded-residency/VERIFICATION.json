@@ -1,0 +1,61 @@
+{
+  "source": "20293b2a911973b328b34c50991175bcb8a2f492",
+  "checks": [
+    {
+      "name": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/rawdb",
+        "./core/state",
+        "./core/state/snapshot",
+        "./core/state/pruner",
+        "./core/chain",
+        "./node",
+        "./node/backend",
+        "./rpc/ethapi"
+      ],
+      "exit": 0,
+      "seconds": 74.0941992229782
+    },
+    {
+      "name": "full",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 46.14102347299922
+    },
+    {
+      "name": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 2.9542497009970248
+    },
+    {
+      "name": "build",
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-o",
+        "/projects/eth2030/qualification/remaining-code-20261122/storage-exact-node",
+        "./cmd/eth2030"
+      ],
+      "exit": 0,
+      "seconds": 6.2851428569993
+    }
+  ],
+  "fresh_full_packages": 220,
+  "official_rpc_requests": 108
+}

@@ -1,0 +1,5 @@
+--- FAIL: TestEmptySnapshotAndMigrationCannotHideIteratorErrors (0.00s)
+    lazy_flat_read_error_test.go:109: empty-root snapshot ignored read failure
+FAIL
+FAIL	github.com/eth2030/eth2030/core/state	1.201s
+FAIL

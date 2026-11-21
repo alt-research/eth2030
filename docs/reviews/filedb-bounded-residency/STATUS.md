@@ -1,3 +1,5 @@
 # FileDB bounded residency
 
 This independent capacity correction preserves the current file-per-key and WAL formats, exclusive ownership, committed-intent recovery and fail-closed writes. The existing implementation reads every value into a permanent index and reads the entire WAL at open. The new path will retain bounded cached values and recovery offsets rather than retaining the complete stored byte volume. State/header/finality authentication is not skipped.
+
+Functional source 20293b2a911973b328b34c50991175bcb8a2f492 passes 220 fresh package suites,108 official RPC requests, eight affected race suites, full vet and native build. New immutable-read/error guards and two behavioral mutation controls pass. Declared same-input storage profiles pass with reduced resident/transient values; exact timings, heap and RSS are retained, including cold-read cost. Current source still retains key/header metadata and performs full authentication, so no arbitrary-cardinality or multi-day claim is made.

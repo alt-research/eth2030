@@ -13,11 +13,22 @@ homepage's pending-work lists; percentages count labels rather than whole-fork
 conformance.
 
 `site/src/lib/data.ts` supplies the shared dated development snapshot rendered
-by `DevelopmentProgress` on both pages. Its November 18, 2026 update cites merged
-PR 61 (`911afb0c`) and the retained run record. Keep runtime source identities
-separate from the merge revision. A fresh CL using a synchronized EL must not be
-presented as independent EL late join. Update snapshot, EIP evidence, active
-plans and export assertions together when a qualified milestone merges.
+by `DevelopmentProgress` on both pages. Its November 22, 2026 snapshot pins merged
+master `9a094830`, the complete frozen Glamsterdam task reconciliation and final
+source-specific operating/recovery/blob records. Qualified runtime source remains
+`d9201b0`; package/workflow tree equivalence is recorded separately. The earlier
+paired Frame control keeps its own source and synchronized-EL limitation.
+
+Optional `verification` entries are repository-relative records rendered as pinned
+qualification links. Companion-CL-only EIPs can have no local `pkg` implementation
+and link their actual CL qualification instead; do not label those entries missing
+EL implementations. Seven additional accepted EIPs do not invent new positions in
+the historical EF drawing. ePBS remains broadly Substantial while its legacy EL
+builder extensions retain the confirmed authentication gap.
+
+Update snapshot, EIP evidence, active plans and export assertions together.
+The matrix verifier skips the Spec column when identifying Implementation/Tests;
+empty companion-CL implementation cells are an intentional regression input.
 
 ### Fork placement baseline
 
@@ -49,6 +60,7 @@ google-chrome --headless --screenshot=/tmp/strawmap.png --window-size=2979,2272 
 | `specUrl` / `specStatus` | Spec link and upstream status (from `refs/EIPs/EIPS/eip-*.md` front matter) |
 | `strawmap` | Box label on the strawmap + `SFI`/`CFI`/`EIP` tag + headliner/offchain/crossLayer flags |
 | `implementation` / `tests` | Paths **relative to `pkg/`** (verified to exist by the verify script) |
+| `verification` | Source-specific repository evidence, linked at the merged revision |
 | `implemented` / `gaps` | Deep-analysis content (the 11 gap-analyzed EIPs) |
 
 Status semantics: `complete` = the recorded implementation scope in `EIP_SPEC_IMPL.md`,

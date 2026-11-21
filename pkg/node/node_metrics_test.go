@@ -1,7 +1,8 @@
 package node
 
 import (
-	"fmt"
+	"encoding/json"
+	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -18,9 +19,6 @@ func TestMetricsServer_StartsAndResponds(t *testing.T) {
 	cfg.MetricsAddr = "127.0.0.1"
 	cfg.MetricsPort = 0 // ephemeral — we'll probe directly
 
-	// Use a fixed port in the high range to avoid conflicts.
-	cfg.MetricsPort = freePort(t)
-
 	n, err := New(&cfg)
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -30,18 +28,37 @@ func TestMetricsServer_StartsAndResponds(t *testing.T) {
 	}
 	defer func() { _ = n.Stop() }()
 
-	// Give the server a moment to bind.
-	time.Sleep(50 * time.Millisecond)
-
-	url := fmt.Sprintf("http://%s/debug/vars", cfg.MetricsListenAddr())
-	resp, err := http.Get(url) //nolint:noctx
+	// Start must reserve a real metrics listener before it returns. A fixed
+	// high test port can be allocated to the node's ephemeral P2P listener.
+	_, port, err := net.SplitHostPort(n.metricsServer.Addr)
+	if err != nil || port == "0" {
+		t.Fatalf("metrics listener not bound after Start: %q (%v)", n.metricsServer.Addr, err)
+	}
+	url := "http://" + n.metricsServer.Addr + "/debug/vars"
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(url) //nolint:noctx
 	if err != nil {
 		t.Fatalf("GET %s error: %v", url, err)
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		t.Errorf("metrics status = %d, want 200", resp.StatusCode)
+		t.Fatalf("metrics status = %d, want 200", resp.StatusCode)
 	}
+	var vars map[string]json.RawMessage
+	if err := json.NewDecoder(resp.Body).Decode(&vars); err != nil {
+		t.Fatalf("decode expvar response: %v", err)
+	}
+	if len(vars["memstats"]) == 0 {
+		t.Fatal("response did not come from the expvar metrics handler")
+	}
+	if err := n.Stop(); err != nil {
+		t.Fatalf("Stop() error: %v", err)
+	}
+	reopened, err := net.Listen("tcp", n.metricsServer.Addr)
+	if err != nil {
+		t.Fatalf("metrics listener not released by Stop: %v", err)
+	}
+	reopened.Close()
 }
 
 func TestMetricsServer_DisabledByDefault(t *testing.T) {
@@ -65,17 +82,4 @@ func TestMetricsServer_DisabledByDefault(t *testing.T) {
 	if n.metricsServer != nil {
 		t.Error("metricsServer should be nil when metrics disabled")
 	}
-}
-
-// freePort returns a deterministic test port derived from the test name.
-func freePort(t *testing.T) int {
-	t.Helper()
-	h := 0
-	for _, c := range t.Name() {
-		h = h*31 + int(c)
-	}
-	if h < 0 {
-		h = -h
-	}
-	return 40000 + (h % 10000)
 }

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { GITHUB_URL } from '@/lib/constants';
+import { developmentSnapshot } from '@/lib/data';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -51,7 +53,7 @@ function FileList({ files, empty }: { files: string[]; empty: string }) {
   return (
     <ul className="space-y-1">
       {files.map((f) => (
-        <li key={f} className="font-mono text-xs text-eth-teal">
+        <li key={f} className="break-all font-mono text-xs text-eth-teal">
           pkg/{f}
         </li>
       ))}
@@ -210,9 +212,13 @@ export default async function EipPage({ params }: { params: Promise<{ id: string
           </Section>
         )}
 
+        {e.verification && <Section title="Qualification evidence" accent="text-eth-teal">
+          <ul className="space-y-2 text-xs">{e.verification.map(path => <li key={path}><a className="break-all text-eth-teal underline" href={`${GITHUB_URL}/blob/${developmentSnapshot.revision}/${path}`}>{path} ↗</a></li>)}</ul>
+        </Section>}
+
         {/* Code pointers */}
         <Section title="Implementation Files">
-          <FileList files={e.implementation} empty="No implementation yet (planned)." />
+          <FileList files={e.implementation} empty={e.verification && e.layer === 'CL' ? "Implemented in the companion consensus-client fork; see qualification evidence." : "No implementation yet (planned)."} />
         </Section>
         <Section title="Tests">
           <FileList files={e.tests} empty="No dedicated test files recorded (covered indirectly)." />

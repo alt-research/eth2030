@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-22 Asia/Shanghai",
+  "merged_master": "9a094830b8d11ab541df4f439a3730941311d430",
+  "qualified_composition": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+  "package_tree": "ac747454ff1d8ac6fb4abdfd2473763d685c6f98",
+  "package_and_code_ci_tree_equal": true,
+  "merged_prs": {
+    "123": "4bc252f5e9740b621321e9cbd24981631010eaf6",
+    "124": "b04acb12d1ce3f00af37ac12c8d86428a9e3684f",
+    "125": "9a094830b8d11ab541df4f439a3730941311d430"
+  },
+  "upstream_lodestar": {
+    "number": 10693,
+    "merged": false,
+    "head": "4e224659179dc8050344b48a397f1791450bf24c",
+    "target": "unstable",
+    "scope": "Current primary GitHub PR metadata. Local/fork runtime qualification is separate from upstream hosted CI and integration."
+  },
+  "retained_records": [
+    "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+    "docs/reviews/glamsterdam-postmerge-20261121/RESULTS.json",
+    "docs/reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json"
+  ],
+  "new_live_campaign_run": false,
+  "code_review_scope": [
+    "legacy Engine builder registration/bid/header methods and call sites",
+    "FileDB startup index and indexed head root/ancestry authentication",
+    "all 18 scheduled core EIPs and five supporting protocols in current site/plan data",
+    "scoped official native/RPC/progressive/KZG/process evidence and merged source identity"
+  ]
+}

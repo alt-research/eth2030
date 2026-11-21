@@ -1,0 +1,17 @@
+2026-11-21T17:55:15.0042160Z 2026/11/21 17:54:55 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026-11-21T17:55:15.0042816Z 2026/11/21 17:54:55 INFO starting ETH2030 node network=mainnet
+2026-11-21T17:55:15.0043337Z 2026/11/21 17:54:55 INFO DAS network manager started
+2026-11-21T17:55:15.0043770Z 2026/11/21 17:54:55 INFO light client started
+2026-11-21T17:55:15.0044240Z 2026/11/21 17:54:55 INFO P2P server listening addr=[::]:43369
+2026-11-21T17:55:15.0044757Z 2026/11/21 17:54:55 INFO node started successfully
+2026-11-21T17:55:15.0045282Z 2026/11/21 17:54:55 INFO Metrics server listening addr=127.0.0.1:43369
+2026-11-21T17:55:15.0045969Z 2026/11/21 17:54:55 ERROR Metrics server error err="listen tcp 127.0.0.1:43369: bind: address already in use"
+2026-11-21T17:55:15.0046678Z 2026/11/21 17:54:55 INFO RPC server listening addr=0.0.0.0:0
+2026-11-21T17:55:15.0047343Z 2026/11/21 17:54:55 INFO Engine API server listening addr=0.0.0.0:0
+2026-11-21T17:55:15.0047873Z 2026/11/21 17:54:55 Engine API server starting on [::]:34325
+2026-11-21T17:55:15.0048386Z 2026/11/21 17:54:55 INFO AA proof circuit ready constraints=3
+2026-11-21T17:55:15.0048868Z 2026/11/21 17:54:56 INFO stopping ETH2030 node
+2026-11-21T17:55:15.0049318Z 2026/11/21 17:54:56 INFO node stopped
+2026-11-21T17:55:15.0049788Z --- FAIL: TestMetricsServer_StartsAndResponds (0.06s)
+2026-11-21T17:55:15.0050861Z     node_metrics_test.go:39: GET http://127.0.0.1:43369/debug/vars error: Get "http://127.0.0.1:43369/debug/vars": EOF
+2026-11-21T17:55:15.0051575Z 2026/11/21 17:54:56 INFO BLS backend: blst (default)

@@ -1,0 +1,9 @@
+eth2030 EIP tracker verify — 149 entries in src/data/eips.ts
+docs/EIP_SPEC_IMPL.md matrix rows parsed: 92
+pkg/ paths checked: 398, missing: 0
+
+✗ 1 problem(s):
+  ✗ EIP-7688: doc matrix status is "planned" but data status is complete
+
+ℹ 1 note(s):
+  ℹ EIP-7885 in data but not in docs/EIP_SPEC_IMPL.md matrix (OK if newer)

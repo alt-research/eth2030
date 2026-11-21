@@ -1,5 +1,7 @@
 # Glamsterdam completion program
 
+> Current merged state (November 22, 2026): EL PRs123/124/125 are merged in master `9a094830`. [Current progress and remaining-gap audit](../../audits/merged-glamsterdam-20261122/README.md) supersedes the older unmerged-review and pending-acceptance statements below. The original frozen task list remains complete; legacy Engine extension authentication, scale qualification, upstream integration and final public decisions are tracked separately.
+
 > Current delivery (2026-11-22): [final post-merge closure](POST_MERGE_CLOSURE_20261122.md). Original EL reviews120/121/122 are merged. Independent corrections123/124 and final dependency review10693 are qualified; review/merge, hosted upstream CI and the reserved public protocol/model decision remain explicit. Earlier checkpoints below are historical.
 
 > Current delivery: [frozen-development completion handoff](COMPLETION_HANDOFF_20261120.md). All 33 original IDs and R01–R13 are reconciled; separate EL PRs 120/121/122 and Lodestar 10693 are submitted. PR merge and the reserved public protocol/model decision remain separate. Earlier statuses below are historical snapshots.

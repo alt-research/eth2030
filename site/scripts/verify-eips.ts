@@ -39,21 +39,27 @@ const DOC_STATUS: Record<string, string> = {
   Substantial: 'substantial',
   Referenced: 'referenced',
   Partial: 'partial',
+  Planned: 'planned',
   Functional: 'functional',
   'Real impl': 'complete',
   Stub: 'partial',
 };
 if (specImpl) {
+  // Tables use both five- and six-column layouts. Resolve by header so the
+  // optional Spec/Status columns cannot shift implementation and test cells.
+  let columns: string[] = [];
   for (const line of specImpl.split('\n')) {
-    const m = line.match(/^\|\s*(\d{3,4})\s*\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]*)\|\s*([^|]*)\|/);
-    if (m) {
-      docEips.set(Number(m[1]), {
-        title: m[2].trim(),
-        status: DOC_STATUS[m[3].trim()],
-        impl: m[4].trim(),
-        tests: m[5].trim(),
-      });
-    }
+    if (!line.startsWith('|')) { columns = []; continue; }
+    const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+    if (cells[0] === 'EIP') { columns = cells; continue; }
+    if (!/^\d{3,4}$/.test(cells[0] ?? '') || columns[0] !== 'EIP') continue;
+    const cell = (name: string) => cells[columns.indexOf(name)] ?? '';
+    docEips.set(Number(cells[0]), {
+      title: cell('Title'),
+      status: DOC_STATUS[cell('Status')],
+      impl: cell('Implementation'),
+      tests: cell('Tests'),
+    });
   }
 } else {
   notes.push('docs/EIP_SPEC_IMPL.md not readable — skipped doc matrix check');

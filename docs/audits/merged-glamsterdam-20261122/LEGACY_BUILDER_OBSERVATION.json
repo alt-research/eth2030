@@ -1,0 +1,10 @@
+{
+  "nonzero_invalid_signature_accepted": true,
+  "observed": true,
+  "registered_balance": "1000000000000000000",
+  "returned_header_signature_zero": true,
+  "scope": "In-process actual exported legacy Engine methods with nil execution backend; no RPC endpoint or live chain touched. This does not establish acceptance by the signed CL consensus path.",
+  "stored_bid_value": 100,
+  "zero_bid_signature_accepted": true,
+  "zero_registration_signature_accepted": true
+}

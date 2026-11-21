@@ -1306,3 +1306,7 @@ Lighthouse direct integration reaches 1fb9876b8 with signed builder registry lif
 ## Glamsterdam frozen-development engineering completion (2026-11-20)
 
 The remaining 33-ID/R01-R13 engineering plan is reconciled in [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md). Separate master reviews 121/122 fix actual storage-fence and snap historical-BAL defects; review 120 retains final consumers, operators and original archives. Lodestar review 10693 separately corrects a real installed-dependency gossip reconnect race. The final source passes actual default-delay registry sweep/reuse and retired/current signature controls, independent signed state/finality/KZG/MPT consumers, original-node recovery, final-source cold full/snap and unchanged-budget steady/pressure windows. Original failures remain retained. Source-head CI/targets and all six ordinary EL merge orders are rechecked at handoff. The user's EL merge and reserved final public protocol/model decision remain separate; no public activation or master merge is performed.
+
+## Glamsterdam post-merge verification (2026-11-21)
+
+PRs120/121/122 are verified merged. Current master is c27a5bb09507461bb6e9f2ca72c2456d04072f80. A separate isolated post-merge branch checks the merged tree, actual consumers, retained network and external-client validation. Earlier source/runtime evidence and original failures remain unchanged; final public protocol/model approval remains reserved.

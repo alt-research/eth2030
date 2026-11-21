@@ -642,3 +642,11 @@ Recommended start order: Track 1 (ePBS PTC + fork-choice is the largest single P
 - [ ] Record the user's reserved final public protocol/model decision and subsequent EL merge/release approval.
 
 See [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md) for exact scope and finite support boundaries. Unrelated later-fork/formal tasks above are not closed by this campaign.
+
+## Glamsterdam post-merge closure (2026-11-21)
+
+- [ ] Verify PR120/121/122 reach current master and compare the merged source with the qualified composition.
+- [ ] Re-run fresh merged-source full Go, exact official RPC fixtures, affected race/vet/build and Python controls.
+- [ ] Recheck the actual retained network and original registry cleanup without changing protocol clocks or validation.
+- [ ] Reconcile external-client workflow coverage and remaining adoption/model review boundaries.
+- [ ] Publish exact post-merge evidence and updated tracking in a master-targeted PR; verify current CI and conflicts.

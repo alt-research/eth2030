@@ -1,3 +1,12 @@
+## Remaining-code closure (2026-11-22)
+
+- [x] Preserve the original checkout and freeze shared source at PR126 head43002a5d; all new PRs target master with explicit ancestry.
+- [ ] Close legacy Builder Engine authority/signature/header gaps under the selected Gloas/Engine contract; retain red and independent signed controls.
+- [ ] Make node startup transactional: synchronous required binds, failure propagation, complete rollback, truthful health and retry.
+- [ ] Recheck scale/coverage/upstream boundaries, publish separate source reviews and verify exact-head CI plus cumulative merge orders.
+
+Each feature owns its detailed CHECK.md and STATUS.md under docs/reviews; shared root tracking is inherited rather than edited independently.
+
 ## Merged roadmap refresh and gap audit (2026-11-22)
 
 - [x] Verify EL reviews123/124/125 merged in master9a094830 and preserve the original dirty checkout.

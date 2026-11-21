@@ -4,7 +4,7 @@
 - [x] Complete four original-datadir restarts, fifteen dependency controls, three automatic provider recoveries and final steady/pressure acceptance.
 - [x] Verify final-source two-row external-builder blob/partials, historical state/BAL and independent finality/SDK consumers.
 - [x] Publish complete public captures and fresh offline replays; preserve original failures and unchanged protocol authority.
-- [ ] Finish exact remote-head CI/target and all-order merge verification and publish the documentation review.
+- [x] Publish master-targeted documentation PR125, verify exact source-head CI/targets and all six cumulative merge orders; final post-push metadata verification is retained separately.
 
 Earlier checklists are retained dated observations. Current completion is reconciled in docs/plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md.
 

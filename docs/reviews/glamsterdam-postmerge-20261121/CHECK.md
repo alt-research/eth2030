@@ -8,7 +8,7 @@
 - [x] Upgrade and recover the new exact runtime while retaining original failed preparation.
 - [x] Repeat automatic provider recovery and unchanged-budget operating windows with independent replays.
 - [x] Publish complete final source/runtime/evidence records and fresh public-byte replay.
-- [ ] Complete post-push current-head CI and all-order merge checks.
+- [x] Verify source-head CI and all six cumulative merge orders, publish master-targeted evidence PR125 and require the final post-push remote-head check.
 
 - [x] Complete actual external-builder two-row blob/KZG/partial/finality controls and historical readback.
 - [x] Publish original failures, separate operational launcher normalization and byte-identical final source rebuild.

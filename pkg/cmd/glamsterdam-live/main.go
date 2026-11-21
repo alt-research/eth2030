@@ -525,8 +525,8 @@ func main() {
 	output := flag.String("output", "", "new complete RPC trace file (required)")
 	timeout := flag.Duration("timeout", 15*time.Minute, "overall bounded campaign duration")
 	flag.Parse()
-	if flag.NArg() > 1 || (flag.NArg() == 1 && flag.Arg(0) != "blobs") {
-		fmt.Fprintln(os.Stderr, "the optional scenario is blobs; flags precede the scenario")
+	if flag.NArg() > 1 || (flag.NArg() == 1 && flag.Arg(0) != "blobs" && flag.Arg(0) != "factory") {
+		fmt.Fprintln(os.Stderr, "optional scenarios: blobs, factory; flags precede the scenario")
 		os.Exit(2)
 	}
 	if *output == "" {
@@ -548,6 +548,8 @@ func main() {
 	campaign := run
 	if flag.Arg(0) == "blobs" {
 		campaign = runBlobs
+	} else if flag.Arg(0) == "factory" {
+		campaign = runFactory
 	}
 	if err = campaign(ctx, strings.Split(*endpoints, ","), common.HexToHash(*expected), file); err != nil {
 		_ = json.NewEncoder(file).Encode(map[string]any{"kind": "campaign_failed", "error": err.Error()})

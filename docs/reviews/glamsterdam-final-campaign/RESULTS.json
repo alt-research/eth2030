@@ -1,0 +1,1559 @@
+{
+  "engineering_complete_for_frozen_target": true,
+  "public_protocol_model_review": "reserved by user",
+  "el_master_merge_performed": false,
+  "original_task_count": 33,
+  "work_packages_reconciled": 13,
+  "native_source": "eff0b823fdf3e0e4d6262bc093b44e8a77787067",
+  "native_binary_sha256": "78d75b0fb0a1c74cca3ad31322b5ccf9cd6db3b299e4edd711926dd63b5cf2dc",
+  "composed_full_tests": {
+    "command": [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./..."
+    ],
+    "toolchain": "go1.26.11",
+    "composition": "f407bdd2d63be0feacc05538547559c6c6dd2136",
+    "exit": 0,
+    "duration_seconds": 35.66072526699281,
+    "packages_passed": 219,
+    "failures": []
+  },
+  "composed_race_vet_build": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/chain",
+        "./core/state",
+        "./node",
+        "./node/backend",
+        "./eth",
+        "./sync/beacon",
+        "./txpool",
+        "./txpool/sparse",
+        "./rpc/ethapi",
+        "./cmd/cl-reveal-control",
+        "./cmd/glamsterdam-ledger"
+      ],
+      "exit": 0,
+      "seconds": 66.75603536500421
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 1.4574869189964375
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "./cmd/eth2030",
+        "./cmd/eth2030-state-history",
+        "./cmd/cl-reveal-control",
+        "./cmd/glamsterdam-ledger"
+      ],
+      "exit": 0,
+      "seconds": 1.9452456859871745
+    }
+  ],
+  "later_python_regressions": 26,
+  "later_command_race_packages": [
+    "cl-reveal-control",
+    "glamsterdam-ledger",
+    "glamsterdam-live"
+  ],
+  "final_operating": {
+    "steady-final-02": {
+      "latency": {
+        "window_ended_at": "2026-11-20T13:39:39.642810+00:00",
+        "samples": 400,
+        "rpc_errors": [],
+        "rpc": {
+          "el-3-geth-lighthouse": {
+            "count": 400,
+            "p95_ms": 1.2552060070447624,
+            "p99_ms": 1.2910390069009736
+          },
+          "el-2-geth-lodestar": {
+            "count": 400,
+            "p95_ms": 1.0857120068976656,
+            "p99_ms": 1.1424669937696308
+          },
+          "el-1-geth-lighthouse": {
+            "count": 400,
+            "p95_ms": 1.067952995072119,
+            "p99_ms": 1.1129729973617941
+          }
+        },
+        "identity_unchanged": true,
+        "finality_evaluated": false,
+        "passed": false,
+        "engine": {
+          "el-3-geth-lighthouse": {
+            "count": 2014,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "eth_syncing:success": 400,
+              "engine_forkchoiceUpdatedV5:VALID": 811,
+              "engine_newPayloadV5:VALID": 400,
+              "engine_forkchoiceUpdatedV4:VALID": 268,
+              "engine_getPayloadV6:success": 132,
+              "engine_getClientVersionV1:success": 2,
+              "engine_exchangeCapabilities:success": 1
+            },
+            "p95_ms": 82.832061,
+            "p99_ms": 128.584594
+          },
+          "el-2-geth-lodestar": {
+            "count": 1494,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV4:VALID": 947,
+              "engine_getPayloadV6:success": 147,
+              "engine_newPayloadV5:VALID": 400
+            },
+            "p95_ms": 83.411262,
+            "p99_ms": 124.584522
+          },
+          "el-1-geth-lighthouse": {
+            "count": 2472,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "eth_syncing:success": 400,
+              "engine_forkchoiceUpdatedV4:VALID": 1301,
+              "engine_newPayloadV5:VALID": 400,
+              "engine_getPayloadV6:success": 363,
+              "engine_exchangeCapabilities:success": 2,
+              "engine_getClientVersionV1:success": 6
+            },
+            "p95_ms": 1.605699,
+            "p99_ms": 1.891462
+          }
+        },
+        "latency_passed": true
+      },
+      "independent_finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "beacon_window": {
+          "first": 25822,
+          "stop": 26222,
+          "slots": 400,
+          "finalized_root": "0xa648fd800d8b18fe960626d8049c93e9ec12c770169c576e70456f47edf30dfd",
+          "finalized_slot": 26240,
+          "signature_slot": 26305,
+          "signature_participants": 512,
+          "parent_hash_links": 419,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      },
+      "offline_finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "replay_input_sha256": "df4f77eefac87c309b408eadc7a8e59ec0d1af95297e7e1e11180f5ce0eb36fb",
+        "beacon_window": {
+          "first": 25822,
+          "stop": 26222,
+          "slots": 400,
+          "finalized_root": "0xa648fd800d8b18fe960626d8049c93e9ec12c770169c576e70456f47edf30dfd",
+          "finalized_slot": 26240,
+          "signature_slot": 26305,
+          "signature_participants": 512,
+          "parent_hash_links": 419,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      }
+    },
+    "pressure-final-03": {
+      "latency": {
+        "window_ended_at": "2026-11-20T13:47:52.245058+00:00",
+        "counts": {
+          "invalid-payload:completed": 358,
+          "http-disconnect:socket_closed_after_send": 7170,
+          "header:completed": 270,
+          "ws-disconnect:socket_closed_while_pending": 7052,
+          "proof:completed": 270,
+          "finite-call:completed": 270,
+          "resources:completed": 60
+        },
+        "control_rounds": 90,
+        "required_control_rounds": 90,
+        "failures": [],
+        "identity_unchanged": true,
+        "rpc": {
+          "el-3-geth-lighthouse": {
+            "count": 270,
+            "p95_ms": 23.146189996623434,
+            "p99_ms": 42.83003100135829
+          },
+          "el-2-geth-lodestar": {
+            "count": 270,
+            "p95_ms": 26.793577009811997,
+            "p99_ms": 40.520372000173666
+          },
+          "el-1-geth-lighthouse": {
+            "count": 270,
+            "p95_ms": 0.7980590016813949,
+            "p99_ms": 0.916698991204612
+          }
+        },
+        "engine": {
+          "el-3-geth-lighthouse": {
+            "count": 482,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_newPayloadV5:INVALID": 179,
+              "engine_forkchoiceUpdatedV4:VALID": 39,
+              "engine_getPayloadV6:success": 20,
+              "engine_forkchoiceUpdatedV5:VALID": 122,
+              "engine_newPayloadV5:VALID": 60,
+              "eth_syncing:success": 60,
+              "engine_getClientVersionV1:success": 1,
+              "engine_exchangeCapabilities:success": 1
+            },
+            "p95_ms": 93.939419,
+            "p99_ms": 145.752209
+          },
+          "el-2-geth-lodestar": {
+            "count": 401,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_newPayloadV5:INVALID": 179,
+              "engine_forkchoiceUpdatedV4:VALID": 141,
+              "engine_newPayloadV5:VALID": 60,
+              "engine_getPayloadV6:success": 21
+            },
+            "p95_ms": 96.031212,
+            "p99_ms": 139.103267
+          },
+          "el-1-geth-lighthouse": {
+            "count": 379,
+            "failed_lines": [],
+            "sequence_gaps": {},
+            "unsealed_sessions": [],
+            "statuses": {
+              "engine_forkchoiceUpdatedV4:VALID": 202,
+              "engine_newPayloadV5:VALID": 60,
+              "eth_syncing:success": 60,
+              "engine_getPayloadV6:success": 57
+            },
+            "p95_ms": 1.659687,
+            "p99_ms": 1.825168
+          }
+        },
+        "latency_passed": true
+      },
+      "independent_finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "beacon_window": {
+          "first": 26326,
+          "stop": 26386,
+          "slots": 60,
+          "finalized_root": "0x8e5959a9ec6b975ac03b29d056bfcb9289537db130c5988c5270c0e62d099fc9",
+          "finalized_slot": 26400,
+          "signature_slot": 26465,
+          "signature_participants": 512,
+          "parent_hash_links": 75,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      },
+      "offline_finality": {
+        "passed": true,
+        "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+        "bls_active": true,
+        "latency_passed": true,
+        "operating_budgets_evaluated": true,
+        "replay_input_sha256": "5516a7c781f9265c93028c6bb8eb5d2cbb4d4419ad69528168fdd9237ea93cea",
+        "beacon_window": {
+          "first": 26326,
+          "stop": 26386,
+          "slots": 60,
+          "finalized_root": "0x8e5959a9ec6b975ac03b29d056bfcb9289537db130c5988c5270c0e62d099fc9",
+          "finalized_slot": 26400,
+          "signature_slot": 26465,
+          "signature_participants": 512,
+          "parent_hash_links": 75,
+          "missing_slots": [],
+          "missing_fraction": 0.0
+        },
+        "rejected_controls": [
+          "signature",
+          "finality_branch",
+          "genesis_domain"
+        ]
+      }
+    }
+  },
+  "registry": {
+    "passed": true,
+    "reference_source": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "bls_active": true,
+    "complete_signed_state_transitions": 160,
+    "actual_sweep": [
+      {
+        "slot": 26656,
+        "beacon_root": "0x185073ee810c10c5fc4b3e1f76f91b46e4df366edbf256dd7009121fad573a26",
+        "before_slot": 26655,
+        "before_root": "0x5a23d64e0ff631dcee70ef6f4fe3a0b7768582b97744d17bef47a1a9f2ec0e32",
+        "after_root": "0x261543505e2e9f43b0ad3120403800ea398b875900509cef5d68d7a86e85232e",
+        "builder_index": 1,
+        "debit_gwei": 50000000000,
+        "withdrawable_epoch": 833,
+        "execution_parent": "0x8366ad54396f5a0ec9fc640d87639e83eab836b847af501f4bd8d5adec0d957c",
+        "execution_payload": "0xf702c85d13e9f6272d949b4e44047a37d859df5b31021fc97af91cd66b6bea36"
+      }
+    ],
+    "actual_index_reuse": [
+      {
+        "slot": 26664,
+        "beacon_root": "0x973ba7adbe9f101a8b11232c698cc5c071893ae5b75e0ec2956c8d61c384a182",
+        "before_slot": 26663,
+        "before_root": "0x511b6efa24697e9651f3bf947fb41946013874c3fecdbb477ab633c236f6bbf2",
+        "after_root": "0x53e9c06f199a775afd187ae6387010976a7e6811d6b03c6ab95d5647aa2adf71",
+        "builder_index": 1,
+        "old_pubkey": "0xa6799f68efde1f8469c30136bb8e10aa0c1d13f11f277fd5112ac2ee695f5bb26267596c2e3496a35fbae252a29d147b",
+        "new_pubkey": "0xb49b274d74d615523a5591a22a37b4e9cdfb1fbaab95df7e8aae393d5823493011965f67213574ffcd7138c9689aa96e",
+        "new_balance_gwei": 50000000000,
+        "new_deposit_epoch": 833
+      }
+    ],
+    "retired_signature_verified_under_original_key": true,
+    "retired_signature_rejected_under_current_key": true,
+    "original_new_key_signature_verified": true,
+    "actual_rejection_http_status": 400,
+    "no_availability_after_rejection_http_status": 404,
+    "untouched_original_new_key_delivery_http_status": 200,
+    "signed_new_key_bid_and_beacon_block": true
+  },
+  "registry_finality": {
+    "passed": true,
+    "spec": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "bls_active": true,
+    "latency_passed": null,
+    "operating_budgets_evaluated": false,
+    "beacon_window": {
+      "first": 26656,
+      "stop": 26794,
+      "slots": 138,
+      "finalized_root": "0xee0364f13d5202a56ac5606e30311f2a745f330c023cd0636f16c3fe61706fae",
+      "finalized_slot": 26816,
+      "signature_slot": 26882,
+      "signature_participants": 512,
+      "parent_hash_links": 161,
+      "missing_slots": [],
+      "missing_fraction": 0.0
+    },
+    "rejected_controls": [
+      "signature",
+      "finality_branch",
+      "genesis_domain"
+    ]
+  },
+  "positive_availability": {
+    "passed": true,
+    "actual_get_http_status": 200,
+    "original_signed_ssz_bytes_equal": true,
+    "builder_index": 1,
+    "beacon_block_root": "0x1cb269c94a7cdf79007bdc272ebbbbcd9d4bee68553a673ac66616796e8b0a90",
+    "execution_optimistic": false,
+    "finalized": false
+  },
+  "fresh_cold": {
+    "full": {
+      "budget": 3600,
+      "anchor": "2026-11-20T13:48:09.543989801Z",
+      "passed": true,
+      "elapsed_seconds": 613.3903353214264,
+      "status": {
+        "is_syncing": false,
+        "is_optimistic": false,
+        "el_offline": false,
+        "head_slot": "26595",
+        "sync_distance": "0"
+      }
+    },
+    "snap": {
+      "budget": 600,
+      "anchor": "2026-11-20T13:48:16.702676086Z",
+      "passed": true,
+      "elapsed_seconds": 76.48270511627197,
+      "status": {
+        "is_syncing": false,
+        "is_optimistic": false,
+        "el_offline": false,
+        "head_slot": "26419",
+        "sync_distance": "0"
+      }
+    }
+  },
+  "fresh_cold_proofs": {
+    "independent_proofs": 4,
+    "passed": true
+  },
+  "actual_automatic_gossip_recovery": {
+    "passed": true,
+    "automatic_only": true,
+    "repetitions": [
+      {
+        "repetition": 1,
+        "passed": true,
+        "recovery_seconds": 6.605391051998595,
+        "canonical_lodestar_proposal": {
+          "root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+          "canonical": true,
+          "header": {
+            "message": {
+              "slot": "25770",
+              "proposer_index": "212",
+              "parent_root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+              "state_root": "0xab168db06c7cf146715acd63091d01fbfebff387b32530f3bdd8a985c7dd7a4f",
+              "body_root": "0xe96469bc8de1396dbff64b8f4c37384fd4712dc015d55b39594daab0ee4ddd89"
+            },
+            "signature": "0xad170cae19151f5744616a631c56ee740cf70e8621f09e6f04167ec38e780830d88c797f145636da1a35e436b9047af80a66365c89be0a390a04b75801935f576d2a1558f3a2a6c3daa576256dff38f63cc182cff9969cf78826aa9b563e2bb4"
+          }
+        },
+        "observations": [
+          {
+            "at": "2026-11-20T13:16:59.662832+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25768",
+                  "proposer_index": "56",
+                  "parent_root": "0x27238e5e0caac12d629972c43b765969bd93f30f72c4f1f6b02bdc592bc263e5",
+                  "state_root": "0xf47a7765234f7bea790f7de91a191ac7febfbe6b09b63b04ee76e6acbb5300a8",
+                  "body_root": "0xd0992e31f3e63d035f500a3bcd0845b0323bef419c64d60c72d5e3e57d4430a8"
+                },
+                "signature": "0xaf3f45e8f23c544cf14240a1c29c7c9f9c870541b5692193872a02dd4088edb5eaf97fd5f47fa93028b01d28a69d78dc0c487a21926bb3e14784d766a671c74d193ca39cd6aee50e33b63e4a207346c9c9487dd0330e3e7da2b8b6dd31893342"
+              }
+            },
+            "elapsed_seconds": 0.08835456499946304
+          },
+          {
+            "at": "2026-11-20T13:17:00.756373+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25768",
+                  "proposer_index": "56",
+                  "parent_root": "0x27238e5e0caac12d629972c43b765969bd93f30f72c4f1f6b02bdc592bc263e5",
+                  "state_root": "0xf47a7765234f7bea790f7de91a191ac7febfbe6b09b63b04ee76e6acbb5300a8",
+                  "body_root": "0xd0992e31f3e63d035f500a3bcd0845b0323bef419c64d60c72d5e3e57d4430a8"
+                },
+                "signature": "0xaf3f45e8f23c544cf14240a1c29c7c9f9c870541b5692193872a02dd4088edb5eaf97fd5f47fa93028b01d28a69d78dc0c487a21926bb3e14784d766a671c74d193ca39cd6aee50e33b63e4a207346c9c9487dd0330e3e7da2b8b6dd31893342"
+              }
+            },
+            "elapsed_seconds": 1.1818887800036464
+          },
+          {
+            "at": "2026-11-20T13:17:01.840269+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25768",
+                  "proposer_index": "56",
+                  "parent_root": "0x27238e5e0caac12d629972c43b765969bd93f30f72c4f1f6b02bdc592bc263e5",
+                  "state_root": "0xf47a7765234f7bea790f7de91a191ac7febfbe6b09b63b04ee76e6acbb5300a8",
+                  "body_root": "0xd0992e31f3e63d035f500a3bcd0845b0323bef419c64d60c72d5e3e57d4430a8"
+                },
+                "signature": "0xaf3f45e8f23c544cf14240a1c29c7c9f9c870541b5692193872a02dd4088edb5eaf97fd5f47fa93028b01d28a69d78dc0c487a21926bb3e14784d766a671c74d193ca39cd6aee50e33b63e4a207346c9c9487dd0330e3e7da2b8b6dd31893342"
+              }
+            },
+            "elapsed_seconds": 2.2657925550010987
+          },
+          {
+            "at": "2026-11-20T13:17:02.937621+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25769",
+                  "proposer_index": "31",
+                  "parent_root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+                  "state_root": "0x81bc6cbc161592debedc79c348727e08b489aaa6311762db19d0bb2c7ef4209c",
+                  "body_root": "0x19f9647ef24c95497a84e6078822cf7ee4aee0cf2038c98ebe2a1da81837376a"
+                },
+                "signature": "0xa90abca0926dd5332561cbf3e75ab87a5ba37a182fbde92f408dae27d08849e3681f119ee9e9b69d9dd9a041f587a9890ff99b069bca5faaac9013b7e0fe21bcc454217c29a405f29b5f06d96222b04df14132bfd4225d2ca957f405cbedebf2"
+              }
+            },
+            "elapsed_seconds": 3.3631437020085286
+          },
+          {
+            "at": "2026-11-20T13:17:04.018956+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25769",
+                  "proposer_index": "31",
+                  "parent_root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+                  "state_root": "0x81bc6cbc161592debedc79c348727e08b489aaa6311762db19d0bb2c7ef4209c",
+                  "body_root": "0x19f9647ef24c95497a84e6078822cf7ee4aee0cf2038c98ebe2a1da81837376a"
+                },
+                "signature": "0xa90abca0926dd5332561cbf3e75ab87a5ba37a182fbde92f408dae27d08849e3681f119ee9e9b69d9dd9a041f587a9890ff99b069bca5faaac9013b7e0fe21bcc454217c29a405f29b5f06d96222b04df14132bfd4225d2ca957f405cbedebf2"
+              }
+            },
+            "elapsed_seconds": 4.444480525999097
+          },
+          {
+            "at": "2026-11-20T13:17:05.099964+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25769",
+                  "proposer_index": "31",
+                  "parent_root": "0x9b5cb07d079a18f00296876518c30cd773ccddae622e61a434772c3ae540cdfb",
+                  "state_root": "0x81bc6cbc161592debedc79c348727e08b489aaa6311762db19d0bb2c7ef4209c",
+                  "body_root": "0x19f9647ef24c95497a84e6078822cf7ee4aee0cf2038c98ebe2a1da81837376a"
+                },
+                "signature": "0xa90abca0926dd5332561cbf3e75ab87a5ba37a182fbde92f408dae27d08849e3681f119ee9e9b69d9dd9a041f587a9890ff99b069bca5faaac9013b7e0fe21bcc454217c29a405f29b5f06d96222b04df14132bfd4225d2ca957f405cbedebf2"
+              }
+            },
+            "elapsed_seconds": 5.525476066002739
+          },
+          {
+            "at": "2026-11-20T13:17:06.179876+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25770",
+                  "proposer_index": "212",
+                  "parent_root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+                  "state_root": "0xab168db06c7cf146715acd63091d01fbfebff387b32530f3bdd8a985c7dd7a4f",
+                  "body_root": "0xe96469bc8de1396dbff64b8f4c37384fd4712dc015d55b39594daab0ee4ddd89"
+                },
+                "signature": "0xad170cae19151f5744616a631c56ee740cf70e8621f09e6f04167ec38e780830d88c797f145636da1a35e436b9047af80a66365c89be0a390a04b75801935f576d2a1558f3a2a6c3daa576256dff38f63cc182cff9969cf78826aa9b563e2bb4"
+              }
+            },
+            "elapsed_seconds": 6.605387132003671
+          },
+          {
+            "at": "2026-11-20T13:17:06.259967+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25770",
+                  "proposer_index": "212",
+                  "parent_root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+                  "state_root": "0xab168db06c7cf146715acd63091d01fbfebff387b32530f3bdd8a985c7dd7a4f",
+                  "body_root": "0xe96469bc8de1396dbff64b8f4c37384fd4712dc015d55b39594daab0ee4ddd89"
+                },
+                "signature": "0xad170cae19151f5744616a631c56ee740cf70e8621f09e6f04167ec38e780830d88c797f145636da1a35e436b9047af80a66365c89be0a390a04b75801935f576d2a1558f3a2a6c3daa576256dff38f63cc182cff9969cf78826aa9b563e2bb4"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:07.340829+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25770",
+                  "proposer_index": "212",
+                  "parent_root": "0xe703cff19a27df1848b43386a0f4ad8bf2405bde83831acd175b4b889a22908d",
+                  "state_root": "0xab168db06c7cf146715acd63091d01fbfebff387b32530f3bdd8a985c7dd7a4f",
+                  "body_root": "0xe96469bc8de1396dbff64b8f4c37384fd4712dc015d55b39594daab0ee4ddd89"
+                },
+                "signature": "0xad170cae19151f5744616a631c56ee740cf70e8621f09e6f04167ec38e780830d88c797f145636da1a35e436b9047af80a66365c89be0a390a04b75801935f576d2a1558f3a2a6c3daa576256dff38f63cc182cff9969cf78826aa9b563e2bb4"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:08.422294+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25771",
+                  "proposer_index": "289",
+                  "parent_root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+                  "state_root": "0x2554741257f49aba11220ebf59c81e718bc846165070241e72b37a5b187166dd",
+                  "body_root": "0x6ce2c60754d2366a627498d45437c13f58b8e8bfa4896067bdee4e5033378453"
+                },
+                "signature": "0x9444a64293f65bfa83b7387a14b6bcd7e2dad5a229b7404736ec7f5d64a3f7de927a1429cfea7a9f315b2c1a7917a47404015de9963d794413ab5b7e14e1241f9c5e3ed6d0706cfe2818f3418a3e677a59a06b8ffd88c3ddc85c9d17d1e091e2"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:09.503342+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25771",
+                  "proposer_index": "289",
+                  "parent_root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+                  "state_root": "0x2554741257f49aba11220ebf59c81e718bc846165070241e72b37a5b187166dd",
+                  "body_root": "0x6ce2c60754d2366a627498d45437c13f58b8e8bfa4896067bdee4e5033378453"
+                },
+                "signature": "0x9444a64293f65bfa83b7387a14b6bcd7e2dad5a229b7404736ec7f5d64a3f7de927a1429cfea7a9f315b2c1a7917a47404015de9963d794413ab5b7e14e1241f9c5e3ed6d0706cfe2818f3418a3e677a59a06b8ffd88c3ddc85c9d17d1e091e2"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:10.583996+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25771",
+                  "proposer_index": "289",
+                  "parent_root": "0xc334cfc67a744f936b0cba72e94fbf73d2ca3ad7382a1f48127cee69f0676cf0",
+                  "state_root": "0x2554741257f49aba11220ebf59c81e718bc846165070241e72b37a5b187166dd",
+                  "body_root": "0x6ce2c60754d2366a627498d45437c13f58b8e8bfa4896067bdee4e5033378453"
+                },
+                "signature": "0x9444a64293f65bfa83b7387a14b6bcd7e2dad5a229b7404736ec7f5d64a3f7de927a1429cfea7a9f315b2c1a7917a47404015de9963d794413ab5b7e14e1241f9c5e3ed6d0706cfe2818f3418a3e677a59a06b8ffd88c3ddc85c9d17d1e091e2"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:11.664329+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25772",
+                  "proposer_index": "11",
+                  "parent_root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+                  "state_root": "0xed49cfad1efa326bd7024ba53ecc0ac869768a6aa60ee3bdba533be3b68566bd",
+                  "body_root": "0xc039b904311bf75d4a04fe26158f50267a0eeb8c89b27442993835fdd8f6205b"
+                },
+                "signature": "0xb389828438fd503cb6a48feaf9d5a57b7244d5b2052e6c68fd2f664108679a06b1e7ec41a1366c79084c650b61bc3ced0a3365cd653e73d7744b2c8017fbceff2210bad18b6a49814ea5262407e830d991723039b7b55a891a206743faeabdaa"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:12.746311+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25772",
+                  "proposer_index": "11",
+                  "parent_root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+                  "state_root": "0xed49cfad1efa326bd7024ba53ecc0ac869768a6aa60ee3bdba533be3b68566bd",
+                  "body_root": "0xc039b904311bf75d4a04fe26158f50267a0eeb8c89b27442993835fdd8f6205b"
+                },
+                "signature": "0xb389828438fd503cb6a48feaf9d5a57b7244d5b2052e6c68fd2f664108679a06b1e7ec41a1366c79084c650b61bc3ced0a3365cd653e73d7744b2c8017fbceff2210bad18b6a49814ea5262407e830d991723039b7b55a891a206743faeabdaa"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:13.827721+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25772",
+                  "proposer_index": "11",
+                  "parent_root": "0x51ae4c4ee45b9db3d017102d3e93d1142be699d89be3b06cd713991a4473dafa",
+                  "state_root": "0xed49cfad1efa326bd7024ba53ecc0ac869768a6aa60ee3bdba533be3b68566bd",
+                  "body_root": "0xc039b904311bf75d4a04fe26158f50267a0eeb8c89b27442993835fdd8f6205b"
+                },
+                "signature": "0xb389828438fd503cb6a48feaf9d5a57b7244d5b2052e6c68fd2f664108679a06b1e7ec41a1366c79084c650b61bc3ced0a3365cd653e73d7744b2c8017fbceff2210bad18b6a49814ea5262407e830d991723039b7b55a891a206743faeabdaa"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:14.910682+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xdac2c52771416d418dd3f90b66dc8da2a99b40dab661365d1088946f5f99cce4",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25773",
+                  "proposer_index": "243",
+                  "parent_root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+                  "state_root": "0x9ebe9545acf318aabf25446d531251c9641bb6f37a57f813fdd1d5c3fc2dabcc",
+                  "body_root": "0x195ac8f743f6a27322eac9128eb92084d85dd41f719a61e6a35054fd420a822a"
+                },
+                "signature": "0x8a829b1da53d4a86d24e992e5bfe13699fae03408bc19d0c8ff42a739dd8d8c059c1d7409dee29530a5f762c8345cd1006187bb6c9330cfc08717777893c8c961ed5073f59d32061113250a04f4e66a72417cf99753ee5baec47d886a1a8619e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:15.991796+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xdac2c52771416d418dd3f90b66dc8da2a99b40dab661365d1088946f5f99cce4",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25773",
+                  "proposer_index": "243",
+                  "parent_root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+                  "state_root": "0x9ebe9545acf318aabf25446d531251c9641bb6f37a57f813fdd1d5c3fc2dabcc",
+                  "body_root": "0x195ac8f743f6a27322eac9128eb92084d85dd41f719a61e6a35054fd420a822a"
+                },
+                "signature": "0x8a829b1da53d4a86d24e992e5bfe13699fae03408bc19d0c8ff42a739dd8d8c059c1d7409dee29530a5f762c8345cd1006187bb6c9330cfc08717777893c8c961ed5073f59d32061113250a04f4e66a72417cf99753ee5baec47d886a1a8619e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:17.076309+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xdac2c52771416d418dd3f90b66dc8da2a99b40dab661365d1088946f5f99cce4",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25773",
+                  "proposer_index": "243",
+                  "parent_root": "0x5390327e329460977aee2ad3b0b12f400403b02b4f706a6e864c3c6df19065d8",
+                  "state_root": "0x9ebe9545acf318aabf25446d531251c9641bb6f37a57f813fdd1d5c3fc2dabcc",
+                  "body_root": "0x195ac8f743f6a27322eac9128eb92084d85dd41f719a61e6a35054fd420a822a"
+                },
+                "signature": "0x8a829b1da53d4a86d24e992e5bfe13699fae03408bc19d0c8ff42a739dd8d8c059c1d7409dee29530a5f762c8345cd1006187bb6c9330cfc08717777893c8c961ed5073f59d32061113250a04f4e66a72417cf99753ee5baec47d886a1a8619e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:18.156537+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xea984160cd1e563a1f230d89c4616901f71fc44d30d89c494eab8e7664ae3266",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25774",
+                  "proposer_index": "218",
+                  "parent_root": "0xdac2c52771416d418dd3f90b66dc8da2a99b40dab661365d1088946f5f99cce4",
+                  "state_root": "0x9189abac3df60b6228095ee5d7bfb378c866f40a2604ca66892c887e3a56a366",
+                  "body_root": "0x0e9b638fbdfaf020849c09e09b068eab9456223c449c30d6d4a44b4103718107"
+                },
+                "signature": "0x8468b176243f04228590c0b78fc8f13b0353ee3e0b11a74bf6dcd8ab55bc48abcbf3fa3698b354b6cc5c904a9fe1e4b6075cfec54773eee70f9cedb1188adc0e181dc57df08a1946cf499d32d659c268900260286d49d0ae3e74f0c343b414b2"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:19.237025+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xea984160cd1e563a1f230d89c4616901f71fc44d30d89c494eab8e7664ae3266",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25774",
+                  "proposer_index": "218",
+                  "parent_root": "0xdac2c52771416d418dd3f90b66dc8da2a99b40dab661365d1088946f5f99cce4",
+                  "state_root": "0x9189abac3df60b6228095ee5d7bfb378c866f40a2604ca66892c887e3a56a366",
+                  "body_root": "0x0e9b638fbdfaf020849c09e09b068eab9456223c449c30d6d4a44b4103718107"
+                },
+                "signature": "0x8468b176243f04228590c0b78fc8f13b0353ee3e0b11a74bf6dcd8ab55bc48abcbf3fa3698b354b6cc5c904a9fe1e4b6075cfec54773eee70f9cedb1188adc0e181dc57df08a1946cf499d32d659c268900260286d49d0ae3e74f0c343b414b2"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:20.322662+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x91569c75dae0dbe139530ee62070f2134bdf0cae2dc3730ad370104a86fe67ff",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25775",
+                  "proposer_index": "382",
+                  "parent_root": "0xea984160cd1e563a1f230d89c4616901f71fc44d30d89c494eab8e7664ae3266",
+                  "state_root": "0x23fe59a356bb463bc3791d50a50f05717590606b1fd19520a79cdc3b7004d0a1",
+                  "body_root": "0x6529990af9a2028138b401e3cc8a748bb904b01d493cc702e854fef472bbb196"
+                },
+                "signature": "0xa9332d8f78f265cf17e16fedb522fef3431ff542836821011f0512843bdc166f429425c6203a53ec720188cbf4b5fd0c03c44b53d08019050d2af569add3604d0e0b3e958f7727246a877ca5e77617a7d945696b4452126254fe97ac5fe9feb9"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "repetition": 2,
+        "passed": true,
+        "recovery_seconds": 0.08222667600784916,
+        "canonical_lodestar_proposal": {
+          "root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+          "canonical": true,
+          "header": {
+            "message": {
+              "slot": "25777",
+              "proposer_index": "210",
+              "parent_root": "0xfdfd970ac593aac174cdbd740e8f869cd612f3bdf167933563dad87aae8ada8b",
+              "state_root": "0xc5872a2ba73a4351931eb98ec2cdf11a5fc26aaaf8f4e3bbcfc8c37249e8ce89",
+              "body_root": "0xa3fd9cf131b1707fd8a47a598f1c23be08a4d0443c9c7f0f42330f277fb8c2d1"
+            },
+            "signature": "0x86ceb03fc0a6cdafcfbb9c267b03f974afb2d464d2663cadddad413d0a422e0f0a88183aa684cabfb887707bad08a51800496ce9206fff24da8053705ca26a0e750bcba4588856424c1b14003f73f3f23053cdfb34e788a1f966b53f905add93"
+          }
+        },
+        "observations": [
+          {
+            "at": "2026-11-20T13:17:27.732078+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25777",
+                  "proposer_index": "210",
+                  "parent_root": "0xfdfd970ac593aac174cdbd740e8f869cd612f3bdf167933563dad87aae8ada8b",
+                  "state_root": "0xc5872a2ba73a4351931eb98ec2cdf11a5fc26aaaf8f4e3bbcfc8c37249e8ce89",
+                  "body_root": "0xa3fd9cf131b1707fd8a47a598f1c23be08a4d0443c9c7f0f42330f277fb8c2d1"
+                },
+                "signature": "0x86ceb03fc0a6cdafcfbb9c267b03f974afb2d464d2663cadddad413d0a422e0f0a88183aa684cabfb887707bad08a51800496ce9206fff24da8053705ca26a0e750bcba4588856424c1b14003f73f3f23053cdfb34e788a1f966b53f905add93"
+              }
+            },
+            "elapsed_seconds": 0.08222274600120727
+          },
+          {
+            "at": "2026-11-20T13:17:27.808737+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25777",
+                  "proposer_index": "210",
+                  "parent_root": "0xfdfd970ac593aac174cdbd740e8f869cd612f3bdf167933563dad87aae8ada8b",
+                  "state_root": "0xc5872a2ba73a4351931eb98ec2cdf11a5fc26aaaf8f4e3bbcfc8c37249e8ce89",
+                  "body_root": "0xa3fd9cf131b1707fd8a47a598f1c23be08a4d0443c9c7f0f42330f277fb8c2d1"
+                },
+                "signature": "0x86ceb03fc0a6cdafcfbb9c267b03f974afb2d464d2663cadddad413d0a422e0f0a88183aa684cabfb887707bad08a51800496ce9206fff24da8053705ca26a0e750bcba4588856424c1b14003f73f3f23053cdfb34e788a1f966b53f905add93"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:28.890049+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25777",
+                  "proposer_index": "210",
+                  "parent_root": "0xfdfd970ac593aac174cdbd740e8f869cd612f3bdf167933563dad87aae8ada8b",
+                  "state_root": "0xc5872a2ba73a4351931eb98ec2cdf11a5fc26aaaf8f4e3bbcfc8c37249e8ce89",
+                  "body_root": "0xa3fd9cf131b1707fd8a47a598f1c23be08a4d0443c9c7f0f42330f277fb8c2d1"
+                },
+                "signature": "0x86ceb03fc0a6cdafcfbb9c267b03f974afb2d464d2663cadddad413d0a422e0f0a88183aa684cabfb887707bad08a51800496ce9206fff24da8053705ca26a0e750bcba4588856424c1b14003f73f3f23053cdfb34e788a1f966b53f905add93"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:29.972746+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25778",
+                  "proposer_index": "136",
+                  "parent_root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+                  "state_root": "0x674efca87fcc82a145d02785a7e0f65cfc1668554fd09b56fce1115eab90b0c9",
+                  "body_root": "0x4a11b94aca9fd1bcf4feffebe45439c11c497313b5cdc4e0fd7a8da521f37d6d"
+                },
+                "signature": "0xb88ac1fb706c6f210b06a0ecffb7c25f57e7d4574b9d20df3215cde665c3412c734cda31ae837a3fafef66516bb138d806a48643e6bd0b2ddbaab35b7cc354b48cc141e8e8ffcdc95afe87a5ff084c6aa4467b0474b60c8f1bff3e8b14df879d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:31.054447+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25778",
+                  "proposer_index": "136",
+                  "parent_root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+                  "state_root": "0x674efca87fcc82a145d02785a7e0f65cfc1668554fd09b56fce1115eab90b0c9",
+                  "body_root": "0x4a11b94aca9fd1bcf4feffebe45439c11c497313b5cdc4e0fd7a8da521f37d6d"
+                },
+                "signature": "0xb88ac1fb706c6f210b06a0ecffb7c25f57e7d4574b9d20df3215cde665c3412c734cda31ae837a3fafef66516bb138d806a48643e6bd0b2ddbaab35b7cc354b48cc141e8e8ffcdc95afe87a5ff084c6aa4467b0474b60c8f1bff3e8b14df879d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:32.134736+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25778",
+                  "proposer_index": "136",
+                  "parent_root": "0x0d2aad45cb24b99ba65d0a4013dbf8322af53e18ccd4f9a220971172d0d5d5bd",
+                  "state_root": "0x674efca87fcc82a145d02785a7e0f65cfc1668554fd09b56fce1115eab90b0c9",
+                  "body_root": "0x4a11b94aca9fd1bcf4feffebe45439c11c497313b5cdc4e0fd7a8da521f37d6d"
+                },
+                "signature": "0xb88ac1fb706c6f210b06a0ecffb7c25f57e7d4574b9d20df3215cde665c3412c734cda31ae837a3fafef66516bb138d806a48643e6bd0b2ddbaab35b7cc354b48cc141e8e8ffcdc95afe87a5ff084c6aa4467b0474b60c8f1bff3e8b14df879d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:33.217254+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xb2693ea1a32b39162795103cb46cea96ba543e21fbbec38623dc59bc05b7dd0f",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25779",
+                  "proposer_index": "154",
+                  "parent_root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+                  "state_root": "0x5e64039535ab3df37a41cffc75b98fbf262813e733d93322e0fdcd30e0886632",
+                  "body_root": "0x946f4b9b969711dabb0efd2327d52f9c7b5594a6a08df79fda73ccf5a8764052"
+                },
+                "signature": "0x9876bba7a817de57107c8163e5c2221789e906d222b5e022c73a3315b69a0e0793fdb790b5f24fa23a1cb6ba3f89cdf90bb0111e6cac3ffc01c068622a27f06225f10af432177dbfa8f65f6dfc2d36f2217ef9766191e3b0c92ad592d401618d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:34.296446+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xb2693ea1a32b39162795103cb46cea96ba543e21fbbec38623dc59bc05b7dd0f",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25779",
+                  "proposer_index": "154",
+                  "parent_root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+                  "state_root": "0x5e64039535ab3df37a41cffc75b98fbf262813e733d93322e0fdcd30e0886632",
+                  "body_root": "0x946f4b9b969711dabb0efd2327d52f9c7b5594a6a08df79fda73ccf5a8764052"
+                },
+                "signature": "0x9876bba7a817de57107c8163e5c2221789e906d222b5e022c73a3315b69a0e0793fdb790b5f24fa23a1cb6ba3f89cdf90bb0111e6cac3ffc01c068622a27f06225f10af432177dbfa8f65f6dfc2d36f2217ef9766191e3b0c92ad592d401618d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:35.387569+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xb2693ea1a32b39162795103cb46cea96ba543e21fbbec38623dc59bc05b7dd0f",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25779",
+                  "proposer_index": "154",
+                  "parent_root": "0xfeab8ce65a8df6eed128387d80c6f2ad3013eb7b304f6c88bfbb3098b3b42519",
+                  "state_root": "0x5e64039535ab3df37a41cffc75b98fbf262813e733d93322e0fdcd30e0886632",
+                  "body_root": "0x946f4b9b969711dabb0efd2327d52f9c7b5594a6a08df79fda73ccf5a8764052"
+                },
+                "signature": "0x9876bba7a817de57107c8163e5c2221789e906d222b5e022c73a3315b69a0e0793fdb790b5f24fa23a1cb6ba3f89cdf90bb0111e6cac3ffc01c068622a27f06225f10af432177dbfa8f65f6dfc2d36f2217ef9766191e3b0c92ad592d401618d"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:36.467368+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xbb56be33a688a2458034bced2023639e3e1946ca7c01a314945d54ece07f7c68",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25780",
+                  "proposer_index": "235",
+                  "parent_root": "0xb2693ea1a32b39162795103cb46cea96ba543e21fbbec38623dc59bc05b7dd0f",
+                  "state_root": "0xa7440157daba7a03faaf34117b545523bfce78f90c96038a82474c38b55900b1",
+                  "body_root": "0x7b8d2e2490d44bdfe5e7eaac7215dd07ad29b5397957a85a72dbcea52e2724be"
+                },
+                "signature": "0x933a4db5e716bc2d2b98161b9bdb43e2a84ea54a195bb04b6491c9472e681c7731451ba33f0c91b985ba25ea30759aca043705326b7961777c49aa57b3aff0e2e5737623bd9ddf2752d23c5cf858d731675bf8623f7cc06778df506683bce0de"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:37.545722+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xbb56be33a688a2458034bced2023639e3e1946ca7c01a314945d54ece07f7c68",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25780",
+                  "proposer_index": "235",
+                  "parent_root": "0xb2693ea1a32b39162795103cb46cea96ba543e21fbbec38623dc59bc05b7dd0f",
+                  "state_root": "0xa7440157daba7a03faaf34117b545523bfce78f90c96038a82474c38b55900b1",
+                  "body_root": "0x7b8d2e2490d44bdfe5e7eaac7215dd07ad29b5397957a85a72dbcea52e2724be"
+                },
+                "signature": "0x933a4db5e716bc2d2b98161b9bdb43e2a84ea54a195bb04b6491c9472e681c7731451ba33f0c91b985ba25ea30759aca043705326b7961777c49aa57b3aff0e2e5737623bd9ddf2752d23c5cf858d731675bf8623f7cc06778df506683bce0de"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:38.625117+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x486033cc83e68fa64f0c0258a7e58a3abb3479d5d7a57aab583aab5f7fd4b046",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25781",
+                  "proposer_index": "281",
+                  "parent_root": "0xbb56be33a688a2458034bced2023639e3e1946ca7c01a314945d54ece07f7c68",
+                  "state_root": "0x6e0f11d50c2c939dc4020e84706830b3b6526a7999e13acb06ec94f7156b14e2",
+                  "body_root": "0x20ee5b374796c45f288a1e1e3d11e6d768f3d1ea959db30285e41f043c0f06de"
+                },
+                "signature": "0x82299a63e5b8ac37562121390f8e5fc3d5c08b0dd979c882d2d021c3c1a923ae7b94a2b095772e11b3256d0c130589c803681e4f6de8aed8b5a3371c3c0813c1f20e48a65beb193a1d8c3b1120c5d7eaf6bfbb9678f62b81770d49e0177c0608"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:39.705692+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x486033cc83e68fa64f0c0258a7e58a3abb3479d5d7a57aab583aab5f7fd4b046",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25781",
+                  "proposer_index": "281",
+                  "parent_root": "0xbb56be33a688a2458034bced2023639e3e1946ca7c01a314945d54ece07f7c68",
+                  "state_root": "0x6e0f11d50c2c939dc4020e84706830b3b6526a7999e13acb06ec94f7156b14e2",
+                  "body_root": "0x20ee5b374796c45f288a1e1e3d11e6d768f3d1ea959db30285e41f043c0f06de"
+                },
+                "signature": "0x82299a63e5b8ac37562121390f8e5fc3d5c08b0dd979c882d2d021c3c1a923ae7b94a2b095772e11b3256d0c130589c803681e4f6de8aed8b5a3371c3c0813c1f20e48a65beb193a1d8c3b1120c5d7eaf6bfbb9678f62b81770d49e0177c0608"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:40.787821+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x486033cc83e68fa64f0c0258a7e58a3abb3479d5d7a57aab583aab5f7fd4b046",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25781",
+                  "proposer_index": "281",
+                  "parent_root": "0xbb56be33a688a2458034bced2023639e3e1946ca7c01a314945d54ece07f7c68",
+                  "state_root": "0x6e0f11d50c2c939dc4020e84706830b3b6526a7999e13acb06ec94f7156b14e2",
+                  "body_root": "0x20ee5b374796c45f288a1e1e3d11e6d768f3d1ea959db30285e41f043c0f06de"
+                },
+                "signature": "0x82299a63e5b8ac37562121390f8e5fc3d5c08b0dd979c882d2d021c3c1a923ae7b94a2b095772e11b3256d0c130589c803681e4f6de8aed8b5a3371c3c0813c1f20e48a65beb193a1d8c3b1120c5d7eaf6bfbb9678f62b81770d49e0177c0608"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:41.869042+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x5f488293127fa835ddde7418d55d3af323322122b686a527155080b8dbf6eb32",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25782",
+                  "proposer_index": "121",
+                  "parent_root": "0x486033cc83e68fa64f0c0258a7e58a3abb3479d5d7a57aab583aab5f7fd4b046",
+                  "state_root": "0x70b9c5e4a574f9e2218c54792100aef52d8c6557b88a491821adb03b99335f2e",
+                  "body_root": "0x8afcb0a1174e38b850bef7b8fad5b7436d1526eefdc977fa50a35f9b666cc99c"
+                },
+                "signature": "0x903b37a92bdc7d991463949ed2ef4af95580334858ea670712941c9c54661e13ca21363dcabcfe281cbc4526538633150b1c75dda6affa9f9844d43cb904ac3f2a7fea5445107bfd1d18e0f42d7120ab715b15e7d3e2797f7aa29c34863ea4b6"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "repetition": 3,
+        "passed": true,
+        "recovery_seconds": 2.2413512070052093,
+        "canonical_lodestar_proposal": {
+          "root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+          "canonical": true,
+          "header": {
+            "message": {
+              "slot": "25785",
+              "proposer_index": "182",
+              "parent_root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+              "state_root": "0xdcd78c0ebd15a850023b34d9ea4f9c09a83b08f95f4e301d126ca9d3d1ad40f0",
+              "body_root": "0xa36a2b12ba7233fb599ba1dd95f2ac606e216f7322bac05798d48d50e093ec61"
+            },
+            "signature": "0xa2eceaa28a47995191b2754977a70a263f0379e8fe31d22302fc070dcdb08c0808cd11e63704fb6385fd441ad82450b21359d486d7c6c6d50dd99b80babc03e55bc522fdd9bedf588b9daf4f804826ef89ddcb96ab64b97742159c057c7f7851"
+          }
+        },
+        "observations": [
+          {
+            "at": "2026-11-20T13:17:49.318984+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25784",
+                  "proposer_index": "41",
+                  "parent_root": "0xee6b9962af45c0a80eabe626ef07aee490f4e63d23c6da123f2fdd6e7a416049",
+                  "state_root": "0x4b561a241511cb1aca471d5357d13525c829e199abc631a638358998e7dd5d28",
+                  "body_root": "0x8d5d9f2946836ea5b6eb06e1bad081d7a8364186ba26a4609f80200c71ac5539"
+                },
+                "signature": "0x85e0ef76782be315b56665661a102a74ef4c223749df2a98297a9ea11efdc9c01ebe9e296efc195931ccc9bf11a381900384499c9813aeb452a06fbdbe47233fab2683c7180e32dbf247718688c3f78c553a135171a2fa5c688b09b0cfdc07e8"
+              }
+            },
+            "elapsed_seconds": 0.07890462499926798
+          },
+          {
+            "at": "2026-11-20T13:17:50.401021+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25784",
+                  "proposer_index": "41",
+                  "parent_root": "0xee6b9962af45c0a80eabe626ef07aee490f4e63d23c6da123f2fdd6e7a416049",
+                  "state_root": "0x4b561a241511cb1aca471d5357d13525c829e199abc631a638358998e7dd5d28",
+                  "body_root": "0x8d5d9f2946836ea5b6eb06e1bad081d7a8364186ba26a4609f80200c71ac5539"
+                },
+                "signature": "0x85e0ef76782be315b56665661a102a74ef4c223749df2a98297a9ea11efdc9c01ebe9e296efc195931ccc9bf11a381900384499c9813aeb452a06fbdbe47233fab2683c7180e32dbf247718688c3f78c553a135171a2fa5c688b09b0cfdc07e8"
+              }
+            },
+            "elapsed_seconds": 1.1609561429941095
+          },
+          {
+            "at": "2026-11-20T13:17:51.481414+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25785",
+                  "proposer_index": "182",
+                  "parent_root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+                  "state_root": "0xdcd78c0ebd15a850023b34d9ea4f9c09a83b08f95f4e301d126ca9d3d1ad40f0",
+                  "body_root": "0xa36a2b12ba7233fb599ba1dd95f2ac606e216f7322bac05798d48d50e093ec61"
+                },
+                "signature": "0xa2eceaa28a47995191b2754977a70a263f0379e8fe31d22302fc070dcdb08c0808cd11e63704fb6385fd441ad82450b21359d486d7c6c6d50dd99b80babc03e55bc522fdd9bedf588b9daf4f804826ef89ddcb96ab64b97742159c057c7f7851"
+              }
+            },
+            "elapsed_seconds": 2.241347336996114
+          },
+          {
+            "at": "2026-11-20T13:17:51.567041+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25785",
+                  "proposer_index": "182",
+                  "parent_root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+                  "state_root": "0xdcd78c0ebd15a850023b34d9ea4f9c09a83b08f95f4e301d126ca9d3d1ad40f0",
+                  "body_root": "0xa36a2b12ba7233fb599ba1dd95f2ac606e216f7322bac05798d48d50e093ec61"
+                },
+                "signature": "0xa2eceaa28a47995191b2754977a70a263f0379e8fe31d22302fc070dcdb08c0808cd11e63704fb6385fd441ad82450b21359d486d7c6c6d50dd99b80babc03e55bc522fdd9bedf588b9daf4f804826ef89ddcb96ab64b97742159c057c7f7851"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:52.647195+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25785",
+                  "proposer_index": "182",
+                  "parent_root": "0xb8d2d966c9596acde2299f57acb5c8aae3f7ee9160dacc5b518aa72f773459ed",
+                  "state_root": "0xdcd78c0ebd15a850023b34d9ea4f9c09a83b08f95f4e301d126ca9d3d1ad40f0",
+                  "body_root": "0xa36a2b12ba7233fb599ba1dd95f2ac606e216f7322bac05798d48d50e093ec61"
+                },
+                "signature": "0xa2eceaa28a47995191b2754977a70a263f0379e8fe31d22302fc070dcdb08c0808cd11e63704fb6385fd441ad82450b21359d486d7c6c6d50dd99b80babc03e55bc522fdd9bedf588b9daf4f804826ef89ddcb96ab64b97742159c057c7f7851"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:53.729016+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe4fa6eea2ccba02d8bb8506968e3aa654be261437ba2650eb8d0ef887df5fe24",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25786",
+                  "proposer_index": "336",
+                  "parent_root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+                  "state_root": "0x61d5ac3b17df52bc85a77fffdfa07fcaaa162a601fa738f6f657a1a90f8155b6",
+                  "body_root": "0xd833a4e7de851312b4eb6001c3dd75927ccb625d8ffe0f21657cbe0c15ab6560"
+                },
+                "signature": "0xa7211c260a01c1dac3af785a86faa125e37c888b502bb3445be7ebd748875eb1f6a6e147fbe223bb5b08170881bf31f310112419e967d0e7e12c379c8eda4ee249bcc2ca1cfeabf63e60031c4f1ec3e6e97ed8531c055acfaa9300660838e18e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:54.809931+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe4fa6eea2ccba02d8bb8506968e3aa654be261437ba2650eb8d0ef887df5fe24",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25786",
+                  "proposer_index": "336",
+                  "parent_root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+                  "state_root": "0x61d5ac3b17df52bc85a77fffdfa07fcaaa162a601fa738f6f657a1a90f8155b6",
+                  "body_root": "0xd833a4e7de851312b4eb6001c3dd75927ccb625d8ffe0f21657cbe0c15ab6560"
+                },
+                "signature": "0xa7211c260a01c1dac3af785a86faa125e37c888b502bb3445be7ebd748875eb1f6a6e147fbe223bb5b08170881bf31f310112419e967d0e7e12c379c8eda4ee249bcc2ca1cfeabf63e60031c4f1ec3e6e97ed8531c055acfaa9300660838e18e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:55.890494+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xe4fa6eea2ccba02d8bb8506968e3aa654be261437ba2650eb8d0ef887df5fe24",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25786",
+                  "proposer_index": "336",
+                  "parent_root": "0x00734bceb8b2ed135221eb99a97a5e8c3391cf17657e3a7c774d8915ebc1c676",
+                  "state_root": "0x61d5ac3b17df52bc85a77fffdfa07fcaaa162a601fa738f6f657a1a90f8155b6",
+                  "body_root": "0xd833a4e7de851312b4eb6001c3dd75927ccb625d8ffe0f21657cbe0c15ab6560"
+                },
+                "signature": "0xa7211c260a01c1dac3af785a86faa125e37c888b502bb3445be7ebd748875eb1f6a6e147fbe223bb5b08170881bf31f310112419e967d0e7e12c379c8eda4ee249bcc2ca1cfeabf63e60031c4f1ec3e6e97ed8531c055acfaa9300660838e18e"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:56.970093+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x63ec78327385d9153f86d1b7c2dfb0035ed1e4c0395f7790f51d16fafe455d3a",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25787",
+                  "proposer_index": "344",
+                  "parent_root": "0xe4fa6eea2ccba02d8bb8506968e3aa654be261437ba2650eb8d0ef887df5fe24",
+                  "state_root": "0x1872d5c302aebb709af428cddbcc9bca24ad811c90f63b02e28e69cd02c5062e",
+                  "body_root": "0xac32bc6a791e6c8153b91eb247d7aab4bdbe72e643ce1b8638cd923bb42c04c8"
+                },
+                "signature": "0x964e92c617133382d8b6e1e3c89fc08ba188c532efab3eaad68eb938b4433f2f2a22590457b95d2def2da80e8be34fce1723afd7d9567b536729a4d94c219117e5af4b10aa91c5eada709bc8fa59fa6bfc370c438c04749b730991fdb1504e12"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:58.049803+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x63ec78327385d9153f86d1b7c2dfb0035ed1e4c0395f7790f51d16fafe455d3a",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25787",
+                  "proposer_index": "344",
+                  "parent_root": "0xe4fa6eea2ccba02d8bb8506968e3aa654be261437ba2650eb8d0ef887df5fe24",
+                  "state_root": "0x1872d5c302aebb709af428cddbcc9bca24ad811c90f63b02e28e69cd02c5062e",
+                  "body_root": "0xac32bc6a791e6c8153b91eb247d7aab4bdbe72e643ce1b8638cd923bb42c04c8"
+                },
+                "signature": "0x964e92c617133382d8b6e1e3c89fc08ba188c532efab3eaad68eb938b4433f2f2a22590457b95d2def2da80e8be34fce1723afd7d9567b536729a4d94c219117e5af4b10aa91c5eada709bc8fa59fa6bfc370c438c04749b730991fdb1504e12"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:17:59.147759+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25788",
+                  "proposer_index": "126",
+                  "parent_root": "0x63ec78327385d9153f86d1b7c2dfb0035ed1e4c0395f7790f51d16fafe455d3a",
+                  "state_root": "0x746bb29b1912cd1365b7296f062c4d25f6579d786cac678585a1ef11ae1b8633",
+                  "body_root": "0xba592b57a8caecfebfd2aed1251e50b3c14e5e6ed4ec2170ac21b4d443c5c249"
+                },
+                "signature": "0xb44f452f3bf5ad340d63f18bdc0886b5d31ac3133aa7a8d194e29f14b632d1f4e3296b27f749cbfe50b2ea2222d0820507811122373313e9edd4d3b4f6f7d55377ecd0e8b3b3edfcb46bfcefa24018ccdb265b09012a0596ca489df542753b59"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:00.225775+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25788",
+                  "proposer_index": "126",
+                  "parent_root": "0x63ec78327385d9153f86d1b7c2dfb0035ed1e4c0395f7790f51d16fafe455d3a",
+                  "state_root": "0x746bb29b1912cd1365b7296f062c4d25f6579d786cac678585a1ef11ae1b8633",
+                  "body_root": "0xba592b57a8caecfebfd2aed1251e50b3c14e5e6ed4ec2170ac21b4d443c5c249"
+                },
+                "signature": "0xb44f452f3bf5ad340d63f18bdc0886b5d31ac3133aa7a8d194e29f14b632d1f4e3296b27f749cbfe50b2ea2222d0820507811122373313e9edd4d3b4f6f7d55377ecd0e8b3b3edfcb46bfcefa24018ccdb265b09012a0596ca489df542753b59"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:01.305423+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25788",
+                  "proposer_index": "126",
+                  "parent_root": "0x63ec78327385d9153f86d1b7c2dfb0035ed1e4c0395f7790f51d16fafe455d3a",
+                  "state_root": "0x746bb29b1912cd1365b7296f062c4d25f6579d786cac678585a1ef11ae1b8633",
+                  "body_root": "0xba592b57a8caecfebfd2aed1251e50b3c14e5e6ed4ec2170ac21b4d443c5c249"
+                },
+                "signature": "0xb44f452f3bf5ad340d63f18bdc0886b5d31ac3133aa7a8d194e29f14b632d1f4e3296b27f749cbfe50b2ea2222d0820507811122373313e9edd4d3b4f6f7d55377ecd0e8b3b3edfcb46bfcefa24018ccdb265b09012a0596ca489df542753b59"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:02.386655+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xd409032bdc971106144cc291918c1d0f1fdbe24103cfdaab35caf016064042f2",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25789",
+                  "proposer_index": "321",
+                  "parent_root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+                  "state_root": "0x38c53f7fc5a1d1f15084013c9ad8f9857aa8ab9d34da08a703eab4c8f5a538c3",
+                  "body_root": "0xc0ab4c88a8980afb566241982e1a029cf57ffd19a42ea152624257fbe99564ce"
+                },
+                "signature": "0xa48cf323cc4ab55050c24ec0e9b616e8305d27a1021e76ef27b9c3fac1963e64cf52c925f16546d066801c8b9ab8182f1119c976b5b572e60a8924ef16826ca48bd15eeb7356b39fa8a13a6ad1f76ef1673da0e04dd2e315267d79a38db5b3c6"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:03.465142+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xd409032bdc971106144cc291918c1d0f1fdbe24103cfdaab35caf016064042f2",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25789",
+                  "proposer_index": "321",
+                  "parent_root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+                  "state_root": "0x38c53f7fc5a1d1f15084013c9ad8f9857aa8ab9d34da08a703eab4c8f5a538c3",
+                  "body_root": "0xc0ab4c88a8980afb566241982e1a029cf57ffd19a42ea152624257fbe99564ce"
+                },
+                "signature": "0xa48cf323cc4ab55050c24ec0e9b616e8305d27a1021e76ef27b9c3fac1963e64cf52c925f16546d066801c8b9ab8182f1119c976b5b572e60a8924ef16826ca48bd15eeb7356b39fa8a13a6ad1f76ef1673da0e04dd2e315267d79a38db5b3c6"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:04.545100+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0xd409032bdc971106144cc291918c1d0f1fdbe24103cfdaab35caf016064042f2",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25789",
+                  "proposer_index": "321",
+                  "parent_root": "0xec3d4e76f202974e2daf37ce1ebe8adeb94e66b41fd1dbff6e3de2a03923c9e8",
+                  "state_root": "0x38c53f7fc5a1d1f15084013c9ad8f9857aa8ab9d34da08a703eab4c8f5a538c3",
+                  "body_root": "0xc0ab4c88a8980afb566241982e1a029cf57ffd19a42ea152624257fbe99564ce"
+                },
+                "signature": "0xa48cf323cc4ab55050c24ec0e9b616e8305d27a1021e76ef27b9c3fac1963e64cf52c925f16546d066801c8b9ab8182f1119c976b5b572e60a8924ef16826ca48bd15eeb7356b39fa8a13a6ad1f76ef1673da0e04dd2e315267d79a38db5b3c6"
+              }
+            }
+          },
+          {
+            "at": "2026-11-20T13:18:05.625234+00:00",
+            "gossip_connected": 3,
+            "header": {
+              "root": "0x8a09599617981e81980128e24acbc76a87dbafd4654a073cf4a6792b2af12c69",
+              "canonical": true,
+              "header": {
+                "message": {
+                  "slot": "25790",
+                  "proposer_index": "83",
+                  "parent_root": "0xd409032bdc971106144cc291918c1d0f1fdbe24103cfdaab35caf016064042f2",
+                  "state_root": "0x9dbc8305d0fd022e10f1e35583a37b4bf13858aa6e2be0837ef2ba5f6e00e44f",
+                  "body_root": "0xa42cf3a5c183a1cc45835b27720be61289644e9b5b252389e617b6c6fbcd9f3a"
+                },
+                "signature": "0xa99660b8b9b77aedc3f903aa91a9021d1da83a974a45a2273dd61ba93614985fdcdabbd65a306b4fd56ab0df9912923312bd0efe87a9569f85777011bd1e3ffe704f1eed329797d4b1ac673632cac467f5abb90eb3ad4b9c0626f4eaaec1cdd5"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "archives": {
+    "format": 1,
+    "all_original_members_byte_verified": true,
+    "archives": {
+      "durability.tar.gz": {
+        "passed": true,
+        "files": 69,
+        "uncompressed_bytes": 24286250,
+        "archive_bytes": 2029206,
+        "sha256": "31c191e1a9283648c851c6f753dab33dee3ab2fcbf35d3cf7afe138700b1e438"
+      },
+      "final-cold.tar.zst": {
+        "passed": true,
+        "files": 19,
+        "uncompressed_bytes": 1069298,
+        "archive_bytes": 71400,
+        "sha256": "5839b4ccbac16f83425ea7d28613e4118764ef8061db2a630dead56040f8ddc3"
+      },
+      "final-operating.tar.zst": {
+        "passed": true,
+        "files": 22,
+        "uncompressed_bytes": 27539344,
+        "archive_bytes": 1088606,
+        "sha256": "ebdfb57835597598d6da99d2826890c854630e79087b28b1561ac7e9e28f3d80"
+      },
+      "handoff.tar.zst": {
+        "passed": true,
+        "files": 25,
+        "uncompressed_bytes": 20821694,
+        "archive_bytes": 1189883,
+        "sha256": "7834c164c6b82ae0ba3aab7dd306afd16d9a5b12e28348ffa29a7bd61ade2a50"
+      },
+      "network-recovery.tar.zst": {
+        "passed": true,
+        "files": 54,
+        "uncompressed_bytes": 9690942,
+        "archive_bytes": 113352,
+        "sha256": "579bc52d3d82f21c76adec1b39370c2d4cfafa8629a370f396a722be8954d7f6"
+      },
+      "operating.tar.gz": {
+        "passed": true,
+        "files": 37,
+        "uncompressed_bytes": 41474947,
+        "archive_bytes": 3627478,
+        "sha256": "5c72ed9264b0b08d6219083b3ace756c725768fb25a86fab3e835b619f9e7457"
+      },
+      "protocol.tar.zst": {
+        "passed": true,
+        "files": 734,
+        "uncompressed_bytes": 323125226,
+        "archive_bytes": 2312307,
+        "sha256": "0ad2fe6c592ec1262301740b75385ce8acc40563357fff92fee2f237b2c14bc4"
+      },
+      "provenance.tar.zst": {
+        "passed": true,
+        "files": 33,
+        "uncompressed_bytes": 5122689,
+        "archive_bytes": 363665,
+        "sha256": "ba427f5ec7bc769f1090a22ac4a5506379daec0ab7e88eca8c0b47b9ed8c99ff"
+      },
+      "registry.tar.zst": {
+        "passed": true,
+        "files": 645,
+        "uncompressed_bytes": 908552079,
+        "archive_bytes": 2513228,
+        "sha256": "4fd0668bcc2f89276564eb18e9cee311fd544280db2584046a51038982a262b2"
+      }
+    }
+  },
+  "public_reproduction": {
+    "passed": true,
+    "scope": "Fresh public-archive extraction. Complete per-file byte verification; original 160 registry transitions and signed finality reproduce; 270 pressure proofs, four new cold proofs and exact three-EL 50-ETH sweep ledger verify independently.",
+    "registry_transitions": 160,
+    "python_regressions": 26,
+    "python_runtime_identity_red_controls": 2,
+    "new_runtime_identity_source": "935bcd82",
+    "python_validation_evidence": "Observed local unittest output before/after repair; all26 pass. Public PR CI retains its own exact-head logs.",
+    "public_operating_windows": [
+      "steady-final-02",
+      "pressure-final-03"
+    ],
+    "original_failed_controls_preserved": true
+  },
+  "source_ci_and_merges": "Rechecked at final delivery against exact current review heads; frozen earlier snapshots retain their own source identities in handoff archive.",
+  "runtime_identity_instrumentation_amendment": "935bcd82: two red controls, original-container-UID fallback, unreadable identities rejected; earlier empty producer fields remain explicit in original snapshots."
+}

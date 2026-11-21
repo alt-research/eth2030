@@ -1,5 +1,7 @@
 # Glamsterdam completion program: current engineering progress
 
+> Historical plan/checkpoint. The remaining frozen-development engineering work is reconciled as complete in the [2026-11-20 final handoff](COMPLETION_HANDOFF_20261120.md), with exact process evidence, PRs and reserved public protocol/model review. Earlier pending rows below retain their original observation date.
+
 This is the active continuation of the [post-merge audit](POST_MERGE_STATUS_20261119.md). The historical audit describes master `5fbc7c133b0e57352ca2a3d6fdd9a63726c42502`; its thirteen work packages remain the acceptance inventory. Counts below are test results, never release-completion percentages.
 
 ## Frozen authority and review workflow

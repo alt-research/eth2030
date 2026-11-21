@@ -1,5 +1,7 @@
 # Glamsterdam completion program
 
+> Current delivery: [frozen-development completion handoff](COMPLETION_HANDOFF_20261120.md). All 33 original IDs and R01–R13 are reconciled; separate EL PRs 120/121/122 and Lodestar 10693 are submitted. PR merge and the reserved public protocol/model decision remain separate. Earlier statuses below are historical snapshots.
+
 > Current post-merge assessment (2026-11-19): [remaining-work inventory](POST_MERGE_STATUS_20261119.md). EL reviews 64–87 are merged at `5fbc7c13`; 13 deduplicated work packages remain across correctness, test infrastructure, CL integration and acceptance/release. Earlier statuses, baseline labels and effort estimates below are historical snapshots, not a current missing-code count.
 
 Status: implementation started in an isolated current-mainline worktree; revalidation is in progress.

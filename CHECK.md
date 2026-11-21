@@ -631,3 +631,14 @@ Recommended start order: Track 1 (ePBS PTC + fork-choice is the largest single P
 
 - [x] Prepare the controller and fixtures independently from the Frame codec.
 - [x] Verify the process lifecycle and evidence assertions on this review branch.
+
+## Glamsterdam final engineering campaign (2026-11-20)
+
+- [x] Reconcile all 33 original GL IDs and R01-R13 against the frozen LIFO/signed-envelope target.
+- [x] Publish separate storage-fence and snap historical-BAL fixes with regression, build and real-process evidence.
+- [x] Complete actual lifecycle/registry/payment/reorg/invalid-state, peer/custody/gossip, sync/storage and operating gates.
+- [x] Retain original failures, exact source/runtime/license inventories, complete byte archives and independent offline consumers.
+- [x] Publish independent master-targeted PRs and verify CI/ordinary cumulative merge orders at handoff.
+- [ ] Record the user's reserved final public protocol/model decision and subsequent EL merge/release approval.
+
+See [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md) for exact scope and finite support boundaries. Unrelated later-fork/formal tasks above are not closed by this campaign.

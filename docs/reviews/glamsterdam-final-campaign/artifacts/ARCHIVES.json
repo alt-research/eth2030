@@ -1,0 +1,69 @@
+{
+  "format": 1,
+  "all_original_members_byte_verified": true,
+  "archives": {
+    "durability.tar.gz": {
+      "passed": true,
+      "files": 69,
+      "uncompressed_bytes": 24286250,
+      "archive_bytes": 2029206,
+      "sha256": "31c191e1a9283648c851c6f753dab33dee3ab2fcbf35d3cf7afe138700b1e438"
+    },
+    "final-cold.tar.zst": {
+      "passed": true,
+      "files": 19,
+      "uncompressed_bytes": 1069298,
+      "archive_bytes": 71400,
+      "sha256": "5839b4ccbac16f83425ea7d28613e4118764ef8061db2a630dead56040f8ddc3"
+    },
+    "final-operating.tar.zst": {
+      "passed": true,
+      "files": 22,
+      "uncompressed_bytes": 27539344,
+      "archive_bytes": 1088606,
+      "sha256": "ebdfb57835597598d6da99d2826890c854630e79087b28b1561ac7e9e28f3d80"
+    },
+    "handoff.tar.zst": {
+      "passed": true,
+      "files": 25,
+      "uncompressed_bytes": 20821694,
+      "archive_bytes": 1189883,
+      "sha256": "7834c164c6b82ae0ba3aab7dd306afd16d9a5b12e28348ffa29a7bd61ade2a50"
+    },
+    "network-recovery.tar.zst": {
+      "passed": true,
+      "files": 54,
+      "uncompressed_bytes": 9690942,
+      "archive_bytes": 113352,
+      "sha256": "579bc52d3d82f21c76adec1b39370c2d4cfafa8629a370f396a722be8954d7f6"
+    },
+    "operating.tar.gz": {
+      "passed": true,
+      "files": 37,
+      "uncompressed_bytes": 41474947,
+      "archive_bytes": 3627478,
+      "sha256": "5c72ed9264b0b08d6219083b3ace756c725768fb25a86fab3e835b619f9e7457"
+    },
+    "protocol.tar.zst": {
+      "passed": true,
+      "files": 734,
+      "uncompressed_bytes": 323125226,
+      "archive_bytes": 2312307,
+      "sha256": "0ad2fe6c592ec1262301740b75385ce8acc40563357fff92fee2f237b2c14bc4"
+    },
+    "provenance.tar.zst": {
+      "passed": true,
+      "files": 33,
+      "uncompressed_bytes": 5122689,
+      "archive_bytes": 363665,
+      "sha256": "ba427f5ec7bc769f1090a22ac4a5506379daec0ab7e88eca8c0b47b9ed8c99ff"
+    },
+    "registry.tar.zst": {
+      "passed": true,
+      "files": 645,
+      "uncompressed_bytes": 908552079,
+      "archive_bytes": 2513228,
+      "sha256": "4fd0668bcc2f89276564eb18e9cee311fd544280db2584046a51038982a262b2"
+    }
+  }
+}

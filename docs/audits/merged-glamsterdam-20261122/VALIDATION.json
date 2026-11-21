@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-22 Asia/Shanghai",
+  "source_baseline": "9a094830",
+  "native_package_changes": false,
+  "site_build": {
+    "passed": true,
+    "node": "22.20.0",
+    "next": "16.4.5",
+    "static_pages": 157,
+    "typescript_passed": true
+  },
+  "tracker": {
+    "entries": 149,
+    "parsed_matrix_rows": 92,
+    "pkg_paths_checked": 398,
+    "missing_paths": 0,
+    "blocking_discrepancies": 0,
+    "informational_notes": [
+      "EIP-7885 predates this scoped refresh and remains outside the historical doc matrix"
+    ]
+  },
+  "evidence_export": {
+    "passed": true,
+    "homepage_roadmap_snapshot_equal": true,
+    "all_18_core_and_5_network_obligations_link_qualification": true,
+    "wrong_rendered_steady_count_rejected": true,
+    "wrong_CL_matrix_status_rejected": true,
+    "old_snapshot_guard_failed_before_update": true,
+    "old_matrix_parser_failed_on_new_empty_local_CL_cells": true
+  },
+  "browser": {
+    "passed": true,
+    "tool": "Playwright browser plugin; webapp-testing reconnaissance/action workflow",
+    "viewports": [
+      1440,
+      375
+    ],
+    "routes": [
+      "/",
+      "/roadmap/",
+      "/eips/eip-7688/",
+      "/eips/eip-8189/",
+      "/eips/eip-7732/"
+    ],
+    "route_viewport_checks": 10,
+    "http_status": 200,
+    "page_errors": [],
+    "hero_roadmap_navigation": true,
+    "horizontal_overflow": false,
+    "original_mobile_EIP7688_scroll_width": 413,
+    "corrected_mobile_EIP7688_scroll_width": 375,
+    "desktop_progress_screenshot_visually_inspected": true
+  },
+  "legacy_builder_observation": {
+    "passed_as_observation": true,
+    "original_output": "LEGACY_BUILDER_OBSERVATION.json",
+    "scope": "Actual in-process exported Engine methods; no live chain or endpoint mutation."
+  },
+  "limits": [
+    "No fresh Ethereum devnet or full historical native fixture campaign was run for this site/documentation update. Prior exact-source results retain their identity.",
+    "The local Python Playwright installation failed through the package proxy; the available Playwright browser plugin completed the actual UI checks.",
+    "GitHub Pages deployment is gated on merging the site PR to master; a branch preview is not a deployed public site."
+  ]
+}

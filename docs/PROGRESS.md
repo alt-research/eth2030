@@ -1,61 +1,27 @@
 # ETH2030 development progress
 
-Updated November 18, 2026 against mainline `911afb0c`, which merged [PR 61](https://github.com/alt-research/eth2030/pull/61).
-This report records scoped implementation and acceptance evidence. The active
-[roadmap](ROADMAP.md), [next-stage plan](next-stage-work-plan.md) and
-[checklist](../CHECK.md) retain the remaining work.
+Updated November 22, 2026 at merged master `9a094830`. EL PRs 123/124/125 are merged. The production package and code-CI workflow equal qualified composition `d9201b0`; merge/source identity and running executable identity remain distinct. The original 33 Glamsterdam task IDs and R01–R13 are complete for the selected merged LIFO / signed Gloas development target.
 
-## Latest merged implementation
+## Current merged acceptance
 
-| Area | Current result | Evidence |
+| Area | Retained result | Evidence |
 | --- | --- | --- |
-| Native Frame execution | Pinned seven-field envelope, scalar nonce, protocol signatures, approvals, independent execution/state gas, refills, atomic rollback and settlement. | [Execution record](frame-8141-execution.md), `pkg/core/execution/frame_8141.go` |
-| Public admission/paymaster | Bounded prefix simulation, head/fee refresh, replacement exposure and a reproducible local paymaster v1 with delayed withdrawal reservations. | `pkg/txpool/frame_8141.go`, `pkg/core/framepay/README.md` |
-| Blob admission | EIP-7594 pooled wrapper accepted through the actual public RPC; ordered KZG cell proofs validated. | `pkg/node/frame_blob_rpc_test.go` |
-| Historical Engine data | Hex V1/V2 body responses and validated RLP BALs persist with blocks; canonical hash/range lookup and reopen preserve original bytes. | `pkg/node/frame_8141_integration_test.go`, `pkg/core/chain/block_access_list_test.go` |
-| Heze checkpoint import | Trusted-anchor satisfaction avoids the unavailable pre-anchor parent; live list lookup, signatures, bids and custody checks remain enforced. | Lighthouse `a4ceb86e`, published `eth2030` branch |
-| Build source identity | Cargo rebuilds version metadata after worktree, packed-ref and detached-HEAD changes. | Lighthouse `common/lighthouse_version/tests/worktree_version.rs` |
-| Service codec candidate | Published Go client comparison plus minimal experimental-layout replay matches real finalized state and block roots, signatures, identities and commitments. | [Consensus replay](../tools/consensus-replay/README.md) |
+| Execution/RPC |219 fresh packages,107 official files/108 requests, six affected race suites, full vet/native build, byte-identical second Go1.26.11 executable. | [Post-merge results](reviews/glamsterdam-postmerge-20261121/RESULTS.json) |
+| Snap/BAL recovery | Legal BAL expiry respects actual finalized slots; indexed snap recovery authenticates original checkpoint/head/markers/canonical ancestry; malformed/failed finalized reads remain errors. | PR 123/124; `core/chain/snap_history_retention_test.go`, `snap_indexed_restart_test.go`, `core/rawdb/finality_checked_test.go` under `pkg/` |
+| Original datadirs | Main2/main3/full/snap conservative Docker-start bounds189.038/212.551/219.661/176.953 seconds, all under 300s, with frozen finalized commitments/eight independent proofs. | [Recovery record](reviews/glamsterdam-postmerge-20261121/RECOVERY.json) |
+| Operating windows |400/400 steady and60/60 pressure slots, original latency budgets,512-participant independent finality/offline controls and270 account proofs. | [Results](reviews/glamsterdam-postmerge-20261121/RESULTS.json) |
+| Final-source blob | Actual external-builder two-row blobslot59163;544 KZG proofs, authenticated parent SSZ/signatures/ordered commitments; useful getBlobs-disabled partial cells228/114 columns and observer32/16. | Final-source archive; same original successful transaction, original API404 preserved |
+| Source reproduction |245 public files, complete manifest, fresh extraction and11 independent replay checks; original nine archives/failures unchanged. | [Public replay](reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json) |
+| Earlier application/CL scope | Signed Uniswap/Safe/7702 sequences, canonical factory, builder payments/registry, progressive SSZ, native official fixtures and independent cold sync retain exact sources. | [Task reconciliation](reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json) |
 
-## Live acceptance
+These results are retained source-specific measurements, not a new live campaign on the merge metadata. Native EF results remain distinct from Geth-backed runners. The initial failed preparations, over-budget runs and corrected harness inputs remain visible.
 
-The qualified EL `e0451092` / Lighthouse `a4ceb86e` pair finalized sponsored
-FOCIL at slot 66 and a blob Frame at slot 165. A new CL database joined at slot
-256 and read both original finalized envelopes. Receiver restart preserved
-both workloads' receipts, storage and sponsor settlement. The CL observer used
-a synchronized EL; independent EL sync is a separate gate.
+## Remaining work after merge
 
-The [retained record](verification/frame-8141-20261118-paymaster-history-final.json)
-contains raw transactions, the signed list and bid, receipts, roots, commitments,
-version/image pins, memory caps and resource removal. Failed controls are
-retained separately in the [execution record](frame-8141-execution.md).
+The [current audit](audits/merged-glamsterdam-20261122/README.md) confirms a real code gap in legacy Engine builder extensions: unauthenticated registration/bids, synthetic local stake and dropped header signature. This does not establish an unsigned-envelope bypass in the qualified CL consensus route. It needs a separate contract/authentication or interface-retirement PR.
 
-## Validation scope
+Lodestar 10693 remains open upstream despite local/fork qualification. Larger-state multi-day operating/indexing capacity remains unmeasured. Public protocol/model approval is reserved. Finite fixture/format coverage remains explicit.
 
-- Full native Go tests, builds, affected vet and race checks passed.
-- CI on the merged PR had seven successful jobs: full build/vet/test, pinned
-  Geth-backed EF fixtures, integration, blst, go-eth-kzg, race and consensus/control
-  regressions. EF results qualify that runner/backend and fixture pin.
-- Real EVM and HTTP/FileDB tests cover authorization, state changes, nonce bounds,
-  fee dimensions, journal rollback and historical readback. Targeted mutations
-  detect missing owner/timelock/reservation, BAL persistence and wire-codec guards.
-- Twelve Python control assertions and standalone consensus SSZ/block replay
-  passed. Frozen paymaster artifacts rebuild with the checksum-verified compiler.
-- Lighthouse Heze and Git-version regressions, cargo check, full lint-fix and
-  release build passed before the paired control.
-- The live enclave, containers/volumes and engine were removed. Seven owned
-  runtime images and temporary binary contexts were removed afterwards.
+Later-fork independent Frame/Bogotá agreement, Dora production consumers, paymaster services and public binary/PQ/proof/native-rollup work retain separate gates. The paired Frame 66/165 and CL join 256 record is preserved at [its original source](verification/frame-8141-20261118-paymaster-history-final.json); its synchronized-EL boundary is not erased.
 
-## Remaining acceptance
-
-| Work | Current boundary |
-| --- | --- |
-| Independent Frame/Bogotá client | Newer Geth experiments have a different keyed-nonce wire contract. A compatible reference pin or separately versioned protocol is required. |
-| Dora and workload services | Codec replay is qualified; the actual production epoch/receipt consumer, retention and restart cutover are not. |
-| CL reliability / Gloas builders | Skipped-slot checkpoint variants, redundant BN/remote signing, alternate-peer recovery, external payment, withheld envelopes and PTC need their own controls. |
-| Track 3 | Independent full/snap late join, authenticated moving-pivot reuse/restart and bounded storage/memory need acceptance. |
-| Public Track 4 / proofs | Public binary layout, witness charging, authenticated committee/key lifecycle and application-specific proof statements require independent qualification. |
-
-The historical package/EIP labels remain available in the
-[traceability matrix](EIP_SPEC_IMPL.md) and [site tracker](EIP_TRACKER.md).
-They are not a current aggregate conformance or production-readiness score.
+[Roadmap](ROADMAP.md) · [Next-stage plan](next-stage-work-plan.md) · [Current gaps and reproducible observations](audits/merged-glamsterdam-20261122/README.md)

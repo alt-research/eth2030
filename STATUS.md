@@ -1,6 +1,6 @@
 ## Merged roadmap and remaining-gap audit (2026-11-22)
 
-EL reviews123/124/125 are merged in master9a094830. Updating stale November18 homepage/roadmap progress and auditing remaining obligations against actual merged code and original qualification evidence. Lodestar10693 remains open upstream; it is not counted as upstream merged. Original development checkout remains preserved.
+EL reviews123/124/125 are merged in master9a094830. The homepage/roadmap now share the November22 qualified Glamsterdam snapshot, with seven omitted EIPs restored and stale networking/7702/PeerDAS gaps corrected. The scoped audit reproduces unauthenticated legacy Builder Engine registrations/bids and a dropped header signature; scale/soak, upstream Lodestar and final public review remain explicit. The157-page build,398-path tracker/export checks, two mutation controls and ten desktop/mobile browser checks pass. See docs/audits/merged-glamsterdam-20261122/README.md. Original development checkout remains preserved; remote publication follows.
 
 ## Final post-merge qualification (2026-11-22)
 

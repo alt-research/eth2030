@@ -1,8 +1,8 @@
 // ETH2030 EIP / roadmap progress — single source of truth.
 //
 // Fork placement follows the L1 Strawmap revision of Nov 2, 2026 (strawmap.org).
-// Reviewed Frame/FOCIL/BAL update: PR 61 merged at 911afb0c (2026-11-18).
-// Evidence: docs/frame-8141-execution.md and its final paired control record.
+// Reviewed Glamsterdam refresh: PRs 123/124/125 merged at 9a094830 (2026-11-22).
+// Evidence: docs/reviews/glamsterdam-postmerge-20261121 and the frozen task reconciliation.
 // Other implementation labels retain their historical review scope.
 // Implementation status / file paths come from eth2030 docs:
 //   - docs/EIP_SPEC_IMPL.md      (traceability matrix, per-EIP files & tests)
@@ -75,6 +75,8 @@ export interface EipEntry {
   /** What is already implemented (deep-analysis EIPs only). */
   implemented?: string[];
   summary?: string;
+  /** Repository-relative source-specific qualification records. */
+  verification?: string[];
 }
 
 export interface ForkInfo {
@@ -177,6 +179,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7928),
     specStatus: 'Draft',
     strawmap: { item: 'BALs', tag: 'SFI', headliner: true },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: [
       'bal/types.go',
       'bal/scheduler_pipeline.go',
@@ -193,12 +196,13 @@ export const EIPS: EipEntry[] = [
       'Transaction tracking (tracker.go, block_tracker.go)',
       'Canonical ordering (Sort by address/accessIndex)',
       'BAL validator',
+      'Independent Geth historical body/BAL equality, interrupted snap backfill and legal expiry restart',
       'BAL header commitment encoded and checked in Engine processing',
       'Validated RLP BALs stored atomically with blocks and checked against their header commitments',
       'Historical V1/V2 Engine body DATA, nullable fork fields and exact readback after FileDB reopen',
     ],
     gaps: [
-      'Full current-spec conformance and independent interoperability remain to be established',
+      'Public activation and changes beyond the frozen source require final protocol review',
     ],
     summary: 'EL headliner of Glamsterdam. Parallel-execution enabler via block-level access lists.',
   },
@@ -214,6 +218,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7732),
     specStatus: 'Draft',
     strawmap: { item: 'ePBS', tag: 'SFI', headliner: true },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: [
       'epbs/types.go',
       'epbs/validation.go',
@@ -229,11 +234,12 @@ export const EIPS: EipEntry[] = [
       'BidHash computation',
       'Payload status constants (absent / present / withheld)',
       'Builder index types and validation logic',
+      'Actual signed Gloas builder/payment/withheld/reorg/registry lifecycle with independent finality',
       'PTC voting and fork-choice integration, builder registry, and payment/withdrawal paths',
     ],
     gaps: [
-      'Full current-spec conformance and independent cross-client validation remain to be established',
-      'Bid validation permits zero signatures or public keys in its testing path',
+      'Legacy EL builder extensions accept unsigned registrations/bids and synthesize local stake; the signed CL consensus route is separately qualified',
+      'Upstream Lodestar integration and final public protocol/model approval remain open',
     ],
     summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',
   },
@@ -247,7 +253,6 @@ export const EIPS: EipEntry[] = [
     fork: 'glamsterdam',
     category: 'Glamsterdam Core',
     status: 'complete',
-    completeness: 95,
     priority: 'P2',
     specUrl: spec(7702),
     specStatus: 'Final',
@@ -262,8 +267,9 @@ export const EIPS: EipEntry[] = [
       'SetCode tx type (0x04) + authorization list',
       'Delegation prefix 0xef0100, ParseDelegation helpers',
       'Gas constants (PerAuthBaseCost, PerEmptyAccountCost)',
+      'Chain ID, nonce bound, low-s recovery and pre-increment authorization order with native vectors',
     ],
-    gaps: ['auth.chain_id validation', 'auth.nonce < 2^64-1 check', 's ≤ secp256k1n/2 signature check'],
+    gaps: ['Recorded native fixtures and signed application vectors retain their finite source/format scope'],
   },
   {
     id: 'eip-7701',
@@ -295,6 +301,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(8070),
     specStatus: 'Draft',
     strawmap: { item: 'sparse blobpool', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['txpool/blobpool/sparse_blobpool.go', 'txpool/blobpool/blobpool.go', 'das/blobpool/'],
     tests: ['txpool/blobpool/*_test.go'],
   },
@@ -321,6 +328,7 @@ export const EIPS: EipEntry[] = [
     status: 'complete',
     specUrl: spec(7708),
     specStatus: 'Draft',
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/eip7708.go'],
     tests: ['core/vm/eip7708_test.go'],
   },
@@ -364,6 +372,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7778),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/instructions.go', 'core/gas/glamsterdam_repricing.go'],
     tests: ['core/eip7778_test.go'],
   },
@@ -378,6 +387,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(2780),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/gas/glamsterdam_repricing.go', 'core/gas/constants.go'],
     tests: ['core/eip2780_test.go'],
   },
@@ -392,7 +402,9 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(8037),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/gas/glamsterdam_repricing.go'],
+    gaps: ['Merged LIFO is selected for development; final public model approval remains reserved'],
     tests: ['core/eip8037_test.go'],
   },
   {
@@ -406,7 +418,9 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(8038),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/gas/glamsterdam_repricing.go'],
+    gaps: ['Merged LIFO is selected for development; final public model approval remains reserved'],
     tests: ['core/eip8038_test.go'],
   },
   {
@@ -434,6 +448,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7976),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/gas/eip7623_floor.go'],
     tests: ['core/eip7976_test.go'],
   },
@@ -448,6 +463,7 @@ export const EIPS: EipEntry[] = [
     specStatus: 'Draft',
     specUrl: spec(7981),
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/gas/fee.go', 'core/types/transaction.go'],
     tests: [],
     summary: 'Covered via processor tests.',
@@ -463,6 +479,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7997),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/eips/eip7997.go'],
     tests: ['core/eips/eip7997_test.go'],
   },
@@ -491,6 +508,7 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7954),
     specStatus: 'Draft',
     strawmap: { item: 'Glamsterdam repricing', tag: 'SFI' },
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/eip7954.go', 'core/vm/eip7954_deep.go'],
     tests: ['core/vm/eip7954_test.go', 'core/vm/eip7954_deep_test.go'],
   },
@@ -519,6 +537,7 @@ export const EIPS: EipEntry[] = [
     status: 'complete',
     specUrl: spec(8024),
     specStatus: 'Review',
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/opcodes.go', 'core/vm/instructions.go'],
     tests: ['core/vm/new_opcodes_test.go'],
   },
@@ -532,6 +551,7 @@ export const EIPS: EipEntry[] = [
     status: 'complete',
     specStatus: 'Draft',
     specUrl: spec(7843),
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/opcodes.go'],
     tests: ['core/vm/new_opcodes_test.go'],
   },
@@ -542,9 +562,10 @@ export const EIPS: EipEntry[] = [
     layer: 'cross',
     fork: 'glamsterdam',
     category: 'Glamsterdam P2P',
-    status: 'substantial',
+    status: 'complete',
     specStatus: 'Draft',
     specUrl: spec(7975),
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['eth/protocol.go', 'eth/handler.go', 'p2p/ethproto/protocol.go'],
     tests: ['eiptest/eip7975_test.go', 'eth/handler_test.go'],
   },
@@ -555,9 +576,10 @@ export const EIPS: EipEntry[] = [
     layer: 'cross',
     fork: 'glamsterdam',
     category: 'Glamsterdam P2P',
-    status: 'substantial',
+    status: 'complete',
     specStatus: 'Draft',
     specUrl: spec(8159),
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['eth/protocol_extended.go', 'p2p/ethproto/protocol.go'],
     tests: ['eiptest/eip8159_test.go'],
   },
@@ -1003,7 +1025,6 @@ export const EIPS: EipEntry[] = [
     fork: 'glamsterdam',
     category: 'Glamsterdam Data',
     status: 'complete',
-    completeness: 80,
     priority: 'P1',
     specUrl: spec(7594),
     specStatus: 'Final',
@@ -1015,13 +1036,10 @@ export const EIPS: EipEntry[] = [
       'Sampling logic (das.go)',
       'Stream enforcer',
       'Cell-level KZG proof framework',
+      'Actual partial-column acquisition, custody 4/8/16, provider recovery and independent KZG mutations',
+      'Final-source two-row external-builder blob with 544 cell proofs and useful getBlobs-disabled partials',
     ],
-    gaps: [
-      'Column subnet gossip rules not fully implemented',
-      'Validator custody requirements',
-      'Reconstruction from <50% columns',
-      'cell_proofs field in transaction pool',
-    ],
+    gaps: ['Production-scale sampling/retention beyond the pinned development campaign remains unqualified'],
   },
   {
     id: 'eip-7251',
@@ -2215,6 +2233,189 @@ export const EIPS: EipEntry[] = [
     specStatus: 'Moved',
     implementation: ['core/eips/aa_entrypoint.go'],
     tests: [],
+  },
+
+  // Additional accepted obligations; no new historical Strawmap placement inferred.
+  {
+    "id": "eip-7688",
+    "number": 7688,
+    "title": "Progressive SSZ containers and proofs",
+    "layer": "CL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-7688",
+    "implementation": [],
+    "tests": [
+      "devnet/kurtosis/qualification/reference/reference-progressive-state-proofs.py"
+    ],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Companion CL progressive BeaconState and actual 384-validator independent proof/finality consumers are qualified at the frozen Gloas source."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Companion CL progressive BeaconState and actual 384-validator independent proof/finality consumers are qualified at the frozen Gloas source."
+  },
+  {
+    "id": "eip-8045",
+    "number": 8045,
+    "title": "Exclude slashed validators from proposer selection",
+    "layer": "CL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8045",
+    "implementation": [],
+    "tests": [],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Companion CL proposer selection/lookahead follows the pinned Gloas transition; no independent EL consensus replacement is claimed."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Companion CL proposer selection/lookahead follows the pinned Gloas transition; no independent EL consensus replacement is claimed."
+  },
+  {
+    "id": "eip-8061",
+    "number": 8061,
+    "title": "Validator activation, exit and consolidation churn",
+    "layer": "CL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8061",
+    "implementation": [],
+    "tests": [],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Companion CL churn and weak-subjectivity rules are part of the selected and qualified Fulu/Gloas tuple."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Companion CL churn and weak-subjectivity rules are part of the selected and qualified Fulu/Gloas tuple."
+  },
+  {
+    "id": "eip-8246",
+    "number": 8246,
+    "title": "Balance-preserving SELFDESTRUCT",
+    "layer": "EL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8246",
+    "implementation": [
+      "core/vm/selfdestruct_8246.go"
+    ],
+    "tests": [
+      "core/vm/selfdestruct_8246_test.go",
+      "core/execution/selfdestruct_8246_test.go"
+    ],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Transaction finalization, balance-preserving destruction and rollback have native execution-vector coverage."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Transaction finalization, balance-preserving destruction and rollback have native execution-vector coverage."
+  },
+  {
+    "id": "eip-8282",
+    "number": 8282,
+    "title": "Builder deposit and exit requests",
+    "layer": "cross",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8282",
+    "implementation": [
+      "core/eips/eip8282.go"
+    ],
+    "tests": [
+      "core/eips/eip8282_test.go",
+      "core/execution/builder_requests_8282_test.go"
+    ],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Canonical contracts/request extraction and actual builder activation, exit, sweep and index reuse have retained consumers."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Canonical contracts/request extraction and actual builder activation, exit, sweep and index reuse have retained consumers."
+  },
+  {
+    "id": "eip-8189",
+    "number": 8189,
+    "title": "BAL-based state sync (snap/2)",
+    "layer": "EL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8189",
+    "implementation": [
+      "node/snap2_runtime.go",
+      "core/chain/snap_pivot.go"
+    ],
+    "tests": [
+      "node/snap2_runtime_test.go",
+      "core/chain/snap_indexed_restart_test.go"
+    ],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Authenticated moving pivots, interrupted ranges, cold independent sync and indexed restart preserve pre-pivot state authority boundaries."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Authenticated moving pivots, interrupted ranges, cold independent sync and indexed restart preserve pre-pivot state authority boundaries."
+  },
+  {
+    "id": "eip-8136",
+    "number": 8136,
+    "title": "Partial data-column messages",
+    "layer": "CL",
+    "fork": "glamsterdam",
+    "category": "Glamsterdam frozen scope",
+    "status": "complete",
+    "specUrl": "https://eips.ethereum.org/EIPS/eip-8136",
+    "implementation": [],
+    "tests": [
+      "devnet/kurtosis/scripts/reference_partial_columns.py"
+    ],
+    "verification": [
+      "docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json",
+      "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"
+    ],
+    "implemented": [
+      "Companion CL versioned partial messages, custody/provider recovery and actual independent KZG consumers are qualified at the frozen source."
+    ],
+    "gaps": [
+      "Final public protocol/model approval and changes beyond the pinned source remain separate"
+    ],
+    "summary": "Companion CL versioned partial messages, custody/provider recovery and actual independent KZG consumers are qualified at the frozen source."
   },
 ];
 

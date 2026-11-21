@@ -7,7 +7,7 @@ export default function DevelopmentProgress() {
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <p className="text-xs uppercase tracking-wider text-eth-teal">Merged development progress · {snapshot.date}</p>
-        <h3 className="mt-2 text-lg font-bold text-eth-text">Native Frame execution and CL history qualified</h3>
+        <h3 className="mt-2 text-lg font-bold text-eth-text">{snapshot.title}</h3>
       </div>
       <a href={`${GITHUB_URL}/pull/${snapshot.pullRequest}`} className="text-sm text-eth-teal underline">Merged PR #{snapshot.pullRequest} ↗</a>
     </div>
@@ -21,7 +21,7 @@ export default function DevelopmentProgress() {
     <p className="mt-5 text-xs leading-6 text-eth-dim">{snapshot.boundary}</p>
     <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">
       <a className="underline" href={`${GITHUB_URL}/blob/${snapshot.revision}/${snapshot.record}`}>Verification record ↗</a>
-      <a className="underline" href={`${GITHUB_URL}/blob/master/${snapshot.plan}`}>Next acceptance work ↗</a>
+      <a className="underline" href={`${GITHUB_URL}/blob/master/${snapshot.plan}`}>Remaining gaps ↗</a>
     </div>
   </aside>;
 }

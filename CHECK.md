@@ -1,9 +1,10 @@
 ## Merged roadmap refresh and gap audit (2026-11-22)
 
 - [x] Verify EL reviews123/124/125 merged in master9a094830 and preserve the original dirty checkout.
-- [ ] Reconcile homepage, roadmap and EIP tracker with the merged source and retained qualification evidence.
-- [ ] Check the merged code, source-specific acceptance boundaries and outstanding upstream/service obligations.
-- [ ] Build and inspect exported pages, verify claims/links and publish a scoped master-targeted PR.
+- [x] Reconcile homepage, roadmap and EIP tracker with merged source, all core/supporting obligations and retained qualification evidence.
+- [x] Reproduce legacy builder-extension gaps and document scaling, upstream/public and later-fork boundaries.
+- [x] Build and inspect157 exported pages, verify desktop/mobile layouts and reject mutated claims/status.
+- [ ] Publish the scoped master-targeted PR and verify exact remote head, CI and merge state.
 
 ## Final post-merge closure (2026-11-22)
 

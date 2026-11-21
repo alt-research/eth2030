@@ -1,0 +1,232 @@
+{
+  "source_composition": "eff0b823fdf3e0e4d6262bc093b44e8a77787067",
+  "toolchain": "go1.26.11",
+  "full": {
+    "exit_code": 0,
+    "seconds": 29.856239194006776,
+    "packages": 218,
+    "failures": []
+  },
+  "affected_race": [
+    "core/chain",
+    "node",
+    "eth"
+  ],
+  "affected_vet": true,
+  "actual_process": {
+    "passed": true,
+    "original_hash": "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+    "original_number": "0x129b",
+    "exact_bal_bytes": 361,
+    "hash_and_range_replies_match_unchanged_geth": true,
+    "unknown_hash_is_null": true,
+    "pre_pivot_state_still_unavailable": {
+      "jsonrpc": "2.0",
+      "error": {
+        "code": -32603,
+        "message": "state not found for block: block is not execution validated"
+      },
+      "id": 1
+    },
+    "pre_pivot_execution_marker_absent": true,
+    "frontier_reached_original_genesis": true,
+    "interrupted_download_resumed": {
+      "at": "2026-11-20T08:33:54.859936+00:00",
+      "pivot": "0x7604c64b91bcbe6352dfecf514dbf063f3bf932cc0a94895f6de3779d661093f",
+      "frontier_before_restart": "0x2847fbee3402141212882f29f7f1675d23922322e1804d7ad9d7336269e0f2d4",
+      "same_container": "1503a09c0f25",
+      "scope": "Interrupt an actual in-progress background historical download; retain the same actual authenticated data directory and original 3600-second campaign budget."
+    },
+    "exchanges": [
+      {
+        "role": "el-1-geth-lighthouse",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "engine_getPayloadBodiesByHashV2",
+          "params": [
+            [
+              "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+              "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            ]
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": [
+            {
+              "transactions": [
+                "0x03f8b782053920843b9aca008501dcd650008307a120947e5f4552091a69125d5dfcb7b8c2659029395bdf8080c0843b9aca00f842a00175cb558d659d5b08d5a49b1f4b5477da30f960cdcd8e745134cd4ee52dda9ba0012c67809308d1c149afc72f0477998f995d560749ed251344bf740410d67ef601a049caf86b107a2ae030cd082aff90bfd6b3fb4d9b74906bcfc5319bef4e97f7dda004add8d2d5d2115f21ef875be109bfefca010e5ac8f2f9417efb4963f51f7844"
+              ],
+              "withdrawals": [],
+              "blockAccessList": "0xf90166de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129ae3e280a0dd9aca5b2c390cf281e5e930a82e6875e67febc1a5045e722515c2cfd95c71dac0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c1c7c680846aff5dace78235c0e3e280a0435cfa5d8cf500e2982bef0873433ad08030e0abde1c6326de225b88da37cb8ec0c0c0c0eb947e5f4552091a69125d5dfcb7b8c2659029395bdfc0c0cecd018b08459506e998544f2c97fac3c20121c0e9948943545177806ed17b9f23f0a21ee5948ecaa776c0c0cfce018c033b2e3b3a11ead7b41d786dc0c0"
+            },
+            null
+          ]
+        }
+      },
+      {
+        "role": "glamsterdam-qualified-snap-el",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "engine_getPayloadBodiesByHashV2",
+          "params": [
+            [
+              "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+              "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            ]
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "result": [
+            {
+              "transactions": [
+                "0x03f8b782053920843b9aca008501dcd650008307a120947e5f4552091a69125d5dfcb7b8c2659029395bdf8080c0843b9aca00f842a00175cb558d659d5b08d5a49b1f4b5477da30f960cdcd8e745134cd4ee52dda9ba0012c67809308d1c149afc72f0477998f995d560749ed251344bf740410d67ef601a049caf86b107a2ae030cd082aff90bfd6b3fb4d9b74906bcfc5319bef4e97f7dda004add8d2d5d2115f21ef875be109bfefca010e5ac8f2f9417efb4963f51f7844"
+              ],
+              "withdrawals": [],
+              "blockAccessList": "0xf90166de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129ae3e280a0dd9aca5b2c390cf281e5e930a82e6875e67febc1a5045e722515c2cfd95c71dac0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c1c7c680846aff5dace78235c0e3e280a0435cfa5d8cf500e2982bef0873433ad08030e0abde1c6326de225b88da37cb8ec0c0c0c0eb947e5f4552091a69125d5dfcb7b8c2659029395bdfc0c0cecd018b08459506e998544f2c97fac3c20121c0e9948943545177806ed17b9f23f0a21ee5948ecaa776c0c0cfce018c033b2e3b3a11ead7b41d786dc0c0"
+            },
+            null
+          ],
+          "id": 1
+        }
+      },
+      {
+        "role": "el-1-geth-lighthouse",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "eth_getBlockByHash",
+          "params": [
+            "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+            false
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": {
+            "baseFeePerGas": "0x7",
+            "blobGasUsed": "0x40000",
+            "blockAccessListHash": "0x3e2e3758180a9d68e09ba9d50e9c0d02561e32c6b02d30c64ae612f1dbcfe667",
+            "difficulty": "0x0",
+            "excessBlobGas": "0x0",
+            "extraData": "0x",
+            "gasLimit": "0x8f0d180",
+            "gasUsed": "0x2ee0",
+            "hash": "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+            "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+            "mixHash": "0x2da2d2eb664b01b15f48f2c87ec27e90a437fb4b759a4f2bdb66afaf37b390a5",
+            "nonce": "0x0000000000000000",
+            "number": "0x129b",
+            "parentBeaconBlockRoot": "0x435cfa5d8cf500e2982bef0873433ad08030e0abde1c6326de225b88da37cb8e",
+            "parentHash": "0xdd9aca5b2c390cf281e5e930a82e6875e67febc1a5045e722515c2cfd95c71da",
+            "receiptsRoot": "0x08a4d61c632646f04c74a6dc18f147bddae17015599c08cab4648cefc7a01eb0",
+            "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+            "size": "0x34c",
+            "slotNumber": "0x1673",
+            "stateRoot": "0x87224ce0b648dbc8f388b6eade77edb070af6d8e38dc1d1af98af7fd17d3d308",
+            "timestamp": "0x6aff5dac",
+            "transactions": [
+              "0x95e5b6f2167221e82d77b6a424a89f4cc93d5ddd468ec9e2c7aec8b792a6a87d"
+            ],
+            "transactionsRoot": "0x33eb6f00805930c3ffeb52306846446d9ab629eaccf197cc4f5be589e2b338fc",
+            "uncles": [],
+            "withdrawals": [],
+            "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          }
+        }
+      },
+      {
+        "role": "el-1-geth-lighthouse",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "engine_getPayloadBodiesByRangeV2",
+          "params": [
+            "0x129b",
+            "0x2"
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": [
+            {
+              "transactions": [
+                "0x03f8b782053920843b9aca008501dcd650008307a120947e5f4552091a69125d5dfcb7b8c2659029395bdf8080c0843b9aca00f842a00175cb558d659d5b08d5a49b1f4b5477da30f960cdcd8e745134cd4ee52dda9ba0012c67809308d1c149afc72f0477998f995d560749ed251344bf740410d67ef601a049caf86b107a2ae030cd082aff90bfd6b3fb4d9b74906bcfc5319bef4e97f7dda004add8d2d5d2115f21ef875be109bfefca010e5ac8f2f9417efb4963f51f7844"
+              ],
+              "withdrawals": [],
+              "blockAccessList": "0xf90166de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129ae3e280a0dd9aca5b2c390cf281e5e930a82e6875e67febc1a5045e722515c2cfd95c71dac0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c1c7c680846aff5dace78235c0e3e280a0435cfa5d8cf500e2982bef0873433ad08030e0abde1c6326de225b88da37cb8ec0c0c0c0eb947e5f4552091a69125d5dfcb7b8c2659029395bdfc0c0cecd018b08459506e998544f2c97fac3c20121c0e9948943545177806ed17b9f23f0a21ee5948ecaa776c0c0cfce018c033b2e3b3a11ead7b41d786dc0c0"
+            },
+            {
+              "transactions": [],
+              "withdrawals": [],
+              "blockAccessList": "0xf90110de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129be3e280a04d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffcc0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c7c7c680846aff5db2e78235c6e3e280a0a97d5fe9ce3c27d6f4155ddef08e85c6700b5a55f7522e576938697d23a9bc55c0c0c0c0"
+            }
+          ]
+        }
+      },
+      {
+        "role": "glamsterdam-qualified-snap-el",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "engine_getPayloadBodiesByRangeV2",
+          "params": [
+            "0x129b",
+            "0x2"
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "result": [
+            {
+              "transactions": [
+                "0x03f8b782053920843b9aca008501dcd650008307a120947e5f4552091a69125d5dfcb7b8c2659029395bdf8080c0843b9aca00f842a00175cb558d659d5b08d5a49b1f4b5477da30f960cdcd8e745134cd4ee52dda9ba0012c67809308d1c149afc72f0477998f995d560749ed251344bf740410d67ef601a049caf86b107a2ae030cd082aff90bfd6b3fb4d9b74906bcfc5319bef4e97f7dda004add8d2d5d2115f21ef875be109bfefca010e5ac8f2f9417efb4963f51f7844"
+              ],
+              "withdrawals": [],
+              "blockAccessList": "0xf90166de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129ae3e280a0dd9aca5b2c390cf281e5e930a82e6875e67febc1a5045e722515c2cfd95c71dac0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c1c7c680846aff5dace78235c0e3e280a0435cfa5d8cf500e2982bef0873433ad08030e0abde1c6326de225b88da37cb8ec0c0c0c0eb947e5f4552091a69125d5dfcb7b8c2659029395bdfc0c0cecd018b08459506e998544f2c97fac3c20121c0e9948943545177806ed17b9f23f0a21ee5948ecaa776c0c0cfce018c033b2e3b3a11ead7b41d786dc0c0"
+            },
+            {
+              "transactions": [],
+              "withdrawals": [],
+              "blockAccessList": "0xf90110de9400000961ef480eb55e80d19ad83579a64c007002c0c480010203c0c0c0de94000064d678505ad48f8ccb093bc65613800e8282c0c480010203c0c0c0de940000bbddc7ce488642fb579f8b00f3a590007251c0c480010203c0c0c0de940000bff46984e3725691fa540a8c7589300d8282c0c480010203c0c0c0f842940000f90827f1c53a10cb7a02335b175320002935e8e782129be3e280a04d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffcc0c0c0c0f84e94000f3df6d732807ef1319fb7b8bb8522d0beac02f4cb8215c7c7c680846aff5db2e78235c6e3e280a0a97d5fe9ce3c27d6f4155ddef08e85c6700b5a55f7522e576938697d23a9bc55c0c0c0c0"
+            }
+          ],
+          "id": 1
+        }
+      },
+      {
+        "role": "glamsterdam-qualified-snap-el",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "eth_getBalance",
+          "params": [
+            "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+            {
+              "blockHash": "0x4d0f8efb805d02acd9209984138a4a18c8a504739d169fd120c68da487ae2ffc",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "response": {
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32603,
+            "message": "state not found for block: block is not execution validated"
+          },
+          "id": 1
+        }
+      }
+    ]
+  },
+  "authority": "Downloaded canonical bodies/BALs are authenticated pivot ancestors, not execution-validated state. The original pre-pivot balance request still errors and its execution marker is absent.",
+  "original_control": "retained-original-bal-preflight.json: synchronized e61ea843 snap process returned null for original slot-5747 block; independent Geth and original native returned exact 361-byte BAL."
+}

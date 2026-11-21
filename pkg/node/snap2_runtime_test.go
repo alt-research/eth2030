@@ -1,6 +1,7 @@
 package node
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"encoding/json"
@@ -265,6 +266,25 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			}
 			head := target.blockchain.CurrentBlock().Hash()
 			root := target.blockchain.CurrentBlock().Root()
+			if scenario == "moving-partial" {
+				historyCtx, historyCancel := context.WithTimeout(context.Background(), 10*time.Second)
+				err := target.backfillSnapHistory(historyCtx)
+				historyCancel()
+				if err != nil {
+					t.Fatal(err)
+				}
+				want, err := source.blockchain.BlockAccessList(old.Hash())
+				if err != nil || want == nil {
+					t.Fatalf("source historical BAL unavailable: %v", err)
+				}
+				got, err := target.blockchain.BlockAccessList(old.Hash())
+				if err != nil || !bytes.Equal(got, want) || target.blockchain.GetBlock(old.Hash()) == nil {
+					t.Fatalf("encrypted-peer backfill lost original body/BAL: %v", err)
+				}
+				if target.blockchain.HasValidatedBlock(old.Hash()) || target.blockchain.CurrentBlock().Hash() != head || target.blockchain.State().GetRoot() != root {
+					t.Fatal("historical acquisition changed execution or canonical authority")
+				}
+			}
 			target.p2pServer.Stop()
 			if err := target.Stop(); err != nil {
 				t.Fatal(err)
@@ -272,6 +292,13 @@ func TestSnap2ActualMovingPivotReorgAndMissingOrphanRecovery(t *testing.T) {
 			reopened := newTestNode(t, &targetCfg)
 			if reopened.blockchain.CurrentBlock().Hash() != head || reopened.blockchain.CurrentBlock().Root() != root {
 				t.Fatal("snap/2 pivot did not survive restart")
+			}
+			if scenario == "moving-partial" {
+				want, _ := source.blockchain.BlockAccessList(old.Hash())
+				got, err := reopened.blockchain.BlockAccessList(old.Hash())
+				if err != nil || !bytes.Equal(got, want) || reopened.blockchain.HasValidatedBlock(old.Hash()) {
+					t.Fatalf("restart lost historical bytes or changed their authority: %v", err)
+				}
 			}
 			if stored, err := reopened.db.Get([]byte("snap-pivot")); err != nil || types.BytesToHash(stored) != head {
 				t.Fatalf("persisted pivot authority missing: %v", err)

@@ -48,7 +48,10 @@ func (bc *Blockchain) restoreIndexedHead(anchor *types.Block, ancestry []*types.
 	var headers []*types.Header
 	var recent []*types.Block
 	missingValidation := false
-	final := rawdb.ReadFinalizedBlockHash(bc.db)
+	final, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+	if err != nil {
+		return false, storageFailure(err)
+	}
 	finalSeen := final == anchor.Hash() || (anchor.NumberU64() == 0 && final == (types.Hash{}))
 	cursor := head
 	for cursor.NumberU64() > anchor.NumberU64() {

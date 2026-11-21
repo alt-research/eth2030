@@ -161,7 +161,10 @@ func (bc *Blockchain) RestoreSnapPivot() error {
 		return err
 	}
 	saved := bc.GetBlock(savedHash)
-	finalHash := rawdb.ReadFinalizedBlockHash(bc.db)
+	finalHash, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+	if err != nil {
+		return storageFailure(err)
+	}
 	final := bc.GetBlock(finalHash)
 	if saved == nil || final == nil || final.NumberU64() < pivot.NumberU64() || final.NumberU64() > saved.NumberU64() {
 		return fmt.Errorf("snap: invalid persisted finality above original checkpoint")
@@ -260,6 +263,9 @@ func (bc *Blockchain) replayStoredAfter(pivot *types.Block) error {
 		}
 		parent = block
 	}
-	final := rawdb.ReadFinalizedBlockHash(bc.db)
+	final, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+	if err != nil {
+		return storageFailure(err)
+	}
 	return bc.ApplyForkchoice(head.Hash(), final, final)
 }

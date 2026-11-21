@@ -189,3 +189,36 @@ func TestIndexedSnapMissingIndexUsesLegacyExecution(t *testing.T) {
 		t.Fatal("legacy recovery lost original validated root")
 	}
 }
+
+type recoveryFinalityReadError struct {
+	rawdb.Database
+	err error
+}
+
+func (d recoveryFinalityReadError) Get(key []byte) ([]byte, error) {
+	if bytes.Equal(key, []byte("hf")) {
+		return nil, d.err
+	}
+	return d.Database.Get(key)
+}
+func TestIndexedRecoveryDoesNotTurnUnreadableFinalityIntoZero(t *testing.T) {
+	for _, mode := range []string{"full", "snap"} {
+		t.Run(mode, func(t *testing.T) {
+			var recovered *Blockchain
+			var guard *restartWriteGuard
+			if mode == "snap" {
+				recovered, _, guard = indexedSnapRestart(t, "")
+			} else {
+				recovered, guard, _ = restartFixture(t, nil)
+			}
+			want := errors.New("finality read unavailable")
+			guard.Database = recoveryFinalityReadError{Database: guard.Database, err: want}
+			if err := recovered.RestoreSnapPivot(); !errors.Is(err, want) {
+				t.Fatalf("finality IO error lost: %v", err)
+			}
+			if recovered.CurrentBlock().Hash() != recovered.genesis.Hash() {
+				t.Fatal("unreadable finality advanced head")
+			}
+		})
+	}
+}

@@ -14,7 +14,7 @@ The selected merged LIFO / signed Gloas implementation and its original 33 task 
 | Sync/durability | Independent Geth full/snap late join, moving-pivot/restart controls, historical state/BAL readback and four original-datadir recoveries under 300s. |
 | Operating evidence |400/400 steady slots and60/60 pressure slots; unchanged budgets,270 independent pressure proofs, finality and offline replay. |
 
-Remaining Glamsterdam-related work is explicit: legacy EL Builder Engine extension authentication/conversion (confirmed code gap), upstream Lodestar integration/full hosted CI, larger-state multi-day capacity/soak qualification, finite coverage expansion when required, and the user's final public protocol/model decision. Completed private development does not imply public-network activation or unlimited production capacity.
+Remaining Glamsterdam-related work is explicit: legacy EL Builder Engine extension authentication/conversion and startup bind-failure propagation (confirmed code gaps), upstream Lodestar integration/full hosted CI, larger-state multi-day capacity/soak qualification, finite coverage expansion when required, and the user's final public protocol/model decision. Completed private development does not imply public-network activation or unlimited production capacity.
 
 ## Other roadmap phases
 

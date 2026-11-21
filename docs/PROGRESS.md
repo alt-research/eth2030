@@ -18,7 +18,7 @@ These results are retained source-specific measurements, not a new live campaign
 
 ## Remaining work after merge
 
-The [current audit](audits/merged-glamsterdam-20261122/README.md) confirms a real code gap in legacy Engine builder extensions: unauthenticated registration/bids, synthetic local stake and dropped header signature. This does not establish an unsigned-envelope bypass in the qualified CL consensus route. It needs a separate contract/authentication or interface-retirement PR.
+The [current audit](audits/merged-glamsterdam-20261122/README.md) confirms a real code gap in legacy Engine builder extensions: unauthenticated registration/bids, synthetic local stake and dropped header signature. This does not establish an unsigned-envelope bypass in the qualified CL consensus route. It needs a separate contract/authentication or interface-retirement PR. A second code gap remains in required-interface startup failure propagation: binding errors can be logged without making `Start` fail and unwind. The CI-discovered ephemeral metrics binding race is fixed separately in this review.
 
 Lodestar 10693 remains open upstream despite local/fork qualification. Larger-state multi-day operating/indexing capacity remains unmeasured. Public protocol/model approval is reserved. Finite fixture/format coverage remains explicit.
 

@@ -1082,12 +1082,20 @@ func (n *Node) Start() error {
 			Addr:    n.config.MetricsListenAddr(),
 			Handler: mux,
 		}
-		go func() {
-			slog.Info("Metrics server listening", "addr", n.config.MetricsListenAddr())
-			if err := n.metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				slog.Error("Metrics server error", "err", err)
-			}
-		}()
+		// Bind before returning from Start: keep port zero genuinely ephemeral
+		// and publish the actual reserved address without a free-port race.
+		listener, err := net.Listen("tcp", n.config.MetricsListenAddr())
+		if err != nil {
+			slog.Error("Metrics server error", "err", err)
+		} else {
+			n.metricsServer.Addr = listener.Addr().String()
+			go func() {
+				slog.Info("Metrics server listening", "addr", n.metricsServer.Addr)
+				if err := n.metricsServer.Serve(listener); err != nil && err != http.ErrServerClosed {
+					slog.Error("Metrics server error", "err", err)
+				}
+			}()
+		}
 	}
 
 	n.running = true

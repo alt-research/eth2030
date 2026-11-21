@@ -1,0 +1,23 @@
+2026/11/22 01:58:13 INFO BLS backend: blst (default)
+2026/11/22 01:58:15 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 01:58:15 INFO finality mode mode=ssf
+2026/11/22 01:58:15 INFO generated JWT secret path=/tmp/TestMetricsServer_StartsAndResponds3912261505/001/jwtsecret
+2026/11/22 01:58:15 INFO tx journal replayed count=0
+2026/11/22 01:58:15 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 01:58:15 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 01:58:15 INFO starting ETH2030 node network=mainnet
+2026/11/22 01:58:15 INFO DAS network manager started
+2026/11/22 01:58:15 INFO light client started
+2026/11/22 01:58:15 INFO P2P server listening addr=[::]:43011
+2026/11/22 01:58:15 INFO node started successfully
+2026/11/22 01:58:15 INFO Metrics server listening addr=127.0.0.1:0
+2026/11/22 01:58:15 INFO RPC server listening addr=0.0.0.0:0
+2026/11/22 01:58:15 INFO stopping ETH2030 node
+2026/11/22 01:58:15 INFO Engine API server listening addr=0.0.0.0:0
+2026/11/22 01:58:15 Engine API server starting on [::]:44867
+2026/11/22 01:58:15 INFO node stopped
+--- FAIL: TestMetricsServer_StartsAndResponds (1.63s)
+    node_metrics_test.go:35: metrics listener not bound after Start: "127.0.0.1:0" (<nil>)
+FAIL
+FAIL	github.com/eth2030/eth2030/node	2.334s
+FAIL

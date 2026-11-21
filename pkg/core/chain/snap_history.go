@@ -102,7 +102,16 @@ func (bc *Blockchain) SnapHistoryCursor(ctx context.Context) (*types.Block, erro
 				return nil, err
 			}
 			if data == nil {
-				return nil, fmt.Errorf("snap history: incomplete committed BAL prefix")
+				// EIP-7928 permits absence only beyond finalized beacon-slot retention.
+				final := bc.CurrentFinalBlock()
+				slot := parent.Header().SlotNumber
+				var last *uint64
+				if final != nil {
+					last = final.Header().SlotNumber
+				}
+				if slot == nil || last == nil || rawdb.IsBALRetained(*last, *slot) {
+					return nil, fmt.Errorf("snap history: incomplete committed BAL prefix")
+				}
 			}
 		}
 		block = parent

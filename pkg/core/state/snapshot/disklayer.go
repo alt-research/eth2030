@@ -123,6 +123,11 @@ func (dl *diskLayer) AccountIterator(seek types.Hash) AccountIterator {
 			data[hash] = val
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		iter.Release()
+		return &diskAccountIterator{err: err}
+	}
+
 	iter.Release()
 
 	sort.Slice(hashes, func(i, j int) bool {
@@ -165,6 +170,11 @@ func (dl *diskLayer) StorageIterator(accountHash types.Hash, seek types.Hash) St
 			data[hash] = val
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		iter.Release()
+		return &diskStorageIterator{err: err}
+	}
+
 	iter.Release()
 
 	sort.Slice(hashes, func(i, j int) bool {

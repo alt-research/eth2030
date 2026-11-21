@@ -72,5 +72,9 @@ func (bc *Blockchain) PruneBogotaPayloads(finalized uint64) error {
 			}
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		return err
+	}
+
 	return batch.Write()
 }

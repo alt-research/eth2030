@@ -363,3 +363,7 @@ func (tdb *TableDB) Close() error {
 // Compile-time interface checks.
 var _ KeyValueStore = (*Table)(nil)
 var _ Batcher = (*Table)(nil)
+
+func (it *tableIterator) Error() error { return IteratorError(it.inner) }
+
+func (t *Table) Error() error { return ReadError(t.db) }

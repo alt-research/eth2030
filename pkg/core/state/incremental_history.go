@@ -330,7 +330,7 @@ func SetReadContext(st any, ctx context.Context) {
 		reader.SetReadContext(historyContext(ctx))
 	}
 }
-func (s *SnapStateDB) Error() error                       { return s.historyErr }
+func (s *SnapStateDB) Error() error                       { return errors.Join(s.historyErr, rawdb.ReadError(s.db)) }
 func (s *SnapStateDB) SetReadContext(ctx context.Context) { s.historyCtx = historyContext(ctx) }
 func (s *SnapStateDB) historyFailure(err error) {
 	if s.historyErr == nil {

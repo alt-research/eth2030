@@ -222,6 +222,10 @@ func LoadStateSnapshot(db rawdb.Database, root types.Hash) (*StateSnapshot, erro
 			s.Storage[a][k] = bytes.Clone(iter.Value())
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		return nil, err
+	}
+
 	for _, body := range s.Accounts {
 		var acc rlpAccount
 		if err := rlp.DecodeBytes(body, &acc); err != nil {
@@ -574,6 +578,11 @@ func ExportStateSnapshot(db StateDB) (*StateSnapshot, error) {
 					frozen[types.BytesToAddress(it.Key()[2:])] = bytes.Clone(it.Value())
 				}
 			}
+			if err := rawdb.ReadError(it); err != nil {
+				it.Release()
+				return nil, err
+			}
+
 			it.Release()
 		}
 		for addr, body := range frozen {
@@ -594,6 +603,11 @@ func ExportStateSnapshot(db StateDB) (*StateSnapshot, error) {
 						slots[crypto.Keccak256Hash(it.Key()[22:])], _ = rlp.EncodeToBytes(bytes.TrimLeft(it.Value(), "\x00"))
 					}
 				}
+				if err := rawdb.ReadError(it); err != nil {
+					it.Release()
+					return nil, err
+				}
+
 				it.Release()
 			}
 			var acc rlpAccount

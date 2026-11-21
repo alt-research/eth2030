@@ -1,3 +1,7 @@
+## Merged roadmap and remaining-gap audit (2026-11-22)
+
+EL reviews123/124/125 are merged in master9a094830. Updating stale November18 homepage/roadmap progress and auditing remaining obligations against actual merged code and original qualification evidence. Lodestar10693 remains open upstream; it is not counted as upstream merged. Original development checkout remains preserved.
+
 ## Final post-merge qualification (2026-11-22)
 
 All original33 task IDs and R01–R13 are reconciled under the selected merged LIFO/signed-envelope target. Masterc27a5bb0 includes120/121/122; separate123/124 fix BAL-expiry progress and authenticated indexed snap/finality IO recovery. Compositiond9201b0 passes219 packages,107 files/108 official requests, six race suites, vet/build and byte-identical rebuild. All four original native datadirs recover within300s, all final-source operating/partial/blob/historical/independent proof controls pass, and Lodestar's fifteen shared-topology controls plus actual automatic recovery pass.

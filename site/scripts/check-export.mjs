@@ -106,6 +106,10 @@ for (const number of [7688, 8045, 8061, 8136]) {
   assert.match(page, /Implemented in the companion consensus-client fork/);
   assert.doesNotMatch(page, /No implementation yet/);
 }
+const refundPage = readFileSync(new URL('../out/eips/eip-7778/index.html', import.meta.url), 'utf8');
+assert.match(refundPage, /Block Gas Accounting without Refunds/);
+assert.match(refundPage, /User refunds remain applied/);
+assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
 assert.match(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');

@@ -364,7 +364,7 @@ export const EIPS: EipEntry[] = [
   {
     id: 'eip-7778',
     number: 7778,
-    title: 'Remove SSTORE Gas Refunds',
+    title: 'Block Gas Accounting without Refunds',
     layer: 'EL',
     fork: 'glamsterdam',
     category: 'Glamsterdam Repricing',
@@ -375,6 +375,7 @@ export const EIPS: EipEntry[] = [
     verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
     implementation: ['core/vm/instructions.go', 'core/gas/glamsterdam_repricing.go'],
     tests: ['core/eip7778_test.go'],
+    implemented: ['User refunds remain applied; block gas accounting excludes refunds under the selected floor/state rules'],
   },
   {
     id: 'eip-2780',

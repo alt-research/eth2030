@@ -52,6 +52,7 @@ Independent seven-field Frame/Bogotá agreement, Dora production epoch/receipt/s
 - Replace the November18 homepage/roadmap snapshot with merged November22 Glamsterdam evidence and source pins.
 - Add seven previously omitted accepted EIPs:7688/8045/8061/8246/8282/8189/8136. Companion-CL-only implementations link their qualification instead of pretending to be missing local EL code. No new EF drawing position is inferred for these entries.
 - Refresh eth/70 and eth/71 labels and remove obsolete 7702/PeerDAS gaps and speculative old percentages. Keep broader ePBS `Substantial` because the legacy extensions above remain unauthenticated even though the frozen signed CL route is qualified.
+- Correct the stale EIP-7778 title: user refunds remain applied; only block accounting excludes them.
 - Align homepage and roadmap through the shared snapshot; verify rendered values against retained records and detect deliberately altered milestones.
 - Correct the tracker verifier's matrix parser: it previously treated the Spec column as Implementation. The new companion-CL empty-local-implementation rows reproduce that false error before the parser correction.
 

@@ -4,7 +4,7 @@
 - [x] Reconcile homepage, roadmap and EIP tracker with merged source, all core/supporting obligations and retained qualification evidence.
 - [x] Reproduce legacy builder-extension gaps and document scaling, upstream/public and later-fork boundaries.
 - [x] Build and inspect157 exported pages, verify desktop/mobile layouts and reject mutated claims/status.
-- [ ] Publish the scoped master-targeted PR and verify exact remote head, CI and merge state.
+- [x] Publish master-targeted PR126; require final exact remote-head CI/merge verification after the documentation suffix.
 
 ## Final post-merge closure (2026-11-22)
 

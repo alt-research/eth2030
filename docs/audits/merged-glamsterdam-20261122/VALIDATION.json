@@ -49,7 +49,14 @@
     "horizontal_overflow": false,
     "original_mobile_EIP7688_scroll_width": 413,
     "corrected_mobile_EIP7688_scroll_width": 375,
-    "desktop_progress_screenshot_visually_inspected": true
+    "desktop_progress_screenshot_visually_inspected": true,
+    "additional_mobile_refund_page": {
+      "path": "/eips/eip-7778/",
+      "width": 375,
+      "scroll_width": 375,
+      "user_refunds_preserved_text": true
+    },
+    "console_errors": 0
   },
   "legacy_builder_observation": {
     "passed_as_observation": true,

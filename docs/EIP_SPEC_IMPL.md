@@ -56,7 +56,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
 | 7904 | Precompile Gas Repricing | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
-| 7778 | Separate block accounting from user refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
+| 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
 | 2780 | Reduce Intrinsic Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/vm/gas_table.go`, `core/glamsterdam_repricing.go` | `core/eip2780_test.go` |
 | 8037 | State Creation Gas Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8037_test.go` |
 | 8038 | State Access Gas Increase | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8038_test.go` |

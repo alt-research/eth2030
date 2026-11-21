@@ -14,7 +14,7 @@ import (
 // restoreIndexedHead reuses only locally persisted execution validation and an
 // independently authenticated original state root. It is a startup path, never
 // a peer-import or forkchoice-selection shortcut.
-func (bc *Blockchain) restoreIndexedHead() (bool, error) {
+func (bc *Blockchain) restoreIndexedHead(anchor *types.Block, ancestry []*types.Header) (bool, error) {
 	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
 		return false, nil
 	}
@@ -48,8 +48,14 @@ func (bc *Blockchain) restoreIndexedHead() (bool, error) {
 	var headers []*types.Header
 	var recent []*types.Block
 	missingValidation := false
-	for cursor := head; cursor.NumberU64() > 0; {
+	final := rawdb.ReadFinalizedBlockHash(bc.db)
+	finalSeen := final == anchor.Hash() || (anchor.NumberU64() == 0 && final == (types.Hash{}))
+	cursor := head
+	for cursor.NumberU64() > anchor.NumberU64() {
 		number, hash := cursor.NumberU64(), cursor.Hash()
+		if hash == final {
+			finalSeen = true
+		}
 		canonical, err := rawdb.ReadCanonicalHash(bc.db, number)
 		if err != nil {
 			return false, storageFailure(err)
@@ -89,10 +95,36 @@ func (bc *Blockchain) restoreIndexedHead() (bool, error) {
 		}
 		cursor = parent
 	}
+	if cursor.Hash() != anchor.Hash() {
+		return false, fmt.Errorf("history recovery: original checkpoint is not a saved-head ancestor")
+	}
+	canonical, err := rawdb.ReadCanonicalHash(bc.db, anchor.NumberU64())
+	if err != nil {
+		return false, storageFailure(err)
+	}
+	if canonical != anchor.Hash() {
+		return false, fmt.Errorf("history recovery: noncanonical original checkpoint")
+	}
+	if anchor.NumberU64() != 0 {
+		marker, err := bc.db.Get(validatedKey(anchor.Hash()))
+		if errors.Is(err, rawdb.ErrNotFound) {
+			missingValidation = true
+		} else if err != nil {
+			return false, storageFailure(err)
+		} else if !bytes.Equal(marker, []byte{1}) {
+			return false, fmt.Errorf("history recovery: corrupt checkpoint validation marker")
+		}
+	}
+	if !finalSeen {
+		return false, fmt.Errorf("history recovery: finality is outside the authenticated saved prefix")
+	}
 	if missingValidation {
 		return false, nil
 	}
-	headers = append(headers, bc.genesis.Header())
+	if len(recent) < bc.opts.BlockCacheSize {
+		recent = append(recent, anchor)
+	}
+	headers = append(headers, ancestry...)
 	bc.mu.Lock()
 	bc.adoptSnapPivot(head, current, headers)
 	// The backwards verification walk cached old ancestors. Preserve the
@@ -103,7 +135,6 @@ func (bc *Blockchain) restoreIndexedHead() (bool, error) {
 		bc.cacheBlockLocked(recent[i])
 	}
 	bc.mu.Unlock()
-	final := rawdb.ReadFinalizedBlockHash(bc.db)
 	if err := bc.ApplyForkchoice(head.Hash(), final, final); err != nil {
 		return false, err
 	}

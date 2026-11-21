@@ -1,0 +1,155 @@
+2026/11/22 02:40:23 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupRequiredBindingsRollbackAndFreshRetryp2p2452788015/001/jwtsecret
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO P2P server listening addr=[::]:38575
+2026/11/22 02:40:24 INFO node started successfully
+2026/11/22 02:40:24 INFO RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO stopping ETH2030 node
+2026/11/22 02:40:24 INFO WebSocket RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO Engine API server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO Metrics server listening addr=127.0.0.1:43153
+2026/11/22 02:40:24 INFO node stopped
+2026/11/22 02:40:24 Engine API server starting on 127.0.0.1:41393
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupRequiredBindingsRollbackAndFreshRetryrpc1440376090/001/jwtsecret
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO P2P server listening addr=[::]:35115
+2026/11/22 02:40:24 INFO node started successfully
+2026/11/22 02:40:24 INFO RPC server listening addr=127.0.0.1:37361
+2026/11/22 02:40:24 INFO Engine API server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO WebSocket RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO stopping ETH2030 node
+2026/11/22 02:40:24 Engine API server starting on 127.0.0.1:41449
+2026/11/22 02:40:24 INFO Metrics server listening addr=127.0.0.1:39867
+2026/11/22 02:40:24 INFO node stopped
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupRequiredBindingsRollbackAndFreshRetryengine221274781/001/jwtsecret
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO P2P server listening addr=[::]:40471
+2026/11/22 02:40:24 INFO RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO node started successfully
+2026/11/22 02:40:24 INFO stopping ETH2030 node
+2026/11/22 02:40:24 INFO Engine API server listening addr=127.0.0.1:34849
+2026/11/22 02:40:24 INFO WebSocket RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO Metrics server listening addr=127.0.0.1:35955
+2026/11/22 02:40:24 Engine API server starting on 127.0.0.1:34849
+2026/11/22 02:40:24 INFO node stopped
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupRequiredBindingsRollbackAndFreshRetryws2565530256/001/jwtsecret
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO P2P server listening addr=[::]:38531
+2026/11/22 02:40:24 INFO node started successfully
+2026/11/22 02:40:24 INFO Engine API server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO WebSocket RPC server listening addr=127.0.0.1:32945
+2026/11/22 02:40:24 INFO Metrics server listening addr=127.0.0.1:37911
+2026/11/22 02:40:24 INFO stopping ETH2030 node
+2026/11/22 02:40:24 INFO RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 Engine API server starting on 127.0.0.1:44843
+2026/11/22 02:40:24 INFO node stopped
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupRequiredBindingsRollbackAndFreshRetrymetrics516435914/001/jwtsecret
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO P2P server listening addr=[::]:35997
+2026/11/22 02:40:24 INFO RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO Engine API server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 ERROR Metrics server error err="listen tcp 127.0.0.1:43599: bind: address already in use"
+2026/11/22 02:40:24 INFO node started successfully
+2026/11/22 02:40:24 INFO WebSocket RPC server listening addr=127.0.0.1:0
+2026/11/22 02:40:24 INFO stopping ETH2030 node
+2026/11/22 02:40:24 Engine API server starting on 127.0.0.1:46095
+2026/11/22 02:40:24 INFO node stopped
+--- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry (1.64s)
+    --- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/p2p (1.64s)
+        startup_rollback_test.go:87: failed startup retains its database lock
+        startup_rollback_test.go:87: failed startup retains an active subsystem
+        startup_rollback_test.go:87: Wait was not released after failed startup
+        startup_rollback_test.go:101: successful startup has no bound required address
+    --- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/rpc (0.00s)
+        startup_rollback_test.go:82: occupied required rpc listener accepted
+    --- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/engine (0.00s)
+        startup_rollback_test.go:82: occupied required engine listener accepted
+    --- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/ws (0.00s)
+        startup_rollback_test.go:82: occupied required ws listener accepted
+    --- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/metrics (0.00s)
+        startup_rollback_test.go:82: occupied required metrics listener accepted
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO generated JWT secret path=/tmp/TestStartupWorkerFailureClosesConstructorResources2705924446/001/jwtsecret
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO starting ETH2030 node network=mainnet
+2026/11/22 02:40:24 INFO DAS network manager started
+2026/11/22 02:40:24 INFO light client started
+2026/11/22 02:40:24 INFO BLS backend: blst (default)
+2026/11/22 02:40:24 INFO KZG backend initialized backend=go-eth-kzg
+2026/11/22 02:40:24 INFO finality mode mode=ssf
+2026/11/22 02:40:24 INFO tx journal replayed count=0
+2026/11/22 02:40:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false
+2026/11/22 02:40:24 INFO anonymous transport selected mode=simulated reason="no external proxy reachable"
+2026/11/22 02:40:24 INFO AA proof circuit ready constraints=3
+--- FAIL: TestStartupWorkerFailureClosesConstructorResources (0.00s)
+    startup_rollback_test.go:134: failed startup retains its database lock
+    startup_rollback_test.go:134: failed startup retains an active subsystem
+    startup_rollback_test.go:134: Wait was not released after failed startup
+FAIL
+FAIL	github.com/eth2030/eth2030/node	2.353s
+FAIL
+

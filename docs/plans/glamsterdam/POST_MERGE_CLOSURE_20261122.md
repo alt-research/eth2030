@@ -8,7 +8,7 @@ The selected merged LIFO and signed Gloas development target is implemented and 
 | --- | --- | --- |
 | [123](https://github.com/alt-research/eth2030/pull/123) | Resume downloaded snap history after legal BAL expiry using actual finalized/block slots; missing retained bytes and present corruption still reject. | master |
 | [124](https://github.com/alt-research/eth2030/pull/124) | Restore authenticated indexed snap descendants without redundant replay; preserve IO/malformed-finality errors instead of fabricating zero. | master |
-| Post-merge evidence review | Original failures, actual normal launch profile, final source/runtime/protocol archives, independent replay and merge-order checks. | master |
+| [125](https://github.com/alt-research/eth2030/pull/125) | Original failures, actual normal launch profile, final source/runtime/protocol archives, independent replay and merge-order checks. | master |
 | [Lodestar10693](https://github.com/ChainSafe/lodestar/pull/10693) | Correct delayed cleanup, pending identify and shared GossipSub protocol aliases using bounded logical-topology generations. Fifteen regressions and actual recovery pass. | unstable |
 
 Original EL reviews120/121/122 are merged in masterc27a5bb09507461bb6e9f2ca72c2456d04072f80. Its package/workflow bytes equal qualified1221d968. Final source d9201b0cdb8524a28c81ae6b09017efa8a39b6a6 composes that master and independent123/124; no aggregate feature PR hides those reviews. Only seven package files differ. Native Go1.26.11 executableSHA256 is8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec; a fresh detached rebuild is byte-identical.

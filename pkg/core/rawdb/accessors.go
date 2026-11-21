@@ -1,6 +1,10 @@
 package rawdb
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"errors"
+	"fmt"
+)
 
 // --- Header Accessors ---
 
@@ -189,13 +193,26 @@ func WriteFinalizedBlockHash(db KeyValueWriter, hash [32]byte) error {
 // ReadFinalizedBlockHash retrieves the persisted finalized block hash.
 // Returns the zero hash when no finalized block has been recorded yet.
 func ReadFinalizedBlockHash(db KeyValueReader) [32]byte {
+	hash, _ := ReadFinalizedBlockHashChecked(db)
+	return hash
+}
+
+// ReadFinalizedBlockHashChecked distinguishes an absent pre-finality record
+// from unreadable or malformed committed metadata during recovery.
+func ReadFinalizedBlockHashChecked(db KeyValueReader) ([32]byte, error) {
 	data, err := db.Get(headFinalizedKey)
-	if err != nil || len(data) != 32 {
-		return [32]byte{}
+	if errors.Is(err, ErrNotFound) {
+		return [32]byte{}, nil
+	}
+	if err != nil {
+		return [32]byte{}, err
+	}
+	if len(data) != 32 {
+		return [32]byte{}, fmt.Errorf("rawdb: corrupt finalized hash length %d", len(data))
 	}
 	var hash [32]byte
 	copy(hash[:], data)
-	return hash
+	return hash, nil
 }
 
 // WriteSafeBlockHash persists the hash of the latest safe block.

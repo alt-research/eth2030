@@ -1,0 +1,7 @@
+# Indexed snap descendant restart qualified
+
+Actual original snap restart source 7994 did not become ready within 300 seconds. The snap path unconditionally replayed persisted descendants after opening its original authenticated checkpoint. Reuse strict indexed recovery only above that checkpoint: audit the saved-head state root, canonical hash/header/body lineage, exact validation markers and finality; retain original snapshot/ancestry authentication and pre-pivot nonexecution. Missing markers/index preserve normal legacy execution. Malformed/unreadable finality remains a storage error.
+
+The preceding local source 67dbfe8e passes 219 full packages plus affected race/vet/build. The final checked-reader source and retention correction are composed at d9201b0c, which passes 219 full package suites, six affected race suites, full vet and native/tool builds. Focused corruption, missing-marker/index, checkpoint-only, next-block, auxiliary-availability and no-premature-adoption controls pass.
+
+The actual original snap role on that composition recovers in 176.742 seconds under the unchanged 300-second limit, with original finalized commitments and two independent account proofs. Original failures, exact source and command scope remain retained. The retained snap role uses the same direct native startup flags; the separate full-role duplicate-migration launcher correction is explicitly recorded elsewhere. Overall final steady/pressure qualification is tracked separately.

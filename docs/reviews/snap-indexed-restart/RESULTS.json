@@ -1,0 +1,176 @@
+{
+  "original_local_record": {
+    "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+    "normative": "EIP-3675 forkchoice/finality and weak-subjectivity checkpoint authority; Engine Paris payload validation and idempotence; EIP-7928 separate auxiliary BAL availability.",
+    "original_actual_failure": "Retained snap observer did not listen/catch up within300 seconds; it unconditionally re-executed saved descendants. Actual original startup logs and failed budget remain retained.",
+    "controls": [
+      "no validation-marker/index publication on verified restart",
+      "complete authenticated checkpoint/head root and descendant lineage",
+      "pre-pivot bodies retain no state/execution authority",
+      "corrupt marker/root/canonical pivot/finality rejected before adoption",
+      "missing markers/index use normal legacy execution",
+      "checkpoint-only restart",
+      "missing auxiliary BAL does not invent data",
+      "bounded current-head body cache",
+      "ordinary next-block execution"
+    ],
+    "checks": [
+      {
+        "name": "full",
+        "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "./..."
+        ],
+        "seconds": 49.220785340003204,
+        "exit": 0
+      },
+      {
+        "name": "race",
+        "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-count=1",
+          "./core/chain",
+          "./node",
+          "./node/backend",
+          "./engine",
+          "./eth"
+        ],
+        "seconds": 75.03216133901151,
+        "exit": 0
+      },
+      {
+        "name": "vet",
+        "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "seconds": 3.09329225399415,
+        "exit": 0
+      },
+      {
+        "name": "build",
+        "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+        "command": [
+          "go",
+          "build",
+          "./cmd/eth2030",
+          "./cmd/eth2030-state-history"
+        ],
+        "seconds": 1.9301202409842517,
+        "exit": 0
+      }
+    ],
+    "full_packages": 219,
+    "actual_updated_restart": "pending source-specific unchanged-budget repeat"
+  },
+  "current_feature_source": "b00e673d",
+  "qualified_composition": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+  "composed_checks": [
+    {
+      "name": "full",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "seconds": 49.906057749001775,
+      "exit": 0
+    },
+    {
+      "name": "race",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/rawdb",
+        "./core/chain",
+        "./node",
+        "./node/backend",
+        "./engine",
+        "./eth"
+      ],
+      "seconds": 74.44678991899127,
+      "exit": 0
+    },
+    {
+      "name": "vet",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "seconds": 3.1098133890191093,
+      "exit": 0
+    },
+    {
+      "name": "build",
+      "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+      "command": [
+        "go",
+        "build",
+        "./cmd/eth2030",
+        "./cmd/eth2030-state-history"
+      ],
+      "seconds": 1.9124257289804518,
+      "exit": 0
+    }
+  ],
+  "checked_finality_reader": "Malformed metadata and actual IO read errors remain errors in both full/snap recovery; never converted to zero.",
+  "actual_normal_snap_recovery": {
+    "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+    "binary_sha256": "8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec",
+    "restart_budget_seconds": 300,
+    "elapsed_seconds": 176.74203144700732,
+    "independent_proofs": {
+      "independent_proofs": 2,
+      "passed": true
+    },
+    "frozen_finalized": {
+      "baseFeePerGas": "0x7",
+      "blobGasUsed": "0x0",
+      "blockAccessListHash": "0x126efd515275dadef6f831828c9c9163fe21b68d6ef44d810f3d2793360a24d6",
+      "difficulty": "0x0",
+      "excessBlobGas": "0x0",
+      "extraData": "0x",
+      "gasLimit": "0x8f0d180",
+      "gasUsed": "0x0",
+      "hash": "0x89d722b14bba82f5b47f51d7ef8bb06ca39d2f14d2016e4ed98700ad57ed8410",
+      "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+      "mixHash": "0x43d08e44e8b44431d07c19d63efc61b7964196124841e88e1c12be708f22e820",
+      "nonce": "0x0000000000000000",
+      "number": "0xd9da",
+      "parentBeaconBlockRoot": "0x250b61382546313bb4733acd466139a3130b478b735b6bb10eec19147bfbd475",
+      "parentHash": "0x1e72853b4e2a20d33ed21a49937995cf556da5e8c371dfc2df482b98afac6f8f",
+      "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+      "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+      "size": "0x28a",
+      "slotNumber": "0xe3ff",
+      "stateRoot": "0x954f9ea678306ce4cd99f4e6d10f491da68504e839249bef7bda0dae7652da77",
+      "timestamp": "0x6b01c650",
+      "transactions": [],
+      "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+      "uncles": [],
+      "withdrawals": [],
+      "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+    }
+  },
+  "review": "https://github.com/alt-research/eth2030/pull/124",
+  "scope": "Same original snap data/genesis/flags/resources and unchanged300-second deadline. Original source7994 failure remains retained. The final composed-source steady/pressure campaign is owned by the separate post-merge record."
+}

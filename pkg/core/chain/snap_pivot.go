@@ -129,12 +129,12 @@ func (bc *Blockchain) adoptSnapPivot(pivot *types.Block, st state.StateDB, heade
 	bc.hc.mu.Unlock()
 }
 
-// RestoreSnapPivot restores the verified checkpoint on restart, then replays
-// subsequent persisted canonical blocks through normal execution validation.
+// RestoreSnapPivot authenticates the checkpoint and indexed local descendants.
+// Legacy or missing execution validation still requires normal replay.
 func (bc *Blockchain) RestoreSnapPivot() error {
 	encoded, err := bc.db.Get(snapPivotKey)
 	if err == rawdb.ErrNotFound {
-		if restored, err := bc.restoreIndexedHead(); err != nil || restored {
+		if restored, err := bc.restoreIndexedHead(bc.genesis, []*types.Header{bc.genesis.Header()}); err != nil || restored {
 			return err
 		}
 		return bc.replayStoredAfter(bc.genesis)
@@ -148,6 +148,33 @@ func (bc *Blockchain) RestoreSnapPivot() error {
 	pivot := bc.GetBlock(types.BytesToHash(encoded))
 	if pivot == nil {
 		return fmt.Errorf("snap: missing persisted pivot")
+	}
+	canonical, err := rawdb.ReadCanonicalHash(bc.db, pivot.NumberU64())
+	if err != nil {
+		return err
+	}
+	if canonical != pivot.Hash() {
+		return fmt.Errorf("snap: noncanonical original checkpoint")
+	}
+	savedHash, err := rawdb.ReadHeadBlockHash(bc.db)
+	if err != nil {
+		return err
+	}
+	saved := bc.GetBlock(savedHash)
+	finalHash, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+	if err != nil {
+		return storageFailure(err)
+	}
+	final := bc.GetBlock(finalHash)
+	if saved == nil || final == nil || final.NumberU64() < pivot.NumberU64() || final.NumberU64() > saved.NumberU64() {
+		return fmt.Errorf("snap: invalid persisted finality above original checkpoint")
+	}
+	finalCanonical, err := rawdb.ReadCanonicalHash(bc.db, final.NumberU64())
+	if err != nil {
+		return err
+	}
+	if finalCanonical != finalHash {
+		return fmt.Errorf("snap: noncanonical persisted finality")
 	}
 	st, err := state.OpenSnapState(bc.db, pivot.Header().Root)
 	if err != nil {
@@ -173,6 +200,12 @@ func (bc *Blockchain) RestoreSnapPivot() error {
 		headers = append(headers, header)
 	}
 	if err := bc.validator.ValidateBody(pivot); err != nil {
+		return err
+	}
+
+	// The authenticated original checkpoint, not downloaded pre-pivot bodies,
+	// is the lower boundary of local execution-validation authority.
+	if restored, err := bc.restoreIndexedHead(pivot, headers); err != nil || restored {
 		return err
 	}
 
@@ -230,6 +263,9 @@ func (bc *Blockchain) replayStoredAfter(pivot *types.Block) error {
 		}
 		parent = block
 	}
-	final := rawdb.ReadFinalizedBlockHash(bc.db)
+	final, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+	if err != nil {
+		return storageFailure(err)
+	}
 	return bc.ApplyForkchoice(head.Hash(), final, final)
 }

@@ -1,0 +1,73 @@
+{
+  "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+  "normative": "EIP-3675 forkchoice/finality and weak-subjectivity checkpoint authority; Engine Paris payload validation and idempotence; EIP-7928 separate auxiliary BAL availability.",
+  "original_actual_failure": "Retained snap observer did not listen/catch up within300 seconds; it unconditionally re-executed saved descendants. Actual original startup logs and failed budget remain retained.",
+  "controls": [
+    "no validation-marker/index publication on verified restart",
+    "complete authenticated checkpoint/head root and descendant lineage",
+    "pre-pivot bodies retain no state/execution authority",
+    "corrupt marker/root/canonical pivot/finality rejected before adoption",
+    "missing markers/index use normal legacy execution",
+    "checkpoint-only restart",
+    "missing auxiliary BAL does not invent data",
+    "bounded current-head body cache",
+    "ordinary next-block execution"
+  ],
+  "checks": [
+    {
+      "name": "full",
+      "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "seconds": 49.220785340003204,
+      "exit": 0
+    },
+    {
+      "name": "race",
+      "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./core/chain",
+        "./node",
+        "./node/backend",
+        "./engine",
+        "./eth"
+      ],
+      "seconds": 75.03216133901151,
+      "exit": 0
+    },
+    {
+      "name": "vet",
+      "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "seconds": 3.09329225399415,
+      "exit": 0
+    },
+    {
+      "name": "build",
+      "source": "67dbfe8ef75b3ff02e87b5837cd1b6f472f44e7a",
+      "command": [
+        "go",
+        "build",
+        "./cmd/eth2030",
+        "./cmd/eth2030-state-history"
+      ],
+      "seconds": 1.9301202409842517,
+      "exit": 0
+    }
+  ],
+  "full_packages": 219,
+  "actual_updated_restart": "pending source-specific unchanged-budget repeat"
+}

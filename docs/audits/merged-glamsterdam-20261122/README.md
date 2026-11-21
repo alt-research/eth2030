@@ -1,5 +1,7 @@
 # Merged Glamsterdam progress and remaining gaps
 
+**Follow-up:** The findings below are the original merged9a094830 observation. [Current corrective delivery and remaining acceptance](../../plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md) records the user-approved retirement of legacy extensions, transactional startup and bounded FileDB residency in separate PRs. Preserve the original reproduction against its original revision; those retired Go helpers no longer exist on corrected source.
+
 Reviewed November 22, 2026 against master `9a094830` after PRs [123](https://github.com/alt-research/eth2030/pull/123), [124](https://github.com/alt-research/eth2030/pull/124) and [125](https://github.com/alt-research/eth2030/pull/125) merged. `pkg` and the code-CI workflow are byte-identical to qualified composition `d9201b0`; merge commit metadata does not relabel the earlier running binary. Exact observations are in [MERGED_EVIDENCE.json](MERGED_EVIDENCE.json).
 
 ## What is delivered

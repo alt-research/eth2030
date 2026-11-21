@@ -19,6 +19,11 @@ export default function DevelopmentProgress() {
       </div>)}
     </div>
     <p className="mt-5 text-xs leading-6 text-eth-dim">{snapshot.boundary}</p>
+    <div className="mt-4 border-t border-eth-teal/20 pt-4 text-xs leading-6">
+      <p className="font-bold text-eth-teal">{snapshot.followUp.title}</p>
+      <p className="mt-1 text-eth-dim">{snapshot.followUp.detail}</p>
+      <div className="mt-2 flex flex-wrap gap-4 text-eth-teal">{snapshot.followUp.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>PR #{number} ↗</a>)}<a className="underline" href={`${GITHUB_URL}/commit/${snapshot.followUp.revision}`}>Reviewed source {snapshot.followUp.revision.slice(0, 8)} ↗</a></div>
+    </div>
     <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">
       <a className="underline" href={`${GITHUB_URL}/blob/${snapshot.revision}/${snapshot.record}`}>Verification record ↗</a>
       <a className="underline" href={`${GITHUB_URL}/blob/master/${snapshot.plan}`}>Remaining gaps ↗</a>

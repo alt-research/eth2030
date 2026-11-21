@@ -77,6 +77,8 @@ export interface EipEntry {
   summary?: string;
   /** Repository-relative source-specific qualification records. */
   verification?: string[];
+  /** Optional newer review source; does not relabel the merged runtime snapshot. */
+  verificationRevision?: string;
 }
 
 export interface ForkInfo {
@@ -218,7 +220,8 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7732),
     specStatus: 'Draft',
     strawmap: { item: 'ePBS', tag: 'SFI', headliner: true },
-    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md"],
+    verificationRevision: 'bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394',
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md", "docs/reviews/builder-authority/STATUS.md"],
     implementation: [
       'epbs/types.go',
       'epbs/validation.go',
@@ -231,14 +234,14 @@ export const EIPS: EipEntry[] = [
     implemented: [
       'BuilderBid / SignedBuilderBid / PayloadEnvelope types',
       'PayloadAttestationData / PayloadAttestation / PayloadAttestationMessage',
-      'BidHash computation',
+      'Standard CL signed SSZ bid authority; legacy EL bid-hash/registry/header extensions retired in PR127',
       'Payload status constants (absent / present / withheld)',
       'Builder index types and validation logic',
       'Actual signed Gloas builder/payment/withheld/reorg/registry lifecycle with independent finality',
       'PTC voting and fork-choice integration, builder registry, and payment/withdrawal paths',
     ],
     gaps: [
-      'Legacy EL builder extensions accept unsigned registrations/bids and synthesize local stake; the signed CL consensus route is separately qualified',
+      'PR127 retires unsupported legacy Builder Engine extensions and awaits merge; selected signed CL scope is qualified separately',
       'Upstream Lodestar integration and final public protocol/model approval remain open',
     ],
     summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',

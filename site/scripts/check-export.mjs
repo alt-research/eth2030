@@ -47,6 +47,9 @@ for (const milestone of [`${tasks.tasks.length}/33 task IDs`, '4 roles under 300
 }
 assert.match(progress(home), /Glamsterdam development target merged and qualified/);
 assert.match(progress(home), /November 22, 2026/);
+assert.match(progress(home), /Follow-up fixes awaiting merge/);
+assert.match(progress(home), /Actual48-hour operation remains pending/);
+for (const number of [127,128,129,130]) assert.ok(progress(home).includes(`/pull/${number}`));
 assert.match(progress(home), /upstream Lodestar integration and production-scale operation remain separate/);
 assert.match(progress(home), /Frame\/FOCIL and service migration retain their own later-fork acceptance gates/);
 assert.ok(progress(home).includes('https://github.com/alt-research/eth2030/pull/125'));
@@ -56,7 +59,7 @@ const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
 assert.match(home, /Signed Gloas route qualified/);
-assert.match(home, /Legacy EL builder-registration\/bid extensions still lack signature authentication/);
+assert.match(home, /PR127 retires unsupported legacy Builder Engine extensions/);
 assert.match(home, /not production-ready/i);
 assert.match(home, /github\.com\/alt-research\/eth2030/);
 assert.match(home, /Go 1\.26\.8\+/);
@@ -99,7 +102,7 @@ for (const [id, expected, obsolete] of [
 for (const number of [2780, 7688, 7708, 7732, 7778, 7843, 7928, 7954, 7976, 7981, 7997, 8024, 8037, 8038, 8045, 8061, 8246, 8282, 7975, 8159, 8070, 8189, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
   assert.match(page, /Qualification evidence/);
-  assert.ok(page.includes(`/blob/${merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
+  assert.ok(page.includes(`/blob/${number === 7732 ? 'bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394' : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
 }
 for (const number of [7688, 8045, 8061, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
@@ -111,7 +114,9 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
-assert.match(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
+assert.match(builderPage, /PR127 retires unsupported legacy Builder Engine extensions/);
+assert.ok(builderPage.includes('/blob/bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394/docs/reviews/builder-authority/STATUS.md'));
+assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 

@@ -14,7 +14,7 @@ The selected merged LIFO / signed Gloas implementation and its original 33 task 
 | Sync/durability | Independent Geth full/snap late join, moving-pivot/restart controls, historical state/BAL readback and four original-datadir recoveries under 300s. |
 | Operating evidence |400/400 steady slots and60/60 pressure slots; unchanged budgets,270 independent pressure proofs, finality and offline replay. |
 
-Remaining Glamsterdam-related work is explicit: legacy EL Builder Engine extension authentication/conversion and startup bind-failure propagation (confirmed code gaps), upstream Lodestar integration/full hosted CI, larger-state multi-day capacity/soak qualification, finite coverage expansion when required, and the user's final public protocol/model decision. Completed private development does not imply public-network activation or unlimited production capacity.
+Follow-up source reviews [127](https://github.com/alt-research/eth2030/pull/127), [128](https://github.com/alt-research/eth2030/pull/128) and [129](https://github.com/alt-research/eth2030/pull/129) retire unsupported legacy Builder Engine extensions, make startup failure transactional and bound FileDB value/WAL residency. [130](https://github.com/alt-research/eth2030/pull/130) corrects restored snap progress under moving CL targets. They require merge review; the merged baseline above is unchanged. Remaining work includes actual multi-day capacity/soak qualification, metadata/history growth, upstream Lodestar hosted integration, conditional corpus expansion and the user's final public protocol/model decision. [Exact delivery and evidence](plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md). Completed private development does not imply public-network activation or unlimited production capacity.
 
 ## Other roadmap phases
 
@@ -30,9 +30,9 @@ The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth 
 
 ## Next development sequence
 
-1. Resolve the legacy builder registration/bid/header contract in a separate functional PR; add real signing/deposit authority and rejection controls or retire unsupported prototype interfaces.
+1. Review and merge the separately qualified Builder-retirement, startup-rollback and FileDB reviews using ancestry-preserving merges; verify the resulting package tree before assigning a release identity.
 2. Pursue upstream Lodestar lockfile review/hosted CI while preserving the qualified dependency patch and exact runtime identity.
-3. Measure larger retained state/history and multi-day operation; address indexing/audit growth without bypassing state/root/finality checks.
+3. Complete the declared48-hour operating profile; retain bounded-value/WAL measurements and original million-file recovery controls. Key/header/canonical metadata and complete startup authentication remain cardinality-dependent.
 4. Complete the reserved public protocol/model and release review against a compatible source/fixture/CL tuple.
 5. Continue Hegotá service/independent-client work and later public state/PQ/proof research in separate scope.
 

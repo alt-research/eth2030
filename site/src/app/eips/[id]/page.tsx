@@ -213,7 +213,7 @@ export default async function EipPage({ params }: { params: Promise<{ id: string
         )}
 
         {e.verification && <Section title="Qualification evidence" accent="text-eth-teal">
-          <ul className="space-y-2 text-xs">{e.verification.map(path => <li key={path}><a className="break-all text-eth-teal underline" href={`${GITHUB_URL}/blob/${developmentSnapshot.revision}/${path}`}>{path} ↗</a></li>)}</ul>
+          <ul className="space-y-2 text-xs">{e.verification.map(path => <li key={path}><a className="break-all text-eth-teal underline" href={`${GITHUB_URL}/blob/${e.verificationRevision ?? developmentSnapshot.revision}/${path}`}>{path} ↗</a></li>)}</ul>
         </Section>}
 
         {/* Code pointers */}

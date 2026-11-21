@@ -1,0 +1,7 @@
+# Remaining-code closure status
+
+Builder retirement (127), transactional startup (128), bounded FileDB values/WAL (129) and restored snap moving-target progress (130) are separately reviewable against master. This handoff composes their ancestry and only adds source-specific evidence, documentation and site corrections. The original merged runtime is not relabelled.
+
+The private archive restart and independent proof/CL controls are complete for their declared finite sources/inputs. Actual48-hour operation is not complete: the initial resumed observer lost all peers and the controller correctly failed/stopped it. A separately declared seed correction adds the existing full/snap providers, preserving all limits, scores and validation. Original failures remain public. Upstream Lodestar hosted integration and the user's final public protocol/model decision remain separate.
+
+All five source heads are mergeable against master with10/10 CI jobs each and no unresolved inline threads. All120 ordinary merge permutations produce one tree. Public95-member archive0b221a6b48cfd4f0609fd6e1cd0fb682d92ce6be301c7bb93d72dd49c80a7fbc freshly replays four snapshot and two runtime MPT proofs, the13-mutation signed bid, original builder finality and21-slot actual runtime finality. Site tracker/build/export, six desktop/mobile views and two deliberate false-duration/missing-review mutations pass. Current48h operating/finality records are frozen snapshots, not future completion claims.

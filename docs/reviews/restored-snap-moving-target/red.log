@@ -1,0 +1,5 @@
+--- FAIL: TestRestoredSnapMovingTargetsMakeProgressBeforeChurnStops (0.00s)
+    execution_sync_progress_test.go:259: restored snap lost all execution progress under advancing targets and cache eviction
+FAIL
+FAIL	github.com/eth2030/eth2030/sync/beacon	0.684s
+FAIL

@@ -339,9 +339,18 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 	next := target.Head
 	var expected uint64
 	known := false
-	// Snap adoption still requires observing the CL-finalized hash on this
-	// exact target path. Keep its original guarded behavior until adoption.
-	reuse := s.pivotSync == nil || s.validated(target.Finalized)
+	// A pivot callback is a bootstrap path, not a reason to discard the
+	// ancestry cursor after restoring authenticated non-genesis state. Both
+	// node pivot implementations reject adoption over that existing state.
+	bootstrap := s.pivotSync != nil
+	if chain, ok := s.chain.(interface{ CurrentBlock() *types.Block }); ok {
+		if head := chain.CurrentBlock(); head != nil && head.NumberU64() > 0 {
+			bootstrap = false
+		}
+	}
+	// Empty-chain snap adoption still has to observe the CL-finalized hash on
+	// this exact target path. Restored chains execute the complete linked path.
+	reuse := !bootstrap || s.validated(target.Finalized)
 	for !s.validated(next) {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -410,7 +419,7 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 			usable = false
 			return err
 		}
-		if s.pivotSync != nil && header.hash == target.Finalized {
+		if bootstrap && header.hash == target.Finalized {
 			block, err := s.downloadedBlock(ctx, header.hash)
 			if err != nil {
 				return err

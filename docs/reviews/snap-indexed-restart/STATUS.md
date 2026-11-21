@@ -1,0 +1,3 @@
+# Indexed snap restart in progress
+
+The actual retained snap role misses its unchanged 300-second normal restart budget. Its startup enters RestoreSnapPivot, recreates the original checkpoint index and unconditionally re-executes every stored descendant even when their validation markers and authenticated state roots remain available. Full-mode indexed recovery already exists; the snap path must reuse equivalent strict recovery only down to its original state-authenticated finalized checkpoint. Downloaded pre-pivot bytes must remain nonexecuted history. Missing validation/index data keeps normal legacy replay, while corrupt committed data remains an error.

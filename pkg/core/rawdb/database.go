@@ -63,3 +63,20 @@ type Database interface {
 	Batcher
 	NewIterator(prefix []byte) Iterator
 }
+
+// IteratorError preserves compatibility with in-memory/custom iterators while
+// exposing real persistent-store read failures instead of an empty snapshot.
+func IteratorError(it Iterator) error {
+	if reader, ok := it.(interface{ Error() error }); ok {
+		return reader.Error()
+	}
+	return nil
+}
+
+// ReadError exposes deferred persistent-read errors through optional adapters.
+func ReadError(reader any) error {
+	if carrier, ok := reader.(interface{ Error() error }); ok {
+		return carrier.Error()
+	}
+	return nil
+}

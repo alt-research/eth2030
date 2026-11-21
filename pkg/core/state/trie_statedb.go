@@ -2,6 +2,8 @@
 package state
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"maps"
 	"math/big"
@@ -67,6 +69,7 @@ const (
 // proportional to the working set of a single block rather than growing with
 // chain history.
 type TrieStateDB struct {
+	readErr            error
 	mem                *MemoryStateDB             // dirty write buffer for the current block
 	db                 rawdb.Database             // persistent backing store
 	gcMode             string                     // GCModeArchive or GCModeFull
@@ -209,11 +212,15 @@ func (t *TrieStateDB) loadFromDB(addr types.Address) {
 		var err error
 		data, err = t.db.Get(accountDBKey(addr))
 		if err != nil {
-			return // not in DB → account does not exist
+			if !errors.Is(err, rawdb.ErrNotFound) {
+				t.readErr = err
+			}
+			return // absent accounts alone are valid
 		}
 	}
 	var acc rlpAccount
 	if err := rlp.DecodeBytes(data, &acc); err != nil {
+		t.readErr = err
 		return
 	}
 	if acc.Balance == nil {
@@ -238,7 +245,13 @@ func (t *TrieStateDB) loadFromDB(addr types.Address) {
 	// Load contract code if non-empty.
 	if len(acc.CodeHash) > 0 && types.BytesToHash(acc.CodeHash) != types.EmptyCodeHash {
 		if code, err := t.db.Get(codeDBKey(acc.CodeHash)); err == nil {
+			if !bytes.Equal(crypto.Keccak256(code), acc.CodeHash) {
+				t.readErr = fmt.Errorf("committed code hash mismatch")
+				return
+			}
 			obj.code = code
+		} else {
+			t.readErr = fmt.Errorf("load committed code: %w", err)
 		}
 	}
 
@@ -270,7 +283,14 @@ func (t *TrieStateDB) loadSlotFromDB(addr types.Address, obj *stateObject, slot 
 	// Pre-first-commit or address not yet tracked: read directly from DB.
 	data, err := t.db.Get(storageDBKey(addr, slot))
 	if err != nil {
-		return types.Hash{} // slot not in DB
+		if !errors.Is(err, rawdb.ErrNotFound) {
+			t.readErr = err
+		}
+		return types.Hash{} // absent slots alone are valid
+	}
+	if len(data) != 32 {
+		t.readErr = fmt.Errorf("invalid stored slot length: %d", len(data))
+		return types.Hash{}
 	}
 	var val types.Hash
 	copy(val[:], data)
@@ -320,6 +340,12 @@ func (t *TrieStateDB) computeStorageRootFromDB(addr types.Address, obj *stateObj
 				persisted[slot] = stored
 			}
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			t.readErr = err
+			return types.Hash{}
+		}
+
 		iter.Release()
 	}
 	for slot, dbVal := range persisted {
@@ -605,10 +631,16 @@ func (t *TrieStateDB) StorageRoot(addr types.Address) types.Hash {
 // Commit), the cached commitRoot is returned directly without rebuilding the
 // trie — this is the common case for read-only callers like eth_call.
 func (t *TrieStateDB) GetRoot() types.Hash {
+	if t.Error() != nil {
+		return types.Hash{}
+	}
 	if len(t.mem.stateObjects) == 0 && t.commitRoot != (types.Hash{}) {
 		return t.commitRoot
 	}
 	root := t.buildStateTrie().Hash()
+	if t.Error() != nil {
+		return types.Hash{}
+	}
 	// Cache the result so the next Commit() call can skip rebuilding the trie.
 	t.cachedRoot = root
 	return root
@@ -728,6 +760,12 @@ func (t *TrieStateDB) buildStateTrie() *trie.Trie {
 			}
 			stateTrie.Put(crypto.Keccak256(addr[:]), iter.Value())
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			t.readErr = err
+			return stateTrie
+		}
+
 		iter.Release()
 	}
 
@@ -739,6 +777,9 @@ func (t *TrieStateDB) buildStateTrie() *trie.Trie {
 // Commit flushes the dirty buffer to the DB, resets the buffer, and returns
 // the new state root. After a successful Commit, Dup() is O(1).
 func (t *TrieStateDB) Commit() (types.Hash, error) {
+	if err := t.Error(); err != nil {
+		return types.Hash{}, err
+	}
 	if t.persistedStorage == nil {
 		// Populate the complete pre-commit index when adopting an existing DB.
 		t.persistedStorage = make(map[types.Address]map[types.Hash]types.Hash)
@@ -761,6 +802,11 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 			}
 			t.persistedStorage[addr][slot] = stored
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			return types.Hash{}, err
+		}
+
 		iter.Release()
 	}
 	// Recompute recreation from the current overlay, so a reverted CREATE
@@ -832,6 +878,9 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 	var encodedAccounts []encodedAccount
 	var destroyedAddrs []types.Address
 
+	if err := t.Error(); err != nil {
+		return types.Hash{}, err
+	}
 	batch := t.db.NewBatch()
 	for addr, obj := range t.mem.stateObjects {
 		if obj.selfDestructed {
@@ -846,6 +895,11 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 					return types.Hash{}, fmt.Errorf("delete storage %s: %w", addr.Hex(), err)
 				}
 			}
+			if err := rawdb.ReadError(iter); err != nil {
+				iter.Release()
+				return types.Hash{}, err
+			}
+
 			iter.Release()
 			destroyedAddrs = append(destroyedAddrs, addr)
 			continue
@@ -903,6 +957,11 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 				return types.Hash{}, fmt.Errorf("delete stale slot %s: %w", addr.Hex(), err)
 			}
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			return types.Hash{}, err
+		}
+
 		iter.Release()
 	}
 
@@ -1011,6 +1070,11 @@ func (t *TrieStateDB) Commit() (types.Hash, error) {
 			copy(val, frozenIter.Value())
 			frozen[addr] = val
 		}
+		if err := rawdb.ReadError(frozenIter); err != nil {
+			frozenIter.Release()
+			return types.Hash{}, err
+		}
+
 		frozenIter.Release()
 		t.frozenAccounts = frozen
 	} else {
@@ -1072,6 +1136,11 @@ func (t *TrieStateDB) ClearAllState() error {
 			copy(k, iter.Key())
 			keys = append(keys, k)
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			return err
+		}
+
 		iter.Release()
 		for _, k := range keys {
 			if err := t.db.Delete(k); err != nil {
@@ -1097,6 +1166,7 @@ func (t *TrieStateDB) Dup() StateDB {
 	}
 	return &TrieStateDB{
 		mem:              t.mem.Copy(),
+		readErr:          t.readErr,
 		db:               t.db,
 		gcMode:           t.gcMode,
 		recreated:        recreatedCopy,
@@ -1113,3 +1183,5 @@ var _ StateDB = (*TrieStateDB)(nil)
 func (t *TrieStateDB) FinalizeTransaction() { t.mem.FinalizeTransaction() }
 
 func (t *TrieStateDB) Finalise(deleteEmpty bool) { t.mem.Finalise(deleteEmpty) }
+
+func (t *TrieStateDB) Error() error { return errors.Join(t.readErr, rawdb.ReadError(t.db)) }

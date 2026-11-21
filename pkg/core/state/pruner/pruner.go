@@ -174,6 +174,10 @@ func (p *Pruner) markPrefix(bf *bloom, prefix []byte) error {
 		key := iter.Key()
 		bf.add(key)
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -207,6 +211,10 @@ func (p *Pruner) sweepPrefix(bf *bloom, prefix []byte) (int, error) {
 			}
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		return deleted, err
+	}
+
 	// Flush remaining deletes.
 	if batchSize > 0 {
 		if err := batch.Write(); err != nil {
@@ -245,6 +253,11 @@ func (p *Pruner) PruneByKeys(keep map[string]struct{}, prefixes [][]byte) (int, 
 				}
 			}
 		}
+		if err := rawdb.ReadError(iter); err != nil {
+			iter.Release()
+			return deleted, err
+		}
+
 		iter.Release()
 		if batchSize > 0 {
 			if err := batch.Write(); err != nil {

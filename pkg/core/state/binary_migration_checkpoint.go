@@ -120,6 +120,10 @@ func MigrateCommittedBinaryBatch(source rawdb.Database, expectedRoot types.Hash,
 			pending = append(pending, binaryMigrationAccount{address: address, body: bytes.Clone(body)})
 		}
 	}
+	if err := rawdb.ReadError(iter); err != nil {
+		return BinaryMigrationProgress{}, err
+	}
+
 	if mpt.Hash() != expectedRoot {
 		return BinaryMigrationProgress{}, ErrBinaryMigrationSource
 	}

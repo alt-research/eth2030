@@ -1,48 +1,27 @@
 package eiptest_test
 
 import (
+	"encoding/json"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/consensus"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/eiptest"
-	"github.com/eth2030/eth2030/engine"
 )
 
-func TestEIP7732_PayloadAuctionLifecycle(t *testing.T) {
+// Legacy EL auction extensions are not an EIP-7732 authority. Real builder
+// lifecycle coverage below and in the CL reference uses the consensus registry.
+func TestEIP7732_LegacyEngineAuctionRetired(t *testing.T) {
 	s := eiptest.New(t)
-	probe := s.Engine()
-	builder, err := probe.API().RegisterBuilderV1(engine.SignedBuilderRegistrationV1{
-		Message: engine.BuilderRegistrationV1{Pubkey: engine.BLSPubkey{1}, FeeRecipient: s.Alice().Address, GasLimit: s.Genesis().GasLimit()},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	const slot uint64 = 1
-	bid := engine.SignedExecutionPayloadBid{Message: engine.ExecutionPayloadBid{
-		ParentBlockHash: s.Genesis().Hash(), BlockHash: types.Hash{1},
-		Slot: slot, BuilderIndex: builder.Index, GasLimit: builder.GasLimit, FeeRecipient: builder.FeeRecipient,
-	}}
-	var accepted bool
-	if err := probe.Call("engine_submitBuilderBidV1", &accepted, bid); err == nil {
-		t.Fatal("accepted a zero-value bid")
-	}
-	for i, price := range []uint64{7, 12} {
-		bid.Message.BlockHash = types.Hash{byte(i + 1)}
-		bid.Message.Value = price
-		if err := probe.Call("engine_submitBuilderBidV1", &accepted, bid); err != nil || !accepted {
-			t.Fatalf("submit bid %d: accepted=%t: %v", price, accepted, err)
+	for _, method := range []string{"engine_registerBuilderV1", "engine_submitBuilderBidV1", "engine_getBuilderBidsV1", "engine_getPayloadHeaderV1", "engine_submitBlindedBlockV1"} {
+		var result json.RawMessage
+		err := s.Engine().Call(method, &result, map[string]any{"slot": 1, "builderIndex": 0, "value": 1})
+		if err == nil || !strings.Contains(err.Error(), "-32601") {
+			t.Fatalf("legacy method %s was not retired: %v", method, err)
 		}
-	}
-	var bids []engine.SignedExecutionPayloadBid
-	if err := probe.Call("engine_getBuilderBidsV1", &bids, slot); err != nil {
-		t.Fatal(err)
-	}
-	if len(bids) != 2 || bids[0].Message.Value != 12 || bids[1].Message.Value != 7 {
-		t.Fatalf("incorrect bid ordering: %+v", bids)
 	}
 }
 

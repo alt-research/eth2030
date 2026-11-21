@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "reference": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "bls_active": true,
+  "original_slot": 59163,
+  "builder_index": 0,
+  "original_parent_state_root": "0x47bfcbd957b594316f4c7df92276302565052f94d4a4c47b468bcad9e5a73dca",
+  "positive_signature_and_active_funded_registry": true,
+  "signed_ssz_roundtrip_preserved": true,
+  "rejected_controls": [
+    "value",
+    "execution_payment",
+    "gas_limit",
+    "execution_requests_root",
+    "zero_signature",
+    "mutated_signature",
+    "commitment_order",
+    "changed_registry_key",
+    "wrong_fork_domain",
+    "wrong_genesis_domain",
+    "unfinalized_deposit",
+    "exited_builder",
+    "no_collateral"
+  ],
+  "scope": "Original independently-finalized captured CL state and signed bid through unchanged reference rules. Companion captured finality replay is required separately. No new live process result or EL-side collateral authority is invented."
+}

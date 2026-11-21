@@ -29,11 +29,7 @@ type Backend = backendapi.Backend
 // EngineAPI implements the Engine API JSON-RPC methods.
 type EngineAPI struct {
 	backend         Backend
-	builderRegistry *BuilderRegistry
 	blobValidator   *blobval.BlobValidator
-	// bidObserver, when set, receives every accepted builder bid (EIP-7732
-	// node-side auction wiring).
-	bidObserver     func(*SignedExecutionPayloadBid) error
 	server          *http.Server
 	listener        net.Listener
 	ethHandler      http.Handler // optional: handles non-engine_ methods (eth_, web3_, net_)
@@ -49,7 +45,6 @@ type EngineAPI struct {
 func NewEngineAPI(backend Backend) *EngineAPI {
 	return &EngineAPI{
 		backend:         backend,
-		builderRegistry: NewBuilderRegistry(),
 		blobValidator:   blobval.NewBlobValidator(),
 		maxRequestSize:  5 * 1024 * 1024,
 		requestTimeout:  8 * time.Second,      // P0: default 8s timeout
@@ -436,12 +431,8 @@ func (api *EngineAPI) ExchangeCapabilities(requested []string) []string {
 		"engine_getPayloadBodiesByRangeV1",
 		"engine_getPayloadBodiesByHashV2",
 		"engine_getPayloadBodiesByRangeV2",
-		"engine_submitBuilderBidV1",
-		"engine_getBuilderBidsV1",
 		"engine_newInclusionListV1",
 		"engine_getInclusionListV1",
-		"engine_getPayloadHeaderV1",
-		"engine_submitBlindedBlockV1",
 	}
 	if _, ok := api.backend.(bogotaBackend); ok {
 		supported = append(supported, "engine_newPayloadV6")

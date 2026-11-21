@@ -422,30 +422,6 @@ func TestHandler_ForkchoiceUpdatedV4_MissingParams(t *testing.T) {
 	}
 }
 
-// TestHandler_GetPayloadHeaderV1_MissingParams tests getPayloadHeaderV1 with wrong param count.
-func TestHandler_GetPayloadHeaderV1_MissingParams(t *testing.T) {
-	api := newHandlerTestAPI()
-	_, rpcErr := api.handleGetPayloadHeaderV1(nil)
-	if rpcErr == nil {
-		t.Fatal("expected error for nil params")
-	}
-	if rpcErr.Code != InvalidParamsCode {
-		t.Fatalf("want code %d, got %d", InvalidParamsCode, rpcErr.Code)
-	}
-}
-
-// TestHandler_SubmitBlindedBlockV1_MissingParams tests submitBlindedBlockV1 with wrong param count.
-func TestHandler_SubmitBlindedBlockV1_MissingParams(t *testing.T) {
-	api := newHandlerTestAPI()
-	_, rpcErr := api.handleSubmitBlindedBlockV1(nil)
-	if rpcErr == nil {
-		t.Fatal("expected error for nil params")
-	}
-	if rpcErr.Code != InvalidParamsCode {
-		t.Fatalf("want code %d, got %d", InvalidParamsCode, rpcErr.Code)
-	}
-}
-
 // TestHexBytes_JSON tests hexBytes JSON marshaling/unmarshaling.
 func TestHexBytes_JSON(t *testing.T) {
 	tests := []struct {

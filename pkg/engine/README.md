@@ -64,10 +64,13 @@ All versions verify blob versioned hash ordering and count against the transacti
 
 The Engine API is extended with ePBS (EIP-7732) methods dispatched through the same JSON-RPC endpoint:
 
-- `engine_submitBuilderBidV1` — builder submits a signed `BuilderBid`; stored in `BuilderRegistry`
-- `engine_getBuilderBidsV1` — CL retrieves pending bids for a slot
-- `engine_getPayloadHeaderV1` — returns a blinded payload header (commitment without body)
-- `engine_submitBlindedBlockV1` — builder reveals the full payload matching a previous bid
+The unsupported `engine_registerBuilderV1`, `engine_submitBuilderBidV1`,
+`engine_getBuilderBidsV1`, `engine_getPayloadHeaderV1` and
+`engine_submitBlindedBlockV1` extensions are retired and return method-not-found.
+They are not advertised through capability exchange. Builder signatures, registry
+and collateral are verified by the selected Gloas CL; deposits/exits flow through
+canonical EIP-8282 execution requests. No unsigned local auction is a substitute.
+
 
 ### FOCIL Inclusion List API
 

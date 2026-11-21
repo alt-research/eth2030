@@ -225,9 +225,9 @@ export const EIPS: EipEntry[] = [
       'epbs/bid/',
       'epbs/escrow/',
       'epbs/commit/',
-      'engine/engine_epbs.go',
+      'engine/server.go',
     ],
-    tests: ['epbs/epbs_test.go', 'engine/engine_epbs_test.go'],
+    tests: ['epbs/epbs_test.go', 'engine/legacy_builder_retired_test.go'],
     implemented: [
       'BuilderBid / SignedBuilderBid / PayloadEnvelope types',
       'PayloadAttestationData / PayloadAttestation / PayloadAttestationMessage',

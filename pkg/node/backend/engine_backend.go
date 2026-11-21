@@ -285,6 +285,9 @@ func (b *EngineBackend) processBlockInternal(
 	if p == nil {
 		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 	}
+	if err := bc.CheckStorage(); err != nil {
+		return payload.PayloadStatusV1{}, err
+	}
 
 	slog.Debug("engine_newPayload",
 		"blockNumber", p.BlockNumber,

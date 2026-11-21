@@ -57,6 +57,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 	defer b.workers.Done()
 	b.fcuMu.Lock()
 	defer b.fcuMu.Unlock()
+	if err := bc.CheckStorage(); err != nil {
+		return payload.ForkchoiceUpdatedResult{}, err
+	}
 	headBlock := bc.GetBlock(fcState.HeadBlockHash)
 	if headBlock == nil || !bc.HasValidatedBlock(fcState.HeadBlockHash) {
 		return b.requestForkchoiceSync(fcState), nil

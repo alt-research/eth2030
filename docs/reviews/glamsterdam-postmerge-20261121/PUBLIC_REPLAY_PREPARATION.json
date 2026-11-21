@@ -1,0 +1,5 @@
+{
+  "scope": "First fresh extraction manifest passes; offline harness runpy did not add the selected script directory to sys.path. No independent validation ran or network connection was used.",
+  "failure": "ModuleNotFoundError: glamsterdam_campaign",
+  "retry": "Fresh public-unpacked-02; same immutable archive bytes; explicit script sys.path and socket guard."
+}

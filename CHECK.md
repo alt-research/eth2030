@@ -1,3 +1,13 @@
+## Final post-merge closure (2026-11-22)
+
+- [x] Fix and separately publish BAL-expiry resume and authenticated indexed snap/finality IO recovery.
+- [x] Complete four original-datadir restarts, fifteen dependency controls, three automatic provider recoveries and final steady/pressure acceptance.
+- [x] Verify final-source two-row external-builder blob/partials, historical state/BAL and independent finality/SDK consumers.
+- [x] Publish complete public captures and fresh offline replays; preserve original failures and unchanged protocol authority.
+- [x] Publish master-targeted documentation PR125, verify exact source-head CI/targets and all six cumulative merge orders; final post-push metadata verification is retained separately.
+
+Earlier checklists are retained dated observations. Current completion is reconciled in docs/plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md.
+
 ## Authorized post-merge corrections and next-step plan (2026-11-20)
 
 - [x] Isolate F1/F2/F3 corrections from the original dirty checkout and retain their red controls/specification authority.
@@ -642,3 +652,11 @@ Recommended start order: Track 1 (ePBS PTC + fork-choice is the largest single P
 - [ ] Record the user's reserved final public protocol/model decision and subsequent EL merge/release approval.
 
 See [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md) for exact scope and finite support boundaries. Unrelated later-fork/formal tasks above are not closed by this campaign.
+
+## Glamsterdam post-merge closure (2026-11-21)
+
+- [ ] Verify PR120/121/122 reach current master and compare the merged source with the qualified composition.
+- [ ] Re-run fresh merged-source full Go, exact official RPC fixtures, affected race/vet/build and Python controls.
+- [ ] Recheck the actual retained network and original registry cleanup without changing protocol clocks or validation.
+- [ ] Reconcile external-client workflow coverage and remaining adoption/model review boundaries.
+- [ ] Publish exact post-merge evidence and updated tracking in a master-targeted PR; verify current CI and conflicts.

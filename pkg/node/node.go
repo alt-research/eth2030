@@ -100,8 +100,15 @@ import (
 )
 
 // Node is the top-level ETH2030 node that manages all subsystems.
+var ErrNodeStopped = errors.New("node is stopped; create a new instance to retry")
+
 type Node struct {
-	config *Config
+	config          *Config
+	closed          bool
+	listeners       []net.Listener
+	background      sync.WaitGroup
+	lifecycleCtx    context.Context
+	lifecycleCancel context.CancelFunc
 
 	// Subsystems.
 	db            rawdb.Database
@@ -302,6 +309,8 @@ func New(config *Config) (*Node, error) {
 		config: config,
 		stop:   make(chan struct{}),
 	}
+
+	n.lifecycleCtx, n.lifecycleCancel = context.WithCancel(context.Background())
 
 	// Initialize persistent database.
 	db, err := rawdb.NewFileDB(config.ResolvePath("chaindata"))
@@ -563,7 +572,9 @@ func New(config *Config) (*Node, error) {
 	}
 
 	// EP-3 US-PQ-6: compile AA proof circuit on startup (non-fatal; logs result).
+	n.background.Add(1)
 	go func() {
+		defer n.background.Done()
 		// Check for shutdown before expensive compile operation.
 		select {
 		case <-n.stop:
@@ -948,139 +959,151 @@ func New(config *Config) (*Node, error) {
 	return n, nil
 }
 
-// Start starts all node subsystems in order.
-func (n *Node) Start() error {
+// Start reserves required endpoints, starts owned subsystems, and publishes
+// readiness only after all fallible startup steps have succeeded. Failure is
+// terminal for this instance; New can immediately reuse the released datadir.
+func (n *Node) Start() (startErr error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-
+	if n.closed {
+		return ErrNodeStopped
+	}
 	if n.running {
 		return errors.New("node already running")
 	}
+	defer func() {
+		if startErr != nil {
+			startErr = errors.Join(startErr, n.stopLocked())
+		}
+	}()
+	bind := func(role, address string) (net.Listener, error) {
+		ln, err := net.Listen("tcp", address)
+		if err != nil {
+			return nil, fmt.Errorf("bind %s: %w", role, err)
+		}
+		n.listeners = append(n.listeners, ln)
+		return ln, nil
+	}
+	rpcLn, err := bind("rpc", n.config.RPCAddr())
+	if err != nil {
+		return err
+	}
+	engineLn, err := bind("engine", n.config.AuthListenAddr())
+	if err != nil {
+		return err
+	}
+	var wsLn, metricsLn net.Listener
+	if n.config.WSEnabled {
+		wsLn, err = bind("ws", n.config.WSListenAddr())
+		if err != nil {
+			return err
+		}
+	}
+	if n.config.Metrics {
+		metricsLn, err = bind("metrics", n.config.MetricsListenAddr())
+		if err != nil {
+			return err
+		}
+	}
 
-	slog.Info("starting ETH2030 node", "network", n.config.Network)
-
-	// Start DAS network manager (PeerDAS EIP-7594).
 	if n.dasNetMgr != nil {
 		n.dasNetMgr.Start()
-		slog.Info("DAS network manager started")
 	}
-
-	// Start light client subsystem.
 	if n.lightClient != nil {
 		if err := n.lightClient.Start(); err != nil {
-			slog.Warn("light client start failed", "err", err)
-		} else {
-			slog.Info("light client started")
+			return fmt.Errorf("start light client: %w", err)
 		}
 	}
-
-	// Start STARK mempool aggregator.
-	if err := n.starkAgg.Start(); err != nil {
-		return fmt.Errorf("start stark aggregator: %w", err)
+	if n.starkAgg != nil {
+		if err := n.starkAgg.Start(); err != nil {
+			return fmt.Errorf("start stark aggregator: %w", err)
+		}
 	}
-
-	// EP-6 BB-1.x: start all registered anonymous transports.
-	for _, err := range n.transportMgr.StartAll() {
-		slog.Warn("anonymous transport start error", "err", err)
-	}
-
-	// Start P2P server.
-	n.executionSync.Start()
-	if n.nativeConsensus != nil {
-		n.nativeConsensus.Start()
+	if n.transportMgr != nil {
+		if errs := n.transportMgr.StartAll(); len(errs) > 0 {
+			return fmt.Errorf("start transports: %w", errors.Join(errs...))
+		}
 	}
 	if err := n.p2pServer.Start(); err != nil {
-		n.executionSync.Stop()
-		if n.nativeConsensus != nil {
-			n.nativeConsensus.Stop()
-		}
 		return fmt.Errorf("start p2p: %w", err)
 	}
-	slog.Info("P2P server listening", "addr", n.p2pServer.ListenAddr())
-
-	// Start NAT port mapping manager.
-	if err := n.natMgr.Start(); err != nil {
-		slog.Warn("NAT manager start failed", "err", err)
+	if n.natMgr != nil {
+		if err := n.natMgr.Start(); err != nil {
+			return fmt.Errorf("start NAT: %w", err)
+		}
 	}
-
-	// Start the CL-driven execution sync worker.
+	// Start each worker once, after required socket reservations succeed.
 	n.executionSync.Start()
 	if n.nativeConsensus != nil {
 		n.nativeConsensus.Start()
 	}
-
-	// Bootstrap peers from DNS discovery (EIP-1459) if configured.
 	n.startSnapHistory()
 	if n.config.DNSDiscovery != "" {
-		go n.runDNSDiscovery(n.config.DNSDiscovery)
+		n.background.Add(1)
+		go func() { defer n.background.Done(); n.runDNSDiscovery(n.config.DNSDiscovery) }()
 	}
-
-	// Start standalone DiscV5 DHT and feed discovered peers into the P2P server.
 	n.discV5.Start()
-	go n.runDiscV5PeerFeed()
+	n.background.Add(1)
+	go func() { defer n.background.Done(); n.runDiscV5PeerFeed() }()
 
-	// Start JSON-RPC server (ExtServer handles auth, rate limiting, CORS, body limits).
-	go func() {
-		slog.Info("RPC server listening", "addr", n.config.RPCAddr())
-		if err := n.rpcServer.Start(n.config.RPCAddr()); err != nil && err != http.ErrServerClosed {
-			slog.Error("RPC server error", "err", err)
-		}
-	}()
-
-	// Start Engine API server.
-	go func() {
-		slog.Info("Engine API server listening", "addr", n.config.AuthListenAddr())
-		if err := n.engineServer.Start(n.config.AuthListenAddr()); err != nil {
-			slog.Error("Engine API error", "err", err)
-		}
-	}()
-
-	// Start WebSocket RPC server if enabled.
-	if n.config.WSEnabled {
-		n.wsServer = newWSServer(n.rpcHandler.Handler(), n.config.WSListenAddr(), n.config.WSOrigins)
+	if err := n.rpcServer.ServeListener(rpcLn); err != nil {
+		return fmt.Errorf("start rpc: %w", err)
+	}
+	if err := n.engineServer.ServeListener(engineLn); err != nil {
+		return fmt.Errorf("start engine: %w", err)
+	}
+	serveHTTP := func(role string, srv *http.Server, ln net.Listener) {
+		n.background.Add(1)
 		go func() {
-			slog.Info("WebSocket RPC server listening", "addr", n.config.WSListenAddr())
-			if err := n.wsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				slog.Error("WebSocket server error", "err", err)
+			defer n.background.Done()
+			if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) && !errors.Is(err, net.ErrClosed) {
+				slog.Error(role+" server error", "err", err)
 			}
 		}()
 	}
-
-	// Start metrics server if enabled.
-	if n.config.Metrics {
+	if wsLn != nil {
+		n.wsServer = newWSServer(n.rpcHandler.Handler(), wsLn.Addr().String(), n.config.WSOrigins)
+		serveHTTP("WebSocket", n.wsServer, wsLn)
+	}
+	if metricsLn != nil {
 		mux := http.NewServeMux()
 		mux.Handle("/debug/vars", expvar.Handler())
 		pe := metrics.NewPrometheusExporter(metrics.DefaultRegistry, metrics.DefaultPrometheusConfig())
 		mux.Handle("/metrics", pe.Handler())
-		n.metricsServer = &http.Server{
-			Addr:    n.config.MetricsListenAddr(),
-			Handler: mux,
-		}
-		// Bind before returning from Start: keep port zero genuinely ephemeral
-		// and publish the actual reserved address without a free-port race.
-		listener, err := net.Listen("tcp", n.config.MetricsListenAddr())
-		if err != nil {
-			slog.Error("Metrics server error", "err", err)
-		} else {
-			n.metricsServer.Addr = listener.Addr().String()
-			go func() {
-				slog.Info("Metrics server listening", "addr", n.metricsServer.Addr)
-				if err := n.metricsServer.Serve(listener); err != nil && err != http.ErrServerClosed {
-					slog.Error("Metrics server error", "err", err)
-				}
-			}()
-		}
+		n.metricsServer = &http.Server{Addr: metricsLn.Addr().String(), Handler: mux}
+		serveHTTP("Metrics", n.metricsServer, metricsLn)
 	}
-
 	n.running = true
-	slog.Info("node started successfully")
+	slog.Info("node started successfully", "p2p", n.p2pServer.ListenAddr(), "rpc", n.rpcServer.Addr(), "engine", n.engineServer.Addr())
 	return nil
 }
 
-// Stop gracefully shuts down all subsystems in reverse order.
+// Stop releases every initialized owner, including nodes never successfully
+// started. It is idempotent and always unblocks Wait, even after partial New.
 func (n *Node) Stop() error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
+	return n.stopLocked()
+}
+
+func (n *Node) stopLocked() error {
+	if n.closed {
+		return nil
+	}
+	n.closed = true
+	n.running = false
+	if n.lifecycleCancel != nil {
+		n.lifecycleCancel()
+	}
+	if n.stop != nil {
+		close(n.stop)
+	}
+	var failures []error
+	record := func(role string, err error) {
+		if err != nil {
+			failures = append(failures, fmt.Errorf("stop %s: %w", role, err))
+		}
+	}
 	if n.historyCancel != nil {
 		n.historyCancel()
 		<-n.historyDone
@@ -1092,124 +1115,77 @@ func (n *Node) Stop() error {
 	if n.nativeConsensus != nil {
 		n.nativeConsensus.Stop()
 	}
-
-	if !n.running {
-		if n.engBackend != nil {
-			n.engBackend.Close()
-		}
-		if n.db != nil {
-			if err := n.db.Close(); err != nil {
-				slog.Warn("database close error", "err", err)
-			}
-			n.db = nil
-		}
-		select {
-		case <-n.stop:
-			// stop channel already closed.
-		default:
-			close(n.stop)
-		}
-		return nil
-	}
-
-	slog.Info("stopping ETH2030 node")
-
-	// Stop DAS network manager.
 	if n.dasNetMgr != nil {
 		n.dasNetMgr.Stop()
 	}
-
-	// Stop light client.
 	if n.lightClient != nil {
 		n.lightClient.Stop()
 	}
-
-	// Stop teragas blob scheduler.
 	if n.teragasScheduler != nil {
 		n.teragasScheduler.Stop()
 	}
-
-	// Stop STARK mempool aggregator.
-	n.starkAgg.Stop()
-
-	// EP-6 BB-1.x: stop all anonymous transports.
-	for _, err := range n.transportMgr.StopAll() {
-		slog.Warn("anonymous transport stop error", "err", err)
+	if n.starkAgg != nil {
+		n.starkAgg.Stop()
 	}
-
-	// Stop Engine API.
-	if err := n.engineServer.Stop(); err != nil {
-		slog.Warn("Engine API stop error", "err", err)
+	if n.transportMgr != nil {
+		for _, err := range n.transportMgr.StopAll() {
+			record("transport", err)
+		}
 	}
-
-	// Stop the block processor goroutine.
-	if n.engBackend != nil {
-		n.engBackend.Close()
+	if n.engineServer != nil {
+		record("engine", n.engineServer.Stop())
 	}
-
-	// Stop RPC server.
 	if n.rpcServer != nil {
-		if err := n.rpcServer.Stop(); err != nil {
-			slog.Warn("RPC server stop error", "err", err)
-		}
+		record("rpc", n.rpcServer.Stop())
 	}
-
-	// Stop WebSocket server.
 	if n.wsServer != nil {
-		if err := n.wsServer.Close(); err != nil {
-			slog.Warn("WebSocket server stop error", "err", err)
+		// Shutdown invokes the existing hijacked-connection cancellation hook.
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		err := n.wsServer.Shutdown(ctx)
+		cancel()
+		if err != nil {
+			_ = n.wsServer.Close()
 		}
+		record("ws", err)
 	}
-
-	// Stop metrics server.
 	if n.metricsServer != nil {
-		if err := n.metricsServer.Close(); err != nil {
-			slog.Warn("Metrics server stop error", "err", err)
-		}
+		record("metrics", n.metricsServer.Close())
 	}
-
-	// Signal all node-owned goroutines (peer-feed, etc.) to stop before tearing
-	// down the subsystems they use. Close n.stop first so runDiscV5PeerFeed
-	// exits before discV5.Stop() marks the DHT closed.
-	select {
-	case <-n.stop:
-		// already closed
-	default:
-		close(n.stop)
+	for _, ln := range n.listeners {
+		_ = ln.Close()
 	}
-
-	// Stop standalone DiscV5 DHT.
-	n.discV5.Stop()
-
-	// Stop NAT port mapping and P2P message subsystems.
-	n.natMgr.Stop()
-	n.p2pDispatch.Close()
-	n.reqRespMgr.Close()
+	if n.discV5 != nil {
+		n.discV5.Stop()
+	}
+	if n.natMgr != nil {
+		n.natMgr.Stop()
+	}
+	if n.p2pDispatch != nil {
+		n.p2pDispatch.Close()
+	}
+	if n.reqRespMgr != nil {
+		n.reqRespMgr.Close()
+	}
 	if n.portalDB != nil {
 		n.portalDB.Close()
 	}
-
-	// Stop P2P server.
-	n.p2pServer.Stop()
-
-	// Close ancient store before the live DB.
+	if n.p2pServer != nil {
+		n.p2pServer.Stop()
+	}
+	n.background.Wait()
+	if n.engBackend != nil {
+		n.engBackend.Close()
+	}
 	if n.blockchain != nil {
-		if as := n.blockchain.AncientStore(); as != nil {
-			if err := as.Close(); err != nil {
-				slog.Warn("ancient store close error", "err", err)
-			}
+		if store := n.blockchain.AncientStore(); store != nil {
+			record("ancient store", store.Close())
 		}
 	}
-
-	// Close database.
-	if err := n.db.Close(); err != nil {
-		slog.Warn("database close error", "err", err)
+	if n.db != nil {
+		record("database", n.db.Close())
+		n.db = nil
 	}
-	n.db = nil
-
-	n.running = false
-	slog.Info("node stopped")
-	return nil
+	return errors.Join(failures...)
 }
 
 // Wait blocks until the node is stopped.
@@ -1523,6 +1499,12 @@ func sliceContains(s []string, elem string) bool {
 
 // runDNSDiscovery resolves peers from a DNS EIP-1459 tree URL and connects
 // to them via the P2P server. It runs once at startup and logs results.
+type nodeDNSResolver struct{ ctx context.Context }
+
+func (r nodeDNSResolver) LookupTXT(domain string) ([]string, error) {
+	return net.DefaultResolver.LookupTXT(r.ctx, domain)
+}
+
 func (n *Node) runDNSDiscovery(treeURL string) {
 	// Parse "enrtree://<pubkey>@<domain>" format.
 	domain := treeURL
@@ -1530,9 +1512,7 @@ func (n *Node) runDNSDiscovery(treeURL string) {
 		domain = treeURL[idx+1:]
 	}
 
-	client := dnsdisc.NewDNSClient(dnsdisc.DNSConfig{
-		Domain: domain,
-	})
+	client := dnsdisc.NewDNSClientWithResolver(dnsdisc.DNSConfig{Domain: domain}, nodeDNSResolver{n.lifecycleCtx})
 
 	nodes, err := client.Resolve(domain)
 	if err != nil {

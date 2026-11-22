@@ -155,6 +155,18 @@ def review(state, rows, bls, now):
     return report
 
 
+def read_published_json(path):
+    # Existing collectors may truncate/rewrite their summary. Retry only a
+    # transient partial publication; a persistently malformed file still fails.
+    for attempt in range(3):
+        try:
+            return json.loads(path.read_text())
+        except json.JSONDecodeError:
+            if attempt == 2:
+                raise
+            time.sleep(0.05)
+
+
 def load_review(run, now):
     # Controller writes summary after appending the ledger. Retry a concurrent
     # publication rather than persisting a torn view as acceptance evidence.
@@ -179,11 +191,11 @@ def load_review(run, now):
     if profile["duration_seconds"] != 24300:
         raise ValueError("bounded diagnostic duration changed")
     path = run / "bounded-bls-windows/result.json"
-    bls = json.loads(path.read_text()) if path.exists() else {}
+    bls = read_published_json(path) if path.exists() else {}
     result = review(state, rows, bls, now)
     path = run / "actual-native-wait-sampling/result.json"
     try:
-        rolling = json.loads(path.read_text())
+        rolling = read_published_json(path)
         finished = "finished_at" in state
         result["rolling_stacks"] = review_rolling(rolling, profile, timestamp(state["finished_at"]) if finished else now, finished)
     except (OSError, ValueError, KeyError, TypeError) as error:

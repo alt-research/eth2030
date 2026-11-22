@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from review_diagnostic import capture, review, review_rolling
+from review_diagnostic import capture, read_published_json, review, review_rolling
 
 
 START = 1800000000
@@ -157,6 +157,14 @@ class ReviewTest(unittest.TestCase):
         result = review_rolling(rolling, profile, START + 1, False)
         self.assertTrue(result["wait_chain_review_required"])
         self.assertIn("request/log correlation", result["scope"])
+
+    def test_partial_publication_retries_but_persistent_corruption_fails(self):
+        with patch.object(Path, "read_text", side_effect=["{", '{"status":"verification_failed"}']), patch("review_diagnostic.time.sleep"):
+            value = read_published_json(Path("summary.json"))
+            self.assertEqual(value["status"], "verification_failed")
+        with patch.object(Path, "read_text", side_effect=["{", "{", "{"]), patch("review_diagnostic.time.sleep"):
+            with self.assertRaises(json.JSONDecodeError):
+                read_published_json(Path("summary.json"))
 
 
 if __name__ == "__main__":

@@ -43,6 +43,12 @@ type commitStallBatch struct {
 func (db *commitStallDB) NewBatch() rawdb.Batch {
 	return &commitStallBatch{Batch: db.Database.NewBatch(), db: db}
 }
+func (db *commitStallDB) Error() error { return rawdb.ReadError(db.Database) }
+func (b *commitStallBatch) Reset() {
+	b.Batch.Reset()
+	b.header = nil
+	b.validated = false
+}
 func (b *commitStallBatch) Put(key, value []byte) error {
 	if len(key) == 41 && key[0] == 'h' {
 		header, err := types.DecodeHeaderRLP(value)

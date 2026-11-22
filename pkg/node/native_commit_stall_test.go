@@ -81,7 +81,7 @@ func (b *commitStallBatch) Write() error {
 							return err
 						}
 						tmp := b.db.status + ".tmp"
-						if err := os.WriteFile(tmp, wire, 0600); err != nil {
+						if err := os.WriteFile(tmp, wire, 0644); err != nil {
 							return err
 						}
 						return os.Rename(tmp, b.db.status)

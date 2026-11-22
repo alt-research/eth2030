@@ -6,7 +6,7 @@
 - [x] Replace that diagnostic read loop with bounded unbuffered reads, including burst/partial/EOF controls.
 - [x] Capture native goroutines and optional CL native thread backtraces before any failed owned diagnostic is stopped.
 - [x] Deploy the verified collector on the unchanged original diagnostic; retain script/runtime identities and every failure.
-- [ ] Recheck the30min operating result, fresh BLS replay, cleanup and sampler continuity after it actually finishes.
+- [x] Recheck the30min operating result, fresh BLS replay, cleanup and sampler continuity after it actually finishes.
 - [ ] Submit a separate master PR and check exact-head CI/merge compatibility.
 
 A collector fix is not the original node root-cause fix. Only a captured waiting chain plus a causal regression can establish that claim. The original04 history worker finished before acceptance; do not attribute the original incident to PR135's startup critical section.

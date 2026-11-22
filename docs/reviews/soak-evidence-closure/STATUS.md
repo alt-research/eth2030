@@ -23,3 +23,7 @@ The CL scheduling fix is separate fork PR4, targetingeth2030 under the prior exp
 ## Source provenance follow-up
 
 The auditor now also requires the exact frozen CL source declaration in the measured profile and both original container identities. Executable hashing remains independently enforced; this closes a provenance inconsistency rather than changing cryptographic acceptance. Wrong/missing source controls pass, along with the full 24 audit/supervisor unit tests. The updated sample and runtime checks were also replayed against the current actual observer prefix. No live controller or immutable deployed source was replaced. The active tuple remains EL 2c0df12f / CL 57ccb466, not the unqualified combined candidate.
+
+## Consolidated progress snapshot
+
+See [RESULTS_20261122.md](RESULTS_20261122.md) for current failed/running/passed boundaries, independently reviewable CL PRs4-11 and remaining exact-source/full-duration gates. The38 Python tests and native build passed; final tuple qualification is still pending.

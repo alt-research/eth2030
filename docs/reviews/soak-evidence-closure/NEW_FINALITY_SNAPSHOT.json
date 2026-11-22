@@ -1,0 +1,19 @@
+{
+  "passed": false,
+  "status": "collecting",
+  "windows": [
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-04/finality/window-0",
+      "first": 73639,
+      "through": 73641,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 461,
+      "links": 58
+    }
+  ],
+  "scope": "Contiguous signed finality for the accepted observed slot span, using unchanged reference with its4096-link bound. The operating controller remains an independent required gate.",
+  "first_slot": 73639,
+  "covered_through": 73641,
+  "updated_at": "2026-11-22T05:17:32.998123+00:00"
+}

@@ -1,0 +1,34 @@
+{
+  "passed": false,
+  "status": "running",
+  "started_at": "2026-11-22T05:10:00.524399+00:00",
+  "updated_at": "2026-11-22T05:18:14.077802+00:00",
+  "evidence": {
+    "passed": false,
+    "prefix_passed": true,
+    "status": "valid_prefix_duration_pending",
+    "checked_at": "2026-11-22T05:18:14.077559+00:00",
+    "actual_48h_evidence": false,
+    "independent_proofs": 4,
+    "operating": {
+      "samples": 14,
+      "max_sample_gap_seconds": 30.33827195398044,
+      "observed_seconds": 422.02886480098823,
+      "finalized_progress": 128
+    },
+    "signed_windows": [
+      {
+        "first": 73639,
+        "through": 73641,
+        "anchor": "0x0e98bb3f380875c70c4123280040e588a5775a229da9bf9fe90b1a18b6dd6892",
+        "participants": 461,
+        "trace_sha256": "394fd0108594e155815a34868a7aa7298b87834f3057d5eda0a73d4f4fa5b965"
+      }
+    ],
+    "cross_window_anchors_verified": 0,
+    "covered_through": 73641,
+    "unsigned_observed_slots": 148,
+    "cleanup_verified": false,
+    "signed_prefix_available": true
+  }
+}

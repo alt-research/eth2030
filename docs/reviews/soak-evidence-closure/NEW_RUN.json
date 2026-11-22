@@ -1,0 +1,10 @@
+{
+  "native_source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+  "cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e",
+  "admission_source": "a7b6bb7a02a9c67a47510eccba45822e2744fc0c",
+  "accepted_started_at": "2026-11-22T05:11:01.060551+00:00",
+  "earliest_full_duration_at": "2026-11-24T05:11:01.060551+00:00",
+  "expected_shanghai": "2026-11-24T13:11:01.060551+08:00",
+  "actual48h_passed": false,
+  "scope": "Three independent collectors/gates; original03 failed time not reused. Both declared resource/deadline contracts unchanged."
+}

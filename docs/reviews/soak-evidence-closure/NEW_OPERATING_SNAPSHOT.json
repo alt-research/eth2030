@@ -1,0 +1,109 @@
+{
+  "passed": false,
+  "status": "running",
+  "started_at": "2026-11-22T05:10:00.326580+00:00",
+  "profile": {
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "binary_sha256": "4e0f7a54765ce0992d0477d65565fcb41c27a8bac6525bb6f2497721939a9043",
+    "genesis_execution_sha256": "42b742b259788319ea579ad5979976fb3998c69e6fa1a3103653304bb079b3f2",
+    "duration_seconds": 172800,
+    "sampling_seconds": 30,
+    "catchup_budget_seconds": 3600,
+    "memory_each_bytes": 4096000000,
+    "cpus_each": 2,
+    "scope": "New zero-duration-start48h run after reviewed CL scheduling fix and successful lifecycle/peer/read smoke. Reuse only own cleanly stopped smoke databases/identities; failed03 artifacts/databases stay retained, original validators/producers/configuration unchanged. No induced restarts/outages in accepted duration. This is observer/system-state operation; ordinary transaction load remains its measured finite scope.",
+    "cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e",
+    "cl_binary_sha256": "3158ae6dc22db03e406b710bd9188ade72d9aad1c0d8cc4a493e4a0d09d6f142",
+    "finality_stall_seconds": 600,
+    "max_finalized_lag_blocks": 128,
+    "disk_free_stop_bytes": 21474836480,
+    "log_max_size": "100m",
+    "log_max_files": 3,
+    "seed_correction": "Initial seeds were only the three validator BNs; two trimmed incoming peers (Too many peers), the remaining provider rate-limited backfill and banned the observer. Add available existing observer ENRs; do not disable scores, signature/hash checks or historical sync.",
+    "admission_source": "a7b6bb7a02a9c67a47510eccba45822e2744fc0c",
+    "max_sample_gap_seconds": 60,
+    "first_sample_deadline_seconds": 60,
+    "first_signed_window_deadline_seconds": 1200
+  },
+  "scope": "48-hour owned observer operating profile only; not public/mainnet capacity or independent BLS finality across the entire span.",
+  "accepted_started_at": "2026-11-22T05:11:01.060551+00:00",
+  "initial": {
+    "ready": true,
+    "sync": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "73639",
+      "sync_distance": "9"
+    },
+    "memory": {
+      "el": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 1893617664,
+        "process_hwm": 1058201600
+      },
+      "cl": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 449384448,
+        "process_hwm": 394108928
+      }
+    },
+    "finalized_hash": "0x45624c5c7efd4806516235792be68a5218af5c4e5187a6eef0a3c169a3cb3d2a",
+    "finalized_root": "0x32843c146901b82870940a37e5e4b3103d12f6fa55b56316e1a465d3617f1d04",
+    "finalized_number": 70934,
+    "reference_lag": 0
+  },
+  "samples": 14,
+  "elapsed_seconds": 422.02886480098823,
+  "last": {
+    "ready": true,
+    "sync": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "73789",
+      "sync_distance": "0"
+    },
+    "memory": {
+      "el": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 1900765184,
+        "process_hwm": 1055580160
+      },
+      "cl": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 449384448,
+        "process_hwm": 394108928
+      }
+    },
+    "finalized_hash": "0x076919eaca481c690ffadc3df5ff79bd9898d7f9406ef747e800fbb94ca44357",
+    "finalized_root": "0xcd167af0fdce8cf565de5a62e4c1f69d603f2dd7060579471eeb87b38864ff7c",
+    "finalized_number": 71062,
+    "reference_lag": 0
+  },
+  "updated_at": "2026-11-22T05:18:02.866480+00:00"
+}

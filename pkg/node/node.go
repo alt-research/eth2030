@@ -270,6 +270,14 @@ type Node struct {
 // New creates a new Node with the given configuration. It initializes
 // all subsystems but does not start any network services.
 func New(config *Config) (*Node, error) {
+	return newWithDatabase(config, func(directory string) (rawdb.Database, error) {
+		return rawdb.NewFileDB(directory)
+	})
+}
+
+// newWithDatabase keeps diagnostic storage injection local to one constructor.
+// Normal nodes always use New's unchanged FileDB opener.
+func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) (*Node, error) {
 	if config == nil {
 		c := DefaultConfig()
 		config = &c
@@ -313,7 +321,7 @@ func New(config *Config) (*Node, error) {
 	n.lifecycleCtx, n.lifecycleCancel = context.WithCancel(context.Background())
 
 	// Initialize persistent database.
-	db, err := rawdb.NewFileDB(config.ResolvePath("chaindata"))
+	db, err := open(config.ResolvePath("chaindata"))
 	if err != nil {
 		return nil, fmt.Errorf("init database: %w", err)
 	}

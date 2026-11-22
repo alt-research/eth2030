@@ -165,10 +165,6 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleExchangeCapabilities(params)
 	case "engine_getClientVersionV1":
 		return api.handleGetClientVersionV1(params)
-	case "engine_submitBuilderBidV1":
-		return api.handleSubmitBuilderBidV1(params)
-	case "engine_getBuilderBidsV1":
-		return api.handleGetBuilderBidsV1(params)
 	case "engine_newInclusionListV1":
 		return api.handleNewInclusionListV1(params)
 	case "engine_getInclusionListV1":
@@ -181,10 +177,6 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleGetPayloadBodiesByHashV2(params)
 	case "engine_getPayloadBodiesByRangeV2":
 		return api.handleGetPayloadBodiesByRangeV2(params)
-	case "engine_getPayloadHeaderV1":
-		return api.handleGetPayloadHeaderV1(params)
-	case "engine_submitBlindedBlockV1":
-		return api.handleSubmitBlindedBlockV1(params)
 	case "engine_getBlobsV1":
 		return api.handleGetBlobsV1(params)
 	case "engine_getBlobsV2":

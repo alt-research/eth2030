@@ -7,7 +7,6 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 	engapi "github.com/eth2030/eth2030/engine/api"
 	engblobs "github.com/eth2030/eth2030/engine/blobsbundle"
-	engbuilder "github.com/eth2030/eth2030/engine/builder"
 	engconvert "github.com/eth2030/eth2030/engine/convert"
 	"github.com/eth2030/eth2030/engine/payload"
 )
@@ -71,9 +70,6 @@ type (
 	// Note: EngineV7 is NOT aliased here; engine_v7.go defines engineV7Wrapper
 	// which wraps engapi.EngineV7 and exposes backend for package-internal tests.
 	// From api/epbs.go
-	GetPayloadHeaderV1Response   = engapi.GetPayloadHeaderV1Response
-	SubmitBlindedBlockV1Request  = engapi.SubmitBlindedBlockV1Request
-	SubmitBlindedBlockV1Response = engapi.SubmitBlindedBlockV1Response
 )
 
 // PayloadStatus values.
@@ -131,54 +127,6 @@ type TransitionConfigurationV1 struct {
 	TerminalBlockHash       types.Hash `json:"terminalBlockHash"`
 	TerminalBlockNumber     uint64     `json:"terminalBlockNumber"`
 }
-
-// Builder sub-package re-exports for backward compatibility.
-// The canonical definitions live in engine/builder.
-const (
-	BLSPubkeySize    = engbuilder.BLSPubkeySize
-	BLSSignatureSize = engbuilder.BLSSignatureSize
-)
-
-// Builder status re-exports.
-const (
-	BuilderStatusActive    = engbuilder.BuilderStatusActive
-	BuilderStatusExiting   = engbuilder.BuilderStatusExiting
-	BuilderStatusWithdrawn = engbuilder.BuilderStatusWithdrawn
-)
-
-// Builder type re-exports.
-type (
-	BLSPubkey                      = engbuilder.BLSPubkey
-	BLSSignature                   = engbuilder.BLSSignature
-	BuilderIndex                   = engbuilder.BuilderIndex
-	BuilderStatus                  = engbuilder.BuilderStatus
-	Builder                        = engbuilder.Builder
-	ExecutionPayloadBid            = engbuilder.ExecutionPayloadBid
-	SignedExecutionPayloadBid      = engbuilder.SignedExecutionPayloadBid
-	ExecutionPayloadEnvelope       = engbuilder.ExecutionPayloadEnvelope
-	SignedExecutionPayloadEnvelope = engbuilder.SignedExecutionPayloadEnvelope
-	BuilderRegistrationV1          = engbuilder.BuilderRegistrationV1
-	SignedBuilderRegistrationV1    = engbuilder.SignedBuilderRegistrationV1
-	BuilderRegistry                = engbuilder.BuilderRegistry
-)
-
-// Builder error re-exports.
-var (
-	ErrBuilderNotFound      = engbuilder.ErrBuilderNotFound
-	ErrBuilderAlreadyExists = engbuilder.ErrBuilderAlreadyExists
-	ErrBuilderNotActive     = engbuilder.ErrBuilderNotActive
-	ErrInsufficientStake    = engbuilder.ErrInsufficientStake
-	ErrInvalidBuilderBid    = engbuilder.ErrInvalidBuilderBid
-	ErrInvalidPayloadReveal = engbuilder.ErrInvalidPayloadReveal
-	ErrNoBidsAvailable      = engbuilder.ErrNoBidsAvailable
-	ErrInvalidBidSignature  = engbuilder.ErrInvalidBidSignature
-)
-
-// NewBuilderRegistry re-export.
-var NewBuilderRegistry = engbuilder.NewBuilderRegistry
-
-// MinBuilderStake re-export.
-var MinBuilderStake = engbuilder.MinBuilderStake
 
 // Convert sub-package re-exports for backward compatibility.
 // The canonical definitions live in engine/convert.

@@ -1,0 +1,3 @@
+# Initial capture-guard correction
+
+The first full run failed only a new guard expecting engine_exchangeCapabilities in its own advertised list. The pinned Engine common specification explicitly forbids returning that bootstrap method in the response. The corrected regression exercises its actual negotiation handler and checks advertisement for all versioned methods from the original capture. No production guard, reference oracle or fixture expectation was weakened. Original failed output remains under the owned qualification workspace as builder-full.log; clean final source76427149 passes all218 suites.

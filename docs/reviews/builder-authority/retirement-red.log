@@ -1,0 +1,17 @@
+--- FAIL: TestLegacyBuilderMethodsAreRetired (0.00s)
+    --- FAIL: TestLegacyBuilderMethodsAreRetired/engine_submitBuilderBidV1 (0.00s)
+        legacy_builder_retired_test.go:46: retired method accepted or misclassified: {ID:17 Result:[] Error:0x150155ba5768}
+    --- FAIL: TestLegacyBuilderMethodsAreRetired/engine_getBuilderBidsV1 (0.00s)
+        legacy_builder_retired_test.go:46: retired method accepted or misclassified: {ID:17 Result:[] Error:0x150155ba5830}
+    --- FAIL: TestLegacyBuilderMethodsAreRetired/engine_getPayloadHeaderV1 (0.00s)
+        legacy_builder_retired_test.go:46: retired method accepted or misclassified: {ID:17 Result:[] Error:0x150155ba5988}
+    --- FAIL: TestLegacyBuilderMethodsAreRetired/engine_submitBlindedBlockV1 (0.00s)
+        legacy_builder_retired_test.go:46: retired method accepted or misclassified: {ID:17 Result:[] Error:0x150155b909a0}
+--- FAIL: TestCapabilitiesDoNotAdvertiseLegacyBuilderExtensions (0.00s)
+    legacy_builder_retired_test.go:69: retired capability advertised: engine_submitBuilderBidV1
+    legacy_builder_retired_test.go:69: retired capability advertised: engine_getBuilderBidsV1
+    legacy_builder_retired_test.go:69: retired capability advertised: engine_getPayloadHeaderV1
+    legacy_builder_retired_test.go:69: retired capability advertised: engine_submitBlindedBlockV1
+FAIL
+FAIL	github.com/eth2030/eth2030/engine	0.732s
+FAIL

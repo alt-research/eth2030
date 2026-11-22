@@ -12,7 +12,7 @@ import (
 	"math/big"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // register pprof handlers on DefaultServeMux
+	"net/http/pprof"
 	"os"
 	"strings"
 	"sync"
@@ -1067,6 +1067,7 @@ func (n *Node) Start() (startErr error) {
 	}
 	if metricsLn != nil {
 		mux := http.NewServeMux()
+		mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
 		mux.Handle("/debug/vars", expvar.Handler())
 		pe := metrics.NewPrometheusExporter(metrics.DefaultRegistry, metrics.DefaultPrometheusConfig())
 		mux.Handle("/metrics", pe.Handler())

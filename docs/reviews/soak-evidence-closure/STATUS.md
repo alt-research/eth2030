@@ -27,3 +27,7 @@ The auditor now also requires the exact frozen CL source declaration in the meas
 ## Consolidated progress snapshot
 
 See [RESULTS_20261122.md](RESULTS_20261122.md) for current failed/running/passed boundaries, independently reviewable CL PRs4-11 and remaining exact-source/full-duration gates. The38 Python tests and native build passed; final tuple qualification is still pending.
+
+## Authoritative round04 failure follow-up
+
+Round04 failed at5h30m /658 samples; it is not active and not a48-hour pass. The signed prefix remains independently valid but the unsigned tail and runtime stall need closure. See the final follow-up in RESULTS_20261122.md for the125/129 final fallback failure, two causal lifecycle fixes, actual EF execution/skip counts and the pending native blocked-stack diagnosis. Original failed03/04 evidence is preserved, and no new accepted clock is started.

@@ -1,0 +1,5 @@
+--- FAIL: TestRestoredSnapMovingTargetsMakeProgressBeforeChurnStops (0.04s)
+    execution_sync_progress_test.go:249: published stale target: {Head:0x9e465a55d14cca774dfca39e37f070eeba59eae7219af86939d38b13300cf5fc Safe:0x42aafdfc2cc7b006f2890e6874c216557dfc9822a033772faf4dc525595c63b1 Finalized:0x0df44a20504ce705b3a22a21a7b2f2d628a99d986f4c634103016f3ee5db293a}
+FAIL
+FAIL	github.com/eth2030/eth2030/sync/beacon	0.720s
+FAIL

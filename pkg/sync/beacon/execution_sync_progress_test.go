@@ -193,3 +193,108 @@ func TestCompletedExecutionBodyRemainsUsableWhenSourceDisappears(t *testing.T) {
 		t.Fatal("body availability was confused with execution validity")
 	}
 }
+
+// A restored snap chain already has authenticated execution state. It must
+// preserve the full-sync progress cursor even when its next finalized target
+// has not been executed yet. The bootstrap callback cannot adopt over this head.
+type restoredProgressChain struct {
+	movingProgressChain
+	restored *types.Block
+}
+
+func (c *restoredProgressChain) CurrentBlock() *types.Block { return c.restored }
+
+func TestRestoredSnapMovingTargetsMakeProgressBeforeChurnStops(t *testing.T) {
+	const initial, changes = 128, 8
+	blocks := make([]*types.Block, initial+changes+1)
+	blocks[0] = types.NewBlock(&types.Header{Number: new(big.Int)}, nil)
+	source := map[types.Hash]*types.Block{blocks[0].Hash(): blocks[0]}
+	for i := 1; i < len(blocks); i++ {
+		blocks[i] = types.NewBlock(&types.Header{Number: big.NewInt(int64(i)), ParentHash: blocks[i-1].Hash(), Time: uint64(i)}, nil)
+		source[blocks[i].Hash()] = blocks[i]
+	}
+	var updates, pivots atomic.Uint64
+	chain := &restoredProgressChain{movingProgressChain: movingProgressChain{executionTestChain: executionTestChain{blocks: map[types.Hash]*types.Block{blocks[0].Hash(): blocks[0], blocks[1].Hash(): blocks[1]}}, updates: &updates, first: make(chan uint64, 1)}, restored: blocks[1]}
+	var cancel context.CancelFunc
+	fetched := 0
+	syncer := NewExecutionSyncer(chain, executionTestFetcher(func(ctx context.Context, hash types.Hash) (*types.Block, error) {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		fetched++
+		if cancel != nil && fetched == 32 {
+			cancel()
+		}
+		return source[hash], nil
+	}), nil, t.TempDir())
+	syncer.SetPivotSync(func(context.Context, *types.Block) (bool, error) { pivots.Add(1); return false, nil })
+	defer syncer.Stop()
+	target := func(n int) ExecutionTarget {
+		return ExecutionTarget{Head: blocks[n].Hash(), Safe: blocks[n-1].Hash(), Finalized: blocks[n-2].Hash()}
+	}
+	for i := 0; i < changes; i++ {
+		updates.Store(uint64(i))
+		tgt := target(initial + i)
+		syncer.Request(tgt, 1)
+		ctx, stop := context.WithCancel(context.Background())
+		cancel = stop
+		fetched = 0
+		err := syncer.synchronize(ctx, tgt)
+		stop()
+		if err != nil && err != context.Canceled {
+			t.Fatal(err)
+		}
+		// Simulate bounded-cache eviction between advancing heads. The on-disk
+		// linked ancestry, not retained block bodies, must preserve the frontier.
+		syncer.downloadHeaders = lru.NewCache[types.Hash, downloadedHeader](1)
+		syncer.downloadBodyLimit = 0
+		syncer.downloadBodies = lru.NewSizeConstrainedCacheWithKeySize[types.Hash, []byte](1, func(types.Hash) uint64 { return 32 })
+	}
+	select {
+	case n := <-chain.first:
+		if n >= changes {
+			t.Fatal("progress only after head changes stopped")
+		}
+	default:
+		t.Fatal("restored snap lost all execution progress under advancing targets and cache eviction")
+	}
+	cancel = nil
+	tgt := target(initial + changes)
+	syncer.Request(tgt, 1)
+	if err := syncer.synchronize(context.Background(), tgt); err != nil {
+		t.Fatal(err)
+	}
+	if chain.GetBlock(tgt.Head) == nil {
+		t.Fatal("latest target was not execution validated")
+	}
+	if pivots.Load() != 0 {
+		t.Fatalf("bootstrap attempted over restored state: %d", pivots.Load())
+	}
+}
+
+func TestGenesisHeadStillRequiresNominatedFinalizedPivot(t *testing.T) {
+	genesis := types.NewBlock(&types.Header{Number: new(big.Int)}, nil)
+	pivot := types.NewBlock(&types.Header{Number: big.NewInt(1), ParentHash: genesis.Hash()}, nil)
+	var updates atomic.Uint64
+	chain := &restoredProgressChain{movingProgressChain: movingProgressChain{executionTestChain: executionTestChain{blocks: map[types.Hash]*types.Block{genesis.Hash(): genesis}}, updates: &updates, first: make(chan uint64, 1)}, restored: genesis}
+	syncer := NewExecutionSyncer(chain, executionTestFetcher(func(_ context.Context, hash types.Hash) (*types.Block, error) {
+		if hash != pivot.Hash() {
+			return nil, fmt.Errorf("unexpected request")
+		}
+		return pivot, nil
+	}), nil, t.TempDir())
+	called := false
+	syncer.SetPivotSync(func(_ context.Context, block *types.Block) (bool, error) {
+		called = true
+		if block.Hash() != pivot.Hash() {
+			t.Fatal("unnominated pivot")
+		}
+		return true, chain.InsertBlock(block)
+	})
+	if err := syncer.synchronize(context.Background(), ExecutionTarget{Head: pivot.Hash(), Finalized: pivot.Hash()}); err != nil {
+		t.Fatal(err)
+	}
+	if !called {
+		t.Fatal("genesis chain skipped authenticated snapshot bootstrap")
+	}
+}

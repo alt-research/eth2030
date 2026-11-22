@@ -1,0 +1,5 @@
+--- FAIL: TestRestoredSnapMovingTargetsMakeProgressBeforeChurnStops (0.02s)
+    execution_sync_progress_test.go:245: restored snap made no execution progress until all 384 target updates stopped
+FAIL
+FAIL	github.com/eth2030/eth2030/sync/beacon	0.706s
+FAIL

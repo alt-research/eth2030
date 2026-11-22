@@ -1,0 +1,78 @@
+{
+  "passed": false,
+  "status": "failed",
+  "windows": [
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-0",
+      "first": 64059,
+      "through": 64061,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 509,
+      "links": 70
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-1",
+      "first": 64062,
+      "through": 65267,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 512,
+      "links": 1251
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-2",
+      "first": 65268,
+      "through": 66472,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 422,
+      "links": 1261
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-3",
+      "first": 66473,
+      "through": 67668,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 512,
+      "links": 1240
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-4",
+      "first": 67669,
+      "through": 68874,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 459,
+      "links": 1260
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-5",
+      "first": 68875,
+      "through": 70070,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 512,
+      "links": 1238
+    },
+    {
+      "directory": "/projects/eth2030/qualification/remaining-code-20261122/live-soak-03/finality/window-6",
+      "first": 70071,
+      "through": 71276,
+      "live_passed": true,
+      "replay_passed": true,
+      "participants": 512,
+      "links": 1258
+    }
+  ],
+  "scope": "Contiguous signed finality for the accepted observed slot span, using unchanged reference with its4096-link bound. The operating controller remains an independent required gate.",
+  "first_slot": 64059,
+  "covered_through": 71276,
+  "updated_at": "2026-11-22T03:18:59.332092+00:00",
+  "failure": {
+    "class": "RuntimeError",
+    "message": "operating gate failed; do not qualify its duration"
+  },
+  "finished_at": "2026-11-22T03:45:59.344173+00:00"
+}

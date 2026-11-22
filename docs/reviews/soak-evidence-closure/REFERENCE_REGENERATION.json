@@ -1,0 +1,10 @@
+{
+  "archive_sha256": "1fc9482c214443d708b4ae4b225dce47246331e530361de56e0277400517bc94",
+  "reference": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+  "regenerated_isolated": true,
+  "generated_gloas_sha256": "533f62dc20e90272a314365ce900e0bef0a70769dc71a5eba97d2fae262a3cf3",
+  "generated_fulu_sha256": "f0c74b75cb302065686673cc582531194f06b1001b991788a0c78ebc3c4560f8",
+  "installed_generated_modules_byte_identical": true,
+  "bls_utils_archive_byte_identical": true,
+  "scope": "Verified immutable source export, not a git checkout. Fresh generated modules match the actual independent consumer; live environment remains untouched."
+}

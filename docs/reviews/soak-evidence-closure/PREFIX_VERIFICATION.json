@@ -1,0 +1,68 @@
+{
+  "passed": false,
+  "prefix_passed": true,
+  "status": "valid_prefix_duration_pending",
+  "checked_at": "2026-11-22T03:35:32.295869+00:00",
+  "actual_48h_evidence": false,
+  "independent_proofs": 154,
+  "operating": {
+    "samples": 763,
+    "max_sample_gap_seconds": 30.779013872146606,
+    "observed_seconds": 23002.24706520801,
+    "finalized_progress": 7679
+  },
+  "signed_windows": [
+    {
+      "first": 64059,
+      "through": 64061,
+      "anchor": "0xec30bf3ef148059c746cdf6cc12cd16ac1dd5717441b14a31d9b1ca8328007fa",
+      "participants": 509,
+      "trace_sha256": "fc3c436fe2fb526c52a39d336ba449064b400c38d9ab9581432e6d902b52f974"
+    },
+    {
+      "first": 64062,
+      "through": 65267,
+      "anchor": "0x27d5f792ae8e96babcb3785186f317f67ce74a6d0a2e7ff2271483febe18a1fc",
+      "participants": 512,
+      "trace_sha256": "2af21e744ce4cdbdcadc619015310a3fe66ed97f5ef0c4ffe60c12b516be7674"
+    },
+    {
+      "first": 65268,
+      "through": 66472,
+      "anchor": "0x6c0d75466dec32c0d451253085d8ebd5b4c3eacf83a38bdda6aa1db47f425c13",
+      "participants": 422,
+      "trace_sha256": "c37ddec350339c7ba26c29c6c9350fc6cd91d996cced977c311e1de6e54bb2b5"
+    },
+    {
+      "first": 66473,
+      "through": 67668,
+      "anchor": "0x89dde80cb78feee37dbd77267885ba991bad307e720cb970fa48e20f01b92cf8",
+      "participants": 512,
+      "trace_sha256": "b8128a57dd38e4ba4e0605ae872269e9abca064577094f4f6d679a33cc4d1d8b"
+    },
+    {
+      "first": 67669,
+      "through": 68874,
+      "anchor": "0x2d18077c1fc3ae0ca6d4c140b19eb405e46540d89cd96c120d8fecb41efb52f5",
+      "participants": 459,
+      "trace_sha256": "96723109ee3c4e0d15b8a6c7a5c984ef879ba8bd815089aec04009b8a803f897"
+    },
+    {
+      "first": 68875,
+      "through": 70070,
+      "anchor": "0x902f095a8ed3094d417a44267d1bdb364997c172f130488ffad727544604e8a7",
+      "participants": 512,
+      "trace_sha256": "4a99e44f07e165ff4f1f33aeddaf45e6944b2520df5cd376075aff7bce66bf73"
+    },
+    {
+      "first": 70071,
+      "through": 71276,
+      "anchor": "0x1e9d06ff830b4933a65f8087a37f72b23085cbda628049da4043b127be35bab7",
+      "participants": 512,
+      "trace_sha256": "20a123d999021b64a6543913fb049e29a3cc118ee5ea67d31fd160463c6a7b10"
+    }
+  ],
+  "cross_window_anchors_verified": 6,
+  "covered_through": 71276,
+  "cleanup_verified": false
+}

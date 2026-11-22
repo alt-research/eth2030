@@ -7,6 +7,7 @@
 - [x] Separate runtime duration, first-ready5.5h coverage, reported BLS ancestry, missing slots and final stopped-head closure.
 - [x] Add passive periodic durable stack/pressure receipts and an explicit5.5h checkpoint without restarting or altering the existing pair.
 - [x] Test false-green, exact threshold, BLS gap/failure and stale sample behavior; verify native build.
-- [ ] Submit independent master PR and check cumulative conflict compatibility.
+- [x] Submit independent master PR139 and check cumulative conflict compatibility at recorded heads.
+- [ ] Finish actual post-5.5h observation, remaining BLS windows and stopped-head closure.
 
 No root cause is inferred from an absence of sustained stacks. No BLS/protocol check, original failure or48h admission is changed.

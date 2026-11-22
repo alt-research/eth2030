@@ -12,7 +12,7 @@ The new `pkg/devnet/kurtosis/scripts/review_diagnostic.py` reads the existing ru
 
 The passive watch mode verifies runtime starts/resources and executable digests, retains minute goroutine/pressure snapshots in exclusive directories, appends reviews, and captures the5.5h time checkpoint even if readiness has failed. It never signals/restarts a node or changes runtime source. The old128-sample ring remains unchanged. Evidence starts at watch attachment; overwritten earlier profiles cannot be reconstructed.
 
-Nine new behavior tests cover legacy false greens, finalized stall,60s gaps/duplicates/staleness, readiness-based timing, threshold capture after failure, BLS discontinuity/zero participants, early completion, source/restart rejection and retained memory pressure. They run in the existing consensus CI discovery. All35 devnet Python control tests passed, and the unchanged native Go build passed with Go1.26.11.
+Nine new behavior tests cover legacy false greens, finalized stall,60s gaps/duplicates/staleness, readiness-based timing, threshold capture after failure, BLS discontinuity/zero participants, early completion, restart rejection and retained memory pressure. They run in the existing consensus CI discovery. All35 devnet Python control tests passed, and the unchanged native Go build passed with Go1.26.11.
 
 The first BLS window was replayed anew with the unchanged frozen real-BLS verifier, original wire capture and all three negative controls. All63 missing slots independently returned404 on both Lodestar and the second Lighthouse, while terminal slot90419 returned200 on both (128 checks). This supports canonical chain absence rather than native import loss, and does not turn a10.016% missing-slot window into an operating-budget pass. See FIRST_WINDOW_REPLAY.json and MISSING_SLOTS_CROSSCHECK.json.
 
@@ -21,3 +21,11 @@ A watch was attached to the existing run without restarting either EL/CL. Its fi
 ## Review after the threshold
 
 At or after2026-11-23T00:09:26Z, inspect `THRESHOLD_5_5H.json`, its full stack and pressure receipt, append-only `reviews.jsonl`, actual native sustained3s/8s events, all post-threshold runtime samples and every BLS window/previous-anchor link. Check sample/collector gaps and final stopped native/CL head binding separately. A no-event counter or a successful cryptographic prefix alone cannot close the original unprofiled incident.
+
+## PR and CI handoff
+
+Submitted https://github.com/alt-research/eth2030/pull/139 to master. At the recorded heads, all9 pending EL PRs131–139 target master;72 ordered pairs,2304 subset extensions and18 explicitly executed complete orders are clean with a single resulting tree. This is representative-ancestry/subset confluence and explicit order testing, not enumeration of all362880 distinct histories. No master merge was performed. See MERGE_AUDIT.json; exact-head metadata will be rechecked after the documentation commit.
+
+Review of the hosted PR138 race log showed that its old green label omitted rawdb/chain/beacon-sync. PR138 follow-up d6d63b4174e99a0873b2646b60f2e2f112df2b1a adds all three packages to the existing hosted race variant. The exact expanded command passed locally (rawdb1.613s, chain4.034s, beacon-sync57.053s); full hosted CI is rerunning. Its package source is unchanged, so the current native/CL binaries and elapsed clock remain valid.
+
+The current review remains strictly before5.5h. The passive guard has retained successful live goroutine/pressure/identity receipts with no daemon restart. Source-level audit gaps are repaired; neither a no-event prefix nor these controlled regression tests resolve the earlier unprofiled incident.

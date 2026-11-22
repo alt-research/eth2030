@@ -14,7 +14,7 @@ import time
 import urllib.request
 
 READY_THRESHOLD = 5.5 * 3600
-MAX_SAMPLE_GAP = 90
+MAX_SAMPLE_GAP = 60
 FINALITY_STALL = 600
 MEMORY = 4096000000
 

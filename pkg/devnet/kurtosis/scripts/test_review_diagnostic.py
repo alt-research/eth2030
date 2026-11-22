@@ -63,6 +63,10 @@ class ReviewTest(unittest.TestCase):
             self.check_failed(bad, candidate, now=START + 300)
         state, rows = fixture()
         self.check_failed(state, rows, now=START + 211)
+        state, rows = fixture(30)
+        rows[-1]["at"] = iso(START + 61)
+        state["last"] = {k: v for k, v in rows[-1].items() if k != "at"}
+        self.assertIn("excessively delayed", self.check_failed(state, rows, now=START + 61)["errors"][0])
 
     def test_five_and_a_half_hours_start_at_readiness_not_process_start(self):
         state, rows = fixture(19800)

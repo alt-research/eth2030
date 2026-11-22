@@ -6,9 +6,9 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -39,6 +39,9 @@ type EngineAPI struct {
 	requestTimeout  time.Duration    // P0: configurable request timeout (default 8s)
 	priorityHandler *PriorityHandler // P2: tracks request priorities
 	mu              sync.Mutex
+	serveDone       chan struct{}
+	serveErr        error
+	stopped         bool
 }
 
 // NewEngineAPI creates a new Engine API instance with the given backend.
@@ -469,29 +472,58 @@ func (api *EngineAPI) SetEthHandler(h http.Handler) {
 	api.ethHandler = h
 }
 
-// Start starts the HTTP JSON-RPC server on the given address.
+// Start binds and serves until Stop, preserving the blocking standalone API.
 func (api *EngineAPI) Start(addr string) error {
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
-		return fmt.Errorf("listen: %w", err)
+		return err
 	}
-
-	mux := http.NewServeMux()
-	mux.Handle("/", api.Handler())
-
+	if err := api.ServeListener(ln); err != nil {
+		ln.Close()
+		return err
+	}
 	api.mu.Lock()
-	api.listener = ln
-	api.server = &http.Server{Handler: mux}
+	done := api.serveDone
 	api.mu.Unlock()
+	<-done
+	api.mu.Lock()
+	defer api.mu.Unlock()
+	return api.serveErr
+}
 
-	log.Printf("Engine API server starting on %s", ln.Addr())
-	if err := api.server.Serve(ln); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("engine API server error: %w", err)
+// ServeListener takes ownership of an already bound listener after successful
+// initialization. The address and shutdown owner are published before return.
+func (api *EngineAPI) ServeListener(ln net.Listener) error {
+	if ln == nil {
+		return fmt.Errorf("nil HTTP listener")
 	}
+	api.mu.Lock()
+	defer api.mu.Unlock()
+	if api.stopped {
+		return http.ErrServerClosed
+	}
+	if api.server != nil {
+		return fmt.Errorf("HTTP server already started")
+	}
+	srv := &http.Server{Handler: api.Handler()}
+	api.server = srv
+	api.listener = ln
+	done := make(chan struct{})
+	api.serveDone = done
+	go func() {
+		err := srv.Serve(ln)
+		if errors.Is(err, http.ErrServerClosed) || errors.Is(err, net.ErrClosed) {
+			err = nil
+		}
+		api.mu.Lock()
+		api.serveErr = err
+		api.mu.Unlock()
+		close(done)
+	}()
 	return nil
 }
 
-// Addr returns the listener address, useful when started on port 0.
+// Addr returns the actual owned listener address, including port-zero binds.
 func (api *EngineAPI) Addr() net.Addr {
 	api.mu.Lock()
 	defer api.mu.Unlock()
@@ -501,16 +533,29 @@ func (api *EngineAPI) Addr() net.Addr {
 	return api.listener.Addr()
 }
 
-// Stop gracefully shuts down the HTTP server.
+// Stop has a bounded graceful period, then forcibly releases listeners and
+// connections. It also joins the serving goroutine if Stop wins the startup race.
 func (api *EngineAPI) Stop() error {
 	api.mu.Lock()
-	srv := api.server
+	api.stopped = true
+	srv, ln, done := api.server, api.listener, api.serveDone
 	api.mu.Unlock()
-
 	if srv == nil {
 		return nil
 	}
-	return srv.Shutdown(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		_ = srv.Close()
+	}
+	if ln != nil {
+		_ = ln.Close()
+	}
+	if done != nil {
+		<-done
+	}
+	return err
 }
 
 // Handler exposes the same HTTP handler used by Start.

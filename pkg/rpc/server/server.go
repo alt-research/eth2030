@@ -8,6 +8,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -263,6 +264,9 @@ type ExtServer struct {
 	started      atomic.Bool
 	middlewares  []MiddlewareFunc
 	requestCount atomic.Int64
+	serveDone    chan struct{}
+	serveErr     error
+	stopped      bool
 }
 
 // NewExtServer creates a new ExtServer for the given RequestHandler.
@@ -330,41 +334,61 @@ func (s *ExtServer) buildHandler() http.Handler {
 	return handler
 }
 
-// Start starts the HTTP server on the given address.
+// Start binds and serves until Stop, preserving the blocking standalone API.
 func (s *ExtServer) Start(addr string) error {
-	if s.started.Load() {
-		return ErrServerStarted
-	}
-
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
-
-	handler := s.buildHandler()
-	mux := http.NewServeMux()
-	mux.Handle("/", handler)
-
-	srv := &http.Server{
-		Handler:      mux,
-		ReadTimeout:  s.config.ReadTimeout,
-		WriteTimeout: s.config.WriteTimeout,
-		IdleTimeout:  s.config.IdleTimeout,
-	}
-
-	s.mu.Lock()
-	s.httpServer = srv
-	s.listener = ln
-	s.mu.Unlock()
-	s.started.Store(true)
-
-	if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err := s.ServeListener(ln); err != nil {
+		ln.Close()
 		return err
 	}
+	s.mu.Lock()
+	done := s.serveDone
+	s.mu.Unlock()
+	<-done
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.serveErr
+}
+
+// ServeListener takes ownership of an already bound listener after successful
+// initialization. The address and shutdown owner are published before return.
+func (s *ExtServer) ServeListener(ln net.Listener) error {
+	if ln == nil {
+		return fmt.Errorf("nil HTTP listener")
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.stopped {
+		return http.ErrServerClosed
+	}
+	if s.started.Load() || s.httpServer != nil {
+		return ErrServerStarted
+	}
+	srv := &http.Server{Handler: s.buildHandler(),
+		ReadTimeout: s.config.ReadTimeout, WriteTimeout: s.config.WriteTimeout, IdleTimeout: s.config.IdleTimeout,
+	}
+	s.httpServer = srv
+	s.listener = ln
+	done := make(chan struct{})
+	s.serveDone = done
+	s.started.Store(true)
+	go func() {
+		err := srv.Serve(ln)
+		if errors.Is(err, http.ErrServerClosed) || errors.Is(err, net.ErrClosed) {
+			err = nil
+		}
+		s.mu.Lock()
+		s.serveErr = err
+		s.mu.Unlock()
+		close(done)
+	}()
 	return nil
 }
 
-// Addr returns the listener address.
+// Addr returns the actual owned listener address, including port-zero binds.
 func (s *ExtServer) Addr() net.Addr {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -374,17 +398,29 @@ func (s *ExtServer) Addr() net.Addr {
 	return s.listener.Addr()
 }
 
-// Stop gracefully shuts down the server.
+// Stop has a bounded graceful period, then forcibly releases listeners and
+// connections. It also joins the serving goroutine if Stop wins the startup race.
 func (s *ExtServer) Stop() error {
 	s.mu.Lock()
-	srv := s.httpServer
+	s.stopped = true
+	srv, ln, done := s.httpServer, s.listener, s.serveDone
 	s.mu.Unlock()
 	if srv == nil {
 		return nil
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), s.config.ShutdownTimeout)
 	defer cancel()
-	return srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		_ = srv.Close()
+	}
+	if ln != nil {
+		_ = ln.Close()
+	}
+	if done != nil {
+		<-done
+	}
+	return err
 }
 
 // RequestCount returns the total number of requests served.

@@ -1,0 +1,68 @@
+[
+  {
+    "budget_passed": true,
+    "fixture": {
+      "format": 1,
+      "keys": 1000,
+      "value_bytes": 4096,
+      "wal_generations": 0,
+      "expected_sha256": "9814b51dc65e0a7149ad620ba20955a6aa829f68f37e3f9434dec547b8c14c6c"
+    },
+    "heap_alloc_after_open": 5568152,
+    "heap_alloc_before": 596096,
+    "max_rss_kib": 18196,
+    "open_seconds": 0.029055334,
+    "passed": true,
+    "read_all_seconds": 0.006570454,
+    "reopening_budget_seconds": 300,
+    "rss_budget_bytes": 1073741824,
+    "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+    "wal_input_bytes": 0,
+    "preparation_seconds": 0.05458323599305004,
+    "name": "small"
+  },
+  {
+    "budget_passed": true,
+    "fixture": {
+      "format": 1,
+      "keys": 10000,
+      "value_bytes": 65536,
+      "wal_generations": 0,
+      "expected_sha256": "40f1550fbc22a23d1913a8bc7f17b6bf19d97a55a479d7dc712d69208a513fe3"
+    },
+    "heap_alloc_after_open": 738905568,
+    "heap_alloc_before": 596096,
+    "max_rss_kib": 939364,
+    "open_seconds": 0.470881962,
+    "passed": true,
+    "read_all_seconds": 0.577168455,
+    "reopening_budget_seconds": 300,
+    "rss_budget_bytes": 1073741824,
+    "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+    "wal_input_bytes": 0,
+    "preparation_seconds": 0.9113192560034804,
+    "name": "large-values"
+  },
+  {
+    "budget_passed": true,
+    "fixture": {
+      "format": 1,
+      "keys": 100,
+      "value_bytes": 4096,
+      "wal_generations": 1000,
+      "expected_sha256": "c8b3a58b364e7253729f44dffd3e9d964dea5def2a6218d51b581270c1603c61"
+    },
+    "heap_alloc_after_open": 1086656,
+    "heap_alloc_before": 595616,
+    "max_rss_kib": 898580,
+    "open_seconds": 0.692449495,
+    "passed": true,
+    "read_all_seconds": 0.000426257,
+    "reopening_budget_seconds": 300,
+    "rss_budget_bytes": 1073741824,
+    "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+    "wal_input_bytes": 412201000,
+    "preparation_seconds": 0.5601651210163254,
+    "name": "long-wal"
+  }
+]

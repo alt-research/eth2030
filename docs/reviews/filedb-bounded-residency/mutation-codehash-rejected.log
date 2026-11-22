@@ -1,0 +1,6 @@
+--- FAIL: TestColdFlatStateReadErrorsRemainErrorsAcrossRollbackAndCopy (0.00s)
+    --- FAIL: TestColdFlatStateReadErrorsRemainErrorsAcrossRollbackAndCopy/code-hash (0.00s)
+        lazy_flat_read_error_test.go:70: cold read failure became an empty account/slot/code
+FAIL
+FAIL	github.com/eth2030/eth2030/core/state	0.683s
+FAIL

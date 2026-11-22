@@ -43,6 +43,10 @@ func MigrateCommittedToBinary(source rawdb.Database, expectedRoot types.Hash, de
 			return types.Hash{}, err
 		}
 	}
+	if err := rawdb.ReadError(accounts); err != nil {
+		return types.Hash{}, err
+	}
+
 	if mpt.Hash() != expectedRoot {
 		return types.Hash{}, ErrBinaryMigrationSource
 	}
@@ -90,6 +94,11 @@ func migrateBinaryAccount(source rawdb.Database, address types.Address, body []b
 			return err
 		}
 	}
+	if err := rawdb.ReadError(slots); err != nil {
+		slots.Release()
+		return err
+	}
+
 	slots.Release()
 	actualStorageRoot := computeStorageRoot(obj)
 	if !bytes.Equal(actualStorageRoot[:], account.Root) {

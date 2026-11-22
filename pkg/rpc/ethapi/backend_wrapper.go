@@ -8,6 +8,7 @@ import (
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	rpcfilter "github.com/eth2030/eth2030/rpc/filter"
 )
@@ -96,6 +97,9 @@ func (b *EthAPIBackend) GetBalance(addr types.Address, blockNum BlockNumber) (*b
 		return nil, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
 	balance := statedb.GetBalance(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return nil, err
+	}
 	if balance == nil {
 		balance = new(big.Int)
 	}
@@ -112,7 +116,8 @@ func (b *EthAPIBackend) GetCode(addr types.Address, blockNum BlockNumber) ([]byt
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
-	return statedb.GetCode(addr), nil
+	result := statedb.GetCode(addr)
+	return result, state.ReadError(statedb)
 }
 
 // GetStorageAt returns the storage value at the given address, key, and
@@ -126,7 +131,8 @@ func (b *EthAPIBackend) GetStorageAt(addr types.Address, key types.Hash, blockNu
 	if err != nil {
 		return types.Hash{}, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
-	return statedb.GetState(addr, key), nil
+	result := statedb.GetState(addr, key)
+	return result, state.ReadError(statedb)
 }
 
 // bloomMatchesQuery checks if a bloom filter matches the filter query.
@@ -246,7 +252,8 @@ func (b *EthAPIBackend) GetNonce(addr types.Address, blockNum BlockNumber) (uint
 	if err != nil {
 		return 0, fmt.Errorf("%w: %v", ErrAPIBackendNoState, err)
 	}
-	return statedb.GetNonce(addr), nil
+	result := statedb.GetNonce(addr)
+	return result, state.ReadError(statedb)
 }
 
 // CurrentBlock returns the current block number.

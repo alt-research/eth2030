@@ -142,6 +142,7 @@ type kv struct {
 }
 
 type memIterator struct {
+	err   error
 	items []kv
 	pos   int
 }
@@ -166,3 +167,5 @@ func (it *memIterator) Value() []byte {
 }
 
 func (it *memIterator) Release() {}
+
+func (it *memIterator) Error() error { return it.err }

@@ -225,6 +225,10 @@ func (t *Tree) IterateAccounts(root, origin types.Hash, fn func(hash types.Hash,
 			break
 		}
 	}
+	if err := rawdb.ReadError(it); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -254,6 +258,10 @@ func (t *Tree) IterateStorage(root, account types.Hash, origin []byte, fn func(h
 			break
 		}
 	}
+	if err := rawdb.ReadError(it); err != nil {
+		return err
+	}
+
 	return nil
 }
 

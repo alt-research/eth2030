@@ -6,6 +6,8 @@ import unittest
 import tempfile
 import json
 from pathlib import Path
+from unittest.mock import patch
+import capture_engine_stall as collector
 from capture_engine_stall import pipe_lines
 
 
@@ -79,6 +81,24 @@ class PipeCaptureTests(unittest.TestCase):
             self.assertEqual(value["status"], "collector_failed")
             self.assertFalse(value["actual48h_passed"])
             self.assertIn("FileNotFoundError", value["error"])
+
+    def test_log_process_launch_failure_cannot_leave_watching_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            record = root / "record.json"
+            record.write_text(json.dumps({"el": "el", "cl": "cl", "profile": {
+                "source": "fixture", "cl_source": "fixture", "binary_sha256": "fixture",
+                "cl_binary_sha256": "fixture"}}))
+            output = root / "capture"
+            with patch.object(sys, "argv", ["capture", "--record", str(record), "--output", str(output)]), \
+                 patch.object(collector, "identity", return_value={}), \
+                 patch.object(collector, "inspect", return_value={"NetworkSettings": {"Ports": {"9001/tcp": [{"HostPort": "1"}]}}}), \
+                 patch.object(collector, "native_profile", return_value={}), \
+                 patch.object(collector.signal, "signal"), \
+                 patch.object(collector.subprocess, "Popen", side_effect=OSError("log launch failed")):
+                with self.assertRaisesRegex(OSError, "log launch failed"):
+                    collector.main()
+            self.assertEqual(json.loads((output / "result.json").read_text())["status"], "collector_failed")
 
     def test_oversized_complete_and_incomplete_lines_fail(self):
         for body in [b"12345\n", b"12345"]:

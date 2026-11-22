@@ -147,9 +147,10 @@ def main():
         stopped = True
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
-    process = subprocess.Popen(["docker", "logs", "--follow", "--since", utc(), el],
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
+    process = None
     try:
+        process = subprocess.Popen(["docker", "logs", "--follow", "--since", utc(), el],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
         for raw in pipe_lines(process.stdout, lambda: stopped):
             if raw is None:
                 if not inspect(el)["State"]["Running"]:
@@ -195,13 +196,14 @@ def main():
         report.update(status="collector_failed", error=repr(error))
         raise
     finally:
-        process.terminate()
-        try:
-            process.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=5)
-        process.stdout.close()
+        if process is not None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=5)
+            process.stdout.close()
         report["finished_at"] = utc()
         save()
 

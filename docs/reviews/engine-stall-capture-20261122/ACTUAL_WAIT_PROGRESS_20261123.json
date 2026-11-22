@@ -67,10 +67,11 @@
     "status": "observing",
     "started_at": "2026-11-22T12:22:19.125011+00:00",
     "elapsed_seconds": 14843.303039722028,
-    "same_el_source": "Bounded6h45m mature-state diagnosis only, not48-hour admission. Reproduce failed04 with goroutine capture before shutdown. No old accepted time reused; signatures/hashes/resources unchanged.",
     "native_rolling_samples": 762,
     "sustained_wait_events": 0,
-    "rolling_collector_sha256": "3ca0132bd9c88a940e85afb902134488612ee0cbf535c7c03112cea384d4c0bd"
+    "rolling_collector_sha256": "3ca0132bd9c88a940e85afb902134488612ee0cbf535c7c03112cea384d4c0bd",
+    "el_source": "19a3f1bbf7a52460d3528b65e47ecfc897bb494d",
+    "cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e"
   },
   "root_fix_submitted": false
 }

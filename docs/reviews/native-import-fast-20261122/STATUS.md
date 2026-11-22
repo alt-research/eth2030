@@ -1,5 +1,7 @@
 # Fast native import qualification status
 
-The user requested a faster development feedback loop than waiting48 hours per iteration. A separate test branch will replay genuine native execution immediately from an authenticated mature snapshot. The existing6h45m diagnostic remains unchanged and has not captured a stall as of2026-11-22T13:10Z.
+Implemented an always-running16-block native/Engine/SDK proof regression and an explicit mature-snapshot replay test with a resource-bounded driver. The driver was exercised against a fresh immutable failed04 archive clone. The old source failed the8s gate at actual block77623 and retained the waiting stack. With the separate1243adc1 history-lock fix, all256 real blocks77623–77878, forced execution, repeated Engine calls, FCU, concurrent SDK proofs and durable restart passed in295.296s total /232.538s execution. NoOOM; clean exit0.
 
-Failed04 timed out importing empty block77623. No ordinary transaction loop was involved. This profile must retain native header/state/receipt/request/BAL validation, Engine8s deadlines and independent proof checks. It must force execution rather than accept already-validated cached payloads. Replay results qualify exactly their recorded event workload, not wall-clock uptime or full native/CL BLS finality.
+Fresh independent real-BLS replay of the complete original observed signed span73639–80256 passed7 linked windows in9.277s. It preserves failed04 as a failed operating result. The normal16-block test passed in2.488s; composed race repetitions5/5 passed12.556s. See FAST_ACCEPTANCE.md and RESULTS.json for commands, pins and qualification boundaries.
+
+Original04 history completion occurred before the accepted run, so its multi-hour stall is still unresolved. The unchanged6h45m diagnosis continues independently. No actual48-hour pass is claimed. Full native suite/vet and current PR conflict/CI checks are tracked in the final handoff.

@@ -1,0 +1,55 @@
+{
+  "scope": "Accelerated event and cryptographic qualification only; original multi-hour incident remains under diagnosis",
+  "actual48h_passed": false,
+  "native_baseline": {
+    "source": "0676f992e55ff96ac2c0a45fca2ce39cb361d6c1",
+    "binary_sha256": "ecb968ad7f087c4f8b773c2ab8ea3329c81e0d26723d4986d9c962e46f6ed873",
+    "passed": false,
+    "seconds": 53.60382451600162,
+    "reason": "block77623 waited for insertMu held by saved-prefix authentication; 8s gate failed before cleanup"
+  },
+  "native_fixed": {
+    "compiled_source": "2e882084e09cc313e0c628907da812fd70452409",
+    "production_fix": "1243adc1680bc1d957ebf4ed2e633e7f22edb0c5",
+    "test_source": "0676f992e55ff96ac2c0a45fca2ce39cb361d6c1",
+    "driver_source": "5c8e78d3e335fbd7b6316f93a5c1fc2db57d939c",
+    "passed": true,
+    "binary_sha256": "669f3504e1554ac13646050f7b892ff941148f97456c9800eead35733acb8f6f",
+    "snapshot_sha256": "d247d5378422d23184c03f914226056142a3609a9825368570868e34c16abd21",
+    "rows_sha256": "72270c8561c7a4f41a296e893156ae24aa28027c6cb2df9621253b5059aea2ff",
+    "genesis_sha256": "42b742b259788319ea579ad5979976fb3998c69e6fa1a3103653304bb079b3f2",
+    "first": 77623,
+    "blocks": 256,
+    "cpus": 2,
+    "memory_bytes": 4096000000,
+    "execution_seconds": 232.5377241789829,
+    "elapsed_seconds": 295.29551482899114,
+    "last": 77878,
+    "last_hash": "0x9f3709c9da547445c2b95f862a32e43fe917d72497a687954161661b92b25e71",
+    "exit_code": 0,
+    "oom_killed": false
+  },
+  "independent_bls_replay": {
+    "passed": true,
+    "seconds": 9.27694812999107,
+    "windows": 7,
+    "first": 73639,
+    "through": 80256,
+    "all_cross_window_anchors_linked": true,
+    "reference": {
+      "debug": true,
+      "bls_active": true,
+      "files": {
+        "eth_consensus_specs.gloas.mainnet": "533f62dc20e90272a314365ce900e0bef0a70769dc71a5eba97d2fae262a3cf3",
+        "eth_consensus_specs.fulu.mainnet": "f0c74b75cb302065686673cc582531194f06b1001b991788a0c78ebc3c4560f8",
+        "eth_consensus_specs.utils.bls": "4f16de600dc05f6c9ff917dbbd8c577a1136c5acacc903323715c462c614c904"
+      },
+      "backend_version": "0.5.0",
+      "backend_hashes": [
+        "e70210171261b0e435acaf09dc68d6c9fe35d1bc170aa3dce7fbe3ac65cda3db"
+      ],
+      "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]"
+    }
+  },
+  "original04_counterevidence": "Original EL log: snap history completed2026-11-22T05:10:33.486Z, before the accepted clock2026-11-22T05:11:01Z. Startup prefix serialization is not established as the original10:41 stall cause."
+}

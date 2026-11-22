@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "actual48h_passed": false,
+  "scope": "Native execution/Engine/MPT/restart event replay; CL BLS and wall-clock stability are independent gates.",
+  "source": "db4781de0ce97f90c015cbeca9784b6ae90a455b",
+  "started_at": "2026-11-22T18:32:32.227888+00:00",
+  "first": 77623,
+  "blocks": 256,
+  "memory_bytes": 4096000000,
+  "cpus": 2,
+  "snapshot_sha256": "d247d5378422d23184c03f914226056142a3609a9825368570868e34c16abd21",
+  "genesis_sha256": "42b742b259788319ea579ad5979976fb3998c69e6fa1a3103653304bb079b3f2",
+  "binary_sha256": "46909348c0548452475ed3a426892ed01cbea9e4d46166e22a46d2f8f3745934",
+  "rows_sha256": "72270c8561c7a4f41a296e893156ae24aa28027c6cb2df9621253b5059aea2ff",
+  "container": "82f4d6bc335527101acd36bc77f64387d2346f3afa999318b1d45778097a34d4",
+  "execution_seconds": 109.91661209403537,
+  "exit_code": 0,
+  "state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-22T18:33:39.40571124Z",
+    "FinishedAt": "2026-11-22T18:35:28.728090128Z"
+  },
+  "elapsed_seconds": 176.92636525497073
+}

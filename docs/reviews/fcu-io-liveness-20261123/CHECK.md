@@ -10,6 +10,8 @@
 - [x] Keep execution-sync progress reads independent from slow application while preserving target publication ordering.
 - [x] Avoid rewriting unchanged forkchoice mappings/checkpoints; preserve durable WAL and state/hash validation.
 - [x] Complete native build, targeted race and full regressions.
-- [ ] Complete real mature-state/live/BLS revalidation; submit a separate master PR.
+- [x] Complete genuine256-block mature-state native/Engine/MPT/restart replay and submit separate master PR138.
+- [x] Check all8 PR targets,56 ordered pairs,1024 subset transitions and16 full merge orders.
+- [ ] Finish post-fix elapsed-time/live/BLS revalidation; retain original failure and physical-storage-latency limits.
 
 The spontaneous diagnosis failed before the original5.5h threshold and captured the real disk-wait chain. That establishes this reproduced failure mechanism. The earlier original04 has no stack and cannot be claimed independently proven identical from timing alone. Physical storage latency cannot be fixed by returning premature VALID or disabling fsync.

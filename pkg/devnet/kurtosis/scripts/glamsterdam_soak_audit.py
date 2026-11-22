@@ -25,6 +25,7 @@ EXECUTABLES = {
     "cl": "3158ae6dc22db03e406b710bd9188ade72d9aad1c0d8cc4a493e4a0d09d6f142",
 }
 SOURCE = "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e"
+CL_SOURCE = "57ccb4661822406adc490089e8d5ae5bfb36003e"
 LABEL = "remaining-code-20261122"
 MEMORY = 4096000000
 DURATION = 172800
@@ -120,6 +121,7 @@ def check_samples(state, samples, complete=False, now=None):
     require(profile["duration_seconds"] == DURATION and profile["sampling_seconds"] == 30,
             "duration or sampling profile changed")
     require(profile["source"] == SOURCE and profile["binary_sha256"] == EXECUTABLES["el"]
+            and profile.get("cl_source") == CL_SOURCE
             and profile["cl_binary_sha256"] == EXECUTABLES["cl"], "runtime source changed")
     require(profile["memory_each_bytes"] == MEMORY and profile["cpus_each"] == 2,
             "resource profile changed")
@@ -322,6 +324,8 @@ def check_runtime(infos, baseline, complete=False):
         require(info["Image"] == original["image"] and info["State"]["StartedAt"] == original["started"]
                 and info["RestartCount"] == 0, "runtime image/start identity changed")
         require(original["binary_sha256"] == EXECUTABLES[role], "initial executable identity changed")
+        require(original.get("source") == {"el": SOURCE, "cl": CL_SOURCE}[role],
+                "initial source declaration changed")
         require(info["HostConfig"]["Memory"] == MEMORY
                 and info["HostConfig"]["NanoCpus"] == 2000000000, "actual runtime resources changed")
         require(not info["State"]["OOMKilled"], "runtime was OOM-killed")

@@ -36,6 +36,7 @@ def operating(count=3):
     state = {"status": "running", "passed": False, "profile": {
         "duration_seconds": audit.DURATION, "sampling_seconds": 30,
         "source": audit.SOURCE, "binary_sha256": audit.EXECUTABLES["el"],
+        "cl_source": audit.CL_SOURCE,
         "cl_binary_sha256": audit.EXECUTABLES["cl"], "memory_each_bytes": audit.MEMORY,
         "cpus_each": 2}, "samples": count, "initial": point(0),
         "accepted_started_at": at(0), "elapsed_seconds": count * 30, "last": point(count)}
@@ -75,6 +76,13 @@ class SamplingTests(unittest.TestCase):
         state.update(passed=True, finished_at=at(100))
         with self.assertRaisesRegex(audit.EvidenceError, "48-hour"):
             audit.check_samples(state, samples, complete=True)
+
+    def test_cl_source_declaration_cannot_disagree_with_frozen_binary(self):
+        for source in (None, "other-source"):
+            state, samples = operating()
+            state["profile"]["cl_source"] = source
+            with self.assertRaisesRegex(audit.EvidenceError, "runtime source changed"):
+                audit.check_samples(state, samples)
 
     def test_complete_real_duration_and_all_samples(self):
         state, samples = operating(5760)
@@ -172,7 +180,8 @@ class RuntimeTests(unittest.TestCase):
         self.infos, self.baseline = {}, {}
         for role in ("el", "cl"):
             self.baseline[role] = {"image": role, "started": at(0),
-                                   "binary_sha256": audit.EXECUTABLES[role]}
+                                   "binary_sha256": audit.EXECUTABLES[role],
+                                   "source": {"el": audit.SOURCE, "cl": audit.CL_SOURCE}[role]}
             self.infos[role] = {"Image": role, "RestartCount": 0,
                 "Config": {"Labels": {"eth2030.qualification": audit.LABEL}},
                 "HostConfig": {"Memory": audit.MEMORY, "NanoCpus": 2000000000},
@@ -183,6 +192,14 @@ class RuntimeTests(unittest.TestCase):
         for value in self.infos.values():
             value["State"]["Running"] = False
         audit.check_runtime(self.infos, self.baseline, complete=True)
+
+    def test_baseline_source_declaration_is_required_for_both_clients(self):
+        for role in ("el", "cl"):
+            with self.subTest(role=role):
+                original = self.baseline[role].pop("source")
+                with self.assertRaisesRegex(audit.EvidenceError, "source declaration"):
+                    audit.check_runtime(self.infos, self.baseline)
+                self.baseline[role]["source"] = original
 
     def test_passed_time_cannot_hide_failed_cleanup(self):
         with self.assertRaisesRegex(audit.EvidenceError, "cleanup failed"):

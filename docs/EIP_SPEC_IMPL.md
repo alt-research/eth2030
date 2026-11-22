@@ -1,9 +1,11 @@
 # EIP Specification & Implementation Traceability
 
-> Scoped refresh: November 18, 2026, merged mainline `911afb0c` (PR 61).
+> Current scoped refresh: November 22, 2026 at merged `9a094830`. Frozen Glamsterdam qualification is recorded in [progress](PROGRESS.md); Frame/FOCIL retain their November 18 control. Additional CL/supporting obligations are indexed in the [gap audit](audits/merged-glamsterdam-20261122/README.md).
 
-This is a historical implementation index, with the Frame, FOCIL and BAL paths
-refreshed below. Other rows retain the February 22, 2026 inventory and have not
+This index retains the February 22, 2026 inventory outside the explicitly
+refreshed scopes. The November 22 update links frozen Glamsterdam acceptance,
+refreshes eth/70 and eth/71, and adds the missing CL/supporting obligations.
+Frame/FOCIL retain their November 18 paired evidence. Other rows have not
 received a new conformance audit. `Complete` is an implementation label within
 its recorded scope; it does not establish current-draft or cross-client acceptance.
 For current fork placement use the [site tracker](EIP_TRACKER.md); for qualified
@@ -31,12 +33,30 @@ EL. Independent EL agreement and the Dora consumer migration remain open; see th
 | 7708 | ETH Transfers Emit Log | Complete | [EIP-7708](https://eips.ethereum.org/EIPS/eip-7708) | `core/vm/eip7708.go`, `core/vm/eip7708_deep.go` | `core/vm/eip7708_test.go` |
 | 7918 | Blob Base Fee Floor | Complete | [EIP-7918](https://eips.ethereum.org/EIPS/eip-7918) | `core/blob_gas.go` | `core/blob_gas_test.go` |
 
-### Glamsterdam Repricing (18 EIPs)
+### Additional frozen Glamsterdam obligations (2026-11-22)
+
+These were already included in the accepted 33-task program but absent from the
+older site/index. Empty local implementation cells identify companion-CL rules,
+not missing EL features; their actual source and process consumers are in the
+[frozen reconciliation](reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json).
+They do not invent new positions in the November 2 Strawmap drawing.
+
+| EIP | Title | Status | Spec | Implementation | Tests |
+| --- | --- | --- | --- | --- | --- |
+| 7688 | Progressive SSZ proofs | Complete | [EIP-7688](https://eips.ethereum.org/EIPS/eip-7688) | | `devnet/kurtosis/qualification/reference/reference-progressive-state-proofs.py` |
+| 8045 | Exclude slashed proposers | Complete | [EIP-8045](https://eips.ethereum.org/EIPS/eip-8045) | | Companion CL frozen transition suite |
+| 8061 | Validator churn | Complete | [EIP-8061](https://eips.ethereum.org/EIPS/eip-8061) | | Companion CL frozen transition suite |
+| 8246 | Balance-preserving SELFDESTRUCT | Complete | [EIP-8246](https://eips.ethereum.org/EIPS/eip-8246) | `core/vm/selfdestruct_8246.go` | `core/vm/selfdestruct_8246_test.go`, `core/execution/selfdestruct_8246_test.go` |
+| 8282 | Builder deposits/exits | Complete | [EIP-8282](https://eips.ethereum.org/EIPS/eip-8282) | `core/eips/eip8282.go` | `core/eips/eip8282_test.go`, `core/execution/builder_requests_8282_test.go` |
+| 8189 | snap/2 | Complete | [EIP-8189](https://eips.ethereum.org/EIPS/eip-8189) | `node/snap2_runtime.go`, `core/chain/snap_pivot.go` | `node/snap2_runtime_test.go`, `core/chain/snap_indexed_restart_test.go` |
+| 8136 | Partial data columns | Complete | [EIP-8136](https://eips.ethereum.org/EIPS/eip-8136) | | `devnet/kurtosis/scripts/reference_partial_columns.py` |
+
+### Glamsterdam Repricing (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
 | 7904 | Precompile Gas Repricing | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
-| 7778 | Remove SSTORE Gas Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
+| 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
 | 2780 | Reduce Intrinsic Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/vm/gas_table.go`, `core/glamsterdam_repricing.go` | `core/eip2780_test.go` |
 | 8037 | State Creation Gas Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8037_test.go` |
 | 8038 | State Access Gas Increase | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8038_test.go` |
@@ -59,8 +79,8 @@ EL. Independent EL agreement and the Dora consumer migration remain open; see th
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7975 | Partial Block Receipt Lists (ETH/70) | Substantial | Draft | `eth/protocol.go`, `eth/handler.go`, `p2p/ethproto/protocol.go` | `eiptest/eip7975_test.go`, `eth/handler_test.go` |
-| 8159 | Block Access List Exchange (ETH/71) | Substantial | Draft | `eth/protocol_extended.go`, `p2p/ethproto/protocol.go` | `eiptest/eip8159_test.go` |
+| 7975 | Partial Block Receipt Lists (ETH/70) | Complete | Draft | `eth/protocol.go`, `eth/handler.go`, `p2p/ethproto/protocol.go` | `eiptest/eip7975_test.go`, `eth/handler_test.go` |
+| 8159 | Block Access List Exchange (ETH/71) | Complete | Draft | `eth/protocol_extended.go`, `p2p/ethproto/protocol.go` | `eiptest/eip8159_test.go` |
 
 ---
 

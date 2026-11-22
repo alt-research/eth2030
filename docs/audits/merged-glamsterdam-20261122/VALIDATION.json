@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-22 Asia/Shanghai",
+  "source_baseline": "9a094830",
+  "native_package_changes": true,
+  "site_build": {
+    "passed": true,
+    "node": "22.20.0",
+    "next": "16.4.5",
+    "static_pages": 157,
+    "typescript_passed": true
+  },
+  "tracker": {
+    "entries": 149,
+    "parsed_matrix_rows": 92,
+    "pkg_paths_checked": 398,
+    "missing_paths": 0,
+    "blocking_discrepancies": 0,
+    "informational_notes": [
+      "EIP-7885 predates this scoped refresh and remains outside the historical doc matrix"
+    ]
+  },
+  "evidence_export": {
+    "passed": true,
+    "homepage_roadmap_snapshot_equal": true,
+    "all_18_core_and_5_network_obligations_link_qualification": true,
+    "wrong_rendered_steady_count_rejected": true,
+    "wrong_CL_matrix_status_rejected": true,
+    "old_snapshot_guard_failed_before_update": true,
+    "old_matrix_parser_failed_on_new_empty_local_CL_cells": true
+  },
+  "browser": {
+    "passed": true,
+    "tool": "Playwright browser plugin; webapp-testing reconnaissance/action workflow",
+    "viewports": [
+      1440,
+      375
+    ],
+    "routes": [
+      "/",
+      "/roadmap/",
+      "/eips/eip-7688/",
+      "/eips/eip-8189/",
+      "/eips/eip-7732/"
+    ],
+    "route_viewport_checks": 10,
+    "http_status": 200,
+    "page_errors": [],
+    "hero_roadmap_navigation": true,
+    "horizontal_overflow": false,
+    "original_mobile_EIP7688_scroll_width": 413,
+    "corrected_mobile_EIP7688_scroll_width": 375,
+    "desktop_progress_screenshot_visually_inspected": true,
+    "additional_mobile_refund_page": {
+      "path": "/eips/eip-7778/",
+      "width": 375,
+      "scroll_width": 375,
+      "user_refunds_preserved_text": true
+    },
+    "console_errors": 0
+  },
+  "legacy_builder_observation": {
+    "passed_as_observation": true,
+    "original_output": "LEGACY_BUILDER_OBSERVATION.json",
+    "scope": "Actual in-process exported Engine methods; no live chain or endpoint mutation."
+  },
+  "limits": [
+    "No fresh Ethereum devnet or full historical native fixture campaign was run for this site/documentation update. Prior exact-source results retain their identity.",
+    "The local Python Playwright installation failed through the package proxy; the available Playwright browser plugin completed the actual UI checks.",
+    "GitHub Pages deployment is gated on merging the site PR to master; a branch preview is not a deployed public site."
+  ],
+  "native_change_scope": "Metrics listener bind/readiness only; original frozen consensus/runtime evidence retains source9a094830/d9201b0.",
+  "metrics_ci_original_failure": {
+    "head": "538408cb9a3d6a09abe0a8174e24af545ed0d1e2",
+    "job_id": 136931496711,
+    "cause": "Fixed test port43369 collided with ephemeral P2P binding; metrics bind failed and HTTP reached P2P.",
+    "red_regression_retained": true
+  },
+  "metrics_correction": {
+    "original_ci_head": "538408cb9a3d6a09abe0a8174e24af545ed0d1e2",
+    "original_failure_job": 136931496711,
+    "input_git_blobs": {
+      "pkg/node/node.go": "6fd784a451a3d6a7f97a229502b4dd16fa09b061",
+      "pkg/node/node_metrics_test.go": "3ce850fdbc4acc9b08858c2c414f6148d74f2225"
+    },
+    "checks": [
+      {
+        "name": "metrics-race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-count=10",
+          "./node",
+          "-run",
+          "^TestMetricsServer_"
+        ],
+        "exit": 0
+      },
+      {
+        "name": "node",
+        "command": [
+          "go",
+          "test",
+          "-count=1",
+          "./node"
+        ],
+        "exit": 0
+      },
+      {
+        "name": "full",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "-count=1",
+          "./..."
+        ],
+        "exit": 0
+      },
+      {
+        "name": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./node"
+        ],
+        "exit": 0
+      },
+      {
+        "name": "build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/projects/eth2030/qualification/merged-progress-20261122/eth2030-metrics-checked",
+          "./cmd/eth2030"
+        ],
+        "exit": 0
+      }
+    ],
+    "fresh_full_packages": 219,
+    "failed_packages": 0,
+    "ordinary_metrics_repetitions": 20,
+    "race_metrics_repetitions": 10,
+    "regression": "Port zero must be reserved before Start returns; actual expvar JSON and released listener after Stop. No fixed port or sleep.",
+    "remaining_boundary": "Occupied required interface can still log a bind error without failing Node.Start; GAP-06 records lifecycle/error propagation follow-up."
+  }
+}

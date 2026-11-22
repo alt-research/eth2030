@@ -1,0 +1,70 @@
+{
+  "original_ci_head": "538408cb9a3d6a09abe0a8174e24af545ed0d1e2",
+  "original_failure_job": 136931496711,
+  "input_git_blobs": {
+    "pkg/node/node.go": "6fd784a451a3d6a7f97a229502b4dd16fa09b061",
+    "pkg/node/node_metrics_test.go": "3ce850fdbc4acc9b08858c2c414f6148d74f2225"
+  },
+  "checks": [
+    {
+      "name": "metrics-race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=10",
+        "./node",
+        "-run",
+        "^TestMetricsServer_"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "node",
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "./node"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "full",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "./..."
+      ],
+      "exit": 0
+    },
+    {
+      "name": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./node"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/projects/eth2030/qualification/merged-progress-20261122/eth2030-metrics-checked",
+        "./cmd/eth2030"
+      ],
+      "exit": 0
+    }
+  ],
+  "fresh_full_packages": 219,
+  "failed_packages": 0,
+  "ordinary_metrics_repetitions": 20,
+  "race_metrics_repetitions": 10,
+  "regression": "Port zero must be reserved before Start returns; actual expvar JSON and released listener after Stop. No fixed port or sleep.",
+  "remaining_boundary": "Occupied required interface can still log a bind error without failing Node.Start; GAP-06 records lifecycle/error propagation follow-up."
+}

@@ -7,6 +7,8 @@ import (
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
 	"math/big"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -59,7 +61,8 @@ func (b *fcuGateBatch) WriteAndPublish(lock sync.Locker, publish func()) error {
 
 func TestFCUDurablePublicationKeepsCommittedReadersResponsive(t *testing.T) {
 	full, _, _ := newHistoryChain(t)
-	db, err := rawdb.NewFileDB(t.TempDir())
+	dir := t.TempDir()
+	db, err := rawdb.NewFileDB(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,9 +160,28 @@ func TestFCUDurablePublicationKeepsCommittedReadersResponsive(t *testing.T) {
 	if bc.CurrentBlock().Hash() != child.Hash() || bc.CurrentSafeBlock().Hash() != old.Hash() || bc.CurrentFinalBlock().Hash() != old.Hash() || bc.State().GetRoot() != child.Root() {
 		t.Fatal("atomic head/state/checkpoint publication incomplete")
 	}
-	// A failed later batch must retain this committed view.
+	// Unknown checkpoints are rejected before publication.
 	if err := bc.ApplyForkchoice(child.Hash(), old.Hash(), types.Hash{31: 0x33}); err == nil || errors.Is(err, rawdb.ErrNotFound) {
 		t.Fatal("unknown checkpoint was not rejected before publication")
+	}
+	// Force an actual materialization failure of the next head pointer, after
+	// execution has persisted successfully. Neither the warm cache nor memory
+	// selection may hide the resulting durable-store failure fence.
+	grandchild := makeBlockWithState(child, nil, bc.State())
+	if err := bc.InsertSyncedBlock(grandchild); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(dir, "data", "6862.tmp"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := bc.ApplyForkchoice(grandchild.Hash(), child.Hash(), old.Hash()); err == nil {
+		t.Fatal("failed head materialization accepted")
+	}
+	if bc.CurrentBlock().Hash() != child.Hash() || bc.CurrentSafeBlock().Hash() != old.Hash() || bc.CurrentFinalBlock().Hash() != old.Hash() || bc.State().GetRoot() != child.Root() {
+		t.Fatal("failed durable batch published selection")
+	}
+	if err := bc.CheckStorage(); err == nil {
+		t.Fatal("committed cache hid failed materialization")
 	}
 }
 

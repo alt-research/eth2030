@@ -1,0 +1,24 @@
+{
+  "passed_for_reproduced_startup_wait": true,
+  "original_multi_hour_incident_resolved": false,
+  "actual48h_passed": false,
+  "production_fix": "1243adc1680bc1d957ebf4ed2e633e7f22edb0c5",
+  "compiled_composition": "2e882084e09cc313e0c628907da812fd70452409",
+  "packages_passed": 219,
+  "targeted_barrier_repetitions": 20,
+  "targeted_race_repetitions": 3,
+  "mature_replay": {
+    "passed": true,
+    "first": 77623,
+    "blocks": 256,
+    "memory_bytes": 4096000000,
+    "cpus": 2,
+    "snapshot_sha256": "d247d5378422d23184c03f914226056142a3609a9825368570868e34c16abd21",
+    "binary_sha256": "669f3504e1554ac13646050f7b892ff941148f97456c9800eead35733acb8f6f",
+    "rows_sha256": "72270c8561c7a4f41a296e893156ae24aa28027c6cb2df9621253b5059aea2ff",
+    "execution_seconds": 232.5377241789829,
+    "elapsed_seconds": 295.29551482899114
+  },
+  "original04_history_completed_at": "2026-11-22T05:10:33.486Z",
+  "original04_acceptance_started_at": "2026-11-22T05:11:01.060551Z"
+}

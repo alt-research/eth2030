@@ -31,3 +31,7 @@ See [RESULTS_20261122.md](RESULTS_20261122.md) for current failed/running/passed
 ## Authoritative round04 failure follow-up
 
 Round04 failed at5h30m /658 samples; it is not active and not a48-hour pass. The signed prefix remains independently valid but the unsigned tail and runtime stall need closure. See the final follow-up in RESULTS_20261122.md for the125/129 final fallback failure, two causal lifecycle fixes, actual EF execution/skip counts and the pending native blocked-stack diagnosis. Original failed03/04 evidence is preserved, and no new accepted clock is started.
+
+## Whole observed BLS span and fixed network repeats
+
+Failed04 forensic BLS finality/ancestry now closes the complete73639–80256 observed span, including a freshly replayed606-slot tail, without qualifying runtime duration. New CL3782df1 passes basic and three fixed consecutive fallback runs at129/129 and head98.67%. A30m mature-state diagnosis did not reproduce the native stall;6h45m stack-capturing diagnosis is active, not48h admission. See the final RESULTS follow-up and FAILED04_PREFIX_BLS_CLOSURE.json.

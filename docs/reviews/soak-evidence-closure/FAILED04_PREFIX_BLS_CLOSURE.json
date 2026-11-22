@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "scope": "Forensic signed ancestry closure of the failed04 actual observed span only; no operating/48h acceptance.",
+  "actual48h_passed": false,
+  "observed_first": 73639,
+  "observed_through": 80256,
+  "original_windows": 6,
+  "new_tail_window": {
+    "first": 79651,
+    "stop": 80257,
+    "slots": 606,
+    "finalized_root": "0x3f8a85ccbdf9ce9b3a09464eed092c97cceffb720ca5d6f6df39230a1e63828b",
+    "finalized_slot": 81344,
+    "signature_slot": 81410,
+    "signature_participants": 405,
+    "parent_hash_links": 1693,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "prior_finalized_anchor_linked": true,
+  "original_operating_failure_retained": true
+}

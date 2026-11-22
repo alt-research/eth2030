@@ -1,0 +1,58 @@
+{
+  "full_test_packages": 219,
+  "native_replay_blocks": 256,
+  "actual48h_passed": false,
+  "postfix_long_run_pending": true,
+  "receipts": [
+    {
+      "artifact": "actual-fcu-io-full-tests.log",
+      "bytes": 12576,
+      "sha256": "52e84b5c3da1702ed0179a168af7536c95e0f794132185ffd65ba02036202730"
+    },
+    {
+      "artifact": "actual-fcu-io-race.log",
+      "bytes": 152,
+      "sha256": "470a0182ac1207752de92df45a5fdfa772e9ae9f6e83f1aa9b98bf3f412f0236"
+    },
+    {
+      "artifact": "actual-fcu-io-vet-build.log",
+      "bytes": 135,
+      "sha256": "96f62fa80e27f7f4f80bc8975e2c65dd11d734d2330e0e886524a49167e708e6"
+    },
+    {
+      "artifact": "actual-fcu-io-combined-tests.log",
+      "bytes": 248,
+      "sha256": "ef9ca86308df94ea73151e3b9bc418ee9c2a8276b2d29545287e50f264fb2b3b"
+    },
+    {
+      "artifact": "actual-fcu-io-mature-replay/replay.log",
+      "bytes": 77474,
+      "sha256": "2ef3ce811982ff3b6521f4867d09199b10c0b17101c23176cb9d5995d279952a"
+    },
+    {
+      "artifact": "actual-fcu-io-old-diagnostic-bls-tail-02/replay.exchanges.jsonl",
+      "bytes": 3568418,
+      "sha256": "554469c8c86e942e35211414199e66f07675403580786d7d2bbcd076f763be57"
+    },
+    {
+      "artifact": "actual-fcu-io-old-diagnostic-bls-prefix/exchanges.jsonl",
+      "bytes": 3629085,
+      "sha256": "30c02db397dc8b011ac1d1953fd938d4c77807b1979ea1f797a3717c41aabd55"
+    },
+    {
+      "artifact": "extend_actual_fcu_io_failed_prefix.py",
+      "bytes": 3166,
+      "sha256": "e3e162f48bd6efb6228129961a5f7ab707e13e02295dbd9e01c28ae198c51bcc"
+    },
+    {
+      "artifact": "actual-fcu-io-postfix/BUILD.json",
+      "bytes": 657,
+      "sha256": "1f7a6fed9fba56ed616ca8132247678cf97b513460bdd7ac974c26faf9a534ab"
+    },
+    {
+      "artifact": "actual-fcu-io-postfix/CLONE.json",
+      "bytes": 1224,
+      "sha256": "28e2f8c787aceaacb556f7895bb4da2dc2c6028dbb2a3df1baea78d804798b69"
+    }
+  ]
+}

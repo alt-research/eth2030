@@ -1,0 +1,175 @@
+Spontaneous diagnostic: first complete native snapshot, before CL gdb.
+Full original SHA256 3aa991926928a8ed841040cf83d58526a15f0478a8fcff468cc7fc690b848592
+
+goroutine 58577 [syscall]:
+syscall.Syscall(0x4a, 0x18, 0x0, 0x0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/syscall_linux.go:74 +0x25
+syscall.Fsync(0x7a507b7fdd80?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/zsyscall_linux_amd64.go:463 +0x25
+internal/poll.(*FD).Fsync.func1(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:18
+internal/poll.ignoringEINTR(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_posix.go:74
+internal/poll.(*FD).Fsync(0x0?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:17 +0xe7
+os.(*File).Sync(0x1e672a4919e0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/os/file_posix.go:167 +0x3b
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).writeDataFile(0x1e672a5d0370?, {0x1e6767d71370?, 0x1e6767d71e08?, 0x1e6733e8c458?}, {0x1e676cdd06a0, 0x20, 0x20})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:440 +0x12f
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).applyOpsLocked(0x1e672a5d0370, {0x1e6739578008, 0x4d, 0x1e6767d71e08?})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:596 +0x445
+github.com/eth2030/eth2030/core/rawdb.(*fileBatch).Write(0x1e675f844210)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:555 +0x74
+github.com/eth2030/eth2030/core/chain.(*Blockchain).ApplyForkchoice(0x1e672a5d8d80, {0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/chain/execution_forkchoice.go:155 +0x199b
+github.com/eth2030/eth2030/node.(*Node).applyExecutionTarget(0x1e672a664308, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/sync_runtime.go:63 +0x265
+github.com/eth2030/eth2030/sync/beacon.(*ExecutionSyncer).ApplyKnown(0x1e6752278140, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/sync/beacon/execution_sync.go:154 +0xd7
+github.com/eth2030/eth2030/node.(*nodeDepsAdapter).ApplyExecutionForkchoice(0x1e672a5d8d80?, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/sync_runtime.go:32 +0xeb
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).forkchoiceUpdated(0x1e672a4c5200, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:81 +0x873
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdated(...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:34
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedV4(0x1e673955a000?, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:302 +0x1d8
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedBogota(0x1e672a4c5200, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_bogota.go:81 +0xa1d
+github.com/eth2030/eth2030/engine.(*EngineAPI).forkchoiceUpdatedBogota(0x1e672a60f540, {{0xce, 0x49, 0x49, 0x37, 0xc0, 0xd6, 0xe4, 0x6e, 0x27, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/bogota.go:129 +0x11e
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleAmsterdamForkchoice(0x1e672a60f540, {0x1e6747b486c0, 0x3, 0x50faf9?}, 0x1)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:623 +0x526
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleForkchoiceUpdatedV5(...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:634
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x1e672a60f540, {0x1e676c33fa20, 0x1a}, {0x1e6747b486c0, 0x3, 0x4})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:149 +0x56e
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x1e672a60f540, {0x1e673c9fd800, 0x179, 0x200})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 45259
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:643 +0xb05
+
+goroutine 58585 [sync.Mutex.Lock, 3 minutes]:
+internal/sync.runtime_SemacquireMutex(0x0?, 0x0?, 0x1e673cc62758?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x1e672a5d0370)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:149 +0x15d
+internal/sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/mutex.go:46
+sync.(*RWMutex).Lock(0x1e676e098b40?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/rwmutex.go:150 +0x32
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).Get(0x1e672a5d0370, {0x1b85102, 0x2, 0x1e673cc628f8?})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:136 +0x5d
+github.com/eth2030/eth2030/core/rawdb.ReadHeadBlockHash({0x7a508d7748d0?, 0x1e672a5d0370?})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/accessors.go:176 +0x4b
+github.com/eth2030/eth2030/core/chain.(*Blockchain).CheckStorage(0x1e6774936948?)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/chain/validated_store.go:25 +0x36
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockInternal(0x1e672a4c5200, 0x1e67394fa288, {0xff, 0x8f, 0x21, 0x63, 0x4a, 0x95, 0xcd, 0x4e, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_backend.go:288 +0x136
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockV5(0x1e672a4c5200, 0x1e67394fa288, {0xff, 0x8f, 0x21, 0x63, 0x4a, 0x95, 0xcd, 0x4e, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_backend.go:269 +0x2e6
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ProcessBlockV5(0xf9d6a0?, 0x10021b463e3?, {0x7a508cd85d38?, 0x1e673cc631f8?, 0x424c05?}, {0xff, 0x8f, 0x21, 0x63, 0x4a, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_backend.go:243 +0x45
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayloadWith(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:306 +0x219
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayload(...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:276
+github.com/eth2030/eth2030/engine.(*EngineAPI).NewPayloadV5(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:267 +0x268
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleNewPayloadV5(0x1e672a60f540, {0x1e6747a82d80, 0x1e6774937bb8?, 0x50faf9?})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:410 +0x5ef
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x1e672a60f540, {0x1e673a042ab0, 0x13}, {0x1e6747a82d80, 0x4, 0x4})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:141 +0x3f3
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x1e672a60f540, {0x1e6738767000, 0x796, 0x800})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 42169
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:643 +0xb05
+
+goroutine 58617 [sync.RWMutex.RLock]:
+sync.runtime_SemacquireRWMutexR(0x1e6739770b40?, 0x1?, 0x35?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/runtime/sema.go:100 +0x25
+sync.(*RWMutex).RLock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/rwmutex.go:74
+github.com/eth2030/eth2030/core/chain.(*Blockchain).CurrentBlock(0x1e672a5d8d80)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/chain/blockchain.go:1019 +0x4a
+github.com/eth2030/eth2030/node.(*nodeDepsAdapter).SyncProgress(0x1e675a742440)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/sync_runtime.go:36 +0x25
+github.com/eth2030/eth2030/node/backend.(*RPCBackend).SyncProgress(0x0?)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/rpc_backend.go:40 +0x3d
+github.com/eth2030/eth2030/rpc/ethapi.(*EthAPI).syncing(0x1e6739770c88?, 0x1e674fcb2cc0)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/rpc/ethapi/eth_api.go:596 +0x50
+github.com/eth2030/eth2030/rpc/ethapi.(*EthAPI).HandleRequest(0x1e675227a550, 0x1e674fcb2cc0)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/rpc/ethapi/eth_api.go:100 +0x230
+github.com/eth2030/eth2030/rpc/server.(*Server).handleRPC(0x1e675227a640, {0x12e0e20, 0x1e67396c6690}, 0x1e673971c780)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/rpc/server/server.go:217 +0x347
+net/http.HandlerFunc.ServeHTTP(0x1e672a5d6480?, {0x12e0e20?, 0x1e67396c6690?}, 0x420e05?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:2266 +0x29
+net/http.(*ServeMux).ServeHTTP(0xf7f7a0?, {0x12e0e20, 0x1e67396c6690}, 0x1e673971c780)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:2808 +0x1c7
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler(0x1e672a60f540, {0x12e0e20, 0x1e67396c6690}, 0x1e673971c500)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:622 +0x1187
+net/http.HandlerFunc.ServeHTTP(0x8c0b20?, {0x12e0e20?, 0x1e67396c6690?}, 0x1e672a4f2b28?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:2266 +0x29
+net/http.serverHandler.ServeHTTP({0x1e673955b5d0?}, {0x12e0e20?, 0x1e67396c6690?}, 0x1?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:3291 +0x8e
+net/http.(*conn).serve(0x1e673955b560, {0x12e2148, 0x1e672a5f5a10})
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:2074 +0x6b0
+created by net/http.(*Server).Serve in goroutine 8344
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/net/http/server.go:3444 +0x485
+
+Later independently rolling-observed WAL wait (9.799 seconds):
+goroutine 58897 [syscall]:
+syscall.Syscall(0x4a, 0x7, 0x0, 0x0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/syscall_linux.go:74 +0x25
+syscall.Fsync(0x1e6751fafb00?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/zsyscall_linux_amd64.go:463 +0x25
+internal/poll.(*FD).Fsync.func1(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:18
+internal/poll.ignoringEINTR(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_posix.go:74
+internal/poll.(*FD).Fsync(0x0?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:17 +0xe7
+os.(*File).Sync(0x1e6751fbc128)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/os/file_posix.go:167 +0x3b
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).walWriteCommit(0x1e672a5d0370)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:304 +0xb8
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).applyOpsLocked(0x1e672a5d0370, {0x1e673536d808, 0x23, 0x1e6766946a18?})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:582 +0x239
+github.com/eth2030/eth2030/core/rawdb.(*fileBatch).Write(0x1e6757e039b0)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/rawdb/filedb.go:555 +0x74
+github.com/eth2030/eth2030/core/chain.(*Blockchain).ApplyForkchoice(0x1e672a5d8d80, {0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/core/chain/execution_forkchoice.go:155 +0x199b
+github.com/eth2030/eth2030/node.(*Node).applyExecutionTarget(0x1e672a664308, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/sync_runtime.go:63 +0x265
+github.com/eth2030/eth2030/sync/beacon.(*ExecutionSyncer).ApplyKnown(0x1e6752278140, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/sync/beacon/execution_sync.go:154 +0xd7
+github.com/eth2030/eth2030/node.(*nodeDepsAdapter).ApplyExecutionForkchoice(0x1e672a5d8d80?, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/sync_runtime.go:32 +0xeb
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).forkchoiceUpdated(0x1e672a4c5200, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:81 +0x873
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdated(...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:34
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedV4(0x1e67355af560?, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_fcu.go:302 +0x1d8
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedBogota(0x1e672a4c5200, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/node/backend/engine_bogota.go:81 +0xa1d
+github.com/eth2030/eth2030/engine.(*EngineAPI).forkchoiceUpdatedBogota(0x1e672a60f540, {{0xec, 0x8b, 0xac, 0x4e, 0x59, 0xc3, 0x72, 0xb0, 0x6d, ...}, ...}, ...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/bogota.go:129 +0x11e
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleAmsterdamForkchoice(0x1e672a60f540, {0x1e674722ed20, 0x3, 0x50faf9?}, 0x1)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:623 +0x526
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleForkchoiceUpdatedV5(...)
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:634
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x1e672a60f540, {0x1e6773fed260, 0x1a}, {0x1e674722ed20, 0x3, 0x4})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:149 +0x56e
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x1e672a60f540, {0x1e6742a2d400, 0x179, 0x200})
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 58686
+	/projects/eth2030/eth2030-engine-import-stall/pkg/engine/server.go:643 +0xb05

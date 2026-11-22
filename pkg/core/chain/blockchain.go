@@ -80,12 +80,13 @@ type Blockchain struct {
 	// briefly for cache reads/writes, not during expensive state execution.
 	// This allows concurrent Engine API reads (HasBlock, GetBlock, etc.)
 	// to proceed without blocking while a block is being processed.
-	insertMu  sync.Mutex
-	config    *config.ChainConfig
-	db        rawdb.Database
-	hc        *HeaderChain
-	processor *execution.StateProcessor
-	validator block.Validator
+	insertMu         sync.Mutex
+	canonicalVersion uint64 // protected by mu; validates multi-key fallback reads
+	config           *config.ChainConfig
+	db               rawdb.Database
+	hc               *HeaderChain
+	processor        *execution.StateProcessor
+	validator        block.Validator
 
 	opts BlockchainOpts // cache size limits, set at construction
 
@@ -943,6 +944,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.Process
 
 	if isCanonical {
 		bc.canonCache[num] = hash
+		bc.canonicalVersion++
 		bc.currentBlock = blk
 		bc.currentState = statedb
 
@@ -987,31 +989,34 @@ func (bc *Blockchain) InsertChain(blocks []*types.Block) (int, error) {
 // It checks the in-memory cache first, then falls back to rawdb.
 func (bc *Blockchain) GetBlock(hash types.Hash) *types.Block {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	if b, ok := bc.blockCache[hash]; ok {
-		return b
+	block := bc.blockCache[hash]
+	ancient := bc.ancientStore
+	bc.mu.RUnlock()
+	if block != nil {
+		return block
 	}
-	// Fallback: try reading from rawdb.
-	return bc.readBlock(hash)
+	return bc.readBlockWithAncient(hash, ancient)
 }
 
-// GetBlockByNumber retrieves the canonical block for a given number.
+// GetBlockByNumber reads cached selection briefly, then performs cold I/O
+// without retaining the publication lock. A cold lookup may wait for a writer.
 func (bc *Blockchain) GetBlockByNumber(number uint64) *types.Block {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	hash, ok := bc.canonCache[number]
-	if !ok {
-		// Fallback: try rawdb canonical hash.
-		h, err := rawdb.ReadCanonicalHash(bc.db, number)
+	hash, known := bc.canonCache[number]
+	block := bc.blockCache[hash]
+	ancient := bc.ancientStore
+	bc.mu.RUnlock()
+	if known && block != nil {
+		return block
+	}
+	if !known {
+		var err error
+		hash, err = rawdb.ReadCanonicalHash(bc.db, number)
 		if err != nil {
 			return nil
 		}
-		hash = h
 	}
-	if b, ok2 := bc.blockCache[hash]; ok2 {
-		return b
-	}
-	return bc.readBlock(hash)
+	return bc.readBlockWithAncient(hash, ancient)
 }
 
 // CurrentBlock returns the head of the canonical chain.
@@ -1058,6 +1063,8 @@ func (bc *Blockchain) AncientStore() *rawdb.AncientStore {
 // that the value survives a node restart. If an AncientStore is wired, it
 // triggers a background migration of all blocks up to the finalized number.
 func (bc *Blockchain) SetFinalized(blk *types.Block) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	bc.currentFinalBlock = blk
 	as := bc.ancientStore
@@ -1093,6 +1100,8 @@ func (bc *Blockchain) migrateToAncient(as *rawdb.AncientStore, finalNum uint64) 
 // The safe block is not persisted to disk (it is reconstructed from the
 // finalized block on startup, following go-ethereum convention).
 func (bc *Blockchain) SetSafe(blk *types.Block) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	bc.currentSafeBlock = blk
 	bc.mu.Unlock()
@@ -1106,10 +1115,11 @@ func (bc *Blockchain) SetSafe(blk *types.Block) {
 // HasBlock checks if a block with the given hash exists in cache or rawdb.
 func (bc *Blockchain) HasBlock(hash types.Hash) bool {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
 	if _, ok := bc.blockCache[hash]; ok {
+		bc.mu.RUnlock()
 		return true
 	}
+	bc.mu.RUnlock()
 	// Fall back to rawdb: if the header number mapping exists, the block was
 	// persisted (written by writeBlock which calls WriteHeader).
 	_, err := rawdb.ReadHeaderNumber(bc.db, hash)
@@ -1137,6 +1147,8 @@ func (bc *Blockchain) SetHead(number uint64) error {
 		}
 		return bc.ApplyForkchoice(target.Hash(), types.Hash{}, types.Hash{})
 	}
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 
@@ -1163,6 +1175,7 @@ func (bc *Blockchain) SetHead(number uint64) error {
 	}
 
 	// Set new head.
+	bc.canonicalVersion++
 	bc.currentBlock = bc.blockCache[target]
 
 	// Re-derive state by re-executing from genesis.
@@ -1314,7 +1327,7 @@ func (bc *Blockchain) CanQuicklyGetState(blk *types.Block, threshold int) bool {
 		parent := bc.blockCache[current.ParentHash()]
 		bc.mu.RUnlock()
 		if parent == nil {
-			parent = bc.readBlock(current.ParentHash())
+			parent = bc.GetBlock(current.ParentHash())
 		}
 		if parent == nil {
 			return false // Parent unknown, would need full sync
@@ -1588,6 +1601,10 @@ func (bc *Blockchain) writeBlock(blk *types.Block) {
 // Caller must hold bc.mu (at least RLock) — ancientStore is read without its
 // own lock because bc.mu guards the pointer and AncientStore methods are safe.
 func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
+	return bc.readBlockWithAncient(hash, bc.ancientStore)
+}
+
+func (bc *Blockchain) readBlockWithAncient(hash types.Hash, ancient *rawdb.AncientStore) *types.Block {
 	// Look up block number from hash.
 	// DeleteHeaderData preserves this mapping after AncientStore migration.
 	num, err := rawdb.ReadHeaderNumber(bc.db, hash)
@@ -1599,8 +1616,8 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 	headerData, _ := rawdb.ReadHeader(bc.db, num, hash)
 	if len(headerData) == 0 {
 		// Header may have been migrated to AncientStore; try there.
-		if bc.ancientStore != nil {
-			block := bc.readBlockFromAncient(num)
+		if ancient != nil {
+			block := readAncientBlock(ancient, num)
 			if block != nil && block.Hash() == hash {
 				return block
 			}
@@ -1619,8 +1636,8 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 			return nil
 		}
 		// Body may have been migrated to AncientStore; try there.
-		if bc.ancientStore != nil {
-			block := bc.readBlockFromAncient(num)
+		if ancient != nil {
+			block := readAncientBlock(ancient, num)
 			if block != nil && block.Hash() == hash {
 				return block
 			}
@@ -1641,7 +1658,9 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 // readBlockFromAncient reads a block by number from the AncientStore.
 // Caller must hold bc.mu (at least RLock).
 func (bc *Blockchain) readBlockFromAncient(num uint64) *types.Block {
-	as := bc.ancientStore
+	return readAncientBlock(bc.ancientStore, num)
+}
+func readAncientBlock(as *rawdb.AncientStore, num uint64) *types.Block {
 	headerData, err := as.ReadHeader(num)
 	if err != nil || len(headerData) == 0 {
 		return nil
@@ -2076,7 +2095,7 @@ func (bc *Blockchain) GetReceipts(blockHash types.Hash) []*types.Receipt {
 	if err != nil {
 		return nil
 	}
-	blk := bc.readBlock(blockHash)
+	blk := bc.GetBlock(blockHash)
 	var txs []*types.Transaction
 	if blk != nil {
 		txs = blk.Transactions()
@@ -2108,7 +2127,7 @@ func (bc *Blockchain) GetBlockReceipts(number uint64) []*types.Receipt {
 		return r
 	}
 	// Fallback: read from rawdb (thread-safe).
-	blk := bc.readBlock(hash)
+	blk := bc.GetBlock(hash)
 	var txs []*types.Transaction
 	if blk != nil {
 		txs = blk.Transactions()
@@ -2125,7 +2144,7 @@ func (bc *Blockchain) GetLogs(blockHash types.Hash) []*types.Log {
 		// Fallback: read from rawdb (thread-safe, no bc.mu needed).
 		num, err := rawdb.ReadHeaderNumber(bc.db, blockHash)
 		if err == nil {
-			blk := bc.readBlock(blockHash)
+			blk := bc.GetBlock(blockHash)
 			var txs []*types.Transaction
 			if blk != nil {
 				txs = blk.Transactions()
@@ -2153,31 +2172,41 @@ func (bc *Blockchain) GetTxLookupEntry(txHash types.Hash) (TxLookupEntry, bool) 
 
 // GetTransactionLookup returns the block location for a transaction hash.
 func (bc *Blockchain) GetTransactionLookup(txHash types.Hash) (blockHash types.Hash, blockNumber uint64, txIndex uint64, found bool) {
-	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	if entry, ok := bc.txLookup[txHash]; ok {
-		return entry.BlockHash, entry.BlockNumber, entry.TxIndex, true
-	}
-	// Fallback: try rawdb tx lookup index.
-	num, err := rawdb.ReadTxLookup(bc.db, txHash)
-	if err != nil {
-		return types.Hash{}, 0, 0, false
-	}
-	hash, err := rawdb.ReadCanonicalHash(bc.db, num)
-	if err != nil {
-		return types.Hash{}, 0, 0, false
-	}
-	// Find the transaction index within the block.
-	blk := bc.readBlock(hash)
-	if blk == nil {
-		return types.Hash{}, 0, 0, false
-	}
-	for i, tx := range blk.Transactions() {
-		if tx.Hash() == txHash {
-			return hash, num, uint64(i), true
+	for {
+		bc.mu.RLock()
+		if entry, ok := bc.txLookup[txHash]; ok {
+			bc.mu.RUnlock()
+			return entry.BlockHash, entry.BlockNumber, entry.TxIndex, true
+		}
+		version, ancient := bc.canonicalVersion, bc.ancientStore
+		bc.mu.RUnlock()
+		blockHash, blockNumber, txIndex, found = func() (types.Hash, uint64, uint64, bool) {
+			num, err := rawdb.ReadTxLookup(bc.db, txHash)
+			if err != nil {
+				return types.Hash{}, 0, 0, false
+			}
+			hash, err := rawdb.ReadCanonicalHash(bc.db, num)
+			if err != nil {
+				return types.Hash{}, 0, 0, false
+			}
+			block := bc.readBlockWithAncient(hash, ancient)
+			if block == nil {
+				return types.Hash{}, 0, 0, false
+			}
+			for i, tx := range block.Transactions() {
+				if tx.Hash() == txHash {
+					return hash, num, uint64(i), true
+				}
+			}
+			return types.Hash{}, 0, 0, false
+		}()
+		bc.mu.RLock()
+		same := bc.canonicalVersion == version
+		bc.mu.RUnlock()
+		if same {
+			return
 		}
 	}
-	return types.Hash{}, 0, 0, false
 }
 
 // HistoryOldestBlock returns the oldest block number for which block bodies
@@ -2192,6 +2221,8 @@ func (bc *Blockchain) HistoryOldestBlock() uint64 {
 // (head - retention) blocks. Headers are preserved. Returns the number
 // of blocks pruned.
 func (bc *Blockchain) PruneHistory(retention uint64) (uint64, error) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 

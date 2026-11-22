@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from review_diagnostic import capture, review
+from review_diagnostic import capture, review, review_rolling
 
 
 START = 1800000000
@@ -139,6 +139,24 @@ class ReviewTest(unittest.TestCase):
         result = review(state, rows, {}, START + 120)
         self.assertEqual(result["status"], "observing_before_5_5h")
         self.assertEqual(result["memory_limit_events"]["el"], 686)
+
+    def test_zero_wait_events_cannot_hide_stale_or_mismatched_collector(self):
+        profile = {"source": "pinned", "binary_sha256": "binary"}
+        rolling = {**profile, "status": "watching", "updated_at": iso(START), "samples": 10, "events": 0}
+        with self.assertRaisesRegex(ValueError, "stale"):
+            review_rolling(rolling, profile, START + 61, False)
+        with self.assertRaisesRegex(ValueError, "stale"):
+            review_rolling(rolling, profile, START + 61, True)
+        rolling["source"] = "other"
+        with self.assertRaisesRegex(ValueError, "identity"):
+            review_rolling(rolling, profile, START + 1, False)
+
+    def test_sustained_wait_requires_review_without_claiming_a_root(self):
+        profile = {"source": "pinned", "binary_sha256": "binary"}
+        rolling = {**profile, "status": "watching", "updated_at": iso(START), "samples": 10, "events": 1}
+        result = review_rolling(rolling, profile, START + 1, False)
+        self.assertTrue(result["wait_chain_review_required"])
+        self.assertIn("request/log correlation", result["scope"])
 
 
 if __name__ == "__main__":

@@ -180,7 +180,32 @@ def load_review(run, now):
         raise ValueError("bounded diagnostic duration changed")
     path = run / "bounded-bls-windows/result.json"
     bls = json.loads(path.read_text()) if path.exists() else {}
-    return review(state, rows, bls, now), state
+    result = review(state, rows, bls, now)
+    path = run / "actual-native-wait-sampling/result.json"
+    try:
+        rolling = json.loads(path.read_text())
+        finished = "finished_at" in state
+        result["rolling_stacks"] = review_rolling(rolling, profile, timestamp(state["finished_at"]) if finished else now, finished)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        result["errors"].append("rolling stack evidence: " + str(error))
+        result["status"] = "failed"
+    return result, state
+
+
+def review_rolling(rolling, profile, now, finished):
+    """A zero event count is meaningful only with a live, matching collector."""
+    if rolling["source"] != profile["source"] or rolling["binary_sha256"] != profile["binary_sha256"]:
+        raise ValueError("rolling runtime identity differs")
+    age = now - timestamp(rolling["updated_at"])
+    valid_states = {"watching", "owned_diagnostic_stopped"} if finished else {"watching"}
+    if rolling["status"] not in valid_states or not -5 <= age <= MAX_SAMPLE_GAP:
+        raise ValueError("rolling collector is stopped or stale")
+    if type(rolling["samples"]) is not int or rolling["samples"] <= 0 or type(rolling["events"]) is not int or rolling["events"] < 0:
+        raise ValueError("invalid rolling evidence counters")
+    return {"samples": rolling["samples"], "sustained_events": rolling["events"],
+            "updated_at": rolling["updated_at"],
+            "wait_chain_review_required": rolling["events"] > 0,
+            "scope": "Sampled sustained goroutines require request/log correlation; zero events never resolve the original fault"}
 
 
 def docker(*args):

@@ -1,6 +1,6 @@
 # ETH2030 development progress
 
-Updated November 22, 2026 at merged master `9a094830`. EL PRs 123/124/125 are merged. The production package and code-CI workflow equal qualified composition `d9201b0`; merge/source identity and running executable identity remain distinct. The original 33 Glamsterdam task IDs and R01–R13 are complete for the selected merged LIFO / signed Gloas development target.
+Updated November 22, 2026 at merged master `55f7fd84`. EL PRs123–130 are merged. Current production package bytes equal functional source `2c0df12f`; original `d9201b0` measurements remain attached to that source; merge/source identity and running executable identity remain distinct. The original 33 Glamsterdam task IDs and R01–R13 are complete for the selected merged LIFO / signed Gloas development target.
 
 ## Current merged acceptance
 
@@ -27,3 +27,7 @@ The original audit's GAP-01 and GAP-06 have separate source corrections awaiting
 Later-fork independent Frame/Bogotá agreement, Dora production consumers, paymaster services and public binary/PQ/proof/native-rollup work retain separate gates. The paired Frame 66/165 and CL join 256 record is preserved at [its original source](verification/frame-8141-20261118-paymaster-history-final.json); its synchronized-EL boundary is not erased.
 
 [Roadmap](ROADMAP.md) · [Next-stage plan](next-stage-work-plan.md) · [Current gaps and reproducible observations](audits/merged-glamsterdam-20261122/README.md)
+
+## Latest runtime acceptance failure
+
+Rounds03 and04 failed; the latter observed658 samples /5h30m before a CL syncing timeout, with noOOM and clean daemon exits. Independent BLS finality/ancestry authenticates the full observed73639–80256 span, but the runtime duration remains failed. Native zero-transaction block77623 only finished after shutdown; its actual blocking dependency is being investigated with a read-only goroutine diagnostic. New CL protocol/lifecycle fixes pass their scoped tests and complete network simulations; they do not close the native stall or48-hour gate. See [results PR132](https://github.com/alt-research/eth2030/pull/132) and [diagnostic PR133](https://github.com/alt-research/eth2030/pull/133).

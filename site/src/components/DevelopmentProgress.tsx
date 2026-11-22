@@ -25,7 +25,7 @@ export default function DevelopmentProgress() {
       <div className="mt-2 flex flex-wrap gap-4 text-eth-teal">{snapshot.followUp.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>PR #{number} ↗</a>)}<a className="underline" href={`${GITHUB_URL}/commit/${snapshot.followUp.revision}`}>Reviewed source {snapshot.followUp.revision.slice(0, 8)} ↗</a></div>
     </div>
     <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">
-      <a className="underline" href={`${GITHUB_URL}/blob/${snapshot.revision}/${snapshot.record}`}>Verification record ↗</a>
+      <a className="underline" href={`${GITHUB_URL}/blob/${snapshot.recordRevision}/${snapshot.record}`}>Verification record ↗</a>
       <a className="underline" href={`${GITHUB_URL}/blob/master/${snapshot.plan}`}>Remaining gaps ↗</a>
     </div>
   </aside>;

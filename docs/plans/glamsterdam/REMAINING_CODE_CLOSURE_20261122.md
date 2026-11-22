@@ -1,6 +1,6 @@
 # Remaining-code corrections and review handoff (2026-11-22)
 
-The user's selected merged LIFO / signed Gloas development target is unchanged. The user explicitly chose to retire unsupported Builder Engine extensions and retain the existing standard CL/EIP-8282 route. This record updates the [original merged audit](../../audits/merged-glamsterdam-20261122/README.md); it preserves that audit and all earlier source-specific failures and measurements. It does not claim the new reviews are merged or48-hour qualification complete.
+The user's selected merged LIFO / signed Gloas development target is unchanged. The user explicitly chose to retire unsupported Builder Engine extensions and retain the existing standard CL/EIP-8282 route. This record updates the [original merged audit](../../audits/merged-glamsterdam-20261122/README.md); it preserves that audit and all earlier source-specific failures and measurements. Reviews126–130 are now merged in master55f7fd84; this does not claim48-hour qualification complete.
 
 ## Separately reviewable delivery
 
@@ -12,9 +12,9 @@ The user's selected merged LIFO / signed Gloas development target is unchanged. 
 | [129](https://github.com/alt-research/eth2030/pull/129) | Keep a16MiB accounted LRU instead of permanent values and stream WAL replay. Preserve known-key IO, write fencing, atomic markers and on-disk formats. Propagate iterator/deferred-state/code-hash errors through snapshots, trie roots, migration and RPC consumers. |20293b2a; [design, profiles and detected mutants](../../reviews/filedb-bounded-residency/DESIGN.md). |
 | [130](https://github.com/alt-research/eth2030/pull/130) | Restore full hash-linked execution progress over non-genesis snap state when CL targets advance; keep genesis finalized-pivot authentication. The live preflight exposed the separate retained-ancestry eligibility mismatch. |2c0df12f; [red regression, genesis positive and qualification](../../reviews/restored-snap-moving-target/STATUS.md). |
 
-At the frozen remote heads, all five reviews have10/10 successful checks, mergeable=true and no unresolved inline review threads. Protected-branch status remainsblocked; this is not a conflict and does not supply human approval. All120 ordinary source merge orders are conflict-free with the same final tree149ee79570ac76da4727bd65ab1b7736c2bed9ab. [Exact heads/CI](../../reviews/remaining-code-closure/SOURCE_PRS.json) and [all orders](../../reviews/remaining-code-closure/MERGE_ORDERS.json) are retained.
+At the historical pre-merge frozen remote heads, all five reviews have10/10 successful checks, mergeable=true and no unresolved inline review threads. Protected-branch status remainsblocked; this is not a conflict and does not supply human approval. All120 ordinary source merge orders are conflict-free with the same final tree149ee79570ac76da4727bd65ab1b7736c2bed9ab. [Exact heads/CI](../../reviews/remaining-code-closure/SOURCE_PRS.json) and [all orders](../../reviews/remaining-code-closure/MERGE_ORDERS.json) are retained.
 
-All targetmaster. The inherited common tracking ancestor prevents independent edits to rootCHECK/STATUS. Each feature owns nested tracking. Use ordinary merges in order126,127,128,129,130, then this documentation review. Review the last two against their prerequisite composition; their base remainsmaster so delivery reachesmaster. Preserve ancestry rather than flattening stacked prerequisites with squash/rebase. No EL master merge is performed here.
+All targetmaster. The inherited common tracking ancestor prevents independent edits to rootCHECK/STATUS. Each feature owns nested tracking. Those source merges are already delivered; this documentation review remains independently targeted. Review the last two against their prerequisite composition; their base remainsmaster so delivery reachesmaster. Preserve ancestry rather than flattening stacked prerequisites with squash/rebase. No EL master merge is performed here.
 
 The source-only compositionbcf9e13e and final functional source2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e each pass219 fresh full-package suites,107 official RPC input files/108 requests and full vet/native build. The former passes11 affected race suites; the final sync change additionally passes beacon/node race and20 moving-target/genesis controls. The original individual source reviews retain their own exact-head checks and package counts. A removed legacy package and added profiling command explain differences; counts are not silently added together.
 
@@ -40,6 +40,8 @@ Value residency and WAL working buffers are bounded; total memory is not constan
 
 ## Actual operating duration remains open
 
+**Authoritative follow-up:** rounds03/04 failed, most recently after658 samples /19836.586s. Six signed windows plus a freshly replayed tail authenticate the entire observed73639–80256 span, without qualifying its failed duration. Both old containers are stopped, databases privately archived, and native empty-block import blocking remains under diagnosis. No accepted48-hour run is currently active. [Current results PR132](https://github.com/alt-research/eth2030/pull/132) and [diagnostic PR133](https://github.com/alt-research/eth2030/pull/133) supersede the historical attempt snapshots below.
+
 The final source runs as a new validator-free observation pair against the unchanged original producer/validator network. The first deployment omitted Lighthouse's explicit entrypoint and never qualified. After correcting that harness, the original bcf9 preflight remained optimistic and was interrupted for the separate progress correction. The first2c0df12f pair became non-optimistic in about60s, matched original Geth finalized commitments and passed independent MPT consumers; it then lost everyCLpeer and the controller failed/stopped it. Logs show two validator BNs sendingToo many peers, followed by backfill rate limiting and a ban from the last provider. A short successful catchup is not a completed duration test.
 
 A new predeclared profile adds the existing full/snap observerENRs, including a provider measured with two peers. Only the new CL's seeds change: original node configuration, peer scoring, hash/signature checks, historical sync, resource limits and acceptance duration are preserved. The same owned databases and identities are retained; no ban/identity reset hides the failed run. Its duration starts from zero after catchup. All failures and the new profile remain separately recorded.
@@ -54,7 +56,7 @@ Live records are under/projects/eth2030/qualification/remaining-code-20261122/li
 
 | Item | Status / concrete next action |
 | --- | --- |
-|GAP-01/GAP-06 |Corrected in separate source reviews; review/merge and verify the resulting package tree. No replacement legacy protocol is invented. |
+|GAP-01/GAP-06 |Merged in master55f7fd84 with package bytes equal to functional2c0df12f; No replacement legacy protocol is invented. |
 |GAP-03 |Value/WAL residency and private million-file recovery measured; actual48h and independent final-span BLS remain pending. Inspect cardinality/history growth before broader capacity claims. |
 |GAP-02 |Lodestar10693 upstream lockfile/full hosted CI/merge remains maintainer-owned; local/fork controls do not make that pipeline green. |
 |GAP-04 |Public gas/model/compatible fork tuple and activation approval remain reserved by the user. Closed-unmerged EIP alternatives adopt no replacement by themselves. |

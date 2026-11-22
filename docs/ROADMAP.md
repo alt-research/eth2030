@@ -1,10 +1,10 @@
 # ETH2030 development roadmap
 
-Updated November 22, 2026 against merged master `9a094830` (PRs 123/124/125). The homepage and `/roadmap` share the same dated source-specific progress; the per-EIP tracker retains the November2 EF Strawmap placement baseline. Tracker-label percentages are not public-fork readiness scores.
+Updated November 22, 2026 against merged master `55f7fd84` (PRs123–130). The homepage and `/roadmap` share the same dated source-specific progress; the per-EIP tracker retains the November2 EF Strawmap placement baseline. Tracker-label percentages are not public-fork readiness scores.
 
 ## Glamsterdam: frozen development target delivered
 
-The selected merged LIFO / signed Gloas implementation and its original 33 task IDs / R01–R13 are merged and qualified. `pkg` and code-CI bytes equal the final tested `d9201b0` composition. See [merged progress](PROGRESS.md), [final source-specific qualification](plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md) and the [current remaining-gap audit](audits/merged-glamsterdam-20261122/README.md).
+The selected merged LIFO / signed Gloas implementation and its original 33 task IDs / R01–R13 are merged and qualified. Original `d9201b0` evidence remains source-specific. Current `pkg` bytes equal the separately tested functional source `2c0df12f`. See [merged progress](PROGRESS.md), [final source-specific qualification](plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md) and the [current remaining-gap audit](audits/merged-glamsterdam-20261122/README.md).
 
 | Area | Delivered result |
 | --- | --- |
@@ -14,7 +14,7 @@ The selected merged LIFO / signed Gloas implementation and its original 33 task 
 | Sync/durability | Independent Geth full/snap late join, moving-pivot/restart controls, historical state/BAL readback and four original-datadir recoveries under 300s. |
 | Operating evidence |400/400 steady slots and60/60 pressure slots; unchanged budgets,270 independent pressure proofs, finality and offline replay. |
 
-Follow-up source reviews [127](https://github.com/alt-research/eth2030/pull/127), [128](https://github.com/alt-research/eth2030/pull/128) and [129](https://github.com/alt-research/eth2030/pull/129) retire unsupported legacy Builder Engine extensions, make startup failure transactional and bound FileDB value/WAL residency. [130](https://github.com/alt-research/eth2030/pull/130) corrects restored snap progress under moving CL targets. They require merge review; the merged baseline above is unchanged. Remaining work includes actual multi-day capacity/soak qualification, metadata/history growth, upstream Lodestar hosted integration, conditional corpus expansion and the user's final public protocol/model decision. [Exact delivery and evidence](plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md). Completed private development does not imply public-network activation or unlimited production capacity.
+Follow-up source reviews [127](https://github.com/alt-research/eth2030/pull/127), [128](https://github.com/alt-research/eth2030/pull/128) and [129](https://github.com/alt-research/eth2030/pull/129) retire unsupported legacy Builder Engine extensions, make startup failure transactional and bound FileDB value/WAL residency. [130](https://github.com/alt-research/eth2030/pull/130) corrects restored snap progress under moving CL targets. All four are merged in master55f7fd84. The later operating rounds03/04 failed, most recently after5h30m. Independent BLS ancestry closes the observed spans, but native Engine import blocking is still under diagnosis and no48-hour pass exists. See [current results](https://github.com/alt-research/eth2030/pull/132) and [diagnostic review](https://github.com/alt-research/eth2030/pull/133). Remaining work includes actual multi-day capacity/soak qualification, metadata/history growth, upstream Lodestar hosted integration, conditional corpus expansion and the user's final public protocol/model decision. [Exact delivery and evidence](plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md). Completed private development does not imply public-network activation or unlimited production capacity.
 
 ## Other roadmap phases
 
@@ -30,9 +30,9 @@ The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth 
 
 ## Next development sequence
 
-1. Review and merge the separately qualified Builder-retirement, startup-rollback and FileDB reviews using ancestry-preserving merges; verify the resulting package tree before assigning a release identity.
+1. Retain merged source55f7fd84 / functional2c0df12f evidence and review the independently targeted pending qualification/diagnostic PRs; source merge is not operating acceptance.
 2. Pursue upstream Lodestar lockfile review/hosted CI while preserving the qualified dependency patch and exact runtime identity.
-3. Complete the declared48-hour operating profile; retain bounded-value/WAL measurements and original million-file recovery controls. Key/header/canonical metadata and complete startup authentication remain cardinality-dependent.
+3. Capture and repair the repeated native import stall, then begin a fresh declared48-hour operating profile on the final tuple; retain bounded-value/WAL measurements and original million-file recovery controls. Key/header/canonical metadata and complete startup authentication remain cardinality-dependent.
 4. Complete the reserved public protocol/model and release review against a compatible source/fixture/CL tuple.
 5. Continue Hegotá service/independent-client work and later public state/PQ/proof research in separate scope.
 

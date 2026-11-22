@@ -241,7 +241,7 @@ export const EIPS: EipEntry[] = [
       'PTC voting and fork-choice integration, builder registry, and payment/withdrawal paths',
     ],
     gaps: [
-      'PR127 retires unsupported legacy Builder Engine extensions and awaits merge; selected signed CL scope is qualified separately',
+      'Merged PR127 retires unsupported legacy Builder Engine extensions; selected signed CL scope is qualified separately',
       'Upstream Lodestar integration and final public protocol/model approval remain open',
     ],
     summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',

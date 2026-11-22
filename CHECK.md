@@ -6,6 +6,7 @@
 - [x] Recheck scale/coverage/upstream boundaries, publish separate source reviews and verify exact-head CI plus all120 cumulative source merge orders.
 
 - [x] Bound FileDB resident values and stream WAL recovery without weakening known-key IO, root or commit-marker checks.
+- [ ] Diagnose and repair the repeated native Engine import stall before fresh operating admission; retain failed03/04 and the independently signed observed spans.
 - [ ] Complete actual 48-hour operation on the final combined runtime; synthetic profiles and short restarts do not close this gate.
 
 Each feature owns its detailed CHECK.md and STATUS.md under docs/reviews; shared root tracking is inherited rather than edited independently.

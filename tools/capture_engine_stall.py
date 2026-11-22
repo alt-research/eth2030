@@ -91,7 +91,7 @@ def cl_backtrace(cid, image, destination):
                "-ex", "set debuginfod enabled off", "-ex", "set pagination off",
                "-ex", "file /proc/1/exe", "-ex", "set sysroot /proc/1/root",
                "-ex", "thread apply all bt 45", "-ex", "detach", "-p", "1"]
-    result = {"interference": "Debugger attachment after an Engine timeout on an owned diagnostic; never clean acceptance time.",
+    result = {"interference": "Debugger attachment on an owned diagnostic; consult caller trigger and timestamps; never clean acceptance time.",
               "started_at": utc()}
     try:
         with destination.open("wb") as log:

@@ -1,0 +1,49 @@
+{
+  "scope": "Controlled recovery observations, never the original unknown native cause or clean operating time",
+  "original04_root_resolved": false,
+  "actual48h_passed": false,
+  "response_case": {
+    "recovered": true,
+    "fault": {
+      "claimed": true,
+      "injected": true,
+      "at": "2026-11-22T14:46:20.256641+00:00",
+      "slot": 85152,
+      "block_hash": "0xe5560544c5547a89f6fa2712d5c2fab0375915e359f87d3718106eca220186c7",
+      "block_number": "0x14255",
+      "actual_seconds": 8.000095535011496
+    },
+    "execution_head_audit": {
+      "execution_recovery_established": true,
+      "actual48h_passed": false,
+      "fault_block_number": 82517,
+      "fault_slot": 85152,
+      "stopped_execution_number": 82520,
+      "stopped_execution_slot": 85155,
+      "native_head_hash": "0xa95861cf891069d67ff18d7eb15959a91b38645750bf5c6fc3d477ca8ac98ce1",
+      "reference_header_agreed": true,
+      "scope": "Do not infer recovery from beacon head progress alone. This independently checks the stopped canonical execution head."
+    },
+    "critical_scope": "The native payload was already VALID. Parallel RPC lookup imported the same envelope before the delayed gossip request errored. Client logged a timeout while the proxy attempted503 at8s. This does not reproduce the original lookup request stuck in uncommitted native execution."
+  },
+  "commit_case": {
+    "recovered": true,
+    "held_commit": {
+      "at": "2026-11-22T15:13:24.266767244Z",
+      "hash": "0xe4d3d1d1a50789c4f68d1a11cf84ed364ca9dbf12b84553c0ef5cfdf5b6fb213",
+      "hold_seconds": 150,
+      "number": 83061,
+      "phase": "released",
+      "released_at": "2026-11-22T15:15:54.267315964Z",
+      "scope": "Deliberately held native checked batch before atomic commit; not the original unknown holder or operating acceptance",
+      "slot": 85696
+    },
+    "held_block_matches_reference_canonical": true,
+    "recovery_slot": 85748,
+    "recovery_number": 83113,
+    "reference_header_agreed": true,
+    "both_exit0_noOOM": true,
+    "debugger_timing_correction": "The control captured its known injected holder at15:13:25Z, about1s after the deliberate hold and BEFORE the first8s timeout. Its private helper generic after-timeout wording is not the actual phase; use timestamps. This was explicit diagnostic interference, never a clean operating observation. The ordinary collector main still attaches only after real native timeout events.",
+    "scope": "The checked native block retained insertMu before batch commit for150s. Holding cause was deliberately injected; release permitted CL and canonical execution recovery. This does not establish original04 holder or cancellation dependency."
+  }
+}

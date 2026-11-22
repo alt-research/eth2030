@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"net/http/pprof"
 	"os"
 	"os/signal"
@@ -23,6 +24,42 @@ import (
 )
 
 var nativeCommitStallConfig = flag.String("native-commit-stall-config", "", "explicit owned diagnostic fixture manifest; never a production node option")
+
+func configureCommitStallProfiler(handler http.Handler) error {
+	mux, ok := handler.(*http.ServeMux)
+	if !ok {
+		return fmt.Errorf("unexpected native metrics handler")
+	}
+	request := httptest.NewRequest(http.MethodGet, "/debug/pprof/goroutine", nil)
+	_, pattern := mux.Handler(request)
+	if pattern == "" {
+		mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	} else if pattern != "/debug/pprof/goroutine" {
+		return fmt.Errorf("unexpected profiling route %q", pattern)
+	}
+	return nil
+}
+
+func TestCommitStallFixtureReusesConfiguredProfile(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	for i := 0; i < 2; i++ {
+		if err := configureCommitStallProfiler(mux); err != nil {
+			t.Fatal(err)
+		}
+	}
+	server := httptest.NewServer(mux)
+	defer server.Close()
+	client := &http.Client{Timeout: time.Second}
+	response, err := client.Get(server.URL + "/debug/pprof/goroutine?debug=2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("existing standard profile route lost: %d", response.StatusCode)
+	}
+}
 
 type commitStallDB struct {
 	rawdb.Database
@@ -281,10 +318,8 @@ func TestNativeCommitStallDiagnostic(t *testing.T) {
 	}
 	// Test-only read-only profiling on the existing listener. No production
 	// flag or listener is added by the fixture.
-	mux, ok := n.metricsServer.Handler.(*http.ServeMux)
-	if !ok {
-		t.Fatal("unexpected native metrics handler")
+	if err := configureCommitStallProfiler(n.metricsServer.Handler); err != nil {
+		t.Fatal(err)
 	}
-	mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
 	<-ctx.Done()
 }

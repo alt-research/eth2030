@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
+from datetime import timedelta
 
 import glamsterdam_soak_audit as audit
 import glamsterdam_soak_supervisor as supervisor
@@ -12,6 +13,48 @@ from test_glamsterdam_soak_audit import START, operating
 
 
 class SupervisorTests(unittest.TestCase):
+    def test_first_sample_deadline_cannot_wait_forever(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            state, _ = operating()
+            state["samples"] = 0
+            audit.write_json(root / "run/result.json", state)
+            audit.write_json(root / "finality/result.json", {"status": "waiting", "windows": []})
+            audit.write_json(root / "record.json", {"el": "owned-el", "cl": "owned-cl"})
+            args = argparse.Namespace(output=root / "supervisor", run=root / "run",
+                                      finality=root / "finality", record=root / "record.json")
+            with patch.object(audit, "audit") as checked, \
+                    patch.object(supervisor, "stop_owned", return_value={"clean": True}) as stopped, \
+                    patch.object(supervisor, "datetime") as clock:
+                clock.now.return_value = START + timedelta(seconds=61)
+                with self.assertRaisesRegex(audit.EvidenceError, "first accepted sample"):
+                    supervisor.supervise(args)
+            checked.assert_not_called()
+            stopped.assert_called_once()
+
+    def test_initial_sample_transition_does_not_kill_a_new_run(self):
+        class EndProbe(BaseException):
+            pass
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            state, _ = operating()
+            state["samples"] = 0
+            audit.write_json(root / "run/result.json", state)
+            audit.write_json(root / "finality/result.json", {"status": "waiting", "windows": []})
+            audit.write_json(root / "record.json", {"el": "owned-el", "cl": "owned-cl"})
+            args = argparse.Namespace(output=root / "supervisor", run=root / "run",
+                                      finality=root / "finality", record=root / "record.json")
+            with patch.object(audit, "audit") as checked, \
+                    patch.object(supervisor, "stop_owned") as stopped, \
+                    patch.object(supervisor.time, "sleep", side_effect=EndProbe), \
+                    patch.object(supervisor, "datetime") as clock:
+                clock.now.return_value = START + timedelta(seconds=1)
+                with self.assertRaises(EndProbe):
+                    supervisor.supervise(args)
+            checked.assert_not_called()
+            stopped.assert_not_called()
+
     def test_unowned_container_is_never_stopped(self):
         with patch.object(audit, "run_json", return_value=[{"Config": {"Labels": {}}}]), \
                 patch.object(supervisor.subprocess, "run") as stop:

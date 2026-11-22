@@ -54,6 +54,11 @@ def supervise(args):
                 time.sleep(30)
                 continue
             started = evidence.timestamp(operating["accepted_started_at"])
+            if not operating.get("passed") and operating.get("samples", 0) == 0:
+                evidence.require(now - started <= evidence.MAX_SAMPLE_GAP,
+                                 "first accepted sample did not arrive within60s")
+                time.sleep(1)
+                continue
             # The legacy process may be shutting down before writing its final
             # result. Allow that bounded transition, never turn it into a pass.
             if not operating.get("passed") and now >= started + evidence.DURATION:
@@ -66,6 +71,9 @@ def supervise(args):
             if finality.get("windows"):
                 evidence.require(now - evidence.timestamp(finality["updated_at"]) <= 4800,
                                  "signed finality collector stopped extending its hourly coverage")
+            else:
+                evidence.require(now - started <= 1200,
+                                 "first signed finality window did not arrive within1200s")
             audit_args.complete = operating.get("passed") is True and finality.get("passed") is True
             checked = evidence.audit(audit_args, cache)
             result.update(status="complete" if audit_args.complete else "running",

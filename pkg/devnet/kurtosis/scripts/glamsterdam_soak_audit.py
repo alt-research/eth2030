@@ -351,6 +351,19 @@ def runtime_snapshot(record, baseline, complete=False):
             for role, info in infos.items()}
 
 
+def check_coverage(finality, windows, first_slot, next_slot, observed_last, complete=False):
+    if windows:
+        require(finality["first_slot"] == first_slot
+                and finality["covered_through"] == next_slot - 1,
+                "finality coverage summary disagrees")
+    else:
+        require(not complete and finality.get("status") in ("waiting", "collecting"),
+                "full observed slot span has no signed finality")
+    if complete:
+        require(finality.get("passed") is True and next_slot - 1 >= observed_last,
+                "full observed slot span lacks contiguous signed finality")
+
+
 def audit(args, cache=None):
     """Cache only results freshly verified in this process, bound to every input byte."""
     cache = {} if cache is None else cache
@@ -450,12 +463,8 @@ def audit(args, cache=None):
         windows.append({"first": expected, "through": item["through"], "anchor": previous_anchor,
                         "participants": window["signature_participants"], "trace_sha256": key[1]})
         expected = item["through"] + 1
-    require(windows and finality["first_slot"] == windows[0]["first"]
-            and finality["covered_through"] == expected - 1, "finality coverage summary disagrees")
-    if args.complete:
-        require(finality.get("passed") is True
-                and expected - 1 >= int(state["last"]["sync"]["head_slot"]),
-                "full observed slot span lacks contiguous signed finality")
+    check_coverage(finality, windows, int(state["initial"]["sync"]["head_slot"]),
+                   expected, int(state["last"]["sync"]["head_slot"]), args.complete)
     result = {"passed": bool(args.complete), "prefix_passed": True,
               "status": "evidence_complete_cleanup_required" if args.complete else "valid_prefix_duration_pending",
               "checked_at": utc(), "actual_48h_evidence": bool(args.complete),
@@ -464,6 +473,9 @@ def audit(args, cache=None):
               "covered_through": expected - 1,
               "unsigned_observed_slots": max(0, int(state["last"]["sync"]["head_slot"]) - expected + 1),
               "cleanup_verified": operating_complete}
+    result["signed_prefix_available"] = bool(windows)
+    if not windows:
+        result["status"] = "awaiting_first_signed_prefix"
     if args.complete:
         result["status"] = "complete"
     write_json(output / "result.json", result)

@@ -120,6 +120,11 @@ class SamplingTests(unittest.TestCase):
 
 
 class FinalityTests(unittest.TestCase):
+    def test_initial_signed_warmup_is_pending_not_completion(self):
+        audit.check_coverage({"status": "waiting", "windows": []}, [], 500, 500, 510)
+        with self.assertRaisesRegex(audit.EvidenceError, "no signed finality"):
+            audit.check_coverage({"status": "waiting", "windows": []}, [], 500, 500, 510, True)
+
     def test_ssz_header_root_matches_unchanged_reference_vector(self):
         # Generated independently with the pinned consensus spec; not derived
         # from the implementation under test at test runtime.

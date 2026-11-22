@@ -22,7 +22,7 @@ REFERENCE_SHAS = {
 ARKWORKS_SHA = "e70210171261b0e435acaf09dc68d6c9fe35d1bc170aa3dce7fbe3ac65cda3db"
 EXECUTABLES = {
     "el": "4e0f7a54765ce0992d0477d65565fcb41c27a8bac6525bb6f2497721939a9043",
-    "cl": "56143d366dee843d1a9410752588ce7c8125ae0b6f9984e1fdad7783588ba3f1",
+    "cl": "3158ae6dc22db03e406b710bd9188ade72d9aad1c0d8cc4a493e4a0d09d6f142",
 }
 SOURCE = "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e"
 LABEL = "remaining-code-20261122"
@@ -461,7 +461,9 @@ def audit(args, cache=None):
               "checked_at": utc(), "actual_48h_evidence": bool(args.complete),
               "independent_proofs": proofs, "operating": metrics, "signed_windows": windows,
               "cross_window_anchors_verified": max(0, len(windows) - 1),
-              "covered_through": expected - 1, "cleanup_verified": operating_complete}
+              "covered_through": expected - 1,
+              "unsigned_observed_slots": max(0, int(state["last"]["sync"]["head_slot"]) - expected + 1),
+              "cleanup_verified": operating_complete}
     if args.complete:
         result["status"] = "complete"
     write_json(output / "result.json", result)

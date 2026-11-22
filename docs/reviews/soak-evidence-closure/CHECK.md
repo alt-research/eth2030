@@ -6,5 +6,6 @@
 - [x] Reproduce missing cadence, cross-window anchoring and final-cleanup acceptance guards with meaningful negative controls.
 - [x] Add a fail-closed audit/supervisor;45 unit controls, four compiled behavior mutations and real SDK corruption rejection pass.
 - [ ] Deploy the strict gate on a newly declared run after fixing the actual CL stall. Original03 remains failed.
-- [ ] Verify local tests/build, publish a separate master-targeted PR and reconcile exact heads/CI/merge compatibility.
+- [x] Verify45 Python controls, native Go build,173-member public archive and fresh independent forensic replay.
+- [ ] Publish a separate master-targeted PR and reconcile exact heads/CI/merge compatibility.
 - [ ] Require actual172800 seconds and complete contiguous finality coverage before final acceptance.

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "stopped_cl_slot": 97868,
+  "stopped_cl_beacon_root": "0x16f42c89f3dae07bf67b606f62d6379383db59a938cccfd97162320c3d34b04d",
+  "stopped_native_number": 94502,
+  "stopped_native_hash": "0x5e59955a4fabe8d97dc3a9305bcb47f8f7e4f761c0d18e6172dc3bc0344e51c9",
+  "stopped_native_state_root": "0x46acba042a7cb54b2eb92a6dc228f9d08d515614195cfd49da567db375a71c99",
+  "last_health_sample_slot": 97858,
+  "extra_stopped_slots": 10,
+  "authenticated_finalized_anchor": "0x3f008cd61e5af98a52be7a5d086ef23da640b757fa8351f94e5d2a8e9e22a852",
+  "signature_participants": 512,
+  "full_persisted_cl_body_rehashed": true,
+  "persisted_forkchoice_unique_leaf_agreed": true,
+  "native_header_and_mpt_sdk_verified": true,
+  "binding": "Unchanged real-BLS verified finality and complete parent path -> actual stopped CL unique stored leaf/header -> full persisted beacon body SSZ root -> execution bid hash -> independently rehashed native persisted header -> state root -> Geth SDK verified account proofs",
+  "scope": "Existing final-window captured ancestry already includes stopped slot97868 below finalized slot97888. Original window profile and through97858 remain unchanged; this separate membership receipt closes the actual stopped endpoint. Forkchoice is read-only decoded/corroborated as a unique leaf, not re-executed as a new CL process.",
+  "signed_block_ssz_sha256": "04f8a3ddbf0ac296a0009ddbc74163e6e1755cf633ea77b94558a9fc1bcea6fd",
+  "final_window_replay_sha256": "9d3b49bea467d14648db05ce893fbbf60ef71743e0b2528b0e6a907a2c21c703",
+  "final_window_trace_sha256": "94fda4fcc784c3b0c62696a76f2c87bb791876c33c306a1b68d48541776c1fad"
+}

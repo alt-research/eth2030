@@ -1,0 +1,378 @@
+{
+  "post_threshold_captures": 72,
+  "first": {
+    "at": "2026-11-23T00:10:03.112871+00:00",
+    "path": "strict-evidence-guard-04/capture-1795392603112876034",
+    "stack_sha256": "34488d58f7d4bd0a4eda58846605f4518026a7370942a45ef66df43e30ff3443"
+  },
+  "last": {
+    "at": "2026-11-23T01:21:03.118410+00:00",
+    "path": "strict-evidence-guard-04/capture-1795396863118414742",
+    "stack_sha256": "c7839a3ead990d046cd253d2ee900e17fd53693abf1cf0c86166fa3b01a18135"
+  },
+  "max_capture_gap_seconds": 60.010454,
+  "engine_point_samples": [],
+  "scope": "Each retained full profile hash and matching lifecycle checked. Point samples are not request durations; sustained collector has a separate receipt.",
+  "captures": [
+    {
+      "at": "2026-11-23T00:10:03.112871+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392603112876034",
+      "stack_sha256": "34488d58f7d4bd0a4eda58846605f4518026a7370942a45ef66df43e30ff3443"
+    },
+    {
+      "at": "2026-11-23T00:11:03.114017+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392663114021948",
+      "stack_sha256": "4ea12d99f96e3ece30507a044b9f336cb70303e5b6eb7e4f982d7a7ccb658dd1"
+    },
+    {
+      "at": "2026-11-23T00:12:03.114987+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392723114992513",
+      "stack_sha256": "afb77b2f05d12e3d597f73c569c5144882a76cce3d9f1a48e38565931f14b101"
+    },
+    {
+      "at": "2026-11-23T00:13:03.113789+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392783113795452",
+      "stack_sha256": "4e4d05bfe5189acf0bc417aabb6b51121faa517343376c8d7934fbd0ee56181b"
+    },
+    {
+      "at": "2026-11-23T00:14:03.112767+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392843112772027",
+      "stack_sha256": "ee0f71bab035b6d0952ade5550fc39b1a554d3e9ed399da613268508a3428555"
+    },
+    {
+      "at": "2026-11-23T00:15:03.114034+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392903114039522",
+      "stack_sha256": "bb7f93942e3c85a20a13563d900ccaa04ffa28a7daf3e6b0d4f65b7a7105b53c"
+    },
+    {
+      "at": "2026-11-23T00:16:03.113994+00:00",
+      "path": "strict-evidence-guard-04/capture-1795392963114000570",
+      "stack_sha256": "e781d094b7120a84cc6dc6daba1d1c94ec567801eeb1e34c939a932c0359b69f"
+    },
+    {
+      "at": "2026-11-23T00:17:03.114645+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393023114651666",
+      "stack_sha256": "d626545969012561412e069eb03370c5316f84e5bcadf88d40daa9f685eab74d"
+    },
+    {
+      "at": "2026-11-23T00:18:03.114123+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393083114129044",
+      "stack_sha256": "934d4e574dba80bbd7d37702add51d34b5020efbd885b4f730b60b70762020a1"
+    },
+    {
+      "at": "2026-11-23T00:19:03.114384+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393143114390642",
+      "stack_sha256": "963dc456a7f01ad76db736892aaf7541966a9cf6b75b5bd79136c8a6b8744c8f"
+    },
+    {
+      "at": "2026-11-23T00:20:03.113959+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393203113964007",
+      "stack_sha256": "e657acb844bfea5d2704ffb62715ad9f5edae45c956a03256e187b5704cf2eef"
+    },
+    {
+      "at": "2026-11-23T00:21:03.113506+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393263113510174",
+      "stack_sha256": "266da910f90c819e5fc869d3e26678e316b9f549a93cacc1b3c1760aecb74389"
+    },
+    {
+      "at": "2026-11-23T00:22:03.115050+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393323115061678",
+      "stack_sha256": "fae8a77383ecccb705bd97aefcb8c60f342160aad9489bc0f2870ef3b70593dc"
+    },
+    {
+      "at": "2026-11-23T00:23:03.114075+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393383114081249",
+      "stack_sha256": "285d3f4667ce59e6348b52995655d054b9a311978b96c4a4d1afc5e8a4d7050a"
+    },
+    {
+      "at": "2026-11-23T00:24:03.116211+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393443116217929",
+      "stack_sha256": "17788e5dc50211a0f5b605d43c5b71035b2ab5804773b030aa7d92fdb136ff8f"
+    },
+    {
+      "at": "2026-11-23T00:25:03.114185+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393503114190326",
+      "stack_sha256": "90b3d59c74072bd6d64c03ec2e1c1153a425c51ad2c2c50d8ee447b3362e79a5"
+    },
+    {
+      "at": "2026-11-23T00:26:03.114510+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393563114515324",
+      "stack_sha256": "aeb07f441b97372373b588c6e9ff57d0603c6a935bf0c5d1969e0ee435fa93ba"
+    },
+    {
+      "at": "2026-11-23T00:27:03.116524+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393623116530456",
+      "stack_sha256": "fe548082050fa826a345e5bc39b627ad7b40c1dc0e53115963e2780c27ac1621"
+    },
+    {
+      "at": "2026-11-23T00:28:03.114693+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393683114699037",
+      "stack_sha256": "7889f729fa5441b58afb626c99eb1f83bb9e771950c96bbfac372767b30e6abf"
+    },
+    {
+      "at": "2026-11-23T00:29:03.115579+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393743115583970",
+      "stack_sha256": "a8fea9cf8fa443d23f92bb0033bfe9139b16faeb6a8c3d228e869b4ef64520b9"
+    },
+    {
+      "at": "2026-11-23T00:30:03.114202+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393803114206885",
+      "stack_sha256": "8fa427f8143642ea5e720abe82bb2cdd779be2440317d5934e30d09cacd76946"
+    },
+    {
+      "at": "2026-11-23T00:31:03.115417+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393863115422766",
+      "stack_sha256": "c742743483fd1f95ed957be4f89a436f9b3552cab87922e73bb56c8be4b22b31"
+    },
+    {
+      "at": "2026-11-23T00:32:03.115378+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393923115383113",
+      "stack_sha256": "4bb6ab24bd2ec76feb8a4be22416038363172b34c91100d6d160f3700a69bf93"
+    },
+    {
+      "at": "2026-11-23T00:33:03.115516+00:00",
+      "path": "strict-evidence-guard-04/capture-1795393983115521836",
+      "stack_sha256": "a4c6946cbbec846a4048dae85927b3a49d0cf33130ada719241a37f017c71bd3"
+    },
+    {
+      "at": "2026-11-23T00:34:03.114501+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394043114506204",
+      "stack_sha256": "1b883664a873ed218c2f38cc2c109328a553cdf1868111e138382cf6936cc958"
+    },
+    {
+      "at": "2026-11-23T00:35:03.115796+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394103115802314",
+      "stack_sha256": "8bffdfdc53433d4a80e56588ca0d233a8c5cd0bc71bea3aba91ec7f3f0c6529c"
+    },
+    {
+      "at": "2026-11-23T00:36:03.114620+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394163114625954",
+      "stack_sha256": "2c98fbf8be96b8682e8b9362018c0b518a505d5a2169d9850b5c0d5db90a3c3a"
+    },
+    {
+      "at": "2026-11-23T00:37:03.114832+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394223114836619",
+      "stack_sha256": "574e17d445bcb5cc1171538887e013deaeb76269249deab9b05bb04ce2ebffa7"
+    },
+    {
+      "at": "2026-11-23T00:38:03.115488+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394283115493589",
+      "stack_sha256": "faa4c16309498b5171db174bb9ae5133d96433b114e8095daa94a46ac7980c57"
+    },
+    {
+      "at": "2026-11-23T00:39:03.115531+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394343115536664",
+      "stack_sha256": "35644a5a5b1002bbff11a5826d86cd2feb4935599eb14528fd20096a353e3f97"
+    },
+    {
+      "at": "2026-11-23T00:40:03.115541+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394403115546971",
+      "stack_sha256": "163a625be1a99bedb0e9ce08665baba3c64dbe2f3f9dcbad8b6c68b5bf242cf3"
+    },
+    {
+      "at": "2026-11-23T00:41:03.116649+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394463116655512",
+      "stack_sha256": "8025252482a9716c3393597f3bc230f32b957f2c545b4135ceba5abed1805e93"
+    },
+    {
+      "at": "2026-11-23T00:42:03.115878+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394523115883722",
+      "stack_sha256": "dc9aeaa0dee3ca8dc22f3e19836240e15a37476a4867ffc38c8a8800a3c66ad8"
+    },
+    {
+      "at": "2026-11-23T00:43:03.115977+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394583115982688",
+      "stack_sha256": "f47afadff271e3e4d5884c419e4b9686f7e71beef352d11bfc3ea1d8b1345628"
+    },
+    {
+      "at": "2026-11-23T00:44:03.116747+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394643116753761",
+      "stack_sha256": "b283f406b329498591af78f9fbd3841920041be4be9d42d0cf4e7f271565ecbd"
+    },
+    {
+      "at": "2026-11-23T00:45:03.115994+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394703115999221",
+      "stack_sha256": "24717793d35b092a441dc9d7f5e26f7c10e0406d41ed105faf37840146393465"
+    },
+    {
+      "at": "2026-11-23T00:46:03.118145+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394763118151766",
+      "stack_sha256": "09c937374f38227a0a575d96dcdb0942f5c3f55a644024a326eed761a57210e4"
+    },
+    {
+      "at": "2026-11-23T00:47:03.116788+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394823116794253",
+      "stack_sha256": "f366bd7773b099b0a7f501da84c25b0ccdac94f5d4bd9fbc386d54cbe716dda1"
+    },
+    {
+      "at": "2026-11-23T00:48:03.117556+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394883117561333",
+      "stack_sha256": "065a52db1b9d01c9d4022b4e5a76360d659918ced1860b50db0892ddfb71bec8"
+    },
+    {
+      "at": "2026-11-23T00:49:03.116962+00:00",
+      "path": "strict-evidence-guard-04/capture-1795394943116967861",
+      "stack_sha256": "66be8fb6f6de55d6763b40f2b338dfd4330717a2574695b21e238b085808d177"
+    },
+    {
+      "at": "2026-11-23T00:50:03.122835+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395003122840628",
+      "stack_sha256": "5b930980515797b8d422b28a7b0703c88f81ab88379c262800ba0182dcf55e02"
+    },
+    {
+      "at": "2026-11-23T00:51:03.117320+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395063117326292",
+      "stack_sha256": "340d1022cef4cb22c734f016d02e2ac6e73c61c3540f608d602749a2409384a6"
+    },
+    {
+      "at": "2026-11-23T00:52:03.116671+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395123116676507",
+      "stack_sha256": "91c9e8261c43b80e1b872ed527dd0256e5849d7d70c04be6265c148cb2ac070e"
+    },
+    {
+      "at": "2026-11-23T00:53:03.117626+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395183117631820",
+      "stack_sha256": "04deaf65a3716670009f792bb62dd62e5e67aaa406b000f14335db6085584689"
+    },
+    {
+      "at": "2026-11-23T00:54:03.116965+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395243116969945",
+      "stack_sha256": "6000deaacab42bd6abba494083106f58d31c923e37a5a385e8eea19c20f3cda1"
+    },
+    {
+      "at": "2026-11-23T00:55:03.117658+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395303117664142",
+      "stack_sha256": "2e1dbfb1da34f3c5f2847029c708fc161d127046c739b12eac639b9b1177d7e8"
+    },
+    {
+      "at": "2026-11-23T00:56:03.117022+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395363117027352",
+      "stack_sha256": "2fe9fb72f26e2f8f028abd7fdf7539c1fe2afb52e2f117eb2f685209e281290f"
+    },
+    {
+      "at": "2026-11-23T00:57:03.116995+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395423116999686",
+      "stack_sha256": "0e59c766becb4b5240b1760222d93eb2575c6247956ea011ce46b7944a6b9567"
+    },
+    {
+      "at": "2026-11-23T00:58:03.117313+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395483117318350",
+      "stack_sha256": "4313c753e1ece24fd5ade1af9dcb3315e844969ceb513e865714e7b0a9ab93c2"
+    },
+    {
+      "at": "2026-11-23T00:59:03.116998+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395543117003634",
+      "stack_sha256": "776194b0d449c4999aeec5aeb9bca75cff7a0cd901055eece3d1908dd0f51d36"
+    },
+    {
+      "at": "2026-11-23T01:00:03.117819+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395603117824382",
+      "stack_sha256": "e25636c4a14b4b0456697d9365edc83a3b43a5ba6c80a4e9b7e0c1a71b24445c"
+    },
+    {
+      "at": "2026-11-23T01:01:03.117969+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395663117974852",
+      "stack_sha256": "f4a0bdde6d12914487fe1a50568ea744e0c82c5558ba955939e1ed123ea4a82e"
+    },
+    {
+      "at": "2026-11-23T01:02:03.117211+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395723117215951",
+      "stack_sha256": "fd8b0d528eb1fdcaa34111d555d804dcff61f943a9bdc014652f51af705e3804"
+    },
+    {
+      "at": "2026-11-23T01:03:03.118896+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395783118901100",
+      "stack_sha256": "77852d14c46eb66c109ec377a556c1b95b542558fab83d0e64e31269b3efb669"
+    },
+    {
+      "at": "2026-11-23T01:04:03.118294+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395843118299460",
+      "stack_sha256": "ab8539a15a03530df10bbe1262bba2551cd1ee1bb057ead2ef4c79618b93fa3f"
+    },
+    {
+      "at": "2026-11-23T01:05:03.118459+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395903118464702",
+      "stack_sha256": "91bd1289a844c89420b67af0acc6bd1c50d96743fac8a519c7d889977fe4e41c"
+    },
+    {
+      "at": "2026-11-23T01:06:03.117147+00:00",
+      "path": "strict-evidence-guard-04/capture-1795395963117151282",
+      "stack_sha256": "82196031276b7bb02f25d2a32d4e241caad3d7c0571a1d9436cb76f824924211"
+    },
+    {
+      "at": "2026-11-23T01:07:03.117220+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396023117224398",
+      "stack_sha256": "55d1c4e5b980640eeae5df6a5de1cc8703469ad4fd6c6dbd6dc69725205d8bc3"
+    },
+    {
+      "at": "2026-11-23T01:08:03.127674+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396083127680353",
+      "stack_sha256": "35db6a2160e2b431de6d5285d874ccdbcec727c38472429bf43d1536e1a4dc69"
+    },
+    {
+      "at": "2026-11-23T01:09:03.118296+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396143118300832",
+      "stack_sha256": "bf0712a9a699649c8e7fbff1c7212c96c44de070cbe12e1a83f0387ed915e9a1"
+    },
+    {
+      "at": "2026-11-23T01:10:03.119008+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396203119014343",
+      "stack_sha256": "9a50e513734fcafd9c9fdaf2dfd616fe6da38f58bbc86c9374417403248e403f"
+    },
+    {
+      "at": "2026-11-23T01:11:03.118319+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396263118324669",
+      "stack_sha256": "c69257d6c1c0c9b18d151249443813fef1987ebd2de077ee65d859a261c921ea"
+    },
+    {
+      "at": "2026-11-23T01:12:03.126495+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396323126502181",
+      "stack_sha256": "e77feb405d0449ca21191bba2ee9d6444ed09e57a61a5e2b9ae856a2129c7818"
+    },
+    {
+      "at": "2026-11-23T01:13:03.125259+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396383125264553",
+      "stack_sha256": "6d42b6a1e2fa19c8e5358183d739f6d91b56c0ccfa89343f2af1fc2e0c6c1220"
+    },
+    {
+      "at": "2026-11-23T01:14:03.123971+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396443123976402",
+      "stack_sha256": "a487dc35fa2f768f74efdb0e1781a10542ef8c161d7b0fde7696c48e8d81d08e"
+    },
+    {
+      "at": "2026-11-23T01:15:03.124606+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396503124611723",
+      "stack_sha256": "63e0acb563e3eec1a208130c11b500c1f9fa480841e558475648218e59242f22"
+    },
+    {
+      "at": "2026-11-23T01:16:03.118716+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396563118721663",
+      "stack_sha256": "1bb5c1f013f86ec9fe6906e472ca8e1e1e4c4fa8883619740792e3356cfe0f66"
+    },
+    {
+      "at": "2026-11-23T01:17:03.119714+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396623119723176",
+      "stack_sha256": "6eba17c3f6c436122972cc11bd6f281655486552d35e5a1b41f291e2b69635c6"
+    },
+    {
+      "at": "2026-11-23T01:18:03.119824+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396683119830328",
+      "stack_sha256": "1fee88abaaf1106ca661b622c33e16c6d43a164478546383af39e037b050989a"
+    },
+    {
+      "at": "2026-11-23T01:19:03.118488+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396743118492701",
+      "stack_sha256": "9511f98770553cf29b272d55cb200ef076f830f596a1bc06b419b1685fa63769"
+    },
+    {
+      "at": "2026-11-23T01:20:03.120388+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396803120392987",
+      "stack_sha256": "85a89a338b4fabda2eafdfc1a9b4fd76ba4847d03eed82f4f7ee7fb2b81a9ae5"
+    },
+    {
+      "at": "2026-11-23T01:21:03.118410+00:00",
+      "path": "strict-evidence-guard-04/capture-1795396863118414742",
+      "stack_sha256": "c7839a3ead990d046cd253d2ee900e17fd53693abf1cf0c86166fa3b01a18135"
+    }
+  ]
+}

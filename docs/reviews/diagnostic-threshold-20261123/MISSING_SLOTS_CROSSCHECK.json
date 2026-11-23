@@ -1,0 +1,8 @@
+{
+  "missing_slots": 63,
+  "independent_services": 2,
+  "checks": 128,
+  "unexpected": [],
+  "scope": "Canonical slot absence on two independent CL services; no native/import fault attribution and no operating-budget pass.",
+  "expected_responses_agree": true
+}

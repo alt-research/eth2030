@@ -1,0 +1,8 @@
+{
+  "archive": "/projects/eth2030/qualification/soak-audit-20261122/actual-fcu-io-postfix-evidence-20261123.tar.zst",
+  "bytes": 7596109,
+  "sha256": "8ad290c60aaada2faeebe106ec9d757cdc9f1cd4b40a3aeec9d6fe63e5c8c10d",
+  "scope": "Completed diagnostic raw observation/stack/BLS/closing evidence. Excludes execution/CL databases, JWT secret and network configs; original evidence and stopped databases remain untouched.",
+  "original_fault_resolved": false,
+  "actual48h_passed": false
+}

@@ -176,6 +176,10 @@ function checkPages(dir) {
   }
 }
 checkPages(new URL('../out/', import.meta.url));
+const siteWorkflow = readFileSync(new URL('../../.github/workflows/site-check.yml', import.meta.url), 'utf8');
+for (const input of ['docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
+  assert.ok(siteWorkflow.includes(`'${input}'`), `Site CI omits new evidence input ${input}`);
+}
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
 assert.match(pagesWorkflow, /echo 'eth2030\.altllm\.ai' > out\/CNAME/);
 console.log('Export claims, retained milestones, shared progress, evidence paths and tracker links verified.');

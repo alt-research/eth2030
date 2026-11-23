@@ -9,4 +9,6 @@
 
 Preserve historical measurements, failed attempts, frozen merged LIFO/signed Gloas target and original-fault/48h boundaries. No release percentage is inferred from tracker labels, source merges or absent wait events.
 
-- [ ] Push the isolated branch, submit a master PR and verify its actual CI/mergeability.
+- [x] Push the isolated branch, submit a master PR and verify its actual CI/mergeability.
+
+PR141 targets master and is mergeable. The final-head site workflow is checked separately; no merge or deployment is performed.

@@ -1,0 +1,71 @@
+[
+  {
+    "order": [
+      3
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "order": [
+      3,
+      2
+    ],
+    "returncode": 1,
+    "output": "3059737349494d1ecc2d8b8047ffc5c9fa9318aa\n100644 0a3f57cc565218dfa3a5bcf371a58d170d14a312 2\tCHECK.md\n100644 60d2861e5e1b1bda642ad0301041300395ec5329 3\tCHECK.md\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\n"
+  },
+  {
+    "order": [
+      3,
+      1
+    ],
+    "returncode": 1,
+    "output": "0ffc8e01d67c2470445426395e58a776cc09e60d\n100644 0a3f57cc565218dfa3a5bcf371a58d170d14a312 2\tCHECK.md\n100644 120e376f363a63d52ea530e6afbcf5687a22df48 3\tCHECK.md\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\n"
+  },
+  {
+    "order": [
+      2
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "order": [
+      2,
+      3
+    ],
+    "returncode": 1,
+    "output": "e1b911428a5a9e87b427c9b265488c42be9f6215\n100644 60d2861e5e1b1bda642ad0301041300395ec5329 2\tCHECK.md\n100644 0a3f57cc565218dfa3a5bcf371a58d170d14a312 3\tCHECK.md\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\n"
+  },
+  {
+    "order": [
+      2,
+      1
+    ],
+    "returncode": 1,
+    "output": "36827392459e893368176589e238ce262bbac1e2\n100644 60d2861e5e1b1bda642ad0301041300395ec5329 2\tCHECK.md\n100644 120e376f363a63d52ea530e6afbcf5687a22df48 3\tCHECK.md\n100644 2d81576850d4abc7ab8fb0102d1afd3756172b8e 1\tconsensus/state_processing/src/upgrade/gloas.rs\n100644 d2db504a09e0d300ab2fcd473b3cfe1c3e41fe49 2\tconsensus/state_processing/src/upgrade/gloas.rs\n100644 aeb05773263d6760015977339a255eacaeff774d 3\tconsensus/state_processing/src/upgrade/gloas.rs\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\nAuto-merging consensus/state_processing/src/upgrade/gloas.rs\nCONFLICT (content): Merge conflict in consensus/state_processing/src/upgrade/gloas.rs\n"
+  },
+  {
+    "order": [
+      1
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "order": [
+      1,
+      3
+    ],
+    "returncode": 1,
+    "output": "81477f28059adb01ddc0bdc0a6812cc709a3fcd6\n100644 120e376f363a63d52ea530e6afbcf5687a22df48 2\tCHECK.md\n100644 0a3f57cc565218dfa3a5bcf371a58d170d14a312 3\tCHECK.md\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\n"
+  },
+  {
+    "order": [
+      1,
+      2
+    ],
+    "returncode": 1,
+    "output": "2e0c04bbec6996dc58d33fc1bd5e89a4d758cd59\n100644 120e376f363a63d52ea530e6afbcf5687a22df48 2\tCHECK.md\n100644 60d2861e5e1b1bda642ad0301041300395ec5329 3\tCHECK.md\n100644 2d81576850d4abc7ab8fb0102d1afd3756172b8e 1\tconsensus/state_processing/src/upgrade/gloas.rs\n100644 aeb05773263d6760015977339a255eacaeff774d 2\tconsensus/state_processing/src/upgrade/gloas.rs\n100644 d2db504a09e0d300ab2fcd473b3cfe1c3e41fe49 3\tconsensus/state_processing/src/upgrade/gloas.rs\n\nAuto-merging CHECK.md\nCONFLICT (add/add): Merge conflict in CHECK.md\nAuto-merging consensus/state_processing/src/upgrade/gloas.rs\nCONFLICT (content): Merge conflict in consensus/state_processing/src/upgrade/gloas.rs\n"
+  }
+]

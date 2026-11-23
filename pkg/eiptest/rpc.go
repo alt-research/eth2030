@@ -50,7 +50,10 @@ func (h *rpcHelpStub) P2PServer() nodebackend.P2PServerDeps   { return nil }
 func (s *Sim) RPC() *RPCProbe {
 	s.t.Helper()
 	backend := nodebackend.NewRPCBackend(&rpcHelpStub{sim: s}, nil)
-	srv := httptest.NewServer(rpcserver.NewServer(backend).Handler())
+	api := rpcserver.NewServer(backend)
+	// Probe harnesses exercise EIP semantics, not the module allowlist.
+	api.SetAllowedModules([]string{"*"})
+	srv := httptest.NewServer(api.Handler())
 	s.t.Cleanup(srv.Close)
 	client := srv.Client()
 	client.Timeout = 10 * time.Second

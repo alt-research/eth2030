@@ -10,6 +10,7 @@ participants:
     el_extra_params:
       - "--override.iplus=0"
       - "--stark-validation-frames"
+      - "--rpc.allow-insecure"
     cl_type: lighthouse
     cl_image: sigp/lighthouse:latest
     count: 2

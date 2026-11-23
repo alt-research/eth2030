@@ -404,6 +404,7 @@ func TestRPCE2E_BlockchainQueries(t *testing.T) {
 
 	backend := &blockchainBackend{bc: bc, chainID: big.NewInt(1337)}
 	srv := rpc.NewServer(backend)
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -447,6 +448,7 @@ func TestRPCE2E_ClientVersion(t *testing.T) {
 
 	backend := &blockchainBackend{bc: bc, chainID: big.NewInt(1337)}
 	srv := rpc.NewServer(backend)
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 

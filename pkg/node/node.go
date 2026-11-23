@@ -116,6 +116,7 @@ type Node struct {
 	txPool        *txpool.TxPool
 	rpcServer     *rpc.ExtServer
 	rpcHandler    *rpc.Server
+	wsRPCServer   *rpc.Server
 	engineServer  *engine.EngineAPI
 	engBackend    *nodebackend.EngineBackend // processor goroutine owner; closed on Stop
 	p2pServer     *p2p.Server
@@ -717,6 +718,16 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	n.rpcHandler = rpc.NewServer(rpcBackend)
 	n.rpcHandler.SetAdminBackend(adminBackend)
 	n.rpcHandler.SetNetBackend(netBackend)
+	// This handler backs the Engine API's non-engine_ fallback (JWT-gated on
+	// 8551); scope it to the public HTTP namespaces rather than --ws.api.
+	n.rpcHandler.SetAllowedModules(config.HTTPModules)
+
+	// Dedicated plain handler for the WebSocket path, scoped to --ws.api so
+	// WebSocket cannot serve namespaces that were not explicitly enabled.
+	n.wsRPCServer = rpc.NewServer(rpcBackend)
+	n.wsRPCServer.SetAdminBackend(adminBackend)
+	n.wsRPCServer.SetNetBackend(netBackend)
+	n.wsRPCServer.SetAllowedModules(config.WSModules)
 	n.rpcServer = rpc.NewExtServer(rpcBackend, rpc.ServerConfig{
 		MaxRequestSize:   config.RPCMaxRequestSize,
 		ReadTimeout:      30 * time.Second,
@@ -727,6 +738,8 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 		AuthSecret:       config.RPCAuthSecret,
 		RateLimitPerSec:  config.RPCRateLimitPerSec,
 		MaxBatchSize:     config.RPCMaxBatchSize,
+		AllowedModules:   config.HTTPModules,
+		AllowedVhosts:    config.HTTPVhosts,
 	})
 	n.rpcServer.SetAdminBackend(adminBackend)
 	n.rpcServer.SetNetBackend(netBackend)
@@ -946,6 +959,7 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	// EIP-7732 registry; deposits/exits use the canonical EIP-8282 requests.
 	// Forward eth_/web3_/net_/admin_ methods on the engine port to the RPC handler.
 	n.engineServer.SetEthHandler(n.rpcHandler.Handler())
+	n.engineServer.SetAuthVhosts(config.AuthVhosts)
 	n.engineServer.SetMaxRequestSize(config.EngineMaxRequestSize)
 	if token, err := resolveEngineAuthToken(config); err != nil {
 		return nil, fmt.Errorf("engine auth: %w", err)
@@ -1070,7 +1084,9 @@ func (n *Node) Start() (startErr error) {
 		}()
 	}
 	if wsLn != nil {
-		n.wsServer = newWSServer(n.rpcHandler.Handler(), wsLn.Addr().String(), n.config.WSOrigins)
+		// WS dispatch goes through the WS-scoped handler (--ws.api allowlist),
+		// not the engine-fallback handler.
+		n.wsServer = newWSServer(n.wsRPCServer.Handler(), wsLn.Addr().String(), n.config.WSOrigins)
 		serveHTTP("WebSocket", n.wsServer, wsLn)
 	}
 	if metricsLn != nil {
@@ -1455,44 +1471,6 @@ func (b *bufResponseWriter) WriteHeader(status int) { b.status = status }
 func (b *bufResponseWriter) Write(p []byte) (int, error) {
 	b.buf = append(b.buf, p...)
 	return len(p), nil
-}
-
-// corsMiddleware wraps handler with CORS headers and virtual-host checking.
-// An empty or ["*"] domains list allows all origins.
-// An empty or ["*"] vhosts list allows all hosts.
-func corsMiddleware(handler http.Handler, domains, vhosts []string) http.Handler {
-	allowAllOrigins := len(domains) == 0 || (len(domains) == 1 && domains[0] == "*")
-	allowAllHosts := len(vhosts) == 0 || (len(vhosts) == 1 && vhosts[0] == "*")
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Virtual-host check.
-		if !allowAllHosts {
-			host := r.Host
-			if idx := strings.LastIndex(host, ":"); idx >= 0 {
-				host = host[:idx]
-			}
-			if !sliceContains(vhosts, host) {
-				http.Error(w, "invalid host", http.StatusForbidden)
-				return
-			}
-		}
-
-		// CORS headers.
-		origin := r.Header.Get("Origin")
-		if origin != "" {
-			if allowAllOrigins || sliceContains(domains, origin) {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-			}
-			if r.Method == http.MethodOptions {
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-		}
-
-		handler.ServeHTTP(w, r)
-	})
 }
 
 // sliceContains reports whether s contains elem (case-insensitive).

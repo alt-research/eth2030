@@ -109,9 +109,11 @@ func TestHTTPDisconnectCancelsActualNativeSingleAndBatchCalls(t *testing.T) {
 			root := db.GetRoot()
 			var handler http.Handler
 			if mode == "simple" {
-				handler = rpc.NewServer(backend).Handler()
+				api := rpc.NewServer(backend)
+				api.SetAllowedModules([]string{"*"})
+				handler = api.Handler()
 			} else {
-				handler = rpc.NewExtServer(backend, rpc.ServerConfig{MaxBatchSize: 100}).Handler()
+				handler = rpc.NewExtServer(backend, rpc.ServerConfig{MaxBatchSize: 100, AllowedModules: []string{"*"}}).Handler()
 			}
 			entered, finished := make(chan struct{}), make(chan struct{})
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

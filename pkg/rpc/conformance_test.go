@@ -735,6 +735,7 @@ func TestConformance_Error_InternalError(t *testing.T) {
 
 func TestConformance_BatchRequest(t *testing.T) {
 	srv := NewServer(newConformanceBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -879,6 +880,7 @@ func TestConformance_Syncing(t *testing.T) {
 
 func TestConformance_HTTP_InvalidJSON(t *testing.T) {
 	srv := NewServer(newConformanceBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -902,6 +904,7 @@ func TestConformance_HTTP_InvalidJSON(t *testing.T) {
 
 func TestConformance_HTTP_MethodNotAllowed(t *testing.T) {
 	srv := NewServer(newConformanceBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -918,6 +921,7 @@ func TestConformance_HTTP_MethodNotAllowed(t *testing.T) {
 
 func TestConformance_HTTP_ValidRequest(t *testing.T) {
 	srv := NewServer(newConformanceBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 

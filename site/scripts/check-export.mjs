@@ -292,6 +292,13 @@ assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/rev
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 assert.match(builderPage, /passes all 27 test-suite jobs and local-testnet/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
+for (const [id, claim] of [
+  ['feature-fast-confirmation', 'no node/Engine consumer found'],
+  ['feature-evm-asm-canonical-quest', 'accepts 256 all-zero proof bytes'],
+]) {
+  const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
+  assert.ok(page.includes(claim), `Missing fresh research limitation on ${id}`);
+}
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 

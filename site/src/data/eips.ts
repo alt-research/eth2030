@@ -602,6 +602,7 @@ export const EIPS: EipEntry[] = [
     strawmap: { item: 'fast confirmation', offchain: true },
     implementation: ['consensus/fastconfirm/fast_confirm.go'],
     tests: [],
+    gaps: ['November 24 source review: standalone validator-index tracker; no node/Engine consumer found beyond the compatibility wrapper. Signed CL input, validator authority and deciding production consumers require a separately adopted contract.'],
   },
   {
     id: 'feature-evm-asm-canonical-quest',
@@ -614,6 +615,7 @@ export const EIPS: EipEntry[] = [
     strawmap: { item: 'evm-asm canonical quest', offchain: true },
     implementation: ['zkvm/canonical.go', 'zkvm/canonical_executor.go'],
     tests: ['zkvm/canonical_test.go'],
+    gaps: ['November 24 executable observation: canonical.VerifyExecution accepts 256 all-zero proof bytes when Success=true; it checks structure rather than execution-proof validity. The separate CanonicalExecutor verifier is not the same method.', 'Independent proof statements, program/input/output/state binding and deciding consumers remain research work.'],
   },
 
   // ── Hegotá — headliners ──────────────────────────────────────────────

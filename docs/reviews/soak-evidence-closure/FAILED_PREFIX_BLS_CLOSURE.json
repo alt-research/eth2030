@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "scope": "Forensic signed coverage of the actual failed6h32m prefix only; not48-hour operating acceptance. Original failure is unchanged.",
+  "first": 64059,
+  "through": 71906,
+  "logical_segments": 7,
+  "preserved_original_segments": 7,
+  "additional_overlapping_segment": {
+    "first": 70071,
+    "stop": 71907,
+    "slots": 1836,
+    "finalized_root": "0x5b5e3f08c93681a92422616c739f6aebc76c586d21e3066ffd294f126d95b842",
+    "finalized_slot": 72512,
+    "signature_slot": 72584,
+    "signature_participants": 512,
+    "parent_hash_links": 2442,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "cross_anchor_checks": 2,
+  "actual48h_complete": false
+}

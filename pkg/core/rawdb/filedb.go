@@ -102,7 +102,7 @@ func NewFileDB(dir string) (*FileDB, error) {
 	}
 
 	// Open WAL for new writes (truncate after successful replay).
-	walPath := filepath.Join(dir, "wal")
+	walPath := FileDBJournalPath(dir)
 	walFile, err := os.OpenFile(walPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0o644)
 	if err != nil {
 		releaseLock(lockFd)
@@ -340,7 +340,7 @@ func (db *FileDB) walWriteCommit() error {
 // Uncommitted operations (those without a trailing commit marker) are
 // discarded. After replay, the data files and index are consistent.
 func (db *FileDB) replayWAL() error {
-	f, err := os.Open(filepath.Join(db.dir, "wal"))
+	f, err := os.Open(FileDBJournalPath(db.dir))
 	if os.IsNotExist(err) {
 		return nil
 	}
@@ -451,7 +451,7 @@ parse:
 
 // keyPath returns the filesystem path for a key's data file.
 func (db *FileDB) keyPath(key []byte) string {
-	return filepath.Join(db.dataDir, hex.EncodeToString(key))
+	return FileDBValuePath(db.dir, key)
 }
 
 // writeDataFile atomically writes a value to the data file for key.
@@ -635,19 +635,7 @@ func (db *FileDB) prepareOpsLocked(ops []fileBatchOp) (err error) {
 		return err
 	}
 	for _, op := range ops {
-		if op.delete {
-			path := db.keyPath(op.key)
-			if name, ok := db.index[string(op.key)]; ok {
-				path = filepath.Join(db.dataDir, name)
-			}
-			err = os.Remove(path)
-			if os.IsNotExist(err) {
-				err = nil
-			}
-		} else {
-			err = db.writeDataFile(op.key, op.value)
-		}
-		if err != nil {
+		if err = db.materializeOp(op); err != nil {
 			return err
 		}
 	}

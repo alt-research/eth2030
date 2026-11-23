@@ -377,6 +377,7 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		}
 	}
 
+	metrics.ChainHeight.Set(int64(bc.currentBlock.NumberU64()))
 	return bc, nil
 }
 
@@ -1192,6 +1193,7 @@ func (bc *Blockchain) SetHead(number uint64) error {
 
 	// Rewind header chain.
 	bc.hc.SetHead(number)
+	metrics.ChainHeight.Set(int64(number))
 
 	return nil
 }
@@ -2047,6 +2049,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 
 	// Update current block.
 	bc.currentBlock = newHead
+	metrics.ChainHeight.Set(int64(newHead.NumberU64()))
 	rawdb.WriteHeadBlockHash(bc.db, newHead.Hash())
 	rawdb.WriteHeadHeaderHash(bc.db, newHead.Hash())
 

@@ -1,6 +1,6 @@
 # ETH2030 development progress
 
-Updated November23,2026 against EL tracking master`d743925e` (throughPR141; frozen qualified Go package tree unchanged) and Lighthouse`eth2030` at`fa16f70abee7d31c9817ab8d782af73bce241484` (PR4-15 integrated;1-3 already contained). The33 frozen LIFO/signed Gloas task IDs remain delivered. New EL142-146 remain independent master-target reviews; Lighthouse15 is integrated. Source integration, actual executables, hosted CI and website deployment remain distinct.
+Updated November24,2026 against master `cfd39f3f4ad05479470466fc14d430c216724347` (PRs142-147 merged) and Lighthouse eth2030 `fa16f70a`. Adopted frozen LIFO/signed Gloas development is complete:33/33 original task IDs and5/5 confirmed software follow-ups; no active confirmed implementation TODO remains. The merged Go package tree equals the actually qualified cumulative code. Per the user's current instruction,48h/larger-scale acceptance and upstream Lodestar approval are excluded from development progress and retained separately.
 
 ## Latest actual qualification
 
@@ -16,7 +16,7 @@ The bounded run retains 686 EL memory-limit events (no OOM) and three recovered 
 
 ## New follow-up campaign
 
-[Current tuple](reviews/remaining-20261123/CURRENT_TUPLE.json) records the separately declared30-minute ready window, whole-window BLS/offline replay, independent proofs and actual stopped endpoint. It does not extend the historical6h45m or establish48h. Eight finite synthetic KV/WAL reopen/RSS profiles pass declared limits; key/header/canonical metadata and unrestricted capacity remain open. EL142 improves actual recurrence capture;144 repairs the canonical-height gauge observed stuck at0 despite RPC progress;145 bounds large durable batch materialization;146 repairs the confirmed ext4 flat-directory capacity limit with compatible sharded values and protected old-reader rollback. The cumulative recovery passes91s RPC/212s catchup/301s ready,102signed slots and actual stopped113651. The initial300s catchup failed and remains failed. [Post-repair receipt](reviews/remaining-20261123/POST_REPAIR_RECOVERY.json). All remain independent master PRs.
+[Current tuple](reviews/remaining-20261123/CURRENT_TUPLE.json) records the separately declared30-minute ready window, whole-window BLS/offline replay, independent proofs and actual stopped endpoint. It does not extend the historical6h45m or establish48h. Eight finite synthetic KV/WAL reopen/RSS profiles pass declared limits; growth of key/header/canonical metadata and unrestricted capacity qualification are deferred outside development progress. EL142 improves actual recurrence capture;144 repairs the canonical-height gauge observed stuck at0 despite RPC progress;145 bounds large durable batch materialization;146 repairs the confirmed ext4 flat-directory capacity limit with compatible sharded values and protected old-reader rollback. The cumulative recovery passes91s RPC/212s catchup/301s ready,102signed slots and actual stopped113651. The initial300s catchup failed and remains failed. [Post-repair receipt](reviews/remaining-20261123/POST_REPAIR_RECOVERY.json). All five implementation follow-ups are now merged into master.
 
 ## Current merged acceptance
 
@@ -38,18 +38,17 @@ PR 127 retired unsupported local Builder Engine extensions, synthetic stake and 
 
 Rounds 03/04 remain failed. Original 04 had no contemporaneous waiting stack. Its exact holder and physical storage latency cause remain unconfirmed; shutdown timing does not establish cancellation as the cause. See [separate unknowns](reviews/premerge-20261123/UNCONFIRMED_ORIGINAL_FAILURE.md) and [captured later chain](reviews/fcu-io-liveness-20261123/ROOT_CAUSE.md).
 
-## Remaining acceptance and source TODOs
+## Completion accounting and separate records
 
-The [dated actionable plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [machine-readable reviewed state](reviews/remaining-20261123/CURRENT_STATE.json) separate:
+The [current plan](plans/glamsterdam/NEXT_STEPS_20261124.md) and [machine accounting](reviews/development-scope-20261124/CURRENT_STATE.json) distinguish completed code from acceptance and deployment decisions.
 
-1. **G-01 / integrated CL CI:** Lighthouse #13-15 are merged into eth2030. Exact CI head `215525de` passed all 27 test-suite jobs and local-testnet (9 passed, one conditional checkpoint skip); merged `fa16f70a` has the same tree. G-01 is closed for this private profile. The primary simulator uses explicit 6s timing; the original 3s failure remains retained. See [repair evidence](reviews/remaining-20261123/CI_REPAIRS.md) and [current campaign](reviews/remaining-20261123/CURRENT_STATE.json).
-2. **G-02 / P1 — original incident evidence:** maintain request-correlated rolling stacks/storage timing. The precise unprofiled historical waiter remains unknown.
-3. **G-03 / P1 — duration/capacity:** no actual 48h pass; key/header/canonical metadata and history still grow. Declare workload/resource/restart budgets and qualify the final tuple. A rapid or bounded profile remains separately named.
-4. **G-04 / P1 — upstream Lodestar10693/10725:** recovery and empty-coverage repairs await maintainer workflow approval/review/integration. Local5547passed/9skipped and821TS coverage records remain separate from upstream hosted qualification.
-5. **G-05 / P1 — public target:** final gas/model, compatible fork/Engine/CL/reference tuple and activation remain reserved. Complete development does not select a new draft or imply public readiness.
-6. **G-06 / P2 — conditional coverage:** selected native/Geth corpora and real-EF tests retain finite coverage. Skipped/inactive cases are not passes.
+- Development:33/33 original tasks,5/5 confirmed follow-ups and integrated CL CI are complete/merged.
+- Deferred by the user:48h/larger-scale admission and Lodestar maintainer approval do not lower development progress. Neither is recast as passed/merged acceptance.
+- Historical record: original04 exact waiter remains unconfirmed; confirmed independent mechanisms are repaired. No-recurrence cannot reconstruct its missing stack.
+- Public activation: a separate network/epoch/timestamp/client-tuple rollout decision. Timestamp/genesis/override and restart-compatibility support already exists; no new public network parameters are selected here.
+- Extra corpus, research and later-fork consumers: not newly adopted into the current denominator. Skipped/inactive cases retain their actual counts.
 
-The source-hit triage in the plan records progressive IL compatibility, unused sidecar/nonce helpers, Node sampler/beam scaffolds and research proof/transport TODOs. Actual FCU custody and standard getPayload blob proof consumers are wired; no additional missing frozen-target wire consumer was established in those reviewed routes. Concrete metrics and persistence defects found in the live follow-up are tracked in their separate repair PRs. This is a scoped finding, not a whole-client bug-free claim. The broader historical fast-confirmation/EVM-ASM framework labels and ePBS draft scope remain distinct from the 33-task ledger.
+The [new source audit](reviews/development-scope-20261124/AUDIT.md) follows current TODO consumers. No additional confirmed missing adopted-scope production consumer was established. This is a scoped review, not a whole-client bug-free or whole-public-fork readiness claim.
 
 Later-fork independent Frame/Bogotá agreement, Dora production consumers, paymaster services and public binary/PQ/proof/native-rollup work retain separate gates. The paired Frame 66/165 and CL join 256 record is preserved [at its original source](verification/frame-8141-20261118-paymaster-history-final.json); its synchronized-EL boundary is unchanged.
 

@@ -1,6 +1,6 @@
 {
   "review_date": "November 23, 2026",
-  "reviewed_at": "2026-11-23T08:22:43.539027+00:00",
+  "reviewed_at": "2026-11-23T08:30:07.176109+00:00",
   "merged_el": {
     "revision": "84200d5322398ebe473ff26c6f54de2665cd2586",
     "through_pr": 140,
@@ -208,8 +208,8 @@
       {
         "id": 137558848100,
         "name": "beacon-chain-tests",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "failure"
       },
       {
         "id": 137558848120,
@@ -232,8 +232,8 @@
       {
         "id": 137558848175,
         "name": "release-tests-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 137558848214,
@@ -362,6 +362,42 @@
         "observed_error": "Sync aggregate at slot 114 was partial, got: 15, expected: 32",
         "artifact_id": 14800183126,
         "attribution": "Root cause not established; inspect simulator logs before changing thresholds."
+      },
+      {
+        "job_id": 137558848100,
+        "name": "beacon-chain-tests",
+        "stage": "test-beacon-chain-fulu",
+        "failed_tests": [
+          "inclusion_list_store::heze_fcu_resolves_deferred_verdict_with_proof_relay",
+          "inclusion_list_store::heze_fcu_resolves_deferred_verdict_from_empty_head",
+          "payload_invalidation::attesting_to_optimistic_head",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid_block_hash",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid_terminal_block",
+          "payload_invalidation::invalid_after_optimistic_sync",
+          "payload_invalidation::invalid_parent",
+          "payload_invalidation::invalidates_all_descendants",
+          "payload_invalidation::invalid_payload_invalidates_parent",
+          "payload_invalidation::justified_checkpoint_becomes_invalid",
+          "payload_invalidation::latest_valid_hash_is_junk",
+          "payload_invalidation::latest_valid_hash_will_not_validate",
+          "payload_invalidation::manually_validate_parent",
+          "payload_invalidation::manually_validate_child",
+          "payload_invalidation::recover_from_invalid_head_after_persist_and_reboot",
+          "payload_invalidation::pre_finalized_latest_valid_hash",
+          "payload_invalidation::switches_heads",
+          "payload_invalidation::recover_from_invalid_head_by_importing_blocks",
+          "payload_invalidation::weights_after_resetting_optimistic_status"
+        ],
+        "passed": 492,
+        "failed": 20,
+        "skipped": 2,
+        "summary": "512 tests run; 2 skipped separately",
+        "payload_invalidation_failures": 18,
+        "payload_invalidation_observed_error": "GetPayloadFailed(EngineError(Api { error: PayloadIdUnavailable }))",
+        "heze_deferred_verdict_failures": 2,
+        "heze_observed_error": "Gloas block production should succeed: NoViablePayloadBid",
+        "attribution": "Actual hosted regression failures; harness versus production root cause not established."
       }
     ]
   },

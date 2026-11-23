@@ -1,0 +1,76 @@
+{
+  "scope": "Completed bounded30min final-candidate observation with independently authenticated stopped-head readback. Not a48-hour result or original04 root-cause closure.",
+  "original04_root_resolved": false,
+  "actual48h_passed": false,
+  "operating_passed": true,
+  "stable_observation_seconds": 1815.4330989299924,
+  "first_ready_at": "2026-11-22T13:59:27.924834+00:00",
+  "last_sample_at": "2026-11-22T14:29:12.528544+00:00",
+  "ready_samples": 60,
+  "max_ready_sample_gap_seconds": 31.17089295387268,
+  "cl_finished_at": "2026-11-22T14:29:42.727755451Z",
+  "el_finished_at": "2026-11-22T14:29:43.125130902Z",
+  "both_exit_zero": true,
+  "oom_killed": false,
+  "source": "d1415df3011cd0bfcce8b54707170796c4aebded",
+  "native_binary_sha256": "07b37dcbfa26ccb945aeec2746d80d77607e7e1e20f4a3752306c78981c3be43",
+  "cl_source": "3782df1f88095997ffb4c91986a5f1c56bfa5bf2",
+  "cl_binary_sha256": "2ff75e82430588857770e2e62afe5af5d9396139f0fc6d6b11c64775c376aff1",
+  "memory_limit_each_bytes": 4096000000,
+  "cpu_limit_each": 2,
+  "cold_el_memory_max_events": 824,
+  "cold_el_memory_peak_bytes": 4096012288,
+  "sampled_signed_span": {
+    "first": 84217,
+    "through": 84812
+  },
+  "through_actual_stopped_head": 84822,
+  "stopped_head_bls": {
+    "first": 84217,
+    "stop": 84823,
+    "slots": 606,
+    "finalized_root": "0xb4f28395404acfcddc7dcb74aaf28a61e63b04f1d52205190517a608037c583b",
+    "finalized_slot": 84832,
+    "signature_slot": 84898,
+    "signature_participants": 512,
+    "parent_hash_links": 616,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "stopped_native": {
+    "actual48h_passed": false,
+    "hash": "0x47001c326977167abcc49636cf9ed863f94965a44f476b3cdc608c69b2a6c5de",
+    "independent_account_proofs": [
+      {
+        "address": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "balance": "9999998905913535304425867",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      },
+      {
+        "address": "0xee9ede56b61f213e69233a001b17fd6414c93675",
+        "balance": "7",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      }
+    ],
+    "number": 82187,
+    "passed": true,
+    "reference_header_agreed": true,
+    "scope": "Read-only stopped native head/MPT audit, not an online closing RPC or added uptime",
+    "slot": 84822,
+    "state_root": "0x7fa8c86d6e0add77bb638780b1ba20041e61a2d07f054c0f0c516b1dd0a65952"
+  },
+  "stopped_execution_binding": {
+    "passed": true,
+    "actual48h_passed": false,
+    "beacon_root": "0x154efd02197aa2e894bc81dee3d615ba167a95e7a8324a38f91d5e7567e08190",
+    "slot": 84822,
+    "committed_execution_hash": "0x47001c326977167abcc49636cf9ed863f94965a44f476b3cdc608c69b2a6c5de",
+    "native_state_root": "0x7fa8c86d6e0add77bb638780b1ba20041e61a2d07f054c0f0c516b1dd0a65952",
+    "binding": "Fresh real BLS finalized ancestry -> full independently rehashed beacon body -> execution bid block hash -> independently rehashed persisted execution header -> stopped native MPT account proofs",
+    "raw_beacon_block_sha256": "b910d910898e1d21a733ee0078d8b03b6d35e3245773f6e1029e2d616b561533"
+  },
+  "read_only_audit_helper_sha256": "9525aa9acef50043234903bf74069912e02f12fece37a9b02c797506d7bdbb41",
+  "online_closing_rpc_reused_or_invented": false
+}

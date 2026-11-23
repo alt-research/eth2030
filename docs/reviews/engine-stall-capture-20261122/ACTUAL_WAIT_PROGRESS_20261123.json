@@ -1,0 +1,77 @@
+{
+  "scope": "Actual original stopped-database metadata and passive live diagnostic progress; no original holder/root is identified yet",
+  "original04_root_resolved": false,
+  "actual48h_passed": false,
+  "as_of_utc": "2026-11-22T16:30:00.844081+00:00",
+  "original_file_metadata": [
+    {
+      "name": "wal",
+      "mtime": "2026-11-22T10:43:41.604242+00:00",
+      "ctime": "2026-11-22T10:43:41.604242+00:00",
+      "bytes": 115917883
+    },
+    {
+      "name": "header",
+      "mtime": "2026-11-22T10:43:41.630242+00:00",
+      "ctime": "2026-11-22T10:43:41.634242+00:00",
+      "bytes": 678
+    },
+    {
+      "name": "validation_marker",
+      "mtime": "2026-11-22T10:43:41.649242+00:00",
+      "ctime": "2026-11-22T10:43:41.654242+00:00",
+      "bytes": 1
+    },
+    {
+      "name": "history_root",
+      "mtime": "2026-11-22T10:43:41.782242+00:00",
+      "ctime": "2026-11-22T10:43:41.792242+00:00",
+      "bytes": 1
+    },
+    {
+      "name": "history_node",
+      "mtime": "2026-11-22T10:43:41.698242+00:00",
+      "ctime": "2026-11-22T10:43:41.703242+00:00",
+      "bytes": 532
+    },
+    {
+      "name": "head",
+      "mtime": "2026-11-22T10:41:23.526277+00:00",
+      "ctime": "2026-11-22T10:41:23.530277+00:00",
+      "bytes": 32
+    },
+    {
+      "name": "finalized",
+      "mtime": "2026-11-22T10:41:23.534277+00:00",
+      "ctime": "2026-11-22T10:41:23.539277+00:00",
+      "bytes": 32
+    }
+  ],
+  "logged_sigterm_utc": "2026-11-22T10:43:41.649Z",
+  "interpretation": "WAL final write and header file materialization precede the logged SIGTERM. Logged shutdown/acceptance proximity does not prove an explicit shutdown cancellation unblocked execution. File metadata does not distinguish earlier execution, database mutex or filesystem waits.",
+  "background_restoration_original": {
+    "started_utc": "2026-11-22T10:40:18Z",
+    "finished_utc": "2026-11-22T10:41:17.655Z",
+    "el_seconds": 57.776861493999604,
+    "scope": "Separate archive preparation, not a mutation of the live node database."
+  },
+  "same_background_workload_repeat": {
+    "started_at": "2026-11-22T16:25:32.830413+00:00",
+    "finished_at": "2026-11-22T16:26:33.002039+00:00",
+    "seconds": 60.17139597795904,
+    "exit_code": 0,
+    "scope": "Repeat the actual original background archive-restoration workload into an exclusive unrelated directory, retaining real native rolling stacks and host IO pressure. No artificial native hold, debugger pause, daemon restart or elapsed-time admission. This correlation experiment does not establish original04 cause alone.",
+    "actual_wait_events_so_far": 0
+  },
+  "unchanged_runtime_diagnostic": {
+    "status": "observing",
+    "started_at": "2026-11-22T12:22:19.125011+00:00",
+    "elapsed_seconds": 14843.303039722028,
+    "native_rolling_samples": 762,
+    "sustained_wait_events": 0,
+    "rolling_collector_sha256": "3ca0132bd9c88a940e85afb902134488612ee0cbf535c7c03112cea384d4c0bd",
+    "el_source": "19a3f1bbf7a52460d3528b65e47ecfc897bb494d",
+    "cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e"
+  },
+  "root_fix_submitted": false
+}

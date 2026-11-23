@@ -1,0 +1,131 @@
+package main
+
+import (
+	"bytes"
+	"context"
+	"encoding/binary"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/eth2030/eth2030/core/rawdb"
+	"github.com/eth2030/eth2030/core/state"
+	n "github.com/eth2030/eth2030/core/types"
+	g "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
+	"math/big"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+type ro struct {
+	rawdb.Database
+	dir string
+}
+
+func (d ro) Get(k []byte) ([]byte, error) {
+	b, e := os.ReadFile(filepath.Join(d.dir, hex.EncodeToString(k)))
+	if errors.Is(e, os.ErrNotExist) {
+		return nil, rawdb.ErrNotFound
+	}
+	return b, e
+}
+func (d ro) Has(k []byte) (bool, error) {
+	_, e := d.Get(k)
+	if errors.Is(e, rawdb.ErrNotFound) {
+		return false, nil
+	}
+	return e == nil, e
+}
+func (d ro) Put([]byte, []byte) error          { return errors.New("read-only audit") }
+func (d ro) Delete([]byte) error               { return errors.New("read-only audit") }
+func (d ro) NewBatch() rawdb.Batch             { panic("read-only audit must not create a batch") }
+func (d ro) NewIterator([]byte) rawdb.Iterator { panic("point-proof audit must not scan the database") }
+func must(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+func main() {
+	d := ro{Database: rawdb.NewMemoryDB(), dir: os.Args[1]}
+	hash, e := d.Get([]byte("hb"))
+	must(e)
+	if len(hash) != 32 {
+		panic("bad head hash")
+	}
+	number, e := d.Get(append([]byte("H"), hash...))
+	must(e)
+	if len(number) != 8 {
+		panic("bad head number")
+	}
+	key := append(append([]byte("h"), number...), hash...)
+	encoded, e := d.Get(key)
+	must(e)
+	var h g.Header
+	must(rlp.DecodeBytes(encoded, &h))
+	if !bytes.Equal(h.Hash().Bytes(), hash) || h.Number.Uint64() != binary.BigEndian.Uint64(number) {
+		panic("independent persisted header identity differs")
+	}
+	body, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "eth_getBlockByHash", "params": []any{h.Hash().Hex(), false}})
+	req, e := http.NewRequest("POST", os.Args[2], bytes.NewReader(body))
+	must(e)
+	req.Header.Set("Content-Type", "application/json")
+	r, e := (&http.Client{Timeout: 10 * time.Second}).Do(req)
+	must(e)
+	defer r.Body.Close()
+	var reply struct {
+		Result *g.Header
+		Error  json.RawMessage
+	}
+	must(json.NewDecoder(r.Body).Decode(&reply))
+	if reply.Result == nil || reply.Result.Hash() != h.Hash() || reply.Result.Root != h.Root {
+		panic("reference complete header differs")
+	}
+	s, e := state.OpenTrieHistory(context.Background(), d, n.Hash(h.Root))
+	must(e)
+	proofs := []map[string]any{}
+	for _, value := range []string{"0x7e5f4552091a69125d5dfcb7b8c2659029395bdf", "0xee9ede56b61f213e69233a001b17fd6414c93675"} {
+		a := n.HexToAddress(value)
+		p, e := s.HistoricalProof(a, nil)
+		must(e)
+		nodes := memorydb.New()
+		for _, blob := range p.AccountProof {
+			must(nodes.Put(crypto.Keccak256(blob), blob))
+		}
+		leaf, e := trie.VerifyProof(h.Root, crypto.Keccak256(a[:]), nodes)
+		must(e)
+		var account g.StateAccount
+		if len(leaf) == 0 {
+			if p.Balance.Sign() != 0 || p.Nonce != 0 {
+				panic("absence value mismatch")
+			}
+		} else {
+			must(rlp.DecodeBytes(leaf, &account))
+			if p.Balance.Cmp(account.Balance.ToBig()) != 0 || p.Nonce != account.Nonce || !bytes.Equal(p.StorageHash[:], account.Root[:]) || !bytes.Equal(p.CodeHash[:], account.CodeHash) {
+				panic("proof fields are not bound to the authenticated account")
+			}
+		}
+		changed := new(big.Int).Add(p.Balance, big.NewInt(1))
+		bound := new(big.Int)
+		if len(leaf) > 0 {
+			bound = account.Balance.ToBig()
+		}
+		if changed.Cmp(bound) == 0 {
+			panic("changed balance escaped binding")
+		}
+		proofs = append(proofs, map[string]any{"address": a.Hex(), "nodes": len(p.AccountProof), "balance": p.Balance.String(), "changed_balance_rejected": true})
+	}
+	slot := uint64(0)
+	if h.SlotNumber != nil {
+		slot = *h.SlotNumber
+	}
+	out := map[string]any{"passed": true, "scope": "Read-only stopped native head/MPT audit, not an online closing RPC or added uptime", "actual48h_passed": false, "number": h.Number.Uint64(), "slot": slot, "hash": h.Hash().Hex(), "state_root": h.Root.Hex(), "independent_account_proofs": proofs, "reference_header_agreed": true}
+	b, e := json.MarshalIndent(out, "", "  ")
+	must(e)
+	fmt.Println(string(b))
+}

@@ -1,3 +1,11 @@
-# Storage wait capture status
+# Correlated storage wait capture
 
-In progress from merged masterd743925e. Original04 has no contemporaneous waiter. Additional observability may capture future real waits; it cannot reconstruct missing historical evidence or produce an operating acceptance verdict.
+The existing Engine timeout collector retained Go stacks but not the contemporaneous thread/fd/storage identities needed to interpret an fsync wait. It now samples EL/CL raw syscall/wchan/kernel stack, process I/O, fd targets/inodes/mount IDs, bind-mount filesystem devices, disk counters and cgroup-v2 pressure/I/O in parallel with each of its four Go-stack samples. PID/start-time and container restart guards remain explicit; fd reuse is marked unstable. Helper and main collector source identities are retained.
+
+Every raw read is capped, as are thread/fd listings. Permission denial, disappearance, PID reuse, truncation, unavailable sysfs devices and failed frames remain in the report. A filesystem device or counter delta does not by itself identify a physical I/O cause. Host procfs restrictions may prevent syscall/kernel-stack access; that is incomplete evidence, not a passed capture. No debugger or acceptance result is introduced by these read-only samples.
+
+Validation:14 collector controls pass, including a real live blocked pipe reader, actual file inode/device binding, controlled fd reuse and an end-to-end quiet timeout event with8 storage receipts. Four executed mutations (PID guard, fd identity, unavailable-read handling and dropped frames) fail the controls; original sources pass.65 existing devnet controls pass and the native Go1.26.11 client builds. These controlled tests verify capture behavior, not the original EL wait or chain finality.
+
+No consensus/execution rules change. The standard Engine FCU/newPayload lifecycle remains intact; hash/signature validation is unchanged. Original04's exact holder and physical storage cause remain unconfirmed; no48h pass is claimed. The collector still requires an owned diagnostic record and records optional later debugger interference separately.
+
+Use the existing tools/capture_engine_stall.py --record ... --output ... command. A triggered capture now includes el-storage-0.json through cl-storage-3.json and capture.json storage_frames receipts alongside the original Go profiles. Main/helper hashes identify the exact capture code. CI watches and executes both collector test modules.

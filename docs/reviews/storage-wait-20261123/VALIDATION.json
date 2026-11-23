@@ -1,0 +1,40 @@
+{
+  "engine_capture_tests": 14,
+  "devnet_control_tests": 65,
+  "native_build_passed": true,
+  "native_build_sha256": "2748efae712b155c89bec07a9409f2cd80876598e0b089f4dc04cdf52ed4f5fa",
+  "mutation_controls": [
+    {
+      "case": "baseline",
+      "exit_code": 0,
+      "expected": true,
+      "summary": "OK"
+    },
+    {
+      "case": "pid_guard",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (failures=1)"
+    },
+    {
+      "case": "fd_identity",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (failures=1)"
+    },
+    {
+      "case": "unknown_permission",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (errors=1)"
+    },
+    {
+      "case": "dropped_storage_frames",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (errors=1)"
+    }
+  ],
+  "original_fault_resolved": false,
+  "actual48h_passed": false
+}

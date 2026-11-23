@@ -1,0 +1,54 @@
+{
+  "scope": "Fresh captured12056-entry32-byte canonical shape, same Docker bind filesystem and2CPU/4.096GB limits. Independent raw KV/reopen check; not full-chain replay or original04 closure.",
+  "results": [
+    {
+      "binary_sha256": "36cf89c2c2587fd9599e96f552c09744d12ff186ff1ccd9f22bd783f71ee98b4",
+      "device": 66308,
+      "entries": 12056,
+      "passed": true,
+      "reopen_all_values_verified": true,
+      "scope": "Fresh captured canonical batch shape, not actual chain replay, runtime duration or original04 attribution",
+      "value_bytes": 32,
+      "write_and_publish_seconds": 27.148673175,
+      "name": "serial-0",
+      "elapsed_seconds": 27.836783050035592
+    },
+    {
+      "binary_sha256": "dd1c8be9e9ad65190162ad5430a813f279d44d41a18dab73e72701a09681d5fa",
+      "device": 66308,
+      "entries": 12056,
+      "passed": true,
+      "reopen_all_values_verified": true,
+      "scope": "Fresh captured canonical batch shape, not actual chain replay, runtime duration or original04 attribution",
+      "value_bytes": 32,
+      "write_and_publish_seconds": 3.075870316,
+      "name": "parallel-0",
+      "elapsed_seconds": 3.6350624529877678
+    },
+    {
+      "binary_sha256": "36cf89c2c2587fd9599e96f552c09744d12ff186ff1ccd9f22bd783f71ee98b4",
+      "device": 66308,
+      "entries": 12056,
+      "passed": true,
+      "reopen_all_values_verified": true,
+      "scope": "Fresh captured canonical batch shape, not actual chain replay, runtime duration or original04 attribution",
+      "value_bytes": 32,
+      "write_and_publish_seconds": 28.079841112,
+      "name": "serial-1",
+      "elapsed_seconds": 28.802424109948333
+    },
+    {
+      "binary_sha256": "dd1c8be9e9ad65190162ad5430a813f279d44d41a18dab73e72701a09681d5fa",
+      "device": 66308,
+      "entries": 12056,
+      "passed": true,
+      "reopen_all_values_verified": true,
+      "scope": "Fresh captured canonical batch shape, not actual chain replay, runtime duration or original04 attribution",
+      "value_bytes": 32,
+      "write_and_publish_seconds": 3.191973067,
+      "name": "parallel-1",
+      "elapsed_seconds": 3.7502008120063692
+    }
+  ],
+  "passed": true
+}

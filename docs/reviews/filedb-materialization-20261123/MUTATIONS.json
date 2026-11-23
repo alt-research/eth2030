@@ -1,0 +1,19 @@
+[
+  {
+    "mutation": "lost_last_intent",
+    "rejected": true,
+    "exit": 1,
+    "behavioral_assertion_rejected": true,
+    "initial_compile_only_attempt_retained": true
+  },
+  {
+    "mutation": "worker_outlives_return",
+    "rejected": true,
+    "exit": 1
+  },
+  {
+    "mutation": "swallowed_materialization_error",
+    "rejected": true,
+    "exit": 1
+  }
+]

@@ -8,7 +8,6 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 	"math/big"
 	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -171,7 +170,7 @@ func TestFCUDurablePublicationKeepsCommittedReadersResponsive(t *testing.T) {
 	if err := bc.InsertSyncedBlock(grandchild); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Mkdir(filepath.Join(dir, "data", "6862.tmp"), 0700); err != nil {
+	if err := os.Mkdir(rawdb.FileDBValuePath(dir, []byte("hb"))+".tmp", 0700); err != nil {
 		t.Fatal(err)
 	}
 	if err := bc.ApplyForkchoice(grandchild.Hash(), child.Hash(), old.Hash()); err == nil {

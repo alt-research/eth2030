@@ -63,6 +63,8 @@ assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
 assert.match(home, /Signed Gloas route qualified/);
 assert.match(home, /PR127 retires unsupported legacy Builder Engine extensions/);
+assert.match(home, /source-specific evidence/);
+assert.doesNotMatch(home, /Review source[^<]*awaiting merge/);
 assert.match(home, /not production-ready/i);
 assert.match(home, /github\.com\/alt-research\/eth2030/);
 assert.match(home, /Go 1\.26\.8\+/);

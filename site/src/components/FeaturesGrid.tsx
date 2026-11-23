@@ -16,7 +16,7 @@ export default function FeaturesGrid() {
           <h3 className="text-lg font-bold text-eth-text mb-3">{item.title}</h3>
           <p className="text-sm text-eth-text/80 leading-6">{item.summary}</p>
           <p className="text-sm text-eth-dim leading-6 mt-3">{item.limit}</p>
-          {item.revision && <p className="mt-3 text-xs text-eth-dim">Review source {item.revision.slice(0, 8)} · awaiting merge</p>}
+          {item.revision && <p className="mt-3 text-xs text-eth-dim">Review source {item.revision.slice(0, 8)} · source-specific evidence</p>}
           <div className="flex flex-wrap gap-4 text-sm mt-5"><a className="text-eth-purple underline" href={`https://eips.ethereum.org/EIPS/eip-${item.eip}`}>{item.spec}</a><a className="text-eth-teal underline" href={`${base}/${item.code.endsWith('.go') ? 'blob' : 'tree'}/${item.revision ?? revision}/${item.code}`}>Source</a><a className="text-eth-teal underline" href={`${base}/blob/${item.revision ?? revision}/${item.test}`}>Tests</a></div>
         </article>)}
       </div>

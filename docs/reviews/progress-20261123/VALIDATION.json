@@ -1,0 +1,122 @@
+{
+  "scope": "Documentation/site only; no Go/Rust protocol behavior changed",
+  "tracker_entries": 149,
+  "matrix_rows": 92,
+  "pkg_paths_checked": 398,
+  "pkg_paths_missing": 0,
+  "tracker_blocking_discrepancies": 0,
+  "existing_nonblocking_note": "EIP-7885 has no legacy matrix row",
+  "static_build": "passed,157 pages",
+  "export_evidence_assertions": "passed",
+  "mutations": {
+    "cases": [
+      {
+        "case": "wrong_duration",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: Missing current retained fact: 6h45m05s"
+      },
+      {
+        "case": "wrong_bls_count",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: Missing current retained fact: 14 BLS windows"
+      },
+      {
+        "case": "false_original_resolution",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /exact holder and physical I\\/O cause remain unconfirmed/. Input:"
+      },
+      {
+        "case": "false_ci_green",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: Missing actual acceptance gate G-01/blocked"
+      },
+      {
+        "case": "missing_conditional_todo",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: Missing actual acceptance gate G-06/conditional"
+      },
+      {
+        "case": "shared_progress_drift",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: Homepage/detail development snapshots diverged"
+      },
+      {
+        "case": "false_48h_pass_with_real_duration_retained",
+        "rejected": true,
+        "assertion": "AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /48-hour (?:passed|complete)|original fault (?:resolved|fixed)|all (?:hosted )?CI (?:passes|green)/i. Input:"
+      }
+    ],
+    "restored_export_passed": true
+  },
+  "pinned_progress_links": [
+    {
+      "sha": "7a7c71d2b3593b7b5f59f64eb9e997099d9748c8",
+      "path": "docs/reviews/progress-20261123/CURRENT_STATE.json",
+      "exists": true
+    },
+    {
+      "sha": "84200d5322398ebe473ff26c6f54de2665cd2586",
+      "path": "docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json",
+      "exists": true
+    },
+    {
+      "sha": "9a094830b8d11ab541df4f439a3730941311d430",
+      "path": "docs/reviews/glamsterdam-postmerge-20261121/RESULTS.json",
+      "exists": true
+    },
+    {
+      "sha": "7a7c71d2b3593b7b5f59f64eb9e997099d9748c8",
+      "path": "docs/plans/glamsterdam/NEXT_STEPS_20261123.md",
+      "exists": true
+    }
+  ],
+  "browser_checks": [
+    {
+      "path": "/",
+      "width": 1440,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 6
+    },
+    {
+      "path": "/roadmap/",
+      "width": 1440,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 6
+    },
+    {
+      "path": "/eips/eip-7732/",
+      "width": 1440,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 0
+    },
+    {
+      "path": "/",
+      "width": 390,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 6
+    },
+    {
+      "path": "/roadmap/",
+      "width": 390,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 6
+    },
+    {
+      "path": "/eips/eip-7732/",
+      "width": 390,
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "gates": 0
+    }
+  ],
+  "navigation": "Home -> EIP Progress Tracker -> ePBS detail reached expected URL and heading",
+  "browser_console_errors": 0,
+  "deployment": "Not deployed by this branch; master merge/Pages remains separate",
+  "original_fault_resolved": false,
+  "actual48h_passed": false
+}

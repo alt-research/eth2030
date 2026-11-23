@@ -1,7 +1,8 @@
 // ETH2030 EIP / roadmap progress — single source of truth.
 //
 // Fork placement follows the L1 Strawmap revision of Nov 2, 2026 (strawmap.org).
-// Reviewed Glamsterdam refresh: PRs 123/124/125 merged at 9a094830 (2026-11-22).
+// Reviewed progress: EL master84200d53 / CL eth2030 34cecfc4 (2026-11-23).
+// Selected33-task delivery and bounded qualification are separate from broad tracker labels.
 // Evidence: docs/reviews/glamsterdam-postmerge-20261121 and the frozen task reconciliation.
 // Other implementation labels retain their historical review scope.
 // Implementation status / file paths come from eth2030 docs:
@@ -220,8 +221,8 @@ export const EIPS: EipEntry[] = [
     specUrl: spec(7732),
     specStatus: 'Draft',
     strawmap: { item: 'ePBS', tag: 'SFI', headliner: true },
-    verificationRevision: 'bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394',
-    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md", "docs/reviews/builder-authority/STATUS.md"],
+    verificationRevision: '84200d5322398ebe473ff26c6f54de2665cd2586',
+    verification: ["docs/reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json", "docs/reviews/glamsterdam-postmerge-20261121/STATUS.md", "docs/reviews/builder-authority/STATUS.md", "docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json", "docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json"],
     implementation: [
       'epbs/types.go',
       'epbs/validation.go',
@@ -241,8 +242,9 @@ export const EIPS: EipEntry[] = [
       'PTC voting and fork-choice integration, builder registry, and payment/withdrawal paths',
     ],
     gaps: [
-      'Merged PR127 retires unsupported legacy Builder Engine extensions; selected signed CL scope is qualified separately',
-      'Upstream Lodestar integration and final public protocol/model approval remain open',
+      'Frozen signed Gloas development route is delivered; the broad draft label is not whole-public-fork qualification',
+      'Integrated CL hosted CI has dependency, API, beacon-chain invalidation/deferred-verdict and simulator failures; local scoped tests do not close full CI',
+      'Original incident attribution, multi-day capacity, upstream Lodestar integration and public protocol/model approval remain open',
     ],
     summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',
   },

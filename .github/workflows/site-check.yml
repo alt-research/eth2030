@@ -8,6 +8,9 @@ on:
       - 'docs/EIP_SPEC_IMPL.md'
       - 'CLAUDE.md'
       - 'docs/reviews/glamsterdam-*/**'
+      - 'docs/reviews/progress-*/**'
+      - 'docs/reviews/diagnostic-threshold-*/**'
+      - 'docs/plans/glamsterdam/**'
       - 'docs/audits/merged-glamsterdam-*/**'
       - '.github/workflows/site-check.yml'
   workflow_dispatch:

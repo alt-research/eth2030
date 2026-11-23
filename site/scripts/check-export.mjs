@@ -13,6 +13,17 @@ const tasks = readRecord('docs/reviews/glamsterdam-final-campaign/TASK_RECONCILI
 const recovery = readRecord('docs/reviews/glamsterdam-postmerge-20261121/RECOVERY.json');
 const reproduced = readRecord('docs/reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json');
 const merged = readRecord('docs/audits/merged-glamsterdam-20261122/MERGED_EVIDENCE.json');
+const current = readRecord('docs/reviews/progress-20261123/CURRENT_STATE.json');
+const bounded = readRecord('docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json');
+const stopped = readRecord('docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json');
+assert.deepEqual(current.bounded_run, bounded, 'Current snapshot changed retained duration/BLS evidence');
+assert.deepEqual(current.stopped_binding, stopped, 'Current snapshot changed stopped endpoint evidence');
+assert.equal(current.selected_scope.task_ids_complete, tasks.tasks.length);
+assert.equal(current.selected_scope.whole_public_fork_readiness, false);
+assert.equal(current.original_fault_resolved, false);
+assert.equal(current.actual48h_passed, false);
+assert.equal(bounded.actual48h_passed, false);
+assert.equal(bounded.original_fault_resolved, false);
 const progress = html => html.match(/<aside aria-label="Verified development progress"[^>]*>(.*?)<\/aside>/s)?.[1];
 assert.ok(progress(home), 'Missing homepage development progress');
 assert.equal(progress(home), progress(roadmap), 'Homepage/detail development snapshots diverged');
@@ -45,24 +56,43 @@ assert.ok(reproduced.checks.every(check => check.passed));
 for (const milestone of [`${tasks.tasks.length}/33 task IDs`, '4 roles under 300s', `${steady.finality.beacon_window.slots}/400 + ${pressure.finality.beacon_window.slots}/60 slots`, `${record.blob.cell_proofs} KZG cell proofs`]) {
   assert.ok(progress(home).includes(milestone), `Missing qualified milestone: ${milestone}`);
 }
-assert.match(progress(home), /Glamsterdam code merged; operating acceptance open/);
-assert.match(progress(home), /November 22, 2026/);
-assert.match(progress(home), /Long-run failures under diagnosis/);
-assert.match(progress(home), /no48-hour pass exists/);
-assert.match(progress(home), /Two long runs failed, most recently after5h30m/);
-assert.match(progress(home), /native Engine import blocking remains under diagnosis/);
-assert.doesNotMatch(progress(home), /Follow-up fixes awaiting merge|48-hour (?:passed|complete)/);
-for (const number of [132,133]) assert.ok(progress(home).includes(`/pull/${number}`));
-assert.match(progress(home), /upstream Lodestar integration and production-scale operation remain separate/);
-assert.match(progress(home), /Frame\/FOCIL and service migration retain their own later-fork acceptance gates/);
-assert.ok(progress(home).includes('https://github.com/alt-research/eth2030/pull/130'));
-assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned verification record');
-assert.doesNotMatch(progress(home), /Native Frame execution and CL history qualified|Independent EL interoperability, Dora consumer migration and state-sync acceptance remain next steps/);
+assert.match(progress(home), /Frozen development scope delivered; readiness gates open/);
+assert.ok(progress(home).includes(current.review_date));
+const duration = Math.floor(bounded.runtime_seconds);
+const durationLabel = `${Math.floor(duration / 3600)}h${Math.floor(duration % 3600 / 60)}m${String(duration % 60).padStart(2, '0')}s`;
+for (const fact of [durationLabel, `${bounded.post_5_5h_samples} healthy samples`, `${bounded.post_5_5h_full_stack_captures} full stacks`, `${bounded.bls_windows_freshly_replayed} BLS windows`, `${bounded.bls_observed_through - bounded.bls_observed_first + 1} observed slots`, `${bounded.bls_missing_slots.length} early missing slots`, `slot ${stopped.stopped_cl_slot}`, `${stopped.extra_stopped_slots} slots beyond the last health sample`, `${bounded.sdk_live_independent_proofs} live + 2 stopped account proofs`]) {
+  assert.ok(progress(home).includes(fact), `Missing current retained fact: ${fact}`);
+}
+assert.equal(current.integrated_ci.gate, 'blocked');
+const failedJobs = current.integrated_ci.jobs.filter(job => job.conclusion === 'failure');
+for (const name of ['check-code', 'http-api-tests', 'beacon-chain-tests', 'basic-simulator-ubuntu']) {
+  assert.ok(failedJobs.some(job => job.name === name), `Missing actual failing job ${name}`);
+}
+for (const [id, state] of [['G-01', current.integrated_ci.gate], ['G-02', 'unconfirmed'], ['G-03', 'open'], ['G-04', 'open'], ['G-05', 'reserved'], ['G-06', 'conditional']]) {
+  assert.ok(progress(home).includes(`data-gate="${id}" data-state="${state}"`), `Missing actual acceptance gate ${id}/${state}`);
+}
+assert.ok(progress(home).includes(current.integrated_ci.url));
+assert.match(progress(home), /Four hosted jobs fail: dependency audit, optimistic-head API, beacon-chain invalidation\/deferred-verdict tests and basic simulator/);
+assert.match(progress(home), /500 local scoped tests do not close full CI/);
+assert.match(progress(home), /Rounds 03\/04 remain failed/);
+assert.match(progress(home), /exact holder and physical I\/O cause remain unconfirmed/);
+assert.match(progress(home), /not a 48-hour pass/);
+assert.match(progress(home), /whole-public-fork or production readiness/);
+assert.match(progress(home), /research features retain separate acceptance gates/);
+assert.doesNotMatch(progress(home), /48-hour (?:passed|complete)|original fault (?:resolved|fixed)|all (?:hosted )?CI (?:passes|green)/i);
+for (const number of [135, 138, 139, 140]) assert.ok(progress(home).includes(`/pull/${number}`));
+assert.ok(progress(home).includes(`/pull/${current.merged_el.through_pr}`));
+assert.ok(progress(home).includes(`/commit/${current.merged_cl.revision}`));
+assert.ok(progress(home).includes(`/blob/${current.merged_el.revision}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
+assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned earlier verification record');
+for (const path of ['docs/reviews/progress-20261123/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261123.md']) {
+  assert.ok(progress(home).includes(`/blob/7a7c71d2b3593b7b5f59f64eb9e997099d9748c8/${path}`), `Missing pinned current evidence/plan ${path}`);
+}
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
 assert.match(home, /Signed Gloas route qualified/);
-assert.match(home, /PR127 retires unsupported legacy Builder Engine extensions/);
+assert.match(home, /PR 127 retires unsupported legacy Builder Engine extensions/);
 assert.match(home, /source-specific evidence/);
 assert.doesNotMatch(home, /Review source[^<]*awaiting merge/);
 assert.match(home, /not production-ready/i);
@@ -107,7 +137,7 @@ for (const [id, expected, obsolete] of [
 for (const number of [2780, 7688, 7708, 7732, 7778, 7843, 7928, 7954, 7976, 7981, 7997, 8024, 8037, 8038, 8045, 8061, 8246, 8282, 7975, 8159, 8070, 8189, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
   assert.match(page, /Qualification evidence/);
-  assert.ok(page.includes(`/blob/${number === 7732 ? 'bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394' : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
+  assert.ok(page.includes(`/blob/${number === 7732 ? current.merged_el.revision : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
 }
 for (const number of [7688, 8045, 8061, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
@@ -119,9 +149,11 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
-assert.match(builderPage, /PR127 retires unsupported legacy Builder Engine extensions/);
-assert.ok(builderPage.includes('/blob/bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394/docs/reviews/builder-authority/STATUS.md'));
+assert.match(builderPage, /legacy EL bid-hash\/registry\/header extensions retired in PR127/);
+assert.ok(builderPage.includes(`/blob/${current.merged_el.revision}/docs/reviews/builder-authority/STATUS.md`));
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
+assert.match(builderPage, /Integrated CL hosted CI has dependency, API, beacon-chain invalidation\/deferred-verdict and simulator failures/);
+assert.ok(builderPage.includes(`/blob/${current.merged_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 
@@ -144,6 +176,10 @@ function checkPages(dir) {
   }
 }
 checkPages(new URL('../out/', import.meta.url));
+const siteWorkflow = readFileSync(new URL('../../.github/workflows/site-check.yml', import.meta.url), 'utf8');
+for (const input of ['docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
+  assert.ok(siteWorkflow.includes(`'${input}'`), `Site CI omits new evidence input ${input}`);
+}
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
 assert.match(pagesWorkflow, /echo 'eth2030\.altllm\.ai' > out\/CNAME/);
 console.log('Export claims, retained milestones, shared progress, evidence paths and tracker links verified.');

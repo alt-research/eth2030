@@ -1,0 +1,414 @@
+{
+  "review_date": "November 23, 2026",
+  "reviewed_at": "2026-11-23T08:30:07.176109+00:00",
+  "merged_el": {
+    "revision": "84200d5322398ebe473ff26c6f54de2665cd2586",
+    "through_pr": 140,
+    "open_prs_at_review": 0
+  },
+  "merged_cl": {
+    "revision": "34cecfc4fc3bd743c14c38a742167064a95dbc25",
+    "target": "eth2030",
+    "merged_prs": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "already_integrated_closed": [
+      1,
+      2,
+      3
+    ],
+    "open_prs_at_integration": 0,
+    "scoped_local_tests": 500
+  },
+  "selected_scope": {
+    "name": "Frozen merged LIFO / signed Gloas development target",
+    "task_ids_complete": 33,
+    "task_ids_total": 33,
+    "reference_consensus_commit": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "whole_public_fork_readiness": false
+  },
+  "bounded_run": {
+    "as_of": "2026-11-23T02:13:13.909607+00:00",
+    "runtime_seconds": 24305.485587,
+    "ready_observed_seconds": 24123.777645,
+    "post_5_5h_samples": 144,
+    "post_5_5h_first": "2026-11-23T00:09:43.400320+00:00",
+    "post_5_5h_last": "2026-11-23T01:21:30.032431+00:00",
+    "post_5_5h_finalized_first": 92985,
+    "post_5_5h_finalized_last": 94425,
+    "post_5_5h_full_stack_captures": 72,
+    "post_5_5h_engine_point_stack_count": 0,
+    "rolling_successful_samples": 24244,
+    "rolling_sustained_events": 0,
+    "bls_windows_freshly_replayed": 14,
+    "bls_anchors_all_linked": true,
+    "bls_participants_min": 494,
+    "bls_observed_first": 89791,
+    "bls_observed_through": 97858,
+    "bls_missing_slots": [
+      89793,
+      89794,
+      89801,
+      89804,
+      89807,
+      89810,
+      89813,
+      89814,
+      89817,
+      89819,
+      89831,
+      89836,
+      89838,
+      89841,
+      89848,
+      89850,
+      89852,
+      89857,
+      89863,
+      89872,
+      89876,
+      89878,
+      89880,
+      89882,
+      89886,
+      89888,
+      89893,
+      89896,
+      89899,
+      89901,
+      89902,
+      89904,
+      89906,
+      89907,
+      89908,
+      89909,
+      89910,
+      89911,
+      89912,
+      89913,
+      89914,
+      89915,
+      89916,
+      89930,
+      89936,
+      89941,
+      89947,
+      89949,
+      89953,
+      89954,
+      89964,
+      89967,
+      89979,
+      89981,
+      89988,
+      89990,
+      89991,
+      89995,
+      89997,
+      90003,
+      90005,
+      90010,
+      90013,
+      90627,
+      90638,
+      90657,
+      91397,
+      91417,
+      91567,
+      91577,
+      91585,
+      91587,
+      91607
+    ],
+    "stopped_binding_passed": true,
+    "actual_stopped_slot": 97868,
+    "actual_stopped_execution_number": 94502,
+    "sdk_live_proof_reports": 80,
+    "sdk_live_independent_proofs": 160,
+    "sdk_live_proofs_all_passed": true,
+    "old_final_review_windows": 13,
+    "fresh_final_review_windows": 14,
+    "original_fault_resolved": false,
+    "actual48h_passed": false,
+    "scope": "Completed bounded process/operational and cryptographic endpoint observation. No spontaneous post-fix waiting chain captured; exact earlier unprofiled incident and physical storage latency remain open."
+  },
+  "stopped_binding": {
+    "passed": true,
+    "actual48h_passed": false,
+    "original_fault_resolved": false,
+    "stopped_cl_slot": 97868,
+    "stopped_cl_beacon_root": "0x16f42c89f3dae07bf67b606f62d6379383db59a938cccfd97162320c3d34b04d",
+    "stopped_native_number": 94502,
+    "stopped_native_hash": "0x5e59955a4fabe8d97dc3a9305bcb47f8f7e4f761c0d18e6172dc3bc0344e51c9",
+    "stopped_native_state_root": "0x46acba042a7cb54b2eb92a6dc228f9d08d515614195cfd49da567db375a71c99",
+    "last_health_sample_slot": 97858,
+    "extra_stopped_slots": 10,
+    "authenticated_finalized_anchor": "0x3f008cd61e5af98a52be7a5d086ef23da640b757fa8351f94e5d2a8e9e22a852",
+    "signature_participants": 512,
+    "full_persisted_cl_body_rehashed": true,
+    "persisted_forkchoice_unique_leaf_agreed": true,
+    "native_header_and_mpt_sdk_verified": true,
+    "binding": "Unchanged real-BLS verified finality and complete parent path -> actual stopped CL unique stored leaf/header -> full persisted beacon body SSZ root -> execution bid hash -> independently rehashed native persisted header -> state root -> Geth SDK verified account proofs",
+    "scope": "Existing final-window captured ancestry already includes stopped slot97868 below finalized slot97888. Original window profile and through97858 remain unchanged; this separate membership receipt closes the actual stopped endpoint. Forkchoice is read-only decoded/corroborated as a unique leaf, not re-executed as a new CL process.",
+    "signed_block_ssz_sha256": "04f8a3ddbf0ac296a0009ddbc74163e6e1755cf633ea77b94558a9fc1bcea6fd",
+    "final_window_replay_sha256": "9d3b49bea467d14648db05ce893fbbf60ef71743e0b2528b0e6a907a2c21c703",
+    "final_window_trace_sha256": "94fda4fcc784c3b0c62696a76f2c87bb791876c33c306a1b68d48541776c1fad"
+  },
+  "integrated_ci": {
+    "id": 45134918940,
+    "head": "34cecfc4fc3bd743c14c38a742167064a95dbc25",
+    "status": "in_progress",
+    "conclusion": null,
+    "url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940",
+    "jobs": [
+      {
+        "id": 137558805064,
+        "name": "lockbud",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558805357,
+        "name": "check-msrv",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558805367,
+        "name": "Check for 'skip-ci' label",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558805418,
+        "name": "check-code",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 137558805493,
+        "name": "forbidden-files-check",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558806809,
+        "name": "target-branch-check",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 137558848100,
+        "name": "beacon-chain-tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 137558848120,
+        "name": "fork-choice-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848147,
+        "name": "op-pool-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848163,
+        "name": "http-api-tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 137558848175,
+        "name": "release-tests-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848214,
+        "name": "state-transition-vectors-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848237,
+        "name": "cargo-udeps",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848247,
+        "name": "network-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848291,
+        "name": "debug-tests-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848300,
+        "name": "cargo-sort",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848320,
+        "name": "ef-tests-mainnet-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848329,
+        "name": "spec-minimal-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848333,
+        "name": "basic-simulator-ubuntu",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 137558848338,
+        "name": "slasher-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848364,
+        "name": "ef-tests-minimal-ubuntu",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 137558848370,
+        "name": "compile-with-beta-compiler",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848385,
+        "name": "execution-engine-integration-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848411,
+        "name": "fallback-simulator-ubuntu",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848417,
+        "name": "cargo-hack",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137558848436,
+        "name": "cli-check",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "gate": "blocked",
+    "known_blocker": {
+      "job_id": 137558805418,
+      "job_name": "check-code",
+      "url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940/job/137558805418",
+      "stage": "audit-CI",
+      "dependency": "url",
+      "locked_version": "2.5.8",
+      "advisory_reported_by_CI": "RUSTSEC-2026-0592",
+      "patched_range_reported_by_CI": ">=2.5.9",
+      "resolution": "Update compatible dependency graph and rerun unchanged audit/build/tests; do not ignore the failing check."
+    },
+    "additional_failures": [
+      {
+        "job_id": 137558848163,
+        "name": "http-api-tests",
+        "stage": "test-http-api-fulu",
+        "failed_tests": [
+          "builder_chain_health_optimistic_head",
+          "builder_chain_health_optimistic_head_v3"
+        ],
+        "observed_error": "GetPayloadFailed(EngineError(Api { error: PayloadIdUnavailable }))",
+        "executed": 111,
+        "planned": 216,
+        "passed": 109,
+        "failed": 2,
+        "unrun_due_to_fail_fast": 105,
+        "attribution": "Root cause not established; do not label infrastructure-only or fixed."
+      },
+      {
+        "job_id": 137558848333,
+        "name": "basic-simulator-ubuntu",
+        "source": "testing/simulator/src/basic_sim.rs:417",
+        "observed_error": "Sync aggregate at slot 114 was partial, got: 15, expected: 32",
+        "artifact_id": 14800183126,
+        "attribution": "Root cause not established; inspect simulator logs before changing thresholds."
+      },
+      {
+        "job_id": 137558848100,
+        "name": "beacon-chain-tests",
+        "stage": "test-beacon-chain-fulu",
+        "failed_tests": [
+          "inclusion_list_store::heze_fcu_resolves_deferred_verdict_with_proof_relay",
+          "inclusion_list_store::heze_fcu_resolves_deferred_verdict_from_empty_head",
+          "payload_invalidation::attesting_to_optimistic_head",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid_block_hash",
+          "payload_invalidation::immediate_forkchoice_update_payload_invalid_terminal_block",
+          "payload_invalidation::invalid_after_optimistic_sync",
+          "payload_invalidation::invalid_parent",
+          "payload_invalidation::invalidates_all_descendants",
+          "payload_invalidation::invalid_payload_invalidates_parent",
+          "payload_invalidation::justified_checkpoint_becomes_invalid",
+          "payload_invalidation::latest_valid_hash_is_junk",
+          "payload_invalidation::latest_valid_hash_will_not_validate",
+          "payload_invalidation::manually_validate_parent",
+          "payload_invalidation::manually_validate_child",
+          "payload_invalidation::recover_from_invalid_head_after_persist_and_reboot",
+          "payload_invalidation::pre_finalized_latest_valid_hash",
+          "payload_invalidation::switches_heads",
+          "payload_invalidation::recover_from_invalid_head_by_importing_blocks",
+          "payload_invalidation::weights_after_resetting_optimistic_status"
+        ],
+        "passed": 492,
+        "failed": 20,
+        "skipped": 2,
+        "summary": "512 tests run; 2 skipped separately",
+        "payload_invalidation_failures": 18,
+        "payload_invalidation_observed_error": "GetPayloadFailed(EngineError(Api { error: PayloadIdUnavailable }))",
+        "heze_deferred_verdict_failures": 2,
+        "heze_observed_error": "Gloas block production should succeed: NoViablePayloadBid",
+        "attribution": "Actual hosted regression failures; harness versus production root cause not established."
+      }
+    ]
+  },
+  "upstream_lodestar": {
+    "number": 10693,
+    "state": "open",
+    "merged": false,
+    "head": "4e224659179dc8050344b48a397f1791450bf24c",
+    "url": "https://github.com/ChainSafe/lodestar/pull/10693"
+  },
+  "original_fault_resolved": false,
+  "actual48h_passed": false,
+  "tracker_scope": "Historical mapped-entry labels; no whole-fork percentage promoted by this refresh"
+}

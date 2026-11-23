@@ -1,6 +1,6 @@
 # EIP Specification & Implementation Traceability
 
-> Current scoped refresh: November 22, 2026 at merged `9a094830`. Frozen Glamsterdam qualification is recorded in [progress](PROGRESS.md); Frame/FOCIL retain their November 18 control. Additional CL/supporting obligations are indexed in the [gap audit](audits/merged-glamsterdam-20261122/README.md).
+> Current scoped progress refresh: November 23, 2026 at EL master `84200d53` / CL eth2030 `34cecfc4`. Selected33-task delivery, bounded 6h45m05s qualification and open integrated CI/incident/duration/upstream/public gates are recorded in [progress](PROGRESS.md) and [next steps](plans/glamsterdam/NEXT_STEPS_20261123.md). Frame/FOCIL retain their November18 control; broader implementation labels below are not upgraded by this refresh.
 
 This index retains the February 22, 2026 inventory outside the explicitly
 refreshed scopes. The November 22 update links frozen Glamsterdam acceptance,

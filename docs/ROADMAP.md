@@ -1,20 +1,32 @@
 # ETH2030 development roadmap
 
-Updated November 22, 2026 against merged master `55f7fd84` (PRs123–130). The homepage and `/roadmap` share the same dated source-specific progress; the per-EIP tracker retains the November2 EF Strawmap placement baseline. Tracker-label percentages are not public-fork readiness scores.
+Updated November 23, 2026 against EL master `84200d53` and Lighthouse `eth2030` `34cecfc4`. EL PRs 131–140 and CL PRs 4–12 are integrated. The homepage and `/roadmap` share the same dated progress and open gates. Per-EIP mapped labels retain the November2 EF Strawmap placement baseline; those percentages are not whole-fork readiness.
 
-## Glamsterdam: frozen development target delivered
+## Glamsterdam: selected development delivered; readiness gates open
 
-The selected merged LIFO / signed Gloas implementation and its original 33 task IDs / R01–R13 are merged and qualified. Original `d9201b0` evidence remains source-specific. Current `pkg` bytes equal the separately tested functional source `2c0df12f`. See [merged progress](PROGRESS.md), [final source-specific qualification](plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md) and the [current remaining-gap audit](audits/merged-glamsterdam-20261122/README.md).
+The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/progress-20261123/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261123.md) retain exact source/evidence boundaries.
 
-| Area | Delivered result |
+| Area | Delivered result / boundary |
 | --- | --- |
-| Native execution and APIs |219 packages;107 unchanged official RPC files/108 requests; six affected race suites; full vet/build and a byte-identical independent native rebuild. Native EF corpora retain their own exact source/fork/format counts. |
-| Builder/CL lifecycle | Actual signed external builders, payments, FULL/EMPTY/withheld/late/reorg controls, registry sweep/reuse, progressive SSZ and independent signed finality. |
-| Data/networking | eth/70 receipts, eth/71 BALs, eth/72 cells, snap/2 and CL partial columns; actual two-row external-builder blob with544 KZG proofs and useful partials. |
-| Sync/durability | Independent Geth full/snap late join, moving-pivot/restart controls, historical state/BAL readback and four original-datadir recoveries under 300s. |
-| Operating evidence |400/400 steady slots and60/60 pressure slots; unchanged budgets,270 independent pressure proofs, finality and offline replay. |
+| Execution and APIs |219 combined Go suites, related race checks, vet/native build. Earlier official107 RPC files/108 requests retain their own source. Native and Geth-backed corpus scope stays finite. |
+| Builder/CL | Signed external bids, payments, withheld/late/reorg/registry controls and progressive SSZ. Unsupported local Builder extensions are retired; authoritative state/signatures use the standard CL/EIP-8282 route. Merged CL 500 local tests are narrower than full hosted CI. |
+| Data/networking | eth/70 receipts, eth/71 BALs, eth/72 cells, snap/2 and CL partial columns; earlier external-builder two-row blob 544 KZG proof record retained. |
+| Sync/durability | Independent Geth full/snap late join, restart/retention controls, original-datadir recovery; queued history publication and actual captured FCU fsync/read-lock liveness defects repaired. |
+| Bounded operation | Completed 6h45m05s; 144 healthy samples and 72 stacks after ready 5.5h. 14 unchanged-reference BLS/finality windows and actual stopped slot 97868 authenticated, 160 live + 2 stopped proofs. No 48h verdict. |
 
-Follow-up source reviews [127](https://github.com/alt-research/eth2030/pull/127), [128](https://github.com/alt-research/eth2030/pull/128) and [129](https://github.com/alt-research/eth2030/pull/129) retire unsupported legacy Builder Engine extensions, make startup failure transactional and bound FileDB value/WAL residency. [130](https://github.com/alt-research/eth2030/pull/130) corrects restored snap progress under moving CL targets. All four are merged in master55f7fd84. The later operating rounds03/04 failed, most recently after5h30m. Independent BLS ancestry closes the observed spans, but native Engine import blocking is still under diagnosis and no48-hour pass exists. See [current results](https://github.com/alt-research/eth2030/pull/132) and [diagnostic review](https://github.com/alt-research/eth2030/pull/133). Remaining work includes actual multi-day capacity/soak qualification, metadata/history growth, upstream Lodestar hosted integration, conditional corpus expansion and the user's final public protocol/model decision. [Exact delivery and evidence](plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md). Completed private development does not imply public-network activation or unlimited production capacity.
+Original rounds 03/04 remain failed. The later captured FCU convoy is a confirmed defect with a merged repair; the original 04 precise holder/physical I/O cause is unconfirmed. 73 early missing slots, 686 memory-limit events and three local reveal advisories remain in the successful bounded record. No recurrence is not a root-cause proof.
+
+## Next acceptance sequence
+
+| Order | Gate | Completion condition |
+| --- | --- | --- |
+| 1 · P0 | G-01 integrated CL CI | Repair the actual url dependency audit, optimistic-head API beacon-chain invalidation/deferred-verdict and simulator failures in workflow 45134918940; inspect all remaining jobs and rerun unchanged complete profiles. Local scoped passes do not substitute. |
+| 2 · P1 | G-02 incident evidence; G-03 duration/capacity | Preserve unknown historical attribution; retain actual correlated waits on recurrence. Declare growing-state/history/resource/restart workload; actually complete strict 48h if retained, or explicitly qualify a separate bounded profile. |
+| Parallel · P1 | G-04 upstream Lodestar | PR 10693 maintainer lock review, full upstream hosted qualification and integration. |
+| Before public activation · P1 | G-05 final protocol/model | Select compatible gas/Engine/consensus/CL/fixture target and activation, then requalify affected paths. |
+| Conditional · P2 | G-06 corpus expansion | Execute specifically adopted formats/handlers/consumers, with native versus wrapper scope and negative controls. |
+
+Broader historical fast-confirmation / EVM-ASM framework labels, optional EL sampler/beam and unused helper stubs need separately scoped implementation/consumer acceptance before promotion. They are not uncompleted obligations silently inside the selected 33 tasks. [Source TODO triage and exact criteria](plans/glamsterdam/NEXT_STEPS_20261123.md).
 
 ## Other roadmap phases
 
@@ -28,12 +40,4 @@ Follow-up source reviews [127](https://github.com/alt-research/eth2030/pull/127)
 
 The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth sync is a different fork/profile and does not close independent Frame acceptance. I*–L* remain placeholder names from the retained EF drawing, without a new schedule assertion.
 
-## Next development sequence
-
-1. Retain merged source55f7fd84 / functional2c0df12f evidence and review the independently targeted pending qualification/diagnostic PRs; source merge is not operating acceptance.
-2. Pursue upstream Lodestar lockfile review/hosted CI while preserving the qualified dependency patch and exact runtime identity.
-3. Capture and repair the repeated native import stall, then begin a fresh declared48-hour operating profile on the final tuple; retain bounded-value/WAL measurements and original million-file recovery controls. Key/header/canonical metadata and complete startup authentication remain cardinality-dependent.
-4. Complete the reserved public protocol/model and release review against a compatible source/fixture/CL tuple.
-5. Continue Hegotá service/independent-client work and later public state/PQ/proof research in separate scope.
-
-[Detailed gap evidence and acceptance criteria](audits/merged-glamsterdam-20261122/README.md) · [Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Task checklist](../CHECK.md)
+[Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Review checklist](reviews/progress-20261123/CHECK.md)

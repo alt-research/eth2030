@@ -24,5 +24,7 @@
       "sha256": "dc16613087ab1a3bf3e836493c21dd1fb8a3289b119bdd5d995b2ed308c9074f",
       "successful_packages": 4
     }
-  }
+  },
+  "initial_cumulative_profile": "Native RPC117s, whole historical catchup300s failed; no ready window passed. Partial persisted FC leaf112083 differs from selected execution/published head112063 during shutdown batch. Failure is retained.",
+  "recovery_profile": "Separately declared RPC300/catchup900/ready300; running, no pass claimed."
 }

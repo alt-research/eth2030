@@ -1,0 +1,300 @@
+{
+  "observed_date": "2026-11-24",
+  "baseline_eips": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "observed_eips": "81a90efc672bdd6130c813d8dae005e5b3a8ce5b",
+  "files": [
+    {
+      "eip": 7773,
+      "blob": "a78ab57b16c8bcccec0175667f75115a8dc18971",
+      "previous_blob": "3b0d9db14e6a1069652045329101d907d0b739c8",
+      "changed": true
+    },
+    {
+      "eip": 2780,
+      "blob": "c41fa1eeced3c08914c6d2333102b04b69e80e68",
+      "previous_blob": "c41fa1eeced3c08914c6d2333102b04b69e80e68",
+      "changed": false
+    },
+    {
+      "eip": 7495,
+      "blob": "10f7fcdc7ae5bcdcabc2226f87099a8bc4d72fa2",
+      "previous_blob": "10f7fcdc7ae5bcdcabc2226f87099a8bc4d72fa2",
+      "changed": false
+    },
+    {
+      "eip": 7688,
+      "blob": "bdb1119c814c032e65580118d64e12039eafe63b",
+      "previous_blob": "bdb1119c814c032e65580118d64e12039eafe63b",
+      "changed": false
+    },
+    {
+      "eip": 7708,
+      "blob": "1fa00f6a2a425b73e0054d6b59f41ae68639413c",
+      "previous_blob": "1fa00f6a2a425b73e0054d6b59f41ae68639413c",
+      "changed": false
+    },
+    {
+      "eip": 7732,
+      "blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
+      "previous_blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
+      "changed": false
+    },
+    {
+      "eip": 7778,
+      "blob": "f84b208173a52b419164465f4ae304726878fd75",
+      "previous_blob": "f84b208173a52b419164465f4ae304726878fd75",
+      "changed": false
+    },
+    {
+      "eip": 7843,
+      "blob": "0a3c68bbd8af638d9ff91197f64cb07bb104a3a2",
+      "previous_blob": "0a3c68bbd8af638d9ff91197f64cb07bb104a3a2",
+      "changed": false
+    },
+    {
+      "eip": 7916,
+      "blob": "8c6869b3b516f895a3b1bfde7196d5ae4096a49e",
+      "previous_blob": "8c6869b3b516f895a3b1bfde7196d5ae4096a49e",
+      "changed": false
+    },
+    {
+      "eip": 7928,
+      "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb",
+      "previous_blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb",
+      "changed": false
+    },
+    {
+      "eip": 7954,
+      "blob": "850e9d488f1f7280bdfece3d38a94a3facc0d933",
+      "previous_blob": "850e9d488f1f7280bdfece3d38a94a3facc0d933",
+      "changed": false
+    },
+    {
+      "eip": 7976,
+      "blob": "15abf8001a4296864141700add3bf66c9f1b8721",
+      "previous_blob": "15abf8001a4296864141700add3bf66c9f1b8721",
+      "changed": false
+    },
+    {
+      "eip": 7981,
+      "blob": "aaf7a767fe5ccbd6699099ff39fcbda1195b48e7",
+      "previous_blob": "aaf7a767fe5ccbd6699099ff39fcbda1195b48e7",
+      "changed": false
+    },
+    {
+      "eip": 7997,
+      "blob": "96a932023940e8b5d27539b51499592c5b3cb841",
+      "previous_blob": "96a932023940e8b5d27539b51499592c5b3cb841",
+      "changed": false
+    },
+    {
+      "eip": 8024,
+      "blob": "1698ab06ca6bfc66fd99f25594083b5709ba0fb6",
+      "previous_blob": "b15042f65157134c398a8dd0f2d6759893f2f81e",
+      "changed": true
+    },
+    {
+      "eip": 8037,
+      "blob": "c8bc85b0bf866089f84d0745769fd848733c2958",
+      "previous_blob": "c8bc85b0bf866089f84d0745769fd848733c2958",
+      "changed": false
+    },
+    {
+      "eip": 8038,
+      "blob": "a1c73c4f5bffc6b4ed69556c497fec6c3d24e287",
+      "previous_blob": "a1c73c4f5bffc6b4ed69556c497fec6c3d24e287",
+      "changed": false
+    },
+    {
+      "eip": 8045,
+      "blob": "e1e2887cf958f03d25096aa03621f9e2cc1ad311",
+      "previous_blob": "e1e2887cf958f03d25096aa03621f9e2cc1ad311",
+      "changed": false
+    },
+    {
+      "eip": 8061,
+      "blob": "dadac31f4d7dfb97ff3cbdadf8c6997715ed3c87",
+      "previous_blob": "dadac31f4d7dfb97ff3cbdadf8c6997715ed3c87",
+      "changed": false
+    },
+    {
+      "eip": 8246,
+      "blob": "6c80a64ed3651696cc7d9251ec3bac2ed199ec6d",
+      "previous_blob": "6c80a64ed3651696cc7d9251ec3bac2ed199ec6d",
+      "changed": false
+    },
+    {
+      "eip": 8282,
+      "blob": "0a763f9f61f2fa96dbafb1ecc66059c27e245407",
+      "previous_blob": "0a763f9f61f2fa96dbafb1ecc66059c27e245407",
+      "changed": false
+    },
+    {
+      "eip": 7975,
+      "blob": "20f2bcf741f3aaf8f42f1071564f286e855c83a6",
+      "previous_blob": "20f2bcf741f3aaf8f42f1071564f286e855c83a6",
+      "changed": false
+    },
+    {
+      "eip": 8070,
+      "blob": "e5307e687b602e10e6d93780d11038eeafd00382",
+      "previous_blob": "b65cda59d5a99acb3d20aef088630c9c4f7220f1",
+      "changed": true
+    },
+    {
+      "eip": 8136,
+      "blob": "63ceeb9c08554e0c7d978bb68917043cd89c6408",
+      "previous_blob": "63ceeb9c08554e0c7d978bb68917043cd89c6408",
+      "changed": false
+    },
+    {
+      "eip": 8159,
+      "blob": "70aa972709bc179e97f55423c035ac8823ee0e8c",
+      "previous_blob": "70aa972709bc179e97f55423c035ac8823ee0e8c",
+      "changed": false
+    },
+    {
+      "eip": 8189,
+      "blob": "cec54301bbcf52db6b51720e9a54a8cc0f0151b7",
+      "previous_blob": "cec54301bbcf52db6b51720e9a54a8cc0f0151b7",
+      "changed": false
+    },
+    {
+      "eip": 8261,
+      "blob": "28a1a1587eb170e4b1c44f1f2cc031625e02d244",
+      "previous_blob": "28a1a1587eb170e4b1c44f1f2cc031625e02d244",
+      "changed": false
+    },
+    {
+      "eip": 7904,
+      "blob": "822b151e5147031adb3a81e65b3f9eb504d6416e",
+      "previous_blob": "822b151e5147031adb3a81e65b3f9eb504d6416e",
+      "changed": false
+    }
+  ],
+  "engine": {
+    "previous": "68d76a5b1c09dff023782d97eec6ce87a6f6505e",
+    "observed": "1ca0818569467cff85b7f41372f22e728d5daa14",
+    "changes": "slotNumber introductory sentence, 2048-byte cell definition, positive Amsterdam timestamp predicate wording; structures/actual method rules retained."
+  },
+  "consensus": {
+    "previous": "2ea9d96a420927eb1a35d7c9399c8b3691c69f6a",
+    "observed": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+    "gloas": [
+      {
+        "path": "specs/gloas/beacon-chain.md",
+        "blob": "f6d01d30ee8d29a4f30f9024872d389b4d1bb571",
+        "previous_blob": "f6d01d30ee8d29a4f30f9024872d389b4d1bb571",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/builder.md",
+        "blob": "2b69830209eba19bce4897a3ee361da07a822fb3",
+        "previous_blob": "2b69830209eba19bce4897a3ee361da07a822fb3",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/fast-confirmation.md",
+        "blob": "8a86219105105e22f565c14e6cf8b0421c3cc266",
+        "previous_blob": "8a86219105105e22f565c14e6cf8b0421c3cc266",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/fork-choice.md",
+        "blob": "f4bdbcfc98afd74c5b69d6685b5758ada88dd286",
+        "previous_blob": "f4bdbcfc98afd74c5b69d6685b5758ada88dd286",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/fork.md",
+        "blob": "cd9390f7ff4f759c97e82a8c361f01c2117cd582",
+        "previous_blob": "cd9390f7ff4f759c97e82a8c361f01c2117cd582",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/optimistic-sync.md",
+        "blob": "a017586835eaa85aab6911a2851206ff6d5ab9bb",
+        "previous_blob": null,
+        "changed": true
+      },
+      {
+        "path": "specs/gloas/p2p-interface.md",
+        "blob": "672419f577092cf586388cebcaaefbde27268c8f",
+        "previous_blob": "787004663465f6de7a77f76916c2fcca55f8c207",
+        "changed": true
+      },
+      {
+        "path": "specs/gloas/validator.md",
+        "blob": "e2a711b7559c1fb33daa0aa8ad45cd01c2cb70db",
+        "previous_blob": "e2a711b7559c1fb33daa0aa8ad45cd01c2cb70db",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/weak-subjectivity.md",
+        "blob": "552e2293c8c6e8004cba8098ffe458d8db5a46c7",
+        "previous_blob": "552e2293c8c6e8004cba8098ffe458d8db5a46c7",
+        "changed": false
+      }
+    ],
+    "gloas_subdirectories": [
+      {
+        "path": "specs/gloas/partial-columns/p2p-interface.md",
+        "blob": "e51fd6b918e636540e1908a02473b6aee7da01bb",
+        "previous_blob": "e51fd6b918e636540e1908a02473b6aee7da01bb",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/light-client/fork.md",
+        "blob": "74fae9820906b6c98b3e7acd6c6c3b05eac3b56d",
+        "previous_blob": "74fae9820906b6c98b3e7acd6c6c3b05eac3b56d",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/light-client/full-node.md",
+        "blob": "90a0641f61f5752d13c39b0d4b31ee75c3d295dd",
+        "previous_blob": "90a0641f61f5752d13c39b0d4b31ee75c3d295dd",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/light-client/p2p-interface.md",
+        "blob": "0d9cb71a96ecb3cbe03f1a5dd020e7361d64f3e4",
+        "previous_blob": "0d9cb71a96ecb3cbe03f1a5dd020e7361d64f3e4",
+        "changed": false
+      },
+      {
+        "path": "specs/gloas/light-client/sync-protocol.md",
+        "blob": "83b650eb7e656095e476e9d0f63508df6dda8f03",
+        "previous_blob": "83b650eb7e656095e476e9d0f63508df6dda8f03",
+        "changed": false
+      }
+    ]
+  },
+  "alternatives": [
+    {
+      "number": 12581,
+      "merged": false,
+      "state": "closed",
+      "head": "2ba9176f360c3c95641c6c1b5428ac3113335c4b",
+      "closed_at": "2026-11-21T11:04:00Z"
+    },
+    {
+      "number": 12582,
+      "merged": false,
+      "state": "closed",
+      "head": "19d788c896ad35fc53dc5721dbe70ed91cb40069",
+      "closed_at": "2026-11-21T11:04:11Z"
+    }
+  ],
+  "confirmed_gaps": [
+    "eth/72 ordinary announcement fixed-width masks",
+    "Engine V2/V3/V4 query shape, readiness, source proof version and stored-proof retrieval",
+    "Gloas balance-backed gossip counters and pending reservations",
+    "Gloas parent-branch state authority and process_slots before builder validation",
+    "Gloas signed bid slot eligibility ignored maximum gossip clock disparity"
+  ],
+  "user_deferred": [
+    "48h/larger-scale acceptance",
+    "upstream Lodestar approval"
+  ],
+  "no_public_activation_parameter_changes": true
+}

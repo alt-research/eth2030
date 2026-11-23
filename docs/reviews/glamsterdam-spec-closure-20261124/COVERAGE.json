@@ -1,0 +1,353 @@
+{
+  "eips_revision": "81a90efc672bdd6130c813d8dae005e5b3a8ce5b",
+  "scope_ids": [
+    2780,
+    7495,
+    7688,
+    7708,
+    7732,
+    7773,
+    7778,
+    7843,
+    7904,
+    7916,
+    7928,
+    7954,
+    7975,
+    7976,
+    7981,
+    7997,
+    8024,
+    8037,
+    8038,
+    8045,
+    8061,
+    8070,
+    8136,
+    8159,
+    8189,
+    8246,
+    8261,
+    8282
+  ],
+  "total_documents": 28,
+  "scheduled_eips": 20,
+  "networking_eips": 5,
+  "informational_eips": 2,
+  "meta_documents": 1,
+  "go_core_tree_identical_to_previous_qualified_source": true,
+  "rows": [
+    {
+      "eip": 7773,
+      "blob": "a78ab57b16c8bcccec0175667f75115a8dc18971",
+      "previous_blob": "3b0d9db14e6a1069652045329101d907d0b739c8",
+      "changed": true,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Current authoritative scope: 20 scheduled EIPs, five networking EIPs and two informational documents; activation remains a separate network decision.",
+      "evidence_paths": []
+    },
+    {
+      "eip": 2780,
+      "blob": "c41fa1eeced3c08914c6d2333102b04b69e80e68",
+      "previous_blob": "c41fa1eeced3c08914c6d2333102b04b69e80e68",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "State-independent intrinsic gas, runtime authorizations/target charges and pre-execution OOG rollback; native execution/pool/RPC consumers retain the exact same core tree.",
+      "evidence_paths": [
+        "pkg/core/execution/amsterdam_message.go",
+        "pkg/core/gas/amsterdam_intrinsic_test.go"
+      ]
+    },
+    {
+      "eip": 7495,
+      "blob": "10f7fcdc7ae5bcdcabc2226f87099a8bc4d72fa2",
+      "previous_blob": "10f7fcdc7ae5bcdcabc2226f87099a8bc4d72fa2",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Production companion CL progressive containers and stable proof consumers; EL SSZ helper tests remain a separate evidence class.",
+      "evidence_paths": [
+        "pkg/ssz/stable_container_test.go"
+      ]
+    },
+    {
+      "eip": 7688,
+      "blob": "bdb1119c814c032e65580118d64e12039eafe63b",
+      "previous_blob": "bdb1119c814c032e65580118d64e12039eafe63b",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Production companion CL progressive state/types; retained 384-validator proof/signature and independent finality records keep their original source.",
+      "evidence_paths": [
+        "docs/reviews/glamsterdam-final-campaign/PROTOCOL_MANIFEST.json"
+      ]
+    },
+    {
+      "eip": 7708,
+      "blob": "1fa00f6a2a425b73e0054d6b59f41ae68639413c",
+      "previous_blob": "1fa00f6a2a425b73e0054d6b59f41ae68639413c",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Native transfer logs, receipt roots, create endowments and revert suppression; fee/withdrawal categories remain excluded as specified.",
+      "evidence_paths": [
+        "pkg/core/vm/eip7708_test.go"
+      ]
+    },
+    {
+      "eip": 7732,
+      "blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
+      "previous_blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
+      "changed": false,
+      "status": "implemented_in_feature_reviews",
+      "consumer_boundary": "Signed CL/standard Engine authority and actual lifecycle retained; current balance-backed gossip count and parent-state authority are repaired in the companion feature branch.",
+      "evidence_paths": [
+        "pkg/engine/server.go"
+      ]
+    },
+    {
+      "eip": 7778,
+      "blob": "f84b208173a52b419164465f4ae304726878fd75",
+      "previous_blob": "f84b208173a52b419164465f4ae304726878fd75",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "User refunds remain applied; block execution accounting excludes them and composes with state gas and calldata floor.",
+      "evidence_paths": [
+        "pkg/core/execution/amsterdam_fees_test.go"
+      ]
+    },
+    {
+      "eip": 7843,
+      "blob": "0a3c68bbd8af638d9ff91197f64cb07bb104a3a2",
+      "previous_blob": "0a3c68bbd8af638d9ff91197f64cb07bb104a3a2",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Supplied beacon slot committed in native header/RLP/hash and forwarded to EVM, RPC and persisted replay.",
+      "evidence_paths": [
+        "pkg/node/amsterdam_slot_integration_test.go"
+      ]
+    },
+    {
+      "eip": 7916,
+      "blob": "8c6869b3b516f895a3b1bfde7196d5ae4096a49e",
+      "previous_blob": "8c6869b3b516f895a3b1bfde7196d5ae4096a49e",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Production companion CL progressive lists and retained actual proof consumers; no unused EL helper is counted as a production CL path.",
+      "evidence_paths": [
+        "pkg/ssz/progressive_list_test.go"
+      ]
+    },
+    {
+      "eip": 7928,
+      "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb",
+      "previous_blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Native BAL recording, canonical bytes/hash, state-access timing, historical consumers and header-correlated peer fetch.",
+      "evidence_paths": [
+        "pkg/core/types/header_bal_rlp_test.go",
+        "pkg/eth/bal_consumer_test.go"
+      ]
+    },
+    {
+      "eip": 7954,
+      "blob": "850e9d488f1f7280bdfece3d38a94a3facc0d933",
+      "previous_blob": "850e9d488f1f7280bdfece3d38a94a3facc0d933",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "64 KiB code / 128 KiB initcode boundaries across native execution, admission and RPC estimates.",
+      "evidence_paths": [
+        "pkg/core/vm/eip7954_boundaries_test.go"
+      ]
+    },
+    {
+      "eip": 7976,
+      "blob": "15abf8001a4296864141700add3bf66c9f1b8721",
+      "previous_blob": "15abf8001a4296864141700add3bf66c9f1b8721",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Uniform 64 gas/byte calldata floor, post-refund transaction costs and execution-dimension block floor.",
+      "evidence_paths": [
+        "pkg/core/gas/amsterdam_intrinsic_test.go"
+      ]
+    },
+    {
+      "eip": 7981,
+      "blob": "aaf7a767fe5ccbd6699099ff39fcbda1195b48e7",
+      "previous_blob": "aaf7a767fe5ccbd6699099ff39fcbda1195b48e7",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Flat access-list data surcharge in intrinsic/floor/receipt and RPC consumers; no content-dependent byte-price substitution.",
+      "evidence_paths": [
+        "pkg/core/gas/amsterdam_intrinsic_test.go"
+      ]
+    },
+    {
+      "eip": 7997,
+      "blob": "96a932023940e8b5d27539b51499592c5b3cb841",
+      "previous_blob": "96a932023940e8b5d27539b51499592c5b3cb841",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Canonical ordinary/genesis factory route and exact code/nonce. The EIP explicitly forbids a fork-boundary existence check; no irregular injection is added.",
+      "evidence_paths": [
+        "pkg/core/execution/factory_fork_test.go"
+      ]
+    },
+    {
+      "eip": 8024,
+      "blob": "1698ab06ca6bfc66fd99f25594083b5709ba0fb6",
+      "previous_blob": "b15042f65157134c398a8dd0f2d6759893f2f81e",
+      "changed": true,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "All immediate encodings, stack depths, code-end behavior, JUMPDEST preservation and fork activation; latest changes only correct list numbering.",
+      "evidence_paths": [
+        "pkg/core/vm/eip8024_current_test.go"
+      ]
+    },
+    {
+      "eip": 8037,
+      "blob": "c8bc85b0bf866089f84d0745769fd848733c2958",
+      "previous_blob": "c8bc85b0bf866089f84d0745769fd848733c2958",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "The current merged LIFO text is blob-identical to the selected target. Frame baselines, borrowing, refills, rollback, system margins, settlement and two block dimensions retain qualified native consumers.",
+      "evidence_paths": [
+        "pkg/core/vm/amsterdam_state_gas_test.go",
+        "pkg/node/amsterdam_state_gas_integration_test.go"
+      ]
+    },
+    {
+      "eip": 8038,
+      "blob": "a1c73c4f5bffc6b4ed69556c497fec6c3d24e287",
+      "previous_blob": "a1c73c4f5bffc6b4ed69556c497fec6c3d24e287",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Access/write constants and pre-/post-state charging, net SSTORE refunds and CALL/CREATE/SELFDESTRUCT composition retain identical native code.",
+      "evidence_paths": [
+        "pkg/core/vm/amsterdam_bal_gas_test.go"
+      ]
+    },
+    {
+      "eip": 8045,
+      "blob": "e1e2887cf958f03d25096aa03621f9e2cc1ad311",
+      "previous_blob": "e1e2887cf958f03d25096aa03621f9e2cc1ad311",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Companion CL slashed-proposer selection and lookahead at the retained exact consensus-state transition source.",
+      "evidence_paths": [
+        "docs/reviews/glamsterdam-final-campaign/PROTOCOL_MANIFEST.json"
+      ]
+    },
+    {
+      "eip": 8061,
+      "blob": "dadac31f4d7dfb97ff3cbdadf8c6997715ed3c87",
+      "previous_blob": "dadac31f4d7dfb97ff3cbdadf8c6997715ed3c87",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Companion CL activation/exit/consolidation churn and weak subjectivity at the retained exact consensus-state transition source.",
+      "evidence_paths": [
+        "docs/reviews/glamsterdam-final-campaign/PROTOCOL_MANIFEST.json"
+      ]
+    },
+    {
+      "eip": 8246,
+      "blob": "6c80a64ed3651696cc7d9251ec3bac2ed199ec6d",
+      "previous_blob": "6c80a64ed3651696cc7d9251ec3bac2ed199ec6d",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Balance-preserving same-transaction SELFDESTRUCT finalization, nonce/code/storage cleanup, later transfers and BAL/receipt consumers.",
+      "evidence_paths": [
+        "pkg/core/execution/selfdestruct_8246_test.go"
+      ]
+    },
+    {
+      "eip": 8282,
+      "blob": "0a763f9f61f2fa96dbafb1ecc66059c27e245407",
+      "previous_blob": "0a763f9f61f2fa96dbafb1ecc66059c27e245407",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Actual builder deposit/exit contracts, execution requests 0x03/0x04, Engine commitment and CL registration/withdrawal consumers.",
+      "evidence_paths": [
+        "pkg/core/execution/builder_requests_8282_test.go"
+      ]
+    },
+    {
+      "eip": 7975,
+      "blob": "20f2bcf741f3aaf8f42f1071564f286e855c83a6",
+      "previous_blob": "20f2bcf741f3aaf8f42f1071564f286e855c83a6",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Negotiated eth/70 receipt pages, request IDs, first-index/last-page semantics and independent receipt/root consumers.",
+      "evidence_paths": [
+        "pkg/eth/handler.go"
+      ]
+    },
+    {
+      "eip": 8070,
+      "blob": "e5307e687b602e10e6d93780d11038eeafd00382",
+      "previous_blob": "b65cda59d5a99acb3d20aef088630c9c4f7220f1",
+      "changed": true,
+      "status": "implemented_in_feature_reviews",
+      "consumer_boundary": "Canonical eth/72 masks; existing request IDs and sparse pool/real KZG flow; all three inherited/current blob query versions now have spec-consistent shape/readiness/source-proof rules.",
+      "evidence_paths": [
+        "pkg/node/sparse_blob_relay_test.go"
+      ]
+    },
+    {
+      "eip": 8136,
+      "blob": "63ceeb9c08554e0c7d978bb68917043cd89c6408",
+      "previous_blob": "63ceeb9c08554e0c7d978bb68917043cd89c6408",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Companion CL partial-column gossip/ReqResp and actual custody/provider recovery; unchanged partial-columns spec blob retained.",
+      "evidence_paths": [
+        "docs/reviews/glamsterdam-final-campaign/PROTOCOL_MANIFEST.json"
+      ]
+    },
+    {
+      "eip": 8159,
+      "blob": "70aa972709bc179e97f55423c035ac8823ee0e8c",
+      "previous_blob": "70aa972709bc179e97f55423c035ac8823ee0e8c",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Negotiated eth/71 canonical BAL encoding, header commitment validation, bounded ordered unavailable replies and request correlation.",
+      "evidence_paths": [
+        "pkg/eth/bal_consumer_test.go"
+      ]
+    },
+    {
+      "eip": 8189,
+      "blob": "cec54301bbcf52db6b51720e9a54a8cc0f0151b7",
+      "previous_blob": "cec54301bbcf52db6b51720e9a54a8cc0f0151b7",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Negotiated snap/2 BAL pivot advancement, authenticated trie application, reorg/restart and actual independent peer controls.",
+      "evidence_paths": [
+        "pkg/node/snap2_runtime_test.go"
+      ]
+    },
+    {
+      "eip": 8261,
+      "blob": "28a1a1587eb170e4b1c44f1f2cc031625e02d244",
+      "previous_blob": "28a1a1587eb170e4b1c44f1f2cc031625e02d244",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Informational gas-limit schedule is planning input, not authorization to invent a public activation or waive workload/resource qualification.",
+      "evidence_paths": []
+    },
+    {
+      "eip": 7904,
+      "blob": "822b151e5147031adb3a81e65b3f9eb504d6416e",
+      "previous_blob": "822b151e5147031adb3a81e65b3f9eb504d6416e",
+      "changed": false,
+      "status": "covered_or_non_executable_document",
+      "consumer_boundary": "Informational analysis specifies no compute gas repricing. No speculative opcode/precompile price changes are introduced.",
+      "evidence_paths": [
+        "pkg/core/vm/gas_table_test.go"
+      ]
+    }
+  ],
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "qualified_el_implementation_source": "264adba468069377fb50b487bd2dec77c089b28d",
+  "qualified_cl_implementation_source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+  "unimplemented_confirmed_glamsterdam_tasks": []
+}

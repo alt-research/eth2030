@@ -1,0 +1,11 @@
+# Status
+
+Implementation closure reviewed November 24, 2026 from master b4b88ed0. All 28 meta/scheduled/network/informational documents listed by current EIP-7773 are reconciled against EIPs 81a90efc, Engine 1ca08185 and consensus-specs d2021d27. Current LIFO text is unchanged and alternatives 12581/12582 closed unmerged. The exact source ledger and scope are in SPEC_COMPARISON.json / COVERAGE.json / MATRIX.md.
+
+Five confirmed issue groups are implemented in independent feature reviews: eth/72 ordinary masks (EL PR 150), the inherited/current blob query family (EL PR 151), and balance-backed bid counting, parent-state authority and clock eligibility (Lighthouse PR 16 to eth2030). The final EL composition 264adba4 passes 219 test-bearing packages plus 18 no-test packages, 23369 pass events, five complete affected race packages, full vet and both entrypoint builds. The clock-inclusive CL source 87169d6 passes cargo check for the actual lighthouse binary, project-policy Clippy and all 59 Gloas bid tests with blst/supranational enabled and fake_crypto absent. Prior failures remain documented.
+
+EL PRs 150/151 hosted CI is green; 151 retained one module-proxy HTTP/2 failure before a successful failed-job-only retry. Lighthouse final hosted suite/local-testnet and authorized eth2030 integration are pending at this initial review snapshot. EL master merges remain for user review. The initial three-open-PR merge audit checks 12 subset transitions covering all six orders, clean/convergent with the measured EL package tree.
+
+No new actual 48h/larger-scale, upstream Lodestar approval, public activation or original-04 root-cause resolution is claimed. The original missing waiter remains unknown; confirmed later mechanisms remain independently repaired. A separately scoped future roadmap item is not silently adopted into Glamsterdam.
+
+Final timer integration also reproduced NoProposerPreferences during the still-valid previous-slot clock window. The shared clock-aware cleanup now preserves both preference and quota/highest-bid evidence, and a signed excess update verifies quota cannot reset. Targeted signed test, actual binary typecheck and project-policy lint pass; source 3d6ea012 receives its own complete-suite and hosted rerun before integration. No earlier passing source is relabelled as this subsequent lifecycle fix.

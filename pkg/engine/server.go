@@ -35,7 +35,7 @@ type EngineAPI struct {
 	ethHandler      http.Handler // optional: handles non-engine_ methods (eth_, web3_, net_)
 	authSecret      string
 	jwtSecret       *[32]byte
-	authVhosts      []string         // Host header allowlist (--authrpc.vhosts); empty or ["*"] allows all
+	authVhosts      []string // Host header allowlist (--authrpc.vhosts); empty or ["*"] allows all
 	maxRequestSize  int64
 	requestTimeout  time.Duration    // P0: configurable request timeout (default 8s)
 	priorityHandler *PriorityHandler // P2: tracks request priorities

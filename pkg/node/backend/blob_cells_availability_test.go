@@ -2,6 +2,9 @@ package backend
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/eth2030/eth2030/crypto/bls"
+	"github.com/eth2030/eth2030/engine/payload"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -99,5 +102,47 @@ func TestGetBlobsV4AvailablePoolPreservesMissingPositionsAndPairs(t *testing.T) 
 	n.syncing = false
 	if got := b.GetBlobsV4ByVersionedHashes([]types.Hash{missing}, mask); len(got) != 1 || got[0] != nil {
 		t.Fatal("recovered serving must report a missing position, not general unavailability")
+	}
+}
+
+func TestGetBlobsV2V3LifecycleBlocksCachedDataDuringSyncAndClose(t *testing.T) {
+	for _, version := range []int{2, 3} {
+		t.Run(fmt.Sprint(version), func(t *testing.T) {
+			n := &cellServingNode{mockNodeDeps: newTestBackendNode(t), handler: &cellServingHandler{}}
+			b := NewEngineBackend(n)
+			t.Cleanup(b.Close)
+			hash := types.Hash{0: 1}
+			blob := make([]byte, 131072)
+			_, cells, err := bls.DefaultKZGBackend().ComputeCellsAndProofs(blob)
+			if err != nil {
+				t.Fatal(err)
+			}
+			proofs := make([][]byte, len(cells))
+			for i, proof := range cells {
+				proofs[i] = append([]byte(nil), proof[:]...)
+			}
+			b.blobCache[hash] = copyBlobCellProofs(blob, proofs)
+			read := func() []*payload.BlobAndProofV2 {
+				if version == 2 {
+					return b.GetBlobsV2ByVersionedHashes([]types.Hash{hash})
+				}
+				return b.GetBlobsV3ByVersionedHashes([]types.Hash{hash})
+			}
+			if got := read(); len(got) != 1 || got[0] == nil {
+				t.Fatal("healthy cached blob unavailable")
+			}
+			n.syncing = true
+			if got := read(); got != nil {
+				t.Fatal("syncing served cached blob")
+			}
+			n.syncing = false
+			if got := read(); len(got) != 1 || got[0] == nil {
+				t.Fatal("recovery lost cached blob")
+			}
+			b.Close()
+			if got := read(); got != nil {
+				t.Fatal("closed backend served cached blob")
+			}
+		})
 	}
 }

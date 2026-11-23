@@ -23,12 +23,9 @@ func parseCellMask(raw []byte) (*types.CellMask, error) {
 	}
 	return &mask, nil
 }
-func (api *EngineAPI) handleGetBlobsV4(params []json.RawMessage) (any, *jsonrpcError) {
-	if len(params) != 2 {
-		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected versioned hashes and 16-byte cell mask"}
-	}
+func parseBlobVersionedHashes(raw json.RawMessage) ([]types.Hash, *jsonrpcError) {
 	var encoded []string
-	if err := json.Unmarshal(params[0], &encoded); err != nil || isNullWire(params[0]) {
+	if err := json.Unmarshal(raw, &encoded); err != nil || isNullWire(raw) {
 		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "invalid versioned hashes"}
 	}
 	if len(encoded) > 128 {
@@ -36,11 +33,22 @@ func (api *EngineAPI) handleGetBlobsV4(params []json.RawMessage) (any, *jsonrpcE
 	}
 	hashes := make([]types.Hash, len(encoded))
 	for i, text := range encoded {
-		raw, err := hexutil.Decode(text)
-		if err != nil || len(raw) != 32 || raw[0] != 1 {
+		value, err := hexutil.Decode(text)
+		if err != nil || len(value) != 32 {
 			return nil, &jsonrpcError{Code: InvalidParamsCode, Message: fmt.Sprintf("invalid versioned hash %d", i)}
 		}
-		copy(hashes[i][:], raw)
+		copy(hashes[i][:], value)
+	}
+	return hashes, nil
+}
+
+func (api *EngineAPI) handleGetBlobsV4(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 2 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected versioned hashes and 16-byte cell mask"}
+	}
+	hashes, parseErr := parseBlobVersionedHashes(params[0])
+	if parseErr != nil {
+		return nil, parseErr
 	}
 	mask, err := parseCellMask(params[1])
 	if err != nil || mask == nil {

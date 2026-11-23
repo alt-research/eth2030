@@ -4,3 +4,10 @@ TestGetBlobsV4GeneralUnavailabilityIsNull/no-handler: want null, got result:[nul
 TestGetBlobsV4GeneralUnavailabilityIsNull/unavailable: want null, got result:[null]
 TestGetBlobsV4GeneralUnavailabilityIsNull/closed: want null, got result:[null]
 TestGetBlobsV4AvailablePoolPreservesMissingPositionsAndPairs: missing cell leaked a non-null proof
+
+Follow-up inheritance regressions on 5620722e:
+TestBlobQueriesV2V3V4ValidateBeforeBackend: V2 null query reached backend and returned [] instead of InvalidParams.
+TestGetBlobsV2V3LifecycleBlocksCachedDataDuringSyncAndClose/2: syncing served cached blob.
+TestGetBlobsV2V3LifecycleBlocksCachedDataDuringSyncAndClose/3: syncing served cached blob.
+
+Source-version inheritance regression on the initial backend: a genuinely admitted legacy sidecar retained across an Osaka pool-rule update was returned as PeerDAS by recomputing proofs. TestPeerDASBlobQueriesDoNotUpgradeLegacyProofs failed with "legacy sidecar was implicitly upgraded and served as PeerDAS".

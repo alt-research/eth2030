@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -14,7 +15,6 @@ import (
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
-	"github.com/eth2030/eth2030/crypto/bls"
 	"github.com/eth2030/eth2030/engine/payload"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/rlp"
@@ -146,7 +146,7 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 	if len(blobsBundle.Blobs) > 0 {
 		b.blobCacheMu.Lock()
 		// Clear old cache entries to avoid stale data
-		b.blobCache = make(map[types.Hash][]byte)
+		b.blobCache = make(map[types.Hash]*payload.BlobAndProofV2)
 		for _, tx := range blk.Transactions() {
 			if len(tx.BlobHashes()) == 0 {
 				continue
@@ -156,6 +156,12 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 				slog.Warn("engine_getPayload: BlobSidecar is nil for blob tx")
 				continue
 			}
+			// The cache is consumed by PeerDAS V2/V3 retrieval only. Legacy
+			// sidecars must not be silently upgraded by a later query.
+			_, frame := tx.Inner().(*types.FrameTx8141)
+			if sc.Version != 1 && !frame {
+				continue
+			}
 			blobHashes := tx.BlobHashes()
 			slog.Debug("engine_getPayload: caching blob hashes",
 				"blobHashes", len(blobHashes),
@@ -163,7 +169,10 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 			)
 			for i, hash := range blobHashes {
 				if i < len(sc.Blobs) && len(sc.Blobs[i]) > 0 {
-					b.blobCache[hash] = sc.Blobs[i]
+					if len(sc.Proofs) < (i+1)*128 {
+						continue
+					}
+					b.blobCache[hash] = copyBlobCellProofs(sc.Blobs[i], sc.Proofs[i*128:(i+1)*128])
 					slog.Debug("engine_getPayload: cached blob", "hash", hash.Hex(), "index", i)
 				}
 			}
@@ -293,126 +302,69 @@ func (b *EngineBackend) GetBlobsByVersionedHashes(hashes []types.Hash) []*payloa
 
 // GetBlobsV2ByVersionedHashes returns blobs with cell proofs.
 func (b *EngineBackend) GetBlobsV2ByVersionedHashes(hashes []types.Hash) []*payload.BlobAndProofV2 {
+	if !b.beginBlobPoolRead() {
+		return nil
+	}
+	defer b.workers.Done()
 	return b.computeBlobsV2(hashes)
 }
 
 // GetBlobsV3ByVersionedHashes returns blobs with cell proofs (sparse).
 func (b *EngineBackend) GetBlobsV3ByVersionedHashes(hashes []types.Hash) []*payload.BlobAndProofV2 {
+	if !b.beginBlobPoolRead() {
+		return nil
+	}
+	defer b.workers.Done()
 	return b.computeBlobsV2(hashes)
+}
+
+// A successful read joins shutdown ownership; syncing never exposes cached data.
+func (b *EngineBackend) beginBlobPoolRead() bool {
+	if b.beginWork() != nil {
+		return false
+	}
+	if source, ok := b.node.(interface {
+		SyncProgress() (bool, uint64, uint64, uint64)
+	}); ok {
+		if syncing, _, _, _ := source.SyncProgress(); syncing {
+			b.workers.Done()
+			return false
+		}
+	}
+	return true
 }
 
 func (b *EngineBackend) computeBlobsV2(hashes []types.Hash) []*payload.BlobAndProofV2 {
 	result := make([]*payload.BlobAndProofV2, len(hashes))
-	kzg := bls.DefaultKZGBackend()
-
+	var pending []types.Hash
+	var positions []int
 	b.blobCacheMu.RLock()
-	cachedBlobs := make([][]byte, len(hashes))
-	cacheHits := 0
-	// Debug: log the requested hashes and cache keys
-	var requestedHashes []string
-	for _, h := range hashes {
-		requestedHashes = append(requestedHashes, h.Hex())
-	}
-	var cacheKeys []string
-	for h := range b.blobCache {
-		cacheKeys = append(cacheKeys, h.Hex())
-	}
-	slog.Debug("computeBlobsV2: hash comparison",
-		"requested", requestedHashes,
-		"cacheKeys", cacheKeys,
-	)
-	for i, h := range hashes {
-		if blob, ok := b.blobCache[h]; ok {
-			cachedBlobs[i] = blob
-			cacheHits++
+	for i, hash := range hashes {
+		if cached := b.blobCache[hash]; cached != nil {
+			result[i] = copyBlobCellProofs(cached.Blob, cached.Proofs)
+		} else {
+			pending = append(pending, hash)
+			positions = append(positions, i)
 		}
 	}
-	cacheSize := len(b.blobCache)
 	b.blobCacheMu.RUnlock()
-
-	if len(hashes) > 0 {
-		slog.Debug("computeBlobsV2: looking up blobs",
-			"requested", len(hashes),
-			"cacheHits", cacheHits,
-			"cacheSize", cacheSize,
-		)
-	}
-
-	for i, blob := range cachedBlobs {
-		if len(blob) == 0 {
-			continue
-		}
-		_, cellProofs, err := kzg.ComputeCellsAndProofs(blob)
-		if err != nil {
-			slog.Warn("computeBlobsV2: ComputeCellsAndProofs failed for cached blob",
-				"hash", hashes[i], "err", err)
-			continue
-		}
-		proofs := make([][]byte, len(cellProofs))
-		for j, p := range cellProofs {
-			cp := p
-			proofs[j] = cp[:]
-		}
-		result[i] = &payload.BlobAndProofV2{
-			Blob:   blob,
-			Proofs: proofs,
-		}
-	}
-
-	if b.node.TxPool() != nil {
-		var pendingHashes []types.Hash
-		pendingIdx := make(map[int]int)
-		for i, h := range hashes {
-			if result[i] == nil {
-				pendingIdx[len(pendingHashes)] = i
-				pendingHashes = append(pendingHashes, h)
+	if len(pending) != 0 && b.node.TxPool() != nil {
+		for i, item := range b.node.TxPool().GetBlobsWithCellProofs(pending) {
+			if item != nil {
+				result[positions[i]] = copyBlobCellProofs(item.Blob, item.CellProofs)
 			}
 		}
-		if len(pendingHashes) > 0 {
-			raw := b.node.TxPool().GetBlobsByVersionedHashes(pendingHashes)
-			poolHits := 0
-			for j, r := range raw {
-				if r == nil || len(r.Blob) == 0 {
-					continue
-				}
-				poolHits++
-				origIdx := pendingIdx[j]
-				_, cellProofs, err := kzg.ComputeCellsAndProofs(r.Blob)
-				if err != nil {
-					slog.Warn("computeBlobsV2: ComputeCellsAndProofs failed",
-						"hash", pendingHashes[j], "err", err)
-					continue
-				}
-				proofs := make([][]byte, len(cellProofs))
-				for k, p := range cellProofs {
-					cp := p
-					proofs[k] = cp[:]
-				}
-				result[origIdx] = &payload.BlobAndProofV2{
-					Blob:   r.Blob,
-					Proofs: proofs,
-				}
-			}
-			slog.Debug("computeBlobsV2: txpool lookup",
-				"pending", len(pendingHashes),
-				"poolHits", poolHits,
-			)
-		}
-	}
-
-	found := 0
-	for _, r := range result {
-		if r != nil {
-			found++
-		}
-	}
-	if found < len(hashes) && len(hashes) > 0 {
-		slog.Warn("computeBlobsV2: missing blobs",
-			"requested", len(hashes),
-			"found", found,
-		)
 	}
 	return result
+}
+
+// Responses own their bytes: a caller cannot mutate pool or published-cache data.
+func copyBlobCellProofs(blob []byte, proofs [][]byte) *payload.BlobAndProofV2 {
+	out := &payload.BlobAndProofV2{Blob: bytes.Clone(blob), Proofs: make([][]byte, len(proofs))}
+	for i, proof := range proofs {
+		out.Proofs[i] = bytes.Clone(proof)
+	}
+	return out
 }
 
 func generatePayloadID(parentHash types.Hash, attrs *block.BuildBlockAttributes, slot uint64) (payload.PayloadID, error) {
@@ -502,19 +454,10 @@ func (b *EngineBackend) SetCustodyColumns(mask types.CellMask) {
 	}
 }
 func (b *EngineBackend) GetBlobsV4ByVersionedHashes(hashes []types.Hash, mask types.CellMask) []*payload.BlobCellsAndProofsV1 {
-	// Amsterdam distinguishes general unavailability from positional misses.
-	// Register the read so shutdown waits before tearing down its dependencies.
-	if b.beginWork() != nil {
+	if !b.beginBlobPoolRead() {
 		return nil
 	}
 	defer b.workers.Done()
-	if source, ok := b.node.(interface {
-		SyncProgress() (bool, uint64, uint64, uint64)
-	}); ok {
-		if syncing, _, _, _ := source.SyncProgress(); syncing {
-			return nil
-		}
-	}
 	h, ok := b.node.EthHandler().(interface {
 		GetBlobCells([]types.Hash, types.CellMask) []types.BlobCells
 	})

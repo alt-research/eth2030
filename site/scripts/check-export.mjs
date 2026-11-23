@@ -13,7 +13,7 @@ const tasks = readRecord('docs/reviews/glamsterdam-final-campaign/TASK_RECONCILI
 const recovery = readRecord('docs/reviews/glamsterdam-postmerge-20261121/RECOVERY.json');
 const reproduced = readRecord('docs/reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json');
 const merged = readRecord('docs/audits/merged-glamsterdam-20261122/MERGED_EVIDENCE.json');
-const current = readRecord('docs/reviews/progress-20261123/CURRENT_STATE.json');
+const current = readRecord('docs/reviews/remaining-20261123/CURRENT_STATE.json');
 const bounded = readRecord('docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json');
 const stopped = readRecord('docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json');
 assert.deepEqual(current.bounded_run, bounded, 'Current snapshot changed retained duration/BLS evidence');
@@ -63,8 +63,64 @@ const durationLabel = `${Math.floor(duration / 3600)}h${Math.floor(duration % 36
 for (const fact of [durationLabel, `${bounded.post_5_5h_samples} healthy samples`, `${bounded.post_5_5h_full_stack_captures} full stacks`, `${bounded.bls_windows_freshly_replayed} BLS windows`, `${bounded.bls_observed_through - bounded.bls_observed_first + 1} observed slots`, `${bounded.bls_missing_slots.length} early missing slots`, `slot ${stopped.stopped_cl_slot}`, `${stopped.extra_stopped_slots} slots beyond the last health sample`, `${bounded.sdk_live_independent_proofs} live + 2 stopped account proofs`]) {
   assert.ok(progress(home).includes(fact), `Missing current retained fact: ${fact}`);
 }
-assert.equal(current.integrated_ci.gate, 'blocked');
-const failedJobs = current.integrated_ci.jobs.filter(job => job.conclusion === 'failure');
+assert.equal(current.integrated_ci.gate, 'closed');
+assert.equal(current.integrated_ci.conclusion, 'success');
+assert.ok(current.integrated_ci.jobs.length >= 26);
+assert.ok(current.integrated_ci.jobs.every(job => job.conclusion === 'success'));
+assert.equal(current.local_testnet.conclusion, 'success');
+const localSkipped = current.local_testnet.jobs.filter(job => job.conclusion === 'skipped');
+assert.equal(localSkipped.length, 1);
+assert.ok(localSkipped.every(job => job.name.startsWith('checkpoint-sync-test-')));
+assert.ok(current.local_testnet.jobs.filter(job => job.conclusion !== 'skipped').every(job => job.conclusion === 'success'));
+const campaign = readRecord('docs/reviews/remaining-20261123/CURRENT_TUPLE.json');
+assert.equal(campaign.operating_passed, true);
+assert.equal(campaign.bls_passed, true);
+assert.equal(campaign.actual_stopped_binding_passed, true);
+assert.equal(campaign.actual48h_passed, false);
+assert.equal(campaign.original_fault_resolved, false);
+assert.equal(campaign.startup_through_stopped_bls.passed, true);
+assert.equal(campaign.startup_through_stopped_bls.ws_checkpoint_root_agreed, true);
+assert.equal(campaign.startup_through_stopped_bls.window.slots, 1012);
+assert.equal(campaign.bls.signature_participants, 512);
+assert.equal(campaign.live_account_proofs, 14);
+assert.equal(campaign.stopped.account_proofs, 2);
+assert.ok(campaign.ready_observed_seconds >= 1800);
+assert.ok(Math.abs(campaign.ready_observed_seconds - (Date.parse(campaign.last_observed_at) - Date.parse(campaign.first_observed_at)) / 1000) < 0.002);
+assert.equal(campaign.stopped.stopped_cl_slot - campaign.observed_through_slot, campaign.stopped.extra_stopped_slots);
+assert.ok(progress(home).includes(`${campaign.observed_slots} observed slots`));
+assert.ok(progress(home).includes(`slot ${campaign.stopped.stopped_cl_slot}`));
+assert.ok(progress(home).includes('5547 passed, 9 skipped'));
+const upstream = readRecord('docs/reviews/remaining-20261123/UPSTREAM_HOSTED_GATES.json');
+assert.ok(upstream.prs.every(pr => pr.merged === false && pr.runs.some(run => run.conclusion === 'action_required')));
+const scale = readRecord('docs/reviews/remaining-20261123/CAPACITY_RESULTS.json');
+assert.equal(scale.results.length, 8);
+assert.ok(scale.results.every(result => result.passed && result.budget_passed));
+const repaired = readRecord('docs/reviews/remaining-20261123/POST_REPAIR_RECOVERY.json');
+assert.equal(repaired.operating_passed, true);
+assert.equal(repaired.bls_passed, true);
+assert.equal(repaired.actual_stopped_binding_passed, true);
+assert.equal(repaired.actual48h_passed, false);
+assert.equal(repaired.original_fault_resolved, false);
+assert.ok(repaired.ready_observed_seconds >= 300);
+assert.ok(repaired.native_rpc_startup_seconds <= 300);
+assert.ok(repaired.catchup_seconds <= 900);
+assert.equal(repaired.full_snapshot_values_verified, 2707772);
+assert.equal(repaired.metrics_gauge_passed, true);
+assert.ok(repaired.metrics_observations > 0);
+assert.equal(repaired.initial_300s_catchup_passed, false);
+assert.equal(repaired.runtime_source, current.cumulative_runtime_source);
+assert.ok(progress(home).includes('PR146'));
+const elReviews = readRecord('docs/reviews/remaining-20261123/FINAL_EL_PR_STATUS.json');
+assert.equal(elReviews.all_current_code_heads_ci_passed, true);
+assert.equal(elReviews.prs.length, 5);
+assert.ok(elReviews.prs.every(pr => pr.base === 'master' && pr.draft === false && pr.ci_conclusion === 'success'));
+const mergeAudit = readRecord('docs/reviews/remaining-20261123/FINAL_LAYOUT_PR_MERGE_AUDIT.json');
+assert.equal(mergeAudit.all_clean, true);
+assert.equal(mergeAudit.subset_extensions_checked, 80);
+assert.equal(mergeAudit.current_package_equal_to_measured_runtime, true);
+for (const pr of elReviews.prs) assert.equal(mergeAudit.heads[pr.number], pr.head);
+assert.equal(mergeAudit.pkg_tree, repaired.runtime_pkg_tree);
+const failedJobs = current.prior_integrated_ci.jobs.filter(job => job.conclusion === 'failure');
 for (const name of ['check-code', 'http-api-tests', 'beacon-chain-tests', 'basic-simulator-ubuntu']) {
   assert.ok(failedJobs.some(job => job.name === name), `Missing actual failing job ${name}`);
 }
@@ -72,8 +128,8 @@ for (const [id, state] of [['G-01', current.integrated_ci.gate], ['G-02', 'uncon
   assert.ok(progress(home).includes(`data-gate="${id}" data-state="${state}"`), `Missing actual acceptance gate ${id}/${state}`);
 }
 assert.ok(progress(home).includes(current.integrated_ci.url));
-assert.match(progress(home), /Four hosted jobs fail: dependency audit, optimistic-head API, beacon-chain invalidation\/deferred-verdict tests and basic simulator/);
-assert.match(progress(home), /500 local scoped tests do not close full CI/);
+assert.match(progress(home), /original 3s failure/);
+assert.match(progress(home), /repaired baseline completed 27 hosted jobs/);
 assert.match(progress(home), /Rounds 03\/04 remain failed/);
 assert.match(progress(home), /exact holder and physical I\/O cause remain unconfirmed/);
 assert.match(progress(home), /not a 48-hour pass/);
@@ -85,8 +141,8 @@ assert.ok(progress(home).includes(`/pull/${current.merged_el.through_pr}`));
 assert.ok(progress(home).includes(`/commit/${current.merged_cl.revision}`));
 assert.ok(progress(home).includes(`/blob/${current.merged_el.revision}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
 assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned earlier verification record');
-for (const path of ['docs/reviews/progress-20261123/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261123.md']) {
-  assert.ok(progress(home).includes(`/blob/7a7c71d2b3593b7b5f59f64eb9e997099d9748c8/${path}`), `Missing pinned current evidence/plan ${path}`);
+for (const path of ['docs/reviews/remaining-20261123/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261123.md']) {
+  assert.ok(progress(home).includes(`/blob/1317a6624e6246a8e0937f56d2758b300ccbcfcb/${path}`), `Missing pinned current evidence/plan ${path}`);
 }
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
@@ -137,7 +193,7 @@ for (const [id, expected, obsolete] of [
 for (const number of [2780, 7688, 7708, 7732, 7778, 7843, 7928, 7954, 7976, 7981, 7997, 8024, 8037, 8038, 8045, 8061, 8246, 8282, 7975, 8159, 8070, 8189, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
   assert.match(page, /Qualification evidence/);
-  assert.ok(page.includes(`/blob/${number === 7732 ? current.merged_el.revision : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
+  assert.ok(page.includes(`/blob/${number === 7732 ? current.historical_el.revision : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
 }
 for (const number of [7688, 8045, 8061, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
@@ -150,10 +206,10 @@ assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
 assert.match(builderPage, /legacy EL bid-hash\/registry\/header extensions retired in PR127/);
-assert.ok(builderPage.includes(`/blob/${current.merged_el.revision}/docs/reviews/builder-authority/STATUS.md`));
+assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/builder-authority/STATUS.md`));
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
-assert.match(builderPage, /Integrated CL hosted CI has dependency, API, beacon-chain invalidation\/deferred-verdict and simulator failures/);
-assert.ok(builderPage.includes(`/blob/${current.merged_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
+assert.match(builderPage, /passes all 27 test-suite jobs and local-testnet/);
+assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 
@@ -177,7 +233,7 @@ function checkPages(dir) {
 }
 checkPages(new URL('../out/', import.meta.url));
 const siteWorkflow = readFileSync(new URL('../../.github/workflows/site-check.yml', import.meta.url), 'utf8');
-for (const input of ['docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
+for (const input of ['docs/reviews/remaining-*/**', 'docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
   assert.ok(siteWorkflow.includes(`'${input}'`), `Site CI omits new evidence input ${input}`);
 }
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');

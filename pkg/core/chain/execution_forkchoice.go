@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/eth2030/eth2030/core/execution"
@@ -56,6 +57,7 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 		return fmt.Errorf("forkchoice: safe block precedes finalized block")
 	}
 	ancestors := make(map[types.Hash]*types.Block)
+	canonicalAlready := make(map[types.Hash]bool)
 	oldHead := bc.CurrentBlock()
 	minimum := head.NumberU64()
 	if oldHead.NumberU64() < minimum {
@@ -69,6 +71,10 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 	for block := head; block != nil; block = bc.GetBlock(block.ParentHash()) {
 		ancestors[block.Hash()] = block
 		canonical, err := rawdb.ReadCanonicalHash(bc.db, block.NumberU64())
+		if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
+			return storageFailure(err)
+		}
+		canonicalAlready[block.Hash()] = err == nil && canonical == block.Hash()
 		if block.NumberU64() <= minimum && err == nil && canonical == block.Hash() {
 			break
 		}
@@ -117,8 +123,10 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 		}
 	}
 	batch := bc.db.NewBatch()
+	deletedLookups := make(map[types.Hash]bool)
 	for _, block := range removed {
 		for _, tx := range block.Transactions() {
+			deletedLookups[tx.Hash()] = true
 			if err := rawdb.DeleteTxLookup(batch, tx.Hash()); err != nil {
 				return storageFailure(err)
 			}
@@ -130,69 +138,93 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 		}
 	}
 	for _, block := range ancestors {
-		if err := rawdb.WriteCanonicalHash(batch, block.NumberU64(), block.Hash()); err != nil {
-			return storageFailure(err)
+		if !canonicalAlready[block.Hash()] {
+			if err := rawdb.WriteCanonicalHash(batch, block.NumberU64(), block.Hash()); err != nil {
+				return storageFailure(err)
+			}
 		}
 		for _, tx := range block.Transactions() {
-			if err := rawdb.WriteTxLookup(batch, tx.Hash(), block.NumberU64()); err != nil {
+			oldNumber, err := rawdb.ReadTxLookup(bc.db, tx.Hash())
+			if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
+				return storageFailure(err)
+			}
+			if deletedLookups[tx.Hash()] || err != nil || oldNumber != block.NumberU64() {
+				if err := rawdb.WriteTxLookup(batch, tx.Hash(), block.NumberU64()); err != nil {
+					return storageFailure(err)
+				}
+			}
+		}
+	}
+	for _, pointer := range []struct {
+		target types.Hash
+		read   func(rawdb.KeyValueReader) ([32]byte, error)
+		write  func(rawdb.KeyValueWriter, [32]byte) error
+	}{
+		{headHash, rawdb.ReadHeadBlockHash, rawdb.WriteHeadBlockHash},
+		{headHash, rawdb.ReadHeadHeaderHash, rawdb.WriteHeadHeaderHash},
+	} {
+		old, err := pointer.read(bc.db)
+		if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
+			return storageFailure(err)
+		}
+		if err != nil || old != pointer.target {
+			if err := pointer.write(batch, pointer.target); err != nil {
 				return storageFailure(err)
 			}
 		}
 	}
-	if err := rawdb.WriteHeadBlockHash(batch, headHash); err != nil {
-		return storageFailure(err)
-	}
-	if err := rawdb.WriteHeadHeaderHash(batch, headHash); err != nil {
-		return storageFailure(err)
-	}
 	if final != nil {
-		if err := rawdb.WriteFinalizedBlockHash(batch, finalHash); err != nil {
+		old, err := rawdb.ReadFinalizedBlockHashChecked(bc.db)
+		if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
 			return storageFailure(err)
 		}
-	}
-	bc.mu.Lock()
-	defer bc.mu.Unlock()
-	if err := batch.Write(); err != nil {
-		return storageFailure(err)
-	}
-	for _, block := range removed {
-		for _, tx := range block.Transactions() {
-			delete(bc.txLookup, tx.Hash())
+		if err != nil || old != finalHash {
+			if err := rawdb.WriteFinalizedBlockHash(batch, finalHash); err != nil {
+				return storageFailure(err)
+			}
 		}
 	}
-	for _, block := range ancestors {
-		bc.canonCache[block.NumberU64()] = block.Hash()
-		for index, tx := range block.Transactions() {
-			bc.txLookup[tx.Hash()] = TxLookupEntry{BlockHash: block.Hash(), BlockNumber: block.NumberU64(), TxIndex: uint64(index)}
+	err = rawdb.WriteBatchAndPublish(batch, &bc.mu, func() {
+		bc.canonicalVersion++
+		for _, block := range removed {
+			for _, tx := range block.Transactions() {
+				delete(bc.txLookup, tx.Hash())
+			}
 		}
-	}
-	for number := range bc.canonCache {
-		if number > head.NumberU64() {
-			delete(bc.canonCache, number)
+		for _, block := range ancestors {
+			bc.canonCache[block.NumberU64()] = block.Hash()
+			for index, tx := range block.Transactions() {
+				bc.txLookup[tx.Hash()] = TxLookupEntry{BlockHash: block.Hash(), BlockNumber: block.NumberU64(), TxIndex: uint64(index)}
+			}
 		}
-	}
-	bc.currentBlock, bc.currentState, bc.currentSafeBlock = head, st, safe
-	if final != nil {
-		bc.currentFinalBlock = final
-	}
-	// Replace a pre-commit cache entry with the independent committed state.
-	bc.sc.remove(headHash)
-	bc.memSC.remove(headHash)
-	bc.sc.put(headHash, head.NumberU64(), st)
-	bc.sc.protect(headHash)
-	bc.memSC.put(headHash, head.NumberU64(), st)
-	bc.memSC.protect(headHash)
-	bc.hc.mu.Lock()
-	for number := range bc.hc.headers {
-		if number > head.NumberU64() {
-			delete(bc.hc.headers, number)
+		for number := range bc.canonCache {
+			if number > head.NumberU64() {
+				delete(bc.canonCache, number)
+			}
 		}
-	}
-	for _, block := range ancestors {
-		bc.hc.headers[block.NumberU64()] = block.Header()
-		bc.hc.headersByHash[block.Hash()] = block.Header()
-	}
-	bc.hc.currentHeader = head.Header()
-	bc.hc.mu.Unlock()
-	return nil
+		bc.currentBlock, bc.currentState, bc.currentSafeBlock = head, st, safe
+		if final != nil {
+			bc.currentFinalBlock = final
+		}
+		// Replace a pre-commit cache entry with the independent committed state.
+		bc.sc.remove(headHash)
+		bc.memSC.remove(headHash)
+		bc.sc.put(headHash, head.NumberU64(), st)
+		bc.sc.protect(headHash)
+		bc.memSC.put(headHash, head.NumberU64(), st)
+		bc.memSC.protect(headHash)
+		bc.hc.mu.Lock()
+		for number := range bc.hc.headers {
+			if number > head.NumberU64() {
+				delete(bc.hc.headers, number)
+			}
+		}
+		for _, block := range ancestors {
+			bc.hc.headers[block.NumberU64()] = block.Header()
+			bc.hc.headersByHash[block.Hash()] = block.Header()
+		}
+		bc.hc.currentHeader = head.Header()
+		bc.hc.mu.Unlock()
+	})
+	return storageFailure(err)
 }

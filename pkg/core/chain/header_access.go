@@ -9,10 +9,11 @@ import (
 // BLOCKHASH window below a snap pivot.
 func (bc *Blockchain) GetHeaderByHash(hash types.Hash) *types.Header {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
 	if block := bc.blockCache[hash]; block != nil {
+		bc.mu.RUnlock()
 		return block.Header()
 	}
+	bc.mu.RUnlock()
 	number, err := rawdb.ReadHeaderNumber(bc.db, hash)
 	if err != nil {
 		return nil

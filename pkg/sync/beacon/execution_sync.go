@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -33,9 +34,15 @@ type ExecutionFetcher interface {
 	FetchBlock(context.Context, types.Hash) (*types.Block, error)
 }
 
+type executionProgress struct {
+	active         bool
+	start, highest uint64
+}
+
 // ExecutionSyncer owns one replaceable CL target and one joined worker. Failed
 // downloads remain pending and retry as peers become available.
 type ExecutionSyncer struct {
+	progress                  atomic.Pointer[executionProgress]
 	mu                        sync.Mutex
 	chain                     ExecutionChain
 	fetcher                   ExecutionFetcher
@@ -126,6 +133,7 @@ func (s *ExecutionSyncer) Request(target ExecutionTarget, startingHeight ...uint
 		}
 		s.target, s.complete, s.lastErr = target, false, nil
 	}
+	s.publishProgressLocked()
 	s.mu.Unlock()
 	select {
 	case s.wake <- struct{}{}:
@@ -133,10 +141,17 @@ func (s *ExecutionSyncer) Request(target ExecutionTarget, startingHeight ...uint
 	}
 }
 
+// Progress reports the last coherently published target without waiting for
+// application callbacks that may be blocked on durable storage. It is telemetry,
+// not an execution-validation or canonical-selection authority.
 func (s *ExecutionSyncer) Progress() (bool, uint64, uint64) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.target.Head != (types.Hash{}) && !s.complete, s.startHeight, s.targetHeight
+	if value := s.progress.Load(); value != nil {
+		return value.active, value.start, value.highest
+	}
+	return false, 0, 0
+}
+func (s *ExecutionSyncer) publishProgressLocked() {
+	s.progress.Store(&executionProgress{active: s.target.Head != (types.Hash{}) && !s.complete, start: s.startHeight, highest: s.targetHeight})
 }
 
 func (s *ExecutionSyncer) Status() (ExecutionTarget, bool, error) {
@@ -159,6 +174,7 @@ func (s *ExecutionSyncer) ApplyKnown(target ExecutionTarget) error {
 		s.requestCancel()
 	}
 	s.target, s.complete, s.lastErr = target, true, nil
+	s.publishProgressLocked()
 	return nil
 }
 
@@ -265,6 +281,7 @@ func (s *ExecutionSyncer) loop(ctx context.Context, done chan struct{}) {
 		s.mu.Lock()
 		if s.target == target {
 			s.lastErr, s.complete = err, err == nil
+			s.publishProgressLocked()
 		}
 		s.requestCancel = nil
 		s.mu.Unlock()
@@ -366,6 +383,7 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 					s.mu.Lock()
 					if s.target == target {
 						s.targetHeight = cached.headNumber
+						s.publishProgressLocked()
 					}
 					s.mu.Unlock()
 				}
@@ -389,6 +407,7 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 			s.mu.Lock()
 			if s.target == target {
 				s.targetHeight = header.number
+				s.publishProgressLocked()
 			}
 			s.mu.Unlock()
 		}
@@ -403,6 +422,7 @@ func (s *ExecutionSyncer) synchronize(ctx context.Context, target ExecutionTarge
 					s.mu.Lock()
 					if s.target == target {
 						s.targetHeight = cached.headNumber
+						s.publishProgressLocked()
 					}
 					s.mu.Unlock()
 				}

@@ -111,6 +111,7 @@ func (bc *Blockchain) adoptSnapPivot(pivot *types.Block, st state.StateDB, heade
 	if snapshot, ok := st.(*state.SnapStateDB); ok {
 		st = snapshot.ExecutionCopy()
 	}
+	bc.canonicalVersion++
 	bc.currentBlock, bc.currentState = pivot, st
 	bc.cacheBlockLocked(pivot)
 	for _, header := range headers {

@@ -38,6 +38,7 @@ const (
 // a single process. Cross-process safety is provided by a file lock.
 type FileDB struct {
 	mu      sync.RWMutex
+	cacheMu sync.Mutex        // committed cache/fence only; never held across disk I/O
 	dir     string            // root directory
 	dataDir string            // dir + "/data"
 	index   map[string]string // startup key/filename metadata only; values are bounded
@@ -121,11 +122,8 @@ func NewFileDB(dir string) (*FileDB, error) {
 func (db *FileDB) Has(key []byte) (bool, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	if db.closed {
-		return false, errors.New("filedb: database closed")
-	}
-	if db.failure != nil {
-		return false, db.failure
+	if err := db.stateError(); err != nil {
+		return false, err
 	}
 	_, ok := db.index[string(key)]
 	return ok, nil
@@ -133,32 +131,59 @@ func (db *FileDB) Has(key []byte) (bool, error) {
 
 // Get retrieves the value for a key. Returns ErrNotFound if the key does not exist.
 func (db *FileDB) Get(key []byte) ([]byte, error) {
+	if value, ok, err := db.cachedRead(string(key)); ok || err != nil {
+		return value, err
+	}
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if db.closed {
-		return nil, errors.New("filedb: database closed")
-	}
-	if db.failure != nil {
-		return nil, db.failure
+	if value, ok, err := db.cachedRead(string(key)); ok || err != nil {
+		return value, err
 	}
 	k := string(key)
 	name, exists := db.index[k]
 	if !exists {
 		return nil, ErrNotFound
 	}
-	value, cached := db.cache.get(k, true)
-	if !cached {
-		var err error
-		value, err = os.ReadFile(filepath.Join(db.dataDir, name))
-		if err != nil {
-			db.failure = fmt.Errorf("filedb: reopen required after indexed read failure: %w", err)
-			return nil, db.failure
-		}
-		db.cache.put(k, value)
+	value, err := os.ReadFile(filepath.Join(db.dataDir, name))
+	if err != nil {
+		return nil, db.fenceRead(fmt.Errorf("filedb: reopen required after indexed read failure: %w", err))
 	}
-	result := make([]byte, len(value))
-	copy(result, value)
-	return result, nil
+	db.cacheMu.Lock()
+	db.cache.put(k, value)
+	db.cacheMu.Unlock()
+	return bytes.Clone(value), nil
+}
+
+// cachedRead serves only the last fully committed cache view. Writers retain
+// the storage mutex during fsync but do not mutate this view until publication.
+func (db *FileDB) cachedRead(key string) ([]byte, bool, error) {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	if err := db.stateErrorLocked(); err != nil {
+		return nil, false, err
+	}
+	value, ok := db.cache.get(key, true)
+	if !ok {
+		return nil, false, nil
+	}
+	return bytes.Clone(value), true, nil
+}
+func (db *FileDB) stateErrorLocked() error {
+	if db.closed {
+		return errors.New("filedb: database closed")
+	}
+	return db.failure
+}
+func (db *FileDB) stateError() error {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	return db.stateErrorLocked()
+}
+func (db *FileDB) fenceRead(err error) error {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	db.failure = err
+	return err
 }
 
 // Put stores a key-value pair. The write is persisted to the WAL and data
@@ -166,8 +191,8 @@ func (db *FileDB) Get(key []byte) ([]byte, error) {
 func (db *FileDB) Put(key, value []byte) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if db.closed {
-		return errors.New("filedb: database closed")
+	if err := db.stateError(); err != nil {
+		return err
 	}
 	return db.putLocked(key, value)
 }
@@ -181,8 +206,8 @@ func (db *FileDB) putLocked(key, value []byte) error {
 func (db *FileDB) Delete(key []byte) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if db.closed {
-		return errors.New("filedb: database closed")
+	if err := db.stateError(); err != nil {
+		return err
 	}
 	return db.deleteLocked(key)
 }
@@ -196,10 +221,13 @@ func (db *FileDB) deleteLocked(key []byte) error {
 func (db *FileDB) Close() error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
+	db.cacheMu.Lock()
 	if db.closed {
+		db.cacheMu.Unlock()
 		return nil
 	}
 	db.closed = true
+	db.cacheMu.Unlock()
 	var errs []error
 	if db.walFile != nil {
 		if err := db.walFile.Sync(); err != nil {
@@ -210,7 +238,9 @@ func (db *FileDB) Close() error {
 		}
 	}
 	releaseLock(db.lockFd)
+	db.cacheMu.Lock()
 	db.cache = fileValueCache{}
+	db.cacheMu.Unlock()
 	db.index = nil
 	if len(errs) > 0 {
 		return fmt.Errorf("filedb: close: %v", errs)
@@ -229,14 +259,11 @@ func (db *FileDB) NewIterator(prefix []byte) Iterator {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	failed := func(err error) Iterator {
-		db.failure = fmt.Errorf("filedb: reopen required after iterator read failure: %w", err)
-		return &memIterator{pos: -1, err: db.failure}
+		failure := db.fenceRead(fmt.Errorf("filedb: reopen required after iterator read failure: %w", err))
+		return &memIterator{pos: -1, err: failure}
 	}
-	if db.closed {
-		return &memIterator{pos: -1, err: errors.New("filedb: database closed")}
-	}
-	if db.failure != nil {
-		return &memIterator{pos: -1, err: db.failure}
+	if err := db.stateError(); err != nil {
+		return &memIterator{pos: -1, err: err}
 	}
 	var keys []string
 	for key := range db.index {
@@ -247,7 +274,9 @@ func (db *FileDB) NewIterator(prefix []byte) Iterator {
 	sort.Strings(keys)
 	items := make([]kv, 0, len(keys))
 	for _, key := range keys {
+		db.cacheMu.Lock()
 		value, cached := db.cache.get(key, false)
+		db.cacheMu.Unlock()
 		if !cached {
 			var err error
 			value, err = os.ReadFile(filepath.Join(db.dataDir, db.index[key]))
@@ -558,16 +587,39 @@ func (b *fileBatch) Write() error {
 // Commit the WAL before materializing data files. Otherwise a crash after the
 // first rename but before the commit marker leaves uncommitted file contents
 // that replay cannot undo. Any write error fences this DB until recovery.
-func (db *FileDB) applyOpsLocked(ops []fileBatchOp) (err error) {
-	if db.closed {
-		return errors.New("filedb: database closed")
+func (db *FileDB) applyOpsLocked(ops []fileBatchOp) error {
+	if err := db.prepareOpsLocked(ops); err != nil {
+		return err
 	}
-	if db.failure != nil {
-		return db.failure
+	db.publishOpsLocked(ops)
+	return nil
+}
+
+// WriteAndPublish retains the old committed cache while durable I/O runs.
+// Cold reads wait on mu and must not retain the caller's publication lock.
+func (b *fileBatch) WriteAndPublish(lock sync.Locker, publish func()) error {
+	b.db.mu.Lock()
+	defer b.db.mu.Unlock()
+	if err := b.db.prepareOpsLocked(b.ops); err != nil {
+		return err
+	}
+	lock.Lock()
+	defer lock.Unlock()
+	b.db.publishOpsLocked(b.ops)
+	publish()
+	return nil
+}
+
+func (db *FileDB) prepareOpsLocked(ops []fileBatchOp) (err error) {
+	if len(ops) == 0 {
+		return db.stateError()
+	}
+	if err := db.stateError(); err != nil {
+		return err
 	}
 	defer func() {
 		if err != nil {
-			db.failure = fmt.Errorf("filedb: reopen required after write failure: %w", err)
+			db.fenceRead(fmt.Errorf("filedb: reopen required after write failure: %w", err))
 		}
 	}()
 	for _, op := range ops {
@@ -599,6 +651,12 @@ func (db *FileDB) applyOpsLocked(ops []fileBatchOp) (err error) {
 			return err
 		}
 	}
+	return nil
+}
+
+func (db *FileDB) publishOpsLocked(ops []fileBatchOp) {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
 	for _, op := range ops {
 		if op.delete {
 			delete(db.index, string(op.key))
@@ -608,7 +666,7 @@ func (db *FileDB) applyOpsLocked(ops []fileBatchOp) (err error) {
 			db.cache.put(string(op.key), op.value)
 		}
 	}
-	return nil
+
 }
 
 func (b *fileBatch) Reset() {
@@ -628,11 +686,4 @@ func syncDir(path string) error {
 }
 
 // Error reports a fenced or closed store to lazy state/proof consumers.
-func (db *FileDB) Error() error {
-	db.mu.RLock()
-	defer db.mu.RUnlock()
-	if db.closed {
-		return errors.New("filedb: database closed")
-	}
-	return db.failure
-}
+func (db *FileDB) Error() error { return db.stateError() }

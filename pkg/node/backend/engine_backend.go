@@ -62,7 +62,7 @@ type EngineBackend struct {
 	bogotaMu        sync.Mutex
 	bogotaFinalized uint64
 
-	blobCache   map[types.Hash][]byte
+	blobCache   map[types.Hash]*payload.BlobAndProofV2
 	blobCacheMu sync.RWMutex
 }
 
@@ -89,7 +89,7 @@ func NewEngineBackend(node NodeDeps) *EngineBackend {
 		payloads:         make(map[payload.PayloadID]*pendingPayload),
 		maxPayloads:      maxPayloads,
 		builder:          builder,
-		blobCache:        make(map[types.Hash][]byte),
+		blobCache:        make(map[types.Hash]*payload.BlobAndProofV2),
 		inclusionResults: make(map[types.Hash]bool),
 	}
 	return b
@@ -491,7 +491,9 @@ func (b *EngineBackend) cacheBlobsFromBlock(blk *types.Block) {
 	// Count new blobs to be added.
 	newBlobs := 0
 	for _, tx := range txs {
-		if tx.BlobSidecar() != nil {
+		sidecar := tx.BlobSidecar()
+		_, frame := tx.Inner().(*types.FrameTx8141)
+		if sidecar != nil && (sidecar.Version == 1 || frame) {
 			newBlobs += len(tx.BlobHashes())
 		}
 	}
@@ -516,13 +518,17 @@ func (b *EngineBackend) cacheBlobsFromBlock(blk *types.Block) {
 
 	for _, tx := range txs {
 		sidecar := tx.BlobSidecar()
-		if sidecar == nil {
+		_, frame := tx.Inner().(*types.FrameTx8141)
+		if sidecar == nil || (sidecar.Version != 1 && !frame) {
 			continue
 		}
 		blobHashes := tx.BlobHashes()
 		for i, hash := range blobHashes {
 			if i < len(sidecar.Blobs) && len(sidecar.Blobs[i]) > 0 {
-				b.blobCache[hash] = sidecar.Blobs[i]
+				if len(sidecar.Proofs) < (i+1)*128 {
+					continue
+				}
+				b.blobCache[hash] = copyBlobCellProofs(sidecar.Blobs[i], sidecar.Proofs[i*128:(i+1)*128])
 			}
 		}
 	}

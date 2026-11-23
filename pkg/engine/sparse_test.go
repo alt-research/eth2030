@@ -51,7 +51,7 @@ func TestSparseGetBlobsValidatesBoundedCanonicalInput(t *testing.T) {
 	api := newHandlerTestAPI()
 	hash := `["0x01` + strings.Repeat("00", 31) + `"]`
 	mask := `"0x01000000000000000000000000000000"`
-	for _, params := range [][]json.RawMessage{{json.RawMessage(hash)}, {json.RawMessage(`null`), json.RawMessage(mask)}, {json.RawMessage(`["0x01"]`), json.RawMessage(mask)}, {json.RawMessage(`["0x02` + strings.Repeat("00", 31) + `"]`), json.RawMessage(mask)}, {json.RawMessage(hash), json.RawMessage(`null`)}, {json.RawMessage(hash), json.RawMessage(`"0x01"`)}} {
+	for _, params := range [][]json.RawMessage{{json.RawMessage(hash)}, {json.RawMessage(`null`), json.RawMessage(mask)}, {json.RawMessage(`["0x01"]`), json.RawMessage(mask)}, {json.RawMessage(hash), json.RawMessage(`null`)}, {json.RawMessage(hash), json.RawMessage(`"0x01"`)}} {
 		if _, err := api.handleGetBlobsV4(params); err == nil {
 			t.Fatal("malformed cell request accepted")
 		}

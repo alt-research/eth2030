@@ -37,6 +37,12 @@ func TestGetBlobsV4ActualSyncReadiness(t *testing.T) {
 	if string(result) != "[null]" {
 		t.Fatalf("healthy empty pool returned %s", result)
 	}
+	for _, method := range []string{"engine_getBlobsV2", "engine_getBlobsV3"} {
+		rpc.call(t, method, &result, []types.Hash{})
+		if string(result) != "[]" {
+			t.Fatalf("%s healthy empty query: %s", method, result)
+		}
+	}
 	var fc engine.ForkchoiceUpdatedResult
 	rpc.call(t, "engine_forkchoiceUpdatedV4", &fc, engine.ForkchoiceStateV1{HeadBlockHash: types.Hash{31: 99}}, nil)
 	if fc.PayloadStatus.Status != engine.StatusSyncing {
@@ -46,6 +52,12 @@ func TestGetBlobsV4ActualSyncReadiness(t *testing.T) {
 	if string(result) != "null" {
 		t.Fatalf("actual sync target returned %s, want null", result)
 	}
+	for _, method := range []string{"engine_getBlobsV2", "engine_getBlobsV3"} {
+		rpc.call(t, method, &result, []types.Hash{})
+		if string(result) != "null" {
+			t.Fatalf("%s syncing query: %s", method, result)
+		}
+	}
 	rpc.call(t, "engine_forkchoiceUpdatedV4", &fc, engine.ForkchoiceStateV1{HeadBlockHash: n.blockchain.Genesis().Hash()}, nil)
 	if fc.PayloadStatus.Status != engine.StatusValid {
 		t.Fatalf("known target status: %s", fc.PayloadStatus.Status)
@@ -54,4 +66,11 @@ func TestGetBlobsV4ActualSyncReadiness(t *testing.T) {
 	if string(result) != "[null]" {
 		t.Fatalf("recovered pool returned %s", result)
 	}
+	for _, method := range []string{"engine_getBlobsV2", "engine_getBlobsV3"} {
+		rpc.call(t, method, &result, []types.Hash{})
+		if string(result) != "[]" {
+			t.Fatalf("%s recovered query: %s", method, result)
+		}
+	}
+
 }

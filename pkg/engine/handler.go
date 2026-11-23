@@ -712,13 +712,14 @@ func (api *EngineAPI) handleGetBlobsV2(params []json.RawMessage) (any, *jsonrpcE
 			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
 	}
-	var hashes []types.Hash
-	if err := json.Unmarshal(params[0], &hashes); err != nil {
-		return nil, &jsonrpcError{
-			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("invalid versioned hashes: %v", err),
-		}
+	hashes, parseErr := parseBlobVersionedHashes(params[0])
+	if parseErr != nil {
+		return nil, parseErr
 	}
+	if !api.backend.IsOsaka(api.backend.GetHeadTimestamp()) {
+		return nil, nil
+	}
+
 	if bb, ok := api.backend.(backendapi.BlobsV2Backend); ok {
 		result := bb.GetBlobsV2ByVersionedHashes(hashes)
 		// All-or-nothing: return null if any blob is missing.
@@ -757,13 +758,14 @@ func (api *EngineAPI) handleGetBlobsV3(params []json.RawMessage) (any, *jsonrpcE
 			}
 		}
 	}
-	var hashes []types.Hash
-	if err := json.Unmarshal(params[0], &hashes); err != nil {
-		return nil, &jsonrpcError{
-			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("invalid versioned hashes: %v", err),
-		}
+	hashes, parseErr := parseBlobVersionedHashes(params[0])
+	if parseErr != nil {
+		return nil, parseErr
 	}
+	if !api.backend.IsOsaka(api.backend.GetHeadTimestamp()) {
+		return nil, nil
+	}
+
 	if bb, ok := api.backend.(backendapi.BlobsV3Backend); ok {
 		result := bb.GetBlobsV3ByVersionedHashes(hashes)
 		found := 0
@@ -776,8 +778,7 @@ func (api *EngineAPI) handleGetBlobsV3(params []json.RawMessage) (any, *jsonrpcE
 			"requested", len(hashes), "found", found)
 		return result, nil
 	}
-	result := make([]*BlobAndProofV2, len(hashes))
-	return result, nil
+	return nil, nil
 }
 
 func engineErrorToRPC(err error) *jsonrpcError {

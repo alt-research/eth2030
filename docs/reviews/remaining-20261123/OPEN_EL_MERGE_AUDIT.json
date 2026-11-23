@@ -1,0 +1,77 @@
+{
+  "base": "d743925e3c4e7deb3fdc00648cb2296372910b28",
+  "heads": {
+    "142": "8f7c983cd15f95cbaf7f360ed7af2e991ce04c4c",
+    "143": "6929e4b77fa4e066be176975394b71e797960ba5",
+    "144": "aad5f0b483722609f3c08b66bb933bae860681eb"
+  },
+  "actual_merge": false,
+  "orders": [
+    {
+      "order": [
+        142,
+        143,
+        144
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    },
+    {
+      "order": [
+        142,
+        144,
+        143
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    },
+    {
+      "order": [
+        143,
+        142,
+        144
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    },
+    {
+      "order": [
+        143,
+        144,
+        142
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    },
+    {
+      "order": [
+        144,
+        142,
+        143
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    },
+    {
+      "order": [
+        144,
+        143,
+        142
+      ],
+      "tree": "f2e34d9631c43275e2ab51d38c42bb2409af8c70"
+    }
+  ],
+  "all_clean": true,
+  "validation_commit": "74ec0372af2dedad9e86cf3cb94591a625f8b12d",
+  "combined_validation": {
+    "combined-open-prs-full-go.log": {
+      "exit": 0,
+      "sha256": "6e1fa7ab3e26bd35d567c0b618521b1722d984ef67e93a72eb6b2a5a49957839",
+      "successful_package_lines": 219,
+      "no_test_files": 18
+    },
+    "combined-open-prs-race.log": {
+      "exit": 0,
+      "sha256": "a2fb394fed9bf32d1f0308b51ce43889f689bc242ed9b6b9f260d0cd74d658c7",
+      "successful_package_lines": 3,
+      "no_test_files": 0
+    },
+    "native_build": "passed"
+  },
+  "at": "2026-11-23T11:46:49.021133+00:00"
+}

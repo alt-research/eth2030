@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "scope": "Read-only actual stopped endpoint closure. No added operating time.",
+  "stopped_leaf": {
+    "index": 211,
+    "slot": 110547,
+    "root": "0x87547d7ab2b178c39cf5750927c72bae9bf61d10d770d9fd64ba429c9c5da37a",
+    "parent": 210
+  },
+  "native": {
+    "actual48h_passed": false,
+    "hash": "0x89e34e5b4b1ab6d9a53dceacb01fac576a3b4a30b6af66131ae3aa78ae3fadcb",
+    "independent_account_proofs": [
+      {
+        "address": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "balance": "9999998905913535304425867",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      },
+      {
+        "address": "0xee9ede56b61f213e69233a001b17fd6414c93675",
+        "balance": "7",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      }
+    ],
+    "number": 107161,
+    "passed": true,
+    "reference_header_agreed": true,
+    "scope": "Read-only stopped native head/MPT audit, not an online closing RPC or added uptime",
+    "slot": 110547,
+    "state_root": "0x82e852532ad3d2607a692eb605b2a09d09b008c8652b8fc8208e69180f099df5"
+  },
+  "block": {
+    "root": "0x87547d7ab2b178c39cf5750927c72bae9bf61d10d770d9fd64ba429c9c5da37a",
+    "slot": 110547,
+    "execution_hash": "0x89e34e5b4b1ab6d9a53dceacb01fac576a3b4a30b6af66131ae3aa78ae3fadcb"
+  },
+  "bls": {
+    "first": 110547,
+    "stop": 110548,
+    "slots": 1,
+    "finalized_root": "0x9aa79a652976f7e01a152dd449ecf4bd318089bddb49bd9aa1ae2449f8bbeff6",
+    "finalized_slot": 110560,
+    "signature_slot": 110625,
+    "signature_participants": 512,
+    "parent_hash_links": 14,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "last_health_sample_slot": 110547,
+  "extra_stopped_slots": 0,
+  "signed_block_ssz_sha256": "ae9acd8265f04c68308585c928b24a273f63e6e11ba722fa8ddf43af8080152a"
+}

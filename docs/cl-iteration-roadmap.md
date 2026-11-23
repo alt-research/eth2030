@@ -1,6 +1,6 @@
 # Consensus client iteration after the merged Frame milestone
 
-Updated November 23, 2026. Lighthouse `eth2030` is `34cecfc4fc3bd743c14c38a742167064a95dbc25` after PRs 4–12 were integrated; 1–3 were already ancestors. EL master `84200d53` includes PRs 131–140. Format/locked all-target compilation and 500 scoped tests pass, but [integrated workflow 45134918940](https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940) is **blocked**: url dependency audit, two optimistic-head API tests, 20 beacon-chain cases and the basic simulator fail. Minimal EF was running at the dated inspection; local scoped tests are not full-suite acceptance.
+Updated November23,2026. Lighthouse`eth2030` is`fa16f70abee7d31c9817ab8d782af73bce241484` after PR4-15;1-3 were already ancestors. EL tracking masterd743925e includes PR141 with unchanged frozen Go package tree. Lighthouse #13-15 are merged into eth2030. Exact CI head `215525de` passed all 27 test-suite jobs and local-testnet (9 passed, one conditional checkpoint skip); merged `fa16f70a` has the same tree. G-01 is closed for this private profile. The primary simulator uses explicit 6s timing; the original 3s failure remains retained. See [repair evidence](reviews/remaining-20261123/CI_REPAIRS.md) and [current campaign](reviews/remaining-20261123/CURRENT_STATE.json).
 
 The completed bounded 6h45m05s run and 14 unchanged-reference BLS windows authenticate actual stopped CL/native slot 97868. Original 04 precise waiting holder/physical I/O and actual 48h capacity remain unconfirmed. Gloas signed builder/payment/late/withheld and independent Glamsterdam full/snap controls are delivered at their recorded sources; they are no longer generic missing implementation tasks. [Current criteria and source TODOs](plans/glamsterdam/NEXT_STEPS_20261123.md).
 
@@ -36,7 +36,7 @@ The retained November 18 Frame/FOCIL milestone below has its own source and sync
 3. **CL reliability:** exercise skipped-slot checkpoints, VC restart, remote
    signing, redundant BN publication, alternate-peer and partial-response recovery.
    Preserve duty/root binding and avoid signing conflicting lists for a duty.
-4. **Gloas integration gates:** close the actual merged-source CI failures, then
+4. **Gloas integration gates:** maintain the complete integrated CI and then
    extend only adopted builder/peer profiles beyond the delivered frozen controls.
 5. **Capacity and recovery:** extend declared growing-state/history operation and
    restart beyond the independently qualified finite Glamsterdam sync profiles.

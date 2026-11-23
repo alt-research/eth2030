@@ -1,15 +1,15 @@
 # ETH2030 development roadmap
 
-Updated November 23, 2026 against EL master `84200d53` and Lighthouse `eth2030` `34cecfc4`. EL PRs 131–140 and CL PRs 4–12 are integrated. The homepage and `/roadmap` share the same dated progress and open gates. Per-EIP mapped labels retain the November2 EF Strawmap placement baseline; those percentages are not whole-fork readiness.
+Updated November 23, 2026 against EL master `d743925e` and Lighthouse `eth2030` `fa16f70abee7d31c9817ab8d782af73bce241484`. EL PRs131-141 and CL PRs4-15 are integrated. The homepage and `/roadmap` share the same dated progress and open gates. Per-EIP mapped labels retain the November2 EF Strawmap placement baseline; those percentages are not whole-fork readiness.
 
 ## Glamsterdam: selected development delivered; readiness gates open
 
-The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/progress-20261123/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261123.md) retain exact source/evidence boundaries.
+The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/remaining-20261123/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261123.md) retain exact source/evidence boundaries.
 
 | Area | Delivered result / boundary |
 | --- | --- |
 | Execution and APIs |219 combined Go suites, related race checks, vet/native build. Earlier official107 RPC files/108 requests retain their own source. Native and Geth-backed corpus scope stays finite. |
-| Builder/CL | Signed external bids, payments, withheld/late/reorg/registry controls and progressive SSZ. Unsupported local Builder extensions are retired; authoritative state/signatures use the standard CL/EIP-8282 route. Merged CL 500 local tests are narrower than full hosted CI. |
+| Builder/CL | Signed external bids, payments, withheld/late/reorg/registry controls and progressive SSZ. Unsupported local Builder extensions are retired; authoritative state/signatures use the standard CL/EIP-8282 route. The repaired baseline completed27 hosted jobs; final simulator/bootstrap qualification is separate. |
 | Data/networking | eth/70 receipts, eth/71 BALs, eth/72 cells, snap/2 and CL partial columns; earlier external-builder two-row blob 544 KZG proof record retained. |
 | Sync/durability | Independent Geth full/snap late join, restart/retention controls, original-datadir recovery; queued history publication and actual captured FCU fsync/read-lock liveness defects repaired. |
 | Bounded operation | Completed 6h45m05s; 144 healthy samples and 72 stacks after ready 5.5h. 14 unchanged-reference BLS/finality windows and actual stopped slot 97868 authenticated, 160 live + 2 stopped proofs. No 48h verdict. |
@@ -20,9 +20,9 @@ Original rounds 03/04 remain failed. The later captured FCU convoy is a confirme
 
 | Order | Gate | Completion condition |
 | --- | --- | --- |
-| 1 · P0 | G-01 integrated CL CI | Repair the actual url dependency audit, optimistic-head API beacon-chain invalidation/deferred-verdict and simulator failures in workflow 45134918940; inspect all remaining jobs and rerun unchanged complete profiles. Local scoped passes do not substitute. |
+| 1 · P0 | G-01 integrated CL CI | Closed for the private profile: final #15 has 27 successful test-suite jobs and successful local-testnet; merged fa16f70a equals the qualified tree. Preserve the original 3s failure and explicit 6s timing profile. |
 | 2 · P1 | G-02 incident evidence; G-03 duration/capacity | Preserve unknown historical attribution; retain actual correlated waits on recurrence. Declare growing-state/history/resource/restart workload; actually complete strict 48h if retained, or explicitly qualify a separate bounded profile. |
-| Parallel · P1 | G-04 upstream Lodestar | PR 10693 maintainer lock review, full upstream hosted qualification and integration. |
+| Parallel · P1 | G-04 upstream Lodestar | PR10693/10725 maintainer workflow approval/review, hosted qualification and integration. Local5547pass/9skip remains separate. |
 | Before public activation · P1 | G-05 final protocol/model | Select compatible gas/Engine/consensus/CL/fixture target and activation, then requalify affected paths. |
 | Conditional · P2 | G-06 corpus expansion | Execute specifically adopted formats/handlers/consumers, with native versus wrapper scope and negative controls. |
 

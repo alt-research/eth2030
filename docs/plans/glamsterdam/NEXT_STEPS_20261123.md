@@ -1,27 +1,33 @@
-# Glamsterdam actual progress and next steps — 2026-11-23
+# Glamsterdam implementation and acceptance follow-up - 2026-11-23
 
-## Current decision
+## Delivered implementation
 
-The selected merged LIFO / signed Gloas development scope and its original 33 task IDs are delivered. EL PRs 131–140 are merged at master84200d5322398ebe473ff26c6f54de2665cd2586. Lighthouse PR4–12 are integrated into eth203034cecfc4fc3bd743c14c38a742167064a95dbc25; 1–3 were already contained and their redundant reviews are closed. A source merge is not full protocol/public activation or a new runtime measurement.
+The33 frozen merged LIFO / signed Gloas task IDs and R01-R13 are delivered. Standard CL/EIP-8282 signatures and finalized registry/collateral remain authoritative; unsupported local Builder Engine extensions are retired. This does not select a changed public gas model or complete every research/later-fork framework.
 
-The completed bounded run covers6h45m5s from startup and6h42m of ready observations. Its post-5.5h tail has144 healthy samples and 72 full stacks; 14 unchanged-reference BLS/finality windows cover 8068 observed slots with 494–512 participants. 73 early missing slots, 686 EL memory-limit events and three recovered local reveal advisories remain retained. The actual stopped CL/native slot 97868 is authenticated through the captured BLS parent path, full persisted beacon SSZ, independently decoded execution header and MPT proofs. 160 live account proofs and two stopped-head proofs pass. This is not a 48h pass or retrospective proof of original 04's exact waiter.
+The newly discovered integrated CI defects have concrete separate repairs: Lighthouse13 updates the compatible url graph without suppressing audit;14 separates healthy fixture production from consumer fault injection while retaining no-ID on non-VALID and optimistic/recovery assertions;15 declares the6s simulator timing profile and authenticates tool-bootstrap API requests with the job token. Old3s partial aggregation and old failing workflow are retained. [Root causes and qualification](../../reviews/remaining-20261123/CI_REPAIRS.md).
 
-Fresh pre-merge combined checks pass 219 Go suites, five related race packages, full vet/native build and 65 Python controls. Merged Lighthouse format/all-target compilation and 500 scoped library/API/snapshot tests pass. The actual integrated hosted run 45134918940 is **not green**: check-code/audit-CI rejects locked url 2.5.8 under RUSTSEC-2026-0592; its recorded patched range is >=2.5.9. Two additional jobs now fail: http-api-tests (the two optimistic-head builder tests, PayloadIdUnavailable; 109 passed, 2 failed and 105 unrun due to fail-fast in the affected Fulu invocation), and basic-simulator-ubuntu (slot 114 sync aggregate 15/32). The beacon-chain-tests job also fails:18 payload-invalidation cases with PayloadIdUnavailable and two Heze deferred-verdict cases with NoViablePayloadBid (492 passed, 20 failed, 2 skipped in the affected Fulu invocation). Their causes are not established; minimal EF remained running at the dated inspection. The previous libz patch does not close this newer dependency failure. This is a concrete CI/dependency todo, not evidence of a hash/BLS validation bypass or a new EL stall.
+New EL PR142 retains contemporaneous Go/thread/fd/device/cgroup storage-wait evidence with identity/race/permission boundaries. EL144 fixes an observed stale canonical-height metric after Engine selection and checkpoint recovery, including failed durable publication controls. EL145 additionally fixes the newly captured progressing12056-key catch-up fsync convoy using bounded16-worker independent-key materialization, preserving durable commit/failure/publication. Same-filesystem batch-shape controls improve27.15/28.08s to3.08/3.19s; the30-minute observer predates this patch. PR146 additionally repairs the actual ext4 single-directory capacity limit with default256-way value placement, legacy reads and a durable old-reader guard. All2707772 real values compare exactly and independent header/state/MPT readback agrees. Its initial cumulative300s catchup failed despite117s native RPC startup; the separately declared recovery uses RPC300/catchup900/ready300 and passed91s/212s/301s,102signed slots and actual stopped113651 without relabeling that failure. These targetmaster and require review; no EL merge is implied.
 
-[Detailed new hosted failure inventory](../../reviews/progress-20261123/CI_FINDINGS.md).
+Local Lodestar full unit/minimal run is5547pass/9skip. Empty TypeScript coverage was independently fixed in upstream10725:821 executed TS records,63.47% line coverage at frozen source4e22465. This is not native-code coverage or an upstream hosted pass.10693 and10725 both await maintainer approval under the current account's read-only upstream permissions.
 
-## Active remaining work
+## Measured profiles and remaining gates
 
-| ID | Priority / kind | Current evidence | Concrete next action and completion criterion |
-| --- | --- | --- | --- |
-| G-01 | P0 · integrated CI | [Merged CL workflow](https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940), [actual blocker](https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940/job/137558805418). Local500 checks are narrower than the hosted suite. | Resolve the compatible url dependency graph without weakening audit. Reproduce/trace both optimistic-head API and 18 beacon-chain payload-invalidation failures, plus both Heze deferred-verdict NoViablePayloadBid failures. Inspect the simulator artifact 14800183126 before attributing its partial aggregate; preserve the remaining unrun tests and rerun the full affected profiles. rerun locked build/lint/relevant regressions and the required integrated workflow. Inspect every remaining job result; do not convert skipped/inactive cases or old standalone failures to passes. |
-| G-02 | P1 · incident evidence | A later old-source recurrence captured a real FCU fsync/read-lock convoy and the merged fix addresses that defect. Original 04 has no contemporaneous waiting stack. | Keep historical attribution explicitly unconfirmed. For any actual recurrence, retain request-correlated rolling stacks plus fd/path/fsync/cgroup/block-I/O timing before shutdown or debugger interference. No new test can manufacture missing historical evidence. [Separate unknowns](../../reviews/premerge-20261123/UNCONFIRMED_ORIGINAL_FAILURE.md). |
-| G-03 | P1 · duration/capacity | A bounded 6h45m run and finite restart fixtures pass; no 172800s run exists. Value/WAL residency is bounded, key/header/canonical metadata and complete authentication still grow. | Declare a final runtime/CL/fixture and state/history/transaction workload; measure I/O, latency, RSS, startup, retention, pruning and restart against independent roots/proofs. If strict 48h admission is retained, actually complete it; a separately approved bounded profile must remain separately named. Do not extend old timestamps or disable durability/validation. |
-| G-04 | P1 · upstream dependency | [Lodestar 10693](https://github.com/ChainSafe/lodestar/pull/10693) remains open; local patch/process controls do not establish full upstream hosted qualification. | Finish maintainer lock review, full upstream checks and integration; retain the exact current dependency patch and its real execution traces meanwhile. |
-| G-05 | P1 · public target decision | Frozen development target is delivered; public gas/model, compatible fork/Engine/reference tuple and activation are reserved to the user. | Explicitly select any new target, compare normative specs, then requalify affected consumers. Do not infer official fork inclusion/finalization or public readiness from historical tracker labels. |
-| G-06 | P2 · conditional coverage | Native/Geth corpora and selected CL real-EF execution retain finite counts. 24 BLS skips and43 inactive handlers are not executed passes. | Extend only specifically adopted formats/handlers/consumer cases; retain real execution counts, signatures/hashes, negative controls and restart/readback. Current complete-suite CI verdict is part of G-01. |
+The old completed6h45m05s run remains source-specific:6h42m ready observations,144 healthy samples and72 stacks after the5.5h threshold,14 unchanged-reference BLS windows across8068 observed slots,73 early missing slots,686 EL limit events and three recovered reveal advisories. Actual stopped slot97868 and160live+2stopped proofs remain authenticated. No original04 waiter was captured in that run, and no actual48h pass exists.
 
-No new mandatory production EL implementation gap was established in the reviewed selected Glams call chains. That is a scoped review result, not proof the whole client is bug-free. The active qualification gates above remain real work.
+A new explicitly declared1800s ready-observed nativeEL/updatedCL profile and8 finite KV/WAL scale cases are recorded in [current campaign state](../../reviews/remaining-20261123/CURRENT_STATE.json). Synthetic metadata reopen/RSS budgets do not establish full state/history/transaction scalability. Original failed stale-checkpoint startup is retained; the rerun uses fresh CL data and independently authenticated WS checkpoint, without ignoring WS checks.
+
+The exact latest published/merged CI state and actual stopped cryptographic endpoint are recorded separately in that current campaign state. Do not relabel the old executable, old observation durations or pending checks as new evidence.
+
+| ID | Remaining criterion |
+| --- | --- |
+| G-01 | Closed for the private profile: final Lighthouse #15 head215525de passes all 27 suite jobs and local-testnet (9 successful, one conditional checkpoint skip); mergedfa16f70a equals that tree. Primary6s simulator and retained original3s failure remain explicit. |
+| G-02 | Original04 exact holder/physical I/O cause remains unconfirmed because contemporaneous evidence is missing. Capture any real recurrence before intervention. Controlled tests and no recurrence do not reconstruct history. |
+| G-03 | Complete declared bounded tuple/resources/proof/restart checks; actual172800s still required if strict48h is retained. Key/header/canonical metadata remain linear and unrestricted capacity is not qualified. |
+| G-04 | Upstream maintainer approval, review, hosted qualification and integration for Lodestar10693/10725. Local passes do not bypass the external gate. |
+| G-05 | Explicit public gas/CL/Engine/reference tuple and activation decision, followed by affected-path requalification. Latest published8037 remains LIFO;12581/12582 are closed unmerged. |
+| G-06 | Extend specifically adopted additional formats/handlers/consumers.24 BLS skips and43 inactive handlers remain unexecuted; no new unbounded scope is inferred. |
+
+[Remaining decisions and owners](../../reviews/remaining-20261123/TODO.md). Original03/04 remain failed. The later captured FCU fsync/read-lock convoy has a merged repair; original04's exact waiter is a separate unknown.
 
 ## Source TODO/stub triage
 
@@ -42,11 +48,8 @@ The historical mapped Glamsterdam tracker also retains ePBS as Substantial and f
 
 Independent Frame/Bogota client agreement, Dora epoch/receipt/schema consumers, paymaster/service cutover and public binary/PQ/proof/native-rollup work retain their later-fork plans. Earlier synchronized-EL CL join is not independent Frame EL sync evidence. Do not inflate Glamsterdam's todo count with those different targets or silently mark them complete.
 
-## Order and reporting rules
+## Delivery and reporting
 
-1. Close G-01 on the merged source; preserve the exact CI conclusion/job/source, including any new failures.
-2. Preserve G-02 observability and qualify G-03 against a declared operational envelope; use rapid native replays as causal/consumer checks, never as substituted elapsed time.
-3. Progress G-04 in parallel. Select G-05 before public activation or adopting a changed gas/CL model; perform G-06 when a concrete new scope is adopted.
-4. Every large implementation remains a separate branch/PR. This progress update changes documentation/site claims, not protocol behavior. Merge/source equivalence, measured runtime identity, hosted CI and deployed website revision remain distinct.
+Keep major changes in independent PRs. EL repairs targetmaster; only explicitly authorized Lighthouse reviews merge into eth2030. Verify exact published heads, required CI and cumulative merge orders. Preserve unrelated work and failed attempts. Runtime executable metadata, source-content equivalence, merge integration, hosted CI and website deployment are separate facts.
 
-[Machine-readable reviewed state](../../reviews/progress-20261123/CURRENT_STATE.json) · [merged progress](../../PROGRESS.md) · [roadmap](../../ROADMAP.md).
+[Current campaign](../../reviews/remaining-20261123/CURRENT_STATE.json) · [Progress](../../PROGRESS.md) · [Roadmap](../../ROADMAP.md).

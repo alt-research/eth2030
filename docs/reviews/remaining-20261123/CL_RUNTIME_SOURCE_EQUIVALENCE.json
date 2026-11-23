@@ -1,0 +1,16 @@
+{
+  "actual_runtime_source": "ed3ac16fea3c440bf507b6b4b7627da82c45eeb8",
+  "actual_binary_sha256": "fe76144df945ac2341e6a45fdfe46eecff8eb6fe275e13e9064c4a5ae7e35754",
+  "final_ci_source": "215525de9d9290e5498fedad47d97c2eb41cebb9",
+  "merged_target": "fa16f70abee7d31c9817ab8d782af73bce241484",
+  "production_CL_source_changed": false,
+  "changed_paths": [
+    ".github/workflows/test-suite.yml",
+    "docs/reviews/ci-simulator-20261123/CHECK.md",
+    "docs/reviews/ci-simulator-20261123/LOCAL_SIMULATION.json",
+    "docs/reviews/ci-simulator-20261123/ROOT_CAUSE.md",
+    "docs/reviews/ci-simulator-20261123/STATUS.md",
+    "testing/simulator/src/basic_sim.rs"
+  ],
+  "boundary": "Production CL source equivalence is inspected; actual executable/version remains ed3ac16, not relabelled as merge metadata."
+}

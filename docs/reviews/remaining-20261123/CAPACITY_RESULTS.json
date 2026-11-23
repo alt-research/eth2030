@@ -1,0 +1,238 @@
+{
+  "profile": {
+    "source": "59d381d508c3a49692ae595218d684e68d95064c",
+    "pkg_tree": "54246b00d267d6f4589d9eed2e315c8454b26d2b",
+    "cases": [
+      [
+        "keys-100k",
+        100000,
+        128,
+        0
+      ],
+      [
+        "keys-500k",
+        500000,
+        128,
+        0
+      ],
+      [
+        "keys-1m",
+        1000000,
+        128,
+        0
+      ],
+      [
+        "wal-growth",
+        10000,
+        128,
+        100
+      ]
+    ],
+    "scope": "Fresh finite synthetic KV cardinality/WAL recovery, not blockchain state or elapsed-time replacement. OS cache retained.",
+    "declared_open_seconds": 300,
+    "declared_rss_bytes": 1073741824,
+    "actual48h_passed": false
+  },
+  "results": [
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 100000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "08fbcdcb289059086ce4a7faa66cbad8f58ecb23847ad2ae679e82fd9ea302a9"
+      },
+      "heap_alloc_after_open": 13060360,
+      "heap_alloc_before": 581680,
+      "max_rss_kib": 72568,
+      "open_seconds": 0.166081209,
+      "passed": true,
+      "read_all_seconds": 1.354612034,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-100k",
+      "attempt": 1,
+      "preparation_seconds": 3.3433255960117094,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:12:21.362550+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 100000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "08fbcdcb289059086ce4a7faa66cbad8f58ecb23847ad2ae679e82fd9ea302a9"
+      },
+      "heap_alloc_after_open": 13049208,
+      "heap_alloc_before": 581680,
+      "max_rss_kib": 72640,
+      "open_seconds": 0.152097171,
+      "passed": true,
+      "read_all_seconds": 1.23297845,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-100k",
+      "attempt": 2,
+      "preparation_seconds": 3.3433255960117094,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:12:22.764202+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 500000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "fe208daec191410fe9c54be7bc49b385005a18e601c52ddc6236a1b6f0793286"
+      },
+      "heap_alloc_after_open": 78357952,
+      "heap_alloc_before": 582288,
+      "max_rss_kib": 209272,
+      "open_seconds": 0.67114862,
+      "passed": true,
+      "read_all_seconds": 6.86525067,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-500k",
+      "attempt": 1,
+      "preparation_seconds": 18.682104212988634,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:12:49.019277+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 500000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "fe208daec191410fe9c54be7bc49b385005a18e601c52ddc6236a1b6f0793286"
+      },
+      "heap_alloc_after_open": 78497384,
+      "heap_alloc_before": 587704,
+      "max_rss_kib": 209784,
+      "open_seconds": 0.608001904,
+      "passed": true,
+      "read_all_seconds": 6.084950947,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-500k",
+      "attempt": 2,
+      "preparation_seconds": 18.682104212988634,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:12:55.744457+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 1000000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "fb004deb354e5b79a0694b4ff604ec73b5cb4996b522f122d99c94c453e58dc6"
+      },
+      "heap_alloc_after_open": 156528272,
+      "heap_alloc_before": 587256,
+      "max_rss_kib": 360820,
+      "open_seconds": 1.366377924,
+      "passed": true,
+      "read_all_seconds": 114.446578042,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-1m",
+      "attempt": 1,
+      "preparation_seconds": 37.422600238001905,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:15:29.063268+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 1000000,
+        "value_bytes": 128,
+        "wal_generations": 0,
+        "expected_sha256": "fb004deb354e5b79a0694b4ff604ec73b5cb4996b522f122d99c94c453e58dc6"
+      },
+      "heap_alloc_after_open": 156282160,
+      "heap_alloc_before": 581632,
+      "max_rss_kib": 360504,
+      "open_seconds": 1.189234016,
+      "passed": true,
+      "read_all_seconds": 100.681304851,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "keys-1m",
+      "attempt": 2,
+      "preparation_seconds": 37.422600238001905,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:17:10.999093+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 10000,
+        "value_bytes": 128,
+        "wal_generations": 100,
+        "expected_sha256": "0bb09d19fd4b9903ebdff850d6be2613f03d52d102ef2bbd8b8feef8d0f9767e"
+      },
+      "heap_alloc_after_open": 1961840,
+      "heap_alloc_before": 582000,
+      "max_rss_kib": 15076,
+      "open_seconds": 3.911430053,
+      "passed": true,
+      "read_all_seconds": 0.176391644,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 154000100,
+      "name": "wal-growth",
+      "attempt": 1,
+      "preparation_seconds": 2.032928658009041,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:17:17.139443+00:00"
+    },
+    {
+      "budget_passed": true,
+      "fixture": {
+        "format": 1,
+        "keys": 10000,
+        "value_bytes": 128,
+        "wal_generations": 100,
+        "expected_sha256": "0bb09d19fd4b9903ebdff850d6be2613f03d52d102ef2bbd8b8feef8d0f9767e"
+      },
+      "heap_alloc_after_open": 1954984,
+      "heap_alloc_before": 581888,
+      "max_rss_kib": 14832,
+      "open_seconds": 0.011332867,
+      "passed": true,
+      "read_all_seconds": 0.118052253,
+      "reopening_budget_seconds": 300,
+      "rss_budget_bytes": 1073741824,
+      "scope": "Synthetic KV storage/recovery profile only; fixture preparation excluded, no blockchain conformance or multi-day claim.",
+      "wal_input_bytes": 0,
+      "name": "wal-growth",
+      "attempt": 2,
+      "preparation_seconds": 2.032928658009041,
+      "filesystem_device": "8:1",
+      "at": "2026-11-23T09:17:17.277136+00:00"
+    }
+  ]
+}

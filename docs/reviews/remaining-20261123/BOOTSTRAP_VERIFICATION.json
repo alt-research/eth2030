@@ -1,0 +1,12 @@
+{
+  "head": "215525de9d9290e5498fedad47d97c2eb41cebb9",
+  "run": 45166237988,
+  "job": 137666389284,
+  "conclusion": "success",
+  "cargo_binstall_release_lookup_started": "2026-11-23T11:38:28.6946081Z",
+  "cargo_cache_installed": "2026-11-23T11:38:30.2604404Z",
+  "simulation_complete": "2026-11-23T11:52:31.8299289Z",
+  "retained_warnings": "QuickInstall report endpoint402 remains non-fatal; GitHub release lookup no longer follows the previous anonymous403/120s retry chain. Not a warning-free claim.",
+  "full_log_sha256": "c3e39375fdef48f3788c19aae5942d29f633e4b74326db82691c0624b57b4042",
+  "scope": "Actual final-head fallback job only. Full workflow and local-testnet acceptance remain separately recorded."
+}

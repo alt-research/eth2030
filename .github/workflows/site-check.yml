@@ -9,6 +9,7 @@ on:
       - 'CLAUDE.md'
       - 'docs/reviews/glamsterdam-*/**'
       - 'docs/reviews/progress-*/**'
+      - 'docs/reviews/remaining-*/**'
       - 'docs/reviews/diagnostic-threshold-*/**'
       - 'docs/plans/glamsterdam/**'
       - 'docs/audits/merged-glamsterdam-*/**'

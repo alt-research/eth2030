@@ -19,6 +19,8 @@ export default function DevelopmentProgress() {
       </div>)}
     </div>
     <p className="mt-5 text-xs leading-6 text-eth-dim">{snapshot.boundary}</p>
+    <p className="mt-3 text-xs leading-6 text-eth-text/80">{snapshot.currentCampaign.detail} <a className="text-eth-teal underline" href={`${GITHUB_URL}/blob/${snapshot.reviewRevision}/${snapshot.currentCampaign.record}`}>Current tuple evidence ↗</a></p>
+    <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">{snapshot.currentCampaign.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>Open EL PR #{number} ↗</a>)}</div>
     <div className="mt-4 border-t border-eth-teal/20 pt-4">
       <h4 className="text-sm font-bold text-eth-text">Remaining acceptance gates</h4>
       <ul className="mt-3 grid gap-4 md:grid-cols-2">

@@ -5,8 +5,10 @@ package node
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -465,22 +467,22 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// isLoopbackHost reports whether addr only exposes the RPC surface to the
-// local machine. Empty, "localhost", "127.0.0.0/8" singles and "::1" count
-// as loopback; wildcard binds ("0.0.0.0", "::") and hostnames do not.
+// isLoopbackHost classifies addresses without DNS resolution. Empty binds
+// listen on all interfaces. Configured IPv6 hosts are unbracketed literals.
 func isLoopbackHost(addr string) bool {
-	if addr == "::1" {
+	host := addr
+	// Preserve the helper's legacy IPv4/hostname:port input form, without
+	// treating a hostname with a numeric-looking prefix as an IP address.
+	if strings.Count(addr, ":") == 1 {
+		if parsed, _, err := net.SplitHostPort(addr); err == nil {
+			host = parsed
+		}
+	}
+	if strings.EqualFold(host, "localhost") {
 		return true
 	}
-	// Strip a trailing ":port" for everything else.
-	if idx := strings.LastIndex(addr, ":"); idx >= 0 {
-		addr = addr[:idx]
-	}
-	switch addr {
-	case "", "localhost", "127.0.0.1":
-		return true
-	}
-	return strings.HasPrefix(addr, "127.")
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // hasPrivilegedModule reports whether the module list contains admin or debug.
@@ -547,22 +549,22 @@ func (c *Config) P2PAddr() string {
 
 // HTTPListenAddr returns the HTTP-RPC listen address string.
 func (c *Config) HTTPListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.HTTPAddr, c.RPCPort)
+	return net.JoinHostPort(c.HTTPAddr, strconv.Itoa(c.RPCPort))
 }
 
 // AuthListenAddr returns the Engine API listen address string.
 func (c *Config) AuthListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.AuthAddr, c.EnginePort)
+	return net.JoinHostPort(c.AuthAddr, strconv.Itoa(c.EnginePort))
 }
 
 // WSListenAddr returns the WebSocket RPC listen address string.
 func (c *Config) WSListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.WSAddr, c.WSPort)
+	return net.JoinHostPort(c.WSAddr, strconv.Itoa(c.WSPort))
 }
 
 // MetricsListenAddr returns the metrics HTTP server listen address string.
 func (c *Config) MetricsListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.MetricsAddr, c.MetricsPort)
+	return net.JoinHostPort(c.MetricsAddr, strconv.Itoa(c.MetricsPort))
 }
 
 // RPCAddr returns the HTTP-RPC listen address (alias for HTTPListenAddr).

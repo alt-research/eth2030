@@ -6,6 +6,7 @@ import (
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/metrics"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -160,6 +161,9 @@ func TestFCUDurablePublicationKeepsCommittedReadersResponsive(t *testing.T) {
 	if bc.CurrentBlock().Hash() != child.Hash() || bc.CurrentSafeBlock().Hash() != old.Hash() || bc.CurrentFinalBlock().Hash() != old.Hash() || bc.State().GetRoot() != child.Root() {
 		t.Fatal("atomic head/state/checkpoint publication incomplete")
 	}
+	if got := metrics.ChainHeight.Value(); got != int64(child.NumberU64()) {
+		t.Fatalf("published gauge = %d", got)
+	}
 	// Unknown checkpoints are rejected before publication.
 	if err := bc.ApplyForkchoice(child.Hash(), old.Hash(), types.Hash{31: 0x33}); err == nil || errors.Is(err, rawdb.ErrNotFound) {
 		t.Fatal("unknown checkpoint was not rejected before publication")
@@ -179,6 +183,9 @@ func TestFCUDurablePublicationKeepsCommittedReadersResponsive(t *testing.T) {
 	}
 	if bc.CurrentBlock().Hash() != child.Hash() || bc.CurrentSafeBlock().Hash() != old.Hash() || bc.CurrentFinalBlock().Hash() != old.Hash() || bc.State().GetRoot() != child.Root() {
 		t.Fatal("failed durable batch published selection")
+	}
+	if got := metrics.ChainHeight.Value(); got != int64(child.NumberU64()) {
+		t.Fatalf("failed durable batch changed gauge: %d", got)
 	}
 	if err := bc.CheckStorage(); err == nil {
 		t.Fatal("committed cache hid failed materialization")

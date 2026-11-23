@@ -7,6 +7,7 @@ import (
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/metrics"
 )
 
 // InsertSyncedBlock validates and stores a downloaded block without publishing
@@ -203,6 +204,7 @@ func (bc *Blockchain) ApplyForkchoice(headHash, safeHash, finalHash types.Hash) 
 			}
 		}
 		bc.currentBlock, bc.currentState, bc.currentSafeBlock = head, st, safe
+		metrics.ChainHeight.Set(int64(head.NumberU64()))
 		if final != nil {
 			bc.currentFinalBlock = final
 		}

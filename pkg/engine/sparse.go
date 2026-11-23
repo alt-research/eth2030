@@ -54,5 +54,5 @@ func (api *EngineAPI) handleGetBlobsV4(params []json.RawMessage) (any, *jsonrpcE
 	}); ok {
 		return backend.GetBlobsV4ByVersionedHashes(hashes, *mask), nil
 	}
-	return make([]*payload.BlobCellsAndProofsV1, len(hashes)), nil
+	return nil, nil
 }

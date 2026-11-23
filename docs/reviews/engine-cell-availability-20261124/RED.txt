@@ -1,0 +1,6 @@
+Original master b4b88ed0 plus new real-backend/JSON-RPC regressions:
+TestGetBlobsV4GeneralUnavailabilityIsNull/syncing: want null, got result:[null]
+TestGetBlobsV4GeneralUnavailabilityIsNull/no-handler: want null, got result:[null]
+TestGetBlobsV4GeneralUnavailabilityIsNull/unavailable: want null, got result:[null]
+TestGetBlobsV4GeneralUnavailabilityIsNull/closed: want null, got result:[null]
+TestGetBlobsV4AvailablePoolPreservesMissingPositionsAndPairs: missing cell leaked a non-null proof

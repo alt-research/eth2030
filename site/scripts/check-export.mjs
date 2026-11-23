@@ -194,6 +194,20 @@ assert.equal(remaining.adoptedDevelopmentTodos, accounting.active_development_to
 assert.deepEqual(remaining.excludedAcceptance, ['G-03', 'G-04']);
 assert.equal(remaining.mergedProgressPr, 148);
 assert.equal(remaining.items.length, 8);
+assert.deepEqual(remaining.specificationRepairs.map(item => item.target), ['master', 'master', 'eth2030']);
+assert.deepEqual(remaining.specificationRepairs.map(item => item.url), [
+  'https://github.com/alt-research/eth2030/pull/150',
+  'https://github.com/alt-research/eth2030/pull/151',
+  'https://github.com/jiayaoqijia/lighthouse/pull/16',
+]);
+for (const item of remaining.specificationRepairs) {
+  assert.ok(roadmap.includes(`data-spec-repair="${item.id}" data-target="${item.target}"`));
+  assert.ok(roadmap.includes(item.url));
+}
+assert.equal(remaining.specificationAuditUrl, 'https://github.com/alt-research/eth2030/pull/152');
+assert.ok(roadmap.includes(remaining.specificationAuditUrl));
+assert.match(roadmap, /code delivery and master integration are separate/);
+
 assert.equal(new Set(remaining.items.map(item => item.id)).size, remaining.items.length);
 assert.match(roadmap, /id="remaining-work"/);
 assert.match(roadmap, /data-remaining-adopted-todos="0"/);

@@ -150,5 +150,29 @@
   "excludedAcceptance": [
     "G-03",
     "G-04"
-  ]
+  ],
+  "specificationRepairs": [
+    {
+      "id": "eth72-mask",
+      "title": "Canonical eth/72 announcement masks",
+      "target": "master",
+      "label": "EL review #150",
+      "url": "https://github.com/alt-research/eth2030/pull/150"
+    },
+    {
+      "id": "blob-query-contract",
+      "title": "V2-V4 blob query and proof contracts",
+      "target": "master",
+      "label": "EL review #151",
+      "url": "https://github.com/alt-research/eth2030/pull/151"
+    },
+    {
+      "id": "gloas-bid-gossip",
+      "title": "Builder bid quota, parent state and clock lifecycle",
+      "target": "eth2030",
+      "label": "Lighthouse review #16",
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/16"
+    }
+  ],
+  "specificationAuditUrl": "https://github.com/alt-research/eth2030/pull/152"
 }

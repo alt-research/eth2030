@@ -6,6 +6,10 @@ PR 148 is merged into master b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0. The froze
 
 48h/larger-scale admission and upstream Lodestar approval remain excluded from development progress at the user's direction. Original 04 attribution remains unconfirmed. Public activation is a separate network rollout decision, using existing schedule/genesis/override support. No public fork parameters or new protocol scope are selected here.
 
+## Current specification repair delivery
+
+Five newly confirmed Glamsterdam problem groups are implemented in independent [EL 150](https://github.com/alt-research/eth2030/pull/150), [EL 151](https://github.com/alt-research/eth2030/pull/151) and [Lighthouse 16](https://github.com/jiayaoqijia/lighthouse/pull/16) reviews. EL targets master; the companion CL targets eth2030. The roadmap now links these reviews and the [current specification audit](https://github.com/alt-research/eth2030/pull/152), separately from the earlier merged baseline. Current CI/merge outcomes are authoritative on those PRs; this does not relabel earlier binaries or claim a new long-duration result.
+
 ## Remaining workstreams
 
 These eight workstreams are grouped next-scope work, not eight newly discovered frozen-target bugs. Integration can be partly implemented while production-consumer qualification is still open. The static page expands each workstream to show evidence and completion criteria.

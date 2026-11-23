@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 )
@@ -53,8 +52,8 @@ func TestLargeFileBatchFailureNeverPublishesAndReplaysCompleteWAL(t *testing.T) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	fault := filepath.Join(dir, "data", fmt.Sprintf("%x.tmp", []byte("key-070")))
-	if err := os.Mkdir(fault, 0700); err != nil {
+	fault := FileDBValuePath(dir, []byte("key-070")) + ".tmp"
+	if err := os.MkdirAll(fault, 0700); err != nil {
 		t.Fatal(err)
 	}
 	b := db.NewBatch()

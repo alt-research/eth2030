@@ -634,8 +634,53 @@ func (db *FileDB) prepareOpsLocked(ops []fileBatchOp) (err error) {
 	if err = db.walWriteCommit(); err != nil {
 		return err
 	}
-	for _, op := range ops {
-		if err = db.materializeOp(op); err != nil {
+	return db.materializeOpsLocked(ops)
+}
+
+// Materialize independent keys concurrently only after the complete WAL commit.
+// Coalesce repeated keys first: recovery also retains the last committed intent.
+// All workers finish before publication or error fencing, so no write can escape
+// a failed batch's lifetime or reorder a later batch.
+func (db *FileDB) materializeOpsLocked(ops []fileBatchOp) error {
+	last := make(map[string]int, len(ops))
+	for i, op := range ops {
+		last[string(op.key)] = i
+	}
+	indices := make([]int, 0, len(last))
+	for i, op := range ops {
+		if last[string(op.key)] == i {
+			indices = append(indices, i)
+		}
+	}
+	// Avoid goroutine/queue overhead on the normal small-batch path.
+	if len(indices) < 64 {
+		for _, i := range indices {
+			if err := db.materializeOp(ops[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	const workers = 16
+	work := make(chan int)
+	failures := make([]error, len(indices))
+	var wait sync.WaitGroup
+	for range workers {
+		wait.Add(1)
+		go func() {
+			defer wait.Done()
+			for i := range work {
+				failures[i] = db.materializeOp(ops[indices[i]])
+			}
+		}()
+	}
+	for i := range indices {
+		work <- i
+	}
+	close(work)
+	wait.Wait()
+	for _, err := range failures {
+		if err != nil {
 			return err
 		}
 	}

@@ -1,13 +1,13 @@
 # ETH2030 next-stage development plan
 
-Updated November 23, 2026 at EL master `84200d53` / Lighthouse `eth2030` `34cecfc4`. EL 131–140 and CL 4–12 are integrated. The original 33 frozen LIFO / signed Gloas tasks are delivered; pending merge review is no longer the next development gate. Use [the dated detailed plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [actual progress](PROGRESS.md).
+Updated November 23, 2026 at EL master `d743925e` / Lighthouse `eth2030` `f73ddf5222147bb429a5fa3a5e94fb36da00f8f6`. EL131-141 and CL4-14 are integrated. The original 33 frozen LIFO / signed Gloas tasks are delivered; pending merge review is no longer the next development gate. Use [the dated detailed plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [actual progress](PROGRESS.md).
 
 | Order | Work | Concrete completion criteria |
 | --- | --- | --- |
-| 1 · P0 | G-01 merged-source hosted CI | Resolve check-code/audit-CI locked url 2.5.8 rejection; trace optimistic-head API PayloadIdUnavailable, beacon-chain invalidation/deferred-verdict and simulator partial sync aggregate. Inspect all workflow 45134918940 jobs, preserve unrun cases, and rerun the complete affected profiles. No skip/threshold dilution. |
+| 1 · P0 | G-01 final exact-head CL CI | Dependency and fixture repairs completed a27-job hosted baseline. Verify final Lighthouse15 suite/local-testnet and integrate. The explicit6s primary simulator keeps full aggregate assertions; original3s failure remains retained. |
 | 2 · P1 | G-02 historical forensics | Original 04 exact holder/device cause remains unknown. Capture request-correlated stacks, fd/path/fsync and resource timing on any actual recurrence before shutdown/debugger effects. Later FCU convoy repair and no-recurrence do not reconstruct missing historical evidence. |
 | 3 · P1 | G-03 declared duration/capacity | The completed 6h45m05s/14-BLS-window record is bounded. Declare final tuple and state/history/transaction workload, measure resource/latency/retention/restart and independently authenticate roots. Complete actual 172800s if strict 48h retained; a separately approved bounded profile is not 48h. |
-| Parallel · P1 | G-04 upstream Lodestar 10693 | Maintainer lockfile review, full hosted unit/spec/e2e/browser checks and integration. Keep local patch/process evidence separate. |
+| Parallel · P1 | G-04 upstream Lodestar10693/10725 | Maintainer workflow approval/review, full hosted checks and integration;5547local unit passes/9skips plus821TS coverage records are not hosted approval. |
 | Before public release · P1 | G-05 protocol/model/activation | Explicit compatible gas/Engine/consensus/CL/fixture selection; requalify changes. No public schedule or overall readiness follows from merged PR count. |
 | Conditional · P2 | G-06 corpus extension | Add concretely adopted formats/consumers and real execution counts with negative controls; 24 BLS skips and43 inactive handlers remain unexecuted. |
 

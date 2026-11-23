@@ -1,0 +1,128 @@
+{
+  "at": "2026-11-23T10:16:31.078416+00:00",
+  "current_account_permissions": {
+    "pull": true,
+    "push": false,
+    "maintain": false,
+    "admin": false
+  },
+  "prs": [
+    {
+      "pr": 10693,
+      "url": "https://github.com/ChainSafe/lodestar/pull/10693",
+      "head": "4e224659179dc8050344b48a397f1791450bf24c",
+      "base": "unstable",
+      "draft": false,
+      "merged": false,
+      "runs": [
+        {
+          "id": 44928781117,
+          "name": "Lint PR title",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 44928755474,
+          "name": "Check docs",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 44928755717,
+          "name": "Sim tests",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 44928755508,
+          "name": "Check Spec References",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 44928755502,
+          "name": "CodeQL",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 44928755453,
+          "name": "Tests",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 44928753440,
+          "name": "Lint PR title",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "pr": 10725,
+      "url": "https://github.com/ChainSafe/lodestar/pull/10725",
+      "head": "ac08fe5b4e151e37c056aa026027412dde416732",
+      "base": "unstable",
+      "draft": false,
+      "merged": false,
+      "runs": [
+        {
+          "id": 45154088035,
+          "name": "Project board",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 45154085161,
+          "name": "Project board",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 45154075815,
+          "name": "Lint PR title",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 45153920361,
+          "name": "Check Spec References",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 45153920473,
+          "name": "CodeQL",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 45153920689,
+          "name": "Check docs",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 45153920673,
+          "name": "Tests",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 45153920437,
+          "name": "Sim tests",
+          "status": "completed",
+          "conclusion": "action_required"
+        },
+        {
+          "id": 45153913570,
+          "name": "Lint PR title",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "scope": "Hosted action_required is a maintainer approval gate, not a passed check. Local evidence is recorded separately."
+}

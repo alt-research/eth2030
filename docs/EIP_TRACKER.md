@@ -14,7 +14,7 @@ conformance.
 
 `site/src/lib/data.ts` supplies the shared dated development snapshot rendered
 by `DevelopmentProgress` on both pages. Its November 23, 2026 snapshot pins merged EL
-`84200d53` and CL `eth2030` `34cecfc4`, the selected 33-task delivery, completed
+`d743925e` and CL `eth2030` `f73ddf52`, the selected 33-task delivery, completed
 bounded 6h45m05s run,14 BLS windows and actual stopped-head binding. The dated
 [reviewed state](reviews/progress-20261123/CURRENT_STATE.json) and
 [next steps](plans/glamsterdam/NEXT_STEPS_20261123.md) retain actual integrated CI

@@ -1,8 +1,8 @@
 # Remaining Glamsterdam acceptance
 
 - [x] Pin merged source and actual failing hosted jobs.
-- [ ] Reproduce original failures with unchanged assertions and adopted specifications.
-- [ ] Fix confirmed causes and retain negative controls.
+- [x] Reproduce original failures with unchanged assertions and adopted specifications.
+- [x] Fix confirmed causes and retain negative controls.
 - [ ] Run appropriate build, regression and full hosted checks.
 - [ ] Submit separately scoped PRs and verify target/CI/conflicts.
 

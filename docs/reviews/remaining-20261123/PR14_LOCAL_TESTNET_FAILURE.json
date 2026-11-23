@@ -1,0 +1,10 @@
+{
+  "run": 45151881227,
+  "job": 137625049892,
+  "conclusion": "failure",
+  "stage": "Kurtosis Starlark validation, before network creation",
+  "actual_error": "Docker registry OAuth token connection reset by peer while pulling ethereum-genesis-generator6.2.9, eth2-val-tools:latest and client-go:latest",
+  "test_executed": false,
+  "source": "ed3ac16fea3c440bf507b6b4b7627da82c45eeb8",
+  "scope": "Original failed preparation retained. This is separate from PR14's successful27-job test-suite and from final PR15 local-testnet qualification."
+}

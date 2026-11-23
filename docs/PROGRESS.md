@@ -1,18 +1,22 @@
 # ETH2030 development progress
 
-Updated November 23, 2026 against EL master `84200d5322398ebe473ff26c6f54de2665cd2586` (PRs 131–140 merged) and Lighthouse `eth2030` at `34cecfc4fc3bd743c14c38a742167064a95dbc25` (PRs 4–12 integrated; 1–3 already contained). The selected merged LIFO / signed Gloas scope, original 33 task IDs and R01–R13 are delivered. Source integration, measured executables, hosted CI and deployed website revision remain distinct.
+Updated November23,2026 against EL tracking master`d743925e` (throughPR141; frozen qualified Go package tree unchanged) and Lighthouse`eth2030` at`f73ddf5222147bb429a5fa3a5e94fb36da00f8f6` (PR4-14 integrated;1-3 already contained). The33 frozen LIFO/signed Gloas task IDs remain delivered. New EL142/144 and final Lighthouse15 are tracked independently. Source integration, actual executables, hosted CI and website deployment remain distinct.
 
 ## Latest actual qualification
 
 | Area | Retained result | Evidence / limitation |
 | --- | --- | --- |
 | Combined source checks |219 Go package suites, five related race packages, full vet/native build and 65 Python controls. | [Pre-merge validation](reviews/premerge-20261123/VALIDATION.json); measured composition retains its original source, not a renamed merge measurement. |
-| Merged Lighthouse | Format and locked workspace/all-target compilation; 500 scoped library/API/snapshot tests pass. | [Integration and current CI](reviews/progress-20261123/CURRENT_STATE.json). Full hosted CI is **blocked**, not a 500-test all-suite pass. |
+| Merged Lighthouse | Compatible dependency and healthy-producer/faulted-consumer fixture repairs; full repaired baseline27 hosted jobs pass. | [Current CI repairs](reviews/remaining-20261123/CI_REPAIRS.md); final simulator/bootstrap exact-head status is recorded separately. |
 | Completed bounded runtime |6h45m05s startup duration; 6h42m ready observations. After the ready 5.5h threshold: 144 healthy samples, 72 full stack receipts; 1s collector 24244 successful observations, 0 sustained events. | [Completed run](reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json). No new waiting chain is not proof of original-fault resolution or 48h acceptance. |
 | Independent finality |14 unchanged-reference window replays, linked anchors, observed slots 89791–97858 inclusive (8068 slots), 494–512 participants. | [All-window replay](reviews/diagnostic-threshold-20261123/ALL_WINDOWS_REREPLAY.json).73 early missing slots remain; cryptographic authenticity does not erase operating-budget failures. |
 | Actual stopped endpoint | Actual stopped CL slot 97868, 10 slots beyond the last health sample; persisted full beacon body → execution bid/header/state → independently verified account proofs. 160 live + 2 stopped proofs pass. | [Stopped binding](reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json). Original observation window through 97858 is unchanged. |
 
 The bounded run retains 686 EL memory-limit events (no OOM) and three recovered local late-reveal advisories. It is not warning-free or multi-day capacity acceptance. Full runtime identities, CL/reference/fixture tuple and sources are retained in the linked records.
+
+## New follow-up campaign
+
+[Current tuple](reviews/remaining-20261123/CURRENT_TUPLE.json) records the separately declared30-minute ready window, whole-window BLS/offline replay, independent proofs and actual stopped endpoint. It does not extend the historical6h45m or establish48h. Eight finite synthetic KV/WAL reopen/RSS profiles pass declared limits; key/header/canonical metadata and unrestricted capacity remain open. EL142 improves actual recurrence capture;144 repairs the canonical-height gauge observed stuck at0 despite RPC progress. Both remain independent master PRs.
 
 ## Current merged acceptance
 
@@ -36,12 +40,12 @@ Rounds 03/04 remain failed. Original 04 had no contemporaneous waiting stack. It
 
 ## Remaining acceptance and source TODOs
 
-The [dated actionable plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [machine-readable reviewed state](reviews/progress-20261123/CURRENT_STATE.json) separate:
+The [dated actionable plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [machine-readable reviewed state](reviews/remaining-20261123/CURRENT_STATE.json) separate:
 
-1. **G-01 / P0 — integrated CL CI:** workflow 45134918940 fails check-code/audit-CI (locked url 2.5.8), the two Fulu optimistic-head builder API tests (PayloadIdUnavailable), basic simulator (slot 114 aggregate 15/32), and beacon-chain tests (18 invalidation / 2 Heze deferred-verdict failures). Minimal EF was running at inspection. Resolve actual causes, retain 105 unrun API cases, and rerun complete required profiles without suppressing checks.
+1. **G-01 / integrated CL CI:** The dependency and producer/consumer fixture defects are repaired in Lighthouse13/14; the repaired baseline completed27 hosted jobs. Lighthouse15 separately qualifies the explicit6s simulator and authenticated bootstrap at its final published head, retaining the original3s failure. See [repair evidence](reviews/remaining-20261123/CI_REPAIRS.md) and [current campaign](reviews/remaining-20261123/CURRENT_STATE.json).
 2. **G-02 / P1 — original incident evidence:** maintain request-correlated rolling stacks/storage timing. The precise unprofiled historical waiter remains unknown.
 3. **G-03 / P1 — duration/capacity:** no actual 48h pass; key/header/canonical metadata and history still grow. Declare workload/resource/restart budgets and qualify the final tuple. A rapid or bounded profile remains separately named.
-4. **G-04 / P1 — upstream Lodestar 10693:** still open; maintainer lock review, complete hosted qualification and integration outstanding.
+4. **G-04 / P1 — upstream Lodestar10693/10725:** recovery and empty-coverage repairs await maintainer workflow approval/review/integration. Local5547passed/9skipped and821TS coverage records remain separate from upstream hosted qualification.
 5. **G-05 / P1 — public target:** final gas/model, compatible fork/Engine/CL/reference tuple and activation remain reserved. Complete development does not select a new draft or imply public readiness.
 6. **G-06 / P2 — conditional coverage:** selected native/Geth corpora and real-EF tests retain finite coverage. Skipped/inactive cases are not passes.
 

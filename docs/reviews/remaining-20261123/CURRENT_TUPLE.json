@@ -1,0 +1,150 @@
+{
+  "profile": "Current dependency tuple, declared1800s ready observation",
+  "scope": "Readiness, configured resource/lag and independent root/proof checks only; no new transaction pressure/retention/strict48h claim. This EL predates metrics and parallel-materialization follow-ups.",
+  "operating_passed": true,
+  "bls_passed": true,
+  "actual_stopped_binding_passed": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "identities": {
+    "el": {
+      "source": "d743925e3c4e7deb3fdc00648cb2296372910b28",
+      "binary_sha256": "2748efae712b155c89bec07a9409f2cd80876598e0b089f4dc04cdf52ed4f5fa",
+      "started": "2026-11-23T11:11:43.630318408Z",
+      "image": "sha256:7e28a791e2375932bceb6e9d8b1b46aa0a0d48ddf7e5c0db841b96044a076b82"
+    },
+    "cl": {
+      "source": "ed3ac16fea3c440bf507b6b4b7627da82c45eeb8",
+      "binary_sha256": "fe76144df945ac2341e6a45fdfe46eecff8eb6fe275e13e9064c4a5ae7e35754",
+      "started": "2026-11-23T11:11:43.85006654Z",
+      "image": "sha256:81d110c81b421df3b6d5e04d34c7d28172d43331a6445f8941f8ca419599ca27"
+    }
+  },
+  "native_pkg_tree": "54246b00d267d6f4589d9eed2e315c8454b26d2b",
+  "first_observed_at": "2026-11-23T11:25:48.315495+00:00",
+  "last_observed_at": "2026-11-23T11:55:57.523506+00:00",
+  "ready_observed_seconds": 1809.208011,
+  "ready_timer_seconds": 1809.2124868199462,
+  "total_samples": 88,
+  "ready_samples": 61,
+  "observed_first_slot": 109944,
+  "observed_through_slot": 110547,
+  "observed_slots": 604,
+  "bls": {
+    "first": 109944,
+    "stop": 110548,
+    "slots": 604,
+    "finalized_root": "0x9aa79a652976f7e01a152dd449ecf4bd318089bddb49bd9aa1ae2449f8bbeff6",
+    "finalized_slot": 110560,
+    "signature_slot": 110625,
+    "signature_participants": 512,
+    "parent_hash_links": 617,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "live_account_proofs": 14,
+  "stopped": {
+    "stopped_cl_slot": 110547,
+    "stopped_beacon_root": "0x87547d7ab2b178c39cf5750927c72bae9bf61d10d770d9fd64ba429c9c5da37a",
+    "stopped_native_number": 107161,
+    "stopped_native_hash": "0x89e34e5b4b1ab6d9a53dceacb01fac576a3b4a30b6af66131ae3aa78ae3fadcb",
+    "stopped_state_root": "0x82e852532ad3d2607a692eb605b2a09d09b008c8652b8fc8208e69180f099df5",
+    "extra_stopped_slots": 0,
+    "account_proofs": 2,
+    "full_body_rehashed": true,
+    "independent_header_agreed": true
+  },
+  "resources": {
+    "el": {
+      "events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "memory_max": 4096000000,
+      "memory_peak": 4053889024,
+      "process_hwm": 1563217920
+    },
+    "cl": {
+      "events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "memory_max": 4096000000,
+      "memory_peak": 592011264,
+      "process_hwm": 403009536
+    }
+  },
+  "engine_timeout_captures": 3,
+  "engine_timeout_trigger_times": [
+    "2026-11-23T11:25:28.10480319Z",
+    "2026-11-23T11:25:36.040755965Z",
+    "2026-11-23T11:25:44.043868692Z"
+  ],
+  "timeout_scope": "All3 triggers predate first ready observation; queued capture3 starts after recovery. Actual large-batch serialization/journal chain recorded separately, not original04 attribution.",
+  "retained_failed_attempts": [
+    "stale WS database startup attempt01",
+    "read-only audit attempt01 lacked DAC read permission",
+    "read-only audit attempt02 parsed trace metadata as a URL; cryptographic replay itself passed"
+  ],
+  "receipts": {
+    "result.json": {
+      "bytes": 3462,
+      "sha256": "3438d9e4c4f94298bdac09fea1e0250cefb0af3bdccdee54860189ea3aed3b7a"
+    },
+    "observations/samples.jsonl": {
+      "bytes": 57753,
+      "sha256": "80bd2a59ab115ef736a405b190893fc4c4c7c5ba0f41a981ce1a6fe77cd8c67d"
+    },
+    "bounded-bls-windows/replay-0.json": {
+      "bytes": 702,
+      "sha256": "16a9f552d977d5da36349aeadabdc64605bf4eafdda83c9dc08e9873ccd13426"
+    },
+    "bounded-bls-windows/replay-0.exchanges.jsonl": {
+      "bytes": 1747198,
+      "sha256": "f662532d97093065e650b5b298f3cebf2e1ce5bb8c99fa2676b19535cc2db2c3"
+    },
+    "STOPPED_CLOSURE_STATUS.json": {
+      "bytes": 1863,
+      "sha256": "faf42bfeda51071cb67cc8b03ac7f346396f118c31ca0e10e19bc64e55dd5bf0"
+    },
+    "stopped-finality-replay.json": {
+      "bytes": 699,
+      "sha256": "4500d615cbbb79a545dd4446e7096095d7bc7d72ff027bcb47599e28e43be329"
+    },
+    "stopped-finality-replay.exchanges.jsonl": {
+      "bytes": 983227,
+      "sha256": "b494784e2a79272ea033c0b0fa35a03ec8851d4347d04ffe694cb3b38b314fbc"
+    },
+    "stopped-cl-beacon-block.ssz": {
+      "bytes": 1368,
+      "sha256": "ae9acd8265f04c68308585c928b24a273f63e6e11ba722fa8ddf43af8080152a"
+    },
+    "terminal-container-identities.json": {
+      "bytes": 23446,
+      "sha256": "976bcf31fe5eb43961effc874bfdbee6cbb254571495b78ab9929370e675b46a"
+    }
+  },
+  "startup_through_stopped_bls": {
+    "passed": true,
+    "ws_checkpoint_root_agreed": true,
+    "window": {
+      "first": 109536,
+      "stop": 110548,
+      "slots": 1012,
+      "finalized_root": "0x6236662f5a18129c24f87b92556483b6d812f9ddcaeeedb6fccf0990362c9411",
+      "finalized_slot": 110784,
+      "signature_slot": 110860,
+      "signature_participants": 512,
+      "parent_hash_links": 1249,
+      "missing_slots": [],
+      "missing_fraction": 0.0
+    },
+    "replay_sha256": "1c4eee188bee7baa22516ad6e66e57747d68307d7821be424596aaf1e46d2b6b",
+    "trace_sha256": "ed889623d7ca8bd362a1d54373be08eeeca82d40dcb7ca92ff52195f02dcec35",
+    "scope": "Separate cryptographic checkpoint-to-stop ancestry. Does not add observation time or change the1800s operating window."
+  }
+}

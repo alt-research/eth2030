@@ -502,11 +502,28 @@ func (b *EngineBackend) SetCustodyColumns(mask types.CellMask) {
 	}
 }
 func (b *EngineBackend) GetBlobsV4ByVersionedHashes(hashes []types.Hash, mask types.CellMask) []*payload.BlobCellsAndProofsV1 {
-	cells := make([]types.BlobCells, len(hashes))
-	if h, ok := b.node.EthHandler().(interface {
-		GetBlobCells([]types.Hash, types.CellMask) []types.BlobCells
+	// Amsterdam distinguishes general unavailability from positional misses.
+	// Register the read so shutdown waits before tearing down its dependencies.
+	if b.beginWork() != nil {
+		return nil
+	}
+	defer b.workers.Done()
+	if source, ok := b.node.(interface {
+		SyncProgress() (bool, uint64, uint64, uint64)
 	}); ok {
-		cells = h.GetBlobCells(hashes, mask)
+		if syncing, _, _, _ := source.SyncProgress(); syncing {
+			return nil
+		}
+	}
+	h, ok := b.node.EthHandler().(interface {
+		GetBlobCells([]types.Hash, types.CellMask) []types.BlobCells
+	})
+	if !ok {
+		return nil
+	}
+	cells := h.GetBlobCells(hashes, mask)
+	if cells == nil {
+		return nil
 	}
 	result := make([]*payload.BlobCellsAndProofsV1, len(hashes))
 	for i := range result {
@@ -520,7 +537,7 @@ func (b *EngineBackend) GetBlobsV4ByVersionedHashes(hashes []types.Hash, mask ty
 					value := hexutil.Bytes(cells[i].Cells[j])
 					item.BlobCells[j] = &value
 				}
-				if j < len(cells[i].Proofs) && cells[i].Proofs[j] != nil {
+				if item.BlobCells[j] != nil && j < len(cells[i].Proofs) && cells[i].Proofs[j] != nil {
 					value := hexutil.Bytes(cells[i].Proofs[j])
 					item.Proofs[j] = &value
 				}

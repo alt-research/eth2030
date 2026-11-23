@@ -20,7 +20,7 @@ type NewPooledTxHashesMsg72 struct {
 	Types  []byte
 	Sizes  []uint32
 	Hashes []types.Hash
-	Mask   []byte
+	Mask   types.CellMask
 }
 
 // Fields are flat: devp2p eth.md and merged Geth PR 35428 include request IDs.

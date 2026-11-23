@@ -1,0 +1,5 @@
+Original master b4b88ed0 with the new tests, after correcting test-only compile types:
+--- FAIL: TestEth72OrdinaryAnnouncementsHaveCanonicalFixedMask
+eth/72 SDK rejected ordinary announcement: rlp: input string too short for types.CustodyBitmap, decoding into (eth.NewPooledTransactionHashesPacket72).Mask
+--- FAIL: TestEth72OrdinaryAnnouncementsRejectNoncanonicalMasks
+accepted 0-byte ordinary mask

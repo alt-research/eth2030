@@ -107,7 +107,7 @@ func (h *Handler) sendRelayAnnouncement(ep *EthPeer, txs []*types.Transaction) e
 				mask = mask.Intersection(h.relay.custody)
 				h.relay.mu.Unlock()
 			}
-			packet.Mask = append([]byte(nil), mask[:]...)
+			packet.Mask = mask
 		}
 		if err := ep.sendMessage(p2p.NewPooledTransactionHashesMsg, &packet); err != nil {
 			return err
@@ -124,15 +124,9 @@ func (h *Handler) handleSparseAnnouncement(ep *EthPeer, msg p2p.Msg) error {
 	if n > 4096 || len(ann.Types) != n || len(ann.Sizes) != n {
 		return errors.New("invalid eth/72 announcement dimensions")
 	}
-	hasBlob := false
-	for _, kind := range ann.Types {
-		hasBlob = hasBlob || kind == types.BlobTxType
-	}
-	if hasBlob && len(ann.Mask) != 16 || !hasBlob && len(ann.Mask) != 0 && len(ann.Mask) != 16 {
-		return errors.New("invalid announcement cell mask")
-	}
-	var mask types.CellMask
-	copy(mask[:], ann.Mask)
+	// EIP-8070 requires B_16 even for ordinary transactions. The fixed-size
+	// field is validated by RLP decoding; its bits are ignored for non-blobs.
+	mask := ann.Mask
 	var ordinary []types.Hash
 	for i, hash := range ann.Hashes {
 		if ann.Sizes[i] == 0 || ann.Sizes[i] > MaxMessageSize {

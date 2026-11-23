@@ -65,9 +65,16 @@ func (bc *Blockchain) SnapHistoryCursor(ctx context.Context) (*types.Block, erro
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	// Snapshot mutation-owned metadata only. The pivot is already finalized,
+	// and its saved prefix is immutable and hash-linked. Authenticating that
+	// entire prefix may take minutes on a mature cold database; holding the
+	// import mutex throughout would prevent newPayload and FCU from progressing.
+	// StageSnapHistoryParent still compares its requested child with the live
+	// cursor under this mutex, so a concurrently advanced snapshot cannot commit
+	// an out-of-date frontier or acquire execution authority.
 	bc.insertMu.Lock()
-	defer bc.insertMu.Unlock()
 	anchor, cursor, err := bc.snapHistoryCursor()
+	bc.insertMu.Unlock()
 	if err != nil || anchor == nil {
 		return nil, err
 	}
@@ -115,6 +122,9 @@ func (bc *Blockchain) SnapHistoryCursor(ctx context.Context) (*types.Block, erro
 			}
 		}
 		block = parent
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
 	return cursor, nil
 }

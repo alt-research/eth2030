@@ -11,6 +11,8 @@ on:
       - 'docs/reviews/progress-*/**'
       - 'docs/reviews/remaining-*/**'
       - 'docs/reviews/development-scope-*/**'
+      - 'docs/reviews/roadmap-remaining-*/**'
+      - 'docs/plans/ROADMAP_REMAINING_*.md'
       - 'docs/reviews/diagnostic-threshold-*/**'
       - 'docs/plans/glamsterdam/**'
       - 'docs/audits/merged-glamsterdam-*/**'
@@ -38,4 +40,4 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node --experimental-strip-types scripts/verify-eips.ts --files
       - run: npm run build
-      - run: node scripts/check-export.mjs
+      - run: node --experimental-strip-types scripts/check-export.mjs

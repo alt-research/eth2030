@@ -1,6 +1,6 @@
 # ETH2030 development roadmap
 
-Updated November24,2026 against master `cfd39f3f` with PR142-147 merged and Lighthouse eth2030 `fa16f70a`. Homepage and roadmap use one development-counting policy: the adopted frozen node implementation and confirmed follow-ups are complete.48h/larger-scale acceptance and upstream Lodestar approval are deferred outside that progress. Historical mapped EIP percentages retain their separate denominators.
+Updated November24,2026 against master `b4b88ed0` with PRs 142-148 merged and Lighthouse eth2030 `fa16f70a`. Homepage and roadmap use one development-counting policy: the adopted frozen node implementation and confirmed follow-ups are complete.48h/larger-scale acceptance and upstream Lodestar approval are deferred outside that progress. Historical mapped EIP percentages retain their separate denominators.
 
 ## Glamsterdam: adopted node development complete
 
@@ -28,6 +28,12 @@ Original rounds 03/04 remain failed. The later captured FCU convoy is a confirme
 | Additional corpus/research/later forks | Separate explicitly adopted scope, not implicit work inside the completed ledger. |
 
 [Exact policy, activation explanation and source audit](plans/glamsterdam/NEXT_STEPS_20261124.md). Known defects remain actionable even when found during deferred acceptance. No whole-public-fork or unrestricted production-readiness score is asserted.
+
+## Explicit remaining-work view
+
+The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists eight later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
+
+All six cards also expose every historical non-complete entry: 3 Glamsterdam, 7 Hegotá, 7 I*, 7 J*, 2 K* and 7 L* (33 labels in total). This coincidental total is unrelated to the 33 completed frozen task IDs. It is an inventory requiring scoped review, not a count of newly confirmed missing node features. The broad ePBS label stays separate from the delivered signed Gloas route; fast-confirmation and canonical-guest research still need real production consumers/verification before promotion.
 
 ## Other roadmap phases
 

@@ -1,8 +1,8 @@
 // Merges, measured runtimes and hosted CI retain distinct pinned records.
 export const developmentSnapshot = {
   date: 'November 24, 2026',
-  revision: 'cfd39f3f4ad05479470466fc14d430c216724347',
-  pullRequest: 147,
+  revision: 'b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0',
+  pullRequest: 148,
   title: 'Adopted Glamsterdam node development complete',
   recordRevision: '9a094830b8d11ab541df4f439a3730941311d430',
   record: 'docs/reviews/glamsterdam-postmerge-20261121/RESULTS.json',

@@ -1,0 +1,154 @@
+{
+  "date": "November 24, 2026",
+  "reviewedMaster": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+  "mergedProgressPr": 148,
+  "adoptedDevelopmentTodos": 0,
+  "policy": "The adopted frozen Glamsterdam scope is complete. These later-scope integration, qualification and research items do not reopen its 33-task denominator. Historical non-complete labels require scoped review; they are not all freshly confirmed missing features.",
+  "items": [
+    {
+      "id": "frame-independent",
+      "phase": "hegota",
+      "kind": "Qualification",
+      "title": "Independent Frame / FOCIL agreement",
+      "current": "Native paired signed Frame and inclusion-list controls are delivered. The fresh CL used a synchronized EL.",
+      "remaining": "Qualify an independent client using the same seven-field Frame/Bogota contract, plus alternate-peer recovery and redundant BN / remote-signer paths.",
+      "doneWhen": "Independent state and receipt roots, signed verdicts, late join and restart agree under the adopted contract.",
+      "evidence": [
+        "docs/verification/frame-8141-20261118-paymaster-history-final.json",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7805",
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "dora-consumers",
+      "phase": "hegota",
+      "kind": "Integration",
+      "title": "Dora production consumers",
+      "current": "Decoder and inclusion-list display work do not establish the full production consumer migration.",
+      "remaining": "Finish and qualify epoch, receipt and statistics consumers, schema migration, missed-event recovery, pruning and persisted rebuild.",
+      "doneWhen": "Real consumer reads survive competing roots, Req/Resp recovery and restart before retained-view adapters are retired.",
+      "evidence": [
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7805",
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "workload-services",
+      "phase": "hegota",
+      "kind": "Integration",
+      "title": "Workload and paymaster service cutover",
+      "current": "The pinned local paymaster ABI and paired sponsored/blob controls are delivered.",
+      "remaining": "Qualify ordinary, delegated and sponsored services against the selected protocol and actual deployment consumers.",
+      "doneWhen": "Real service settlement, fees, receipts, retry and restart agree at declared source pins.",
+      "evidence": [
+        "docs/verification/frame-8141-20261118-paymaster-history-final.json",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "fast-confirmation",
+      "phase": "glamsterdam",
+      "kind": "Research",
+      "title": "Broader fast-confirmation integration",
+      "current": "The standalone tracker counts supplied validator indices. A compatibility wrapper exists; no node/Engine integration caller was found in this review.",
+      "remaining": "Adopt a signed CL input and consumer contract, then connect real validator authority, conflicts and restart behavior.",
+      "doneWhen": "Signed live inputs and independent deciding consumers establish the claimed confirmation semantics.",
+      "evidence": [
+        "pkg/consensus/fastconfirm/fast_confirm.go",
+        "pkg/consensus/fastconfirm_compat.go"
+      ],
+      "entries": [
+        "feature-fast-confirmation"
+      ]
+    },
+    {
+      "id": "canonical-proofs",
+      "phase": "glamsterdam",
+      "kind": "Research",
+      "title": "Canonical guest and deciding proof verification",
+      "current": "Guest execution exists, but canonical.VerifyExecution checks success and proof length then returns true; it does not verify the claimed execution proof.",
+      "remaining": "Adopt the proof statement, bind program/input/output/state to a real verifier and wire an actual deciding consumer.",
+      "doneWhen": "Independent vectors and mutated proof/program/input/output/state tests reject invalid claims in the selected consumer.",
+      "evidence": [
+        "pkg/zkvm/canonical.go",
+        "pkg/zkvm/canonical_executor.go"
+      ],
+      "entries": [
+        "feature-evm-asm-canonical-quest",
+        "feature-leanvm-pq-proofs",
+        "feature-mandatory-proofs"
+      ]
+    },
+    {
+      "id": "public-binary-state",
+      "phase": "i",
+      "kind": "Research",
+      "title": "Public binary-state contract and recovery",
+      "current": "Private binary overlay/conversion controls do not define a public compatible layout.",
+      "remaining": "Agree layout, addressing and witness rules; qualify authenticated recovery and resource bounds.",
+      "doneWhen": "Independent clients agree on roots, witnesses and persisted recovery under the chosen public contract.",
+      "evidence": [
+        "docs/ROADMAP.md",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7864"
+      ]
+    },
+    {
+      "id": "pq-lifecycle",
+      "phase": "j",
+      "kind": "Research",
+      "title": "PQ validator keys, transactions and sampling",
+      "current": "PQ primitives and private provider/transaction controls are narrower than a public protocol.",
+      "remaining": "Define validator-key lifecycle, public signing/sampling contracts and independent implementation vectors.",
+      "doneWhen": "Key registration, rotation, revocation, replay rejection and live consumers agree across independent implementations.",
+      "evidence": [
+        "docs/ROADMAP.md",
+        "pkg/crypto/pqc/pq_tx_signer.go"
+      ],
+      "entries": [
+        "feature-lean-sphincs-pq-transactions",
+        "feature-leanxmss-pq-attestations",
+        "feature-leanda-pq-sampling"
+      ]
+    },
+    {
+      "id": "proof-rollup-finality",
+      "phase": "l",
+      "kind": "Research",
+      "title": "Proof, native-rollup and finality consumers",
+      "current": "Native rollup transition/withdrawal helpers use simulated hash conditions; these are not real rollup proof acceptance.",
+      "remaining": "Adopt compatible execution, proof and consensus contracts; connect independent verifiers and actual deciding consumers.",
+      "doneWhen": "State transitions, withdrawals, fees and finality pass independent end-to-end positive and rejection controls.",
+      "evidence": [
+        "pkg/rollup/native_rollup.go",
+        "docs/ROADMAP.md"
+      ],
+      "entries": [
+        "eip-8079",
+        "feature-mandatory-proofs",
+        "feature-1-round-finality"
+      ]
+    }
+  ],
+  "plannedOnly": [
+    "feature-tapered-issuance-burn",
+    "feature-decentralized-state",
+    "feature-ethp2p-unification",
+    "feature-remove-blob-transactions"
+  ],
+  "excludedAcceptance": [
+    "G-03",
+    "G-04"
+  ]
+}

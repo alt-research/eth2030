@@ -1,7 +1,7 @@
 // ETH2030 EIP / roadmap progress — single source of truth.
 //
 // Fork placement follows the L1 Strawmap revision of Nov 2, 2026 (strawmap.org).
-// Reviewed progress: EL tracking masterd743925e / CL eth2030 fa16f70a (2026-11-23).
+// Reviewed progress: EL master b4b88ed0 / CL eth2030 fa16f70a (2026-11-24).
 // Selected33-task delivery and bounded qualification are separate from broad tracker labels.
 // Evidence: docs/reviews/glamsterdam-postmerge-20261121 and the frozen task reconciliation.
 // Other implementation labels retain their historical review scope.
@@ -244,7 +244,7 @@ export const EIPS: EipEntry[] = [
     gaps: [
       'Frozen signed Gloas development route is delivered; the broad draft label is not whole-public-fork qualification',
       'Integrated CL final head passes all 27 test-suite jobs and local-testnet, with equal merged tree; original 3s simulator failure and separately named 6s primary profile remain retained',
-      'Original incident attribution, multi-day capacity, upstream Lodestar integration and public protocol/model approval remain open',
+      'Original incident attribution remains unconfirmed; multi-day/larger-scale acceptance and upstream Lodestar approval are user-deferred outside development progress; public rollout and new protocol adoption are separate decisions',
     ],
     summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',
   },

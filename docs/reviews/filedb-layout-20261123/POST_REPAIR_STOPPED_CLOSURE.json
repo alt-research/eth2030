@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "scope": "Read-only actual stopped endpoint closure. No added operating time.",
+  "stopped_leaf": {
+    "index": 147,
+    "slot": 113651,
+    "root": "0x30e55ef936e5a46b9f462225145ad0174ba99fe0d376f7ee96ca83c3d7eb6e16",
+    "parent": 146
+  },
+  "native": {
+    "actual48h_passed": false,
+    "hash": "0x3eb1019d04a882e053d8a4310ce4f6a541e8407aa75bcfac15b9d323aa8ab2ce",
+    "independent_account_proofs": [
+      {
+        "address": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+        "balance": "9999998905913535304425867",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      },
+      {
+        "address": "0xee9ede56b61f213e69233a001b17fd6414c93675",
+        "balance": "7",
+        "changed_balance_rejected": true,
+        "nodes": 4
+      }
+    ],
+    "number": 110248,
+    "passed": true,
+    "reference_header_agreed": true,
+    "scope": "Read-only stopped native head/MPT audit of current/legacy layouts, not added uptime",
+    "slot": 113651,
+    "state_root": "0x5d39e8f19bce6c2922562013cc776e073526e7a092d6751608b42386d717ed4c"
+  },
+  "block": {
+    "root": "0x30e55ef936e5a46b9f462225145ad0174ba99fe0d376f7ee96ca83c3d7eb6e16",
+    "slot": 113651,
+    "execution_hash": "0x3eb1019d04a882e053d8a4310ce4f6a541e8407aa75bcfac15b9d323aa8ab2ce"
+  },
+  "bls": {
+    "first": 113651,
+    "stop": 113652,
+    "slots": 1,
+    "finalized_root": "0x9d2673cc112e3f1a4673ae63e667262ad7486aea74ed4a4c846a993db82018b7",
+    "finalized_slot": 113664,
+    "signature_slot": 113729,
+    "signature_participants": 512,
+    "parent_hash_links": 14,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "last_health_sample_slot": 113651,
+  "extra_stopped_slots": 0,
+  "signed_block_ssz_sha256": "294fa2284ebe7d80141cca0c195e3cdbb04868e4ed2daeb9c1f0ab36dfbdad7f"
+}

@@ -12,7 +12,7 @@
   "whole_snapshot_values": 2707772,
   "snapshot_values_all_compared": true,
   "independent_prestart_header_and_mpt_proofs_passed": true,
-  "runtime_pending": true,
+  "runtime_pending": false,
   "original_fault_resolved": false,
   "actual48h_passed": false,
   "logs": {
@@ -26,5 +26,6 @@
     }
   },
   "initial_cumulative_profile": "Native RPC117s, whole historical catchup300s failed; no ready window passed. Partial persisted FC leaf112083 differs from selected execution/published head112063 during shutdown batch. Failure is retained.",
-  "recovery_profile": "Separately declared RPC300/catchup900/ready300; running, no pass claimed."
+  "recovery_profile": "Passed separately declared recovery: native RPC91.038s, catchup211.729s, ready301.423s,102slots with512-participant unchanged-reference BLS/offline replay, actual stopped slot113651 and4live+2stopped MPT proofs;60 positive current-gauge receipts; no timeout/OOM.",
+  "runtime_source": "50514bf32353aaf98484747ffc7b86823af85bed"
 }

@@ -1,6 +1,6 @@
 {
   "review_date": "November 23, 2026",
-  "reviewed_at": "2026-11-23T08:12:26.451635+00:00",
+  "reviewed_at": "2026-11-23T08:22:43.539027+00:00",
   "merged_el": {
     "revision": "84200d5322398ebe473ff26c6f54de2665cd2586",
     "through_pr": 140,
@@ -170,131 +170,157 @@
     "url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940",
     "jobs": [
       {
+        "id": 137558805064,
         "name": "lockbud",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558805357,
         "name": "check-msrv",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558805367,
         "name": "Check for 'skip-ci' label",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558805418,
         "name": "check-code",
         "status": "completed",
         "conclusion": "failure"
       },
       {
+        "id": 137558805493,
         "name": "forbidden-files-check",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558806809,
         "name": "target-branch-check",
         "status": "completed",
         "conclusion": "skipped"
       },
       {
+        "id": 137558848100,
         "name": "beacon-chain-tests",
         "status": "in_progress",
         "conclusion": null
       },
       {
+        "id": 137558848120,
         "name": "fork-choice-tests",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848147,
         "name": "op-pool-tests",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
+        "id": 137558848163,
         "name": "http-api-tests",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "failure"
       },
       {
+        "id": 137558848175,
         "name": "release-tests-ubuntu",
         "status": "in_progress",
         "conclusion": null
       },
       {
+        "id": 137558848214,
         "name": "state-transition-vectors-ubuntu",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848237,
         "name": "cargo-udeps",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848247,
         "name": "network-tests",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
+        "id": 137558848291,
         "name": "debug-tests-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
+        "id": 137558848300,
         "name": "cargo-sort",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848320,
         "name": "ef-tests-mainnet-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
+        "id": 137558848329,
         "name": "spec-minimal-tests",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848333,
         "name": "basic-simulator-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "failure"
       },
       {
+        "id": 137558848338,
         "name": "slasher-tests",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848364,
         "name": "ef-tests-minimal-ubuntu",
         "status": "in_progress",
         "conclusion": null
       },
       {
+        "id": 137558848370,
         "name": "compile-with-beta-compiler",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848385,
         "name": "execution-engine-integration-ubuntu",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848411,
         "name": "fallback-simulator-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
+        "id": 137558848417,
         "name": "cargo-hack",
         "status": "completed",
         "conclusion": "success"
       },
       {
+        "id": 137558848436,
         "name": "cli-check",
         "status": "completed",
         "conclusion": "success"
@@ -311,7 +337,33 @@
       "advisory_reported_by_CI": "RUSTSEC-2026-0592",
       "patched_range_reported_by_CI": ">=2.5.9",
       "resolution": "Update compatible dependency graph and rerun unchanged audit/build/tests; do not ignore the failing check."
-    }
+    },
+    "additional_failures": [
+      {
+        "job_id": 137558848163,
+        "name": "http-api-tests",
+        "stage": "test-http-api-fulu",
+        "failed_tests": [
+          "builder_chain_health_optimistic_head",
+          "builder_chain_health_optimistic_head_v3"
+        ],
+        "observed_error": "GetPayloadFailed(EngineError(Api { error: PayloadIdUnavailable }))",
+        "executed": 111,
+        "planned": 216,
+        "passed": 109,
+        "failed": 2,
+        "unrun_due_to_fail_fast": 105,
+        "attribution": "Root cause not established; do not label infrastructure-only or fixed."
+      },
+      {
+        "job_id": 137558848333,
+        "name": "basic-simulator-ubuntu",
+        "source": "testing/simulator/src/basic_sim.rs:417",
+        "observed_error": "Sync aggregate at slot 114 was partial, got: 15, expected: 32",
+        "artifact_id": 14800183126,
+        "attribution": "Root cause not established; inspect simulator logs before changing thresholds."
+      }
+    ]
   },
   "upstream_lodestar": {
     "number": 10693,

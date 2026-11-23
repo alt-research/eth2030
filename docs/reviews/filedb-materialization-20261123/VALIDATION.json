@@ -1,0 +1,33 @@
+{
+  "toolchain": "go1.26.11",
+  "production_source_sha256": "5b10dd921425a4da2563a830d8529fe495ffd22a51198e9ef1adfaf2c8d18913",
+  "full_go_packages_passed": 219,
+  "race_packages_passed": 4,
+  "vet": "passed for rawdb/chain",
+  "native_build": "passed",
+  "mutations_behaviorally_rejected": 3,
+  "initial_mutation_compile_only_attempt_not_counted": true,
+  "runtime_scope": "Controlled same-Docker-filesystem captured batch shape, not full node/old5.5h/48h verdict",
+  "logs": {
+    "parallel16-filedb-full-go.log": {
+      "bytes": 12990,
+      "sha256": "4b84ae7ddbdda490bfb00d699d506a588a0ed11c1a4358a69f4378f14881587c"
+    },
+    "parallel16-filedb-race.log": {
+      "bytes": 204,
+      "sha256": "715a939a699b9f7258301d799610121a31f6ffeb5966793dfadb07b736b58f65"
+    },
+    "mutation-lost_last_intent.log": {
+      "bytes": 390,
+      "sha256": "ddb2eaaba1b86da4357abead2ea8f8abb8783372927269978787ad1374897f44"
+    },
+    "mutation-worker_outlives_return.log": {
+      "bytes": 235,
+      "sha256": "851fa17424d1110a9a2a08fa0846a38262c1e79239e545080f31fabc905c7ad5"
+    },
+    "mutation-swallowed_materialization_error.log": {
+      "bytes": 218,
+      "sha256": "6c5e2a24fbc22b3bfc5db5c377eb49531d018dbc20a3382319f4225bfd1e13c1"
+    }
+  }
+}

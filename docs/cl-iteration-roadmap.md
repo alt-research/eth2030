@@ -1,9 +1,10 @@
 # Consensus client iteration after the merged Frame milestone
 
-Updated November 18, 2026 after ETH2030 PR 61 merged at `911afb0c`.
-The active milestone is independent-client and service acceptance. The private
-native control already covers nonempty signed FOCIL, coded sponsorship, blob
-Frames, fresh CL history and receiver restart.
+Updated November 23, 2026. Lighthouse `eth2030` is `34cecfc4fc3bd743c14c38a742167064a95dbc25` after PRs 4–12 were integrated; 1–3 were already ancestors. EL master `84200d53` includes PRs 131–140. Format/locked all-target compilation and 500 scoped tests pass, but [integrated workflow 45134918940](https://github.com/jiayaoqijia/lighthouse/actions/runs/45134918940) is **blocked**: url dependency audit, two optimistic-head API tests, 20 beacon-chain cases and the basic simulator fail. Minimal EF was running at the dated inspection; local scoped tests are not full-suite acceptance.
+
+The completed bounded 6h45m05s run and 14 unchanged-reference BLS windows authenticate actual stopped CL/native slot 97868. Original 04 precise waiting holder/physical I/O and actual 48h capacity remain unconfirmed. Gloas signed builder/payment/late/withheld and independent Glamsterdam full/snap controls are delivered at their recorded sources; they are no longer generic missing implementation tasks. [Current criteria and source TODOs](plans/glamsterdam/NEXT_STEPS_20261123.md).
+
+The retained November 18 Frame/FOCIL milestone below has its own source and synchronized-EL boundary. Independent Frame-client agreement, Dora and service cutover remain separate.
 
 ## Delivered baseline
 
@@ -35,10 +36,10 @@ Frames, fresh CL history and receiver restart.
 3. **CL reliability:** exercise skipped-slot checkpoints, VC restart, remote
    signing, redundant BN publication, alternate-peer and partial-response recovery.
    Preserve duty/root binding and avoid signing conflicting lists for a duty.
-4. **Gloas external builders:** require signed external bid/payment, late/withheld
-   payload and PTC outcomes, BAL rejection and blob custody evidence.
-5. **Genesis and sync:** qualify the newer package/generator schema, independent
-   full/snap late join, restart and authenticated state recovery.
+4. **Gloas integration gates:** close the actual merged-source CI failures, then
+   extend only adopted builder/peer profiles beyond the delivered frozen controls.
+5. **Capacity and recovery:** extend declared growing-state/history operation and
+   restart beyond the independently qualified finite Glamsterdam sync profiles.
 6. **Longer horizon:** Heze light-client/proof vectors, decoupled consensus and
    PQ key/committee lifecycle remain separately pinned research acceptance.
 

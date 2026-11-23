@@ -13,18 +13,23 @@ homepage's pending-work lists; percentages count labels rather than whole-fork
 conformance.
 
 `site/src/lib/data.ts` supplies the shared dated development snapshot rendered
-by `DevelopmentProgress` on both pages. Its November 22, 2026 snapshot pins merged
-master `9a094830`, the complete frozen Glamsterdam task reconciliation and final
-source-specific operating/recovery/blob records. Qualified runtime source remains
-`d9201b0`; package/workflow tree equivalence is recorded separately. The earlier
-paired Frame control keeps its own source and synchronized-EL limitation.
+by `DevelopmentProgress` on both pages. Its November 23, 2026 snapshot pins merged EL
+`84200d53` and CL `eth2030` `34cecfc4`, the selected 33-task delivery, completed
+bounded 6h45m05s run,14 BLS windows and actual stopped-head binding. The dated
+[reviewed state](reviews/progress-20261123/CURRENT_STATE.json) and
+[next steps](plans/glamsterdam/NEXT_STEPS_20261123.md) retain actual integrated CI
+failures and original-incident/48h/upstream/public gates. Older400/60-slot,
+recovery and544-proof records retain their original source pins. Merge identity,
+measured runtime identity, hosted CI and deployed website identity are distinct.
 
 Optional `verification` entries are repository-relative records rendered as pinned
 qualification links. Companion-CL-only EIPs can have no local `pkg` implementation
-and link their actual CL qualification instead; do not label those entries missing
-EL implementations. Seven additional accepted EIPs do not invent new positions in
-the historical EF drawing. ePBS remains broadly Substantial while its legacy EL
-builder extensions retain the confirmed authentication gap.
+and link their actual CL qualification instead; do not label them missing EL
+implementations. Seven additional accepted EIPs do not invent positions in the
+historical EF drawing. ePBS remains broadly Substantial while its selected signed
+Gloas route is delivered; legacy local Builder extensions were retired in PR 127.
+The fast-confirmation and EVM-ASM entries retain Functional framework labels.
+These broader mapped-entry labels do not share the selected 33-task denominator.
 
 Update snapshot, EIP evidence, active plans and export assertions together.
 The matrix verifier skips the Spec column when identifying Implementation/Tests;

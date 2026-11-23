@@ -14,6 +14,7 @@ const recovery = readRecord('docs/reviews/glamsterdam-postmerge-20261121/RECOVER
 const reproduced = readRecord('docs/reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json');
 const merged = readRecord('docs/audits/merged-glamsterdam-20261122/MERGED_EVIDENCE.json');
 const current = readRecord('docs/reviews/remaining-20261123/CURRENT_STATE.json');
+const accounting = readRecord('docs/reviews/development-scope-20261124/CURRENT_STATE.json');
 const bounded = readRecord('docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json');
 const stopped = readRecord('docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json');
 assert.deepEqual(current.bounded_run, bounded, 'Current snapshot changed retained duration/BLS evidence');
@@ -56,8 +57,8 @@ assert.ok(reproduced.checks.every(check => check.passed));
 for (const milestone of [`${tasks.tasks.length}/33 task IDs`, '4 roles under 300s', `${steady.finality.beacon_window.slots}/400 + ${pressure.finality.beacon_window.slots}/60 slots`, `${record.blob.cell_proofs} KZG cell proofs`]) {
   assert.ok(progress(home).includes(milestone), `Missing qualified milestone: ${milestone}`);
 }
-assert.match(progress(home), /Frozen development scope delivered; readiness gates open/);
-assert.ok(progress(home).includes(current.review_date));
+assert.match(progress(home), /Adopted Glamsterdam node development complete/);
+assert.ok(progress(home).includes(accounting.review_date));
 const duration = Math.floor(bounded.runtime_seconds);
 const durationLabel = `${Math.floor(duration / 3600)}h${Math.floor(duration % 3600 / 60)}m${String(duration % 60).padStart(2, '0')}s`;
 for (const fact of [durationLabel, `${bounded.post_5_5h_samples} healthy samples`, `${bounded.post_5_5h_full_stack_captures} full stacks`, `${bounded.bls_windows_freshly_replayed} BLS windows`, `${bounded.bls_observed_through - bounded.bls_observed_first + 1} observed slots`, `${bounded.bls_missing_slots.length} early missing slots`, `slot ${stopped.stopped_cl_slot}`, `${stopped.extra_stopped_slots} slots beyond the last health sample`, `${bounded.sdk_live_independent_proofs} live + 2 stopped account proofs`]) {
@@ -109,7 +110,7 @@ assert.equal(repaired.metrics_gauge_passed, true);
 assert.ok(repaired.metrics_observations > 0);
 assert.equal(repaired.initial_300s_catchup_passed, false);
 assert.equal(repaired.runtime_source, current.cumulative_runtime_source);
-assert.ok(progress(home).includes('PR146'));
+assert.ok(progress(home).includes('/pull/146'));
 const elReviews = readRecord('docs/reviews/remaining-20261123/FINAL_EL_PR_STATUS.json');
 assert.equal(elReviews.all_current_code_heads_ci_passed, true);
 assert.equal(elReviews.prs.length, 5);
@@ -124,25 +125,66 @@ const failedJobs = current.prior_integrated_ci.jobs.filter(job => job.conclusion
 for (const name of ['check-code', 'http-api-tests', 'beacon-chain-tests', 'basic-simulator-ubuntu']) {
   assert.ok(failedJobs.some(job => job.name === name), `Missing actual failing job ${name}`);
 }
-for (const [id, state] of [['G-01', current.integrated_ci.gate], ['G-02', 'unconfirmed'], ['G-03', 'open'], ['G-04', 'open'], ['G-05', 'reserved'], ['G-06', 'conditional']]) {
-  assert.ok(progress(home).includes(`data-gate="${id}" data-state="${state}"`), `Missing actual acceptance gate ${id}/${state}`);
+assert.deepEqual(accounting.original_tasks, { complete: 33, total: tasks.tasks.length });
+assert.deepEqual(accounting.implementation_followups, { complete: 5, total: 5, prs: [142, 143, 144, 145, 146] });
+assert.equal(accounting.merged_prs.length, 6);
+assert.ok(accounting.merged_prs.every(pr => pr.merged === true && pr.base === 'master' && pr.merge_commit && pr.merged_at));
+for (const number of [...accounting.implementation_followups.prs, accounting.documentation_pr]) {
+  assert.ok(accounting.merged_prs.some(pr => pr.number === number), `Missing merged development PR ${number}`);
 }
+assert.equal(accounting.package_equal_to_qualified_runtime, true);
+assert.equal(accounting.pkg_tree, repaired.runtime_pkg_tree);
+assert.equal(accounting.qualified_runtime_source, repaired.runtime_source);
+assert.deepEqual(accounting.active_development_todos, []);
+assert.equal(accounting.development_complete, true);
+assert.equal(accounting.known_implementation_defects_remain_counted, true);
+assert.equal(accounting.whole_public_fork_readiness, false);
+assert.equal(accounting.actual48h_passed, false);
+assert.equal(accounting.original_fault_resolved, false);
+assert.equal(accounting.historical_investigation.status, 'unconfirmed');
+assert.equal(accounting.historical_investigation.counted_as_unimplemented_feature, false);
+assert.deepEqual(accounting.excluded_acceptance.map(item => item.id), ['G-03', 'G-04']);
+assert.ok(accounting.excluded_acceptance.every(item => item.counted_in_development_progress === false && item.status === 'deferred_by_user'));
+assert.equal(accounting.excluded_acceptance[0].passed, false);
+assert.equal(accounting.excluded_acceptance[1].upstream_merged, false);
+assert.equal(accounting.public_rollout.counted_in_development_progress, false);
+assert.equal(accounting.public_rollout.status, 'separate_network_rollout_decision');
+assert.equal(accounting.public_rollout.chosen_public_network, null);
+assert.equal(accounting.public_rollout.activation_parameters_changed, false);
+assert.equal(accounting.public_rollout.mainnet_amsterdam_time_configured, false);
+assert.equal(accounting.public_rollout.mainnet_private_glamsterdan_time_configured, false);
+assert.equal(accounting.conditional_expansion.counted_in_current_denominator, false);
+assert.equal(accounting.conditional_expansion.status, 'not_adopted');
+assert.match(progress(home), /data-development-complete="true"/);
+assert.match(progress(home), /data-active-development-todos="0"/);
+assert.match(progress(home), /33\/33 original task IDs and 5\/5 implementation follow-ups are merged/);
+for (const id of ['G-01', 'G-07']) {
+  assert.ok(progress(home).includes(`data-gate="${id}" data-state="closed"`), `Missing completed development check ${id}`);
+}
+for (const id of ['G-02', 'G-03', 'G-04', 'G-05', 'G-06']) {
+  assert.ok(!progress(home).includes(`data-gate="${id}"`), `Out-of-scope item counted as development gate ${id}`);
+}
+for (const id of ['G-03', 'G-04']) {
+  assert.ok(progress(home).includes(`data-deferred="${id}" data-counted-in-progress="false"`), `Missing explicit acceptance exclusion ${id}`);
+}
+assert.match(progress(home), /data-rollout-counted-in-progress="false"/);
+assert.doesNotMatch(progress(home), /Open EL PR/);
 assert.ok(progress(home).includes(current.integrated_ci.url));
 assert.match(progress(home), /original 3s failure/);
 assert.match(progress(home), /repaired baseline completed 27 hosted jobs/);
 assert.match(progress(home), /Rounds 03\/04 remain failed/);
 assert.match(progress(home), /exact holder and physical I\/O cause remain unconfirmed/);
 assert.match(progress(home), /not a 48-hour pass/);
-assert.match(progress(home), /whole-public-fork or production readiness/);
+assert.match(progress(home), /whole-public-fork or production readiness/i);
 assert.match(progress(home), /research features retain separate acceptance gates/);
 assert.doesNotMatch(progress(home), /48-hour (?:passed|complete)|original fault (?:resolved|fixed)|all (?:hosted )?CI (?:passes|green)/i);
 for (const number of [135, 138, 139, 140]) assert.ok(progress(home).includes(`/pull/${number}`));
-assert.ok(progress(home).includes(`/pull/${current.merged_el.through_pr}`));
+assert.ok(progress(home).includes(`/pull/${accounting.documentation_pr}`));
 assert.ok(progress(home).includes(`/commit/${current.merged_cl.revision}`));
-assert.ok(progress(home).includes(`/blob/${current.merged_el.revision}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
+assert.ok(progress(home).includes(`/blob/${accounting.master}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
 assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned earlier verification record');
-for (const path of ['docs/reviews/remaining-20261123/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261123.md']) {
-  assert.ok(progress(home).includes(`/blob/1317a6624e6246a8e0937f56d2758b300ccbcfcb/${path}`), `Missing pinned current evidence/plan ${path}`);
+for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261124.md']) {
+  assert.ok(progress(home).includes(`/blob/1eca90d7b9f4dfdd4354156b7f660dab910520c2/${path}`), `Missing pinned current evidence/plan ${path}`);
 }
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
@@ -233,7 +275,7 @@ function checkPages(dir) {
 }
 checkPages(new URL('../out/', import.meta.url));
 const siteWorkflow = readFileSync(new URL('../../.github/workflows/site-check.yml', import.meta.url), 'utf8');
-for (const input of ['docs/reviews/remaining-*/**', 'docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
+for (const input of ['docs/reviews/development-scope-*/**', 'docs/reviews/remaining-*/**', 'docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
   assert.ok(siteWorkflow.includes(`'${input}'`), `Site CI omits new evidence input ${input}`);
 }
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');

@@ -10,6 +10,7 @@ on:
       - 'docs/reviews/glamsterdam-*/**'
       - 'docs/reviews/progress-*/**'
       - 'docs/reviews/remaining-*/**'
+      - 'docs/reviews/development-scope-*/**'
       - 'docs/reviews/diagnostic-threshold-*/**'
       - 'docs/plans/glamsterdam/**'
       - 'docs/audits/merged-glamsterdam-*/**'

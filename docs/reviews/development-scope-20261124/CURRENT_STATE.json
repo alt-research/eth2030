@@ -1,0 +1,118 @@
+{
+  "review_date": "November 24, 2026",
+  "development_scope": "Adopted frozen LIFO / signed Gloas node implementation",
+  "original_tasks": {
+    "complete": 33,
+    "total": 33
+  },
+  "implementation_followups": {
+    "complete": 5,
+    "total": 5,
+    "prs": [
+      142,
+      143,
+      144,
+      145,
+      146
+    ]
+  },
+  "documentation_pr": 147,
+  "master": "cfd39f3f4ad05479470466fc14d430c216724347",
+  "pkg_tree": "48afbc345e9418d562be901c13e2e54eaae500b9",
+  "qualified_runtime_source": "50514bf32353aaf98484747ffc7b86823af85bed",
+  "package_equal_to_qualified_runtime": true,
+  "merged_prs": [
+    {
+      "number": 142,
+      "head": "8f7c983cd15f95cbaf7f360ed7af2e991ce04c4c",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:47:05Z",
+      "merge_commit": "0077a89ddb815ccd3de864ab720c4a64beb6ef96"
+    },
+    {
+      "number": 143,
+      "head": "3b5fbeb55ddfdcab07c3d5d8639988922a95bd75",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:47:18Z",
+      "merge_commit": "617ce1564b617e5304927503ec4e4a300605347f"
+    },
+    {
+      "number": 144,
+      "head": "f3da9c131940db25de6863e0636155ab43ca9943",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:47:32Z",
+      "merge_commit": "574309378e99656749b0a93ada0eab1e28c737be"
+    },
+    {
+      "number": 145,
+      "head": "b1c95a5aae905dd564e65c7f9bc9679212d57ebe",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:47:44Z",
+      "merge_commit": "9e21f1de7f7343f475205799952268d7cc30bea7"
+    },
+    {
+      "number": 146,
+      "head": "d5ef77a63088b10597d407fd1f3f6ad65e626501",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:47:57Z",
+      "merge_commit": "627f10e95dced24de12d32a1d2d7e2f98a5a39f7"
+    },
+    {
+      "number": 147,
+      "head": "f3ab4b473fb719a407fe0fa74df7bc80f2c49555",
+      "base": "master",
+      "merged": true,
+      "merged_at": "2026-11-23T16:48:08Z",
+      "merge_commit": "cfd39f3f4ad05479470466fc14d430c216724347"
+    }
+  ],
+  "active_development_todos": [],
+  "development_complete": true,
+  "whole_public_fork_readiness": false,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "excluded_acceptance": [
+    {
+      "id": "G-03",
+      "item": "48h and larger-scale admission",
+      "counted_in_development_progress": false,
+      "status": "deferred_by_user",
+      "passed": false
+    },
+    {
+      "id": "G-04",
+      "item": "Upstream Lodestar maintainer approval/integration",
+      "counted_in_development_progress": false,
+      "status": "deferred_by_user",
+      "upstream_merged": false
+    }
+  ],
+  "historical_investigation": {
+    "id": "G-02",
+    "counted_as_unimplemented_feature": false,
+    "status": "unconfirmed",
+    "reason": "No contemporaneous original04 waiter capture; confirmed mechanisms are repaired independently. Missing historical evidence cannot be manufactured by new tests."
+  },
+  "public_rollout": {
+    "id": "G-05",
+    "counted_in_development_progress": false,
+    "status": "separate_network_rollout_decision",
+    "chosen_public_network": null,
+    "activation_parameters_changed": false,
+    "mainnet_amsterdam_time_configured": false,
+    "mainnet_private_glamsterdan_time_configured": false,
+    "authority": "https://eips.ethereum.org/EIPS/eip-7773#activation"
+  },
+  "conditional_expansion": {
+    "id": "G-06",
+    "counted_in_current_denominator": false,
+    "status": "not_adopted",
+    "scope": "Additional formats/handlers, research and later-fork consumers retain separate plans; inactive/skipped cases are not executed passes."
+  },
+  "known_implementation_defects_remain_counted": true
+}

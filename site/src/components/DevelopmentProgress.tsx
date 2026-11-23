@@ -20,9 +20,11 @@ export default function DevelopmentProgress() {
     </div>
     <p className="mt-5 text-xs leading-6 text-eth-dim">{snapshot.boundary}</p>
     <p className="mt-3 text-xs leading-6 text-eth-text/80">{snapshot.currentCampaign.detail} <a className="text-eth-teal underline" href={`${GITHUB_URL}/blob/${snapshot.reviewRevision}/${snapshot.currentCampaign.record}`}>Current tuple evidence ↗</a></p>
-    <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">{snapshot.currentCampaign.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>Open EL PR #{number} ↗</a>)}</div>
+    <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">{snapshot.currentCampaign.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>Merged EL PR #{number} ↗</a>)}</div>
     <div className="mt-4 border-t border-eth-teal/20 pt-4">
-      <h4 className="text-sm font-bold text-eth-text">Remaining acceptance gates</h4>
+      <h4 className="text-sm font-bold text-eth-text">Development checks</h4>
+      <p data-development-complete="true" className="mt-2 text-xs leading-6 text-eth-text/80">{snapshot.development.detail}</p>
+      <p data-active-development-todos={snapshot.development.activeTodos} className="text-xs leading-6 text-eth-dim">Active development TODOs: {snapshot.development.activeTodos}</p>
       <ul className="mt-3 grid gap-4 md:grid-cols-2">
         {snapshot.gates.map(gate => <li key={gate.id} data-gate={gate.id} data-state={gate.state} className="text-xs leading-6">
           <p className="font-bold text-eth-text">{gate.title} <span className="ml-1 font-normal capitalize text-eth-teal">· {gate.state}</span></p>
@@ -31,6 +33,11 @@ export default function DevelopmentProgress() {
         </li>)}
       </ul>
     </div>
+    <div role="region" aria-label="Deferred acceptance outside development progress" className="mt-4 border-t border-eth-teal/20 pt-4 text-xs leading-6">
+      <h4 className="font-bold text-eth-text">Deferred acceptance · excluded from development progress</h4>
+      <ul className="mt-3 grid gap-4 md:grid-cols-2">{snapshot.deferredAcceptance.map(item => <li key={item.id} data-deferred={item.id} data-counted-in-progress="false"><p className="font-bold text-eth-text">{item.title}</p><p className="text-eth-dim">{item.detail}</p>{'url' in item && <a className="text-eth-teal underline" href={item.url}>Upstream record ↗</a>}</li>)}</ul>
+    </div>
+    <div role="region" aria-label="Separate public-network rollout decision" data-rollout-counted-in-progress="false" className="mt-4 border-t border-eth-teal/20 pt-4 text-xs leading-6"><h4 className="font-bold text-eth-text">{snapshot.rollout.title}</h4><p className="text-eth-dim">{snapshot.rollout.detail}</p></div>
     <div className="mt-4 border-t border-eth-teal/20 pt-4 text-xs leading-6">
       <p className="font-bold text-eth-teal">{snapshot.followUp.title}</p>
       <p className="mt-1 text-eth-dim">{snapshot.followUp.detail}</p>

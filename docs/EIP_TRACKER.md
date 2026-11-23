@@ -13,14 +13,7 @@ homepage's pending-work lists; percentages count labels rather than whole-fork
 conformance.
 
 `site/src/lib/data.ts` supplies the shared dated development snapshot rendered
-by `DevelopmentProgress` on both pages. Its November 23, 2026 snapshot pins merged EL
-`d743925e` and CL `eth2030` `fa16f70a`, the selected 33-task delivery, completed
-bounded 6h45m05s run,14 BLS windows and actual stopped-head binding. The dated
-[reviewed state](reviews/progress-20261123/CURRENT_STATE.json) and
-[next steps](plans/glamsterdam/NEXT_STEPS_20261123.md) retain actual integrated CI
-failures and original-incident/48h/upstream/public gates. Older400/60-slot,
-recovery and544-proof records retain their original source pins. Merge identity,
-measured runtime identity, hosted CI and deployed website identity are distinct.
+by `DevelopmentProgress` on both pages. Its November24,2026 accounting records all33 original tasks and5 confirmed follow-ups complete/merged, while48h/larger-scale admission and upstream Lodestar approval are explicitly deferred outside development progress. Public rollout and original04 historical attribution are separately recorded. [Current accounting](reviews/development-scope-20261124/CURRENT_STATE.json) and [current plan](plans/glamsterdam/NEXT_STEPS_20261124.md) preserve the distinction. Older6h45m/30m/recovery/BLS/blob measurements retain their original source pins and failure boundaries. Merge identity, actual runtime, hosted CI and website deployment remain distinct.
 
 Optional `verification` entries are repository-relative records rendered as pinned
 qualification links. Companion-CL-only EIPs can have no local `pkg` implementation

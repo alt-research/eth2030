@@ -1,10 +1,10 @@
 # ETH2030 development roadmap
 
-Updated November 23, 2026 against EL master `d743925e` and Lighthouse `eth2030` `fa16f70abee7d31c9817ab8d782af73bce241484`. EL PRs131-141 and CL PRs4-15 are integrated. The homepage and `/roadmap` share the same dated progress and open gates. Per-EIP mapped labels retain the November2 EF Strawmap placement baseline; those percentages are not whole-fork readiness.
+Updated November24,2026 against master `cfd39f3f` with PR142-147 merged and Lighthouse eth2030 `fa16f70a`. Homepage and roadmap use one development-counting policy: the adopted frozen node implementation and confirmed follow-ups are complete.48h/larger-scale acceptance and upstream Lodestar approval are deferred outside that progress. Historical mapped EIP percentages retain their separate denominators.
 
-## Glamsterdam: selected development delivered; readiness gates open
+## Glamsterdam: adopted node development complete
 
-The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/remaining-20261123/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261123.md) retain exact source/evidence boundaries.
+The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/development-scope-20261124/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261124.md) retain exact source/evidence boundaries.
 
 | Area | Delivered result / boundary |
 | --- | --- |
@@ -16,17 +16,18 @@ The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 
 
 Original rounds 03/04 remain failed. The later captured FCU convoy is a confirmed defect with a merged repair; the original 04 precise holder/physical I/O cause is unconfirmed. 73 early missing slots, 686 memory-limit events and three local reveal advisories remain in the successful bounded record. No recurrence is not a root-cause proof.
 
-## Next acceptance sequence
+## Current completion and next scope
 
-| Order | Gate | Completion condition |
-| --- | --- | --- |
-| 1 · P0 | G-01 integrated CL CI | Closed for the private profile: final #15 has 27 successful test-suite jobs and successful local-testnet; merged fa16f70a equals the qualified tree. Preserve the original 3s failure and explicit 6s timing profile. |
-| 2 · P1 | G-02 incident evidence; G-03 duration/capacity | Preserve unknown historical attribution; retain actual correlated waits on recurrence. Declare growing-state/history/resource/restart workload; actually complete strict 48h if retained, or explicitly qualify a separate bounded profile. |
-| Parallel · P1 | G-04 upstream Lodestar | PR10693/10725 maintainer workflow approval/review, hosted qualification and integration. Local5547pass/9skip remains separate. |
-| Before public activation · P1 | G-05 final protocol/model | Select compatible gas/Engine/consensus/CL/fixture target and activation, then requalify affected paths. |
-| Conditional · P2 | G-06 corpus expansion | Execute specifically adopted formats/handlers/consumers, with native versus wrapper scope and negative controls. |
+| Item | Development treatment |
+| --- | --- |
+| Original tasks and confirmed fixes | Complete:33/33 original task IDs and5/5 follow-ups, all merged. No active confirmed adopted-scope implementation TODO. |
+| Integrated CL CI | Complete for the selected profile:27 suite successes and local-testnet9success/1conditional skip; merged tree equals qualified source. |
+|48h/larger-scale acceptance; Lodestar upstream approval | Deferred by the user, excluded from progress; actual acceptance/approval status remains separately recorded. |
+| Original04 attribution | Historical unknown; not declared resolved and not an unimplemented feature. Future actual recurrence capture remains available. |
+| Public activation | Separate chosen-network rollout decision using existing schedule/genesis/override support. No public preset is changed here. |
+| Additional corpus/research/later forks | Separate explicitly adopted scope, not implicit work inside the completed ledger. |
 
-Broader historical fast-confirmation / EVM-ASM framework labels, optional EL sampler/beam and unused helper stubs need separately scoped implementation/consumer acceptance before promotion. They are not uncompleted obligations silently inside the selected 33 tasks. [Source TODO triage and exact criteria](plans/glamsterdam/NEXT_STEPS_20261123.md).
+[Exact policy, activation explanation and source audit](plans/glamsterdam/NEXT_STEPS_20261124.md). Known defects remain actionable even when found during deferred acceptance. No whole-public-fork or unrestricted production-readiness score is asserted.
 
 ## Other roadmap phases
 
@@ -40,4 +41,4 @@ Broader historical fast-confirmation / EVM-ASM framework labels, optional EL sam
 
 The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth sync is a different fork/profile and does not close independent Frame acceptance. I*–L* remain placeholder names from the retained EF drawing, without a new schedule assertion.
 
-[Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Review checklist](reviews/progress-20261123/CHECK.md)
+[Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Review checklist](reviews/development-scope-20261124/CHECK.md)

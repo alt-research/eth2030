@@ -1,6 +1,6 @@
 # EIP Specification & Implementation Traceability
 
-> Current scoped progress refresh: November 23, 2026 at EL master `d743925e` / CL eth2030 `fa16f70a`. Selected33-task delivery, bounded 6h45m05s qualification and closed private CI and open incident/duration/upstream/public gates are recorded in [progress](PROGRESS.md) and [next steps](plans/glamsterdam/NEXT_STEPS_20261123.md). Frame/FOCIL retain their November18 control; broader implementation labels below are not upgraded by this refresh.
+> Current development accounting: November24,2026 at merged master cfd39f3f. Adopted frozen Glamsterdam33-task delivery and5 confirmed follow-ups are complete.48h/larger-scale acceptance and upstream Lodestar approval are deferred outside this progress. Public activation is a separate rollout decision. [Current plan](plans/glamsterdam/NEXT_STEPS_20261124.md). Historical mapped labels below retain their own scope; no whole-public-fork score is promoted.
 
 This index retains the February 22, 2026 inventory outside the explicitly
 refreshed scopes. The November 22 update links frozen Glamsterdam acceptance,

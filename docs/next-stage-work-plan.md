@@ -1,17 +1,10 @@
 # ETH2030 next-stage development plan
 
-Updated November 23, 2026 at EL master `d743925e` / Lighthouse `eth2030` `fa16f70abee7d31c9817ab8d782af73bce241484`. EL131-141 and CL4-15 are integrated. The original 33 frozen LIFO / signed Gloas tasks are delivered; pending merge review is no longer the next development gate. Use [the dated detailed plan](plans/glamsterdam/NEXT_STEPS_20261123.md) and [actual progress](PROGRESS.md).
+Updated November24,2026. The adopted frozen Glamsterdam node scope is complete and merged:33/33 original task IDs plus5/5 confirmed follow-ups. There is no active confirmed implementation TODO in this reviewed scope. [Current ledger and plan](plans/glamsterdam/NEXT_STEPS_20261124.md) · [Progress](PROGRESS.md).
 
-| Order | Work | Concrete completion criteria |
-| --- | --- | --- |
-| 1 · P0 | G-01 final exact-head CL CI | Closed for the private profile: final #15 passes all 27 test-suite jobs and local-testnet; merged fa16f70a equals the qualified tree. The explicit 6s simulator keeps full aggregate assertions; original 3s failure remains retained. |
-| 2 · P1 | G-02 historical forensics | Original 04 exact holder/device cause remains unknown. Capture request-correlated stacks, fd/path/fsync and resource timing on any actual recurrence before shutdown/debugger effects. Later FCU convoy repair and no-recurrence do not reconstruct missing historical evidence. |
-| 3 · P1 | G-03 declared duration/capacity | The completed 6h45m05s/14-BLS-window record is bounded. Declare final tuple and state/history/transaction workload, measure resource/latency/retention/restart and independently authenticate roots. Complete actual 172800s if strict 48h retained; a separately approved bounded profile is not 48h. |
-| Parallel · P1 | G-04 upstream Lodestar10693/10725 | Maintainer workflow approval/review, full hosted checks and integration;5547local unit passes/9skips plus821TS coverage records are not hosted approval. |
-| Before public release · P1 | G-05 protocol/model/activation | Explicit compatible gas/Engine/consensus/CL/fixture selection; requalify changes. No public schedule or overall readiness follows from merged PR count. |
-| Conditional · P2 | G-06 corpus extension | Add concretely adopted formats/consumers and real execution counts with negative controls; 24 BLS skips and43 inactive handlers remain unexecuted. |
+48h/larger-scale acceptance and upstream Lodestar approval are deferred by the user and excluded from development progress. Their absence is not converted to acceptance. Original04 exact historical attribution remains unknown. Public activation is a separate network rollout decision, using already implemented timestamp/genesis/override and persisted compatibility paths. No new public fork parameters or future formats are adopted here.
 
-Standard CL registry/signature authority and retired unsupported Engine extensions follow the user's compatibility decision. Historical33-task and earlier private recovery/steady/blob measurements stay attached to their original sources. Broader mapped ePBS/framework labels and research/later-fork TODOs are separately enumerated in the detailed plan; no global 100% claim is made.
+Continue on a concrete newly observed defect or a specifically adopted next scope. Research/later-fork service work below has its own contracts and does not reopen the completed Glamsterdam denominator.
 
 ## Separate later-fork and service sequence
 

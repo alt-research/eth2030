@@ -11,3 +11,11 @@
 - [ ] Finish actual post-5.5h observation, remaining BLS windows and stopped-head closure.
 
 No root cause is inferred from an absence of sustained stacks. No BLS/protocol check, original failure or48h admission is changed.
+
+## Completed-run follow-up
+
+- [x] Verify real6h45m endpoint,5.5h threshold snapshot and144 post-threshold healthy samples.
+- [x] Recheck exact current PR138/139 heads: both9/9 CI successful before follow-up changes.
+- [ ] Fix final-review/BLS worker completion ordering without changing original evidence.
+- [ ] Re-run unchanged real-BLS verification of all14 captured windows and bind actual stopped native/CL head beyond the final health sample.
+- [ ] Publish completed-run evidence and qualified scope; original incident remains open.

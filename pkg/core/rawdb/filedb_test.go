@@ -543,7 +543,7 @@ func TestFileDB_WALRecovery(t *testing.T) {
 	db.Close()
 
 	// Simulate a crash by writing a partial WAL entry (no commit marker).
-	walPath := filepath.Join(dir, "wal")
+	walPath := FileDBJournalPath(dir)
 	f, err := os.OpenFile(walPath, os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		t.Fatalf("open wal: %v", err)
@@ -595,7 +595,7 @@ func TestFileDB_WALRecoveryCommitted(t *testing.T) {
 	db.Close()
 
 	// Manually write a fully committed WAL entry.
-	walPath := filepath.Join(dir, "wal")
+	walPath := FileDBJournalPath(dir)
 	f, err := os.OpenFile(walPath, os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		t.Fatalf("open wal: %v", err)
@@ -951,7 +951,7 @@ func TestFileDBBatchReplaysAfterMaterializationFailure(t *testing.T) {
 	// Block one of the data files after the first operation of the batch.
 	// A commit must survive as a whole when the durable WAL is replayed.
 	blocker := db.keyPath(newKey) + ".tmp"
-	if err := os.Mkdir(blocker, 0o755); err != nil {
+	if err := os.MkdirAll(blocker, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	batch := db.NewBatch()

@@ -1,0 +1,28 @@
+{
+  "toolchain": "go1.26.11",
+  "full_go_packages": 219,
+  "race_packages": 4,
+  "entrypoints": [
+    "cmd/eth2030",
+    "cmd/eth2030-geth"
+  ],
+  "vet": "core/rawdb passed",
+  "old_reader": "Actual compiled6db8d49b rejects guarded format; new value unchanged",
+  "mutations": 4,
+  "whole_snapshot_values": 2707772,
+  "snapshot_values_all_compared": true,
+  "independent_prestart_header_and_mpt_proofs_passed": true,
+  "runtime_pending": true,
+  "original_fault_resolved": false,
+  "actual48h_passed": false,
+  "logs": {
+    "filedb-layout-full-go-final2.log": {
+      "sha256": "d814bc6116667b794d24eebbcb89166f6ee70c77f1a7e6e5fed19dfa0b1e6e23",
+      "successful_packages": 219
+    },
+    "filedb-layout-race-final.log": {
+      "sha256": "dc16613087ab1a3bf3e836493c21dd1fb8a3289b119bdd5d995b2ed308c9074f",
+      "successful_packages": 4
+    }
+  }
+}

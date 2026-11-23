@@ -70,3 +70,9 @@ In the actual main2/main3 campaign, the one-time state-history migration was alr
 The final normal main2/main3/full/snap Docker-start recovery bounds are189.038/212.551/219.661/176.953seconds under300s. Original directory-backup timeout, snap replay timeout and redundant-migration over-budget run remain failed. No resource/clock/configuration change is used to recast them as passes. Full source/runtime/proof records are in docs/reviews/glamsterdam-postmerge-20261121.
 
 The final Lodestar patch isb1b03520dcf17504a10641301d16abca4e8434c02b1c9e81dd5e7baf9fc8e156 from functional sourcecad22db, with fifteen normal-root regressions including logical topology aliases. Its actual recovery times0.155/5.493/1.168seconds and final400/60-slot operating windows supersede the earlier source-specific seven-case qualification above for current acceptance. The historical records remain valid only for their original source tuples. The required upstream lockfile review/full hosted CI remains explicit.
+
+## FileDB value-layout version 2
+
+The directory-capacity repair writes new values under `data-v2/<bucket>/<hex-key>` and keeps existing `data/` values readable until touched. `wal-v2` is the active journal; the `wal` directory symlink is an intentional old-reader guard. Opening an old store installs the guard before new-layout values can be published, including when later node startup fails. The journal transition preserves interrupted upgrades.
+
+Use a binary supporting this layout for restart and recovery. A legacy binary is expected to refuse the guarded store; deleting the guard or truncating its journal does not perform a downgrade. A downgrade requires an intact stopped pre-upgrade backup with its matching binary and checkpoint/fork configuration. Keep current journal and both value directories together in backups. This changes physical paths, not Ethereum keys, values or state roots.

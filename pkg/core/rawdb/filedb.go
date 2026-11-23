@@ -1,24 +1,18 @@
-// FileDB implements a persistent file-based key-value store using a flat
-// directory layout with a write-ahead log (WAL) for crash safety. Keys are
-// hex-encoded and stored as individual files under a data/ subdirectory.
-// An in-memory index is maintained for fast lookups and rebuilt from disk
-// on open. A file lock prevents concurrent process access.
+// FileDB implements a persistent key-value store with a durable WAL. New
+// values use 256 directories selected by a hash of the full key, avoiding flat
+// directory limits even when application keys share a long common prefix.
+// Legacy data/ files remain readable and migrate only when touched.
 //
-// Layout:
-//
-//	<dir>/
-//	  LOCK          - flock-based exclusive lock
-//	  wal           - write-ahead log (binary, append-only)
-//	  data/         - key-value files (filename = hex(key))
+// Layout: LOCK, wal-v2, wal -> data-v2/ (old-reader guard), data/ (legacy),
+// data-v2/<bucket>/<hex-key>. The index stores membership for new keys without
+// retaining a duplicate full hex filename. Values remain bounded and cold.
 package rawdb
 
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -73,6 +67,11 @@ func NewFileDB(dir string) (*FileDB, error) {
 		lockFd:  lockFd,
 	}
 
+	if err := prepareFileDBLayout(dir); err != nil {
+		releaseLock(lockFd)
+		return nil, fmt.Errorf("filedb: prepare layout: %w", err)
+	}
+
 	// Load key/filename metadata in bounded directory batches; values remain cold.
 	if err := db.loadIndex(); err != nil {
 		releaseLock(lockFd)
@@ -85,18 +84,8 @@ func NewFileDB(dir string) (*FileDB, error) {
 		return nil, fmt.Errorf("filedb: replay wal: %w", err)
 	}
 
-	// Make replayed renames durable before discarding the recovery journal.
-	directory, err := os.Open(dataDir)
-	if err != nil {
-		releaseLock(lockFd)
-		return nil, err
-	}
-	err = directory.Sync()
-	closeErr := directory.Close()
-	if err == nil {
-		err = closeErr
-	}
-	if err != nil {
+	// Sync every touched layout directory before discarding recovery intents.
+	if err := db.syncDataDirectories(); err != nil {
 		releaseLock(lockFd)
 		return nil, err
 	}
@@ -144,7 +133,7 @@ func (db *FileDB) Get(key []byte) ([]byte, error) {
 	if !exists {
 		return nil, ErrNotFound
 	}
-	value, err := os.ReadFile(filepath.Join(db.dataDir, name))
+	value, err := os.ReadFile(db.indexedPath(key, name))
 	if err != nil {
 		return nil, db.fenceRead(fmt.Errorf("filedb: reopen required after indexed read failure: %w", err))
 	}
@@ -279,7 +268,7 @@ func (db *FileDB) NewIterator(prefix []byte) Iterator {
 		db.cacheMu.Unlock()
 		if !cached {
 			var err error
-			value, err = os.ReadFile(filepath.Join(db.dataDir, db.index[key]))
+			value, err = os.ReadFile(db.indexedPath([]byte(key), db.index[key]))
 			if err != nil {
 				return failed(fmt.Errorf("filedb: iterator read: %w", err))
 			}
@@ -420,15 +409,16 @@ parse:
 		record := committed[key]
 		path := db.keyPath([]byte(key))
 		if name, ok := db.index[key]; ok {
-			path = filepath.Join(db.dataDir, name)
+			path = db.indexedPath([]byte(key), name)
 		}
 		if record.op == walDelete {
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			if err := db.removeDataFiles([]byte(key)); err != nil {
 				return err
 			}
 			delete(db.index, key)
 			continue
 		}
+
 		value := make([]byte, int(record.size))
 		if len(value) > 0 {
 			if err := read(record.offset, value); err != nil {
@@ -441,7 +431,7 @@ parse:
 		if err := db.writeDataFile([]byte(key), value); err != nil {
 			return err
 		}
-		db.index[key] = hex.EncodeToString([]byte(key))
+		db.index[key] = ""
 	}
 
 	return nil
@@ -458,6 +448,9 @@ func (db *FileDB) keyPath(key []byte) string {
 // It writes to a temporary file first, then renames for atomicity.
 func (db *FileDB) writeDataFile(key, value []byte) error {
 	path := db.keyPath(key)
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return err
+	}
 	tmpPath := path + ".tmp"
 
 	file, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
@@ -479,43 +472,7 @@ func (db *FileDB) writeDataFile(key, value []byte) error {
 		os.Remove(tmpPath) // Best-effort cleanup.
 		return fmt.Errorf("filedb: rename: %w", err)
 	}
-	return nil
-}
-
-// loadIndex scans the data directory and loads all key-value pairs into
-// the in-memory index.
-func (db *FileDB) loadIndex() error {
-	dir, err := os.Open(db.dataDir)
-	if err != nil {
-		return err
-	}
-	defer dir.Close()
-	for {
-		entries, readErr := dir.ReadDir(128)
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			name := entry.Name()
-			if len(name) > 4 && name[len(name)-4:] == ".tmp" {
-				_ = os.Remove(filepath.Join(db.dataDir, name))
-				continue
-			}
-			key, err := hex.DecodeString(name)
-			if err != nil {
-				continue
-			}
-			if previous, ok := db.index[string(key)]; !ok || name > previous {
-				db.index[string(key)] = name
-			}
-		}
-		if readErr == io.EOF {
-			return nil
-		}
-		if readErr != nil {
-			return readErr
-		}
-	}
+	return db.removeLegacyValue(key)
 }
 
 // --- File locking ---
@@ -650,7 +607,7 @@ func (db *FileDB) publishOpsLocked(ops []fileBatchOp) {
 			delete(db.index, string(op.key))
 			db.cache.remove(string(op.key))
 		} else {
-			db.index[string(op.key)] = hex.EncodeToString(op.key)
+			db.index[string(op.key)] = ""
 			db.cache.put(string(op.key), op.value)
 		}
 	}

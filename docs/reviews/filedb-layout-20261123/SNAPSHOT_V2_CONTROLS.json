@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": [
+    "all bytes, missing/tampered reuse and exact count",
+    "no source hardlinks",
+    "active source rejected before destination creation",
+    "source-linked reuse rejected",
+    "source values unchanged across all attempts"
+  ],
+  "tool_sha256": "70edc2d732ebb4279ad29c247e7c6f87add88c59e5d1b7f9c5a916e5f0fd08dd"
+}

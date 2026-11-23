@@ -73,6 +73,13 @@ type ServerConfig struct {
 	RateLimitPerSec  int
 	MaxBatchSize     int
 	ShutdownTimeout  time.Duration
+	// AllowedModules is the namespace allowlist (e.g. eth, net, web3).
+	// nil denies every namespace; the "*" entry allows all. This is the
+	// enforcement point for --http.api.
+	AllowedModules []string
+	// AllowedVhosts restricts the Host header (DNS-rebinding defense).
+	// Empty or ["*"] allows all hosts; this enforces --http.vhosts.
+	AllowedVhosts []string
 }
 
 // DefaultServerConfig returns sensible server defaults.
@@ -149,11 +156,12 @@ type MiddlewareFunc func(http.Handler) http.Handler
 // Server is a simple JSON-RPC HTTP server that dispatches requests to a
 // RequestHandler, with optional admin_, net_, and beacon_ namespace support.
 type Server struct {
-	api       RequestHandler
-	adminAPI  AdminRequestHandler
-	netAPI    NetRequestHandler
-	beaconAPI BeaconRequestHandler
-	mux       *http.ServeMux
+	api            RequestHandler
+	adminAPI       AdminRequestHandler
+	netAPI         NetRequestHandler
+	beaconAPI      BeaconRequestHandler
+	allowedModules []string
+	mux            *http.ServeMux
 }
 
 // NewServer creates a new Server for the given RequestHandler.
@@ -181,6 +189,12 @@ func (s *Server) SetBeaconHandler(h BeaconRequestHandler) {
 	s.beaconAPI = h
 }
 
+// SetAllowedModules sets the namespace allowlist applied to every request.
+// nil denies all namespaces; the "*" entry allows all.
+func (s *Server) SetAllowedModules(modules []string) {
+	s.allowedModules = modules
+}
+
 // Handler returns the HTTP handler for the server.
 func (s *Server) Handler() http.Handler {
 	return s.mux
@@ -205,6 +219,11 @@ func (s *Server) handleRPC(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req = *req.WithContext(r.Context())
+	if !methodAllowed(req.Method, s.allowedModules) {
+		writeJSON(w, methodUnavailableResponse(req.Method))
+		return
+	}
+
 	var resp *rpctypes.Response
 	switch {
 	case isAdminMethod(req.Method) && s.adminAPI != nil:
@@ -232,6 +251,66 @@ func isNetMethod(method string) bool {
 // isBeaconMethod reports whether the method belongs to the beacon_ namespace.
 func isBeaconMethod(method string) bool {
 	return len(method) > 7 && method[:7] == "beacon_"
+}
+
+// methodNamespace returns the JSON-RPC namespace of a method, i.e. the part
+// before the first underscore. Methods without an underscore form their own
+// namespace.
+func methodNamespace(method string) string {
+	if idx := strings.Index(method, "_"); idx >= 0 {
+		return method[:idx]
+	}
+	return method
+}
+
+// methodAllowed reports whether method passes the namespace allowlist.
+// A nil modules list denies everything; the "*" entry allows everything.
+// Matching is case-insensitive.
+func methodAllowed(method string, modules []string) bool {
+	ns := strings.ToLower(methodNamespace(method))
+	for _, m := range modules {
+		if m == "*" || strings.EqualFold(m, ns) {
+			return true
+		}
+	}
+	return false
+}
+
+// hostAllowed reports whether the request Host header passes the vhost
+// allowlist. An empty or ["*"] list allows all hosts; otherwise the Host
+// must match an entry case-insensitively, ignoring a trailing ":port".
+func hostAllowed(r *http.Request, vhosts []string) bool {
+	allowAll := len(vhosts) == 0 || (len(vhosts) == 1 && vhosts[0] == "*")
+	if allowAll {
+		return true
+	}
+	host := r.Host
+	// Strip the port, handling bracketed IPv6 literals like "[::1]:8545".
+	if strings.HasPrefix(host, "[") {
+		if idx := strings.LastIndex(host, "]"); idx >= 0 {
+			host = host[1:idx]
+		}
+	} else if idx := strings.LastIndex(host, ":"); idx >= 0 {
+		host = host[:idx]
+	}
+	for _, v := range vhosts {
+		if strings.EqualFold(v, host) {
+			return true
+		}
+	}
+	return false
+}
+
+// methodUnavailableResponse builds the geth-style denial used when a method
+// is not served under the configured module allowlist.
+func methodUnavailableResponse(method string) *rpctypes.Response {
+	return &rpctypes.Response{
+		JSONRPC: "2.0",
+		Error: &rpctypes.RPCError{
+			Code:    rpctypes.ErrCodeMethodNotFound,
+			Message: fmt.Sprintf("the method %s does not exist/is not available", method),
+		},
+	}
 }
 
 func writeJSON(w http.ResponseWriter, v interface{}) {
@@ -284,6 +363,7 @@ func NewExtServer(api RequestHandler, config ServerConfig) *ExtServer {
 		rateLimiter: NewRateLimiter(config.RateLimitPerSec),
 	}
 	s.batch.SetMaxBatchSize(config.MaxBatchSize)
+	s.batch.SetAllowedModules(config.AllowedModules)
 	return s
 }
 
@@ -438,6 +518,18 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	metrics.RPCRequests.Inc()
 	s.requestCount.Add(1)
+
+	// Virtual-host check (DNS-rebinding defense, --http.vhosts).
+	if !hostAllowed(r, s.config.AllowedVhosts) {
+		rpcLog.Warn("rpc_vhost_rejected",
+			"event", "rpc_vhost_rejected",
+			"remote", r.RemoteAddr,
+			"host", r.Host,
+		)
+		http.Error(w, "invalid host", http.StatusForbidden)
+		return
+	}
+
 	s.setCORSHeaders(w, r)
 
 	if r.Method == http.MethodOptions {
@@ -524,6 +616,13 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	)
 
 	req = *req.WithContext(r.Context())
+	// Namespace allowlist (--http.api). Denied methods report the same
+	// geth-style "not available" error as unknown methods.
+	if !methodAllowed(req.Method, s.config.AllowedModules) {
+		writeJSON(w, methodUnavailableResponse(req.Method))
+		return
+	}
+
 	var resp *rpctypes.Response
 	switch {
 	case isAdminMethod(req.Method) && s.adminAPI != nil:

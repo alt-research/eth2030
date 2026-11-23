@@ -31,6 +31,7 @@ func newStubHandler() *stubHandler { return &stubHandler{} }
 
 func TestServerHandler_ValidRequest(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -62,6 +63,7 @@ func TestServerHandler_ValidRequest(t *testing.T) {
 
 func TestServerHandler_MethodNotAllowed(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -78,6 +80,7 @@ func TestServerHandler_MethodNotAllowed(t *testing.T) {
 
 func TestServerHandler_InvalidJSON(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -102,6 +105,7 @@ func TestServerHandler_InvalidJSON(t *testing.T) {
 
 func TestServerHandler_MethodNotFound(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -126,6 +130,7 @@ func TestServerHandler_MethodNotFound(t *testing.T) {
 
 func TestServerHandler_MultipleRequests(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -151,6 +156,7 @@ func TestServerHandler_MultipleRequests(t *testing.T) {
 
 func TestServerHandler_EmptyBody(t *testing.T) {
 	srv := NewServer(newStubHandler())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 

@@ -73,12 +73,16 @@ func run(args []string) int {
 	// Log security configuration.
 	slog.Info("Security",
 		"rpc_auth", cfg.RPCAuthSecret != "",
+		"rpc_modules", cfg.HTTPModules,
 		"rpc_rate", cfg.RPCRateLimitPerSec,
 		"rpc_body", cfg.RPCMaxRequestSize,
 		"rpc_batch", cfg.RPCMaxBatchSize,
 		"engine_body", cfg.EngineMaxRequestSize,
 		"engine_auth", cfg.EngineAuthToken != "" || cfg.EngineAuthTokenPath != "",
 	)
+	if cfg.RPCAllowInsecureRemoteAdmin {
+		slog.Warn("INSECURE: privileged RPC namespaces (admin/debug) are exposed remotely without --rpc.auth_secret via --rpc.allow-insecure; never run this configuration on an untrusted network")
+	}
 
 	// Log any fork override timestamps so they appear in the startup banner.
 	logForkOverrides(&cfg)
@@ -167,6 +171,7 @@ func newFlagSet(cfg *node.Config) *flagSet {
 	fs.StringSliceVar(&cfg.HTTPCORSDomain, "http.corsdomain", cfg.HTTPCORSDomain, "comma-separated CORS domains")
 	fs.StringSliceVar(&cfg.HTTPModules, "http.api", cfg.HTTPModules, "comma-separated HTTP-RPC API modules")
 	fs.StringVar(&cfg.RPCAuthSecret, "rpc.auth_secret", cfg.RPCAuthSecret, "Bearer token required by HTTP-RPC (empty = disabled)")
+	fs.BoolVar(&cfg.RPCAllowInsecureRemoteAdmin, "rpc.allow-insecure", cfg.RPCAllowInsecureRemoteAdmin, "allow admin/debug modules on a non-loopback RPC bind without --rpc.auth_secret (container devnets only)")
 	fs.IntVar(&cfg.RPCRateLimitPerSec, "rpc.rate_limit", cfg.RPCRateLimitPerSec, "HTTP-RPC request rate limit (req/s, 0 = unlimited)")
 	fs.Int64Var(&cfg.RPCMaxRequestSize, "rpc.max_request_size", cfg.RPCMaxRequestSize, "HTTP-RPC max request body size (bytes)")
 	fs.IntVar(&cfg.RPCMaxBatchSize, "rpc.max_batch_size", cfg.RPCMaxBatchSize, "HTTP-RPC max batch size")

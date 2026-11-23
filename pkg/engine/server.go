@@ -35,6 +35,7 @@ type EngineAPI struct {
 	ethHandler      http.Handler // optional: handles non-engine_ methods (eth_, web3_, net_)
 	authSecret      string
 	jwtSecret       *[32]byte
+	authVhosts      []string // Host header allowlist (--authrpc.vhosts); empty or ["*"] allows all
 	maxRequestSize  int64
 	requestTimeout  time.Duration    // P0: configurable request timeout (default 8s)
 	priorityHandler *PriorityHandler // P2: tracks request priorities
@@ -62,6 +63,37 @@ func (api *EngineAPI) SetAuthSecret(secret string) {
 	defer api.mu.Unlock()
 	api.authSecret = secret
 	api.jwtSecret = nil
+}
+
+// SetAuthVhosts sets the Host header allowlist (--authrpc.vhosts). An empty
+// list or ["*"] allows all hosts; otherwise the Host must match an entry
+// (case-insensitive, port stripped).
+func (api *EngineAPI) SetAuthVhosts(vhosts []string) {
+	api.mu.Lock()
+	defer api.mu.Unlock()
+	api.authVhosts = vhosts
+}
+
+// vhostAllowed reports whether the request Host passes the configured
+// vhost allowlist.
+func vhostAllowed(r *http.Request, vhosts []string) bool {
+	if len(vhosts) == 0 || (len(vhosts) == 1 && vhosts[0] == "*") {
+		return true
+	}
+	host := r.Host
+	if strings.HasPrefix(host, "[") {
+		if idx := strings.LastIndex(host, "]"); idx >= 0 {
+			host = host[1:idx]
+		}
+	} else if idx := strings.LastIndex(host, ":"); idx >= 0 {
+		host = host[:idx]
+	}
+	for _, v := range vhosts {
+		if strings.EqualFold(v, host) {
+			return true
+		}
+	}
+	return false
 }
 
 // SetJWTSecret configures Engine API HS256 authentication.
@@ -565,6 +597,14 @@ func (api *EngineAPI) Handler() http.Handler { return http.HandlerFunc(api.httpH
 // P0: Implements request timeout protection to prevent CL-EL cascade failures.
 // P2: Tracks request priorities for monitoring and potential scheduling.
 func (api *EngineAPI) httpHandler(w http.ResponseWriter, r *http.Request) {
+	api.mu.Lock()
+	vhosts := api.authVhosts
+	api.mu.Unlock()
+	if !vhostAllowed(r, vhosts) {
+		http.Error(w, "invalid host", http.StatusForbidden)
+		return
+	}
+
 	if !api.authorizedRequest(r) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)

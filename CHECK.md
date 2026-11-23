@@ -682,3 +682,31 @@ See [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md) f
 - [ ] Recheck the actual retained network and original registry cleanup without changing protocol clocks or validation.
 - [ ] Reconcile external-client workflow coverage and remaining adoption/model review boundaries.
 - [ ] Publish exact post-merge evidence and updated tracking in a master-targeted PR; verify current CI and conflicts.
+## RPC exposure hardening — unauthenticated admin/debug on wildcard bind (2026-11-23)
+
+External report (0xpack, severity High, CWE-862) confirmed against commit 55f7fd8:
+the `eth2030` binary defaults to `--http.addr 0.0.0.0` with `admin`/`debug`
+modules served and no auth; `HTTPModules`, vhosts and CORS checks are never
+enforced by the dispatcher (`corsMiddleware` is dead code).
+
+Decision: geth-compatible secure defaults + explicit devnet opt-in
+(kurtosis `ethereum-package` already passes `--http.addr=0.0.0.0`,
+`--http.api=admin,...`, `--http.vhosts=*` itself); remote admin/debug without
+an auth secret requires the explicit `--rpc.allow-insecure` flag.
+
+- [x] Verify every report claim against the code (defaults, dispatcher, dead vhost check, stubs, JWT on 8551, geth-leg local bind).
+- [x] Switch node defaults to loopback bind + `[eth net web3]` modules (config.go).
+- [x] Enforce the module allowlist in the RPC dispatcher (ExtServer, plain Server, batch single + extended paths).
+- [x] Enforce HTTP vhosts and Engine `AuthVhosts` on the live request path.
+- [x] Add `--rpc.allow-insecure` gate: refuse remote admin/debug without `--rpc.auth_secret` unless explicitly allowed.
+- [x] Wire `WSModules` into the WebSocket handler (was decorative).
+- [x] Remove dead `corsMiddleware`; add live-path tests for modules/vhosts.
+- [x] Add `--rpc.allow-insecure` to all 49 devnet yamls using `eth2030:local` (validated with a YAML parser).
+- [x] Unit tests for defaults, guardrail, dispatcher allowlist, vhost, engine vhost, WS modules.
+- [x] Build `eth2030` and run the focused test suites.
+- [x] Update devnet README flag docs and STATUS.md; commit.
+
+Known limits: devnet yamls are config-checked but not re-run end to end in this
+session; `eth2030-geth` needs no change (real go-ethereum stack enforces its own
+module allowlist); `debug_setHead`/`debug_dumpBlock` remain unwired dead code
+(report overstated their reachability).

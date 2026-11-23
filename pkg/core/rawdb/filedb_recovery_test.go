@@ -3,7 +3,6 @@ package rawdb
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -40,12 +39,12 @@ func TestFileDBRecoveryCoalescesCommittedIntentsAndPreservesMaterializedFiles(t 
 		wal = append(wal, recoveryRecord(walPut, "head", value)...)
 		wal = append(wal, walCommit)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "wal"), wal, 0600); err != nil {
+	if err := os.WriteFile(FileDBJournalPath(dir), wal, 0600); err != nil {
 		t.Fatal(err)
 	}
 	// No intermediate rewrite is needed, including when a stale temporary
 	// directory prevents writes. It must not prevent exact completed recovery.
-	if err := os.Mkdir(path+".tmp", 0700); err != nil {
+	if err := os.MkdirAll(path+".tmp", 0700); err != nil {
 		t.Fatal(err)
 	}
 	db, err = NewFileDB(dir)
@@ -63,7 +62,7 @@ func TestFileDBRecoveryCoalescesCommittedIntentsAndPreservesMaterializedFiles(t 
 	if value, err := db.Get([]byte("head")); err != nil || string(value) != "final" {
 		t.Fatalf("head=%q %v", value, err)
 	}
-	if data, err := os.ReadFile(filepath.Join(dir, "wal")); err != nil || len(data) != 0 {
+	if data, err := os.ReadFile(FileDBJournalPath(dir)); err != nil || len(data) != 0 {
 		t.Fatalf("successful recovery did not checkpoint WAL: %v", err)
 	}
 }
@@ -82,7 +81,7 @@ func TestFileDBRecoveryRepairsOnlyFinalCommittedValuesAndDeletes(t *testing.T) {
 		t.Fatal(err)
 	}
 	// The final deletion never needs to materialize its intermediate put.
-	if err := os.Mkdir(deletedPath+".tmp", 0700); err != nil {
+	if err := os.MkdirAll(deletedPath+".tmp", 0700); err != nil {
 		t.Fatal(err)
 	}
 	var wal []byte
@@ -97,7 +96,7 @@ func TestFileDBRecoveryRepairsOnlyFinalCommittedValuesAndDeletes(t *testing.T) {
 	wal = append(wal, recoveryRecord(walDelete, "deleted", "")...)
 	wal = append(wal, walCommit)
 	wal = append(wal, recoveryRecord(walPut, "repair", "uncommitted")...)
-	if err := os.WriteFile(filepath.Join(dir, "wal"), wal, 0600); err != nil {
+	if err := os.WriteFile(FileDBJournalPath(dir), wal, 0600); err != nil {
 		t.Fatal(err)
 	}
 	db, err = NewFileDB(dir)
@@ -189,7 +188,7 @@ func TestFileDBRecoveryUnknownSuffixPreservesCommittedPrefix(t *testing.T) {
 	if _, err := db.Get([]byte("other")); err != ErrNotFound {
 		t.Fatal("resynchronized through an unknown record")
 	}
-	if value, err := os.ReadFile(filepath.Join(dir, "data", hex.EncodeToString([]byte("committed")))); err != nil || string(value) != "original" {
+	if value, err := os.ReadFile(FileDBValuePath(dir, []byte("committed"))); err != nil || string(value) != "original" {
 		t.Fatal("committed value missing from recovered disk")
 	}
 }
@@ -209,15 +208,15 @@ func TestFileDBRecoveryFailureRetainsJournalForAtomicRetry(t *testing.T) {
 	if err := os.WriteFile(journal, wal, 0600); err != nil {
 		t.Fatal(err)
 	}
-	blocker := filepath.Join(dataDir, hex.EncodeToString([]byte("b"))+".tmp")
-	if err := os.Mkdir(blocker, 0700); err != nil {
+	blocker := FileDBValuePath(dir, []byte("b")) + ".tmp"
+	if err := os.MkdirAll(blocker, 0700); err != nil {
 		t.Fatal(err)
 	}
 	if db, err := NewFileDB(dir); err == nil {
 		db.Close()
 		t.Fatal("recovery accepted an incomplete committed batch")
 	}
-	retained, err := os.ReadFile(journal)
+	retained, err := os.ReadFile(FileDBJournalPath(dir))
 	if err != nil || !bytes.Equal(retained, wal) {
 		t.Fatalf("failed recovery discarded its durable commit: %v", err)
 	}

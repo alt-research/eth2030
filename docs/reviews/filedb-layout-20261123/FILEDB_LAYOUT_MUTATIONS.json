@@ -1,0 +1,25 @@
+{
+  "initial_test_blind_spot_retained": "legacy delete initially escaped a single reopen; strengthened to reopen after WAL checkpoint",
+  "final_mutations": [
+    {
+      "mutation": "common-prefix-routing",
+      "behaviorally_rejected": true,
+      "exit": 1
+    },
+    {
+      "mutation": "old-reader-guard",
+      "behaviorally_rejected": true,
+      "exit": 1
+    },
+    {
+      "mutation": "legacy-delete-resurrection",
+      "behaviorally_rejected": true,
+      "exit": 1
+    },
+    {
+      "mutation": "ambiguous-journal-authority",
+      "behaviorally_rejected": true,
+      "exit": 1
+    }
+  ]
+}

@@ -9,3 +9,5 @@ Normative basis: pinned Engine Paris forkchoice rules4-6 (`refs/execution-apis/s
 Before the patch both new regressions failed: published head0 versus3 and restored head0 versus6. Afterwards the complete core/chain race suite passes, and the final added legacy rewind plus real FileDB failed-materialization gauge controls pass under race. Full `go test ./...` also passes. Native `GOTOOLCHAIN=go1.26.11 go build ./cmd/eth2030-geth` passes. Tests inspect staged/committed state, failed durable publication and downward rewinds rather than merely calling Gauge.Set.
 
 The running observer uses the earlier native binary. It cannot count as a runtime measurement of this patch. Metrics use the existing process-global registry; independent test chains within one process continue sharing it. No new production registry architecture is introduced.
+
+Shared parent5baf0f32 extracts unchanged FileDB paths/operations and makes the actual FCU fault target format-aware. The chain race suite passes after rebasing; the previously retained full-package validation remains source-specific, with final cumulative checks recorded separately.

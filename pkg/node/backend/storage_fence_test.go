@@ -3,7 +3,6 @@ package backend
 import (
 	"errors"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/chain"
@@ -35,7 +34,7 @@ func TestEngineFencedDatabaseCannotBecomeSyncingOrCachedValid(t *testing.T) {
 		t.Fatalf("healthy unknown head = %+v, %v", status, err)
 	}
 	// Real OS materialization failure after FileDB has appended/synced intent.
-	if err := os.Mkdir(filepath.Join(dir, "data", "6661756c74.tmp"), 0700); err != nil {
+	if err := os.MkdirAll(rawdb.FileDBValuePath(dir, []byte("fault"))+".tmp", 0700); err != nil {
 		t.Fatal(err)
 	}
 	if err := db.Put([]byte("fault"), []byte("durable intent")); err == nil {

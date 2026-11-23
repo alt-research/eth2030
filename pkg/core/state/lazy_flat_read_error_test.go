@@ -1,13 +1,11 @@
 package state
 
 import (
-	"encoding/hex"
 	"errors"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/types"
 	"math/big"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -45,7 +43,7 @@ func TestColdFlatStateReadErrorsRemainErrorsAcrossRollbackAndCopy(t *testing.T) 
 			if kind == "code" || kind == "code-hash" {
 				key = codeDBKey(codeHash[:])
 			}
-			path := filepath.Join(dir, "data", hex.EncodeToString(key))
+			path := rawdb.FileDBValuePath(dir, key)
 			if kind == "code-hash" {
 				body, err := os.ReadFile(path)
 				if err != nil {

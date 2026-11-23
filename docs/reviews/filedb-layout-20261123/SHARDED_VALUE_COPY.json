@@ -1,0 +1,15 @@
+{
+  "buckets": 256,
+  "copied_values": 79664,
+  "destination": "/target/el/execution-data/chaindata-prepared-v2",
+  "destination_same_order_sha256": "8da9449a8598696e97d8804e480b120338a5a67889fc1a5ec7c698659fefa40e",
+  "elapsed_seconds": 664.285420312,
+  "keys": 2707772,
+  "order_scope": "Source directory enumeration order; each key/value independently checked before hashing; not a canonical cross-filesystem digest",
+  "passed": true,
+  "scope": "Read-only closed legacy source; complete per-value source/destination digest comparison; only verified owned reusable copies move. No source hardlinks or source writes.",
+  "source": "/source-el/execution-data/chaindata",
+  "source_order_sha256": "8da9449a8598696e97d8804e480b120338a5a67889fc1a5ec7c698659fefa40e",
+  "value_bytes": 687886126,
+  "verified_reused_values": 2628108
+}

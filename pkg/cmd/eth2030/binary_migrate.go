@@ -56,16 +56,40 @@ func runBinaryMigration(args []string, stdout, stderr io.Writer) int {
 }
 
 func migrateBinaryFiles(source, dest string, root types.Hash, size, maxBatches int) (progress state.BinaryMigrationProgress, err error) {
-	info, err := os.Stat(filepath.Join(source, "data"))
-	if err != nil {
-		return progress, fmt.Errorf("source FileDB: %w", err)
+	var sourceDirectories []os.FileInfo
+	for _, name := range []string{"data", "data-v2"} {
+		info, statErr := os.Stat(filepath.Join(source, name))
+		if os.IsNotExist(statErr) {
+			continue
+		}
+		if statErr != nil {
+			return progress, fmt.Errorf("source FileDB: %w", statErr)
+		}
+		if !info.IsDir() {
+			return progress, errors.New("source FileDB data path is not a directory")
+		}
+		sourceDirectories = append(sourceDirectories, info)
 	}
-	if !info.IsDir() {
-		return progress, errors.New("source FileDB data path is not a directory")
+	if len(sourceDirectories) == 0 {
+		return progress, errors.New("source FileDB has no value directory")
 	}
-	if destInfo, err := os.Stat(filepath.Join(dest, "data")); err == nil && os.SameFile(info, destInfo) {
-		return progress, errors.New("source and destination must be separate databases")
+	// Both legacy and current value directories must be independent, including
+	// cross-layout symlink aliases, before opening either database.
+	for _, name := range []string{"data", "data-v2"} {
+		info, statErr := os.Stat(filepath.Join(dest, name))
+		if os.IsNotExist(statErr) {
+			continue
+		}
+		if statErr != nil {
+			return progress, fmt.Errorf("destination FileDB: %w", statErr)
+		}
+		for _, sourceInfo := range sourceDirectories {
+			if os.SameFile(sourceInfo, info) {
+				return progress, errors.New("source and destination must be separate databases")
+			}
+		}
 	}
+
 	src, err := rawdb.NewFileDB(source)
 	if err != nil {
 		return progress, fmt.Errorf("open source: %w", err)

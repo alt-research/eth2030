@@ -7,6 +7,7 @@ import (
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/metrics"
 )
 
 var snapPivotKey = []byte("snap-pivot")
@@ -113,6 +114,7 @@ func (bc *Blockchain) adoptSnapPivot(pivot *types.Block, st state.StateDB, heade
 	}
 	bc.canonicalVersion++
 	bc.currentBlock, bc.currentState = pivot, st
+	metrics.ChainHeight.Set(int64(pivot.NumberU64()))
 	bc.cacheBlockLocked(pivot)
 	for _, header := range headers {
 		bc.canonCache[header.Number.Uint64()] = header.Hash()

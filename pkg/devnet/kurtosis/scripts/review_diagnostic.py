@@ -335,6 +335,27 @@ def main():
                 stream.write(json.dumps({"at": datetime.now(timezone.utc).isoformat(), "error": repr(error)}) + "\n")
             if not args.watch:
                 return 1
+            # A corrupt closing BLS report can make load_review fail before
+            # awaiting_final_bls runs. Consult only the separate runtime
+            # endpoint so that this error path cannot retry past its deadline.
+            try:
+                runtime = read_published_json(args.run / "result.json")
+                expired = "finished_at" in runtime and time.time() - timestamp(runtime["finished_at"]) >= FINAL_BLS_WAIT
+            except (OSError, ValueError, TypeError, KeyError):
+                expired = False
+            if expired:
+                result = {"status": "failed", "errors": list(failures),
+                          "retained_guard_failures": list(failures),
+                          "actual48h_passed": False, "original_fault_resolved": False,
+                          "awaiting_final_bls": False,
+                          "reviewed_at": datetime.now(timezone.utc).isoformat(),
+                          "reason": "closing evidence unreadable beyond the finished runtime's bounded wait"}
+                with (args.output / "reviews.jsonl").open("a") as stream:
+                    stream.write(json.dumps(result) + "\n")
+                temporary = args.output / "result.tmp"
+                temporary.write_text(json.dumps(result, indent=2) + "\n")
+                temporary.replace(args.output / "result.json")
+                return 1
         time.sleep(max(0, 60 - (time.monotonic() - before)))
 
 

@@ -192,6 +192,22 @@ class ReviewTest(unittest.TestCase):
                 self.assertEqual(result["status"], "failed")
                 self.assertTrue(result["errors"])
 
+    def test_unreadable_closing_report_cannot_bypass_finished_wait_deadline(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run, out = Path(tmp) / "run", Path(tmp) / "out"
+            (run / "observations").mkdir(parents=True)
+            (run / "containers.json").write_text(json.dumps({"el": "el", "cl": "cl"}))
+            (run / "observations/identities.json").write_text(json.dumps({r: {"started": iso(START)} for r in ("el", "cl")}))
+            (run / "result.json").write_text(json.dumps({"finished_at": iso(START)}))
+            args = ["review_diagnostic.py", "--run", str(run), "--output", str(out), "--watch"]
+            with patch("sys.argv", args), patch("review_diagnostic.load_review", side_effect=ValueError("unreadable closing report")), patch("review_diagnostic.time.time", return_value=START + 3601), patch("review_diagnostic.time.sleep", side_effect=AssertionError("kept retrying beyond finished worker deadline")):
+                self.assertEqual(main(), 1)
+            report = json.loads((out / "result.json").read_text())
+            self.assertEqual(report["status"], "failed")
+            self.assertFalse(report["actual48h_passed"])
+            self.assertFalse(report["original_fault_resolved"])
+            self.assertTrue(report["retained_guard_failures"])
+
 
 if __name__ == "__main__":
     unittest.main()

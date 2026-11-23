@@ -7,4 +7,4 @@
 - [x] Explain public-network activation as a separate rollout decision; preserve historical unknowns and later-scope boundaries.
 - [x] Update homepage/roadmap/plans and evidence guards with one shared counting policy.
 - [x] Verify native build, activation regressions, static export and negative claim controls.
-- [ ] Submit a master-target PR and verify its exact-head CI and mergeability.
+- [x] Submit a master-target PR and verify its exact-head CI and mergeability (PR 148, initial submission head 25b95fea; final documentation head rechecked on the PR).

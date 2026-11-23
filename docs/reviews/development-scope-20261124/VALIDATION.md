@@ -22,3 +22,7 @@ The current branch, merged master cfd39f3f and measured cumulative source 50514b
 The final website points to evidence commit 1eca90d7b9f4dfdd4354156b7f660dab910520c2. Dated November 23 receipts retain their historical failed, unconfirmed and unmerged statuses. Current merged PR records and user-directed exclusions are in CURRENT_STATE.json. No fresh 48h/larger-scale test, upstream approval, public activation or original-04 root-cause resolution is asserted.
 
 PR and exact-head hosted CI are checked after submission; those results remain attached to the PR rather than being confused with local export checks or a new public deployment.
+
+## PR handoff
+
+[PR 148](https://github.com/alt-research/eth2030/pull/148) targets master cfd39f3f. Initial submission head 25b95feae6703f9faf2c95e3d1c412f46ef804a5 passed [hosted Site progress and evidence run 45223731159](https://github.com/alt-research/eth2030/actions/runs/45223731159), and GitHub reported mergeable=true. The subsequent handoff-only documentation commit is checked again on the PR, without relabelling this run's head. No EL master merge was performed.

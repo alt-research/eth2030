@@ -104,7 +104,7 @@ def snapshot(pid, expected_start, mounts=()):
             relative = line[3:].lstrip("/")
             path = (Path("/sys/fs/cgroup") / relative).resolve()
             if path.is_relative_to(Path("/sys/fs/cgroup")):
-                result["cgroup_v2"] = {name: read_text(path / name) for name in ("io.stat", "io.pressure", "cpu.stat", "memory.events")}
+                result["cgroup_v2"] = {name: read_text(path / name) for name in ("io.stat", "io.pressure", "io.max", "io.weight", "cpu.stat", "cpu.max", "memory.events", "memory.max", "memory.high")}
             else:
                 result["cgroup_v2"] = {"error": "cgroup path is outside the host cgroup mount"}
     diskstats = read_text(Path("/proc/diskstats"), 1 << 20)

@@ -6,6 +6,10 @@ on:
     paths:
       - 'pkg/**'
       - 'tools/consensus-replay/**'
+      - 'tools/capture_engine_stall.py'
+      - 'tools/engine_storage_snapshot.py'
+      - 'tools/test_capture_engine_stall.py'
+      - 'tools/test_engine_storage_snapshot.py'
       - 'IFLOW.md'
       - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
@@ -14,6 +18,10 @@ on:
     paths:
       - 'pkg/**'
       - 'tools/consensus-replay/**'
+      - 'tools/capture_engine_stall.py'
+      - 'tools/engine_storage_snapshot.py'
+      - 'tools/test_capture_engine_stall.py'
+      - 'tools/test_engine_storage_snapshot.py'
       - 'IFLOW.md'
       - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
@@ -51,6 +59,8 @@ jobs:
         run: python3 -m unittest discover -s pkg/devnet/kurtosis/scripts -p 'test_*.py'
       - name: Verify quiet-pipe Engine timeout evidence capture
         run: python3 -m unittest discover -s tools -p 'test_capture_engine_stall.py'
+      - name: Verify live storage-wait evidence capture
+        run: python3 -m unittest discover -s tools -p 'test_engine_storage_snapshot.py'
       - name: Rebuild the frozen paymaster runtime
         run: |
           curl --fail --location --retry 3 https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/linux-amd64/solc-linux-amd64-v0.8.38+commit.1835d247 -o "$RUNNER_TEMP/frame-solc"

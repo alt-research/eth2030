@@ -24,6 +24,18 @@
       "packages_passed": 6,
       "sha256": "a99901a43c163b84e1c95d0e64e1306099f4fb71fe0f5d265544c37ec12b59f7"
     },
-    "native_build": "passed"
-  }
+    "native_build": "passed",
+    "integration": {
+      "exit": 0,
+      "packages_passed": 219,
+      "sha256": "af4e66f67a43c80095b9f472650218b322676c7a24097d6e94abc66ed96ea59c"
+    },
+    "explicit_entrypoints": [
+      "go build ./cmd/eth2030 (native EL)",
+      "go build ./cmd/eth2030-geth (Geth-backed wrapper)"
+    ]
+  },
+  "public_validation_branch": "qualification/remaining-final-code-20261123",
+  "public_validation_source": "https://github.com/alt-research/eth2030/commit/ef8c68e725c724566c5c34619d71b8a0fd1acba0",
+  "publication_boundary": "Retained cumulative source only; no master merge and no aggregate feature PR."
 }

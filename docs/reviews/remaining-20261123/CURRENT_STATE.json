@@ -1,6 +1,6 @@
 {
   "review_date": "November 23, 2026",
-  "reviewed_at": "2026-11-23T12:14:53.705764+00:00",
+  "reviewed_at": "2026-11-23T14:38:15.281908+00:00",
   "merged_el": {
     "revision": "d743925e3c4e7deb3fdc00648cb2296372910b28",
     "through_pr": 141,
@@ -8,11 +8,12 @@
       142,
       143,
       144,
-      145
+      145,
+      146
     ]
   },
   "merged_cl": {
-    "revision": "f73ddf5222147bb429a5fa3a5e94fb36da00f8f6",
+    "revision": "fa16f70abee7d31c9817ab8d782af73bce241484",
     "target": "eth2030",
     "merged_prs": [
       4,
@@ -25,7 +26,8 @@
       11,
       12,
       13,
-      14
+      14,
+      15
     ],
     "already_integrated_closed": [
       1,
@@ -33,7 +35,9 @@
       3
     ],
     "open_prs_at_integration": 0,
-    "scoped_local_tests": 500
+    "scoped_local_tests": 500,
+    "qualified_ci_head": "215525de9d9290e5498fedad47d97c2eb41cebb9",
+    "tree_equal_to_qualified_head": true
   },
   "selected_scope": {
     "name": "Frozen merged LIFO / signed Gloas development target",
@@ -172,9 +176,9 @@
   "integrated_ci": {
     "id": 45166237988,
     "head": "215525de9d9290e5498fedad47d97c2eb41cebb9",
-    "status": "in_progress",
-    "conclusion": null,
-    "gate": "qualifying",
+    "status": "completed",
+    "conclusion": "success",
+    "gate": "closed",
     "url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45166237988",
     "jobs": [
       {
@@ -228,8 +232,8 @@
       {
         "id": 137666388959,
         "name": "release-tests-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 137666388966,
@@ -246,8 +250,8 @@
       {
         "id": 137666389120,
         "name": "http-api-tests",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 137666389278,
@@ -270,8 +274,8 @@
       {
         "id": 137666389339,
         "name": "ef-tests-minimal-ubuntu",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 137666389423,
@@ -330,6 +334,12 @@
       {
         "id": 137666389645,
         "name": "cli-check",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 137703921633,
+        "name": "test-suite-success",
         "status": "completed",
         "conclusion": "success"
       }
@@ -663,9 +673,13 @@
   "upstream_hosted_gates_record": "docs/reviews/remaining-20261123/UPSTREAM_HOSTED_GATES.json",
   "code_repairs": {
     "142": "Correlated storage-wait evidence;16 controls and6 executed mutations",
-    "143": "Format-only follow-up; latest9 CI jobs pass",
-    "144": "Canonical height after FCU/recovery and failed-publication guards; latest9 CI jobs pass",
-    "145": "Actual new12056-entry materialization convoy;16-worker bounded repair,219 packages/4 race suites/3 behavioral mutations and latest9 CI jobs pass"
+    "143": "Format and actual bind-address/IPv6 corrections; latest exact-head CI succeeds",
+    "144": "Canonical gauge after FCU/recovery; shared-parent race and exact-head CI succeed",
+    "145": "Bounded16-worker durable materialization; shared-parent race and exact-head CI succeed",
+    "146": "Confirmed ext4 directory limit repaired by default256-bucket values, guarded WAL upgrade/old-reader rejection;2707772 actual values verified; cumulative native/BLS/stopped recovery passed with explicit earlier catchup failure."
   },
-  "integration_boundary": "EL repair PRs remain unmerged. Current observer predates EL metrics/materialization repairs. Full source, measured executable, hosted CI and deployment identities remain distinct."
+  "integration_boundary": "EL142-146 remain reviewable/unmerged into master. Native post-repair measurement uses exact cumulative code50514bf3, not a master or merge-metadata rerun. Earlier30m and6h45m identities remain separate.",
+  "current_rapid_profile": "Passed separate post-failed-catchup recovery: native RPC91.038s/catchup211.729s/ready301.423s;102signed slots and actual stopped113651 bound. Earlier300s historical catchup remains failed.",
+  "cumulative_runtime_source": "50514bf32353aaf98484747ffc7b86823af85bed",
+  "post_repair_record": "docs/reviews/remaining-20261123/POST_REPAIR_RECOVERY.json"
 }

@@ -1,0 +1,142 @@
+{
+  "operating_passed": true,
+  "bls_passed": true,
+  "actual_stopped_binding_passed": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "runtime_source": "50514bf32353aaf98484747ffc7b86823af85bed",
+  "runtime_pkg_tree": "48afbc345e9418d562be901c13e2e54eaae500b9",
+  "native_binary_sha256": "08c05bd6000006a3da515093e5149aa2b102bfe81f4c6bec569df31bb9d2615d",
+  "native_entrypoint": "cmd/eth2030",
+  "cl_runtime_source": "ed3ac16fea3c440bf507b6b4b7627da82c45eeb8",
+  "native_rpc_startup_seconds": 91.03768215904711,
+  "catchup_seconds": 211.728675,
+  "declared_native_rpc_budget_seconds": 300,
+  "declared_catchup_budget_seconds": 900,
+  "declared_ready_seconds": 300,
+  "ready_observed_seconds": 301.423151,
+  "first_observed_at": "2026-11-23T14:26:08.236351+00:00",
+  "last_observed_at": "2026-11-23T14:31:09.659502+00:00",
+  "ready_samples": 11,
+  "observed_first_slot": 113550,
+  "observed_through_slot": 113651,
+  "beacon_window": {
+    "first": 113550,
+    "stop": 113652,
+    "slots": 102,
+    "finalized_root": "0x9d2673cc112e3f1a4673ae63e667262ad7486aea74ed4a4c846a993db82018b7",
+    "finalized_slot": 113664,
+    "signature_slot": 113729,
+    "signature_participants": 512,
+    "parent_hash_links": 115,
+    "missing_slots": [],
+    "missing_fraction": 0.0
+  },
+  "full_snapshot_values_verified": 2707772,
+  "metrics_gauge_passed": true,
+  "metrics_observations": 60,
+  "metrics_first": {
+    "at": "2026-11-23T14:26:12.404930+00:00",
+    "before": 110149,
+    "gauge": 110149,
+    "after": 110149
+  },
+  "metrics_last": {
+    "at": "2026-11-23T14:31:07.570272+00:00",
+    "before": 110247,
+    "gauge": 110247,
+    "after": 110247
+  },
+  "engine_timeout_captures": 0,
+  "live_account_proofs": 4,
+  "resources": {
+    "el": {
+      "events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "memory_max": 4096000000,
+      "memory_peak": 2803146752,
+      "process_hwm": 1074839552
+    },
+    "cl": {
+      "events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "memory_max": 4096000000,
+      "memory_peak": 457097216,
+      "process_hwm": 364683264
+    }
+  },
+  "initial_300s_catchup_passed": false,
+  "initial_failure_record": "FAILED_CATCHUP_TRIAGE.json",
+  "data_reuse": "Owned quiescent inputs advanced during the failed300s catchup attempt; old immutable source snapshots are unchanged. This is a separate recovery profile, not reinterpretation or continuation of a passed first attempt.",
+  "stopped": {
+    "slot": 113651,
+    "beacon_root": "0x30e55ef936e5a46b9f462225145ad0174ba99fe0d376f7ee96ca83c3d7eb6e16",
+    "execution_hash": "0x3eb1019d04a882e053d8a4310ce4f6a541e8407aa75bcfac15b9d323aa8ab2ce",
+    "execution_number": 110248,
+    "execution_slot": 113651,
+    "state_root": "0x5d39e8f19bce6c2922562013cc776e073526e7a092d6751608b42386d717ed4c",
+    "extra_slots_beyond_observed": 0,
+    "account_proofs": 2,
+    "full_stored_body_rehashed": true,
+    "independent_header_agreed": true,
+    "bls": {
+      "first": 113651,
+      "stop": 113652,
+      "slots": 1,
+      "finalized_root": "0x9d2673cc112e3f1a4673ae63e667262ad7486aea74ed4a4c846a993db82018b7",
+      "finalized_slot": 113664,
+      "signature_slot": 113729,
+      "signature_participants": 512,
+      "parent_hash_links": 14,
+      "missing_slots": [],
+      "missing_fraction": 0.0
+    }
+  },
+  "scope": "Finite declared shared-host recovery/ready/resource/root/proof profile. No additional transaction-pressure, unrestricted growth, historical attribution or172800s claim.",
+  "receipts": {
+    "result.json": {
+      "bytes": 3612,
+      "sha256": "a972135548c7ebcc01aa393de794d3cd087471f31f493907d32df9be702b1dff"
+    },
+    "observations/samples.jsonl": {
+      "bytes": 10993,
+      "sha256": "66bf09631274e28d02d342237c6ede782c08526d2ededee76cbb186dfe1fcdc4"
+    },
+    "bounded-bls-windows/replay-0.json": {
+      "bytes": 702,
+      "sha256": "e4022bff6a25fc8d04fb01597974de4167544d5c52363b2f8669246818d9483f"
+    },
+    "bounded-bls-windows/replay-0.exchanges.jsonl": {
+      "bytes": 1275447,
+      "sha256": "fffd80ecef28eb4ebec7a96813fbde354d340184b60d7dd6d1afcfdf63389b78"
+    },
+    "METRICS_GAUGE.json": {
+      "bytes": 7995,
+      "sha256": "1875b416728f5ffd77427b456ecdd992d1e04b9d716586bdeab7432166af6d36"
+    },
+    "STOPPED_CLOSURE_STATUS.json": {
+      "bytes": 1864,
+      "sha256": "25402ee72676225b16007555c59c721b5402b073f1b75cf0bc0b2ce02335c395"
+    },
+    "stopped-cl-beacon-block.ssz": {
+      "bytes": 1368,
+      "sha256": "294fa2284ebe7d80141cca0c195e3cdbb04868e4ed2daeb9c1f0ab36dfbdad7f"
+    },
+    "stopped-finality-replay.json": {
+      "bytes": 699,
+      "sha256": "84cb942ea4d7186add570719e07d301d2cdef7d245dcc4ae4d8f813bf73d9ff4"
+    },
+    "stopped-finality-replay.exchanges.jsonl": {
+      "bytes": 1166739,
+      "sha256": "b907a33b7627eead72180f2e23021929800c95de469377451ddc182d99ee4db5"
+    }
+  }
+}

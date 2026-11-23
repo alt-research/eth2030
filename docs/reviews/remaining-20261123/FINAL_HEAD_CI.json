@@ -1,9 +1,9 @@
 {
   "id": 45166237988,
   "head": "215525de9d9290e5498fedad47d97c2eb41cebb9",
-  "status": "in_progress",
-  "conclusion": null,
-  "gate": "qualifying",
+  "status": "completed",
+  "conclusion": "success",
+  "gate": "closed",
   "url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45166237988",
   "jobs": [
     {
@@ -57,8 +57,8 @@
     {
       "id": 137666388959,
       "name": "release-tests-ubuntu",
-      "status": "in_progress",
-      "conclusion": null
+      "status": "completed",
+      "conclusion": "success"
     },
     {
       "id": 137666388966,
@@ -75,8 +75,8 @@
     {
       "id": 137666389120,
       "name": "http-api-tests",
-      "status": "in_progress",
-      "conclusion": null
+      "status": "completed",
+      "conclusion": "success"
     },
     {
       "id": 137666389278,
@@ -99,8 +99,8 @@
     {
       "id": 137666389339,
       "name": "ef-tests-minimal-ubuntu",
-      "status": "in_progress",
-      "conclusion": null
+      "status": "completed",
+      "conclusion": "success"
     },
     {
       "id": 137666389423,
@@ -159,6 +159,12 @@
     {
       "id": 137666389645,
       "name": "cli-check",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 137703921633,
+      "name": "test-suite-success",
       "status": "completed",
       "conclusion": "success"
     }

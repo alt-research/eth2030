@@ -124,5 +124,6 @@
       ]
     }
   ],
-  "scope": "Hosted action_required is a maintainer approval gate, not a passed check. Local evidence is recorded separately."
+  "scope": "Hosted action_required is a maintainer approval gate, not a passed check. Local evidence is recorded separately.",
+  "permissions_reverified_at": "2026-11-23T12:18:42.496252+00:00"
 }

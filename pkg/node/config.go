@@ -5,8 +5,10 @@ package node
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -55,6 +57,12 @@ type Config struct {
 
 	// RPCAuthSecret requires this bearer token for JSON-RPC requests when set.
 	RPCAuthSecret string
+
+	// RPCAllowInsecureRemoteAdmin permits admin/debug modules on a non-loopback
+	// HTTP bind without RPCAuthSecret. Intended for container devnets where the
+	// orchestrator passes explicit flags; production deployments should instead
+	// set RPCAuthSecret or keep the privileged modules off.
+	RPCAllowInsecureRemoteAdmin bool
 
 	// RPCRateLimitPerSec controls request rate limiting for JSON-RPC requests.
 	RPCRateLimitPerSec int
@@ -245,36 +253,39 @@ func DefaultConfig() Config {
 		Verbosity: 3,
 
 		// HTTP-RPC
+		// Secure-by-default (matches go-ethereum): loopback bind, public
+		// namespaces only, no CORS. Remote exposure of admin/debug requires
+		// --rpc.auth_secret or the explicit --rpc.allow-insecure flag.
 		RPCPort:            8545,
-		HTTPAddr:           "0.0.0.0",
+		HTTPAddr:           "127.0.0.1",
 		RPCAuthSecret:      "",
 		RPCRateLimitPerSec: 100,
 		RPCMaxRequestSize:  5 * 1024 * 1024,
 		RPCMaxBatchSize:    100,
-		RPCCORSOrigins:     "*",
-		HTTPVhosts:         []string{"*"},
-		HTTPCORSDomain:     []string{"*"},
-		HTTPModules:        []string{"eth", "net", "web3", "engine", "admin", "debug", "txpool"},
+		RPCCORSOrigins:     "",
+		HTTPVhosts:         []string{"localhost", "127.0.0.1", "::1"},
+		HTTPCORSDomain:     []string{},
+		HTTPModules:        []string{"eth", "net", "web3"},
 
 		// Engine API
 		EnginePort:           8551,
-		AuthAddr:             "0.0.0.0",
+		AuthAddr:             "127.0.0.1",
 		EngineMaxRequestSize: 5 * 1024 * 1024,
 		EngineAuthToken:      "",
 		EngineAuthTokenPath:  "",
-		AuthVhosts:           []string{"*"},
+		AuthVhosts:           []string{"localhost", "127.0.0.1", "::1"},
 		JWTSecret:            "",
 
 		// WebSocket
 		WSEnabled: false,
-		WSAddr:    "0.0.0.0",
+		WSAddr:    "127.0.0.1",
 		WSPort:    8546,
-		WSModules: []string{},
+		WSModules: []string{"eth", "net", "web3"},
 		WSOrigins: []string{},
 
 		// Metrics
 		Metrics:     false,
-		MetricsAddr: "0.0.0.0",
+		MetricsAddr: "127.0.0.1",
 		MetricsPort: 9001,
 
 		// Frame mempool (EIP-8141 AA-2.3)
@@ -433,7 +444,56 @@ func (c *Config) Validate() error {
 	default:
 		return fmt.Errorf("config: invalid mixnet mode %q (must be simulated|tor|nym)", c.MixnetMode)
 	}
+	// Refuse remote exposure of privileged RPC namespaces without auth.
+	// Loopback binds and container devnets with explicit --rpc.allow-insecure
+	// are unaffected.
+	for _, bind := range []struct{ what, addr string }{
+		{"http.addr", c.HTTPAddr},
+		{"ws.addr", c.WSAddr},
+	} {
+		if isLoopbackHost(bind.addr) {
+			continue
+		}
+		if bind.what == "http.addr" && len(c.HTTPModules) > 0 && !hasPrivilegedModule(c.HTTPModules) {
+			continue
+		}
+		if bind.what == "ws.addr" && (!c.WSEnabled || (len(c.WSModules) > 0 && !hasPrivilegedModule(c.WSModules))) {
+			continue
+		}
+		if c.RPCAuthSecret == "" && !c.RPCAllowInsecureRemoteAdmin {
+			return fmt.Errorf("config: %s=%q exposes privileged RPC namespaces (admin/debug) remotely without --rpc.auth_secret; set --rpc.auth_secret, restrict --http.api/--ws.api to public modules, or pass --rpc.allow-insecure to accept the risk (container devnets only)", bind.what, bind.addr)
+		}
+	}
 	return nil
+}
+
+// isLoopbackHost classifies addresses without DNS resolution. Empty binds
+// listen on all interfaces. Configured IPv6 hosts are unbracketed literals.
+func isLoopbackHost(addr string) bool {
+	host := addr
+	// Preserve the helper's legacy IPv4/hostname:port input form, without
+	// treating a hostname with a numeric-looking prefix as an IP address.
+	if strings.Count(addr, ":") == 1 {
+		if parsed, _, err := net.SplitHostPort(addr); err == nil {
+			host = parsed
+		}
+	}
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
+}
+
+// hasPrivilegedModule reports whether the module list contains admin or debug.
+func hasPrivilegedModule(modules []string) bool {
+	for _, m := range modules {
+		switch strings.ToLower(strings.TrimSpace(m)) {
+		case "admin", "debug":
+			return true
+		}
+	}
+	return false
 }
 
 // VerbosityToLogLevel converts a numeric verbosity level to a log level string.
@@ -489,22 +549,22 @@ func (c *Config) P2PAddr() string {
 
 // HTTPListenAddr returns the HTTP-RPC listen address string.
 func (c *Config) HTTPListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.HTTPAddr, c.RPCPort)
+	return net.JoinHostPort(c.HTTPAddr, strconv.Itoa(c.RPCPort))
 }
 
 // AuthListenAddr returns the Engine API listen address string.
 func (c *Config) AuthListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.AuthAddr, c.EnginePort)
+	return net.JoinHostPort(c.AuthAddr, strconv.Itoa(c.EnginePort))
 }
 
 // WSListenAddr returns the WebSocket RPC listen address string.
 func (c *Config) WSListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.WSAddr, c.WSPort)
+	return net.JoinHostPort(c.WSAddr, strconv.Itoa(c.WSPort))
 }
 
 // MetricsListenAddr returns the metrics HTTP server listen address string.
 func (c *Config) MetricsListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.MetricsAddr, c.MetricsPort)
+	return net.JoinHostPort(c.MetricsAddr, strconv.Itoa(c.MetricsPort))
 }
 
 // RPCAddr returns the HTTP-RPC listen address (alias for HTTPListenAddr).
@@ -550,7 +610,12 @@ func SplitModules(s string) []string {
 }
 
 // RPCCORSAllowedOrigins returns the parsed CORS origin allowlist.
+// An unset or empty RPCCORSOrigins returns nil: no CORS headers are emitted,
+// matching go-ethereum's deny-by-default browser policy.
 func (c *Config) RPCCORSAllowedOrigins() []string {
+	if strings.TrimSpace(c.RPCCORSOrigins) == "" {
+		return nil
+	}
 	out := make([]string, 0, 8)
 	seen := make(map[string]struct{}, 8)
 	for _, origin := range strings.Split(c.RPCCORSOrigins, ",") {
@@ -565,7 +630,7 @@ func (c *Config) RPCCORSAllowedOrigins() []string {
 		out = append(out, trimmed)
 	}
 	if len(out) == 0 {
-		out = append(out, "*")
+		return nil
 	}
 	return out
 }

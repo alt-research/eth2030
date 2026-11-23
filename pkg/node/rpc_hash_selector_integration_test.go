@@ -35,6 +35,8 @@ func TestHashSelectedExecutionRPCUsesExactBranchStateAndAncestry(t *testing.T) {
 		t.Fatal(err)
 	}
 	cfg := makeTestConfig(t)
+	// This test exercises debug_trace* through the real HTTP path.
+	cfg.HTTPModules = append(cfg.HTTPModules, "debug")
 	cfg.EngineAuthToken = token
 	cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
 	if err := os.WriteFile(cfg.GenesisPath, raw, 0600); err != nil {

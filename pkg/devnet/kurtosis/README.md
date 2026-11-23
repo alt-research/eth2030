@@ -180,6 +180,20 @@ Key flags supported by eth2030-geth for Kurtosis compatibility:
 - `--metrics`, `--metrics.addr`, `--metrics.port` — Prometheus metrics (port 9001)
 - `--nat`, `--bootnodes`, `--discovery.port` — P2P networking
 
+### eth2030 image RPC exposure
+
+The `eth2030` binary (the image entrypoint for `el_image: eth2030:local`) defaults to
+**loopback-only RPC**: `127.0.0.1` binds on ports 8545/8551/8546/9001, `--http.api`
+defaults to `eth,net,web3`, and CORS is deny-by-default. The module allowlist,
+vhost check, and Engine `--authrpc.vhosts` are enforced on the request path.
+
+Kurtosis devnets override these via the ethereum-package launcher
+(`--http.addr=0.0.0.0 --http.api=admin,... --http.vhosts=*`), and every config
+yaml in `configs/` additionally passes `--rpc.allow-insecure` so admin/debug stay
+reachable inside the enclave without `--rpc.auth_secret`. Never use
+`--rpc.allow-insecure` outside container devnets; prefer `--rpc.auth_secret` or
+keeping admin/debug off.
+
 ## Troubleshooting
 
 **Kurtosis engine not running**: `kurtosis engine start`

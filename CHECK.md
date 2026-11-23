@@ -1,9 +1,13 @@
 ## Remaining-code closure (2026-11-22)
 
 - [x] Preserve the original checkout and freeze shared source at PR126 head43002a5d; all new PRs target master with explicit ancestry.
-- [ ] Close legacy Builder Engine authority/signature/header gaps under the selected Gloas/Engine contract; retain red and independent signed controls.
-- [ ] Make node startup transactional: synchronous required binds, failure propagation, complete rollback, truthful health and retry.
-- [ ] Recheck scale/coverage/upstream boundaries, publish separate source reviews and verify exact-head CI plus cumulative merge orders.
+- [x] Close legacy Builder Engine authority/signature/header gaps under the selected Gloas/Engine contract; retain red and independent signed controls.
+- [x] Make node startup transactional: synchronous required binds, failure propagation, complete rollback, truthful health and retry.
+- [x] Recheck scale/coverage/upstream boundaries, publish separate source reviews and verify exact-head CI plus all120 cumulative source merge orders.
+
+- [x] Bound FileDB resident values and stream WAL recovery without weakening known-key IO, root or commit-marker checks.
+- [ ] Diagnose and repair the repeated native Engine import stall before fresh operating admission; retain failed03/04 and the independently signed observed spans.
+- [ ] Complete actual 48-hour operation on the final combined runtime; synthetic profiles and short restarts do not close this gate.
 
 Each feature owns its detailed CHECK.md and STATUS.md under docs/reviews; shared root tracking is inherited rather than edited independently.
 

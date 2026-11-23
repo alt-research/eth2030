@@ -45,18 +45,26 @@ assert.ok(reproduced.checks.every(check => check.passed));
 for (const milestone of [`${tasks.tasks.length}/33 task IDs`, '4 roles under 300s', `${steady.finality.beacon_window.slots}/400 + ${pressure.finality.beacon_window.slots}/60 slots`, `${record.blob.cell_proofs} KZG cell proofs`]) {
   assert.ok(progress(home).includes(milestone), `Missing qualified milestone: ${milestone}`);
 }
-assert.match(progress(home), /Glamsterdam development target merged and qualified/);
+assert.match(progress(home), /Glamsterdam code merged; operating acceptance open/);
 assert.match(progress(home), /November 22, 2026/);
+assert.match(progress(home), /Long-run failures under diagnosis/);
+assert.match(progress(home), /no48-hour pass exists/);
+assert.match(progress(home), /Two long runs failed, most recently after5h30m/);
+assert.match(progress(home), /native Engine import blocking remains under diagnosis/);
+assert.doesNotMatch(progress(home), /Follow-up fixes awaiting merge|48-hour (?:passed|complete)/);
+for (const number of [132,133]) assert.ok(progress(home).includes(`/pull/${number}`));
 assert.match(progress(home), /upstream Lodestar integration and production-scale operation remain separate/);
 assert.match(progress(home), /Frame\/FOCIL and service migration retain their own later-fork acceptance gates/);
-assert.ok(progress(home).includes('https://github.com/alt-research/eth2030/pull/125'));
+assert.ok(progress(home).includes('https://github.com/alt-research/eth2030/pull/130'));
 assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned verification record');
 assert.doesNotMatch(progress(home), /Native Frame execution and CL history qualified|Independent EL interoperability, Dora consumer migration and state-sync acceptance remain next steps/);
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
 assert.match(home, /Signed Gloas route qualified/);
-assert.match(home, /Legacy EL builder-registration\/bid extensions still lack signature authentication/);
+assert.match(home, /PR127 retires unsupported legacy Builder Engine extensions/);
+assert.match(home, /source-specific evidence/);
+assert.doesNotMatch(home, /Review source[^<]*awaiting merge/);
 assert.match(home, /not production-ready/i);
 assert.match(home, /github\.com\/alt-research\/eth2030/);
 assert.match(home, /Go 1\.26\.8\+/);
@@ -99,7 +107,7 @@ for (const [id, expected, obsolete] of [
 for (const number of [2780, 7688, 7708, 7732, 7778, 7843, 7928, 7954, 7976, 7981, 7997, 8024, 8037, 8038, 8045, 8061, 8246, 8282, 7975, 8159, 8070, 8189, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
   assert.match(page, /Qualification evidence/);
-  assert.ok(page.includes(`/blob/${merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
+  assert.ok(page.includes(`/blob/${number === 7732 ? 'bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394' : merged.merged_master}/docs/reviews/glamsterdam-postmerge-20261121/STATUS.md`));
 }
 for (const number of [7688, 8045, 8061, 8136]) {
   const page = readFileSync(new URL(`../out/eips/eip-${number}/index.html`, import.meta.url), 'utf8');
@@ -111,7 +119,9 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
-assert.match(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
+assert.match(builderPage, /PR127 retires unsupported legacy Builder Engine extensions/);
+assert.ok(builderPage.includes('/blob/bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394/docs/reviews/builder-authority/STATUS.md'));
+assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 

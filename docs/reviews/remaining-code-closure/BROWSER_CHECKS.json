@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "page_errors": [],
+  "checks": [
+    {
+      "width": 1440,
+      "path": "/",
+      "scroll_width": 1440,
+      "viewport_width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "path": "/roadmap/",
+      "scroll_width": 1440,
+      "viewport_width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "path": "/eips/eip-7732/",
+      "scroll_width": 1440,
+      "viewport_width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "path": "/",
+      "scroll_width": 375,
+      "viewport_width": 375,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "path": "/roadmap/",
+      "scroll_width": 375,
+      "viewport_width": 375,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "path": "/eips/eip-7732/",
+      "scroll_width": 375,
+      "viewport_width": 375,
+      "overflow": false
+    }
+  ],
+  "scope": "Real Playwright checks against final157-page static export; shared progress displays awaiting-merge PRs127-130 and pending48h, EIP7732 displays retirement review source."
+}

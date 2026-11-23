@@ -1,6 +1,6 @@
 # ETH2030 development progress
 
-Updated November 22, 2026 at merged master `9a094830`. EL PRs 123/124/125 are merged. The production package and code-CI workflow equal qualified composition `d9201b0`; merge/source identity and running executable identity remain distinct. The original 33 Glamsterdam task IDs and R01–R13 are complete for the selected merged LIFO / signed Gloas development target.
+Updated November 22, 2026 at merged master `55f7fd84`. EL PRs123–130 are merged. Current production package bytes equal functional source `2c0df12f`; original `d9201b0` measurements remain attached to that source; merge/source identity and running executable identity remain distinct. The original 33 Glamsterdam task IDs and R01–R13 are complete for the selected merged LIFO / signed Gloas development target.
 
 ## Current merged acceptance
 
@@ -18,10 +18,16 @@ These results are retained source-specific measurements, not a new live campaign
 
 ## Remaining work after merge
 
-The [current audit](audits/merged-glamsterdam-20261122/README.md) confirms a real code gap in legacy Engine builder extensions: unauthenticated registration/bids, synthetic local stake and dropped header signature. This does not establish an unsigned-envelope bypass in the qualified CL consensus route. It needs a separate contract/authentication or interface-retirement PR. A second code gap remains in required-interface startup failure propagation: binding errors can be logged without making `Start` fail and unwind. The CI-discovered ephemeral metrics binding race is fixed separately in this review.
+The original audit's GAP-01 and GAP-06 have separate source corrections merged in master `55f7fd84`: [127](https://github.com/alt-research/eth2030/pull/127) removes the unsupported local Builder registry, synthetic stake and signature-dropping header route; [128](https://github.com/alt-research/eth2030/pull/128) returns required bind failures, unwinds owners and requires a fresh instance for retry. The standard CL registry, signed SSZ bid and actual finalized-deposit/collateral controls remain authoritative. [130](https://github.com/alt-research/eth2030/pull/130) also corrects restored snap ancestry-cursor eligibility under moving CL targets; its finite actual non-optimistic prefix has independent signed finality.
 
-Lodestar 10693 remains open upstream despite local/fork qualification. Larger-state multi-day operating/indexing capacity remains unmeasured. Public protocol/model approval is reserved. Finite fixture/format coverage remains explicit.
+[129](https://github.com/alt-research/eth2030/pull/129) replaces permanent value residency with a16MiB accounted cache and streams WAL replay. A655.36MB value fixture reduces measured peak RSS from939,364 to52,440KiB; a412.20MB WAL fixture from898,580 to12,784KiB. Both original and corrected runs meet their declared budgets; cold reads cost more. The corrected private million-file clone restarts in62.504/10.719seconds, preserves original finalized commitments and passes four independent MPT proofs. These are finite measurements with OS cache retained, not public full-database reproduction or multi-day acceptance.
+
+[Current delivery and remaining gates](plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md) preserves all original failures. Actual48-hour operation, growing key/header metadata, upstream Lodestar integration and reserved public protocol/model approval remain open. Native and Geth-backed corpus scope stays finite.
 
 Later-fork independent Frame/Bogotá agreement, Dora production consumers, paymaster services and public binary/PQ/proof/native-rollup work retain separate gates. The paired Frame 66/165 and CL join 256 record is preserved at [its original source](verification/frame-8141-20261118-paymaster-history-final.json); its synchronized-EL boundary is not erased.
 
 [Roadmap](ROADMAP.md) · [Next-stage plan](next-stage-work-plan.md) · [Current gaps and reproducible observations](audits/merged-glamsterdam-20261122/README.md)
+
+## Latest runtime acceptance failure
+
+Rounds03 and04 failed; the latter observed658 samples /5h30m before a CL syncing timeout, with noOOM and clean daemon exits. Independent BLS finality/ancestry authenticates the full observed73639–80256 span, but the runtime duration remains failed. Native zero-transaction block77623 only finished after shutdown; its actual blocking dependency is being investigated with a read-only goroutine diagnostic. New CL protocol/lifecycle fixes pass their scoped tests and complete network simulations; they do not close the native stall or48-hour gate. See [results PR132](https://github.com/alt-research/eth2030/pull/132) and [diagnostic PR133](https://github.com/alt-research/eth2030/pull/133).

@@ -9,4 +9,4 @@
 
 Large metadata cardinality, full trie authentication and true multi-day soak remain separately measured boundaries; no shortened test is represented as a multi-day pass.
 
-- [ ] Complete current-head CI, composed-source verification and review/merge-order publication.
+- [x] Complete current-head10/10 CI, composed-source verification and all120 merge-order publication in ../remaining-code-closure.

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "build",
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "command": [
+      "go",
+      "build",
+      "-trimpath",
+      "-ldflags",
+      "-X main.commit=2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e -X main.version=remaining-code-soak",
+      "-o",
+      "/projects/eth2030/qualification/remaining-code-20261122/resume-final-native",
+      "./cmd/eth2030"
+    ],
+    "seconds": 4.339761212992016,
+    "exit": 0
+  },
+  {
+    "name": "full",
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "./..."
+    ],
+    "seconds": 35.00954679300776,
+    "exit": 0
+  },
+  {
+    "name": "vet",
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "seconds": 0.8464985080063343,
+    "exit": 0
+  }
+]

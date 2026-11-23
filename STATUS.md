@@ -1,3 +1,7 @@
+## Remaining-code delivery and capacity boundary (2026-11-22)
+
+PRs123–130 are merged in master55f7fd84, whose production package equals functional2c0df12f. The legacy Builder extensions are retired, startup is transactional, FileDB value/WAL residency is bounded and restored snap progress is corrected. Operating rounds03/04 failed;04 stopped after658 samples /5h30m on a CL syncing timeout. Independent BLS finality and ancestry authenticate its whole observed73639–80256 span, but no48-hour pass exists. Native zero-transaction import blocking remains under diagnosis; source-scoped CL fixes and network simulations do not close that runtime gate. See resultsPR132, diagnosticPR133 and docs/plans/glamsterdam/REMAINING_CODE_CLOSURE_20261122.md. All historical measurements below remain source-specific.
+
 ## Builder authority and transactional startup closure (2026-11-22)
 
 The remaining-code task has separate Builder and startup branches based on the already qualified PR126 head43002a5d. Both reviews target master and retain the shared pending PR ancestry to avoid duplicating or conflicting with its metrics correction. No EL master merge is performed. Selected merged LIFO and signed Gloas rules remain frozen. Detailed feature status is maintained under docs/reviews/builder-authority and docs/reviews/startup-rollback. Public model review and external upstream approval remain separate from controllable implementation work.

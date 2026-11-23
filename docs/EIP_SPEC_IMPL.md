@@ -122,7 +122,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7732 | Enshrined PBS (ePBS) | Substantial | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/engine_epbs.go` | `epbs/*_test.go` |
+| 7732 | Enshrined PBS (ePBS) | Substantial | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/server.go`, `engine/legacy_builder_retired_test.go` | `epbs/*_test.go` |
 | 7547 | Inclusion Lists | Complete | [EIP-7547](https://eips.ethereum.org/EIPS/eip-7547) | `core/types/inclusion_list.go`, `core/inclusion_list.go` | via focil tests |
 
 ---

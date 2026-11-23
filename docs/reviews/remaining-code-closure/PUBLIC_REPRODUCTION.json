@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "files_verified": 95,
+  "archive_sha256": "0b221a6b48cfd4f0609fd6e1cd0fb682d92ce6be301c7bb93d72dd49c80a7fbc",
+  "checks": [
+    {
+      "name": "sdk-build",
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-o",
+        "/projects/eth2030/qualification/remaining-code-20261122/fresh-handoff-ledger",
+        "./cmd/glamsterdam-ledger"
+      ],
+      "exit": 0,
+      "seconds": 0.566907689004438,
+      "result": ""
+    },
+    {
+      "name": "original-state-proofs",
+      "command": [
+        "/projects/eth2030/qualification/remaining-code-20261122/fresh-handoff-ledger",
+        "proof-stream",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/snapshot-runtime-02/proofs.jsonl"
+      ],
+      "exit": 0,
+      "seconds": 0.004291666991775855,
+      "result": "{\"independent_proofs\":4,\"passed\":true}"
+    },
+    {
+      "name": "new-runtime-proofs",
+      "command": [
+        "/projects/eth2030/qualification/remaining-code-20261122/fresh-handoff-ledger",
+        "proof-stream",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/soak-progress-at-handoff/proofs-0.jsonl"
+      ],
+      "exit": 0,
+      "seconds": 0.0037558329931925982,
+      "result": "{\"independent_proofs\":2,\"passed\":true}"
+    },
+    {
+      "name": "signed-builder",
+      "command": [
+        "/projects/eth2030/qualification/consensus-reference-env/bin/python",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/source/docs/reviews/builder-authority/verify_standard_builder.py",
+        "--capture",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/standard-builder-capture",
+        "--output",
+        "/projects/eth2030/qualification/remaining-code-20261122/handoff-replay-builder.json"
+      ],
+      "exit": 0,
+      "seconds": 0.9892268080147915,
+      "result": "{\"passed\": true, \"reference\": \"2ea9d96a420927eb1a35d7c9399c8b3691c69f6a\", \"bls_active\": true, \"original_slot\": 59163, \"builder_index\": 0, \"original_parent_state_root\": \"0x47bfcbd957b594316f4c7df92276302565052f94d4a4c47b468bcad9e5a73dca\", \"positive_signature_and_active_funded_registry\": true, \"signed_ssz_roundtrip_preserved\": true, \"rejected_controls\": [\"value\", \"execution_payment\", \"gas_limit\", \"execution_requests_root\", \"zero_signature\", \"mutated_signature\", \"commitment_order\", \"changed_registry_key\", \"wrong_fork_domain\", \"wrong_genesis_domain\", \"unfinalized_deposit\", \"exited_builder\", \"no_collateral\"], \"scope\": \"Original independently-finalized captured CL state and signed bid through unchanged reference rules. Companion captured finality replay is required separately. No new live process result or EL-side collateral authority is invented.\"}"
+    },
+    {
+      "name": "builder-finality",
+      "command": [
+        "/projects/eth2030/qualification/consensus-reference-env/bin/python",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/source/pkg/devnet/kurtosis/scripts/reference_operating_window.py",
+        "--capture",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/standard-builder-capture/final-blob/finality",
+        "--trusted-bootstrap",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/standard-builder-capture/reference/trusted-bootstrap.jsonl",
+        "--replay",
+        "--output",
+        "/projects/eth2030/qualification/remaining-code-20261122/handoff-replay-builder-finality.json"
+      ],
+      "exit": 0,
+      "seconds": 3.1389345719944686,
+      "result": "{\"passed\": true, \"spec\": \"2ea9d96a420927eb1a35d7c9399c8b3691c69f6a\", \"bls_active\": true, \"latency_passed\": null, \"operating_budgets_evaluated\": false, \"replay_input_sha256\": \"988059d88bfd9ca349bec05a5ce2e2743d02cd57128a2eb9a5b3eaa272d0c450\", \"beacon_window\": {\"first\": 59162, \"stop\": 59164, \"slots\": 2, \"finalized_root\": \"0x56f87c3173d319b99c88937fd2f2da3143f313e348dc72bfb9ee843b3c836873\", \"finalized_slot\": 59168, \"signature_slot\": 59233, \"signature_participants\": 512, \"parent_hash_links\": 7, \"missing_slots\": [], \"missing_fraction\": 0.0}, \"rejected_controls\": [\"signature\", \"finality_branch\", \"genesis_domain\"]}"
+    },
+    {
+      "name": "runtime-prefix-finality",
+      "command": [
+        "/projects/eth2030/qualification/consensus-reference-env/bin/python",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/source/pkg/devnet/kurtosis/scripts/reference_operating_window.py",
+        "--capture",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/runtime-prefix-finality",
+        "--trusted-bootstrap",
+        "/projects/eth2030/qualification/remaining-code-20261122/closure-handoff-fresh/standard-builder-capture/reference/trusted-bootstrap.jsonl",
+        "--replay",
+        "--output",
+        "/projects/eth2030/qualification/remaining-code-20261122/handoff-replay-runtime-prefix.json"
+      ],
+      "exit": 0,
+      "seconds": 3.5867739460081793,
+      "result": "{\"passed\": true, \"spec\": \"2ea9d96a420927eb1a35d7c9399c8b3691c69f6a\", \"bls_active\": true, \"latency_passed\": null, \"operating_budgets_evaluated\": false, \"replay_input_sha256\": \"3bd5a947acc63f7c4988bce5b4d2d095cf74c0631556ca4640406f77c267a77c\", \"beacon_window\": {\"first\": 64059, \"stop\": 64080, \"slots\": 21, \"finalized_root\": \"0x7ee2901652e6f1908b5fc4bc1b757e596893ba63aebd8513ff2e40a8930faa96\", \"finalized_slot\": 64096, \"signature_slot\": 64161, \"signature_participants\": 512, \"parent_hash_links\": 38, \"missing_slots\": [], \"missing_fraction\": 0.0}, \"rejected_controls\": [\"signature\", \"finality_branch\", \"genesis_domain\"]}"
+    }
+  ],
+  "private_full_database_reproduced": false,
+  "actual_48h_complete": false
+}

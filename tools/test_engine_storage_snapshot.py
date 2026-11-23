@@ -107,6 +107,26 @@ class StorageSnapshotTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             self.assertEqual(storage.read_text(Path(directory) / "gone")["errno"], errno.ENOENT)
 
+    def test_namespace_helper_timeout_is_bounded_and_removed(self):
+        calls = []
+        def run(command, **options):
+            calls.append(command)
+            if command[1] == "run":
+                self.assertEqual(options["timeout"], 8)
+                raise subprocess.TimeoutExpired(command, 8)
+            return subprocess.CompletedProcess(command, 0, b"", b"")
+        with patch.object(collector.subprocess, "run", side_effect=run):
+            result = collector.namespace_storage("owned-target", "123", "sha256:fixture")
+        self.assertIn("TimeoutExpired", result["error"])
+        self.assertEqual(result["helper_remove_exit"], 0)
+        command = calls[0]
+        self.assertEqual(command[command.index("--pid") + 1], "container:owned-target")
+        self.assertEqual(command[command.index("--network") + 1], "none")
+        self.assertIn("--read-only", command)
+        self.assertEqual(calls[-1][-1], command[command.index("--name") + 1])
+        self.assertEqual(collector.namespace_storage("owned-target", None, "fixture"),
+                         {"error": "target process start identity is unavailable"})
+
     def test_large_files_and_directory_entries_are_bounded_and_marked(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)

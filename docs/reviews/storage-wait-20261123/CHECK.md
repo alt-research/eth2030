@@ -4,4 +4,6 @@
 - [x] Add bounded read-only process/fd/syscall/cgroup/device snapshots before diagnostic delays.
 - [x] Verify real live blocked child, file-to-device binding, identity change and unavailable/truncated evidence.
 - [x] Integrate collector and CI; run required checks and native build.
-- [ ] Submit independent master PR; keep original04/48h verdicts unconfirmed.
+- [x] Submit independent master PR; keep original04/48h verdicts unconfirmed.
+
+PR142 targets master. All9 hosted checks passed on functional source20fef009; the final documentation-only receipt retains the actual source boundary. No EL merge is performed.

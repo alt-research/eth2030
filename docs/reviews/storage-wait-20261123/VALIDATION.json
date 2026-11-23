@@ -56,5 +56,16 @@
     "syscall_captured": true,
     "kernel_stack_unavailable_retained": true,
     "scope": "Actual owned diagnostic control; no EL original-wait or acceptance claim."
+  },
+  "actual_native_integration_control": {
+    "passed": true,
+    "binary_sha256": "2748efae712b155c89bec07a9409f2cd80876598e0b089f4dc04cdf52ed4f5fa",
+    "rpc_ready_seconds": 4.769832997000776,
+    "namespace_exit": 0,
+    "namespace_identity": true,
+    "namespace_threads": 7,
+    "namespace_fds": 21,
+    "stop_exit": 0,
+    "scope": "Actual isolated native EL diagnostic integration control, not chain progression, an original waiter or operating acceptance."
   }
 }

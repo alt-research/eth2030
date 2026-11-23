@@ -1,0 +1,20 @@
+{
+  "repository": "jiayaoqijia/lighthouse",
+  "feature_source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+  "run_id": 45258290463,
+  "job_id": 137986085168,
+  "conclusion": "success",
+  "passed_test_instances_across_forks_and_presets": 2290,
+  "skipped_test_instances": 6,
+  "distinct_test_count_claimed": false,
+  "source_log_lines": [
+    "2026-11-23T20:20:44.4554836Z env FORK_NAME=fulu cargo nextest run --release --features \"fork_from_env,slasher/lmdb,portable\" -p beacon_chain --no-fail-fast --lib --test beacon_chain_tests",
+    "2026-11-23T20:40:28.4612639Z      Summary [ 835.106s] 517 tests run: 517 passed (13 slow), 2 skipped",
+    "2026-11-23T20:40:28.4726909Z env FORK_NAME=fulu cargo nextest run --release --features \"fork_from_env,slasher/lmdb,spec-minimal,portable\" -p beacon_chain --no-fail-fast --lib --test beacon_chain_spec_minimal_tests",
+    "2026-11-23T20:54:42.3013942Z      Summary [ 602.927s] 628 tests run: 628 passed (4 slow), 1 skipped",
+    "2026-11-23T20:54:42.3120840Z env FORK_NAME=gloas cargo nextest run --release --features \"fork_from_env,slasher/lmdb,portable\" -p beacon_chain --no-fail-fast --lib --test beacon_chain_tests",
+    "2026-11-23T21:06:14.5143426Z      Summary [ 691.217s] 517 tests run: 517 passed (3 slow), 2 skipped",
+    "2026-11-23T21:06:14.5245370Z env FORK_NAME=gloas cargo nextest run --release --features \"fork_from_env,slasher/lmdb,spec-minimal,portable\" -p beacon_chain --no-fail-fast --lib --test beacon_chain_spec_minimal_tests",
+    "2026-11-23T21:16:11.7528402Z      Summary [ 596.261s] 628 tests run: 628 passed, 1 skipped"
+  ]
+}

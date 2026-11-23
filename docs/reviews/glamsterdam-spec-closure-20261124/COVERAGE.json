@@ -96,8 +96,8 @@
       "blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
       "previous_blob": "5baf745271ab7dce5863c1be123ddb783987bd44",
       "changed": false,
-      "status": "implemented_in_feature_reviews",
-      "consumer_boundary": "Signed CL/standard Engine authority and actual lifecycle retained; current balance-backed gossip count and parent-state authority are repaired in the companion feature branch.",
+      "status": "implemented_and_integrated_in_companion_cl",
+      "consumer_boundary": "Signed CL/standard Engine authority and lifecycle retained; balance-backed gossip counts, authoritative parent-state slot processing and clock-aware eligibility/cache cleanup are implemented, qualified and integrated in Lighthouse eth2030.",
       "evidence_paths": [
         "pkg/engine/server.go"
       ]
@@ -349,5 +349,7 @@
   "original_fault_resolved": false,
   "qualified_el_implementation_source": "264adba468069377fb50b487bd2dec77c089b28d",
   "qualified_cl_implementation_source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
-  "unimplemented_confirmed_glamsterdam_tasks": []
+  "unimplemented_confirmed_glamsterdam_tasks": [],
+  "companion_cl_merge_commit": "dc6547450c19b7b7605b4c7b4abd1466c5addb43",
+  "el_master_integration_pending_user_review": true
 }

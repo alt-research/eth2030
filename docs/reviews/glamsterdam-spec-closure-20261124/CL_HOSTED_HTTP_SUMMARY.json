@@ -1,0 +1,20 @@
+{
+  "repository": "jiayaoqijia/lighthouse",
+  "feature_source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+  "run_id": 45258290463,
+  "job_id": 137986085099,
+  "conclusion": "success",
+  "passed_test_instances_across_forks_and_presets": 512,
+  "skipped_test_instances": 0,
+  "distinct_test_count_claimed": false,
+  "source_log_lines": [
+    "2026-11-23T20:20:47.2219383Z env FORK_NAME=fulu cargo nextest run --release --features \"beacon_chain/fork_from_env\" -p http_api --lib --test bn_http_api_tests",
+    "2026-11-23T21:02:29.0195200Z      Summary [2134.825s] 216 tests run: 216 passed (65 slow), 0 skipped",
+    "2026-11-23T21:02:29.0298761Z env FORK_NAME=fulu cargo nextest run --release --features \"beacon_chain/fork_from_env,spec-minimal\" -p http_api --lib --test bn_http_api_spec_minimal_tests",
+    "2026-11-23T21:08:29.8084262Z      Summary [  38.506s] 40 tests run: 40 passed, 0 skipped",
+    "2026-11-23T21:08:29.8194558Z env FORK_NAME=gloas cargo nextest run --release --features \"beacon_chain/fork_from_env\" -p http_api --lib --test bn_http_api_tests",
+    "2026-11-23T21:37:59.4794418Z      Summary [1768.488s] 216 tests run: 216 passed (51 slow), 0 skipped",
+    "2026-11-23T21:37:59.4946672Z env FORK_NAME=gloas cargo nextest run --release --features \"beacon_chain/fork_from_env,spec-minimal\" -p http_api --lib --test bn_http_api_spec_minimal_tests",
+    "2026-11-23T21:39:32.0070655Z      Summary [  91.331s] 40 tests run: 40 passed, 0 skipped"
+  ]
+}

@@ -7,6 +7,7 @@
 - [x] Reproduce and repair every confirmed current Glamsterdam wire/Engine/execution gap; keep major functional changes on separate branches/PRs.
 - [x] Run meaningful positive/rejection/regression/race checks and native builds, plus finite affected integration validation.
 - [x] Reconcile specification coverage and progress without waiving failed or historical-unconfirmed evidence.
-- [ ] Submit master-target PRs, check exact-head CI and all current merge combinations, then stop for review.
+- [x] Submit master-target PRs and check exact-head CI / all current merge combinations; final receipt-only head receives its own hosted CI and published-head recheck before handoff.
+- [x] Integrate the independently qualified Lighthouse change into eth2030 under the existing user authorization and verify tree equality.
 
 48h/larger-scale acceptance and upstream Lodestar approval remain user-deferred outside progress. Frame/FOCIL/PQ/proof/rollup future frameworks are not silently adopted as Glamsterdam requirements.

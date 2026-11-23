@@ -107,6 +107,22 @@ class StorageSnapshotTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             self.assertEqual(storage.read_text(Path(directory) / "gone")["errno"], errno.ENOENT)
 
+    def test_capture_rejects_restart_or_namespace_identity_change_after_observation(self):
+        pid = os.getpid()
+        expected = {"host_pid": pid, "started": "before", "start_ticks": storage.start_ticks(pid)}
+        info = {"State": {"Pid": pid, "StartedAt": "before"}, "Mounts": []}
+        changed = {"State": {"Pid": pid + 1, "StartedAt": "after"}, "Mounts": []}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "frame.json"
+            with patch.object(collector, "inspect", side_effect=[info, changed]):
+                receipt = collector.capture_storage("owned", expected, path)
+            self.assertFalse(receipt["identity_matches"])
+            self.assertTrue(json.loads(path.read_text())["target_restarted_during_capture"])
+            with patch.object(collector, "inspect", return_value=info), patch.object(collector, "namespace_storage", return_value={"observation": {"identity_matches": False}}):
+                receipt = collector.capture_storage("owned", expected, path, "fixture")
+            self.assertFalse(receipt["identity_matches"])
+            self.assertFalse(json.loads(path.read_text())["namespace_identity_matches"])
+
     def test_namespace_helper_timeout_is_bounded_and_removed(self):
         calls = []
         def run(command, **options):

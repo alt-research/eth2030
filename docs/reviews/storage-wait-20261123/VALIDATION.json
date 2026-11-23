@@ -1,5 +1,5 @@
 {
-  "engine_capture_tests": 15,
+  "engine_capture_tests": 16,
   "devnet_control_tests": 65,
   "native_build_passed": true,
   "native_build_sha256": "2748efae712b155c89bec07a9409f2cd80876598e0b089f4dc04cdf52ed4f5fa",
@@ -33,6 +33,18 @@
       "exit_code": 1,
       "expected": true,
       "summary": "FAILED (errors=1)"
+    },
+    {
+      "case": "restart_during_capture",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (failures=1)"
+    },
+    {
+      "case": "namespace_identity",
+      "exit_code": 1,
+      "expected": true,
+      "summary": "FAILED (failures=1)"
     }
   ],
   "original_fault_resolved": false,

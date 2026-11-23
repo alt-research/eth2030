@@ -128,6 +128,13 @@ def capture_storage(cid, expected, destination, proc_image=None):
     result = storage_snapshot(expected["host_pid"], expected.get("start_ticks"), current.get("Mounts", []))
     if proc_image:
         result["namespace_proc"] = namespace_storage(cid, expected.get("start_ticks"), proc_image)
+        observation = result["namespace_proc"].get("observation", {})
+        result["namespace_identity_matches"] = observation.get("identity_matches")
+        if result["namespace_identity_matches"] is False:
+            result["identity_matches"] = False
+    after = inspect(cid)["State"]
+    if after["StartedAt"] != expected["started"] or after["Pid"] != expected["host_pid"]:
+        result.update(identity_matches=False, target_restarted_during_capture=True)
     destination.write_text(json.dumps(result, indent=2) + "\n")
     return {"at": result["at"], "path": destination.name,
             "identity_matches": result["identity_matches"],

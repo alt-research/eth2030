@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from review_diagnostic import capture, read_published_json, review, review_rolling
+from review_diagnostic import awaiting_final_bls, capture, main, read_published_json, review, review_rolling
 
 
 START = 1800000000
@@ -165,6 +165,32 @@ class ReviewTest(unittest.TestCase):
         with patch.object(Path, "read_text", side_effect=["{", "{", "{"]), patch("review_diagnostic.time.sleep"):
             with self.assertRaises(json.JSONDecodeError):
                 read_published_json(Path("summary.json"))
+
+    def test_finished_runtime_waits_for_last_bls_window_before_final_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run, out = Path(tmp) / "run", Path(tmp) / "out"
+            (run / "observations").mkdir(parents=True)
+            (run / "containers.json").write_text(json.dumps({"el": "el", "cl": "cl"}))
+            (run / "observations/identities.json").write_text(json.dumps({r: {"started": iso(START)} for r in ("el", "cl")}))
+            state = {"finished_at": iso(START)}
+            pending = {"errors": [], "reported_bls_windows": 13, "bls_controller_status": "verifying_window"}
+            complete = {"errors": [], "reported_bls_windows": 14, "bls_controller_status": "observed_windows_complete_stopped_heads_pending", "bls_window_reports_cover_observed_slots": True}
+            args = ["review_diagnostic.py", "--run", str(run), "--output", str(out), "--watch"]
+            with patch("sys.argv", args), patch("review_diagnostic.load_review", side_effect=[(pending, state), (complete, state)]) as load, patch("review_diagnostic.time.sleep"), patch("review_diagnostic.time.time", return_value=START + 1):
+                self.assertEqual(main(), 0)
+            self.assertEqual(load.call_count, 2, "runtime completion must not discard the pending closing window")
+            self.assertEqual(json.loads((out / "result.json").read_text())["reported_bls_windows"], 14)
+
+    def test_closing_worker_failure_incomplete_coverage_and_timeout_are_not_success(self):
+        state = {"finished_at": iso(START)}
+        for status, now in [("verification_failed", START + 1),
+                            ("observed_windows_complete_stopped_heads_pending", START + 1),
+                            ("verifying_window", START + 3600)]:
+            with self.subTest(status=status):
+                result = {"errors": [], "bls_controller_status": status}
+                self.assertFalse(awaiting_final_bls(result, state, now))
+                self.assertEqual(result["status"], "failed")
+                self.assertTrue(result["errors"])
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ READY_THRESHOLD = 5.5 * 3600
 MAX_SAMPLE_GAP = 60
 FINALITY_STALL = 600
 MEMORY = 4096000000
+FINAL_BLS_WAIT = 3600  # Worker has two bounded 1800s capture/replay subprocesses.
 
 
 def timestamp(value):
@@ -34,6 +35,7 @@ def review(state, rows, bls, now):
         "actual48h_passed": False, "original_fault_resolved": False,
         "stopped_head_closure_verified": False,
         "bls_signatures_verified_by_this_tool": False,
+        "bls_controller_status": bls.get("status", "missing"),
     }
     try:
         start = timestamp(state["started_at"])
@@ -224,6 +226,28 @@ def docker(*args):
     return subprocess.check_output(["docker", *args], text=True, timeout=15)
 
 
+def awaiting_final_bls(result, state, now):
+    """Join the closing cryptographic report after runtime shutdown, finitely."""
+    if "finished_at" not in state:
+        return False
+    status = result["bls_controller_status"]
+    error = None
+    if status == "verification_failed":
+        error = "BLS window controller failed"
+    elif status == "observed_windows_complete_stopped_heads_pending":
+        if not result.get("bls_window_reports_cover_observed_slots"):
+            error = "completed BLS window reports do not cover the observed endpoint"
+    elif now - timestamp(state["finished_at"]) < FINAL_BLS_WAIT:
+        return True
+    else:
+        error = "closing BLS worker did not finish within its bounded review wait"
+    if error:
+        if error not in result["errors"]:
+            result["errors"].append(error)
+        result["status"] = "failed"
+    return False
+
+
 def capture(run, output, record):
     """Read-only point snapshot; never signal, pause or restart either node."""
     at = datetime.now(timezone.utc).isoformat()
@@ -283,6 +307,7 @@ def main():
         before = time.monotonic()
         try:
             result, state = load_review(args.run, time.time())
+            result["awaiting_final_bls"] = awaiting_final_bls(result, state, time.time())
             if args.watch and "finished_at" not in state:
                 receipt, directory = capture(args.run, args.output, record)
                 result["capture"] = directory
@@ -302,7 +327,7 @@ def main():
             temporary = args.output / "result.tmp"
             temporary.write_text(json.dumps(result, indent=2) + "\n")
             temporary.replace(args.output / "result.json")
-            if not args.watch or "finished_at" in state:
+            if not args.watch or ("finished_at" in state and not result["awaiting_final_bls"]):
                 return 1 if result["errors"] or failures else 0
         except Exception as error:
             failures.append(repr(error))

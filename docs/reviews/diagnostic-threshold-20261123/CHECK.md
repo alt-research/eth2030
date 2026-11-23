@@ -8,7 +8,7 @@
 - [x] Add passive periodic durable stack/pressure receipts and an explicit5.5h checkpoint without restarting or altering the existing pair.
 - [x] Test false-green, exact threshold, BLS gap/failure and stale sample behavior; verify native build.
 - [x] Submit independent master PR139 and check cumulative conflict compatibility at recorded heads.
-- [ ] Finish actual post-5.5h observation, remaining BLS windows and stopped-head closure.
+- [x] Finish actual post-5.5h observation, all14 BLS windows and separate stopped-head binding.
 
 No root cause is inferred from an absence of sustained stacks. No BLS/protocol check, original failure or48h admission is changed.
 
@@ -16,6 +16,6 @@ No root cause is inferred from an absence of sustained stacks. No BLS/protocol c
 
 - [x] Verify real6h45m endpoint,5.5h threshold snapshot and144 post-threshold healthy samples.
 - [x] Recheck exact current PR138/139 heads: both9/9 CI successful before follow-up changes.
-- [ ] Fix final-review/BLS worker completion ordering without changing original evidence.
-- [ ] Re-run unchanged real-BLS verification of all14 captured windows and bind actual stopped native/CL head beyond the final health sample.
-- [ ] Publish completed-run evidence and qualified scope; original incident remains open.
+- [x] Fix final-review/BLS worker completion ordering without changing original evidence.
+- [x] Re-run unchanged real-BLS verification of all14 captured windows and bind actual stopped native/CL head beyond the final health sample.
+- [x] Publish completed-run evidence and qualified scope; original incident remains open.

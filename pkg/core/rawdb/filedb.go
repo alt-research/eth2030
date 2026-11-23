@@ -634,19 +634,66 @@ func (db *FileDB) prepareOpsLocked(ops []fileBatchOp) (err error) {
 	if err = db.walWriteCommit(); err != nil {
 		return err
 	}
-	for _, op := range ops {
-		if op.delete {
-			path := db.keyPath(op.key)
-			if name, ok := db.index[string(op.key)]; ok {
-				path = filepath.Join(db.dataDir, name)
-			}
-			err = os.Remove(path)
-			if os.IsNotExist(err) {
-				err = nil
-			}
-		} else {
-			err = db.writeDataFile(op.key, op.value)
+	return db.materializeOpsLocked(ops)
+}
+
+// Materialize independent keys concurrently only after the complete WAL commit.
+// Coalesce repeated keys first: recovery also retains the last committed intent.
+// All workers finish before publication or error fencing, so no write can escape
+// a failed batch's lifetime or reorder a later batch.
+func (db *FileDB) materializeOpsLocked(ops []fileBatchOp) error {
+	last := make(map[string]int, len(ops))
+	for i, op := range ops {
+		last[string(op.key)] = i
+	}
+	indices := make([]int, 0, len(last))
+	for i, op := range ops {
+		if last[string(op.key)] == i {
+			indices = append(indices, i)
 		}
+	}
+	materialize := func(op fileBatchOp) error {
+		if !op.delete {
+			return db.writeDataFile(op.key, op.value)
+		}
+		path := db.keyPath(op.key)
+		if name, ok := db.index[string(op.key)]; ok {
+			path = filepath.Join(db.dataDir, name)
+		}
+		err := os.Remove(path)
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	// Avoid goroutine/queue overhead on the normal small-batch path.
+	if len(indices) < 64 {
+		for _, i := range indices {
+			if err := materialize(ops[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	const workers = 16
+	work := make(chan int)
+	failures := make([]error, len(indices))
+	var wait sync.WaitGroup
+	for range workers {
+		wait.Add(1)
+		go func() {
+			defer wait.Done()
+			for i := range work {
+				failures[i] = materialize(ops[indices[i]])
+			}
+		}()
+	}
+	for i := range indices {
+		work <- i
+	}
+	close(work)
+	wait.Wait()
+	for _, err := range failures {
 		if err != nil {
 			return err
 		}

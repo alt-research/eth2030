@@ -1,0 +1,137 @@
+goroutine 11485 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x119f37ea1b808?, 0x1?, 0x8?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x19f37ead8db0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:149 +0x15d
+internal/sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/mutex.go:46
+github.com/eth2030/eth2030/core/chain.(*Blockchain).CanIgnoreStaleForkchoice(0x19f37ead8d80, {0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/stale_forkchoice.go:14 +0x65
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).forkchoiceUpdated(0x19f37e9f9200, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_fcu.go:68 +0x4df
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdated(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_fcu.go:34
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedV4(0x19f3b58d1b90?, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_fcu.go:302 +0x1d8
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ForkchoiceUpdatedBogota(0x19f37e9f9200, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_bogota.go:81 +0xa1d
+github.com/eth2030/eth2030/engine.(*EngineAPI).forkchoiceUpdatedBogota(0x19f37ec0a280, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/bogota.go:129 +0x11e
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleAmsterdamForkchoice(0x19f37ec0a280, {0x19f3d45463c0, 0x3, 0x50faf9?}, 0x1)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:623 +0x526
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleForkchoiceUpdatedV5(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:634
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x19f37ec0a280, {0x19f3b819c9c0, 0x1a}, {0x19f3d45463c0, 0x3, 0x4})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:149 +0x56e
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x19f37ec0a280, {0x19f3d4343a00, 0x179, 0x200})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 8299
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:643 +0xb05
+
+goroutine 11507 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x10?, 0x6a?, 0x30?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x19f37ead8db0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:149 +0x15d
+internal/sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/mutex.go:46
+github.com/eth2030/eth2030/core/chain.(*Blockchain).InsertSyncedBlockWithResult(0x19f37ea01da0?, 0x19f3d49107e0)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/execution_forkchoice.go:20 +0x5a
+github.com/eth2030/eth2030/core/chain.(*Blockchain).InsertSyncedBlock(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/execution_forkchoice.go:15
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockInternal(0x19f37e9f9200, 0x19f3b6cd8c88, {0x0, 0x5a, 0xf0, 0x20, 0x1f, 0x34, 0x4f, 0x50, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:430 +0x11ea
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockV5(0x19f37e9f9200, 0x19f3b6cd8c88, {0x0, 0x5a, 0xf0, 0x20, 0x1f, 0x34, 0x4f, 0x50, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:269 +0x2e6
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ProcessBlockV5(0xf9ed20?, 0x10021b463e3?, {0x78ea04037c50?, 0x19f3a9b171f8?, 0x424c05?}, {0x0, 0x5a, 0xf0, 0x20, 0x1f, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:243 +0x45
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayloadWith(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:306 +0x219
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayload(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:276
+github.com/eth2030/eth2030/engine.(*EngineAPI).NewPayloadV5(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:267 +0x268
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleNewPayloadV5(0x19f37ec0a280, {0x19f3d4910780, 0x19f3d2f5fbb8?, 0x50faf9?})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:410 +0x5ef
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x19f37ec0a280, {0x19f3d4906858, 0x13}, {0x19f3d4910780, 0x4, 0x4})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:141 +0x3f3
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x19f37ec0a280, {0x19f3d491a000, 0x790, 0x800})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 11488
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:643 +0xb05
+
+goroutine 11487 [sync.Mutex.Lock]:
+internal/sync.runtime_SemacquireMutex(0x10?, 0x6a?, 0x30?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/runtime/sema.go:95 +0x25
+internal/sync.(*Mutex).lockSlow(0x19f37ead8db0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:149 +0x15d
+internal/sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/sync/mutex.go:70
+sync.(*Mutex).Lock(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/sync/mutex.go:46
+github.com/eth2030/eth2030/core/chain.(*Blockchain).InsertSyncedBlockWithResult(0x19f37ea01da0?, 0x19f3d4546a20)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/execution_forkchoice.go:20 +0x5a
+github.com/eth2030/eth2030/core/chain.(*Blockchain).InsertSyncedBlock(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/execution_forkchoice.go:15
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockInternal(0x19f37e9f9200, 0x19f3d4586508, {0x0, 0x5a, 0xf0, 0x20, 0x1f, 0x34, 0x4f, 0x50, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:430 +0x11ea
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).processBlockV5(0x19f37e9f9200, 0x19f3d4586508, {0x0, 0x5a, 0xf0, 0x20, 0x1f, 0x34, 0x4f, 0x50, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:269 +0x2e6
+github.com/eth2030/eth2030/node/backend.(*EngineBackend).ProcessBlockV5(0xf9ed20?, 0x10021b463e3?, {0x78ea04092c20?, 0x19f3d46171f8?, 0x424c05?}, {0x0, 0x5a, 0xf0, 0x20, 0x1f, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/backend/engine_backend.go:243 +0x45
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayloadWith(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:306 +0x219
+github.com/eth2030/eth2030/engine.(*EngineAPI).processAmsterdamPayload(...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:276
+github.com/eth2030/eth2030/engine.(*EngineAPI).NewPayloadV5(_, {{{{{...}, {...}}, _, _}, {_, _, _}}, {_, _, ...}, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:267 +0x268
+github.com/eth2030/eth2030/engine.(*EngineAPI).handleNewPayloadV5(0x19f37ec0a280, {0x19f3d45469c0, 0x19f3d2f63bb8?, 0x50faf9?})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:410 +0x5ef
+github.com/eth2030/eth2030/engine.(*EngineAPI).dispatch(0x19f37ec0a280, {0x19f3d453c6c0, 0x13}, {0x19f3d45469c0, 0x4, 0x4})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:141 +0x3f3
+github.com/eth2030/eth2030/engine.(*EngineAPI).HandleRequest(0x19f37ec0a280, {0x19f3d4566000, 0x790, 0x800})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/handler.go:87 +0x3eb
+github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler.func1()
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:645 +0x5c
+created by github.com/eth2030/eth2030/engine.(*EngineAPI).httpHandler in goroutine 10059
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/engine/server.go:643 +0xb05
+
+goroutine 4124 [syscall]:
+syscall.Syscall(0x4a, 0x17, 0x0, 0x0)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/syscall_linux.go:74 +0x25
+syscall.Fsync(0x1000000080241?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/syscall/zsyscall_linux_amd64.go:463 +0x25
+internal/poll.(*FD).Fsync.func1(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:18
+internal/poll.ignoringEINTR(...)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_posix.go:74
+internal/poll.(*FD).Fsync(0x0?)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/internal/poll/fd_fsync_posix.go:17 +0xe7
+os.(*File).Sync(0x19f3d487e540)
+	/home/fy/.gvm/pkgsets/go1.27.3/global/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64/src/os/file_posix.go:167 +0x3b
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).writeDataFile(0x19f37ead0370?, {0x19f3d43d03d0?, 0x19f3d44471c0?, 0x21?}, {0x19f3b814ec60, 0x20, 0x20})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/rawdb/filedb.go:469 +0x12f
+github.com/eth2030/eth2030/core/rawdb.(*FileDB).prepareOpsLocked(0x19f37ead0370, {0x19f3d8400000, 0x2f18, 0x19f3a68c1118?})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/rawdb/filedb.go:648 +0x3c8
+github.com/eth2030/eth2030/core/rawdb.(*fileBatch).WriteAndPublish(0x19f3d42a3b30, {0x12e0368, 0x19f37ead8d80}, 0x19f3b51efd80)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/rawdb/filedb.go:603 +0x91
+github.com/eth2030/eth2030/core/rawdb.WriteBatchAndPublish({0x12e7560, 0x19f3d42a3b30}, {0x12e0368, 0x19f37ead8d80}, 0x19f3b51efd80)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/rawdb/publication.go:13 +0x12a
+github.com/eth2030/eth2030/core/chain.(*Blockchain).ApplyForkchoice(0x19f37ead8d80, {0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/core/chain/execution_forkchoice.go:187 +0x1de7
+github.com/eth2030/eth2030/node.(*Node).applyExecutionTarget(0x19f37eb64308, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, 0x30, 0x20, ...}, ...})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/node/sync_runtime.go:63 +0x265
+github.com/eth2030/eth2030/sync/beacon.(*ExecutionSyncer).synchronize(0x19f3a6532140, {0x12e3a60, 0x19f3b65f2d20}, {{0xa1, 0x58, 0x1f, 0x36, 0x63, 0xba, 0xed, ...}, ...})
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/sync/beacon/execution_sync.go:532 +0x177c
+github.com/eth2030/eth2030/sync/beacon.(*ExecutionSyncer).loop(0x19f3a6532140, {0x12e3a60, 0x19f3d230ae60}, 0xf28?)
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/sync/beacon/execution_sync.go:276 +0x31b
+created by github.com/eth2030/eth2030/sync/beacon.(*ExecutionSyncer).Start in goroutine 1
+	/projects/eth2030/eth2030-storage-wait-capture/pkg/sync/beacon/execution_sync.go:102 +0x18c

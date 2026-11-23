@@ -1,0 +1,353 @@
+{
+  "original_fault_resolved": false,
+  "scope": "Actual new transient catch-up wait, not original04 attribution. Thread/fd reads are sequential observations; stable fd receipt does not prove an atomic syscall-to-inode binding.",
+  "captures": [
+    {
+      "capture": "stack-112528105049",
+      "trigger": {
+        "time": "2026-11-23T11:25:28.10480319Z",
+        "level": "WARN",
+        "msg": "engine_request_timeout",
+        "module": "engine/api",
+        "event": "engine_request_timeout",
+        "timeout_ms": 8000
+      },
+      "capture_started_at": "2026-11-23T11:25:28.105207+00:00",
+      "profiles": [
+        {
+          "at": "2026-11-23T11:25:28.133589+00:00",
+          "bytes": 36781,
+          "truncated": false,
+          "sha256": "fcb241bccc4acff63f87ce6fcdd0200e543b13d58d9d771bca654937d01fedac"
+        },
+        {
+          "at": "2026-11-23T11:25:29.553015+00:00",
+          "bytes": 36781,
+          "truncated": false,
+          "sha256": "9d73de1b509df0edb9a17d60add6038a18ad1abea55d71ade57956d5cb3f0c44"
+        },
+        {
+          "at": "2026-11-23T11:25:32.440371+00:00",
+          "bytes": 36789,
+          "truncated": false,
+          "sha256": "1e5de762cfe32196596e6be79f83ae749c84b2c9d427d13a1a9bc2616a6d592e"
+        },
+        {
+          "at": "2026-11-23T11:25:38.292372+00:00",
+          "bytes": 40688,
+          "truncated": false,
+          "sha256": "35a531822f939f082428562a69ce5d687a95d47ba478a3b4050b75c24a735831"
+        }
+      ],
+      "frames": [
+        {
+          "name": "el-storage-0.json",
+          "at": "2026-11-23T11:25:28.900483+00:00",
+          "identity_matches": true,
+          "sha256": "7a5be3496b2ac026ef41232ce18f1036e9d079bf0b666819acb4d89bd1dc3060",
+          "fsync_receipts": [
+            {
+              "tid": "31",
+              "syscall": {
+                "text": "74 0x17 0x0 0x0 0x0 0x0 0x0 0x19f3a68c0d08 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": [
+                {
+                  "fd": "23",
+                  "binding_stable": true,
+                  "fdinfo": {
+                    "text": "pos:\t32\nflags:\t02100001\nmnt_id:\t6665\nino:\t59093144\n",
+                    "truncated": false
+                  },
+                  "target": "/snapshot/execution-data/chaindata/data/630000000000018b47.tmp",
+                  "regular_file": true,
+                  "inode": 59093144,
+                  "device": "259:4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "el-storage-1.json",
+          "at": "2026-11-23T11:25:30.321953+00:00",
+          "identity_matches": true,
+          "sha256": "d272060afdd3efda71b0ef8dfa0725d006ab24f43e01c2e12254f915dc724936",
+          "fsync_receipts": [
+            {
+              "tid": "9",
+              "syscall": {
+                "text": "74 0x17 0x0 0x0 0x0 0x0 0x0 0x19f3a68c0d08 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": [
+                {
+                  "fd": "23",
+                  "binding_stable": true,
+                  "fdinfo": {
+                    "text": "pos:\t32\nflags:\t02100001\nmnt_id:\t6665\nino:\t59093842\n",
+                    "truncated": false
+                  },
+                  "target": "/snapshot/execution-data/chaindata/data/630000000000019bcb.tmp",
+                  "regular_file": true,
+                  "inode": 59093842,
+                  "device": "259:4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "el-storage-2.json",
+          "at": "2026-11-23T11:25:33.112583+00:00",
+          "identity_matches": true,
+          "sha256": "f9608109c7cb700809c1a2f2f68ad8e9d94067e9797bdb4ef07ab4a66a9c857f",
+          "fsync_receipts": [
+            {
+              "tid": "9",
+              "syscall": {
+                "text": "74 0x17 0x0 0x0 0x0 0x0 0x0 0x19f3a68c0d08 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": [
+                {
+                  "fd": "23",
+                  "binding_stable": true,
+                  "fdinfo": {
+                    "text": "pos:\t32\nflags:\t02100001\nmnt_id:\t6665\nino:\t59094914\n",
+                    "truncated": false
+                  },
+                  "target": "/snapshot/execution-data/chaindata/data/630000000000018767.tmp",
+                  "regular_file": true,
+                  "inode": 59094914,
+                  "device": "259:4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "el-storage-3.json",
+          "at": "2026-11-23T11:25:39.058687+00:00",
+          "identity_matches": true,
+          "sha256": "f41c53bca038e62367e2973302314ae653a2b2fbbcac164cf52678b9b4e04c3a",
+          "fsync_receipts": []
+        }
+      ]
+    },
+    {
+      "capture": "stack-112539365852",
+      "trigger": {
+        "time": "2026-11-23T11:25:36.040755965Z",
+        "level": "WARN",
+        "msg": "engine_request_timeout",
+        "module": "engine/api",
+        "event": "engine_request_timeout",
+        "timeout_ms": 8000
+      },
+      "capture_started_at": "2026-11-23T11:25:39.365921+00:00",
+      "profiles": [
+        {
+          "at": "2026-11-23T11:25:39.392691+00:00",
+          "bytes": 40162,
+          "truncated": false,
+          "sha256": "6eebe481d91703a315700ea5b908d90ce6594df0af5099156a6994d941b3550e"
+        },
+        {
+          "at": "2026-11-23T11:25:40.831425+00:00",
+          "bytes": 41351,
+          "truncated": false,
+          "sha256": "cf1718a2c68e1c7621ff1d2b05c01fb4e2cea474d961fbf18df8bb7587edb08c"
+        },
+        {
+          "at": "2026-11-23T11:25:43.783959+00:00",
+          "bytes": 40162,
+          "truncated": false,
+          "sha256": "6889b9f86809a42c12a17baf4f80524e72289c8234326593474ec2a0e4543961"
+        },
+        {
+          "at": "2026-11-23T11:25:49.722294+00:00",
+          "bytes": 24706,
+          "truncated": false,
+          "sha256": "0f89608fa672abb16d4bf1c517a27e9955c838aaab44388469794dc559838ec8"
+        }
+      ],
+      "frames": [
+        {
+          "name": "el-storage-0.json",
+          "at": "2026-11-23T11:25:40.177402+00:00",
+          "identity_matches": true,
+          "sha256": "22e38e0f7f26dce0932862e7812c276ecef7a3a717210213ef9a22de054d5597",
+          "fsync_receipts": [
+            {
+              "tid": "31",
+              "syscall": {
+                "text": "74 0x17 0x0 0x0 0x0 0x0 0x0 0x19f3a68c0d08 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": [
+                {
+                  "fd": "23",
+                  "binding_stable": true,
+                  "fdinfo": {
+                    "text": "pos:\t32\nflags:\t02100001\nmnt_id:\t6665\nino:\t59098322\n",
+                    "truncated": false
+                  },
+                  "target": "/snapshot/execution-data/chaindata/data/630000000000019fca.tmp",
+                  "regular_file": true,
+                  "inode": 59098322,
+                  "device": "259:4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "el-storage-1.json",
+          "at": "2026-11-23T11:25:41.610032+00:00",
+          "identity_matches": true,
+          "sha256": "e8d0ead76b2cc0cf4fc2e37736b929636954da549e7b8d1e9222d9efc07344ec",
+          "fsync_receipts": [
+            {
+              "tid": "31",
+              "syscall": {
+                "text": "74 0x17 0x0 0x0 0x0 0x0 0x0 0x19f3a68c0d08 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": []
+            }
+          ]
+        },
+        {
+          "name": "el-storage-2.json",
+          "at": "2026-11-23T11:25:44.534965+00:00",
+          "identity_matches": true,
+          "sha256": "4d640069176e470d97aa174a815e87d88584911cd8fcc594efc9b6f3bf36e802",
+          "fsync_receipts": [
+            {
+              "tid": "31",
+              "syscall": {
+                "text": "74 0x16 0x0 0x0 0x0 0x0 0x0 0x19f3d6625058 0x40c38e\n",
+                "truncated": false
+              },
+              "wchan": {
+                "text": "jbd2_log_wait_commit",
+                "truncated": false
+              },
+              "same_receipt_fd": [
+                {
+                  "fd": "22",
+                  "binding_stable": true,
+                  "fdinfo": {
+                    "text": "pos:\t115\nflags:\t02100001\nmnt_id:\t6665\nino:\t59100236\n",
+                    "truncated": false
+                  },
+                  "target": "/snapshot/execution-data/chaindata/data/6d70742d686973746f72792d6e6f64652f47ba5fbb82410b98a4cabeaf4b02ab4f3616f09a590633487a936d9eb86e80a2.tmp",
+                  "regular_file": true,
+                  "inode": 59100236,
+                  "device": "259:4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "el-storage-3.json",
+          "at": "2026-11-23T11:25:50.525474+00:00",
+          "identity_matches": true,
+          "sha256": "139a51cb4b3abc130e79f6e4870e0b03938eaf76cf144d4c3bdb585c1f6871f2",
+          "fsync_receipts": []
+        }
+      ]
+    },
+    {
+      "capture": "stack-112550822133",
+      "trigger": {
+        "time": "2026-11-23T11:25:44.043868692Z",
+        "level": "WARN",
+        "msg": "engine_request_timeout",
+        "module": "engine/api",
+        "event": "engine_request_timeout",
+        "timeout_ms": 8000
+      },
+      "capture_started_at": "2026-11-23T11:25:50.822210+00:00",
+      "profiles": [
+        {
+          "at": "2026-11-23T11:25:50.851068+00:00",
+          "bytes": 24706,
+          "truncated": false,
+          "sha256": "949ebedd1ebb9b50e2fac6f51b6fc236657d90fc1a35a92998f6e20a26fc4dc1"
+        },
+        {
+          "at": "2026-11-23T11:25:52.206966+00:00",
+          "bytes": 24706,
+          "truncated": false,
+          "sha256": "4265ac948bbd9d62b2a2c24d151554a4f5175ea568b3419c415fb70ef1e58ce9"
+        },
+        {
+          "at": "2026-11-23T11:25:55.115954+00:00",
+          "bytes": 24706,
+          "truncated": false,
+          "sha256": "5e27ad8062c9f4f0ed04b1ded591f38c2beb1acb091b20e934b8c1a19f4b1a24"
+        },
+        {
+          "at": "2026-11-23T11:26:01.006939+00:00",
+          "bytes": 24706,
+          "truncated": false,
+          "sha256": "9d336b21c1a835ca5052e183f802edd0671274349b789f6ebb9a53dff02a2ab2"
+        }
+      ],
+      "frames": [
+        {
+          "name": "el-storage-0.json",
+          "at": "2026-11-23T11:25:51.557749+00:00",
+          "identity_matches": true,
+          "sha256": "fc5e1b6cc380c746e416785e748b6135b744f479084c2b6465d2fed46e8a9fa0",
+          "fsync_receipts": []
+        },
+        {
+          "name": "el-storage-1.json",
+          "at": "2026-11-23T11:25:52.877060+00:00",
+          "identity_matches": true,
+          "sha256": "ff05eedc7b74e4c5a956bdc257b60a873a9c7015821c77c6dbb6f7037c133b43",
+          "fsync_receipts": []
+        },
+        {
+          "name": "el-storage-2.json",
+          "at": "2026-11-23T11:25:55.777854+00:00",
+          "identity_matches": true,
+          "sha256": "0e34264baa74928146d7708c57650af5ba0dfb0452da68f531dd817a8901b5fd",
+          "fsync_receipts": []
+        },
+        {
+          "name": "el-storage-3.json",
+          "at": "2026-11-23T11:26:01.754391+00:00",
+          "identity_matches": true,
+          "sha256": "2b2679e2a2e27ad327b7599f64b705ddd2b0df2e01e98d5c5d49ede941db1080",
+          "fsync_receipts": []
+        }
+      ]
+    }
+  ]
+}

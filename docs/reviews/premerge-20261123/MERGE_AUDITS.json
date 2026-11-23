@@ -1,0 +1,116 @@
+[
+  {
+    "repo": "alt-research/eth2030",
+    "target": "master",
+    "base": "55f7fd8489d2454a688772abda8a25da0dcc4a0b",
+    "heads": {
+      "139": "cf72af70d85c38ed2968e5a72f3f55dc1cb762ff",
+      "138": "d6d63b4174e99a0873b2646b60f2e2f112df2b1a",
+      "137": "1c68ece80a7bc13930d632024205ec535f433fed",
+      "136": "ed4e9705db81a104453a06969a8cf550778c80da",
+      "135": "3076dabbcf598832fbe529e9b318047f0a91e3a6",
+      "134": "2558a1924d28e507f97ea38b5bd8005e5a0ae81c",
+      "133": "958e407d6fe55e487a8a0bc65ee732ebbcaba70f",
+      "132": "dc59280c8b7b92ea056b5ea6f2a312373c28a926",
+      "131": "720566e8cc1bf71f2f6fb774b727c8106b7d8d79"
+    },
+    "all_clean": true,
+    "actual_target_merge": false,
+    "scope": "Representative ancestry at every subset extension, confluence checked; explicit ascending/descending full orders. Not enumeration of every possible history.",
+    "subset_transitions": 2304,
+    "ordered_pairs": 72,
+    "final_tree": "ccb3a4cac7ab5d5ed81b1cb7a7bfb02c4ea12734",
+    "simulated_composition": "9af6dea87d28019b5f7328135a97a4b07c316f3b",
+    "explicit_orders": [
+      [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139
+      ],
+      [
+        139,
+        138,
+        137,
+        136,
+        135,
+        134,
+        133,
+        132,
+        131
+      ]
+    ],
+    "at": "2026-11-23T03:08:52.283234+00:00",
+    "seconds": 8.471939597046003
+  },
+  {
+    "repo": "jiayaoqijia/lighthouse",
+    "target": "eth2030",
+    "base": "42f6fc26e5c48c4c1ec16368a0a7df705bcc3e69",
+    "heads": {
+      "12": "c8f1f3860367965550c0541ff364180c0438b77c",
+      "11": "a46dbc2961ff5a9088b7e2adc64648548fe18fca",
+      "10": "c07689f4fd81e5e0c5645f19b6bef270e7c3ef9c",
+      "9": "476789481f02d69800db0fa8258d2d6f03a5961d",
+      "8": "54e1884460caf56889e35f8e887ba3ce8f74da5d",
+      "7": "57d2c2c87a829268f35703df3073483213b4c9e1",
+      "6": "40e5d609233a8b4b0a869484e287db1f59b2acd2",
+      "5": "7210741372e113bf0745420d381fa5db2dbe552a",
+      "4": "1da38247c0a673c956639052a249b052ef8cbb04"
+    },
+    "all_clean": true,
+    "actual_target_merge": false,
+    "scope": "Representative ancestry at every subset extension, confluence checked; explicit ascending/descending full orders. Not enumeration of every possible history.",
+    "subset_transitions": 2304,
+    "ordered_pairs": 72,
+    "final_tree": "0577e7c2f8d8657028f48873d79ca785744f02da",
+    "simulated_composition": "01aa4af47b63f68db37d4f2eff9a14ff73341d4b",
+    "explicit_orders": [
+      [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      [
+        12,
+        11,
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4
+      ]
+    ],
+    "at": "2026-11-23T03:09:08.052799+00:00",
+    "seconds": 15.767877010046504
+  },
+  {
+    "repo": "jiayaoqijia/lighthouse",
+    "target": "unstable",
+    "base": "8104a2467c59487e69aa95b6acedbaeea4a534a1",
+    "heads": {
+      "3": "cb72ff1530715c2323aae17b03ceca2710a4cf66",
+      "2": "b57d54d45ec45b47d940a6689a2f2f8fb39b8f8a",
+      "1": "9b27d866c2c747abb28b760a8c52c0602c8d0d1f"
+    },
+    "all_clean": false,
+    "actual_target_merge": false,
+    "scope": "Representative ancestry at every subset extension, confluence checked; explicit ascending/descending full orders. Not enumeration of every possible history.",
+    "error": "Command '['git', 'merge-tree', '--write-tree', 'e5546b8419b068193b416b2327f87aec82da157d', '9b27d866c2c747abb28b760a8c52c0602c8d0d1f']' returned non-zero exit status 1.",
+    "at": "2026-11-23T03:09:08.080134+00:00",
+    "seconds": 0.023408205015584826
+  }
+]

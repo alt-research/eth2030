@@ -37,7 +37,7 @@ func TestIsLoopbackHost(t *testing.T) {
 		addr string
 		want bool
 	}{
-		{"", true},
+		{"", false},
 		{"localhost", true},
 		{"127.0.0.1", true},
 		{"127.9.9.9", true},

@@ -16,6 +16,8 @@ import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from engine_storage_snapshot import snapshot as storage_snapshot, start_ticks
 
 
 def utc():
@@ -68,8 +70,75 @@ def identity(cid, expected):
     actual = docker("exec", cid, "sha256sum", "/proc/1/exe").split()[0]
     if actual != expected:
         raise ValueError("actual diagnostic executable differs from record")
-    return {"container": cid, "started": info["State"]["StartedAt"],
-            "image": info["Image"], "binary_sha256": actual}
+    result = {"container": cid, "started": info["State"]["StartedAt"],
+              "host_pid": info["State"]["Pid"], "image": info["Image"], "binary_sha256": actual}
+    try:
+        result["start_ticks"] = start_ticks(result["host_pid"])
+    except (OSError, IndexError) as error:
+        result["storage_identity_error"] = repr(error)
+    return result
+
+
+def namespace_storage(cid, expected_start, image):
+    """Read an owned target through its PID namespace, without attaching a debugger."""
+    if expected_start is None:
+        return {"error": "target process start identity is unavailable"}
+    name = "storage-wait-" + str(time.time_ns())
+    module = Path(__file__).with_name("engine_storage_snapshot.py").resolve()
+    command = ["docker", "run", "--name", name, "--rm", "--network", "none",
+               "--pid", "container:" + cid, "--read-only", "--cap-drop", "ALL",
+               "--cap-add", "SYS_PTRACE", "--user", "0", "--cpus", "0.25",
+               "--memory", "134217728", "--mount",
+               "type=bind,src=" + str(module) + ",dst=/engine_storage_snapshot.py,readonly",
+               "--entrypoint", "python3", image, "-B", "-c",
+               "import sys,json;sys.path.insert(0,'/');from engine_storage_snapshot import snapshot;print(json.dumps(snapshot(1,sys.argv[1])))",
+               str(expected_start)]
+    result = {"pid_namespace": "container:" + cid, "image": image,
+              "access": "Read-only procfs with SYS_PTRACE permission; no debugger attachment.",
+              "started_at": utc()}
+    try:
+        process = subprocess.run(command, capture_output=True, timeout=8)
+        result["exit_code"] = process.returncode
+        if process.returncode:
+            result["error"] = process.stderr[:4096].decode(errors="replace")
+        elif len(process.stdout) > 32 << 20:
+            result["error"] = "namespace storage output exceeded declared32MiB bound"
+        else:
+            observation = json.loads(process.stdout)
+            observation["namespace_pid"] = observation.pop("host_pid")
+            result["observation"] = observation
+    except Exception as error:
+        result["error"] = repr(error)
+    finally:
+        # A timed-out docker CLI does not stop its daemon-managed helper.
+        try:
+            cleanup = subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=10)
+            result["helper_remove_exit"] = cleanup.returncode
+        except Exception as error:
+            result["cleanup_error"] = repr(error)
+        result["finished_at"] = utc()
+    return result
+
+
+def capture_storage(cid, expected, destination, proc_image=None):
+    current = inspect(cid)
+    if (current["State"]["StartedAt"] != expected["started"]
+            or current["State"]["Pid"] != expected["host_pid"]):
+        raise ValueError("storage target restarted before capture")
+    result = storage_snapshot(expected["host_pid"], expected.get("start_ticks"), current.get("Mounts", []))
+    if proc_image:
+        result["namespace_proc"] = namespace_storage(cid, expected.get("start_ticks"), proc_image)
+        observation = result["namespace_proc"].get("observation", {})
+        result["namespace_identity_matches"] = observation.get("identity_matches")
+        if result["namespace_identity_matches"] is False:
+            result["identity_matches"] = False
+    after = inspect(cid)["State"]
+    if after["StartedAt"] != expected["started"] or after["Pid"] != expected["host_pid"]:
+        result.update(identity_matches=False, target_restarted_during_capture=True)
+    destination.write_text(json.dumps(result, indent=2) + "\n")
+    return {"at": result["at"], "path": destination.name,
+            "identity_matches": result["identity_matches"],
+            "sha256": hashlib.sha256(destination.read_bytes()).hexdigest()}
 
 
 def native_profile(url, destination):
@@ -110,11 +179,13 @@ def main():
     parser.add_argument("--record", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cl-debug-image", help="Optional locally built GDB image; attaches only after a timeout")
+    parser.add_argument("--storage-proc-image", help="Optional local Python3 image for read-only owned PID-namespace procfs access; no debugger attachment")
     args = parser.parse_args()
     out = args.output
     out.mkdir(mode=0o700, exist_ok=False)
     report = {"status": "initializing", "started_at": utc(), "captures": 0,
               "collector_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+              "storage_collector_sha256": hashlib.sha256(Path(__file__).with_name("engine_storage_snapshot.py").read_bytes()).hexdigest(),
               "actual48h_passed": False,
               "scope": "Read-only diagnostic capture, with explicitly recorded optional post-timeout debugger interference. No operating acceptance."}
     def save():
@@ -131,6 +202,10 @@ def main():
                       "cl": identity(cl, profile["cl_binary_sha256"])}
         port = inspect(el)["NetworkSettings"]["Ports"]["9001/tcp"][0]["HostPort"]
         url = "http://127.0.0.1:" + port + "/debug/pprof/goroutine?debug=2"
+        storage_image = None
+        if args.storage_proc_image:
+            storage_image = json.loads(docker("image", "inspect", args.storage_proc_image))[0]["Id"]
+            report["storage_proc_image"] = storage_image
         if args.cl_debug_image:
             docker("image", "inspect", args.cl_debug_image)
         report.update(status="watching", identities=identities,
@@ -169,10 +244,23 @@ def main():
             for index, delay in enumerate([0, .5, 2, 5]):
                 if delay:
                     time.sleep(delay)
-                try:
-                    capture["profiles"].append(native_profile(url, directory / ("goroutines-" + str(index) + ".txt")))
-                except Exception as error:
-                    capture["profiles"].append({"at": utc(), "error": repr(error)})
+                # Start both storage observations and the Go profile together: a slow
+                # profile endpoint must not defer the first syscall/fd observation.
+                with ThreadPoolExecutor(max_workers=3) as pool:
+                    pending = {role: pool.submit(capture_storage, cid, identities[role],
+                               directory / (role + "-storage-" + str(index) + ".json"), storage_image)
+                               for role, cid in [("el", el), ("cl", cl)]}
+                    profile = pool.submit(native_profile, url, directory / ("goroutines-" + str(index) + ".txt"))
+                    for role, future in pending.items():
+                        try:
+                            frame = future.result()
+                        except Exception as error:
+                            frame = {"at": utc(), "error": repr(error), "identity_matches": False}
+                        capture.setdefault("storage_frames", []).append({"role": role, "frame": index, **frame})
+                    try:
+                        capture["profiles"].append(profile.result())
+                    except Exception as error:
+                        capture["profiles"].append({"at": utc(), "error": repr(error)})
             if args.cl_debug_image:
                 capture["cl_debugger"] = cl_backtrace(cl, args.cl_debug_image, directory / "cl-threads.txt")
             for role, cid in [("el", el), ("cl", cl)]:

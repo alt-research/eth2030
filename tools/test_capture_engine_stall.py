@@ -100,6 +100,58 @@ class PipeCaptureTests(unittest.TestCase):
                     collector.main()
             self.assertEqual(json.loads((output / "result.json").read_text())["status"], "collector_failed")
 
+    def test_timeout_keeps_correlated_storage_frames_before_owned_stop(self):
+        child = subprocess.Popen([sys.executable, "-c", "import os,sys;os.write(1,b'engine_request_timeout\\n');sys.stdin.buffer.read()"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0)
+        handlers = {}
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                record = root / "record.json"
+                record.write_text(json.dumps({"el": "el", "cl": "cl", "profile": {
+                    "source": "control", "cl_source": "control", "binary_sha256": "control",
+                    "cl_binary_sha256": "control"}}))
+                output = root / "capture"
+                expected = {"started": "control", "host_pid": os.getpid(), "start_ticks": collector.start_ticks(os.getpid())}
+                info = {"State": {"Pid": os.getpid(), "StartedAt": "control", "Running": True},
+                        "NetworkSettings": {"Ports": {"9001/tcp": [{"HostPort": "1"}]}}, "Mounts": []}
+                def profile(_url, destination):
+                    destination.write_text("controlled profile fixture")
+                    if destination.name == "goroutines-3.txt":
+                        handlers[collector.signal.SIGTERM](None, None)
+                    return {"at": collector.utc(), "fixture": True}
+                def handler(sig, fn):
+                    handlers[sig] = fn
+                with patch.object(sys, "argv", ["capture", "--record", str(record), "--output", str(output)]), \
+                     patch.object(collector, "identity", return_value=expected), \
+                     patch.object(collector, "inspect", return_value=info), \
+                     patch.object(collector, "native_profile", side_effect=profile), \
+                     patch.object(collector.signal, "signal", side_effect=handler), \
+                     patch.object(collector.time, "sleep"), \
+                     patch.object(collector.subprocess, "Popen", return_value=child), \
+                     patch.object(collector.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, b"control", b"")):
+                    collector.main()
+                result = json.loads((output / "result.json").read_text())
+                self.assertEqual(result["status"], "stopped_by_owner")
+                self.assertEqual(result["captures"], 1)
+                self.assertFalse(result["actual48h_passed"])
+                self.assertEqual(len(result["storage_collector_sha256"]), 64)
+                capture_dir = Path(result["last_capture"])
+                capture = json.loads((capture_dir / "capture.json").read_text())
+                self.assertEqual(len(capture["profiles"]), 4)
+                self.assertEqual(len(capture["storage_frames"]), 8)
+                for frame in capture["storage_frames"]:
+                    self.assertTrue(frame["identity_matches"])
+                    data = json.loads((capture_dir / frame["path"]).read_text())
+                    self.assertEqual(data["host_pid"], os.getpid())
+                    self.assertFalse(data["original_fault_resolved"])
+        finally:
+            if child.poll() is None:
+                child.terminate()
+                child.wait(timeout=3)
+            child.stdin.close()
+            if not child.stdout.closed:
+                child.stdout.close()
+
     def test_oversized_complete_and_incomplete_lines_fail(self):
         for body in [b"12345\n", b"12345"]:
             with self.subTest(body=body), self.assertRaises(ValueError):

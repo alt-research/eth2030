@@ -1,4 +1,5 @@
 'use client';
+import OfficialGlamsterdamScope from '@/components/OfficialGlamsterdamScope';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
@@ -164,6 +165,9 @@ export default function EipsPage() {
           <code className="text-eth-purple"> scripts/verify-eips.ts</code> checks references and paths,
           not implementation correctness.
         </p>
+
+        <div className="mt-6"><OfficialGlamsterdamScope /></div>
+        <p className="mt-3 text-xs leading-6 text-eth-dim">The inventory below retains historical project groupings and extensions. Use the official scope above for the Glamsterdam completion denominator; later proof proposals are not assigned an official fork date.</p>
 
         {/* North stars */}
         <div className="mt-6 flex flex-wrap gap-2">

@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import SectionHeading from '@/components/ui/SectionHeading';
+import OfficialGlamsterdamScope from '@/components/OfficialGlamsterdamScope';
+import LaterProofWork from '@/components/LaterProofWork';
 import DevelopmentProgress from '@/components/DevelopmentProgress';
 import { roadmapStages, roadmapProgress, roadmapStatusNames } from '@/lib/roadmap';
 import styles from './RoadmapTimeline.module.css';
@@ -10,10 +12,10 @@ export default function RoadmapTimeline() {
     <SectionHeading title="The L1 Strawmap" subtitle="Ethereum’s roadmap. ETH2030’s work on it." />
     <div className={styles.wrap}>
       <div className={styles.intro}>
-        <p>Six proposed upgrades from the EF Architecture Strawmap, dated November 2, 2026. Explore the project&apos;s tracked work against the roadmap.</p>
+        <p>Glamsterdam follows the official EIP-7773 inclusion list. Later stages retain the November 2, 2026 EF Strawmap planning view.</p>
         <Link href="/roadmap/" className={styles.detailLink}>Explore the full roadmap <span>↗</span></Link>
       </div>
-      <DevelopmentProgress />
+      <OfficialGlamsterdamScope />
       <p className="mb-5 text-sm text-eth-teal"><Link className="underline" href="/roadmap/#remaining-work">See remaining integration, qualification and research work ↗</Link></p>
       <div className={styles.cards} aria-label="Roadmap progress">
         {roadmapStages.map((stage, index) => {
@@ -21,11 +23,11 @@ export default function RoadmapTimeline() {
           // Finished EIPs stay out of the homepage's work-in-progress list.
           const pending = entries.filter(entry => entry.status !== 'complete');
           const unique = [...new Map(pending.map(entry => [entry.strawmap?.item ?? entry.title, entry])).values()];
-          return <Link href={`/roadmap/#fork-${stage.id}`} key={stage.id} className={styles.card} data-phase={stage.id} style={{ '--card-index': index, '--complete-pct': completePercentage ?? 0 } as CSSProperties}>
+          return <Link href={`/roadmap/#fork-${stage.id}`} key={stage.id} className={styles.card} data-scope={stage.id === 'glamsterdam' ? 'official-core' : 'project-planning'} data-phase={stage.id} style={{ '--card-index': index, '--complete-pct': completePercentage ?? 0 } as CSSProperties}>
             <div className={styles.cardHead}><span className={styles.glyph}>{stage.glyph}</span><div><span className={styles.phaseIndex}>FORK 0{index + 1}</span><h3>{stage.name}</h3></div><span className={styles.arrow}>↗</span></div>
-            <div className={styles.progress} role="img" aria-label={completePercentage === null ? 'No mapped tracker entries' : `${completePercentage}% of mapped tracker entries labelled complete`}>
+            <div className={styles.progress} role="img" aria-label={completePercentage === null ? 'No mapped tracker entries' : `${completePercentage}% of ${stage.id === 'glamsterdam' ? 'officially scheduled core EIPs' : 'mapped tracker entries'} labelled complete`}>
               <div className={styles.ring}><strong>{completePercentage ?? '—'}{completePercentage !== null && <small>%</small>}</strong></div>
-              <div className={styles.progressText}><span>TRACKER COMPLETE</span><strong>{counts.complete} <i>/</i> {entries.length}</strong><small>mapped entries</small></div>
+              <div className={styles.progressText}><span>{stage.id === 'glamsterdam' ? 'ETH2030 IMPLEMENTATION' : 'TRACKER COMPLETE'}</span><strong>{counts.complete} <i>/</i> {entries.length}</strong><small>{stage.id === 'glamsterdam' ? 'scheduled core EIPs' : 'mapped entries'}</small></div>
             </div>
             <div className={styles.pendingTitle}><span>WORK IN THE TRACKER</span><span>{pending.length} entries</span></div>
             <div className={styles.pending}>
@@ -36,7 +38,9 @@ export default function RoadmapTimeline() {
           </Link>;
         })}
       </div>
-      <p className={styles.note}>Percentages count mapped entries labelled Complete in the historical tracker; they are not independent conformance or production-readiness measurements. Unmapped EF nodes are excluded. I*–L* are placeholder names. <a href="https://strawmap.org/" target="_blank" rel="noreferrer">View the EF original ↗</a></p>
+      <LaterProofWork />
+      <details className="my-6 rounded-xl border border-eth-teal/30 p-4"><summary className="cursor-pointer text-sm font-bold text-eth-teal">Merged development progress</summary><DevelopmentProgress /></details>
+      <p className={styles.note}>Glamsterdam counts reviewed ETH2030 Complete labels against officially scheduled core EIPs. Later stages use project-planning entries; they are not independent conformance or production-readiness measurements. Unmapped EF nodes are excluded. I*–L* are placeholder names. <a href="https://strawmap.org/" target="_blank" rel="noreferrer">View the EF original ↗</a></p>
       <p className={styles.secondary}><Link href="/eips/">EIP Progress Tracker</Link><span>·</span><Link href="/pq-roadmap/">Post-quantum research notes</Link></p>
     </div>
   </section>;

@@ -16,6 +16,7 @@ const merged = readRecord('docs/audits/merged-glamsterdam-20261122/MERGED_EVIDEN
 const current = readRecord('docs/reviews/remaining-20261123/CURRENT_STATE.json');
 const accounting = readRecord('docs/reviews/development-scope-20261124/CURRENT_STATE.json');
 const remaining = readRecord('site/src/data/remaining-work.json');
+const officialScope = readRecord('site/src/data/official-glamsterdam.json');
 const { EIPS } = await import('../src/data/eips.ts');
 const bounded = readRecord('docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json');
 const stopped = readRecord('docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json');
@@ -193,7 +194,7 @@ for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json'
 assert.equal(remaining.adoptedDevelopmentTodos, accounting.active_development_todos.length);
 assert.deepEqual(remaining.excludedAcceptance, ['G-03', 'G-04']);
 assert.equal(remaining.mergedProgressPr, 148);
-assert.equal(remaining.items.length, 7);
+assert.equal(remaining.items.length, 8);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.target), ['master', 'master', 'eth2030']);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.url), [
   'https://github.com/alt-research/eth2030/pull/155',
@@ -206,7 +207,7 @@ for (const item of remaining.specificationRepairs) {
 }
 assert.equal(remaining.specificationAuditUrl, 'https://github.com/alt-research/eth2030/pull/152');
 assert.ok(roadmap.includes(remaining.specificationAuditUrl));
-assert.match(roadmap, /code delivery and master integration are separate/);
+assert.match(roadmap, /These repairs and proof extensions are merged/);
 
 assert.equal(new Set(remaining.items.map(item => item.id)).size, remaining.items.length);
 assert.match(roadmap, /id="remaining-work"/);
@@ -224,17 +225,53 @@ for (const item of remaining.items) {
     assert.ok(roadmap.includes(`/blob/${remaining.reviewedMaster}/${path}`), `Unpinned remaining-work source ${path}`);
   }
 }
-const stages = ['glamsterdam', 'hegota', 'i', 'j', 'k', 'l'];
+const stages = ['glamsterdam', 'hegota', 'i', 'j', 'k', 'l', 'longer'];
 const remappedFork = entry => entry.id === 'feature-leanvm-pq-proofs' ? 'i' : entry.id === 'feature-ethp2p-unification' ? 'l' : entry.fork;
-const pending = EIPS.filter(entry => entry.strawmap && stages.includes(remappedFork(entry)) && entry.status !== 'complete');
-const glamsterdamMapped = EIPS.filter(entry => entry.fork === 'glamsterdam' && entry.strawmap);
-assert.equal(glamsterdamMapped.length, 17);
-assert.equal(glamsterdamMapped.filter(entry => entry.status === 'complete').length, 16);
-assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').map(entry => [entry.id, entry.status]), [['feature-evm-asm-canonical-quest', 'substantial']]);
+const inDisplayedScope = entry => entry.number !== null && officialScope.scheduledCore.includes(entry.number) || entry.strawmap && remappedFork(entry) !== 'glamsterdam' && remappedFork(entry) !== 'longer' && stages.includes(remappedFork(entry)) || officialScope.laterProofEntries.includes(entry.id);
+const pending = EIPS.filter(entry => inDisplayedScope(entry) && entry.status !== 'complete');
+const glamsterdamMapped = EIPS.filter(entry => entry.number !== null && officialScope.scheduledCore.includes(entry.number));
+const sourceSnapshot = readFileSync(new URL('../../docs/reviews/official-roadmap-scope-20261124/EIP_7773_SOURCE.md', import.meta.url), 'utf8');
+const sourceIds = section => [...section.matchAll(/^\* \[EIP-(\d+)\]/gm)].map(match => Number(match[1]));
+const officialCore = sourceIds(sourceSnapshot.split('### EIPs Scheduled for Inclusion')[1].split('### Other EIPs')[0]);
+const officialNetwork = sourceIds(sourceSnapshot.split('#### Networking EIPs')[1].split('#### Informational EIP')[0]);
+const officialInfo = sourceIds(sourceSnapshot.split('#### Informational EIP')[1].split('### Mascot')[0]);
+assert.deepEqual(officialScope.scheduledCore, officialCore, 'Official core scope differs from the pinned EIP-7773 source');
+assert.deepEqual(officialScope.networking, officialNetwork);
+assert.deepEqual(officialScope.informational.map(item => item.number), officialInfo);
+assert.equal(officialScope.scheduledCore.length, 20);
+assert.equal(new Set(officialScope.scheduledCore).size, 20);
+assert.equal(glamsterdamMapped.length, 20);
+assert.equal(glamsterdamMapped.filter(entry => entry.status === 'complete').length, 19);
+assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').map(entry => [entry.id, entry.status]), [['eip-7495', 'functional']]);
+assert.deepEqual(officialScope.networking, [7975, 8070, 8136, 8159, 8189]);
+assert.deepEqual(officialScope.informational.map(entry => entry.number), [7904, 8261]);
+assert.ok(!officialScope.scheduledCore.includes(8025) && !officialScope.scheduledCore.includes(7904));
+for (const html of [home, roadmap]) {
+  assert.match(html, /data-official-complete="19" data-official-total="20"/);
+  assert.match(html, /19\/20 scheduled core EIPs labelled Complete/);
+  assert.match(html, /Networking references/);
+  assert.match(html, /Informational references/);
+  assert.match(html, /Later rounds/);
+  assert.ok(html.includes(officialScope.sourceSnapshot));
+  for (const id of officialScope.laterProofEntries) assert.ok(html.includes(`data-later-proof="${id}"`));
+  for (const number of officialScope.networking) assert.ok(html.includes(`data-official-network-eip="${number}"`));
+  for (const item of officialScope.informational) assert.ok(html.includes(`data-official-info-eip="${item.number}"`));
+  assert.doesNotMatch(html, /16\/17 mapped entries complete|canonical Ethereum STF execution is the remaining Glamsterdam/i);
+}
+const officialCard = roadmap.match(/<article[^>]*id="fork-glamsterdam"[^>]*>(.*?)<\/article>/s)?.[1];
+assert.ok(officialCard);
+assert.deepEqual([...officialCard.matchAll(/data-official-core-eip="(\d+)"/g)].map(match => Number(match[1])).sort((a,b) => a-b), [...officialScope.scheduledCore].sort((a,b) => a-b));
+assert.doesNotMatch(officialCard, /EIP-8025|canonical quest|fast confirmation|Precompile Gas Repricing/);
+for (const id of officialScope.laterProofEntries) {
+  assert.equal(EIPS.find(entry => entry.id === id).fork, 'longer');
+  const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
+  assert.match(page, /Later proof proposal.*not officially scheduled/);
+  assert.match(page, /href="\/roadmap\/#later-proof-work"/);
+}
 const renderedPending = [...roadmap.matchAll(/data-pending-entry="([^"]+)"/g)].map(match => match[1]);
 assert.deepEqual(renderedPending.sort(), pending.map(entry => entry.id).sort(), 'Remaining view omits or duplicates historical non-complete entries');
 for (const phase of stages) {
-  const count = pending.filter(entry => remappedFork(entry) === phase).length;
+  const count = pending.filter(entry => phase === 'glamsterdam' ? entry.number !== null && officialScope.scheduledCore.includes(entry.number) : remappedFork(entry) === phase).length;
   assert.ok(roadmap.includes(`data-pending-phase="${phase}" data-pending-count="${count}"`));
 }
 const planned = pending.filter(entry => entry.status === 'planned');
@@ -244,7 +281,19 @@ for (const id of remaining.plannedOnly) assert.ok(roadmap.includes(`data-planned
 assert.match(roadmap, /canonical Ethereum STF guest/);
 assert.match(roadmap, /real RV32IM program-execution receipts/);
 assert.match(roadmap, /Native rollup transition\/withdrawal helpers use simulated hash conditions/);
-const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
+function sectionById(html, id) {
+  const start = html.indexOf(`<section id="${id}"`);
+  assert.ok(start >= 0, `Missing section ${id}`);
+  const tags = /<\/?section\b[^>]*>/g;
+  tags.lastIndex = start;
+  let depth = 0, tag;
+  while ((tag = tags.exec(html))) {
+    depth += tag[0].startsWith('</') ? -1 : 1;
+    if (depth === 0) return html.slice(start, tags.lastIndex);
+  }
+  throw new Error(`Unclosed section ${id}`);
+}
+const homepageRoadmap = sectionById(home, 'roadmap');
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
 assert.match(home, /Signed Gloas route qualified/);
@@ -274,7 +323,7 @@ for (const fork of ['glamsterdam', 'hegota', 'i', 'j', 'k', 'l']) {
   const homeCard = homepageRoadmap.match(new RegExp(`<a[^>]*data-phase="${fork}"[^>]*>(.*?)</a>`, 's'))?.[1];
   const detailCard = roadmap.match(new RegExp(`<article[^>]*id="fork-${fork}"[^>]*>(.*?)</article>`, 's'))?.[1];
   assert.ok(homeCard && detailCard, `Missing rendered cards for ${fork}`);
-  const percentage = html => html.match(/aria-label="(\d+)% of mapped tracker entries (?:are )?labelled complete"/)?.[1] ?? null;
+  const percentage = html => html.match(/aria-label="(\d+)% of (?:mapped tracker entries|officially scheduled core EIPs) (?:are )?labelled complete"/)?.[1] ?? null;
   assert.notEqual(percentage(homeCard), null, `Missing tracker percentage for ${fork}`);
   assert.equal(percentage(homeCard), percentage(detailCard), `Homepage/detail percentage mismatch for ${fork}`);
 }
@@ -305,7 +354,7 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
-assert.match(home, /16\/17 mapped entries complete/);
+assert.match(home, /19\/20 scheduled core EIPs labelled Complete/);
 assert.match(builderPage, /legacy EL bid-hash\/registry\/header extensions retired in PR127/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/builder-authority/STATUS.md`));
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);

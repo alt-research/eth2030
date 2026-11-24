@@ -1,0 +1,39 @@
+{
+  "reviewed_master": "1f9b427f5a8e823f8a80abfd43d26f062b32c194",
+  "official_source": "https://github.com/ethereum/EIPs/blob/b055feec322fbc37e9d77a393a50b3ff56b31c92/EIPS/eip-7773.md",
+  "official_core": {
+    "total": 20,
+    "complete_labels": 19,
+    "open": [
+      {
+        "eip": 7495,
+        "label": "functional"
+      }
+    ]
+  },
+  "networking_separate": [
+    7975,
+    8070,
+    8136,
+    8159,
+    8189
+  ],
+  "informational_separate": [
+    {
+      "number": 7904,
+      "title": "Compute Gas Cost Analysis"
+    },
+    {
+      "number": 8261,
+      "title": "Gas Limit Schedule"
+    }
+  ],
+  "later_without_official_fork": [
+    "eip-8025",
+    "feature-evm-asm-canonical-quest"
+  ],
+  "implementation_labels_changed": false,
+  "protocol_or_activation_changed": false,
+  "scope_only_not_new_conformance": true,
+  "historical_records_preserved": true
+}

@@ -1,3 +1,4 @@
+import officialScope from '@/data/official-glamsterdam.json';
 import type { Metadata } from 'next';
 import { GITHUB_URL } from '@/lib/constants';
 import { developmentSnapshot } from '@/lib/data';
@@ -67,6 +68,8 @@ export default async function EipPage({ params }: { params: Promise<{ id: string
   if (!e) notFound();
 
   const fork = forkByName[e.fork];
+  const laterProof = officialScope.laterProofEntries.includes(e.id);
+  const scopeLabel = laterProof ? 'Later proof proposal · no official fork assignment' : e.number !== null && officialScope.scheduledCore.includes(e.number) ? 'Official Glamsterdam scheduled core' : e.number !== null && officialScope.networking.includes(e.number) ? 'Official Glamsterdam networking reference · outside core denominator' : officialScope.informational.some(item => item.number === e.number) ? 'Official Glamsterdam informational reference · outside core denominator' : e.fork === 'glamsterdam' ? 'Historical project extension · outside official scheduled core' : null;
   const meta = STATUS_META[e.status];
   const layerColor = LAYER_COLORS[e.layer];
   const name = e.number !== null ? `EIP-${e.number}` : 'Feature';
@@ -93,7 +96,7 @@ export default async function EipPage({ params }: { params: Promise<{ id: string
             {e.layer}
           </span>
           <span className="rounded border border-eth-dim/40 px-2 py-1 text-xs text-eth-dim">
-            {fork.name} · {fork.year}
+            {laterProof ? 'Later proof proposal · not officially scheduled' : `${fork.name} · ${fork.year}`}
           </span>
           <span
             className="rounded border px-2 py-1 text-xs font-bold tracking-wider"
@@ -110,11 +113,13 @@ export default async function EipPage({ params }: { params: Promise<{ id: string
         <h1 className="mt-4 text-2xl font-bold text-eth-text md:text-3xl">{e.title}</h1>
         {e.summary && <p className="mt-3 max-w-3xl text-sm text-eth-dim">{e.summary}</p>}
 
+        {scopeLabel && <div data-official-entry-scope={laterProof ? 'later-proposal' : 'glamsterdam-reference'} className="mt-4 rounded-lg border border-eth-teal/30 p-4 text-xs leading-6 text-eth-dim"><p className="font-bold text-eth-teal">{scopeLabel}</p><p>Scope follows <a className="text-eth-teal underline" href={officialScope.source}>EIP-7773 ↗</a>; implementation labels retain their reviewed project evidence. <Link className="text-eth-teal underline" href={laterProof ? '/roadmap/#later-proof-work' : '/roadmap/#fork-glamsterdam'}>View the current roadmap scope ↗</Link></p></div>}
+
         {/* Strawmap placement */}
         {e.strawmap && (
           <div className="mt-4 rounded-lg border border-eth-purple/20 bg-eth-surface p-4">
             <div className="text-xs text-eth-dim">
-              L1 Strawmap placement (revision {STRAWMAP_REVISION})
+              {laterProof ? 'Historical Strawmap label' : 'L1 Strawmap placement'} (revision {STRAWMAP_REVISION})
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <span className="text-eth-text">“{e.strawmap.item}”</span>

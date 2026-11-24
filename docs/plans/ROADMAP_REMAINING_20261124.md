@@ -2,7 +2,7 @@
 
 ## Reviewed state
 
-PR 148 is merged into master b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0. The frozen LIFO / signed Gloas node-development scope remains complete: 33/33 original tasks and 5/5 confirmed follow-up repairs. Its pkg tree remains equal to the measured cumulative code; this page refresh is not a new runtime qualification. The old Glamsterdam card incorrectly said integrated CL CI was open; that wording is corrected.
+Current reviewed master is 1f9b427f, with PRs 155–157 merged. Glamsterdam scope follows official EIP-7773 at b055feec: twenty scheduled core EIPs, with nineteen current Complete labels and EIP-7495 Functional. Networking/informational references are separate. The earlier 33/33 frozen task ledger and 5/5 follow-up record retain their original source-specific meaning; they are not the official-core denominator. This page correction is not a new runtime qualification.
 
 48h/larger-scale admission and upstream Lodestar approval remain excluded from development progress at the user's direction. Original 04 attribution remains unconfirmed. Public activation is a separate network rollout decision, using existing schedule/genesis/override support. No public fork parameters or new protocol scope are selected here.
 
@@ -12,7 +12,11 @@ Five newly confirmed Glamsterdam problem groups are implemented in independent [
 
 ## Remaining workstreams
 
-These seven workstreams are grouped next-scope work, not seven newly discovered frozen-target bugs. Integration can be partly implemented while production-consumer qualification is still open. The static page expands each workstream to show evidence and completion criteria.
+This view includes one official-core conformance follow-up and seven later-scope workstreams. They do not reopen the earlier frozen task ledger. Integration can be partly implemented while production-consumer qualification is still open. The static page expands each workstream to show evidence and completion criteria.
+
+### Official Glamsterdam: EIP-7495 ProgressiveContainer
+
+The current official inclusion list schedules this EIP. Existing StableContainer code and tests retain a Functional implementation label. Review and independently qualify the current active-field, canonical encoding and progressive Merkleization contract before promoting the label. No implementation status changes merely because the scope is corrected.
 
 ### 1. Independent Frame / FOCIL agreement (qualification)
 
@@ -44,11 +48,11 @@ The pinned local paymaster ABI and paired sponsored/blob controls are delivered.
 
 Sources: [docs/verification/frame-8141-20261118-paymaster-history-final.json](../../docs/verification/frame-8141-20261118-paymaster-history-final.json), [docs/next-stage-work-plan.md](../../docs/next-stage-work-plan.md).
 
-### 4. Canonical Ethereum STF guest and public proof consumers (research)
+### 4. Later optional execution proofs and canonical Ethereum STF guest (research)
 
-EL #156 supplies real pinned RV32IM execution receipts, complete machine-state/statement binding and native asynchronous proof RPC. The fixed-output STF adapter fixture is not an Ethereum STF implementation.
+Merged EL #156 supplies real pinned RV32IM execution receipts, complete machine-state/statement binding and native asynchronous proof RPC. EIP-8025 and the executable Ethereum STF guest are later proposals outside official Glamsterdam scope; no official future fork assignment is implied. The fixed-output STF adapter fixture is not an Ethereum STF implementation.
 
-**Remaining:** Implement an executable canonical Ethereum STF guest with actual block/prestate witnesses; qualify independent state/receipt roots and mandatory public deciding consumers under an adopted protocol.
+**Remaining:** Implement an executable canonical Ethereum STF guest with actual block/prestate witnesses; qualify independent state/receipt roots and payload-bound optional proof production, verification and recovery under the adopted draft. Mandatory proof adoption is separate later protocol work.
 
 **Done when:** Real Ethereum block transitions execute inside the proved guest, and independent positive and invalid witness/root/program/receipt controls agree at the deciding block consumer.
 
@@ -86,9 +90,9 @@ Sources: [pkg/rollup/native_rollup.go](../../pkg/rollup/native_rollup.go), [docs
 
 ## Historical label inventory
 
-Across the six mapped cards there are 51 entries: 20 labelled Complete and 31 non-complete. The current distribution is Glamsterdam 1, Hegotá 7, I* 7, J* 7, K* 2 and L* 7. These counts are unrelated to the 33 completed frozen-development task IDs; no whole-client completion percentage is derived from either.
+Current progress uses nineteen Complete labels out of twenty officially scheduled Glamsterdam core EIPs; EIP-7495 remains Functional. Future project phases keep their mapped planning entries. A separate later-proof section retains EIP-8025 and the canonical Ethereum STF guest without counting them against Glamsterdam or assigning them an official activation date.
 
-Glamsterdam is 16/17 within stated development scopes. The canonical quest remains Substantial because an executable Ethereum STF guest is unfinished. ePBS completion covers the adopted signed Gloas contract, and FCR uses the normative signed CL path and standard native Engine consumer. Separate PR integration and finite runtime receipts do not imply public activation or unrestricted acceptance.
+Archived 16/17 and 33-task accounting records are not rewritten. They describe earlier project-specific selections and are superseded for the current page denominator.
 
 Four planned-only entries list no implementation or tests: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal. These are identified as planned scope, not as already implemented features. Every other historical non-complete entry remains visible in the page's per-phase expandable inventory; a fresh source/consumer audit is required before promoting or recasting those labels.
 
@@ -102,11 +106,11 @@ Dora sibling revision 6f702f24e8445d9e4b764d5bf141c604b1c99d47 was inspected rea
 
 1. Adopt a compatible independent Frame/Bogotá target and close independent-client/alternate-peer/restart qualification.
 2. Complete Dora consumer/schema/rebuild migration and workload/paymaster service cutover in separate branches/PRs.
-3. Review EL #155/#156 master integration and the authorized Lighthouse #17 eth2030 integration. Build a real Ethereum STF guest as a separate major feature; select independent binary-state, PQ and rollup/finality contracts before public consumers. Do not promote structural/simulated verification to protocol authority.
+3. EL #155/#156 and Lighthouse #17 integration are merged. Qualify the current EIP-7495 contract as the remaining official-core label. Build a real Ethereum STF guest as a separate major feature; select independent binary-state, PQ and rollup/finality contracts before public consumers. Do not promote structural/simulated verification to protocol authority.
 4. Revisit planned-only scope only when a concrete contract is adopted; retain the two deferred acceptance items outside the development denominator.
 
 [Roadmap](../ROADMAP.md) · [Current frozen accounting](../reviews/development-scope-20261124/CURRENT_STATE.json) · [Review checklist](../reviews/roadmap-remaining-20261124/CHECK.md).
 
 ## Extension delivery update
 
-The November 24 extension review supersedes the earlier Fast confirmation and canonical verifier observations: EL #155 implements vote isolation and actual signed CL/native consumers; Lighthouse #17 repairs durable FCR publication; EL #156 supplies real pinned execution receipts and native proof RPC. The remaining broad canonical quest is an executable Ethereum STF guest and adopted public proof consumers, not the old hash/length verifier defect. Current mapped progress is 16/17; see [the extension record](../reviews/glamsterdam-extensions-20261124/STATUS.md) for source-specific validation and integration state.
+The November 24 extension review supersedes the earlier Fast confirmation and canonical verifier observations: EL #155 implements vote isolation and actual signed CL/native consumers; Lighthouse #17 repairs durable FCR publication; EL #156 supplies real pinned execution receipts and native proof RPC. The remaining broad canonical quest is an executable Ethereum STF guest and adopted public proof consumers, not the old hash/length verifier defect. Current page scope is the official twenty-core-EIP list (19 Complete, EIP-7495 Functional); later proof proposals are excluded; see [the extension record](../reviews/glamsterdam-extensions-20261124/STATUS.md) for source-specific validation and integration state.

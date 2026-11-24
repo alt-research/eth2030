@@ -75,8 +75,8 @@ EIP-7904 and EIP-8261 are informational. They do not authorize silently installi
 Use an unchanged generated consensus reference at `d2021d27`, remerkleable at `2f0baeef`, and a clean Lighthouse checkout with tree `9fba2d60` (merged eth2030 `983f62e9`). The Rust probe is an external qualification program; it does not modify or embed a replacement client implementation.
 
 ```sh
-PYTHONPATH=/path/to/remerkleable /path/to/consensus-venv/bin/python docs/reviews/pr-160/cl_oracle.py /path/to/lighthouse/consensus/types/testdata docs/reviews/pr-160/EIP_8061_SOURCE.md /tmp/glamsterdam-cl-audit
+PYTHONPATH=/path/to/remerkleable /path/to/consensus-venv/bin/python docs/reviews/pr-160/cl_oracle.py /path/to/lighthouse/consensus/types/testdata docs/reviews/pr-160/EIP_8061_SOURCE.md.gz /tmp/glamsterdam-cl-audit
 CARGO_TARGET_DIR=/path/to/lighthouse/target python3 docs/reviews/pr-160/run_cl_check.py /path/to/lighthouse /tmp/glamsterdam-cl-audit
 ```
 
-The runner builds the actual type library, selects exact Cargo artifact paths, links the probe, and requires both positive comparisons and deliberately wrong expectation controls. It refuses a dirty or different CL source tree. Hosted checks and mergeability for the final documentation head are recorded on [PR160](https://github.com/alt-research/eth2030/pull/160), independently of the local source-specific receipts above.
+The EIP-8061 source archive preserves the exact upstream bytes, including its trailing whitespace. The runner builds the actual type library, selects exact Cargo artifact paths, links the probe, and requires both positive comparisons and deliberately wrong expectation controls. It refuses a dirty or different CL source tree. Hosted checks and mergeability for the final documentation head are recorded on [PR160](https://github.com/alt-research/eth2030/pull/160), independently of the local source-specific receipts above.

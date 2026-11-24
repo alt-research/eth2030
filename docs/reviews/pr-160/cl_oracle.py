@@ -51,7 +51,10 @@ ns = {"BeaconState": dict, "Gwei": int, "uint64": int,
       "MAX_PER_EPOCH_ACTIVATION_CHURN_LIMIT": 256_000_000_000,
       "MIN_VALIDATOR_WITHDRAWABILITY_DELAY": int(spec.config.MIN_VALIDATOR_WITHDRAWABILITY_DELAY),
       "SAFETY_DECAY": int(spec.SAFETY_DECAY)}
-for block in re.findall(r"```python\n(.*?)```", Path(sys.argv[2]).read_text(), re.S):
+eip_bytes = Path(sys.argv[2]).read_bytes()
+if sys.argv[2].endswith(".gz"):
+    eip_bytes = gzip.decompress(eip_bytes)
+for block in re.findall(r"```python\n(.*?)```", eip_bytes.decode(), re.S):
     if "def get_activation_churn_limit(" in block or "def compute_weak_subjectivity_period(" in block:
         exec(compile(block, "EIP-8061 normative functions", "exec"), ns)
 churn = []

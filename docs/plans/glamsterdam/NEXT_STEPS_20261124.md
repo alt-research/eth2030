@@ -1,5 +1,7 @@
 # Adopted Glamsterdam development completion - 2026-11-24
 
+> Current specification follow-up: [closure review](SPEC_CLOSURE_20261124.md) reconciles all 28 current documents and implements five newly confirmed issue groups in independent EL 150/151 and Lighthouse 16 reviews. The original delivery/accounting below is retained at its source; current review/CI/integration state is tracked separately.
+
 ## Current completion scope
 
 The adopted frozen LIFO / signed Gloas node-development scope is complete: 33/33 original task IDs, R01-R13, and 5/5 confirmed implementation follow-ups. EL PRs 142-147 are merged into master cfd39f3f; its Go package tree 48afbc34 equals the actually qualified cumulative source 50514bf3. Lighthouse 13-15 are integrated into eth2030 fa16f70a; the qualified CI head 215525de has 27 successful suite jobs plus local-testnet 9 success / 1 conditional checkpoint skip. Source/merge equivalence does not rename old executables or create a new runtime run.

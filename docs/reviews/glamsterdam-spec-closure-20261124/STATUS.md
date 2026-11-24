@@ -1,0 +1,15 @@
+# Status
+
+Implementation closure reviewed November 24, 2026 from master b4b88ed0. All 28 meta/scheduled/network/informational documents listed by current EIP-7773 are reconciled against EIPs 81a90efc, Engine 1ca08185 and consensus-specs d2021d27. Current LIFO text is unchanged and alternatives 12581/12582 closed unmerged. SPEC_COMPARISON.json, COVERAGE.json and MATRIX.md preserve the exact source ledger and scope.
+
+Five confirmed issue groups are implemented in independent feature reviews: eth/72 ordinary masks (EL PR 150), the inherited/current blob query family (EL PR 151), and balance-backed bid counting, parent-state authority and clock eligibility/lifecycle (Lighthouse PR 16). All confirmed current-scope implementation tasks have delivered code. EL PRs 149-152 independently target master and remain for user review/merge; no EL master merge is performed.
+
+The final EL composition 264adba4 passes 219 test-bearing packages plus 18 no-test packages, 23369 parent/subtest pass events, five complete affected race packages, full vet and both entrypoint builds. Current EL hosted CI is green; 151 retains one module-proxy HTTP/2 failure before a successful failed-job-only retry with unchanged source. EL_VALIDATION.json, EL_HOSTED_CI.json and CI_ATTEMPTS.json retain those boundaries.
+
+Final lifecycle-inclusive CL source 3d6ea012 passes the actual lighthouse binary check, project-policy Clippy and all 59 Gloas bid tests with blst/supranational enabled and fake_crypto absent. The actual timer cleanup retains both prior-slot preferences and consumed quota/highest-bid evidence; a signed excess update remains ignored. Earlier behavior/fixture/filter failures and the earlier source-specific full runs remain documented separately.
+
+Hosted test-suite 45258290463 completed with 27 successful jobs. Local-testnet 45258290749 completed with nine successful jobs and one conditional checkpoint-sync skip. Lighthouse PR 16 is merged into eth2030 at dc6547450c19b7b7605b4c7b4abd1466c5addb43; its tree equals the qualified 3d6ea012 feature tree. CL_HOSTED_AND_MERGE.json records exact sources, jobs and the actual merge. No earlier runtime executable is relabelled.
+
+The four pre-receipt EL PR heads pass all 32 subset transitions covering 24 merge orders, converge to one tree and preserve the measured EL pkg tree. FINAL_MERGE_AUDIT.json records that snapshot; the final receipt-only review head receives its own hosted CI and published-head merge recheck before handoff. Simulated trees are not actual master merges.
+
+48h/larger-scale admission and upstream Lodestar approval remain user-deferred outside progress and are not declared passed. Original-04 exact waiter/device attribution remains unknown because contemporaneous capture is absent; later confirmed corrections or no recurrence cannot reconstruct it. Public activation remains a separate network/client/schedule decision. Broader Frame/FOCIL, canonical-proof, PQ, binary-state and native-rollup research is not silently adopted into Glamsterdam.

@@ -1,0 +1,241 @@
+{
+  "observed_at": "2026-11-23T21:17:04.244783+00:00",
+  "base": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+  "snapshot_heads": [
+    {
+      "number": 149,
+      "head": "915ddd49425fbf4a82589304dc27b041e3bc080d",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "merged": false,
+      "mergeable": true
+    },
+    {
+      "number": 150,
+      "head": "005ef47389470a67a1f8368cb8a9d87e0300a6a8",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "merged": false,
+      "mergeable": true
+    },
+    {
+      "number": 151,
+      "head": "07f6e3645310637184ee0b5445b53253d64a155b",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "merged": false,
+      "mergeable": true
+    },
+    {
+      "number": 152,
+      "head": "1b0a92b1ea3cfdac56d04cb97353150f5dd0f0ce",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "merged": false,
+      "mergeable": true
+    }
+  ],
+  "all_clean": true,
+  "subset_transitions": 32,
+  "merge_orders_covered": 24,
+  "all_orders_converge": true,
+  "pkg_tree": "0206fabc89395694d02b0bf63d069d8c825b5192",
+  "qualified_source": "264adba468069377fb50b487bd2dec77c089b28d",
+  "package_equal_to_measured_source": true,
+  "checks": [
+    {
+      "prefix": 0,
+      "next_pr": 149,
+      "tree": "9db5f7922cbb6dd118cf29e358c2915e6925fd37",
+      "clean": true
+    },
+    {
+      "prefix": 0,
+      "next_pr": 150,
+      "tree": "932f9481f62c151fc8e80be33a1f7ae220e23423",
+      "clean": true
+    },
+    {
+      "prefix": 0,
+      "next_pr": 151,
+      "tree": "0285d79a43675c6bbf8deb122a981b1dc050937d",
+      "clean": true
+    },
+    {
+      "prefix": 0,
+      "next_pr": 152,
+      "tree": "e0087ee21b9bd2bdf534de21919f72830c826218",
+      "clean": true
+    },
+    {
+      "prefix": 1,
+      "next_pr": 150,
+      "tree": "18f4135414699f3bcaad506b95203f5285afd560",
+      "clean": true
+    },
+    {
+      "prefix": 1,
+      "next_pr": 151,
+      "tree": "6f1f6b3298dfd85a6e71b63e901cb9e8502ae7aa",
+      "clean": true
+    },
+    {
+      "prefix": 1,
+      "next_pr": 152,
+      "tree": "6367fa470a2e191f4e0def086b01e91d83b83697",
+      "clean": true
+    },
+    {
+      "prefix": 2,
+      "next_pr": 149,
+      "tree": "18f4135414699f3bcaad506b95203f5285afd560",
+      "clean": true
+    },
+    {
+      "prefix": 2,
+      "next_pr": 151,
+      "tree": "84d1c2242b60d5ccb094736dc8aacdd5c44f4e7b",
+      "clean": true
+    },
+    {
+      "prefix": 2,
+      "next_pr": 152,
+      "tree": "3b30ea5265f383668d597189666a39c615a4263d",
+      "clean": true
+    },
+    {
+      "prefix": 3,
+      "next_pr": 151,
+      "tree": "a12cae7fe75525d3bafed07f52a3276672bd5915",
+      "clean": true
+    },
+    {
+      "prefix": 3,
+      "next_pr": 152,
+      "tree": "e25c1c51215b6fde2e5c68e2ca6074512c71f0e1",
+      "clean": true
+    },
+    {
+      "prefix": 4,
+      "next_pr": 149,
+      "tree": "6f1f6b3298dfd85a6e71b63e901cb9e8502ae7aa",
+      "clean": true
+    },
+    {
+      "prefix": 4,
+      "next_pr": 150,
+      "tree": "84d1c2242b60d5ccb094736dc8aacdd5c44f4e7b",
+      "clean": true
+    },
+    {
+      "prefix": 4,
+      "next_pr": 152,
+      "tree": "ca6fb2d73875d1f113fe6d621cd068c4cd57b00a",
+      "clean": true
+    },
+    {
+      "prefix": 5,
+      "next_pr": 150,
+      "tree": "a12cae7fe75525d3bafed07f52a3276672bd5915",
+      "clean": true
+    },
+    {
+      "prefix": 5,
+      "next_pr": 152,
+      "tree": "43fc95c82cdff826aa0ff4d7e5e6e8452d260a97",
+      "clean": true
+    },
+    {
+      "prefix": 6,
+      "next_pr": 149,
+      "tree": "a12cae7fe75525d3bafed07f52a3276672bd5915",
+      "clean": true
+    },
+    {
+      "prefix": 6,
+      "next_pr": 152,
+      "tree": "aa0a50eeef1ea0f054a1e98f05408e0e3ad27ff3",
+      "clean": true
+    },
+    {
+      "prefix": 7,
+      "next_pr": 152,
+      "tree": "0de3273721285f53467643c31685cc366cf7c58c",
+      "clean": true
+    },
+    {
+      "prefix": 8,
+      "next_pr": 149,
+      "tree": "6367fa470a2e191f4e0def086b01e91d83b83697",
+      "clean": true
+    },
+    {
+      "prefix": 8,
+      "next_pr": 150,
+      "tree": "3b30ea5265f383668d597189666a39c615a4263d",
+      "clean": true
+    },
+    {
+      "prefix": 8,
+      "next_pr": 151,
+      "tree": "ca6fb2d73875d1f113fe6d621cd068c4cd57b00a",
+      "clean": true
+    },
+    {
+      "prefix": 9,
+      "next_pr": 150,
+      "tree": "e25c1c51215b6fde2e5c68e2ca6074512c71f0e1",
+      "clean": true
+    },
+    {
+      "prefix": 9,
+      "next_pr": 151,
+      "tree": "43fc95c82cdff826aa0ff4d7e5e6e8452d260a97",
+      "clean": true
+    },
+    {
+      "prefix": 10,
+      "next_pr": 149,
+      "tree": "e25c1c51215b6fde2e5c68e2ca6074512c71f0e1",
+      "clean": true
+    },
+    {
+      "prefix": 10,
+      "next_pr": 151,
+      "tree": "aa0a50eeef1ea0f054a1e98f05408e0e3ad27ff3",
+      "clean": true
+    },
+    {
+      "prefix": 11,
+      "next_pr": 151,
+      "tree": "0de3273721285f53467643c31685cc366cf7c58c",
+      "clean": true
+    },
+    {
+      "prefix": 12,
+      "next_pr": 149,
+      "tree": "43fc95c82cdff826aa0ff4d7e5e6e8452d260a97",
+      "clean": true
+    },
+    {
+      "prefix": 12,
+      "next_pr": 150,
+      "tree": "aa0a50eeef1ea0f054a1e98f05408e0e3ad27ff3",
+      "clean": true
+    },
+    {
+      "prefix": 13,
+      "next_pr": 150,
+      "tree": "0de3273721285f53467643c31685cc366cf7c58c",
+      "clean": true
+    },
+    {
+      "prefix": 14,
+      "next_pr": 149,
+      "tree": "0de3273721285f53467643c31685cc366cf7c58c",
+      "clean": true
+    }
+  ],
+  "actual_el_merge_performed": false,
+  "receipt_boundary": "Pre-receipt heads; the final receipt-only PR head is checked again in the published handoff, without a self-referential commit loop."
+}

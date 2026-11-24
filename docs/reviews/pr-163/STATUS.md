@@ -1,8 +1,8 @@
 # Status
 
-G01 implementation is complete against master `5fedb7e5733fbef69767a711115ef9925e7bd769`; final committed-source receipts and remote CI are being collected. This work does not close G02 (current CL vectors), G03 (independent live interoperability), or original-04 waiting-chain attribution.
+G01 implementation is published in [PR #163](https://github.com/alt-research/eth2030/pull/163) against master `5fedb7e5733fbef69767a711115ef9925e7bd769`; final committed-source receipts pass; remote CI is being checked. This work does not close G02 (current CL vectors), G03 (independent live interoperability), or original-04 waiting-chain attribution.
 
-The native runner imports 43,790 official cases containing 52,620 encoded blocks: Osaka 17,441/19,875 and Amsterdam 26,349/32,745. Both full preliminary corrected-source runs pass. Final-source reruns remain a separate checklist item. Eight blocks per corpus have independently proven multiple invalid fields and reject at another permitted check; receipts flag them explicitly and do not assert that the declared signature branch ran.
+The native runner imports 43,790 official cases containing 52,620 encoded blocks: Osaka 17,441/19,875 and Amsterdam 26,349/32,745. Both complete final-source runs pass at clean executable revision `a73dc6a6225dfdc7e370f01bfba931b94f20feb4`; see `VALIDATION.json`. Eight blocks per corpus have independently proven multiple invalid fields and reject at another permitted check; receipts flag them explicitly and do not assert that the declared signature branch ran.
 
 The real import path found and fixed BAL bookkeeping addresses, zero-amount withdrawal account cleanup, zero-length EXTCODECOPY account access, uint256 BLOCKHASH truncation, erroneous EL rejection of opaque request output, and missing mandatory Amsterdam slot headers. Existing test constructors now supply explicit slot zero. The low-level block constructor retains zero as its omitted-slot default; Engine callers continue to validate and supply the actual CL slot, without deriving it from timestamps.
 

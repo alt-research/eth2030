@@ -6,5 +6,5 @@
 - [x] Reproduce and fix six execution/header defects; retain seven unchanged official regressions and negative reference controls.
 - [x] Execute six restored behavioral mutations; require assertion failures rather than compile failures.
 - [x] Pass the full Go suite and both node builds.
-- [ ] Finish final affected race/vet checks and rerun both complete corpora from the committed executable.
+- [x] Finish final affected race/vet checks and rerun both complete corpora from the committed executable.
 - [ ] Publish an independent master-target PR and verify exact-head CI and cumulative merge compatibility.

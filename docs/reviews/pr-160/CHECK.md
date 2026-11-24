@@ -16,3 +16,5 @@
 - [x] Independently compare slashed proposer selection, unchanged lookahead and churn/weak-subjectivity boundaries.
 - [x] Retain the reproduced pre-fix native Engine rejection and meaningful invalid encodings.
 - [x] Document all twenty EIPs and explicit remaining qualification/maintenance gaps.
+
+- [x] Diagnose and retain the actual proof-CI installer rate-limit failure; supply the existing read-only workflow token without changing pins or acceptance.

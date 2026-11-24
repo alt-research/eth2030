@@ -18,6 +18,10 @@ Both backends now compare hex digits without regard to case, while still requiri
 
 This is a valid-input interoperability defect, not an observed state-root divergence or an explanation of the historical import stall.
 
+## F02: proof CI installer used the anonymous GitHub API budget
+
+The final documentation-head proof job 138568582860 failed in `Install pinned local proving components`: GitHub returned an anonymous API-rate-limit 403 while rzup looked up the pinned Rust release. Neither the client build nor proof execution had started; the missing artifact error was a consequence of that setup failure. The workflow now supplies its existing read-only `github.token` through rzup's documented `GITHUB_TOKEN` variable at the installer step only. Toolchain versions, installer checksum, guest image and proof acceptance assertions are unchanged. [CI_BOOTSTRAP.json](CI_BOOTSTRAP.json) records the original failure; the corrected hosted run is a separate gate, not a retroactive pass.
+
 ## Executed evidence
 
 - Full Go baseline: 220 passing packages, zero failing packages; eighteen packages contain no tests. The 123 conditional test skip events are retained in [TEST_RESULTS.json](TEST_RESULTS.json), rather than counted as passed cases.

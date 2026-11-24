@@ -7,3 +7,7 @@ Both the memory backend and actual native Engine HTTP import reject 0x2A before 
 ## Whole-upgrade audit
 
 The current-spec review covers all twenty official core entries at the pinned current EIP source, with five networking references separate. See [the complete audit](AUDIT.md), [per-EIP matrix](EIP_MATRIX.json), [source manifest](SOURCE_MANIFEST.json) and [test/skip results](TEST_RESULTS.json). The active-path slot defect is corrected. G01 full native blockchain/BAL corpus, G02 complete CL reference fixture admission, G03 independent mixed-peer qualification and G04 misleading legacy gas-helper authority remain explicitly open. These are not represented as newly passed whole-upgrade conformance. No master merge or public deployment is performed.
+
+## Hosted installer correction
+
+F02 is a separately retained proof-CI setup failure at 98b7f67e: rzup hit the anonymous GitHub API limit before client build or proof execution. The installer step now receives the workflow's existing read-only token through its documented environment variable. Pins and acceptance assertions remain unchanged. CI_BOOTSTRAP.json records the failed run; final corrected-head hosted checks are recorded on PR160.

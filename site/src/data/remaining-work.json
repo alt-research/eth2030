@@ -1,9 +1,9 @@
 {
   "date": "November 24, 2026",
-  "reviewedMaster": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+  "reviewedMaster": "45e8c145236da03ecbcd89ad73eba05780923c12",
   "mergedProgressPr": 148,
   "adoptedDevelopmentTodos": 0,
-  "policy": "The adopted frozen Glamsterdam scope is complete. These later-scope integration, qualification and research items do not reopen its 33-task denominator. Historical non-complete labels require scoped review; they are not all freshly confirmed missing features.",
+  "policy": "The adopted frozen Glamsterdam scope is complete. The FCR and real RV32IM proof extensions have separate implementation reviews. A canonical Ethereum STF guest remains broader unfinished work; it is not hidden by the original 33-task denominator.",
   "items": [
     {
       "id": "frame-independent",
@@ -55,29 +55,13 @@
       ]
     },
     {
-      "id": "fast-confirmation",
-      "phase": "glamsterdam",
-      "kind": "Research",
-      "title": "Broader fast-confirmation integration",
-      "current": "The standalone tracker counts supplied validator indices. A compatibility wrapper exists; no node/Engine integration caller was found in this review.",
-      "remaining": "Adopt a signed CL input and consumer contract, then connect real validator authority, conflicts and restart behavior.",
-      "doneWhen": "Signed live inputs and independent deciding consumers establish the claimed confirmation semantics.",
-      "evidence": [
-        "pkg/consensus/fastconfirm/fast_confirm.go",
-        "pkg/consensus/fastconfirm_compat.go"
-      ],
-      "entries": [
-        "feature-fast-confirmation"
-      ]
-    },
-    {
       "id": "canonical-proofs",
       "phase": "glamsterdam",
       "kind": "Research",
-      "title": "Canonical guest and deciding proof verification",
-      "current": "Guest execution exists, but canonical.VerifyExecution checks success and proof length then returns true; it does not verify the claimed execution proof.",
-      "remaining": "Adopt the proof statement, bind program/input/output/state to a real verifier and wire an actual deciding consumer.",
-      "doneWhen": "Independent vectors and mutated proof/program/input/output/state tests reject invalid claims in the selected consumer.",
+      "title": "Canonical Ethereum STF guest and public proof consumers",
+      "current": "EL #156 delivers real RV32IM program-execution receipts, complete statement binding and native asynchronous prove/verify consumers. The fixed-output STF adapter fixture is not an Ethereum STF implementation.",
+      "remaining": "Implement an executable canonical Ethereum STF guest with actual block/prestate witnesses, then qualify independent poststate/receipt roots and mandatory public proof consumers under an adopted protocol.",
+      "doneWhen": "A real Ethereum block transition is executed inside the proved guest; independent vectors and invalid witness, root, program and receipt controls agree at the deciding block consumer.",
       "evidence": [
         "pkg/zkvm/canonical.go",
         "pkg/zkvm/canonical_executor.go"
@@ -153,25 +137,25 @@
   ],
   "specificationRepairs": [
     {
-      "id": "eth72-mask",
-      "title": "Canonical eth/72 announcement masks",
+      "id": "fast-confirmation-native",
+      "title": "Signed FCR and native safe-block consumers",
       "target": "master",
-      "label": "EL review #150",
-      "url": "https://github.com/alt-research/eth2030/pull/150"
+      "label": "EL review #155",
+      "url": "https://github.com/alt-research/eth2030/pull/155"
     },
     {
-      "id": "blob-query-contract",
-      "title": "V2-V4 blob query and proof contracts",
+      "id": "real-execution-proofs",
+      "title": "Real execution receipts and native proof RPC",
       "target": "master",
-      "label": "EL review #151",
-      "url": "https://github.com/alt-research/eth2030/pull/151"
+      "label": "EL review #156",
+      "url": "https://github.com/alt-research/eth2030/pull/156"
     },
     {
-      "id": "gloas-bid-gossip",
-      "title": "Builder bid quota, parent state and clock lifecycle",
+      "id": "fcr-crash-durability",
+      "title": "Durable FCR announcements before publication",
       "target": "eth2030",
-      "label": "Lighthouse review #16",
-      "url": "https://github.com/jiayaoqijia/lighthouse/pull/16"
+      "label": "Lighthouse review #17",
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/17"
     }
   ],
   "specificationAuditUrl": "https://github.com/alt-research/eth2030/pull/152"

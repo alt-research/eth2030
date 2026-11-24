@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "started": "2026-11-24T06:37:07.811647+00:00",
+  "stopped": "2026-11-24T06:49:08.137965+00:00",
+  "observations": 700,
+  "fcr_events": 458,
+  "safe_ahead_samples": 649,
+  "first_slot": 0,
+  "final_slot": 115,
+  "common_head": "0xce9ab1e5e2e3f13cad6915a405faf3f75b3e5436e446b54eee45110b1c9997cb",
+  "crash_restart_passed": true,
+  "postcrash_observations": 251,
+  "precrash_confirmed_slot": 71,
+  "actual_proof_passed": true,
+  "transport_reconnects": [
+    {
+      "at": "2026-11-24T06:44:47.423996+00:00",
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "at": "2026-11-24T06:44:48.424692+00:00",
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "at": "2026-11-24T06:44:48.945881+00:00",
+      "observation_error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "at": "2026-11-24T06:44:49.425208+00:00",
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "at": "2026-11-24T06:44:49.948621+00:00",
+      "observation_error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "at": "2026-11-24T06:44:50.425725+00:00",
+      "error": "[Errno 104] Connection reset by peer"
+    }
+  ]
+}

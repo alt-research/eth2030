@@ -1,0 +1,16 @@
+{
+  "source_revision": "7901a25767a8ad3f53d99b3f1821b30bd9d28d75",
+  "source_dirty": false,
+  "proof_system": "risc0-3.1.0",
+  "image": {
+    "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+    "sdk": "3.1.0",
+    "system": "risc0",
+    "version": 1
+  },
+  "binaries": {
+    "eth2030": "3627517b11f647cc019d5baddb4f3d40a66fa7c82a2c829e3f968013c66c3a23",
+    "eth2030-prover": "76240eb3c84f368d83de23cde72e3f6a2a7d1cf478f711f23e7130e5f69cc6b2",
+    "r0vm": "990c7e55c5627c6d78968c5fa6c6c98119a6282b5298831ccb52178f0dff9310"
+  }
+}

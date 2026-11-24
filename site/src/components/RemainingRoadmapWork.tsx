@@ -33,8 +33,8 @@ export default function RemainingRoadmapWork() {
       <ul className="mt-2 grid gap-2 text-xs leading-6 text-eth-teal sm:grid-cols-2">{remaining.plannedOnly.map(id => <li key={id} data-planned-work={id}><Link className="underline" href={`/eips/${id}/`}>{EIPS.find(entry => entry.id === id)?.title ?? id} ↗</Link></li>)}</ul>
     </div>
     <div className="mt-5 border-t border-eth-teal/20 pt-4">
-      <h3 className="text-sm font-bold text-eth-text">Historical non-complete labels: {labelledPending} entries</h3>
-      <p className="mt-2 text-xs leading-6 text-eth-dim">This is an inventory of old labels, not {labelledPending} newly confirmed missing features. In particular, the broad ePBS label does not reopen the delivered signed Gloas route. Expand a phase to inspect every non-complete entry.</p>
+      <h3 className="text-sm font-bold text-eth-text">Current non-complete tracker labels: {labelledPending} entries</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">This inventory contains {labelledPending} non-complete mapped entries across all phases. The Glamsterdam remainder is the canonical Ethereum STF guest; the adopted signed Gloas and FCR routes have scoped completion evidence. Expand a phase to inspect every non-complete entry.</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{inventory.map(({ stage, pending }) => <details key={stage.id} data-pending-phase={stage.id} data-pending-count={pending.length} className="min-w-0 rounded-lg border border-eth-teal/20 p-3 text-xs leading-6">
         <summary className="cursor-pointer font-bold text-eth-text">{stage.name} · {pending.length} entries</summary>
         <ul className="mt-2 space-y-2">{pending.map(entry => <li key={entry.id} data-pending-entry={entry.id}><Link className="text-eth-teal underline" href={`/eips/${entry.id}/`}>{entry.title}</Link><span className="ml-2 text-eth-dim">{roadmapStatusNames[entry.status]}</span></li>)}</ul>

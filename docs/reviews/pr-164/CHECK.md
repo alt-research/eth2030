@@ -5,4 +5,6 @@
 - [x] Verify typed independent nonempty BALs, unavailable holes, soft-budget truncation, subsequent recovery and wrong-header commitments over real TCP/RLPx.
 - [x] Retain raw requests/responses and source identities; keep serving/client component qualification distinct from whole-node import and canonical recovery.
 - [x] Run full affected race suites, final profile race, vet, both node builds and two executed behavioral mutation controls.
-- [ ] Publish an independent master-target PR and verify exact-head CI/conflicts.
+- [x] Publish master-target PR #164 and verify GitHub reports no conflicts.
+- [x] Verify the exact functional head native-geth-snap2 CI job and all nine standard Go/fixture checks pass.
+- [ ] Confirm final metadata-head checks and cumulative merge orders with the other open master PRs.

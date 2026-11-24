@@ -19,3 +19,5 @@ ETH2030_INTEROP_OUTPUT=/tmp/snap2-interop go test -race ./node -run TestIndepend
 The test-only recorder writes compressed actual RLP and `exchanges.json` below the selected output directory. Omit the setting to use automatically cleaned test temporary directories. The test assertions always run.
 
 Normative input: [EIP-8159](https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8159.md), [devp2p snap/2](https://github.com/ethereum/devp2p/blob/master/caps/snap.md), and the exact Geth v1.17.10 module pinned by go.mod/go.sum. The BAL shape/unavailable/commitment rules and snap-specific message IDs are qualified separately.
+
+PR: https://github.com/alt-research/eth2030/pull/164 (base `master`). At functional head `36cddcc1847282627525d07d141ffad34be4bbda`, native-geth-snap2 and the nine standard Go/fixture checks pass. The additional real-proof matrix has one pass and three still running at this observation. GitHub reports mergeable; branch protection remains in force. Final metadata-head CI and cumulative five-PR merge simulation are tracked separately.

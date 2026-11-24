@@ -32,6 +32,7 @@ class FastConfirmationProfileTest(unittest.TestCase):
             with self.assertRaises(urllib.error.HTTPError):
                 archive_signed_block(root, "http://cl", 7)
             self.assertEqual(list(root.iterdir()), [])
+            values[-1].close()
 
     def test_real_cl_authority_and_native_consumers_are_enabled(self):
         result = profile("native:qualified", "lighthouse:qualified")

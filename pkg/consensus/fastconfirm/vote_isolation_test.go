@@ -1,6 +1,7 @@
 package fastconfirm
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -52,5 +53,37 @@ func TestTrackerOwnsConfiguration(t *testing.T) {
 	}
 	if tracker.IsConfirmed(1, fcHash(1)) || tracker.Config().TotalValidators != 4 {
 		t.Fatal("caller mutation changed the tracker quorum")
+	}
+}
+
+func TestNonFiniteQuorumIsRejected(t *testing.T) {
+	cfg := DefaultFastConfirmConfig()
+	cfg.QuorumThreshold = math.NaN()
+	if err := ValidateFastConfirmConfig(cfg); err == nil {
+		t.Fatal("accepted non-finite quorum")
+	}
+	tracker := NewFastConfirmTracker(cfg)
+	if err := tracker.AddAttestation(1, fcHash(1), 0); err == nil || tracker.TrackedSlots() != 0 {
+		t.Fatal("invalid quorum created tracker state")
+	}
+}
+
+func TestConfirmationValidationMatchesTrackerQuorum(t *testing.T) {
+	cfg := &FastConfirmConfig{QuorumThreshold: .5, MinAttesters: 3, TotalValidators: 4, MaxTrackedSlots: 4}
+	claim := &FastConfirmation{Slot: 1, BlockRoot: fcHash(1), AttestationCount: 2, Confirmed: true}
+	if err := ValidateConfirmation(claim, cfg); err == nil {
+		t.Fatal("accepted confirmation below minimum attesters")
+	}
+	claim.Confirmed = false
+	claim.AttestationCount = -1
+	if err := ValidateConfirmation(claim, cfg); err == nil {
+		t.Fatal("accepted negative vote count")
+	}
+	cfg.TotalValidators = 0
+	cfg.MinAttesters = 0
+	claim.Confirmed = true
+	claim.AttestationCount = 0
+	if err := ValidateConfirmation(claim, cfg); err == nil {
+		t.Fatal("accepted empty-set confirmation")
 	}
 }

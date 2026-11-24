@@ -6,6 +6,7 @@ package fastconfirm
 
 import (
 	"errors"
+	"math"
 	"sync"
 	"time"
 
@@ -272,7 +273,16 @@ func ValidateConfirmation(fc *FastConfirmation, cfg *FastConfirmConfig) error {
 	if fc.BlockRoot == emptyHash {
 		return ErrFCBlockRootEmpty
 	}
+	if fc.AttestationCount < 0 {
+		return errors.New("fast confirm: negative attestation count")
+	}
 	if cfg != nil {
+		if err := ValidateFastConfirmConfig(cfg); err != nil {
+			return err
+		}
+		if fc.Confirmed && (cfg.TotalValidators == 0 || fc.AttestationCount < cfg.MinAttesters) {
+			return errors.New("fast confirm: confirmed without the required validator support")
+		}
 		if cfg.TotalValidators > 0 && fc.AttestationCount > cfg.TotalValidators {
 			return errors.New("fast confirm: attestation count exceeds total validators")
 		}
@@ -291,7 +301,7 @@ func ValidateFastConfirmConfig(cfg *FastConfirmConfig) error {
 	if cfg == nil {
 		return errors.New("fast confirm: nil config")
 	}
-	if cfg.QuorumThreshold < 0 || cfg.QuorumThreshold > 1.0 {
+	if math.IsNaN(cfg.QuorumThreshold) || cfg.QuorumThreshold < 0 || cfg.QuorumThreshold > 1.0 {
 		return errors.New("fast confirm: quorum threshold must be in [0, 1]")
 	}
 	if cfg.MinAttesters < 0 {

@@ -7,7 +7,7 @@ import { roadmapStages, roadmapProgress, roadmapStatusNames } from '@/lib/roadma
 export default function RemainingRoadmapWork() {
   const inventory = roadmapStages.map(stage => ({ stage, pending: roadmapProgress(stage.id).entries.filter(entry => entry.status !== 'complete') }));
   const labelledPending = inventory.reduce((total, phase) => total + phase.pending.length, 0);
-  return <section id="remaining-work" aria-labelledby="remaining-work-heading" className="mb-8 rounded-xl border border-eth-teal/30 bg-eth-surface/80 p-5 md:p-6">
+  return <section aria-labelledby="remaining-work-heading" className="mb-8 rounded-xl border border-eth-teal/30 bg-eth-surface/80 p-5 md:p-6">
     <p className="text-xs uppercase tracking-wider text-eth-teal">Remaining work · {remaining.date}</p>
     <h2 id="remaining-work-heading" className="mt-2 text-xl font-bold text-eth-text">What still needs work</h2>
     <p data-remaining-adopted-todos={remaining.adoptedDevelopmentTodos} className="mt-3 text-sm leading-7 text-eth-text/80">Adopted Glamsterdam development: {remaining.adoptedDevelopmentTodos} confirmed open implementation TODOs. PR #{remaining.mergedProgressPr} is merged into master.</p>

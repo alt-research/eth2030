@@ -49,7 +49,7 @@ func (*RISCZeroVerifier) Prove(program *GuestProgram, input []byte) (*Proof, err
 	if program == nil || len(program.Code) == 0 {
 		return nil, ErrGuestEmptyProgram
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), canonicalproof.ProvingTimeout)
 	defer cancel()
 	receipt, err := (canonicalproof.Prover{}).Prove(ctx, program.Code, input, canonicalproof.DefaultConfig())
 	if err != nil {

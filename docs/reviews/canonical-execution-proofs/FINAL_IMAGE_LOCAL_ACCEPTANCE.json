@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "source": "d492fe98aa73722acbaae3fcc0211023fe297466",
+  "guest_image": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "required_passed": [
+    "TestCanonExec_ExecuteAndProve",
+    "TestCanonExec_ProofStatementConsistency",
+    "TestCanonExec_VerifyGuestProof",
+    "TestCanonExec_VerifyGuestProofTampered",
+    "TestIndependentRV32IMExecutionVectors",
+    "TestRealCanonicalProofThroughNativeNode",
+    "TestRealExplicitBackendAndProductionVerifier",
+    "TestRealReceiptIndependentVerificationAndBindings",
+    "TestRealSTFExec_ExecuteSTF",
+    "TestRealSTFExec_VerifySTFProof",
+    "TestZKISABridge_ExecuteZKISA"
+  ],
+  "required_skipped": [],
+  "failed": [],
+  "package_passes": [
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "elapsed": 1049.573
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm/canonicalproof",
+      "elapsed": 0.355
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm/poseidon",
+      "elapsed": 0.022
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm/r1cs",
+      "elapsed": 0.002
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm/riscv",
+      "elapsed": 0.003
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm/zkvmtypes",
+      "elapsed": 0.003
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "elapsed": 77.112
+    }
+  ],
+  "note": "Final-image full local actual backend run; CI failed initial CPU budget independently. The subsequent bounded-timeout change has separate validation."
+}

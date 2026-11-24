@@ -76,7 +76,7 @@ func (s *Service) Submit(program, input []byte, cfg Config) (Job, error) {
 	s.order = append(s.order, id)
 	s.busy = true
 	s.workers.Add(1)
-	ctx, cancel := context.WithTimeout(s.ctx, 5*time.Minute)
+	ctx, cancel := context.WithTimeout(s.ctx, ProvingTimeout)
 	s.jobCancels[id] = cancel
 	ownedProgram, ownedInput := append([]byte(nil), program...), append([]byte(nil), input...)
 	s.mu.Unlock()

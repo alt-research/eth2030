@@ -19,11 +19,16 @@ concurrency:
 jobs:
   real-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 110
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [executor, stf, bridge-backend, native-vectors]
     env:
       CARGO_BUILD_JOBS: 2
       RISC0_BUILD_LOCKED: 1
       GOTOOLCHAIN: go1.26.11
+      PROOF_GROUP: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
       - name: Select the isolated pinned proving toolchain
@@ -38,6 +43,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: tools/canonical-prover
+      - name: Retain actual proving capacity
+        run: |
+          nproc
+          lscpu
+          free -h
+          cat /sys/fs/cgroup/cpu.max || true
+          cat /sys/fs/cgroup/memory.max || true
       - name: Install pinned local proving components
         run: bash tools/canonical-prover/bootstrap.sh
       - name: Build the native node and complete real-prover bundle
@@ -50,29 +62,43 @@ jobs:
           command -v r0vm
           cargo fmt --manifest-path tools/canonical-prover/Cargo.toml --all --check
           cargo test --manifest-path tools/canonical-prover/Cargo.toml --release --locked
-      - name: Execute all actual producer, verifier and native-node cases
+      - name: Execute the complete selected actual producer and consumer family
         working-directory: pkg
-        run: go test -p 1 -tags canonicalproof_integration ./zkvm/... ./node -count=1 -timeout=90m -json > canonical-proof-results.jsonl
-      - name: Require every real-proof acceptance case
+        run: |
+          case "$PROOF_GROUP" in
+            executor) pattern='^TestCanonExec_' ;;
+            stf) pattern='^TestRealSTFExec_' ;;
+            bridge-backend) pattern='^TestZKISABridge_|^TestRealExplicitBackendAndProductionVerifier$' ;;
+            native-vectors) pattern='^TestRealCanonicalProofThroughNativeNode$|^TestRealReceiptIndependentVerificationAndBindings$|^TestIndependentRV32IMExecutionVectors$' ;;
+            *) exit 2 ;;
+          esac
+          go test -p 1 -tags canonicalproof_integration ./zkvm/... ./node -run "$pattern" -count=1 -timeout=100m -json > canonical-proof-results.jsonl
+      - name: Require every actual case in this family
         run: |
           python3 - <<'PYTHON'
           import json,os
           from pathlib import Path
-          required={'TestCanonExec_ExecuteAndProve','TestCanonExec_VerifyGuestProof','TestCanonExec_VerifyGuestProofTampered','TestCanonExec_ProofStatementConsistency','TestRealSTFExec_ExecuteSTF','TestRealSTFExec_VerifySTFProof','TestZKISABridge_ExecuteZKISA','TestRealReceiptIndependentVerificationAndBindings','TestIndependentRV32IMExecutionVectors','TestRealCanonicalProofThroughNativeNode','TestRealExplicitBackendAndProductionVerifier'}
+          families={
+            'executor':{'TestCanonExec_ExecuteAndProve','TestCanonExec_VerifyGuestProof','TestCanonExec_VerifyGuestProofTampered','TestCanonExec_ProofStatementConsistency'},
+            'stf':{'TestRealSTFExec_ExecuteSTF','TestRealSTFExec_VerifySTFProof'},
+            'bridge-backend':{'TestZKISABridge_ExecuteZKISA','TestRealExplicitBackendAndProductionVerifier'},
+            'native-vectors':{'TestRealReceiptIndependentVerificationAndBindings','TestIndependentRV32IMExecutionVectors','TestRealCanonicalProofThroughNativeNode'},
+          }
           events=[json.loads(line) for line in Path('pkg/canonical-proof-results.jsonl').read_text().splitlines()]
           passed={event.get('Test') for event in events if event.get('Action')=='pass'}
           skipped={event.get('Test') for event in events if event.get('Action')=='skip'}
+          required=families[os.environ['PROOF_GROUP']]
           assert required<=passed,sorted(required-passed)
           assert not required&skipped,sorted(required&skipped)
           image=json.loads(Path('tools/canonical-prover/target/node-bundle/prover-image.json').read_text())
           assert image['image_id']==Path('tools/canonical-prover/image-id.txt').read_text().strip()
-          Path('pkg/canonical-proof-summary.json').write_text(json.dumps({'source':os.environ['GITHUB_SHA'],'required_passed':sorted(required),'image':image,'required_skipped':[]},indent=2)+'\n')
+          Path('pkg/canonical-proof-summary.json').write_text(json.dumps({'source':os.environ['GITHUB_SHA'],'group':os.environ['PROOF_GROUP'],'required_passed':sorted(required),'image':image,'required_skipped':[]},indent=2)+'\n')
           PYTHON
       - name: Retain exact real-proof results and source/image identities
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: canonical-proof-${{ github.sha }}
+          name: canonical-proof-${{ matrix.group }}-${{ github.sha }}
           path: |
             pkg/canonical-proof-results.jsonl
             pkg/canonical-proof-summary.json
@@ -80,3 +106,33 @@ jobs:
             tools/canonical-prover/target/node-bundle/prover-image.json
           if-no-files-found: error
           retention-days: 90
+
+  real-proof-success:
+    runs-on: ubuntu-latest
+    needs: real-proof
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: canonical-proof-*-${{ github.sha }}
+          path: proof-results
+      - name: Require all four families at one source and fixed image
+        env:
+          MATRIX_RESULT: ${{ needs.real-proof.result }}
+        run: |
+          python3 - <<'PYTHON'
+          import json,os
+          from pathlib import Path
+          assert os.environ['MATRIX_RESULT']=='success',os.environ['MATRIX_RESULT']
+          summaries=[json.loads(path.read_text()) for path in Path('proof-results').rglob('canonical-proof-summary.json')]
+          assert len(summaries)==4,len(summaries)
+          assert {item['group'] for item in summaries}=={'executor','stf','bridge-backend','native-vectors'}
+          expected=Path('tools/canonical-prover/image-id.txt').read_text().strip()
+          for item in summaries:
+            assert item['source']==os.environ['GITHUB_SHA']
+            assert item['image']['image_id']==expected
+            assert item['required_skipped']==[]
+          assert len({case for item in summaries for case in item['required_passed']})==11
+          print('All 11 actual proof acceptance cases passed without skipping at the same source and pinned guest image.')
+          PYTHON

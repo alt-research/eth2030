@@ -33,7 +33,7 @@ func TestRealCanonicalProofThroughNativeNode(t *testing.T) {
 	if job.ID == "" || time.Since(start) > 3*time.Second {
 		t.Fatal("proving submission blocked HTTP")
 	}
-	deadline := time.Now().Add(4 * time.Minute)
+	deadline := time.Now().Add(canonicalproof.ProvingTimeout + 30*time.Second)
 	for time.Now().Before(deadline) {
 		var height string
 		wire.call(t, "eth_blockNumber", &height)

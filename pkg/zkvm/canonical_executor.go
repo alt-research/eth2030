@@ -199,7 +199,7 @@ func (ce *CanonicalExecutor) ExecuteGuest(programID types.Hash, input []byte) (*
 
 // ExecuteAndProve runs a guest program and generates a ZK proof of execution.
 func (ce *CanonicalExecutor) ExecuteAndProve(programID types.Hash, input []byte) (*GuestOutput, *GuestProof, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), canonicalproof.ProvingTimeout)
 	defer cancel()
 	return ce.ExecuteAndProveContext(ctx, programID, input)
 }

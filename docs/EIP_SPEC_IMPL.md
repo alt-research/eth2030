@@ -122,7 +122,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7732 | Enshrined PBS (ePBS) | Substantial | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/server.go`, `engine/legacy_builder_retired_test.go` | `epbs/*_test.go` |
+| 7732 | Enshrined PBS (ePBS) | Complete | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/server.go`, `engine/legacy_builder_retired_test.go` | `epbs/*_test.go` |
 | 7547 | Inclusion Lists | Complete | [EIP-7547](https://eips.ethereum.org/EIPS/eip-7547) | `core/types/inclusion_list.go`, `core/inclusion_list.go` | via focil tests |
 
 ---
@@ -386,3 +386,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 | Source files | 986 |
 | Test files | 916 |
 | Total LOC | ~702K |
+
+## November 24 extension scope
+
+EIP-7732 is complete for the adopted signed Gloas development contract; this is not whole-public-fork qualification. EL #155 and Lighthouse #17 connect signed CL FCR to native Engine safeBlockHash and repair crash durability. EL #156 replaces synthetic canonical proof checks with pinned real RV32IM execution receipts and native proof RPC. An executable canonical Ethereum STF guest remains a separate, unfinished broader roadmap item. See [the extension record](reviews/glamsterdam-extensions-20261124/STATUS.md).

@@ -12,7 +12,7 @@ Five newly confirmed Glamsterdam problem groups are implemented in independent [
 
 ## Remaining workstreams
 
-These eight workstreams are grouped next-scope work, not eight newly discovered frozen-target bugs. Integration can be partly implemented while production-consumer qualification is still open. The static page expands each workstream to show evidence and completion criteria.
+These seven workstreams are grouped next-scope work, not seven newly discovered frozen-target bugs. Integration can be partly implemented while production-consumer qualification is still open. The static page expands each workstream to show evidence and completion criteria.
 
 ### 1. Independent Frame / FOCIL agreement (qualification)
 
@@ -44,27 +44,17 @@ The pinned local paymaster ABI and paired sponsored/blob controls are delivered.
 
 Sources: [docs/verification/frame-8141-20261118-paymaster-history-final.json](../../docs/verification/frame-8141-20261118-paymaster-history-final.json), [docs/next-stage-work-plan.md](../../docs/next-stage-work-plan.md).
 
-### 4. Broader fast-confirmation integration (research)
+### 4. Canonical Ethereum STF guest and public proof consumers (research)
 
-The standalone tracker counts supplied validator indices. A compatibility wrapper exists; no node/Engine integration caller was found in this review.
+EL #156 supplies real pinned RV32IM execution receipts, complete machine-state/statement binding and native asynchronous proof RPC. The fixed-output STF adapter fixture is not an Ethereum STF implementation.
 
-**Remaining:** Adopt a signed CL input and consumer contract, then connect real validator authority, conflicts and restart behavior.
+**Remaining:** Implement an executable canonical Ethereum STF guest with actual block/prestate witnesses; qualify independent state/receipt roots and mandatory public deciding consumers under an adopted protocol.
 
-**Done when:** Signed live inputs and independent deciding consumers establish the claimed confirmation semantics.
+**Done when:** Real Ethereum block transitions execute inside the proved guest, and independent positive and invalid witness/root/program/receipt controls agree at the deciding block consumer.
 
-Sources: [pkg/consensus/fastconfirm/fast_confirm.go](../../pkg/consensus/fastconfirm/fast_confirm.go), [pkg/consensus/fastconfirm_compat.go](../../pkg/consensus/fastconfirm_compat.go).
+Sources: [the real-proof review](https://github.com/alt-research/eth2030/pull/156), [extension validation](../reviews/glamsterdam-extensions-20261124/STATUS.md).
 
-### 5. Canonical guest and deciding proof verification (research)
-
-Guest execution exists, but canonical.VerifyExecution checks success and proof length then returns true; it does not verify the claimed execution proof.
-
-**Remaining:** Adopt the proof statement, bind program/input/output/state to a real verifier and wire an actual deciding consumer.
-
-**Done when:** Independent vectors and mutated proof/program/input/output/state tests reject invalid claims in the selected consumer.
-
-Sources: [pkg/zkvm/canonical.go](../../pkg/zkvm/canonical.go), [pkg/zkvm/canonical_executor.go](../../pkg/zkvm/canonical_executor.go).
-
-### 6. Public binary-state contract and recovery (research)
+### 5. Public binary-state contract and recovery (research)
 
 Private binary overlay/conversion controls do not define a public compatible layout.
 
@@ -74,7 +64,7 @@ Private binary overlay/conversion controls do not define a public compatible lay
 
 Sources: [docs/ROADMAP.md](../../docs/ROADMAP.md), [docs/next-stage-work-plan.md](../../docs/next-stage-work-plan.md).
 
-### 7. PQ validator keys, transactions and sampling (research)
+### 6. PQ validator keys, transactions and sampling (research)
 
 PQ primitives and private provider/transaction controls are narrower than a public protocol.
 
@@ -84,7 +74,7 @@ PQ primitives and private provider/transaction controls are narrower than a publ
 
 Sources: [docs/ROADMAP.md](../../docs/ROADMAP.md), [pkg/crypto/pqc/pq_tx_signer.go](../../pkg/crypto/pqc/pq_tx_signer.go).
 
-### 8. Proof, native-rollup and finality consumers (research)
+### 7. Proof, native-rollup and finality consumers (research)
 
 Native rollup transition/withdrawal helpers use simulated hash conditions; these are not real rollup proof acceptance.
 
@@ -96,15 +86,15 @@ Sources: [pkg/rollup/native_rollup.go](../../pkg/rollup/native_rollup.go), [docs
 
 ## Historical label inventory
 
-Across the six mapped cards there are 51 entries: 18 labelled Complete and 33 with older non-complete labels. The non-complete distribution is Glamsterdam 3, Hegotá 7, I* 7, J* 7, K* 2 and L* 7. The total of 33 old labels is coincidental and unrelated to the 33 completed frozen-development task IDs. No whole-client completion percentage is derived from either count.
+Across the six mapped cards there are 51 entries: 20 labelled Complete and 31 non-complete. The current distribution is Glamsterdam 1, Hegotá 7, I* 7, J* 7, K* 2 and L* 7. These counts are unrelated to the 33 completed frozen-development task IDs; no whole-client completion percentage is derived from either.
 
-The three Glamsterdam labels are broad ePBS (Substantial), fast confirmation (Functional) and evm-asm canonical quest (Functional). Broad ePBS keeps its historical draft label even though the adopted signed route is delivered; it is not counted as a newly missing code feature. Both offchain research frameworks need separately adopted production input/consumer contracts. Their old phase placement does not expand the completed frozen task ledger.
+Glamsterdam is 16/17 within stated development scopes. The canonical quest remains Substantial because an executable Ethereum STF guest is unfinished. ePBS completion covers the adopted signed Gloas contract, and FCR uses the normative signed CL path and standard native Engine consumer. Separate PR integration and finite runtime receipts do not imply public activation or unrestricted acceptance.
 
 Four planned-only entries list no implementation or tests: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal. These are identified as planned scope, not as already implemented features. Every other historical non-complete entry remains visible in the page's per-phase expandable inventory; a fresh source/consumer audit is required before promoting or recasting those labels.
 
 ## Review depth and limits
 
-The fresh source checks inspect fast-confirmation constructor/input consumers, canonical.VerifyExecution versus CanonicalExecutor.VerifyGuestProof, and native-rollup transition/withdrawal hash simulations. A [fresh executable observation](../reviews/roadmap-remaining-20261124/CANONICAL_OBSERVATION.json) confirms that the standalone VerifyExecution helper accepts 256 all-zero proof bytes with Success=true; the source is retained as canonical-observation.go and can be run from pkg. The structural legacy helper is not conflated with the separate executor verification method. No new failure of the qualified native Glamsterdam import/signature path is established by these research findings.
+The earlier review inspected fast-confirmation constructor/input consumers, canonical.VerifyExecution versus CanonicalExecutor.VerifyGuestProof, and native-rollup transition/withdrawal hash simulations. A retained [historical executable observation](../reviews/roadmap-remaining-20261124/CANONICAL_OBSERVATION.json) confirms that the standalone VerifyExecution helper accepts 256 all-zero proof bytes with Success=true; the source is retained as canonical-observation.go and can be run from pkg. The structural legacy helper is not conflated with the separate executor verification method. No new failure of the qualified native Glamsterdam import/signature path is established by these research findings.
 
 Dora sibling revision 6f702f24e8445d9e4b764d5bf141c604b1c99d47 was inspected read-only: writedb.go still has Gloas/Heze EL-fallback handling. That corroborates a migration/consumer-qualification boundary; it does not claim no decoder or no indexing exists. Frame/paymaster receipts retain their November 18 synchronized-EL and source-specific boundaries. No new independent Frame or production service acceptance was executed here.
 
@@ -112,7 +102,11 @@ Dora sibling revision 6f702f24e8445d9e4b764d5bf141c604b1c99d47 was inspected rea
 
 1. Adopt a compatible independent Frame/Bogotá target and close independent-client/alternate-peer/restart qualification.
 2. Complete Dora consumer/schema/rebuild migration and workload/paymaster service cutover in separate branches/PRs.
-3. Select individual research contracts before connecting fast-confirmation, canonical proofs, binary state, PQ and rollup/finality consumers. Do not silently enable structural/simulated verification as protocol authority.
+3. Review EL #155/#156 master integration and the authorized Lighthouse #17 eth2030 integration. Build a real Ethereum STF guest as a separate major feature; select independent binary-state, PQ and rollup/finality contracts before public consumers. Do not promote structural/simulated verification to protocol authority.
 4. Revisit planned-only scope only when a concrete contract is adopted; retain the two deferred acceptance items outside the development denominator.
 
 [Roadmap](../ROADMAP.md) · [Current frozen accounting](../reviews/development-scope-20261124/CURRENT_STATE.json) · [Review checklist](../reviews/roadmap-remaining-20261124/CHECK.md).
+
+## Extension delivery update
+
+The November 24 extension review supersedes the earlier Fast confirmation and canonical verifier observations: EL #155 implements vote isolation and actual signed CL/native consumers; Lighthouse #17 repairs durable FCR publication; EL #156 supplies real pinned execution receipts and native proof RPC. The remaining broad canonical quest is an executable Ethereum STF guest and adopted public proof consumers, not the old hash/length verifier defect. Current mapped progress is 16/17; see [the extension record](../reviews/glamsterdam-extensions-20261124/STATUS.md) for source-specific validation and integration state.

@@ -31,9 +31,9 @@ Original rounds 03/04 remain failed. The later captured FCU convoy is a confirme
 
 ## Explicit remaining-work view
 
-The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists eight later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
+The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists seven later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
 
-All six cards also expose every historical non-complete entry: 3 Glamsterdam, 7 Hegotá, 7 I*, 7 J*, 2 K* and 7 L* (33 labels in total). This coincidental total is unrelated to the 33 completed frozen task IDs. It is an inventory requiring scoped review, not a count of newly confirmed missing node features. The broad ePBS label stays separate from the delivered signed Gloas route; fast-confirmation and canonical-guest research still need real production consumers/verification before promotion.
+The updated six-card inventory has 31 non-complete entries: 1 Glamsterdam, 7 Hegotá, 7 I*, 7 J*, 2 K* and 7 L*. This inventory is unrelated to the 33 completed frozen task IDs. Glamsterdam is 16/17 for scoped mapped development: ePBS and signed CL FCR are delivered; the canonical quest is Substantial because a real RV32IM proof service does not implement an executable Ethereum STF guest. EL #155/#156 remain independent master integration reviews; Lighthouse #17 targets eth2030.
 
 ## Other roadmap phases
 
@@ -48,3 +48,9 @@ All six cards also expose every historical non-complete entry: 3 Glamsterdam, 7 
 The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth sync is a different fork/profile and does not close independent Frame acceptance. I*–L* remain placeholder names from the retained EF drawing, without a new schedule assertion.
 
 [Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Review checklist](reviews/development-scope-20261124/CHECK.md)
+
+## FCR and real-proof extensions
+
+See [the current extension review](reviews/glamsterdam-extensions-20261124/STATUS.md). The production FCR authority is the CL: authenticated votes, active balances, fork choice and optimistic exclusion feed standard Engine safeBlockHash. The legacy Go counter is a compatibility utility, with mixed-root votes isolated and validator indices bounded. CL announcements are durably checkpointed before publication; failure falls back to finalized and retries.
+
+The real proof backend verifies a pinned RISC Zero receipt for an RV32IM interpreter with full machine-state, program/input/output, configuration and resource binding. Native asynchronous proof submission, polling, cancellation and independent verification are connected. CPU-only execution cannot masquerade as a proof. The remaining canonical quest requires real Ethereum block/prestate witness execution inside the guest and independent root agreement; its fixed-output STF adapter test does not satisfy that requirement.

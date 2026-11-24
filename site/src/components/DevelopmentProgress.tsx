@@ -43,6 +43,12 @@ export default function DevelopmentProgress() {
       <p className="mt-1 text-eth-dim">{snapshot.followUp.detail}</p>
       <div className="mt-2 flex flex-wrap gap-4 text-eth-teal">{snapshot.followUp.reviews.map(number => <a key={number} className="underline" href={`${GITHUB_URL}/pull/${number}`}>PR #{number} ↗</a>)}<a className="underline" href={`${GITHUB_URL}/commit/${snapshot.followUp.revision}`}>Reviewed source {snapshot.followUp.revision.slice(0, 8)} ↗</a></div>
     </div>
+    <div data-extension-progress="reviewed" className="mt-4 border-t border-eth-teal/20 pt-4 text-xs leading-6">
+      <h4 className="font-bold text-eth-text">FCR and real-proof extension reviews</h4>
+      <p className="mt-2 text-eth-dim">Signed CL FCR feeds native Engine safeBlockHash; durable announcements and mixed-root vote isolation are implemented. Real RV32IM receipts bind the complete execution statement and reach native asynchronous prove/verify RPC. EL #155/#156 await master integration; Lighthouse #17 is merged into eth2030 after all 27 suite checks and local-testnet.</p>
+      <p className="mt-2 text-eth-dim">Glamsterdam: 16/17 mapped entries complete for their stated development scope. The remaining canonical quest requires an executable Ethereum STF guest; the real program proof and fixed-output STF adapter do not establish that guest.</p>
+      <div className="mt-2 flex flex-wrap gap-4 text-eth-teal"><a className="underline" href={`${GITHUB_URL}/pull/155`}>FCR EL #155 ↗</a><a className="underline" href={`${GITHUB_URL}/pull/156`}>Real proof EL #156 ↗</a><a className="underline" href="https://github.com/jiayaoqijia/lighthouse/pull/17">Durable CL FCR #17 ↗</a></div>
+    </div>
     <p className="mt-4 text-xs leading-6 text-eth-dim">Earlier source-specific controls: {snapshot.historicalMilestones.join(' · ')}. These retain their original runtime records.</p>
     <div className="mt-3 flex flex-wrap gap-4 text-xs text-eth-teal">
       <a className="underline" href={`${GITHUB_URL}/blob/${snapshot.reviewRevision}/${snapshot.stateRecord}`}>Reviewed state ↗</a>

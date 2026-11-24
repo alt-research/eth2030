@@ -183,7 +183,7 @@ assert.doesNotMatch(progress(home), /48-hour (?:passed|complete)|original fault 
 for (const number of [135, 138, 139, 140]) assert.ok(progress(home).includes(`/pull/${number}`));
 assert.ok(progress(home).includes(`/pull/${remaining.mergedProgressPr}`));
 assert.ok(progress(home).includes(`/commit/${current.merged_cl.revision}`));
-assert.ok(progress(home).includes(`/blob/${remaining.reviewedMaster}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
+assert.ok(progress(home).includes(`/blob/b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
 assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned earlier verification record');
 for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261124.md']) {
   assert.ok(progress(home).includes(`/blob/1eca90d7b9f4dfdd4354156b7f660dab910520c2/${path}`), `Missing pinned current evidence/plan ${path}`);
@@ -193,12 +193,12 @@ for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json'
 assert.equal(remaining.adoptedDevelopmentTodos, accounting.active_development_todos.length);
 assert.deepEqual(remaining.excludedAcceptance, ['G-03', 'G-04']);
 assert.equal(remaining.mergedProgressPr, 148);
-assert.equal(remaining.items.length, 8);
+assert.equal(remaining.items.length, 7);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.target), ['master', 'master', 'eth2030']);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.url), [
-  'https://github.com/alt-research/eth2030/pull/150',
-  'https://github.com/alt-research/eth2030/pull/151',
-  'https://github.com/jiayaoqijia/lighthouse/pull/16',
+  'https://github.com/alt-research/eth2030/pull/155',
+  'https://github.com/alt-research/eth2030/pull/156',
+  'https://github.com/jiayaoqijia/lighthouse/pull/17',
 ]);
 for (const item of remaining.specificationRepairs) {
   assert.ok(roadmap.includes(`data-spec-repair="${item.id}" data-target="${item.target}"`));
@@ -227,6 +227,10 @@ for (const item of remaining.items) {
 const stages = ['glamsterdam', 'hegota', 'i', 'j', 'k', 'l'];
 const remappedFork = entry => entry.id === 'feature-leanvm-pq-proofs' ? 'i' : entry.id === 'feature-ethp2p-unification' ? 'l' : entry.fork;
 const pending = EIPS.filter(entry => entry.strawmap && stages.includes(remappedFork(entry)) && entry.status !== 'complete');
+const glamsterdamMapped = EIPS.filter(entry => entry.fork === 'glamsterdam' && entry.strawmap);
+assert.equal(glamsterdamMapped.length, 17);
+assert.equal(glamsterdamMapped.filter(entry => entry.status === 'complete').length, 16);
+assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').map(entry => [entry.id, entry.status]), [['feature-evm-asm-canonical-quest', 'substantial']]);
 const renderedPending = [...roadmap.matchAll(/data-pending-entry="([^"]+)"/g)].map(match => match[1]);
 assert.deepEqual(renderedPending.sort(), pending.map(entry => entry.id).sort(), 'Remaining view omits or duplicates historical non-complete entries');
 for (const phase of stages) {
@@ -237,8 +241,8 @@ const planned = pending.filter(entry => entry.status === 'planned');
 assert.deepEqual([...remaining.plannedOnly].sort(), planned.map(entry => entry.id).sort());
 assert.ok(planned.every(entry => entry.implementation.length === 0 && entry.tests.length === 0), 'Planned-only explanation needs a fresh source review');
 for (const id of remaining.plannedOnly) assert.ok(roadmap.includes(`data-planned-work="${id}"`));
-assert.match(roadmap, /inventory of old labels, not/);
-assert.match(roadmap, /canonical.VerifyExecution checks success and proof length/);
+assert.match(roadmap, /canonical Ethereum STF guest/);
+assert.match(roadmap, /real RV32IM program-execution receipts/);
 assert.match(roadmap, /Native rollup transition\/withdrawal helpers use simulated hash conditions/);
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
@@ -301,14 +305,15 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
+assert.match(home, /16\/17 mapped entries complete/);
 assert.match(builderPage, /legacy EL bid-hash\/registry\/header extensions retired in PR127/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/builder-authority/STATUS.md`));
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 assert.match(builderPage, /passes all 27 test-suite jobs and local-testnet/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
 for (const [id, claim] of [
-  ['feature-fast-confirmation', 'no node/Engine consumer found'],
-  ['feature-evm-asm-canonical-quest', 'accepts 256 all-zero proof bytes'],
+  ['feature-fast-confirmation', 'standard Engine safeBlockHash'],
+  ['feature-evm-asm-canonical-quest', 'executable canonical Ethereum STF guest remains unimplemented'],
 ]) {
   const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
   assert.ok(page.includes(claim), `Missing fresh research limitation on ${id}`);

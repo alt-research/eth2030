@@ -1,0 +1,82 @@
+{
+  "checks": [
+    {
+      "viewport": 1440,
+      "route": "/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 1440,
+      "route": "/roadmap/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 1440,
+      "route": "/eips/eip-7732/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 1440,
+      "route": "/eips/feature-fast-confirmation/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 1440,
+      "route": "/eips/feature-evm-asm-canonical-quest/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 375,
+      "route": "/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 375,
+      "route": "/roadmap/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 375,
+      "route": "/eips/eip-7732/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 375,
+      "route": "/eips/feature-fast-confirmation/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    },
+    {
+      "viewport": 375,
+      "route": "/eips/feature-evm-asm-canonical-quest/",
+      "status": 200,
+      "horizontal_overflow": false,
+      "page_errors": []
+    }
+  ],
+  "details_interaction_passed": true,
+  "inventory_entries": 31,
+  "planned_only_entries": 4,
+  "workstreams": 7,
+  "screenshots": [
+    "/tmp/eth2030-extension-browser-20261124/roadmap-remaining-375.png",
+    "/tmp/eth2030-extension-browser-20261124/roadmap-remaining-1440.png"
+  ]
+}

@@ -1,7 +1,7 @@
 // ETH2030 EIP / roadmap progress — single source of truth.
 //
 // Fork placement follows the L1 Strawmap revision of Nov 2, 2026 (strawmap.org).
-// Reviewed progress: EL master b4b88ed0 / CL eth2030 fa16f70a (2026-11-24).
+// Reviewed baseline: EL master 45e8c145; extension reviews EL155/156 and CL17 (2026-11-24).
 // Selected33-task delivery and bounded qualification are separate from broad tracker labels.
 // Evidence: docs/reviews/glamsterdam-postmerge-20261121 and the frozen task reconciliation.
 // Other implementation labels retain their historical review scope.
@@ -216,7 +216,7 @@ export const EIPS: EipEntry[] = [
     layer: 'CL',
     fork: 'glamsterdam',
     category: 'Glamsterdam Core',
-    status: 'substantial',
+    status: 'complete',
     priority: 'P0',
     specUrl: spec(7732),
     specStatus: 'Draft',
@@ -246,7 +246,7 @@ export const EIPS: EipEntry[] = [
       'Integrated CL final head passes all 27 test-suite jobs and local-testnet, with equal merged tree; original 3s simulator failure and separately named 6s primary profile remain retained',
       'Original incident attribution remains unconfirmed; multi-day/larger-scale acceptance and upstream Lodestar approval are user-deferred outside development progress; public rollout and new protocol adoption are separate decisions',
     ],
-    summary: 'CL headliner of Glamsterdam. Protocol-level proposer/builder separation.',
+    summary: 'Complete for the adopted signed Gloas development contract. Public-fork scheduling and deferred acceptance remain separate.',
   },
 
   // ── Glamsterdam — core EL ────────────────────────────────────────────
@@ -598,11 +598,13 @@ export const EIPS: EipEntry[] = [
     layer: 'CL',
     fork: 'glamsterdam',
     category: 'Glamsterdam Features',
-    status: 'functional',
+    status: 'complete',
     strawmap: { item: 'fast confirmation', offchain: true },
-    implementation: ['consensus/fastconfirm/fast_confirm.go'],
-    tests: [],
-    gaps: ['November 24 source review: standalone validator-index tracker; no node/Engine consumer found beyond the compatibility wrapper. Signed CL input, validator authority and deciding production consumers require a separately adopted contract.'],
+    implementation: ['consensus/fastconfirm/fast_confirm.go', 'node/'],
+    tests: ['consensus/fastconfirm/*_test.go'],
+    implemented: ['Signed, balance- and fork-choice-aware Lighthouse FCR supplies the native EL through standard Engine safeBlockHash; Gloas selects the confirmed beacon block parent payload.', 'Legacy counter rejects foreign-root votes and unknown validators and owns its configuration; it is not the production FCR authority.', 'Durable CL announcements precede publication; checkpoint failure falls back to finalized and retries. Native HTTP covers confidence advance/retraction, invalid checkpoints and restart/reannouncement.'],
+    gaps: ['Code delivery is reviewed in EL #155 and Lighthouse #17; master integration and exact source-specific runtime receipts are recorded separately.', 'FCR retains the consensus specification synchrony and Byzantine-balance assumptions. No public activation or new 48h/scale acceptance is implied.'],
+    summary: 'Adopted CL FCR and native Engine/RPC consumer implemented; independent signed-window qualification is recorded with the extension review.',
   },
   {
     id: 'feature-evm-asm-canonical-quest',
@@ -611,11 +613,13 @@ export const EIPS: EipEntry[] = [
     layer: 'EL',
     fork: 'glamsterdam',
     category: 'Glamsterdam Features',
-    status: 'functional',
+    status: 'substantial',
     strawmap: { item: 'evm-asm canonical quest', offchain: true },
     implementation: ['zkvm/canonical.go', 'zkvm/canonical_executor.go'],
     tests: ['zkvm/canonical_test.go'],
-    gaps: ['November 24 executable observation: canonical.VerifyExecution accepts 256 all-zero proof bytes when Success=true; it checks structure rather than execution-proof validity. The separate CanonicalExecutor verifier is not the same method.', 'Independent proof statements, program/input/output/state binding and deciding consumers remain research work.'],
+    implemented: ['Real RISC Zero receipts replace canonical hash/length acceptance. A pinned RV32IM interpreter binds program, input, output, complete machine state, configuration and resources.', 'Independent Go/Rust execution vectors, altered receipt and statement controls, native asynchronous prove/poll/cancel/verify RPC and portable verification after restart.', 'A reproducible pinned guest image, runtime bundle and mandatory hosted actual-proof tests accompany EL #156. Missing proving components fail closed.'],
+    gaps: ['An executable canonical Ethereum STF guest remains unimplemented: proving the RV32IM interpreter or a fixed-output STF adapter fixture does not prove an Ethereum block transition.', 'Public mandatory block-proof adoption, multi-prover agreement and public-network qualification remain separate protocol work. This broad quest is deliberately not labelled Complete.'],
+    summary: 'Real program-execution proofs and native deciding consumers delivered. Canonical Ethereum STF execution is the remaining broad roadmap gap.',
   },
 
   // ── Hegotá — headliners ──────────────────────────────────────────────

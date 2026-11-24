@@ -114,10 +114,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 		// Short string: 0-55 bytes.
 		size := int(prefix - 0x80)
 		start := s.pos + 1
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		if size == 1 && s.data[start] <= 0x7f {
 			return 0, nil, 0, ErrCanonSize
 		}
@@ -141,10 +142,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 			return 0, nil, 0, ErrNonCanonicalSize
 		}
 		start := s.pos + 1 + lenOfLen
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + lenOfLen + size
 		s.pos = end
@@ -154,10 +156,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 		// Short list.
 		size := int(prefix - 0xc0)
 		start := s.pos + 1
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + size
 		s.pos = end
@@ -178,10 +181,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 			return 0, nil, 0, ErrNonCanonicalSize
 		}
 		start := s.pos + 1 + lenOfLen
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + lenOfLen + size
 		s.pos = end
@@ -232,6 +236,9 @@ func (s *Stream) List() (uint64, error) {
 			return 0, ErrNonCanonicalSize
 		}
 		payloadStart = s.pos + 1 + lenOfLen
+		if size < 0 || size > s.limit()-payloadStart {
+			return 0, io.ErrUnexpectedEOF
+		}
 		payloadEnd = payloadStart + size
 	default:
 		return 0, ErrExpectedList

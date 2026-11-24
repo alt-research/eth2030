@@ -31,6 +31,13 @@ def verify(args):
     output = args.output
     output.mkdir(parents=True, exist_ok=False)
     base = profile["cl"]
+    archive = root / "signed-window"
+    def captured(name):
+        return json.loads(gzip.decompress((archive / (name + ".json.gz")).read_bytes()))
+    manifest = captured("manifest")
+    assert manifest["through_slot"] == result["final_slot"]
+    assert sorted(manifest["slots"] + manifest["missed_slots"]) == list(range(1, result["final_slot"] + 1))
+    assert len(set(manifest["slots"] + manifest["missed_slots"])) == result["final_slot"]
     report = {"passed": False, "source_revision": revision, "bls_active": True, "first_slot": 1, "through_slot": result["final_slot"], "counts": {}, "mutation_controls": {}}
     counts = report["counts"]
     controls = report["mutation_controls"]
@@ -57,31 +64,38 @@ def verify(args):
         return spec.BLSSignature(bytes(data))
 
     try:
-        genesis = get(base + "/eth/v1/beacon/genesis")["data"]
+        network = captured("network-spec")
+        retained("network-spec", network)
+        changes = {
+            name: parsed(network[name], type(value))
+            for name, value in spec.config._asdict().items()
+            if name in network and (name.endswith(("_FORK_VERSION", "_FORK_EPOCH")) or name in ("SLOT_DURATION_MS", "SECONDS_PER_SLOT"))
+        }
+        spec.config = spec.config._replace(**changes)
+        assert int(spec.config.GLOAS_FORK_EPOCH) == 0
+        report["network_configuration"] = {name: network[name] for name in changes}
+        genesis = json.loads((root / "genesis.json").read_text())
         assert genesis == json.loads((root / "genesis.json").read_text())
-        raw = get(base + "/eth/v2/debug/beacon/states/0")["data"]
+        raw = captured("genesis-state")
         retained("genesis-state", raw)
         state0 = parsed(raw, spec.BeaconState)
         assert "0x" + bytes(state0.genesis_validators_root).hex() == genesis["genesis_validators_root"]
-        header0 = get(base + "/eth/v1/beacon/headers/0")["data"]
+        header0 = captured("genesis-header")
         assert "0x" + bytes(spec.hash_tree_root(state0)).hex() == header0["header"]["message"]["state_root"]
         roster = [bytes(validator.pubkey) for validator in state0.validators]
         previous = header0["root"]
         for slot in range(1, result["final_slot"] + 1):
-            try:
-                block_response = get(base + "/eth/v2/beacon/blocks/" + str(slot))
-            except urllib.error.HTTPError as error:
-                if error.code == 404:
-                    count("missed_slots")
-                    continue
-                raise
+            if slot in manifest["missed_slots"]:
+                count("missed_slots")
+                continue
+            block_response = captured(f"block-{slot}")
             raw_block = block_response["data"]
             block = parsed(raw_block, spec.SignedBeaconBlock)
             retained(f"block-{slot}", raw_block)
             block_root = "0x" + bytes(spec.hash_tree_root(block.message)).hex()
             assert "0x" + bytes(block.message.parent_root).hex() == previous
             state_root = "0x" + bytes(block.message.state_root).hex()
-            raw_state = get(base + "/eth/v2/debug/beacon/states/" + state_root)["data"]
+            raw_state = captured(f"state-{slot}")
             retained(f"state-{slot}", raw_state)
             state = parsed(raw_state, spec.BeaconState)
             assert int(state.slot) == slot
@@ -136,7 +150,7 @@ def verify(args):
             else:
                 assert spec.verify_execution_payload_bid_signature(state, bid)
                 count("builder_bid_signatures")
-            envelope_response = get(base + "/eth/v1/beacon/execution_payload_envelopes/" + block_root)
+            envelope_response = captured(f"envelope-{slot}")
             retained(f"envelope-{slot}", envelope_response)
             envelope = parsed(envelope_response["data"], spec.SignedExecutionPayloadEnvelope)
             assert bytes(envelope.message.beacon_block_root) == bytes(spec.hash_tree_root(block.message))
@@ -148,6 +162,7 @@ def verify(args):
         assert counts["blocks"] >= 80
         for category in ["proposer", "randao", "attestation", "payload_attestation", "sync_aggregate", "execution_envelope"]:
             assert controls.get(category), "missing real category/control: " + category
+        report["offline_retained_window"] = True
         report["passed"] = True
         report["scope"] = "Every available block in the declared private window: proposer, RANDAO, included attestation/PTC aggregates, sync aggregates and execution envelopes, with authenticated state-root/roster bindings. Self-build bids are not counted as separate BLS signatures. This is not a new 48h, scale or complete Ethereum STF acceptance."
     finally:

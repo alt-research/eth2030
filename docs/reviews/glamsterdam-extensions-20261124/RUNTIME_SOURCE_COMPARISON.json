@@ -1,13 +1,26 @@
 {
   "runtime_revision": "b7a0ec69a189186c4d110670de92cfefc47b8cc2",
-  "current_qualification": "7b5b78b460558f1a544ac57862de4cb0509792f1",
+  "current_qualification": "7901a25767a8ad3f53d99b3f1821b30bd9d28d75",
   "changes": [
     "pkg/consensus/fastconfirm/fast_confirm.go",
     "pkg/consensus/fastconfirm/vote_isolation_test.go",
     "pkg/devnet/kurtosis/scripts/qualify_fast_confirmation.py",
     "pkg/devnet/kurtosis/scripts/reference_fast_confirmation_window.py",
-    "pkg/devnet/kurtosis/scripts/test_fast_confirmation_profile.py"
+    "pkg/devnet/kurtosis/scripts/test_fast_confirmation_profile.py",
+    "pkg/node/canonical_proof_real_integration_test.go",
+    "pkg/zkvm/canonical_executor.go",
+    "pkg/zkvm/canonicalproof/prover.go",
+    "pkg/zkvm/canonicalproof/service.go",
+    "pkg/zkvm/proof_backend.go",
+    "pkg/zkvm/verifier.go",
+    "tools/canonical-prover/README.md"
   ],
-  "native_cl_engine_rpc_prover_source_unchanged": true,
-  "legacy_counter_followup": "Independent unit/race checks; not the production FCR authority."
+  "native_engine_rpc_cl_algorithm_unchanged": true,
+  "proof_guest_image_and_verification_algorithm_unchanged": true,
+  "subsequent_changes": {
+    "legacy_counter": "NaN, minimum-attester, negative/empty-set validation, independently unit/race verified; not the production FCR authority.",
+    "collection": "Preserve raw blocks/states/envelopes before pruning; verify actual fork graph and retained orphan.",
+    "proof_budget": "Shared CPU proving deadline 300 to 900 seconds; native acceptance waits for this same budget. Verifier deadlines, async response bound, cancellation and worker limits remain unchanged."
+  },
+  "scope": "Earlier runtime is retained at its actual source, not relabelled as the newer whole package tree. New-budget direct proof and Node/CI qualification have separate source-specific records."
 }

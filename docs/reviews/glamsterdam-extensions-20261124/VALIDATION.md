@@ -21,7 +21,7 @@ Run from the Fast confirmation feature checkout. The output directory must not a
 
 ## Source and proof boundaries
 
-The measured native bundle is clean cumulative b7a0ec69a189186c4d110670de92cfefc47b8cc2; Lighthouse is qualified 274100659f310772e68c11c684eed2ce4b407a62. CL_MERGE.json proves the authorized eth2030 merge has the identical source tree. RUNTIME_SOURCE_COMPARISON.json separates subsequent collection and legacy-counter changes from unchanged native Engine/RPC/prover runtime code. The legacy helper's additional NaN/minimum-vote/negative/empty-set fixes have their own executed red/green, complete counter race, native HTTP race and vet coverage; the earlier binary is not relabelled as the later whole package tree.
+The measured native bundle is clean cumulative b7a0ec69a189186c4d110670de92cfefc47b8cc2; Lighthouse is qualified 274100659f310772e68c11c684eed2ce4b407a62. CL_MERGE.json proves the authorized eth2030 merge has the identical source tree. RUNTIME_SOURCE_COMPARISON.json separates subsequent collection and legacy-counter changes from unchanged native Engine/RPC/FCR and proof-verification algorithms; the subsequent CPU proving budget is recorded explicitly. The legacy helper's additional NaN/minimum-vote/negative/empty-set fixes have their own executed red/green, complete counter race, native HTTP race and vet coverage; the earlier binary is not relabelled as the later whole package tree.
 
 Real execution receipts use the pinned 48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a RV32IM interpreter image. Actual program/input/output, configuration, cycles, terminal PC/register/RAM and journal verification are bound. The runtime-only bundle proves with networking disabled and no SDK install. Native async proof RPC remains responsive and exported artifacts verify after node restart. Full Go/Rust state vectors and altered receipt/program/input/output/state controls are separate from synthetic fixtures.
 
@@ -30,3 +30,11 @@ This is not an executable Ethereum STF guest, a mandatory public block-proof for
 ## Site and review checks
 
 Production export builds 157 pages. All 149 entries and 400 listed source/test paths reconcile. Export guards bind current and historical receipts separately. Desktop/mobile checks cover ten route/view combinations and preserve both bottom panels default collapsed. Exact final PR heads, hosted CI and six cumulative merge orders are recorded at review delivery, outside self-referential source-commit assertions.
+
+## Hosted proving capacity correction
+
+Initial actual-proof hosted run 45336500029 failed all producers at the inherited 300-second deadline; its Node waiter was only 240 seconds. HOSTED_INITIAL_TIMEOUT.json preserves every failed case. The final-image full local run passed all eleven required cases without skipping (FINAL_IMAGE_LOCAL_ACCEPTANCE.json). A separately affinity-limited four-core actual proof took 385.808 seconds and completed successfully, exceeding the original budget; FOUR_CORE_PROVING.json retains the measurement.
+
+The shared CPU proving deadline is now bounded at fifteen minutes, with the Node waiter using that same budget. Short verifier deadlines, asynchronous submission latency, cancellation, process-group cleanup and worker limits are retained. Independent hosted families and a final aggregate gate still require all eleven real positive cases, zero required skips, identical source and the pinned guest image. An earlier runtime binary is not relabelled as this later deadline configuration. Final hosted results are authoritative on the proof review and final delivery record.
+
+The new-budget source 40a78da6 also passed an actual four-core-limited native Node TCP test in 170.01s, including real proving, ordinary RPC responsiveness, changed input/state rejection, artifact verification after restart and rejection of the old node-lifetime job ID. See NEW_BUDGET_NODE.json.

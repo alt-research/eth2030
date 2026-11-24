@@ -19,6 +19,10 @@ import (
 	"time"
 )
 
+// ProvingTimeout bounds CPU proving on modest hosts. Verification retains its
+// separate short deadline; cancellation and node shutdown still interrupt work.
+const ProvingTimeout = 15 * time.Minute
+
 const (
 	MaxProgram    = 1 << 20
 	MaxInput      = 1 << 20

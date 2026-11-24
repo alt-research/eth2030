@@ -59,7 +59,7 @@ bounds, images or seals cannot be adopted as valid results.
 
 One proof runs at a time, with no unbounded queue; two concurrent verifications
 are allowed. Busy calls fail promptly. Eight terminal jobs are retained, and
-each proof has a five-minute deadline. Shutdown cancels and joins the complete
+each proof has a bounded fifteen-minute deadline (CPU-only hosts may exceed five minutes). Shutdown cancels and joins the complete
 Linux process group, including `r0vm`. Job IDs belong to one node lifetime;
 exported proofs remain independently verifiable after restart. Programs, input
 and output are bounded to 1 MiB each, guest cycles to 2^24 and RAM to 16,384 pages.

@@ -13,6 +13,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
+	gethengine "github.com/ethereum/go-ethereum/beacon/engine"
 	gethcommon "github.com/ethereum/go-ethereum/common"
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -125,6 +126,19 @@ func TestEth72ActualNodeFullPromotionAndEngineCells(t *testing.T) {
 		valid, err := backend.VerifyCellProof(commitment[:], cell, proof, index)
 		if err != nil || !valid {
 			t.Fatalf("Engine cell proof %d: %v", index, err)
+		}
+	}
+
+	for _, method := range []string{"engine_getBlobsV2", "engine_getBlobsV3"} {
+		var full []*gethengine.BlobAndProofV2
+		receiver.call(t, method, &full, []types.Hash{types.Hash(hash)})
+		if len(full) != 1 || full[0] == nil || !bytes.Equal(full[0].Blob, blob) || len(full[0].CellProofs) != 128 {
+			t.Fatalf("%s SDK blob projection changed", method)
+		}
+		for i, proof := range full[0].CellProofs {
+			if !bytes.Equal(proof, proofs[i][:]) {
+				t.Fatalf("%s stored proof %d changed", method, i)
+			}
 		}
 	}
 	if err := receiver.invoke("engine_getBlobsV4", &projection, []types.Hash{types.Hash(hash)}, "0x01"); err == nil {

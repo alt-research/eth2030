@@ -26,7 +26,7 @@ def profile(el_image, cl_image):
     base = Path(__file__).parents[1] / "configs/gloas-genesis.yaml"
     contracts = next(line.split("additional_preloaded_contracts:", 1)[1] for line in base.read_text().splitlines() if "additional_preloaded_contracts:" in line)
     return {
-        "participants": [{"el_type": "geth", "el_image": el_image, "el_max_mem": 2048, "cl_max_mem": 2048, "vc_max_mem": 1024, "el_extra_params": ["--rpc.rate_limit=0", "--http.api=eth,net,web3,zkvm"], "cl_type": "lighthouse", "cl_image": cl_image, "cl_extra_params": ["--subscribe-all-subnets", "--target-peers=1", "--disable-peer-scoring", "--enable-fast-confirmation"], "count": 2}],
+        "participants": [{"el_type": "geth", "el_image": el_image, "el_max_mem": 8192, "cl_max_mem": 2048, "vc_max_mem": 1024, "el_extra_params": ["--rpc.rate_limit=0", "--http.api=admin,eth,net,web3,zkvm", "--ws.api=eth,net,web3,zkvm", "--rpc.allow-insecure"], "cl_type": "lighthouse", "cl_image": cl_image, "cl_extra_params": ["--subscribe-all-subnets", "--target-peers=1", "--disable-peer-scoring", "--enable-fast-confirmation"], "count": 2}],
         "network_params": {"additional_preloaded_contracts": json.loads(contracts), "network": "kurtosis", "seconds_per_slot": 6, "genesis_delay": 60, "electra_fork_epoch": 0, "fulu_fork_epoch": 0, "gloas_fork_epoch": 0, "num_validator_keys_per_node": 128},
         "ethereum_genesis_generator_params": {"image": "ethpandaops/ethereum-genesis-generator@sha256:e1ac93bb064fc00aacf5a6533b8a5a8d9eb1903350d24598a87d3ed186eb6b8a"},
         "additional_services": [],
@@ -64,6 +64,16 @@ def selected_container(service, public_port, internal_port):
     return matches[0]
 
 
+def restarted_endpoint(container_id, internal_port="4000/tcp"):
+    # Docker may reassign an automatically published host port after start.
+    # Kurtosis metadata still contains the original mapping.
+    item = json.loads(run("docker", "inspect", container_id))[0]
+    ports = item["NetworkSettings"]["Ports"][internal_port]
+    local = [port for port in ports if port["HostIp"] in ("127.0.0.1", "0.0.0.0")]
+    assert len(local) == 1, (container_id, ports)
+    return "http://127.0.0.1:" + local[0]["HostPort"]
+
+
 def observe(args):
     root = args.output
     root.mkdir(parents=True, exist_ok=False)
@@ -72,7 +82,8 @@ def observe(args):
     follower, _ = endpoint(args.enclave, "el-2-geth-lighthouse", "rpc")
     assert "--enable-fast-confirmation" in " ".join(cl_config["cmd"])
     container = selected_container("cl-1-lighthouse-geth", int(cl.rsplit(":", 1)[1]), "4000/tcp")
-    (root / "profile.json").write_text(json.dumps({"declared_at": now(), "enclave": args.enclave, "cl": cl, "el": el, "follower": follower, "duration_seconds": args.duration, "restart_at_slot": args.restart_at_slot, "proof_requested": args.proof, "cl_container": container["Id"], "cl_image": container["Image"], "scope": "Bounded 256-validator private FCR/native-node integration; not 48h or unrestricted scale acceptance."}, indent=2) + "\n")
+    capture_profile = {"declared_at": now(), "enclave": args.enclave, "cl": cl, "el": el, "follower": follower, "duration_seconds": args.duration, "restart_at_slot": args.restart_at_slot, "proof_requested": args.proof, "cl_container": container["Id"], "cl_image": container["Image"], "scope": "Bounded 256-validator private FCR/native-node integration; not 48h or unrestricted scale acceptance."}
+    (root / "profile.json").write_text(json.dumps(capture_profile, indent=2) + "\n")
     report = {"passed": False, "started": now()}
     events = collections.deque(maxlen=4096)
     event_lock = threading.Lock()
@@ -101,6 +112,8 @@ def observe(args):
     thread.start()
     records = []
     restarted = False
+    crash_record = None
+    precrash_confirmed_slot = None
     proof_job = None
     proof_complete = None
     start = time.monotonic()
@@ -140,9 +153,18 @@ def observe(args):
                         else:
                             assert job["status"] == "running", job
                     if args.restart_at_slot and not restarted and slot >= args.restart_at_slot:
-                        (root / "before-crash.json").write_text(json.dumps(record, indent=2) + "\n")
+                        crash_record = dict(record)
+                        with event_lock:
+                            precrash_confirmed_slot = max((int(event["slot"]) for event in events), default=0)
+                        crash_record["confirmed_slot"] = precrash_confirmed_slot
+                        (root / "before-crash.json").write_text(json.dumps(crash_record, indent=2) + "\n")
                         run("docker", "kill", "--signal", "KILL", container["Id"])
                         run("docker", "start", container["Id"])
+                        old_cl = cl
+                        cl = restarted_endpoint(container["Id"])
+                        capture_profile["cl"] = cl
+                        capture_profile["cl_endpoint_history"] = [old_cl, cl]
+                        (root / "profile.json").write_text(json.dumps(capture_profile, indent=2) + "\n")
                         restarted = True
                 except (urllib.error.URLError, TimeoutError, ConnectionError) as error:
                     errors.append({"at": now(), "observation_error": str(error)})
@@ -162,8 +184,15 @@ def observe(args):
                 output.write(json.dumps({"root": block_root, "block": block}) + "\n")
         matched = [record for record in records if record["safe"] in parents.values() and record["safe_number"] is not None and record["finalized_number"] is not None and record["safe_number"] > record["finalized_number"]]
         assert len(matched) >= 3, "no FCR-confirmed safe block ahead of finality"
-        assert records[-1]["slot"] >= 96 and records[-1]["head_number"] >= 80, "window did not cover three epochs"
+        assert records[-1]["slot"] >= 96 and records[-1]["slot"] - records[0]["slot"] >= 96 and records[-1]["head_number"] >= 80, "window did not cover three epochs"
         assert not args.restart_at_slot or restarted, "crash/restart was not executed"
+        postcrash = []
+        if restarted:
+            postcrash = [record for record in records if record["at"] > crash_record["at"]]
+            assert len(postcrash) >= 30 and postcrash[-1]["slot"] >= crash_record["slot"] + 32, "insufficient actual post-crash observation"
+            postevents = [json.loads(line)["event"] for line in (root / "events.jsonl").read_text().splitlines() if json.loads(line)["observed_at"] > crash_record["at"]]
+            assert len(postevents) >= 10, "missing reconnected FCR events"
+            assert min(int(event["slot"]) for event in postevents) >= precrash_confirmed_slot, "crash regressed announced FCR confidence"
         assert not args.proof or proof_complete is not None, "actual proving did not complete"
         # Poll for a common native head after the requested crash and proof work.
         deadline = time.monotonic() + 30
@@ -173,7 +202,7 @@ def observe(args):
                 break
             time.sleep(1)
         assert one["hash"] == two["hash"], "native peers did not converge after recovery"
-        report.update(passed=True, stopped=now(), observations=len(records), fcr_events=len(observed_events), safe_ahead_samples=len(matched), first_slot=records[0]["slot"], final_slot=records[-1]["slot"], common_head=one["hash"], crash_restart_passed=restarted, actual_proof_passed=proof_complete is not None)
+        report.update(passed=True, stopped=now(), observations=len(records), fcr_events=len(observed_events), safe_ahead_samples=len(matched), first_slot=records[0]["slot"], final_slot=records[-1]["slot"], common_head=one["hash"], crash_restart_passed=restarted, postcrash_observations=len(postcrash), precrash_confirmed_slot=precrash_confirmed_slot, actual_proof_passed=proof_complete is not None)
     finally:
         stop.set(); thread.join(timeout=16)
         report["transport_reconnects"] = errors

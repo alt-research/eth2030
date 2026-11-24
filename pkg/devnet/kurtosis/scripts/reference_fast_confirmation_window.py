@@ -88,6 +88,14 @@ def verify(args):
             assert "0x" + bytes(spec.hash_tree_root(state)).hex() == state_root
             assert bytes(state.genesis_validators_root) == bytes(state0.genesis_validators_root)
             assert [bytes(validator.pubkey) for validator in state.validators] == roster
+            # This profile generates no slashings, exits, credential changes or
+            # deposits. Fail on a newly present unreviewed category instead of
+            # silently claiming every signature was checked.
+            for category in ("proposer_slashings", "attester_slashings", "voluntary_exits", "bls_to_execution_changes", "deposits"):
+                assert not getattr(block.message.body, category), "unexpected signed category: " + category
+                counts.setdefault(category, 0)
+            assert not block.message.body.parent_execution_requests.deposits, "unexpected signed deposit request"
+            counts.setdefault("deposit_requests", 0)
             proposer = roster[int(block.message.proposer_index)]
             epoch = spec.compute_epoch_at_slot(block.message.slot)
             signing = spec.compute_signing_root(block.message, spec.get_domain(state, spec.DOMAIN_BEACON_PROPOSER, epoch))
@@ -131,6 +139,7 @@ def verify(args):
             envelope_response = get(base + "/eth/v1/beacon/execution_payload_envelopes/" + block_root)
             retained(f"envelope-{slot}", envelope_response)
             envelope = parsed(envelope_response["data"], spec.SignedExecutionPayloadEnvelope)
+            assert bytes(envelope.message.beacon_block_root) == bytes(spec.hash_tree_root(block.message))
             assert spec.verify_execution_payload_envelope_signature(state, envelope)
             altered = copy.deepcopy(envelope); altered.signature = changed_signature(envelope.signature)
             reject("execution_envelope", lambda: spec.verify_execution_payload_envelope_signature(state, altered))

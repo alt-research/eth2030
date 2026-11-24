@@ -21,11 +21,11 @@ import (
 // If the floor exceeds execution gas, the difference is added to the final
 // gas used. This ensures calldata-heavy transactions pay at least the floor.
 //
-// EIP-7976 (Glamsterdan) modifies the floor calculation:
-//   - All bytes (zero and nonzero) are weighted equally: tokens = total_bytes * 4
-//   - TOTAL_COST_FLOOR_PER_TOKEN increases from 10 to 16
-//   - TX_BASE_COST uses the Glamsterdan value (4500)
-//   - EIP-7981: access list data tokens are included in the floor
+// The named Glamst variants below retain the obsolete 4500-base experiment.
+// They are not used for current Amsterdam consensus. Current EIP-2780/7976/7981
+// pricing requires sender, recipient and value and is calculated together by
+// CalculateAmsterdamIntrinsic. Pre-Amsterdam EIP-7623 helpers remain historical
+// Prague utilities.
 
 // FloorGasResult holds the result of an EIP-7623 calldata floor calculation.
 type FloorGasResult struct {
@@ -58,11 +58,13 @@ func CalcFloorGas(data []byte, isCreate bool) FloorGasResult {
 	}
 }
 
-// CalcFloorGasGlamst computes the EIP-7976 calldata floor gas for Glamsterdan.
+// CalcFloorGasGlamst retains the legacy exploratory calldata floor.
 // Under EIP-7976, all calldata bytes are weighted equally:
 //   - floor_tokens = total_bytes * 4
 //   - EIP-7981: access list bytes are also counted as tokens
 //   - Floor = TxBaseGlamsterdam + total_tokens * TotalCostFloorPerTokenGlamst
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func CalcFloorGasGlamst(data []byte, accessList types.AccessList, isCreate bool) FloorGasResult {
 	calldataFloorTokens := uint64(len(data)) * 4
 	alTokens := accessListDataTokens(accessList)
@@ -100,6 +102,8 @@ func ApplyCalldataFloor(executionGas uint64, data []byte, isCreate bool) (effect
 // ApplyCalldataFloorGlamst applies the EIP-7976 calldata floor for Glamsterdan
 // transactions. This is the Glamsterdan variant of ApplyCalldataFloor that
 // uses the increased floor cost and equal byte weighting.
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func ApplyCalldataFloorGlamst(executionGas uint64, data []byte, accessList types.AccessList, isCreate bool) (effectiveGas uint64, floorApplied bool) {
 	result := CalcFloorGasGlamst(data, accessList, isCreate)
 	if result.FloorGas > executionGas {
@@ -120,6 +124,8 @@ func ApplyCalldataFloorGlamst(executionGas uint64, data []byte, accessList types
 //  6. Refund (gas_limit - effective_gas) to the sender
 //
 // This function implements step 5.
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func CalcEffectiveGas(config *config.ChainConfig, headerTime uint64, executionGas uint64, data []byte, accessList types.AccessList, isCreate bool) (effectiveGas uint64, floorApplied bool) {
 	if config == nil {
 		return executionGas, false
@@ -138,6 +144,8 @@ func CalcEffectiveGas(config *config.ChainConfig, headerTime uint64, executionGa
 
 // CalcFloorGasForTx computes the calldata floor gas for a transaction,
 // automatically selecting the correct calculation based on the active fork.
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func CalcFloorGasForTx(config *config.ChainConfig, headerTime uint64, tx *types.Transaction) FloorGasResult {
 	data := tx.Data()
 	isCreate := tx.To() == nil
@@ -155,6 +163,8 @@ func CalcFloorGasForTx(config *config.ChainConfig, headerTime uint64, tx *types.
 // This is useful for transaction pool validation: a transaction whose
 // gas limit is sufficient for standard execution but insufficient for
 // the floor should be rejected early.
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func FloorGasExcess(config *config.ChainConfig, headerTime uint64, tx *types.Transaction, standardIntrinsicGas uint64) uint64 {
 	result := CalcFloorGasForTx(config, headerTime, tx)
 	if result.FloorGas > standardIntrinsicGas {
@@ -167,6 +177,8 @@ func FloorGasExcess(config *config.ChainConfig, headerTime uint64, tx *types.Tra
 // sufficient to cover both the standard intrinsic gas and the calldata floor.
 // This should be called during transaction validation (e.g., in the txpool)
 // to reject transactions that would inevitably fail the floor check.
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func ValidateGasLimitCoversFloor(config *config.ChainConfig, headerTime uint64, tx *types.Transaction) error {
 	if config == nil || !config.IsPrague(headerTime) {
 		return nil
@@ -197,6 +209,8 @@ func ValidateGasLimitCoversFloor(config *config.ChainConfig, headerTime uint64, 
 //   - finalGas: the gas amount to charge the sender
 //   - refundApplied: how much refund was actually applied
 //   - floorApplied: whether the calldata floor overrode the refunded gas
+//
+// Deprecated: for Amsterdam use CalculateAmsterdamIntrinsic and the canonical transaction transition.
 func RefundWithFloor(
 	gasUsed uint64,
 	refund uint64,

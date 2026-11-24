@@ -51,18 +51,20 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | 8189 | snap/2 | Complete | [EIP-8189](https://eips.ethereum.org/EIPS/eip-8189) | `node/snap2_runtime.go`, `core/chain/snap_pivot.go` | `node/snap2_runtime_test.go`, `core/chain/snap_indexed_restart_test.go` |
 | 8136 | Partial data columns | Complete | [EIP-8136](https://eips.ethereum.org/EIPS/eip-8136) | | `devnet/kurtosis/scripts/reference_partial_columns.py` |
 
-### Glamsterdam Repricing (historical inventory)
+### Glamsterdam gas implementation
+
+Current scheduled gas EIPs use the canonical Amsterdam admission, opcode and settlement paths below. The 4500-base exploratory helpers are deprecated compatibility APIs. EIP-7904 is informational; its earlier draft code is not a current gas-schedule requirement.
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
 | 7904 | Compute Gas Cost Analysis (informational; earlier draft code retained) | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
-| 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
-| 2780 | Reduce Intrinsic Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/vm/gas_table.go`, `core/glamsterdam_repricing.go` | `core/eip2780_test.go` |
-| 8037 | State Creation Gas Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8037_test.go` |
-| 8038 | State Access Gas Increase | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8038_test.go` |
+| 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/execution/amsterdam_message.go`, `core/block/builder.go`, `core/chain/blockchain.go` | `core/eip7778_test.go`, `core/execution/amsterdam_fees_test.go`, `core/block/builder_integration_test.go` |
+| 2780 | Resource-Based Intrinsic Transaction Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
+| 8037 | State Creation Gas Cost Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/amsterdam_state_gas.go`, `core/vm/amsterdam_create.go`, `core/execution/amsterdam_message.go`, `core/execution/system_calls.go` | `core/vm/amsterdam_state_gas_test.go`, `core/execution/amsterdam_system_gas_test.go`, `core/eftest/signed_native_test.go` |
+| 8038 | State-Access Gas Cost Update | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/amsterdam_gas_table.go`, `core/gas/amsterdam_intrinsic.go` | `core/vm/amsterdam_bal_gas_test.go`, `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
 | 7623 | Calldata Floor Pricing | Complete | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) | `core/eip7623_floor.go` | `core/eip7623_test.go` |
-| 7976 | Calldata Floor Revision | Complete | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) | `core/eip7623_floor.go` (CalcFloorGasGlamst) | `core/eip7976_test.go` |
-| 7981 | Access List Floor Cost | Complete | Draft | `core/processor.go`, `core/chain_config.go` | via processor tests |
+| 7976 | Increase Calldata Floor Cost | Complete | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/execution/amsterdam_fees_test.go`, `core/eftest/signed_native_test.go` |
+| 7981 | Increase Access List Cost | Complete | [EIP-7981](https://eips.ethereum.org/EIPS/eip-7981) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go`, `txpool/txpool.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
 | 7997 | Deterministic CREATE2 Factory | Complete | [EIP-7997](https://eips.ethereum.org/EIPS/eip-7997) | `core/eip7997.go` | `core/eip7997_test.go` |
 | 7610 | Revert Creation Non-Empty Storage | Complete | [EIP-7610](https://eips.ethereum.org/EIPS/eip-7610) | `core/vm/eip7610.go` | `core/vm/eip7610_test.go` |
 | 7954 | Increased Max Code Size | Complete | [EIP-7954](https://eips.ethereum.org/EIPS/eip-7954) | `core/vm/eip7954.go`, `core/vm/eip7954_deep.go` | `core/vm/eip7954_test.go`, `core/vm/eip7954_deep_test.go` |
@@ -335,7 +337,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 | # | Feature | EIP(s) | Status | Key Implementation |
 |---|---------|--------|--------|-------------------|
-| 35 | Glamsterdam repricing | 7904,7778,2780,8037,8038,7623,7976 | **Complete** | `core/glamsterdam_repricing.go` |
+| 35 | Glamsterdam repricing | 7778,2780,8037,8038,7623,7976,7981 | **Complete** | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go`, `core/vm/amsterdam_gas_table.go` |
 | 36 | Optional proofs | 8025 | Functional | `proofs/optional.go` |
 | 37 | Hegotá repricing | - | Functional | `core/hogota_repricing.go` |
 | 38 | 3x/year gas limit | - | Functional | `core/gas_limit.go` |

@@ -9,7 +9,7 @@ Complete gas pricing stack: EIP-1559 base fee, blob gas, multidimensional pricin
 Package `gas` implements all gas-related computation for the ETH2030 execution
 layer. It covers the historical EIP-1559 base fee, the EIP-4844 blob gas
 mechanism with BPO blob schedules, the EIP-7706 multidimensional (5D) gas
-engine, Glamsterdam and Hogotá repricing bundles, the EIP-7623/7976 calldata
+engine, canonical Amsterdam transaction pricing and separate experimental repricing bundles, the EIP-7623/7976 calldata
 floor, the EIP-7825 gas cap, a binary-search gas estimator, and the long-dated
 gas futures market (M+ roadmap).
 
@@ -70,11 +70,19 @@ Five independent gas dimensions, each with its own EIP-1559-style base fee:
 - `CalcGasLimitSchedule(config, parent)` — scheduled gas limit increases per
   fork (Hogotá 3x/year schedule).
 
-### Repricing (`glamsterdam_repricing.go`, `hogota_repricing.go`, `conversion_repricing.go`)
+### Canonical Amsterdam gas
 
-- `ApplyGlamsterdamRepricing(opcode)` — applies the Glamsterdam repricing bundle
-  (18 EIPs) to EVM opcode gas costs.
-- `ApplyHogotaRepricing(opcode)` — applies the Hogotá repricing adjustments.
+`amsterdam_intrinsic.go` computes state-independent transaction admission and
+floor charges from sender, recipient, value, calldata, access lists and
+authorizations. `execution/amsterdam_message.go` performs runtime charges and
+settles both dimensions. `vm/amsterdam_gas_table.go` installs current state-access
+and write costs; `vm/amsterdam_state_gas.go` owns reservoir and LIFO rollback.
+
+The similarly named APIs in `glamsterdam_repricing.go` and the `Glamst` floor
+family retain an obsolete 4500-base exploratory model. They are deprecated and
+kept only for source compatibility with historical tests/external consumers.
+They must not supply current consensus pricing. Later experimental Hogota and
+conversion tables are separate project research, not official Amsterdam rules.
 
 ### Gas Estimator (`gas_estimator.go`)
 

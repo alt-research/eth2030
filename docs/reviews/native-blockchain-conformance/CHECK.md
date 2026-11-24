@@ -1,7 +1,10 @@
-# Native blockchain fixture runner
+# Native blockchain fixture conformance
 
-- [ ] Read fixture format, block/header/BAL/request contracts and current native chain APIs.
-- [ ] Execute encoded blocks with native validation and compare supplied header, BAL, requests, receipts, final state and canonical head.
-- [ ] Preserve expected invalid blocks and reject unsupported/incomplete fixture semantics explicitly.
-- [ ] Run both complete selected official corpora with no silent skipping.
-- [ ] Add independent mutation/negative cases, required builds and CI; publish master-target PR.
+- [x] Read official encoded-block fixture format, EIP-7928 BAL, EIP-7843 header, EIP-7685/EIP-8282 request and EIP-4895 execution contracts.
+- [x] Import signed encoded blocks through the native Blockchain and compare independent header, BAL bytes, persisted BAL, receipts, full state and canonical head.
+- [x] Preserve expected invalid cases; fail unknown exceptions, panics, missing metadata and unsupported networks instead of silently skipping.
+- [x] Reproduce and fix six execution/header defects; retain seven unchanged official regressions and negative reference controls.
+- [x] Execute six restored behavioral mutations; require assertion failures rather than compile failures.
+- [x] Pass the full Go suite and both node builds.
+- [ ] Finish final affected race/vet checks and rerun both complete corpora from the committed executable.
+- [ ] Publish an independent master-target PR and verify exact-head CI and cumulative merge compatibility.

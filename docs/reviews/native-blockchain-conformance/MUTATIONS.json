@@ -1,0 +1,38 @@
+[
+  {
+    "mutation": "bookkeeping-touch",
+    "test": "TestNativeBlockchainOfficialRegressions/bal$",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "withdrawal-cleanup",
+    "test": "TestNativeBlockchainOfficialRegressions/zero_withdrawal$",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "zero-copy-access",
+    "test": "TestNativeBlockchainOfficialRegressions/bal_storage$",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "blockhash-truncation",
+    "test": "TestNativeBlockchainOfficialRegressions/history$",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "missing-header-slot",
+    "test": "TestNativeBlockchainRejectsMissingAmsterdamSlot",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "opaque-request-output",
+    "test": "TestNativeBlockchainOfficialRegressions/queue$",
+    "exit_code": 1,
+    "assertion_caught": true
+  }
+]

@@ -248,5 +248,7 @@
     }
   ],
   "prior_protocol_pin": "3db38a3725105cb67b8804ac3e147967113bc3ca",
-  "prior_protocol_comparison": "Seventeen EL/CL contracts compare equal after metadata removal except EIP-8024 step numbering and a corrected cross-reference; no opcode semantics changed."
+  "prior_protocol_comparison": "Seventeen EL/CL contracts compare equal after metadata removal except EIP-8024 step numbering and a corrected cross-reference; no opcode semantics changed.",
+  "current_consensus_head_verified": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "specification_conflict_record": "SPEC_CONFLICTS.json"
 }

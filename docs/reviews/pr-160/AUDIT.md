@@ -2,7 +2,7 @@
 
 ## Result and source boundary
 
-One reproducible active-path defect was confirmed and corrected: valid mixed-case slot QUANTITY digits were rejected by both Engine backends (F01). The other executed checks passed. This is not a proof that every possible Glamsterdam interaction is correct, and the four explicit follow-ups below must not be replaced by the page's Complete labels.
+One reproducible active-path defect was confirmed and corrected: valid mixed-case slot QUANTITY digits were rejected by both Engine backends (F01). A CI installer defect (F02) was also corrected. Additional review reproduced a prose/detailed-spec discrepancy for EIP-8282 top-ups (G05): the client agrees with the current detailed consensus reference. This is not a proof that every possible Glamsterdam interaction is correct, and the five explicit follow-ups below must not be replaced by the page's Complete labels.
 
 Merged EL baseline: `5fedb7e5733fbef69767a711115ef9925e7bd769`, including PR159. The audit-only baseline commit `8caa00cd` changes CHECK/STATUS documentation, not Go code. Corrected functional source: `e9174cbe`. Further commits attach audit evidence only.
 
@@ -57,7 +57,7 @@ The proposer probe executes at the actual dependent decision slot, after derivin
 | 8045 | Pre-shuffle exclusion and fixed lookahead | 96 independent expected selections agree |
 | 8061 | Independent churn dimensions, caps/rounding and asymmetric weak subjectivity | Ten actual helper boundary comparisons agree |
 | 8246 | Preserve balance, clear nonce/code/storage, repeated destruction and rollback; 12 native cases | No additional deviation confirmed |
-| 8282 | Real runtime/system queues, fees/caps/inhibitor, request wire, domain and exit authorization | EL/CL tests pass; no dedicated cases in the chosen EELS state corpus |
+| 8282 | Real runtime/system queues, fees/caps/inhibitor, request wire, domain and exit authorization | G05: top-up prose versus detailed prefix precondition requires clarification |
 
 ## Separate networking and informational review
 
@@ -71,6 +71,7 @@ EIP-7904 and EIP-8261 are informational. They do not authorize silently installi
 2. **G02 — Full current CL reference fixture admission.** The fresh CL suites and additional independent probes are bounded. Replay the complete selected upstream fork/state-transition/fork-choice and converted-type SSZ fixtures at explicitly compatible pins, retain unsupported/failed cases, and add cross-client negative messages for bids, envelopes and parent execution requests. This is a coverage/qualification gap, not a newly confirmed missing builder transition.
 3. **G03 — Independent mixed-peer network regression.** Repeat partial/full-column fallback and scoring, sparse custody reconnect/expansion/contraction, and positional/truncated BAL recovery against an independently selected compatible peer. Current local tests and earlier dated campaign receipts are not a new independent-network pass. Upstream Lodestar approval is still separately excluded at the user's direction.
 4. **G04 — Retire misleading legacy gas-helper authority.** No active canonical Amsterdam caller was found for the obsolete `DefaultGlamsterdamGasTable`, `IntrinsicGasGlamsterdam` and old floor-helper family. They retain the old 4500-base/experimental schedules, and several tracker entries still point at them. Deprecate or remove that compatibility surface after checking external consumers and update source pointers to `amsterdam_intrinsic.go`, `amsterdam_message.go` and `amsterdam_gas_table.go`. Do not route production back through the old helpers or infer a consensus defect merely from their stale constants.
+5. **G05 — Clarify builder top-up credential semantics before changing consensus.** EIP-8282 prose says an existing builder's amount is credited while credentials/signature are ignored. Its linked `d9663f85` consensus code and current master `d2021d27` instead validate the withdrawal-credential prefix before any registry lookup. The actual unchanged Lighthouse transition and independent current reference agree: against the captured registered builder, a 1 ETH request with prefix `0xb0` and zero signature credits 1 ETH; changing only the prefix to `0xff` credits zero. Neither changes the execution address. See [the discrepancy record](SPEC_CONFLICTS.json), [reference results](BUILDER_TOPUP_REFERENCE.json) and [actual client results](BUILDER_TOPUP_CLIENT.json). Either the prose must explicitly retain the common validity precondition, or a protocol revision must change the detailed transition and vectors together. This is not a demonstrated client/reference divergence and is not fixed by silently changing the CL.
 
 48h/larger-scale acceptance and upstream Lodestar approval remain excluded, not passed. Public activation is a network rollout decision. The original-04 / 5.5-hour actual waiting-chain attribution remains **UNKNOWN**. No source/test result here changes those boundaries.
 
@@ -83,4 +84,4 @@ PYTHONPATH=/path/to/remerkleable /path/to/consensus-venv/bin/python docs/reviews
 CARGO_TARGET_DIR=/path/to/lighthouse/target python3 docs/reviews/pr-160/run_cl_check.py /path/to/lighthouse /tmp/glamsterdam-cl-audit
 ```
 
-The EIP-8061 source archive preserves the exact upstream bytes, including its trailing whitespace. The runner builds the actual type library, selects exact Cargo artifact paths, links the probe, and requires both positive comparisons and deliberately wrong expectation controls. It refuses a dirty or different CL source tree. Hosted checks and mergeability for the final documentation head are recorded on [PR160](https://github.com/alt-research/eth2030/pull/160), independently of the local source-specific receipts above.
+The EIP-8061 source archive preserves the exact upstream bytes, including its trailing whitespace. The runner builds the actual type/state-processing libraries, selects exact Cargo artifact paths, links external probes, and requires both positive comparisons and deliberately wrong expectation controls. It also reproduces both builder top-up cases against the generated reference and actual CL. It refuses a dirty or different CL source tree. Hosted checks and mergeability for the final documentation head are recorded on [PR160](https://github.com/alt-research/eth2030/pull/160), independently of the local source-specific receipts above.

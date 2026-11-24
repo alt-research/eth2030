@@ -18,3 +18,5 @@
 - [x] Document all twenty EIPs and explicit remaining qualification/maintenance gaps.
 
 - [x] Diagnose and retain the actual proof-CI installer rate-limit failure; supply the existing read-only workflow token without changing pins or acceptance.
+
+- [x] Reproduce the EIP-8282 top-up prose/prefix-precondition discrepancy in both the actual unchanged CL and current independent reference; record G05 without changing consensus behavior.

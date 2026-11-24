@@ -11,3 +11,7 @@ The current-spec review covers all twenty official core entries at the pinned cu
 ## Hosted installer correction
 
 F02 is a separately retained proof-CI setup failure at 98b7f67e: rzup hit the anonymous GitHub API limit before client build or proof execution. The installer step now receives the workflow's existing read-only token through its documented environment variable. Pins and acceptance assertions remain unchanged. CI_BOOTSTRAP.json records the failed run; final corrected-head hosted checks are recorded on PR160.
+
+## Cross-spec clarification
+
+G05 is independently reproduced in the actual unchanged CL transition and the current d2021d27 consensus reference. An existing builder receives a 1 ETH top-up with prefix 0xb0, but the same request with prefix 0xff is dropped before registry lookup. This conflicts with a literal reading of EIP-8282 prose that credentials are ignored for top-ups; the linked d9663f85 and current detailed reference both contain the prefix precondition. The client agrees with that detailed contract. SPEC_CONFLICTS.json records the unresolved clarification; no unilateral consensus change is made.

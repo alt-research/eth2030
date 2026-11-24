@@ -65,9 +65,24 @@ for eth in [1, 32, 4_194_303, 4_194_304, 4_194_305, 8_388_607,
                   "exit": ns["get_exit_churn_limit"](state),
                   "consolidation": ns["get_consolidation_churn_limit"](state),
                   "weak_subjectivity": ns["compute_weak_subjectivity_period"](state)})
+topups = []
+for prefix in [0xb0, 0xff]:
+    captured = state_from_capture()
+    builder = captured.builders[0]
+    before = int(builder.balance)
+    recipient = bytes(builder.execution_address)
+    request = spec.BuilderDepositRequest(pubkey=builder.pubkey,
+        withdrawal_credentials=bytes([prefix]) + bytes(31), amount=1_000_000_000,
+        signature=bytes(96))
+    spec.process_builder_deposit_request(captured, request)
+    topups.append({"prefix": prefix, "before": before, "after": int(captured.builders[0].balance),
+        "credited": int(captured.builders[0].balance) - before,
+        "execution_address_unchanged": bytes(captured.builders[0].execution_address) == recipient})
+assert topups[0]["credited"] == 1_000_000_000 and topups[1]["credited"] == 0
 out = Path(sys.argv[3])
 out.mkdir(parents=True, exist_ok=True)
 (out / "cl-captured-state.ssz").write_bytes(raw)
+(out / "BUILDER_TOPUP_REFERENCE.json").write_text(json.dumps({"reference": "d2021d2719235f0df4726a1d330502cb15aa8ea3", "amount": 1_000_000_000, "cases": topups}, indent=2) + "\n")
 (out / "CL_ORACLE.json").write_text(json.dumps({"reference": "ethereum/consensus-specs@d2021d2719235f0df4726a1d330502cb15aa8ea3",
     "state_root": expected["state_root"], "captured_validators": 384,
     "proposer_cases": proposers, "decision_slot": decision_slot, "lookahead": list(map(int, state_from_capture().proposer_lookahead)),

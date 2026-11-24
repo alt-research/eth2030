@@ -16,7 +16,7 @@ assert tree == "9fba2d606e87e9fb70e49ec13ee7eb08434711f3", tree
 assert not subprocess.check_output(["git", "-C", str(cl), "status", "--porcelain"], text=True)
 target = Path(os.environ["CARGO_TARGET_DIR"]).resolve() / "release"
 env = dict(os.environ, CARGO_BUILD_JOBS="2")
-build = subprocess.run(["cargo", "build", "--release", "-p", "types", "--message-format=json"],
+build = subprocess.run(["cargo", "build", "--release", "-p", "state_processing", "--message-format=json"],
                        cwd=cl, env=env, capture_output=True, text=True, check=True)
 (out / "cl-library-build.jsonl").write_text(build.stdout)
 (out / "cl-library-build.log").write_text(build.stderr)
@@ -59,3 +59,19 @@ for kind in ["proposer", "churn"]:
     controls.append({"changed_expectation": kind, "exit_code": result.returncode, "rejected_by_assertion": True})
 (out / "CL_NEGATIVE_CONTROLS.json").write_text(json.dumps(controls, indent=2) + "\n")
 print(json.dumps({"checks": checks, "negative_controls": controls}))
+
+# Exercise the actual unchanged builder transition too; compare with the exact
+# same inputs processed by the independently generated consensus reference.
+cmd[3] = str(Path(__file__).with_name("builder_topup_check.rs"))
+cmd[5] = str(out / "builder-topup-check")
+cmd += ["--extern", "state_processing=" + libs["state_processing"], "--extern", "bls=" + libs["bls"]]
+compiled = subprocess.run(cmd, cwd=cl, env=env, capture_output=True, text=True)
+(out / "builder-topup-compile.log").write_text(compiled.stdout + compiled.stderr)
+assert compiled.returncode == 0, compiled.stderr
+result = subprocess.run([str(out / "builder-topup-check"), str(state_path)], capture_output=True, text=True)
+assert result.returncode == 0, result.stderr
+topup = json.loads(result.stdout)
+reference = json.loads((out / "BUILDER_TOPUP_REFERENCE.json").read_text())
+assert topup["cases"] == reference["cases"]
+(out / "BUILDER_TOPUP_CLIENT.json").write_text(json.dumps(topup, indent=2) + "\n")
+print(json.dumps({"builder_topup": topup}))

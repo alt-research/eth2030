@@ -292,7 +292,7 @@
       "native_state_cases_by_explicit_eip_path": 0,
       "direct_named_go_pass_events": 7,
       "executed_evidence": "Full EL suites plus actual CL builder registry/wire/payment tests in the 67-case CL suite.",
-      "finding_or_boundary": "No dedicated EIP8282 cases occur by path in the selected EELS state corpus; do not count that corpus as independent contract acceptance. G01/G02.",
+      "finding_or_boundary": "No dedicated EIP8282 cases occur by path in the selected EELS state corpus; do not count that corpus as independent contract acceptance. G01/G02. G05: top-up prose versus detailed prefix precondition differs, reproduced in both actual client and current independent reference; no unilateral CL consensus change.",
       "universal_conformance_claimed": false
     }
   ]

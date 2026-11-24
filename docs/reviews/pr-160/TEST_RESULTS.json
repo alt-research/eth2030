@@ -678,5 +678,7 @@
   "whole_upgrade_conformance_claimed": false,
   "historical_5h5_waiting_chain_attribution": "UNKNOWN",
   "48h_scale_and_lodestar_upstream_approval": "Excluded, not passed",
-  "later_eip8025_guest_scope": "Not added to Glamsterdam progress"
+  "later_eip8025_guest_scope": "Not added to Glamsterdam progress",
+  "specification_conflict_record": "SPEC_CONFLICTS.json",
+  "actual_builder_topup_matches_current_consensus_reference": true
 }

@@ -3,8 +3,24 @@
   "reviewedMaster": "45e8c145236da03ecbcd89ad73eba05780923c12",
   "mergedProgressPr": 148,
   "adoptedDevelopmentTodos": 0,
-  "policy": "The adopted frozen Glamsterdam scope is complete. The FCR and real RV32IM proof extensions have separate implementation reviews. A canonical Ethereum STF guest remains broader unfinished work; it is not hidden by the original 33-task denominator.",
+  "policy": "Glamsterdam progress follows the twenty officially scheduled core EIPs in EIP-7773, preserving the Functional EIP-7495 label. The earlier frozen development ledger is separate. EIP-8025 and canonical Ethereum STF guest research belong to later rounds without an official fork assignment.",
   "items": [
+    {
+      "id": "progressive-container",
+      "phase": "glamsterdam",
+      "kind": "Qualification",
+      "title": "EIP-7495 ProgressiveContainer conformance",
+      "current": "Officially scheduled by EIP-7773. The project retains a Functional label and existing StableContainer code/tests; no new current-spec conformance result is claimed.",
+      "remaining": "Review the current ProgressiveContainer semantics and qualify its active-field, serialization, Merkleization and independent-vector behavior before promotion.",
+      "doneWhen": "Current normative vectors and independent consumers establish the complete ProgressiveContainer contract at pinned sources.",
+      "evidence": [
+        "pkg/ssz/stable_container.go",
+        "pkg/ssz/stable_container_test.go"
+      ],
+      "entries": [
+        "eip-7495"
+      ]
+    },
     {
       "id": "frame-independent",
       "phase": "hegota",
@@ -56,17 +72,18 @@
     },
     {
       "id": "canonical-proofs",
-      "phase": "glamsterdam",
+      "phase": "longer",
       "kind": "Research",
-      "title": "Canonical Ethereum STF guest and public proof consumers",
+      "title": "Later optional execution proofs and canonical Ethereum STF guest",
       "current": "EL #156 delivers real RV32IM program-execution receipts, complete statement binding and native asynchronous prove/verify consumers. The fixed-output STF adapter fixture is not an Ethereum STF implementation.",
-      "remaining": "Implement an executable canonical Ethereum STF guest with actual block/prestate witnesses, then qualify independent poststate/receipt roots and mandatory public proof consumers under an adopted protocol.",
-      "doneWhen": "A real Ethereum block transition is executed inside the proved guest; independent vectors and invalid witness, root, program and receipt controls agree at the deciding block consumer.",
+      "remaining": "Complete the Ethereum STF guest, authenticated execution witnesses and payload-bound optional-proof lifecycle in later rounds; this work is outside official Glamsterdam scope.",
+      "doneWhen": "Authenticated witness-backed Ethereum execution matches independent roots, and payload-bound optional proof production, verification, signed propagation and recovery pass at pinned schemas. Normal payload validation remains authoritative.",
       "evidence": [
         "pkg/zkvm/canonical.go",
         "pkg/zkvm/canonical_executor.go"
       ],
       "entries": [
+        "eip-8025",
         "feature-evm-asm-canonical-quest",
         "feature-leanvm-pq-proofs",
         "feature-mandatory-proofs"

@@ -1,0 +1,15 @@
+{
+  "baseline_passed_after_restore": true,
+  "controls": [
+    {
+      "mutation": "research_in_core",
+      "rejected": true,
+      "message": "AssertionError [ERR_ASSERTION]: Official core scope differs from the pinned EIP-7773 source"
+    },
+    {
+      "mutation": "wrong_rendered_denominator",
+      "rejected": true,
+      "message": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /data-official-complete=\"19\" data-official-total=\"20\"/. Input:"
+    }
+  ]
+}

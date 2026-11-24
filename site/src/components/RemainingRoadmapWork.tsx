@@ -2,19 +2,19 @@ import Link from 'next/link';
 import remaining from '@/data/remaining-work.json';
 import { EIPS } from '@/data/eips';
 import { GITHUB_URL } from '@/lib/constants';
-import { roadmapStages, roadmapProgress, roadmapStatusNames } from '@/lib/roadmap';
+import { roadmapStages, roadmapProgress, roadmapStatusNames, laterProofEntries } from '@/lib/roadmap';
 
 export default function RemainingRoadmapWork() {
-  const inventory = roadmapStages.map(stage => ({ stage, pending: roadmapProgress(stage.id).entries.filter(entry => entry.status !== 'complete') }));
+  const inventory = [...roadmapStages.map(stage => ({ stage, pending: roadmapProgress(stage.id).entries.filter(entry => entry.status !== 'complete') })), { stage: { id: 'longer', name: 'Later proof proposals' }, pending: laterProofEntries.filter(entry => entry.status !== 'complete') }];
   const labelledPending = inventory.reduce((total, phase) => total + phase.pending.length, 0);
   return <section aria-labelledby="remaining-work-heading" className="mb-8 rounded-xl border border-eth-teal/30 bg-eth-surface/80 p-5 md:p-6">
     <p className="text-xs uppercase tracking-wider text-eth-teal">Remaining work · {remaining.date}</p>
     <h2 id="remaining-work-heading" className="mt-2 text-xl font-bold text-eth-text">What still needs work</h2>
-    <p data-remaining-adopted-todos={remaining.adoptedDevelopmentTodos} className="mt-3 text-sm leading-7 text-eth-text/80">Adopted Glamsterdam development: {remaining.adoptedDevelopmentTodos} confirmed open implementation TODOs. PR #{remaining.mergedProgressPr} is merged into master.</p>
+    <p data-remaining-adopted-todos={remaining.adoptedDevelopmentTodos} className="mt-3 text-sm leading-7 text-eth-text/80">Earlier frozen development ledger: {remaining.adoptedDevelopmentTodos} confirmed open implementation TODOs in that retained scope. PR #{remaining.mergedProgressPr} is merged into master.</p>
     <p className="mt-2 text-xs leading-6 text-eth-dim">{remaining.policy}</p>
     <div className="mt-5 border-t border-eth-teal/20 pt-4" aria-label="Current specification repair reviews">
       <h3 className="text-sm font-bold text-eth-text">Current specification repairs</h3>
-      <p className="mt-2 text-xs leading-6 text-eth-dim">These implemented fixes extend the earlier merged baseline. Current CI and merge outcomes are attached to each independent review; code delivery and master integration are separate.</p>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">These repairs and proof extensions are merged. Their retained reviews preserve source-specific CI and runtime evidence; broader proof research remains later work.</p>
       <ul className="mt-3 grid gap-3 md:grid-cols-3">{remaining.specificationRepairs.map(item => <li key={item.id} data-spec-repair={item.id} data-target={item.target} className="min-w-0 rounded-lg border border-eth-teal/20 p-3 text-xs leading-6"><p className="font-bold text-eth-text">{item.title}</p><p className="mt-1 text-eth-dim">Target: {item.target}</p><a className="text-eth-teal underline" href={item.url}>{item.label} ↗</a></li>)}</ul>
       <a className="mt-3 inline-block text-xs text-eth-teal underline" href={remaining.specificationAuditUrl}>Current EIP scope and source-specific validation ↗</a>
     </div>
@@ -34,7 +34,7 @@ export default function RemainingRoadmapWork() {
     </div>
     <div className="mt-5 border-t border-eth-teal/20 pt-4">
       <h3 className="text-sm font-bold text-eth-text">Current non-complete tracker labels: {labelledPending} entries</h3>
-      <p className="mt-2 text-xs leading-6 text-eth-dim">This inventory contains {labelledPending} non-complete mapped entries across all phases. The Glamsterdam remainder is the canonical Ethereum STF guest; the adopted signed Gloas and FCR routes have scoped completion evidence. Expand a phase to inspect every non-complete entry.</p>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">This inventory contains {labelledPending} non-complete entries across the displayed official and project-planning scopes. The official Glamsterdam open label is EIP-7495. EIP-8025 and canonical Ethereum STF research belong to later rounds; the adopted signed Gloas and FCR routes retain scoped completion evidence. Expand a phase to inspect every non-complete entry.</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{inventory.map(({ stage, pending }) => <details key={stage.id} data-pending-phase={stage.id} data-pending-count={pending.length} className="min-w-0 rounded-lg border border-eth-teal/20 p-3 text-xs leading-6">
         <summary className="cursor-pointer font-bold text-eth-text">{stage.name} · {pending.length} entries</summary>
         <ul className="mt-2 space-y-2">{pending.map(entry => <li key={entry.id} data-pending-entry={entry.id}><Link className="text-eth-teal underline" href={`/eips/${entry.id}/`}>{entry.title}</Link><span className="ml-2 text-eth-dim">{roadmapStatusNames[entry.status]}</span></li>)}</ul>

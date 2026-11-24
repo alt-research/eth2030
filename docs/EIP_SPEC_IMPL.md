@@ -55,7 +55,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7904 | Precompile Gas Repricing | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
+| 7904 | Compute Gas Cost Analysis (informational; earlier draft code retained) | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
 | 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
 | 2780 | Reduce Intrinsic Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/vm/gas_table.go`, `core/glamsterdam_repricing.go` | `core/eip2780_test.go` |
 | 8037 | State Creation Gas Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8037_test.go` |
@@ -100,7 +100,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | 7916 | SSZ ProgressiveList | Complete | [EIP-7916](https://eips.ethereum.org/EIPS/eip-7916) | `ssz/progressive_list.go`, `ssz/progressive_encoder.go` | `ssz/progressive_list_test.go`, `ssz/progressive_encoder_test.go` |
 | 8077 | Announce Nonce (ETH/72) | Complete | [EIP-8077](https://eips.ethereum.org/EIPS/eip-8077) | `eth/announce_nonce.go`, `p2p/announce_nonce.go` | via eth tests |
 | 7691 | Blob Throughput Increase | Complete | [EIP-7691](https://eips.ethereum.org/EIPS/eip-7691) | `core/blob_schedule.go`, `core/blob_gas.go` | `core/eip7691_test.go`, `core/blob_schedule_test.go` |
-| 7495 | SSZ StableContainer | Functional | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/stable_container.go` | `ssz/stable_container_test.go` |
+| 7495 | SSZ ProgressiveContainer | Functional | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/stable_container.go` | `ssz/stable_container_test.go` |
 
 ---
 
@@ -371,7 +371,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 ## Historical coverage summary (retained)
 
-The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current scoped Glamsterdam progress is 16/17; the executable canonical Ethereum STF guest remains unfinished. The extension record distinguishes exact source and test receipts.
+The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current official-scope Glamsterdam labels are 19/20; EIP-7495 remains Functional. The executable canonical Ethereum STF guest remains later research outside that denominator. The extension record distinguishes exact source and test receipts.
 
 | Metric | Value |
 |--------|-------|

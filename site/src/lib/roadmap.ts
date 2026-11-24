@@ -1,7 +1,8 @@
+import officialScope from '@/data/official-glamsterdam.json';
 import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/data/eips';
 
 export const roadmapStages: { id: ForkId; name: string; glyph: string; heading: string; description: string }[] = [
-  { id: 'glamsterdam', name: 'Glamsterdam', glyph: 'G*', heading: 'Scale the execution layer', description: 'Adopted LIFO / signed Gloas and FCR development delivered. Real RV32IM proofs are implemented; an executable canonical Ethereum STF guest remains.' },
+  { id: 'glamsterdam', name: 'Glamsterdam', glyph: 'G*', heading: 'Scale the execution layer', description: 'Scope follows the official EIP-7773 scheduled core list. ETH2030 implementation labels are counted against that list; networking, informational references and later proof proposals are separate.' },
   { id: 'hegota', name: 'Hegotá', glyph: 'H*', heading: 'Open the protocol', description: 'Inclusion lists, quick slots and programmable transactions.' },
   { id: 'i', name: 'I*', glyph: 'I*', heading: 'The next foundations', description: 'Decoupled consensus, binary state and post-quantum research.' },
   { id: 'j', name: 'J*', glyph: 'J*', heading: 'Towards post-quantum', description: 'Attestations, sampling and proofs for a new security model.' },
@@ -25,7 +26,9 @@ export function roadmapLayer(entry: EipEntry): Layer {
 }
 
 export function roadmapProgress(fork: ForkId) {
-  const entries = EIPS.filter(entry => roadmapFork(entry) === fork && entry.strawmap);
+  const entries = fork === 'glamsterdam'
+    ? EIPS.filter(entry => entry.number !== null && officialScope.scheduledCore.includes(entry.number))
+    : EIPS.filter(entry => roadmapFork(entry) === fork && entry.strawmap);
   const counts = Object.fromEntries(roadmapStatuses.map(status => [status, entries.filter(entry => entry.status === status).length])) as Record<Status, number>;
   const completePercentage = entries.length ? Math.round((counts.complete / entries.length) * 100) : null;
   return { entries, counts, completePercentage };
@@ -34,8 +37,10 @@ export function roadmapProgress(fork: ForkId) {
 export function groupRoadmapNodes(entries: EipEntry[]) {
   const groups = new Map<string, EipEntry[]>();
   for (const entry of entries) {
-    const key = `${roadmapLayer(entry)}:${entry.strawmap?.item}`;
+    const key = `${roadmapLayer(entry)}:${entry.strawmap?.item ?? entry.id}`;
     groups.set(key, [...(groups.get(key) ?? []), entry]);
   }
   return [...groups.values()];
 }
+
+export const laterProofEntries = EIPS.filter(entry => officialScope.laterProofEntries.includes(entry.id));

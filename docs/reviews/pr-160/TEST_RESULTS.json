@@ -1,0 +1,682 @@
+{
+  "merged_master": "5fedb7e5733fbef69767a711115ef9925e7bd769",
+  "baseline_audit_revision": "8caa00cd71b5f6e0f6b9a5bbfb6a3043d025f9d0",
+  "baseline_audit_changes": "Only CHECK/STATUS documentation differs from merged master.",
+  "slot_fix_source": "e9174cbece06cb02cca1a8fc45dc4c03516e1647",
+  "go_baseline": {
+    "exit_code": 0,
+    "packages": {
+      "pass": 220,
+      "fail": 0,
+      "skip": 18
+    },
+    "conditional_test_skips": [
+      {
+        "package": "github.com/eth2030/eth2030/core/rawdb",
+        "test": "TestNewAncientStore_ReadOnlyFlag"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/rawdb",
+        "test": "TestAncientStore_PruneTail_ReadOnly"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/rawdb",
+        "test": "TestAncientStore_Compact_ReadOnly"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFDiscoverFixtures"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFRunSingleFixture"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFSkipUnsupportedForks"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFStateRootMismatchReporting"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFBatchRunConcurrency"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_Example_Add11"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_Example_SelfBalance"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_DiscoverGeneralStateTests"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFRunGoEthereumStateTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFIntegrationGoEthereumFixtures"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFRunStaticStateTests"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_RegressionGates"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestGethRunnerSmoke"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestGethCategorySummary"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestGethRunnerSingleCategory"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFLoadStateTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFSubtests"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFPreStateSetup"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFMultipleDataVariants"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEFRunAgainstGoEthereumFixture"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stCodeCopyTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stRevertTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stStaticCall"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stEIP1559"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stMemoryTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stEIP150Specific"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stCallCodes"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stQuadraticComplexityTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stArgsZeroOneBalance"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stMemoryStressTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stExpectSection"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stSLoadTest"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/eftest",
+        "test": "TestEF_stZeroCallsRevert"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAdd"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSub"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonMul"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonDiv"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSdiv"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonMod"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSmod"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAnd"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonOr"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonXor"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonByte"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSHL"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSHR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSAR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonLt"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonGt"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSlt"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSgt"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonEq"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonSignExtend"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/ADD"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SUB"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/MUL"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/DIV"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SDIV"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/MOD"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SMOD"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/EXP"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/AND"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/OR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/XOR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/BYTE"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SHL"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SHR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SAR"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/LT"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/GT"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SLT"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SGT"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/EQ"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonAllOpcodes/SIGNEXTEND"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonVectorCounts"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonEcRecover"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBN256Add"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBN256ScalarMul"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBN256Pairing"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBlake2F"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonModExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonModExpEIP2565"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonP256Verify"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG1Add"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG1Mul"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG1MultiExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG2Add"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG2Mul"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSG2MultiExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSPairing"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSMapG1"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonBLSMapG2"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBlake2F"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSG1Add"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSG1MultiExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSG2Add"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSG2MultiExp"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSPairing"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSMapG1"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/core/vm",
+        "test": "TestJsonFailBLSMapG2"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestCanonExec_ExecuteAndProve"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestCanonExec_VerifyGuestProof"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestCanonExec_VerifyGuestProofTampered"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestCanonExec_ProofStatementConsistency"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestRealSTFExec_ExecuteSTF"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestRealSTFExec_ExecuteSTFMismatch"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestRealSTFExec_VerifySTFProof"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestRealSTFExec_FullRoundTrip"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/zkvm",
+        "test": "TestZKISABridge_ExecuteZKISA"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestLoadGenesisFile_Kurtosis"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestLoadGenesisFile_Kurtosis_AllocDetails"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestNodeWithGenesisFile_Kurtosis"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestNativeCommitStallDiagnostic"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestNativeMatureImportReplay"
+      },
+      {
+        "package": "github.com/eth2030/eth2030/node",
+        "test": "TestTrack4LiveDevnet"
+      }
+    ],
+    "packages_without_tests": [
+      "github.com/eth2030/eth2030/crypto/pqc/internal/pqclean",
+      "github.com/eth2030/eth2030/eiptest/contracts",
+      "github.com/eth2030/eth2030/engine/actor",
+      "github.com/eth2030/eth2030/engine/backendapi",
+      "github.com/eth2030/eth2030/internal/testutil",
+      "github.com/eth2030/eth2030/p2p/nat",
+      "github.com/eth2030/eth2030/p2p/peermgr",
+      "github.com/eth2030/eth2030/p2p/wire",
+      "github.com/eth2030/eth2030/rollup/anchor",
+      "github.com/eth2030/eth2030/rollup/bridge",
+      "github.com/eth2030/eth2030/rollup/execute",
+      "github.com/eth2030/eth2030/rollup/proof",
+      "github.com/eth2030/eth2030/rollup/registry",
+      "github.com/eth2030/eth2030/rollup/sequencer",
+      "github.com/eth2030/eth2030/rpc/internal/testutil",
+      "github.com/eth2030/eth2030/tools/eiptest-scaffold",
+      "github.com/eth2030/eth2030/tools/gen-contracts",
+      "github.com/eth2030/eth2030/trie"
+    ]
+  },
+  "broad_race": {
+    "exit_code": 0,
+    "packages": {
+      "pass": 64,
+      "fail": 0,
+      "skip": 5
+    },
+    "failures": []
+  },
+  "eels": {
+    "release": "tests@v21.0.2",
+    "archive_sha256": "e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9",
+    "native_signed_state_corpora": [
+      {
+        "executor": "eth2030-native-signed-state-transition",
+        "native_revision": "8caa00cd71b5f6e0f6b9a5bbfb6a3043d025f9d0",
+        "fork": "Osaka",
+        "passed": 14665,
+        "failed": 0,
+        "errors": [],
+        "cases_by_path_eip": {
+          "2929": 568,
+          "2930": 673,
+          "196": 176,
+          "197": 195,
+          "198": 47,
+          "211": 4,
+          "214": 180,
+          "1153": 171,
+          "4844": 819,
+          "5656": 173,
+          "6780": 212,
+          "7516": 4,
+          "1014": 26,
+          "1052": 85,
+          "145": 3,
+          "2681": 3,
+          "1344": 5,
+          "152": 73,
+          "2200": 774,
+          "1559": 109,
+          "7594": 10,
+          "7823": 23,
+          "7825": 35,
+          "7883": 168,
+          "7939": 598,
+          "7951": 397,
+          "2315": 1,
+          "150": 325,
+          "158": 15,
+          "3607": 12,
+          "3651": 28,
+          "3855": 19,
+          "3860": 62,
+          "2537": 1013,
+          "7623": 483,
+          "7702": 758,
+          "155": 3,
+          "161": 84
+        }
+      },
+      {
+        "executor": "eth2030-native-signed-state-transition",
+        "native_revision": "8caa00cd71b5f6e0f6b9a5bbfb6a3043d025f9d0",
+        "fork": "Amsterdam",
+        "passed": 16908,
+        "failed": 0,
+        "errors": [],
+        "cases_by_path_eip": {
+          "2780": 269,
+          "7708": 74,
+          "7843": 18,
+          "7928": 66,
+          "7702": 744,
+          "7954": 58,
+          "7976": 543,
+          "7981": 189,
+          "7997": 40,
+          "8024": 288,
+          "8037": 497,
+          "8038": 263,
+          "8246": 12,
+          "2929": 568,
+          "2930": 673,
+          "196": 176,
+          "197": 195,
+          "198": 47,
+          "211": 4,
+          "214": 180,
+          "1153": 171,
+          "4844": 819,
+          "5656": 173,
+          "6780": 212,
+          "7516": 4,
+          "1014": 26,
+          "1052": 85,
+          "145": 3,
+          "2681": 3,
+          "1344": 5,
+          "152": 73,
+          "2200": 774,
+          "1559": 109,
+          "7594": 10,
+          "7823": 21,
+          "7825": 11,
+          "7883": 163,
+          "7939": 596,
+          "7951": 395,
+          "2315": 1,
+          "150": 325,
+          "158": 15,
+          "3607": 12,
+          "3651": 28,
+          "3855": 19,
+          "2537": 1021,
+          "7623": 483,
+          "3860": 26,
+          "155": 3,
+          "161": 84
+        }
+      }
+    ],
+    "scope": "Signed state transitions and independent expected roots; not the official blockchain/BAL corpus."
+  },
+  "cl": {
+    "source_head": "274100659f310772e68c11c684eed2ce4b407a62",
+    "merged_eth2030": "983f62e9b08e3ee655df951909df099e80e5ad7b",
+    "equal_trees": "9fba2d606e87e9fb70e49ec13ee7eb08434711f3",
+    "default_crypto": "No fake_crypto feature enabled; actual BLS routines remain active. Unit execution endpoints are mocks, not a new live multi-client network.",
+    "suites": {
+      "state_processing": [
+        "test result: ok. 67 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.07s"
+      ],
+      "captured_and_limits": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.36s"
+      ],
+      "fork_choice_and_proto_array": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "types_library": [
+        "345 passed; 0 failed; 0 ignored"
+      ]
+    }
+  },
+  "fixed_source_local": {
+    "engine_node_race_packages": 20,
+    "vet": true,
+    "native_and_wrapper_build": true
+  },
+  "whole_upgrade_conformance_claimed": false,
+  "historical_5h5_waiting_chain_attribution": "UNKNOWN",
+  "48h_scale_and_lodestar_upstream_approval": "Excluded, not passed",
+  "later_eip8025_guest_scope": "Not added to Glamsterdam progress"
+}

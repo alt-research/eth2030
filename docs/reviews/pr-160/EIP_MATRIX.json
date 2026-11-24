@@ -1,0 +1,299 @@
+{
+  "scope": "Twenty official scheduled core EIPs; evidence rows are not completion percentages.",
+  "core": [
+    {
+      "eip": 2780,
+      "title": "Resource-based intrinsic gas",
+      "requirements_reviewed": "State-independent validity; decomposed sender/recipient/value costs; runtime authorization/account OOG is an included failure.",
+      "source_paths": [
+        "core/gas/amsterdam_intrinsic.go",
+        "core/execution/amsterdam_message.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 269,
+      "direct_named_go_pass_events": 17,
+      "executed_evidence": "Native signed corpus, sender/self/creation and pre-execution regression tests.",
+      "finding_or_boundary": "No additional deviation confirmed.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7495,
+      "title": "ProgressiveContainer",
+      "requirements_reviewed": "Immutable active_fields, four illegal layouts, Container wire identity, active-word mix-in and stable gindices.",
+      "source_paths": [
+        "ssz/progressive_container.go",
+        "ssz/progressive_reference_test.go",
+        "ssz/progressive_captured_test.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 62,
+      "executed_evidence": "Independent 29-container/1016-field/487-list corpus and actual captured CL state run inside full Go suite.",
+      "finding_or_boundary": "Deprecated compatibility helpers are separate from normative schemas.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7688,
+      "title": "Forward-compatible CL structures",
+      "requirements_reviewed": "Converted container/list shapes and runtime bounds; immutable Validator and history accumulators remain unchanged.",
+      "source_paths": [
+        "lighthouse:consensus/types/src/state/beacon_state.rs",
+        "lighthouse:consensus/types/src/block/beacon_block_body.rs",
+        "lighthouse:consensus/types/src/execution/execution_requests.rs"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 0,
+      "executed_evidence": "345 CL type tests; four captured/progressive checks; actual captured state matches the unchanged selected consensus reference.",
+      "finding_or_boundary": "No fresh complete upstream per-type/per-fork CL fixture replay; see G02.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7708,
+      "title": "ETH transfer logs",
+      "requirements_reviewed": "Exact emitter/topic/amount, chronological transfer logs, no zero/self/fee/withdrawal logs, rollback removes reverted logs.",
+      "source_paths": [
+        "core/vm/eip7708.go",
+        "core/vm/instructions.go",
+        "core/vm/amsterdam_create.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 74,
+      "direct_named_go_pass_events": 7,
+      "executed_evidence": "Native signed corpus and full VM/Node integration suites.",
+      "finding_or_boundary": "No additional deviation confirmed.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7732,
+      "title": "ePBS",
+      "requirements_reviewed": "Signed bid/envelope authority, request root, single beacon post-state and deferred parent processing; payments/withdrawals and builder registry.",
+      "source_paths": [
+        "lighthouse:consensus/state_processing/src/per_block_processing.rs",
+        "lighthouse:consensus/state_processing/src/per_block_processing/process_operations.rs",
+        "lighthouse:consensus/types/src/execution/execution_payload_bid.rs"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 4,
+      "executed_evidence": "67 CL state-processing tests, 4 fork-choice and 41 proto-array tests; includes 23 builder-family cases. Actual crypto, mock execution endpoints.",
+      "finding_or_boundary": "Not a fresh full fork-choice/gossip fixture or live independent-peer campaign; G02/G03 remain.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7778,
+      "title": "Gross block gas",
+      "requirements_reviewed": "User refund remains; execution block dimension uses pre-refund gas/floor while state refills remain net; header max and receipt sum differ.",
+      "source_paths": [
+        "core/execution/amsterdam_message.go",
+        "core/block/builder.go",
+        "core/chain/blockchain.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 3,
+      "executed_evidence": "EIP7778 and builder/replay/gas-pool tests plus complete signed state corpora.",
+      "finding_or_boundary": "State corpus alone cannot establish block header/receipt/BAL conformance; G01.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7843,
+      "title": "SLOTNUM",
+      "requirements_reviewed": "Opcode 0x4b, cost 2; uint64 from CL committed in the header and carried over Engine API.",
+      "source_paths": [
+        "core/vm/instructions.go",
+        "engine/backend.go",
+        "node/backend/engine_backend.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 18,
+      "direct_named_go_pass_events": 0,
+      "executed_evidence": "Native state corpus plus actual Engine HTTP, independent Geth header, canonical RPC, opcode and restart regression.",
+      "finding_or_boundary": "F01: valid uppercase/mixed-case quantity digits rejected before fix; corrected in PR160.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7916,
+      "title": "ProgressiveList",
+      "requirements_reviewed": "Progressive 1/4/16/64 subtrees, empty termination, basic packing/bit packing and element-count mix-in, stable proof paths.",
+      "source_paths": [
+        "ssz/progressive_list.go",
+        "ssz/progressive_reference_test.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 1,
+      "executed_evidence": "Independent corpus and full SSZ race suites; shared gindex repair from merged PR159 retained.",
+      "finding_or_boundary": "Chunk-root encoder helpers are not a general typed serializer; ordinary typed codecs still own field encoding.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7928,
+      "title": "Block access lists",
+      "requirements_reviewed": "Minimal integer RLP, phase indices, ordering/uniqueness, pre/post-state OOG accesses, final transaction diffs, commitment and retention.",
+      "source_paths": [
+        "bal/tracker.go",
+        "bal/decode.go",
+        "bal/types.go",
+        "core/execution/processor.go",
+        "core/chain/block_access_list.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 66,
+      "direct_named_go_pass_events": 4,
+      "executed_evidence": "Native state corpus plus actual block build/import, system transitions, raw BAL/retention and reconciliation tests.",
+      "finding_or_boundary": "No native official blockchain/BAL corpus replay tool was found; G01.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7954,
+      "title": "Code/initcode limits",
+      "requirements_reviewed": "65536-byte code and 131072-byte initcode limits with fork gating and creation failure semantics.",
+      "source_paths": [
+        "core/vm/eip7954.go",
+        "core/vm/amsterdam_create.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 58,
+      "direct_named_go_pass_events": 21,
+      "executed_evidence": "Native signed corpus and VM/transaction creation boundary tests.",
+      "finding_or_boundary": "No additional deviation confirmed.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7976,
+      "title": "Calldata floor",
+      "requirements_reviewed": "64 gas for every zero/nonzero byte; decomposed base from EIP2780; validity/settlement and block execution floor.",
+      "source_paths": [
+        "core/gas/amsterdam_intrinsic.go",
+        "core/execution/amsterdam_message.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 543,
+      "direct_named_go_pass_events": 14,
+      "executed_evidence": "Native signed corpus and RPC/txpool/execution tests in full/race suites.",
+      "finding_or_boundary": "Older named gas helpers are not the canonical Amsterdam path; G04.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7981,
+      "title": "Access-list data surcharge",
+      "requirements_reviewed": "Flat 64 gas per address/key byte enters both intrinsic and floor; access charge remains separate with EIP8038 repricing.",
+      "source_paths": [
+        "core/gas/amsterdam_intrinsic.go",
+        "core/execution/amsterdam_message.go",
+        "txpool/txpool.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 189,
+      "direct_named_go_pass_events": 5,
+      "executed_evidence": "Native signed corpus and actual processor/txpool tests.",
+      "finding_or_boundary": "No additional deviation confirmed in the active path.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 7997,
+      "title": "Deterministic factory",
+      "requirements_reviewed": "Exact address/runtime and nonzero nonce via explicit genesis/deployment; no fork-boundary injection or existence check.",
+      "source_paths": [
+        "core/eips/eip7997.go",
+        "core/config/genesis.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 40,
+      "direct_named_go_pass_events": 3,
+      "executed_evidence": "Native signed corpus and explicit genesis/runtime/system tests.",
+      "finding_or_boundary": "Network allocation policy is separate from an EL fork-boundary validity check.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8024,
+      "title": "Deep stack opcodes",
+      "requirements_reviewed": "Exact decoding/reserved immediate ranges, zero-padding at EOF, stack bounds and unchanged JUMPDEST analysis.",
+      "source_paths": [
+        "core/vm/instructions.go",
+        "core/vm/jump_table.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 288,
+      "direct_named_go_pass_events": 672,
+      "executed_evidence": "Native signed corpus and 672 directly named passing Go test events.",
+      "finding_or_boundary": "Current source differs from prior pin only in editorial step numbering/cross-reference.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8037,
+      "title": "State gas reservoir",
+      "requirements_reviewed": "Fixed CPSB1530; per-dimension inclusion; LIFO charge/refill, baseline rollback, committed authorizations, creation/collision and system margin.",
+      "source_paths": [
+        "core/vm/amsterdam_state_gas.go",
+        "core/vm/amsterdam_create.go",
+        "core/execution/amsterdam_message.go",
+        "core/execution/system_calls.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 497,
+      "direct_named_go_pass_events": 10,
+      "executed_evidence": "Native signed corpus; complete affected/broad race suites and actual system-state margin tests.",
+      "finding_or_boundary": "Whole-block official corpus remains separate; G01. Deferred 48h is not reclassified as a pass.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8038,
+      "title": "State access/write pricing",
+      "requirements_reviewed": "Cold account3000, access-list2900/2000, storage write10000, clear refund11616; writes and delegation/pre-state access order.",
+      "source_paths": [
+        "core/vm/amsterdam_gas_table.go",
+        "core/vm/amsterdam_state_gas.go",
+        "core/gas/amsterdam_intrinsic.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 263,
+      "direct_named_go_pass_events": 14,
+      "executed_evidence": "Native signed corpus and full VM/transaction/BAL suites.",
+      "finding_or_boundary": "Obsolete experimental gas-table helpers still carry misleading names/comments; G04.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8045,
+      "title": "Exclude slashed proposers",
+      "requirements_reviewed": "Filter before shuffling; preserve existing current/next lookahead; compute only at the decision slot.",
+      "source_paths": [
+        "lighthouse:consensus/types/src/state/beacon_state.rs"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 0,
+      "executed_evidence": "Actual unchanged CL library matches 96 independently selected indices across three slashing distributions; cached lookahead unchanged; out-of-window request rejected.",
+      "finding_or_boundary": "Derived captured-state helper test, not a new live mass-slashing campaign.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8061,
+      "title": "Exit/consolidation churn",
+      "requirements_reviewed": "32768 exit quotient, activation cap256 ETH, independent consolidation65536 quotient, increment rounding and asymmetric weak-subjectivity formula.",
+      "source_paths": [
+        "lighthouse:consensus/types/src/state/beacon_state.rs"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 0,
+      "executed_evidence": "Ten independent literal-EIP expectations against actual CL helper methods, including cap/rounding boundaries and 36M/120M ETH aggregate inputs.",
+      "finding_or_boundary": "Large totals are explicitly injected cache inputs for helper testing, not network-scale state acceptance.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8246,
+      "title": "No SELFDESTRUCT burn",
+      "requirements_reviewed": "Same-transaction self-beneficiary retains balance; finalization clears nonce/code/storage, preserves later credits, and EIP161 removes empty result.",
+      "source_paths": [
+        "core/vm/selfdestruct_8246.go",
+        "core/vm/instructions.go",
+        "core/state/memory_statedb.go"
+      ],
+      "native_state_cases_by_explicit_eip_path": 12,
+      "direct_named_go_pass_events": 31,
+      "executed_evidence": "Native signed corpus plus 31 directly named passing Go events and backend/restart integration tests.",
+      "finding_or_boundary": "No additional deviation confirmed.",
+      "universal_conformance_claimed": false
+    },
+    {
+      "eip": 8282,
+      "title": "Builder requests",
+      "requirements_reviewed": "Exact runtime/address, fees/inhibitor/caps/endian request bus; mandatory system call, rollback, BLS deposit domain and exit source authorization.",
+      "source_paths": [
+        "core/eips/eip8282.go",
+        "core/execution/requests.go",
+        "core/types/builder_request.go",
+        "lighthouse:consensus/state_processing/src/per_block_processing/process_operations.rs"
+      ],
+      "native_state_cases_by_explicit_eip_path": 0,
+      "direct_named_go_pass_events": 7,
+      "executed_evidence": "Full EL suites plus actual CL builder registry/wire/payment tests in the 67-case CL suite.",
+      "finding_or_boundary": "No dedicated EIP8282 cases occur by path in the selected EELS state corpus; do not count that corpus as independent contract acceptance. G01/G02.",
+      "universal_conformance_claimed": false
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "cached_lookahead_preserved_cases": 3,
+  "churn_and_weak_subjectivity_cases": 10,
+  "churn_scope": "synthetic aggregate cache inputs to unchanged actual Lighthouse helpers",
+  "complete_proposer_indices": 96,
+  "passed": true,
+  "proposer_cases": 3,
+  "lighthouse_tree": "9fba2d606e87e9fb70e49ec13ee7eb08434711f3",
+  "out_of_decision_window_query_rejected": true
+}

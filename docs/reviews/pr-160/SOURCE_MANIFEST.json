@@ -1,0 +1,252 @@
+{
+  "official_core": [
+    2780,
+    7495,
+    7688,
+    7708,
+    7732,
+    7778,
+    7843,
+    7916,
+    7928,
+    7954,
+    7976,
+    7981,
+    7997,
+    8024,
+    8037,
+    8038,
+    8045,
+    8061,
+    8246,
+    8282
+  ],
+  "eips": [
+    {
+      "eip": 2780,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-2780.md",
+      "bytes": 31325,
+      "local_ref_exists": true,
+      "sha256": "d968a85f43e4ce794ce6705e72c026b0f20be99983df45dcf895f5d650daa6a8"
+    },
+    {
+      "eip": 7495,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7495.md",
+      "bytes": 7957,
+      "local_ref_exists": true,
+      "sha256": "6949d066732a6603bacea1e62407a81999ce0f3698ec365f5a8dccb365f49b3d"
+    },
+    {
+      "eip": 7688,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7688.md",
+      "bytes": 19761,
+      "local_ref_exists": true,
+      "sha256": "6d0990cc182cedbe57aa8425329cea52ba76e10e314dc910bde9bca7a380da7b"
+    },
+    {
+      "eip": 7708,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7708.md",
+      "bytes": 5659,
+      "local_ref_exists": true,
+      "sha256": "a67a4f63196fac44305ff1ef996efaca9c2981a9cc8f6acf68efd1223d8b0ed3"
+    },
+    {
+      "eip": 7732,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7732.md",
+      "bytes": 45889,
+      "local_ref_exists": true,
+      "sha256": "f75fc2ade0a9edee17b5a901c286215c77a70923eeeb028eb004ab98c4cfbf31"
+    },
+    {
+      "eip": 7773,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7773.md",
+      "bytes": 3328,
+      "local_ref_exists": true,
+      "sha256": "3d6f58227e8f551319c5958058cbaeaf9beccca48a5862a88d3106da172251dc"
+    },
+    {
+      "eip": 7778,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7778.md",
+      "bytes": 4143,
+      "local_ref_exists": true,
+      "sha256": "b79233b6d727cd28958387e37dba14c0f7b355e4d55ef9d4e7217e118d65ad23"
+    },
+    {
+      "eip": 7843,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7843.md",
+      "bytes": 3062,
+      "local_ref_exists": true,
+      "sha256": "a5f438c4d4b22ab2858d311c570bd1eb3b39ce0bace6011842357cb979eeb48a"
+    },
+    {
+      "eip": 7904,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7904.md",
+      "bytes": 13073,
+      "local_ref_exists": true,
+      "sha256": "f3fe99952af021a6a7669feef239fdbfc6c56edc3d2bac13fe12506819f8f57f"
+    },
+    {
+      "eip": 7916,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7916.md",
+      "bytes": 10381,
+      "local_ref_exists": true,
+      "sha256": "fc1f36dff491d3ce6349253c5b1ab1749ef01fc43154efaf63c0791d63c67d7f"
+    },
+    {
+      "eip": 7928,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7928.md",
+      "bytes": 32080,
+      "local_ref_exists": true,
+      "sha256": "d10532270758ace128a2b4ce1d6dd8c485e34f2e8e609893cfc7110a2f028a75"
+    },
+    {
+      "eip": 7954,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7954.md",
+      "bytes": 1866,
+      "local_ref_exists": true,
+      "sha256": "314e8fb7154848dc076dfb2200159fd291a0f2633b49e55c1e7b7e750bba2084"
+    },
+    {
+      "eip": 7975,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7975.md",
+      "bytes": 3848,
+      "local_ref_exists": true,
+      "sha256": "bde96326aaf73e69cc659730aeb2f0951a6e7dd89b535d8023a458da644a0682"
+    },
+    {
+      "eip": 7976,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7976.md",
+      "bytes": 6632,
+      "local_ref_exists": true,
+      "sha256": "149c2b738266a0f1f621d4ddb69dad1c129f25d1fc74a8a610ffeec0231f36c9"
+    },
+    {
+      "eip": 7981,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7981.md",
+      "bytes": 5140,
+      "local_ref_exists": true,
+      "sha256": "7d7942b3b6e60a68550862cfd58d519dc7fb9780842213da4a4c4e958aab132f"
+    },
+    {
+      "eip": 7997,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7997.md",
+      "bytes": 7598,
+      "local_ref_exists": true,
+      "sha256": "9a6b9ba827ce5625b306b3921eb22c61cc334306110a5de93ec326978e8cf429"
+    },
+    {
+      "eip": 8024,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8024.md",
+      "bytes": 12334,
+      "local_ref_exists": true,
+      "sha256": "d66f60e801c61507467b34e5c7ad345af1be4296214cb113f9066e1f075aa261"
+    },
+    {
+      "eip": 8037,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8037.md",
+      "bytes": 55808,
+      "local_ref_exists": true,
+      "sha256": "632fca5923a5f6f8231b60cac3b531137dd46307819a21118647ad6486393855"
+    },
+    {
+      "eip": 8038,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8038.md",
+      "bytes": 27837,
+      "local_ref_exists": true,
+      "sha256": "3e5937bb5cea775a8b86cda62a2ebfcd16494601e0c80aed9ca1b2dfbcf96f66"
+    },
+    {
+      "eip": 8045,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8045.md",
+      "bytes": 5273,
+      "local_ref_exists": true,
+      "sha256": "10f8b7929deadec6d68c093fa38213b40f5c86bc27cf23b6c8c6ea4c353da3a2"
+    },
+    {
+      "eip": 8061,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8061.md",
+      "bytes": 16520,
+      "local_ref_exists": true,
+      "sha256": "b83af6dc1800236e1dc48338b235119f8b2fa6a1991683628a7bff7c81d50fd2"
+    },
+    {
+      "eip": 8070,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8070.md",
+      "bytes": 23627,
+      "local_ref_exists": true,
+      "sha256": "7189be872a6858da7f836a0caf057dff83e8afcf0a86b8de6094ace3edba51a8"
+    },
+    {
+      "eip": 8136,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8136.md",
+      "bytes": 6931,
+      "local_ref_exists": true,
+      "sha256": "32571dd76c3bfbec27c34be48f900c7bc55934099e7e9a9c8f5badb4f2e96d6a"
+    },
+    {
+      "eip": 8159,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8159.md",
+      "bytes": 6112,
+      "local_ref_exists": true,
+      "sha256": "02d1223ce9d8401d78bb2b31a8d2103525e85a5ef88db115d89e1e39fbe79675"
+    },
+    {
+      "eip": 8189,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8189.md",
+      "bytes": 7766,
+      "local_ref_exists": false,
+      "sha256": "cd9d72d429d22baddb942b928a5f2e1aae4d81a16e327af99066e1dcc5c10de2"
+    },
+    {
+      "eip": 8246,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8246.md",
+      "bytes": 9219,
+      "local_ref_exists": false,
+      "sha256": "7a83e010bc8e11e984d8f56bbccc6de2b14ebd964124d38feec8b53bd163c6b0"
+    },
+    {
+      "eip": 8261,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8261.md",
+      "bytes": 15964,
+      "local_ref_exists": false,
+      "sha256": "52932a7340b17414095d572509e12e30c319dd77195db19abe4b4bc059773396"
+    },
+    {
+      "eip": 8282,
+      "source_revision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+      "source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8282.md",
+      "bytes": 19999,
+      "local_ref_exists": false,
+      "sha256": "a5784c75bd09e74d6ea02e513bc8213eb0c4420cbb2ce7756ea5e3293d703a0b"
+    }
+  ],
+  "prior_protocol_pin": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "prior_protocol_comparison": "Seventeen EL/CL contracts compare equal after metadata removal except EIP-8024 step numbering and a corrected cross-reference; no opcode semantics changed."
+}

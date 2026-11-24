@@ -1,0 +1,187 @@
+{
+  "passed": true,
+  "workflow_run": 45346983229,
+  "branch_head": "40a78da6f0aa02024607ce848eff3d4a1af767da",
+  "checkout_revision": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+  "checkout_tree": "ebf0cdcbb1610321913e2de6ed0355f98abbac4d",
+  "checkout_tree_matches_branch_head": true,
+  "source_matched_by_github_git_commit_and_local_rev_parse": true,
+  "required_passed": [
+    "TestCanonExec_ExecuteAndProve",
+    "TestCanonExec_ProofStatementConsistency",
+    "TestCanonExec_VerifyGuestProof",
+    "TestCanonExec_VerifyGuestProofTampered",
+    "TestIndependentRV32IMExecutionVectors",
+    "TestRealCanonicalProofThroughNativeNode",
+    "TestRealExplicitBackendAndProductionVerifier",
+    "TestRealReceiptIndependentVerificationAndBindings",
+    "TestRealSTFExec_ExecuteSTF",
+    "TestRealSTFExec_VerifySTFProof",
+    "TestZKISABridge_ExecuteZKISA"
+  ],
+  "required_skipped": [],
+  "groups": [
+    {
+      "group": "executor",
+      "summary": {
+        "source": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "group": "executor",
+        "required_passed": [
+          "TestCanonExec_ExecuteAndProve",
+          "TestCanonExec_ProofStatementConsistency",
+          "TestCanonExec_VerifyGuestProof",
+          "TestCanonExec_VerifyGuestProofTampered"
+        ],
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "required_skipped": []
+      },
+      "build": {
+        "source_revision": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "source_dirty": false,
+        "proof_system": "risc0-3.1.0",
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "binaries": {
+          "eth2030": "fee752dc86a2ce84a45d3141c551c15bd95a327a48fd6dd6554f026646c26dd7",
+          "eth2030-prover": "c9d54853b270082f222775d76fe4c9e152513d5e3c1a074d6fba9ff12b7943a8",
+          "r0vm": "990c7e55c5627c6d78968c5fa6c6c98119a6282b5298831ccb52178f0dff9310"
+        }
+      },
+      "artifact_sha256": "f9ea243c56157c414aaa6e14362ad49ea14ecaf5929284891fbc97a136b759f7",
+      "required_seconds": {
+        "TestCanonExec_ExecuteAndProve": 580.24,
+        "TestCanonExec_VerifyGuestProof": 580.92,
+        "TestCanonExec_VerifyGuestProofTampered": 579.52,
+        "TestCanonExec_ProofStatementConsistency": 1161.16
+      }
+    },
+    {
+      "group": "stf",
+      "summary": {
+        "source": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "group": "stf",
+        "required_passed": [
+          "TestRealSTFExec_ExecuteSTF",
+          "TestRealSTFExec_VerifySTFProof"
+        ],
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "required_skipped": []
+      },
+      "build": {
+        "source_revision": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "source_dirty": false,
+        "proof_system": "risc0-3.1.0",
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "binaries": {
+          "eth2030": "fee752dc86a2ce84a45d3141c551c15bd95a327a48fd6dd6554f026646c26dd7",
+          "eth2030-prover": "c9d54853b270082f222775d76fe4c9e152513d5e3c1a074d6fba9ff12b7943a8",
+          "r0vm": "990c7e55c5627c6d78968c5fa6c6c98119a6282b5298831ccb52178f0dff9310"
+        }
+      },
+      "artifact_sha256": "550475075aad23e73ec31875587aee5007ef57922ae3914bc9bdc8c62994a140",
+      "required_seconds": {
+        "TestRealSTFExec_ExecuteSTF": 582.36,
+        "TestRealSTFExec_VerifySTFProof": 582.04
+      }
+    },
+    {
+      "group": "bridge-backend",
+      "summary": {
+        "source": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "group": "bridge-backend",
+        "required_passed": [
+          "TestRealExplicitBackendAndProductionVerifier",
+          "TestZKISABridge_ExecuteZKISA"
+        ],
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "required_skipped": []
+      },
+      "build": {
+        "source_revision": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "source_dirty": false,
+        "proof_system": "risc0-3.1.0",
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "binaries": {
+          "eth2030": "fee752dc86a2ce84a45d3141c551c15bd95a327a48fd6dd6554f026646c26dd7",
+          "eth2030-prover": "c9d54853b270082f222775d76fe4c9e152513d5e3c1a074d6fba9ff12b7943a8",
+          "r0vm": "990c7e55c5627c6d78968c5fa6c6c98119a6282b5298831ccb52178f0dff9310"
+        }
+      },
+      "artifact_sha256": "2b18f2f4d1a4d5b5d67a80a44dba4700dda541049e25b967eb7680bd12eef241",
+      "required_seconds": {
+        "TestRealExplicitBackendAndProductionVerifier": 271.78,
+        "TestZKISABridge_ExecuteZKISA": 570.72
+      }
+    },
+    {
+      "group": "native-vectors",
+      "summary": {
+        "source": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "group": "native-vectors",
+        "required_passed": [
+          "TestIndependentRV32IMExecutionVectors",
+          "TestRealCanonicalProofThroughNativeNode",
+          "TestRealReceiptIndependentVerificationAndBindings"
+        ],
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "required_skipped": []
+      },
+      "build": {
+        "source_revision": "6b68de7ddda3073080efd10da1f78ccd85f36340",
+        "source_dirty": false,
+        "proof_system": "risc0-3.1.0",
+        "image": {
+          "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+          "sdk": "3.1.0",
+          "system": "risc0",
+          "version": 1
+        },
+        "binaries": {
+          "eth2030": "fee752dc86a2ce84a45d3141c551c15bd95a327a48fd6dd6554f026646c26dd7",
+          "eth2030-prover": "c9d54853b270082f222775d76fe4c9e152513d5e3c1a074d6fba9ff12b7943a8",
+          "r0vm": "990c7e55c5627c6d78968c5fa6c6c98119a6282b5298831ccb52178f0dff9310"
+        }
+      },
+      "artifact_sha256": "22cea019428c7183d857a3b92460f961b8484aa808dd21d50baa2f9a75b0e430",
+      "required_seconds": {
+        "TestIndependentRV32IMExecutionVectors": 0.34,
+        "TestRealReceiptIndependentVerificationAndBindings": 0.04,
+        "TestRealCanonicalProofThroughNativeNode": 288.75
+      }
+    }
+  ]
+}

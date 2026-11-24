@@ -42,3 +42,7 @@ The new-budget source 40a78da6 also passed an actual four-core-limited native No
 The final clean cumulative bundle is source 7901a25767a8ad3f53d99b3f1821b30bd9d28d75, with image 48b22 unchanged. Actual cumulative Node HTTP acceptance passed both FCR safe-checkpoint and real proof/restart consumers (FINAL_CUMULATIVE_HTTP.json). The release runtime container is eth2030-native:extensions-7901a257, sha256:0e54acfa45a8d1f7279ebfaed89847b3f498948aece92ac3c83da34b8d8e749e. Only this task's four private enclaves were stopped after capture; original pre-existing diagnostic networks remain untouched (PRIVATE_ENCLAVES_STOPPED.json).
 
 The final runtime-only container also generated an actual proof in 45.987s with networking disabled and no SDK installed (FINAL_RUNTIME_ONLY_PROOF.json). This is the later clean cumulative release image, recorded separately from the earlier live BLS/FCR runtime.
+
+## Final hosted result
+
+Hosted run 45346983229 passed all four actual-proof families and real-proof-success. Downloaded artifact SHA256 values, actual case timings, eleven required passes with no required skips, identical checkout source/image and build cleanliness are retained in PROOF_HOSTED_ACCEPTANCE.json. The CI checkout 6b68de7d has the identical tree to feature head 40a78da6 (ebf0cdcbb1610321913e2de6ed0355f98abbac4d). The initial failed run remains failed. No feature-head rewrite is used to relabel an older acceptance result.

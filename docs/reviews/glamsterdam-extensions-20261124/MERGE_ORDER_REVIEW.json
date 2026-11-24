@@ -1,0 +1,66 @@
+{
+  "base": "45e8c145236da03ecbcd89ad73eba05780923c12",
+  "heads": {
+    "155": "5e9b18bc6a16583203324859d7059997590fdf29",
+    "156": "40a78da6f0aa02024607ce848eff3d4a1af767da",
+    "157": "9fbc39213dedfcc51e4b81f81ae33f6b86471531"
+  },
+  "all_six_orders_clean": true,
+  "same_final_tree": true,
+  "results": [
+    {
+      "order": [
+        155,
+        156,
+        157
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    },
+    {
+      "order": [
+        155,
+        157,
+        156
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    },
+    {
+      "order": [
+        156,
+        155,
+        157
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    },
+    {
+      "order": [
+        156,
+        157,
+        155
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    },
+    {
+      "order": [
+        157,
+        155,
+        156
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    },
+    {
+      "order": [
+        157,
+        156,
+        155
+      ],
+      "tree": "6b1243539f627091600e1dd4ac4b063bf57fbf97",
+      "clean": true
+    }
+  ]
+}

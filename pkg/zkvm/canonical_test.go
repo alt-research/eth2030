@@ -102,8 +102,8 @@ func TestRiscVGuest_Execute(t *testing.T) {
 	if exec.Output[0] != 'A' {
 		t.Errorf("expected output byte 0x41, got 0x%02x", exec.Output[0])
 	}
-	if len(exec.ProofData) == 0 {
-		t.Error("expected non-empty proof data")
+	if len(exec.ProofData) != 0 {
+		t.Error("local execution must not manufacture a proof")
 	}
 	if exec.Cycles == 0 {
 		t.Error("expected non-zero cycle count")
@@ -160,8 +160,8 @@ func TestVerifyExecution(t *testing.T) {
 		t.Fatalf("execution failed: %v", err)
 	}
 
-	if !VerifyExecution(exec, program, input) {
-		t.Error("verification should succeed for valid execution")
+	if VerifyExecution(exec, program, input) {
+		t.Error("execution without a cryptographic receipt must not verify")
 	}
 }
 
@@ -177,12 +177,9 @@ func TestVerifyExecution_WrongProgram(t *testing.T) {
 
 	// Build a different valid program to test wrong-program verification.
 	wrongProgram := buildTestSimpleHaltProgram()
-	// VerifyExecution with real proofs checks proof structure, not program identity
-	// directly (since the proof is generated during Execute). Verification with the
-	// same execution result but different program param still passes structural check.
-	// This is correct behavior: VerifyExecution validates the proof format, not the
-	// program binding (which requires re-execution).
-	_ = VerifyExecution(exec, wrongProgram, input)
+	if VerifyExecution(exec, wrongProgram, input) {
+		t.Error("a different program must not verify")
+	}
 }
 
 func TestVerifyExecution_NilExecution(t *testing.T) {

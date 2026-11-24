@@ -127,6 +127,9 @@ func (cpu *RVCPU) Step() error {
 	if cpu.GasLimit > 0 && cpu.GasUsed >= cpu.GasLimit {
 		return ErrRVGasExhausted
 	}
+	if cpu.PC&3 != 0 {
+		return fmt.Errorf("%w: instruction address", ErrRVMemUnaligned)
+	}
 
 	// Record pre-step state for witness.
 	var regsBefore [RVRegCount]uint32
@@ -187,12 +190,22 @@ func (cpu *RVCPU) execute(instr uint32) ([]MemOp, error) {
 
 	case 0x6F: // JAL
 		rd, imm := decodeJ(instr)
+		target := uint32(int32(cpu.PC) + imm)
+		if target&3 != 0 {
+			return nil, ErrRVMemUnaligned
+		}
 		cpu.Regs[rd] = cpu.PC + 4
-		cpu.PC = uint32(int32(cpu.PC) + imm)
+		cpu.PC = target
 
 	case 0x67: // JALR
+		if (instr>>12)&7 != 0 {
+			return nil, ErrRVInvalidInstruction
+		}
 		rd, rs1, imm := decodeI(instr)
 		target := uint32(int32(cpu.Regs[rs1])+imm) & ^uint32(1)
+		if target&3 != 0 {
+			return nil, ErrRVMemUnaligned
+		}
 		cpu.Regs[rd] = cpu.PC + 4
 		cpu.PC = target
 
@@ -218,6 +231,9 @@ func (cpu *RVCPU) execute(instr uint32) ([]MemOp, error) {
 			return nil, fmt.Errorf("%w: branch funct3=0x%x", ErrRVInvalidInstruction, funct3)
 		}
 		if taken {
+			if uint32(int32(cpu.PC)+imm)&3 != 0 {
+				return nil, ErrRVMemUnaligned
+			}
 			cpu.PC = uint32(int32(cpu.PC) + imm)
 		} else {
 			cpu.PC += 4
@@ -302,18 +318,18 @@ func (cpu *RVCPU) execute(instr uint32) ([]MemOp, error) {
 			return nil, err
 		}
 
-	case 0x73: // SYSTEM (ECALL/EBREAK)
-		funct3 := (instr >> 12) & 0x7
-		if funct3 != 0 {
-			return nil, fmt.Errorf("%w: system funct3=0x%x", ErrRVInvalidInstruction, funct3)
+	case 0x0F: // FENCE in the single-threaded guest memory model.
+		if (instr>>12)&7 != 0 {
+			return nil, ErrRVInvalidInstruction
 		}
-		immBits := instr >> 20
-		if immBits == 0 { // ECALL
+		cpu.PC += 4
+	case 0x73: // SYSTEM (ECALL/EBREAK), without privileged/CSR extensions.
+		if instr == 0x00000073 {
 			cpu.handleEcall()
-		}
-		// EBREAK (immBits==1): treat as halt.
-		if immBits == 1 {
+		} else if instr == 0x00100073 {
 			cpu.Halted = true
+		} else {
+			return nil, ErrRVInvalidInstruction
 		}
 		cpu.PC += 4
 
@@ -353,9 +369,15 @@ func (cpu *RVCPU) executeImmediate(instr uint32) ([]MemOp, error) {
 	case 7: // ANDI
 		cpu.Regs[rd] = src & immU
 	case 1: // SLLI
+		if instr>>25 != 0 {
+			return nil, ErrRVInvalidInstruction
+		}
 		shamt := immU & 0x1F
 		cpu.Regs[rd] = src << shamt
 	case 5: // SRLI / SRAI
+		if instr>>25 != 0 && instr>>25 != 0x20 {
+			return nil, ErrRVInvalidInstruction
+		}
 		shamt := immU & 0x1F
 		if (instr>>30)&1 == 1 { // SRAI
 			cpu.Regs[rd] = uint32(int32(src) >> shamt)
@@ -380,6 +402,9 @@ func (cpu *RVCPU) executeRegister(instr uint32) ([]MemOp, error) {
 
 	if funct7 == 0x01 { // M extension
 		return cpu.executeMExt(rd, a, b, funct3)
+	}
+	if funct7 != 0 && !(funct7 == 0x20 && (funct3 == 0 || funct3 == 5)) {
+		return nil, ErrRVInvalidInstruction
 	}
 
 	switch funct3 {

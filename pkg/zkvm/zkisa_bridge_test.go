@@ -101,6 +101,7 @@ func TestZKISABridge_OpTableRegister(t *testing.T) {
 }
 
 func TestZKISABridge_ExecuteZKISA(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	bridge, err := NewZKISABridge(reg)
 	if err != nil {

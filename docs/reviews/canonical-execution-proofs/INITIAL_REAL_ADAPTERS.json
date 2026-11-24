@@ -1,0 +1,21 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 1026.0869036500226,
+  "log": "/tmp/eth2030-canonical-proof-20261124/legacy-canonical-real-tests.jsonl",
+  "passed": [
+    "TestCanonExec_ExecuteAndProve",
+    "TestCanonExec_VerifyGuestProof",
+    "TestCanonExec_VerifyGuestProofTampered",
+    "TestCanonExec_ProofStatementConsistency",
+    "TestRealSTFExec_ExecuteSTF",
+    "TestRealSTFExec_ExecuteSTFMismatch",
+    "TestRealSTFExec_ExecuteSTFNilInput",
+    "TestRealSTFExec_VerifySTFProof",
+    "TestRealSTFExec_FullRoundTrip/basic_round-trip",
+    "TestRealSTFExec_FullRoundTrip/commitment_determinism",
+    "TestRealSTFExec_FullRoundTrip/tampered_proof_fails_verification",
+    "TestRealSTFExec_FullRoundTrip",
+    "TestZKISABridge_ExecuteZKISA"
+  ],
+  "failed": []
+}

@@ -1,0 +1,29 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 42.64155608502915,
+  "network_disabled": true,
+  "sdk_toolchain_absent_in_runtime": true,
+  "log": "/tmp/eth2030-canonical-proof-20261124/runtime-container-proof.log",
+  "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "statement": {
+    "config": {
+      "entry_pc": 0,
+      "input_base": 0,
+      "load_input": false,
+      "max_cycles": 100,
+      "memory_pages": 4,
+      "program_base": 0,
+      "stack_base": 2147483648
+    },
+    "cycles": 7,
+    "exit_code": 0,
+    "final_pc": 28,
+    "input_consumed": 1,
+    "input_hash": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "output": "2a",
+    "output_hash": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "program_hash": "95cb77668069de5e7187dbe2c945bc5f47a8e676d48c9c40df7969b570c74fc6",
+    "state_hash": "67da167b5c90e03560c084068ce39343224343f551355956e752f78656d88b97",
+    "version": 1
+  }
+}

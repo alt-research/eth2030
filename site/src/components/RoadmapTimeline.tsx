@@ -14,6 +14,7 @@ export default function RoadmapTimeline() {
         <Link href="/roadmap/" className={styles.detailLink}>Explore the full roadmap <span>↗</span></Link>
       </div>
       <DevelopmentProgress />
+      <p className="mb-5 text-sm text-eth-teal"><Link className="underline" href="/roadmap/#remaining-work">See remaining integration, qualification and research work ↗</Link></p>
       <div className={styles.cards} aria-label="Roadmap progress">
         {roadmapStages.map((stage, index) => {
           const { entries, counts, completePercentage } = roadmapProgress(stage.id);

@@ -15,6 +15,8 @@ const reproduced = readRecord('docs/reviews/glamsterdam-postmerge-20261121/PUBLI
 const merged = readRecord('docs/audits/merged-glamsterdam-20261122/MERGED_EVIDENCE.json');
 const current = readRecord('docs/reviews/remaining-20261123/CURRENT_STATE.json');
 const accounting = readRecord('docs/reviews/development-scope-20261124/CURRENT_STATE.json');
+const remaining = readRecord('site/src/data/remaining-work.json');
+const { EIPS } = await import('../src/data/eips.ts');
 const bounded = readRecord('docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json');
 const stopped = readRecord('docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json');
 assert.deepEqual(current.bounded_run, bounded, 'Current snapshot changed retained duration/BLS evidence');
@@ -179,13 +181,65 @@ assert.match(progress(home), /whole-public-fork or production readiness/i);
 assert.match(progress(home), /research features retain separate acceptance gates/);
 assert.doesNotMatch(progress(home), /48-hour (?:passed|complete)|original fault (?:resolved|fixed)|all (?:hosted )?CI (?:passes|green)/i);
 for (const number of [135, 138, 139, 140]) assert.ok(progress(home).includes(`/pull/${number}`));
-assert.ok(progress(home).includes(`/pull/${accounting.documentation_pr}`));
+assert.ok(progress(home).includes(`/pull/${remaining.mergedProgressPr}`));
 assert.ok(progress(home).includes(`/commit/${current.merged_cl.revision}`));
-assert.ok(progress(home).includes(`/blob/${accounting.master}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
+assert.ok(progress(home).includes(`/blob/${remaining.reviewedMaster}/docs/reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json`));
 assert.ok(progress(home).includes(`/blob/${merged.merged_master}/${recordPath}`), 'Missing pinned earlier verification record');
 for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json', 'docs/plans/glamsterdam/NEXT_STEPS_20261124.md']) {
   assert.ok(progress(home).includes(`/blob/1eca90d7b9f4dfdd4354156b7f660dab910520c2/${path}`), `Missing pinned current evidence/plan ${path}`);
 }
+// The explicit remaining-work view must cover the complete non-complete inventory,
+// without treating old labels or deferred acceptance as new implementation defects.
+assert.equal(remaining.adoptedDevelopmentTodos, accounting.active_development_todos.length);
+assert.deepEqual(remaining.excludedAcceptance, ['G-03', 'G-04']);
+assert.equal(remaining.mergedProgressPr, 148);
+assert.equal(remaining.items.length, 8);
+assert.deepEqual(remaining.specificationRepairs.map(item => item.target), ['master', 'master', 'eth2030']);
+assert.deepEqual(remaining.specificationRepairs.map(item => item.url), [
+  'https://github.com/alt-research/eth2030/pull/150',
+  'https://github.com/alt-research/eth2030/pull/151',
+  'https://github.com/jiayaoqijia/lighthouse/pull/16',
+]);
+for (const item of remaining.specificationRepairs) {
+  assert.ok(roadmap.includes(`data-spec-repair="${item.id}" data-target="${item.target}"`));
+  assert.ok(roadmap.includes(item.url));
+}
+assert.equal(remaining.specificationAuditUrl, 'https://github.com/alt-research/eth2030/pull/152');
+assert.ok(roadmap.includes(remaining.specificationAuditUrl));
+assert.match(roadmap, /code delivery and master integration are separate/);
+
+assert.equal(new Set(remaining.items.map(item => item.id)).size, remaining.items.length);
+assert.match(roadmap, /id="remaining-work"/);
+assert.match(roadmap, /data-remaining-adopted-todos="0"/);
+assert.match(home, /href="\/roadmap\/#remaining-work"/);
+assert.doesNotMatch(home + roadmap, /integrated CI and operational acceptance remain open/);
+for (const item of remaining.items) {
+  assert.ok(['Qualification', 'Integration', 'Research'].includes(item.kind));
+  assert.ok(item.current && item.remaining && item.doneWhen && item.entries.length && item.evidence.length, `Incomplete work criteria ${item.id}`);
+  assert.ok(roadmap.includes(`data-remaining-work="${item.id}"`));
+  assert.ok(roadmap.includes(item.title) && roadmap.includes(item.doneWhen));
+  for (const id of item.entries) assert.ok(EIPS.some(entry => entry.id === id), `Unknown work item ${id}`);
+  for (const path of item.evidence) {
+    assert.ok(existsSync(new URL(`../../${path}`, import.meta.url)), `Missing remaining-work source ${path}`);
+    assert.ok(roadmap.includes(`/blob/${remaining.reviewedMaster}/${path}`), `Unpinned remaining-work source ${path}`);
+  }
+}
+const stages = ['glamsterdam', 'hegota', 'i', 'j', 'k', 'l'];
+const remappedFork = entry => entry.id === 'feature-leanvm-pq-proofs' ? 'i' : entry.id === 'feature-ethp2p-unification' ? 'l' : entry.fork;
+const pending = EIPS.filter(entry => entry.strawmap && stages.includes(remappedFork(entry)) && entry.status !== 'complete');
+const renderedPending = [...roadmap.matchAll(/data-pending-entry="([^"]+)"/g)].map(match => match[1]);
+assert.deepEqual(renderedPending.sort(), pending.map(entry => entry.id).sort(), 'Remaining view omits or duplicates historical non-complete entries');
+for (const phase of stages) {
+  const count = pending.filter(entry => remappedFork(entry) === phase).length;
+  assert.ok(roadmap.includes(`data-pending-phase="${phase}" data-pending-count="${count}"`));
+}
+const planned = pending.filter(entry => entry.status === 'planned');
+assert.deepEqual([...remaining.plannedOnly].sort(), planned.map(entry => entry.id).sort());
+assert.ok(planned.every(entry => entry.implementation.length === 0 && entry.tests.length === 0), 'Planned-only explanation needs a fresh source review');
+for (const id of remaining.plannedOnly) assert.ok(roadmap.includes(`data-planned-work="${id}"`));
+assert.match(roadmap, /inventory of old labels, not/);
+assert.match(roadmap, /canonical.VerifyExecution checks success and proof length/);
+assert.match(roadmap, /Native rollup transition\/withdrawal helpers use simulated hash conditions/);
 const homepageRoadmap = home.split('id="roadmap"')[1]?.split('</section>')[0];
 assert.ok(homepageRoadmap, 'Homepage roadmap section is missing');
 assert.match(home, /November 2, 2026/);
@@ -252,6 +306,13 @@ assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/rev
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
 assert.match(builderPage, /passes all 27 test-suite jobs and local-testnet/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json`));
+for (const [id, claim] of [
+  ['feature-fast-confirmation', 'no node/Engine consumer found'],
+  ['feature-evm-asm-canonical-quest', 'accepts 256 all-zero proof bytes'],
+]) {
+  const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
+  assert.ok(page.includes(claim), `Missing fresh research limitation on ${id}`);
+}
 const authPage = readFileSync(new URL('../out/eips/eip-7702/index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(authPage, /auth.chain_id validation|s ≤ secp256k1n/);
 
@@ -275,9 +336,13 @@ function checkPages(dir) {
 }
 checkPages(new URL('../out/', import.meta.url));
 const siteWorkflow = readFileSync(new URL('../../.github/workflows/site-check.yml', import.meta.url), 'utf8');
-for (const input of ['docs/reviews/development-scope-*/**', 'docs/reviews/remaining-*/**', 'docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
+for (const input of ['docs/reviews/roadmap-remaining-*/**', 'docs/plans/ROADMAP_REMAINING_*.md', 'docs/reviews/development-scope-*/**', 'docs/reviews/remaining-*/**', 'docs/reviews/progress-*/**', 'docs/reviews/diagnostic-threshold-*/**', 'docs/plans/glamsterdam/**']) {
   assert.ok(siteWorkflow.includes(`'${input}'`), `Site CI omits new evidence input ${input}`);
 }
 const pagesWorkflow = readFileSync(new URL('../../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
+for (const workflow of [siteWorkflow, pagesWorkflow]) {
+  assert.match(workflow, /node-version: ['"]?22/);
+  assert.match(workflow, /node --experimental-strip-types scripts\/check-export\.mjs/);
+}
 assert.match(pagesWorkflow, /echo 'eth2030\.altllm\.ai' > out\/CNAME/);
 console.log('Export claims, retained milestones, shared progress, evidence paths and tracker links verified.');

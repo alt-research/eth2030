@@ -1,0 +1,9 @@
+{
+  "accepted": true,
+  "path": "pkg/zkvm/canonical.go:VerifyExecution",
+  "proof_all_zero": true,
+  "proof_bytes": 256,
+  "scope": "standalone research helper; not the qualified Glamsterdam import path",
+  "source": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+  "success_flag": true
+}

@@ -1,7 +1,7 @@
 import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/data/eips';
 
 export const roadmapStages: { id: ForkId; name: string; glyph: string; heading: string; description: string }[] = [
-  { id: 'glamsterdam', name: 'Glamsterdam', glyph: 'G*', heading: 'Scale the execution layer', description: 'Selected LIFO / signed Gloas development delivered; integrated CI and operational acceptance remain open.' },
+  { id: 'glamsterdam', name: 'Glamsterdam', glyph: 'G*', heading: 'Scale the execution layer', description: 'Adopted LIFO / signed Gloas development and integrated CL CI are complete. Deferred acceptance and broader research remain separate.' },
   { id: 'hegota', name: 'Hegotá', glyph: 'H*', heading: 'Open the protocol', description: 'Inclusion lists, quick slots and programmable transactions.' },
   { id: 'i', name: 'I*', glyph: 'I*', heading: 'The next foundations', description: 'Decoupled consensus, binary state and post-quantum research.' },
   { id: 'j', name: 'J*', glyph: 'J*', heading: 'Towards post-quantum', description: 'Attestations, sampling and proofs for a new security model.' },

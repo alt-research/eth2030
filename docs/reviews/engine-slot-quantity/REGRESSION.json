@@ -1,0 +1,90 @@
+{
+  "base": "5fedb7e5733fbef69767a711115ef9925e7bd769",
+  "expected": "Canonical lowercase 0x prefix with uppercase/mixed hex digits represents the same uint64; independent Geth hexutil decoder agrees.",
+  "prefx_exit_code": 1,
+  "prefx_events": [
+    {
+      "Time": "2026-11-24T23:23:45.895310527+08:00",
+      "Action": "output",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Test": "TestMemoryEngineSlotCommitment/0x2A",
+      "Output": "    slot_commitment_test.go:56: memory receiver lost slot: err=invalid params status={Status: LatestValidHash:<nil> ValidationError:<nil>}\n"
+    },
+    {
+      "Time": "2026-11-24T23:23:45.895401507+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Test": "TestMemoryEngineSlotCommitment/0x2A",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-24T23:23:45.896661456+08:00",
+      "Action": "output",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Test": "TestMemoryEngineSlotCommitment/0xFfFfFfFfFfFfFfFf",
+      "Output": "    slot_commitment_test.go:56: memory receiver lost slot: err=invalid params status={Status: LatestValidHash:<nil> ValidationError:<nil>}\n"
+    },
+    {
+      "Time": "2026-11-24T23:23:45.896696026+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Test": "TestMemoryEngineSlotCommitment/0xFfFfFfFfFfFfFfFf",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-24T23:23:45.896702196+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Test": "TestMemoryEngineSlotCommitment",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-24T23:23:45.898939473+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/engine",
+      "Elapsed": 0.715
+    },
+    {
+      "Time": "2026-11-24T23:23:48.744701937+08:00",
+      "Action": "output",
+      "Package": "github.com/eth2030/eth2030/node",
+      "Test": "TestAmsterdamSlotCommitmentAcrossEngineAndRestart/0x2A",
+      "Output": "    amsterdam_slot_integration_test.go:90: engine_newPayloadV5: RPC -32602: invalid params\n"
+    },
+    {
+      "Time": "2026-11-24T23:23:48.745480296+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/node",
+      "Test": "TestAmsterdamSlotCommitmentAcrossEngineAndRestart/0x2A",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-11-24T23:23:48.745492576+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/node",
+      "Test": "TestAmsterdamSlotCommitmentAcrossEngineAndRestart",
+      "Elapsed": 1.65
+    },
+    {
+      "Time": "2026-11-24T23:23:48.752232259+08:00",
+      "Action": "fail",
+      "Package": "github.com/eth2030/eth2030/node",
+      "Elapsed": 2.367
+    }
+  ],
+  "fixed_engine_node_full_race_packages": 20,
+  "fixed_engine_node_full_race_failures": [],
+  "vet_passed": true,
+  "native_and_geth_wrapper_build_passed": true,
+  "malformed_encodings_rejected": [
+    "0x",
+    "0x00",
+    "0x02a",
+    "0X2A",
+    "2a",
+    "0x10000000000000000",
+    "0x-1"
+  ],
+  "native_http_and_restart_passed": true,
+  "independent_geth_header_hash_and_slotnum_passed": true
+}

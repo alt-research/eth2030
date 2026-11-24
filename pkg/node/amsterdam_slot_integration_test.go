@@ -14,6 +14,12 @@ import (
 )
 
 func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
+	for _, wireSlot := range []string{"0x2a", "0x2A"} {
+		t.Run(wireSlot, func(t *testing.T) { testAmsterdamSlotQuantityAcrossEngineAndRestart(t, wireSlot) })
+	}
+}
+
+func testAmsterdamSlotQuantityAcrossEngineAndRestart(t *testing.T, wireSlot string) {
 	const token = "amsterdam-slot-integration"
 	var genesis map[string]any
 	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
@@ -55,7 +61,7 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 	}
 	beaconRoot := types.Hash{31: 1}
 	attrs := map[string]any{
-		"timestamp": "0x60", "slotNumber": "0x8", "withdrawals": []any{},
+		"timestamp": "0x60", "slotNumber": "0x2a", "withdrawals": []any{},
 		"prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 1},
 		"parentBeaconBlockRoot": beaconRoot, "targetGasLimit": "0x1c9c380",
 	}
@@ -69,7 +75,7 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 		ExecutionRequests []string
 	}
 	proposer.call(t, "engine_getPayloadV6", &built, fc.PayloadID)
-	if built.ExecutionPayload.SlotNumber != "0x8" {
+	if built.ExecutionPayload.SlotNumber != "0x2a" {
 		t.Fatalf("built slot %s", built.ExecutionPayload.SlotNumber)
 	}
 	wrongSlot := built.ExecutionPayload
@@ -80,6 +86,7 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 		t.Fatalf("slot modification returned %+v", status)
 	}
 	p := built.ExecutionPayload
+	p.SlotNumber = wireSlot
 	verifier.call(t, "engine_newPayloadV5", &status, p, []types.Hash{}, beaconRoot, built.ExecutionRequests)
 	if status.Status != "VALID" || status.LatestValidHash == nil || *status.LatestValidHash != p.BlockHash {
 		t.Fatalf("verifier status %+v", status)
@@ -100,8 +107,8 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 		if err := gethrlp.DecodeBytes(encoded, &reference); err != nil {
 			t.Fatal(err)
 		}
-		if reference.SlotNumber == nil || *reference.SlotNumber != 8 || reference.BlockAccessListHash == nil || types.Hash(reference.Hash()) != p.BlockHash {
-			t.Fatalf("independent header slot %v hash %s, want slot 8 hash %s", reference.SlotNumber, reference.Hash(), p.BlockHash)
+		if reference.SlotNumber == nil || *reference.SlotNumber != 42 || reference.BlockAccessListHash == nil || types.Hash(reference.Hash()) != p.BlockHash {
+			t.Fatalf("independent header slot %v hash %s, want slot 42 hash %s", reference.SlotNumber, reference.Hash(), p.BlockHash)
 		}
 		rpc := track4NodeRPC(t, node, token)
 		for _, full := range []bool{false, true} {
@@ -111,13 +118,13 @@ func TestAmsterdamSlotCommitmentAcrossEngineAndRestart(t *testing.T) {
 				BlockAccessListHash types.Hash
 			}
 			rpc.call(t, "eth_getBlockByNumber", &block, "latest", full)
-			if block.Hash != p.BlockHash || block.SlotNumber != "0x8" || block.BlockAccessListHash != types.Hash(*reference.BlockAccessListHash) {
+			if block.Hash != p.BlockHash || block.SlotNumber != "0x2a" || block.BlockAccessListHash != types.Hash(*reference.BlockAccessListHash) {
 				t.Fatalf("canonical block via RPC %+v", block)
 			}
 		}
 		var value string
 		rpc.call(t, "eth_call", &value, map[string]any{"to": codeAddress}, "latest")
-		if value != "0x0000000000000000000000000000000000000000000000000000000000000008" {
+		if value != "0x000000000000000000000000000000000000000000000000000000000000002a" {
 			t.Fatalf("SLOTNUM returned %s", value)
 		}
 	}

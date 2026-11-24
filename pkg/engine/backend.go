@@ -1193,7 +1193,7 @@ func (b *EngineBackend) processRequestPayload(
 		header.BlockAccessListHash = &hash
 		if payload.SlotNumber != "" {
 			slot, err := strconv.ParseUint(strings.TrimPrefix(payload.SlotNumber, "0x"), 16, 64)
-			if err != nil || fmt.Sprintf("0x%x", slot) != payload.SlotNumber {
+			if !strings.HasPrefix(payload.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != strings.ToLower(payload.SlotNumber) {
 				return PayloadStatusV1{}, ErrInvalidParams
 			}
 			header.SlotNumber = &slot

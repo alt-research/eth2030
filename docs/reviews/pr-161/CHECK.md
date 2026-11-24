@@ -4,4 +4,5 @@
 - [x] Mark obsolete experimental APIs as deprecated compatibility helpers with accurate migration targets.
 - [x] Replace tracker/matrix/README pointers with actual Amsterdam consumers; keep official inclusion labels unchanged.
 - [x] Verify compatibility tests, canonical gas regressions, builds and exported site evidence links.
-- [ ] Submit independent master-target PR and verify CI/conflicts.
+- [x] Submit independent master-target PR161.
+- Final exact-head CI and conflicts are recorded on PR161.

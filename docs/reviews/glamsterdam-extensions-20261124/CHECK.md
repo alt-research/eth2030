@@ -5,8 +5,8 @@
 - [x] Use signed CL authority and standard Engine safeBlockHash.
 - [x] Replace synthetic canonical proof acceptance with a pinned real receipt verifier.
 - [x] Bind program, input, output, configuration and complete machine state.
-- [ ] Complete fresh native-node/FCR crash-recovery and proof window.
-- [ ] Verify the complete captured signed window with unchanged reference BLS.
+- [x] Complete fresh native-node/FCR crash-recovery and proof window.
+- [x] Verify the complete captured signed window with unchanged reference BLS.
 - [x] Reconcile ePBS, roadmap and homepage against actual delivered scope.
 - [x] Build/export and inspect desktop/mobile disclosures and evidence links.
 - [ ] Check exact hosted CI heads and all cumulative EL merge orders.

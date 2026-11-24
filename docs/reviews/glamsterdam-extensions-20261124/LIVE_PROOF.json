@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "statement": {
+    "version": 1,
+    "program_hash": "95cb77668069de5e7187dbe2c945bc5f47a8e676d48c9c40df7969b570c74fc6",
+    "input_hash": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "output": "2a",
+    "output_hash": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "cycles": 7,
+    "exit_code": 0,
+    "final_pc": 28,
+    "input_consumed": 1,
+    "state_hash": "67da167b5c90e03560c084068ce39343224343f551355956e752f78656d88b97",
+    "config": {
+      "max_cycles": 100,
+      "memory_pages": 4,
+      "program_base": 0,
+      "entry_pc": 0,
+      "stack_base": 2147483648,
+      "input_base": 0,
+      "load_input": false
+    }
+  },
+  "actual_receipt_sha256": "2740eced78f0a3250c5a0b78a96f8e199c6eb2bd9d1b61e3e6b3b069479cd88e",
+  "native_runtime_revision": "b7a0ec69a189186c4d110670de92cfefc47b8cc2",
+  "native_image": "sha256:042ac4ab87a3bc35883aa5e8527ee3dd8278822326210da367e81bbed70da7fd",
+  "cl_revision": "274100659f310772e68c11c684eed2ce4b407a62",
+  "cl_image": "sha256:b33f17fd9e26382ac5d5015d2ad0c5a144b502990be0d21d9f2100cc59fa3d49",
+  "scope": "Real RV32IM program execution and cross-node verification; not an Ethereum STF program.",
+  "changed_input_rejected": true,
+  "independent_follower_rechecked": true
+}

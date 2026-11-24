@@ -137,7 +137,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | 1-Epoch Finality | Framework-level | Functional | `consensus/finality.go` (singleEpochMode) | `consensus/finality_test.go` |
 | 1M Attestations/Slot | Framework-level | Functional | `consensus/attestation_scaler.go`, `consensus/parallel_bls.go`, `consensus/committee_subnet.go`, `consensus/batch_verifier.go` | `consensus/attestation_scaler_test.go`, `consensus/batch_verifier_test.go` |
 | Mandatory 3-of-5 Proofs | Framework-level | Functional | `proofs/mandatory_proofs.go`, `proofs/mandatory.go` | `proofs/mandatory_test.go` |
-| Canonical Guest | Framework-level | Functional | `zkvm/canonical.go`, `zkvm/canonical_executor.go` | `zkvm/canonical_test.go` |
+| Canonical Guest | Framework-level | Substantial | `zkvm/canonical.go`, `zkvm/canonical_executor.go` | `zkvm/canonical_test.go` |
 | CL Proof Circuits | Framework-level | Functional | `consensus/cl_proof_circuits.go`, `light/cl_proofs.go` | `consensus/cl_proof_circuits_test.go` |
 
 ---
@@ -164,7 +164,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | Feature | Related EIPs | Status | Implementation | Tests |
 |---------|-------------|--------|----------------|-------|
 | Gigagas L1 (1 Ggas/sec) | Framework-level | Functional | `core/gigagas.go`, `core/gigagas_integration.go` | `core/gigagas_test.go` |
-| Canonical zkVM | Framework-level | Functional | `zkvm/riscv_cpu.go`, `zkvm/canonical_executor.go`, `zkvm/proof_backend.go` | `zkvm/riscv_cpu_test.go` |
+| Canonical zkVM | Framework-level | Substantial | `zkvm/riscv_cpu.go`, `zkvm/canonical_executor.go`, `zkvm/proof_backend.go` | `zkvm/riscv_cpu_test.go` |
 | Gas Futures Market | Framework-level | Functional | `core/vm/gas_futures_long.go`, `core/gas_market.go` | `core/gas_market_test.go` |
 | PQ Transactions | 7932, 8051 | Partial | `core/types/pq_transaction.go`, `crypto/pqc/pq_tx_signer.go` | `core/types/pq_transaction_test.go` |
 | Sharded Mempool | Framework-level | Functional | `txpool/sharding.go`, `txpool/shared/` | `txpool/sharding_test.go` |
@@ -291,7 +291,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 | # | Feature | EIP(s) | Status | Key Implementation |
 |---|---------|--------|--------|-------------------|
-| 1 | Fast confirmation | - | Functional | `consensus/fast_confirm.go` |
+| 1 | Fast confirmation | - | **Complete (adopted CL FCR)** | Companion CL signed FCR and native Engine safeBlockHash; `consensus/fastconfirm/fast_confirm.go` is only the legacy utility |
 | 2 | Quick slots (6-sec) | - | Functional | `consensus/quick_slots.go` |
 | 3 | 1-epoch finality | - | Functional | `consensus/finality.go` |
 | 4 | 4-slot epochs | - | Functional | `consensus/quick_slots.go` |
@@ -344,7 +344,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 | 41 | Block in blobs | - | Functional | `core/block_in_blobs.go` |
 | 42 | Announce nonce | 8077 | Functional | `eth/announce_nonce.go` |
 | 43 | Mandatory proofs | - | Functional | `proofs/mandatory_proofs.go` |
-| 44 | Canonical guest | - | Functional | `zkvm/canonical.go` |
+| 44 | Canonical guest | - | Substantial (real RV32IM receipts; Ethereum STF guest remains) | `zkvm/canonical.go` |
 | 45 | Canonical zkVM | - | Functional | `zkvm/riscv_cpu.go` |
 | 46 | Long-dated gas futures | - | Functional | `core/vm/gas_futures_long.go` |
 | 47 | Sharded mempool | - | Functional | `txpool/sharding.go` |
@@ -369,7 +369,9 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 ---
 
-## Coverage Summary
+## Historical coverage summary (retained)
+
+The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current scoped Glamsterdam progress is 16/17; the executable canonical Ethereum STF guest remains unfinished. The extension record distinguishes exact source and test receipts.
 
 | Metric | Value |
 |--------|-------|

@@ -1,0 +1,13 @@
+{
+  "runtime_revision": "b7a0ec69a189186c4d110670de92cfefc47b8cc2",
+  "current_qualification": "7b5b78b460558f1a544ac57862de4cb0509792f1",
+  "changes": [
+    "pkg/consensus/fastconfirm/fast_confirm.go",
+    "pkg/consensus/fastconfirm/vote_isolation_test.go",
+    "pkg/devnet/kurtosis/scripts/qualify_fast_confirmation.py",
+    "pkg/devnet/kurtosis/scripts/reference_fast_confirmation_window.py",
+    "pkg/devnet/kurtosis/scripts/test_fast_confirmation_profile.py"
+  ],
+  "native_cl_engine_rpc_prover_source_unchanged": true,
+  "legacy_counter_followup": "Independent unit/race checks; not the production FCR authority."
+}

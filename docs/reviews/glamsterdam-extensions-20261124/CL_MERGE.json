@@ -1,0 +1,13 @@
+{
+  "sha": "983f62e9b08e3ee655df951909df099e80e5ad7b",
+  "merged": true,
+  "message": "Pull Request successfully merged",
+  "qualified_head": "274100659f310772e68c11c684eed2ce4b407a62",
+  "qualified_tree": "9fba2d606e87e9fb70e49ec13ee7eb08434711f3",
+  "merged_tree_equal": true,
+  "test_suite_run": 45331374425,
+  "test_suite_jobs_success": 27,
+  "local_testnet_run": 45331374304,
+  "local_testnet_success": 9,
+  "local_testnet_conditional_skips": 1
+}

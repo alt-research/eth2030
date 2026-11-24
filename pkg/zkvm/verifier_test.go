@@ -9,7 +9,7 @@ import (
 
 // --- VerifyProof function tests ---
 
-func TestVerifyProofValidProof(t *testing.T) {
+func TestVerifyProofRejectsArbitraryNonzeroBytes(t *testing.T) {
 	vk := &VerificationKey{
 		Data:        []byte("vk-data"),
 		ProgramHash: types.Hash{0x01},
@@ -23,8 +23,8 @@ func TestVerifyProofValidProof(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !valid {
-		t.Error("expected valid proof")
+	if valid {
+		t.Error("accepted arbitrary bytes as a proof")
 	}
 }
 
@@ -325,8 +325,7 @@ func TestMockProveAndVerifyRoundTrip(t *testing.T) {
 	}
 }
 
-func TestVerifyProofUsesMockVerifier(t *testing.T) {
-	// VerifyProof dispatches to MockVerifier internally.
+func TestVerifyProofDoesNotFallBackToMockVerifier(t *testing.T) {
 	vk := &VerificationKey{Data: []byte("vk")}
 	proof := &Proof{Data: []byte("data"), PublicInputs: []byte("inputs")}
 
@@ -334,7 +333,7 @@ func TestVerifyProofUsesMockVerifier(t *testing.T) {
 	if err != nil {
 		t.Fatalf("VerifyProof: %v", err)
 	}
-	if !valid {
-		t.Error("expected valid proof from VerifyProof using mock backend")
+	if valid {
+		t.Error("production verification fell back to a mock")
 	}
 }

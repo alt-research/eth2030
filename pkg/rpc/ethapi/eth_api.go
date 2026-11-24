@@ -54,6 +54,8 @@ func (api *EthAPI) executionAPI(req *Request) *EthAPI {
 // HandleRequest dispatches a JSON-RPC request to the appropriate method.
 func (api *EthAPI) HandleRequest(req *Request) *Response {
 	switch req.Method {
+	case "zkvm_proveExecution", "zkvm_getProof", "zkvm_cancelProof", "zkvm_verifyExecution":
+		return api.canonicalProofRequest(req)
 	case "eth_chainId":
 		return api.chainID(req)
 	case "eth_blockNumber":

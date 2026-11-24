@@ -265,7 +265,7 @@ func DefaultConfig() Config {
 		RPCCORSOrigins:     "",
 		HTTPVhosts:         []string{"localhost", "127.0.0.1", "::1"},
 		HTTPCORSDomain:     []string{},
-		HTTPModules:        []string{"eth", "net", "web3"},
+		HTTPModules:        []string{"eth", "net", "web3", "zkvm"},
 
 		// Engine API
 		EnginePort:           8551,
@@ -280,7 +280,7 @@ func DefaultConfig() Config {
 		WSEnabled: false,
 		WSAddr:    "127.0.0.1",
 		WSPort:    8546,
-		WSModules: []string{"eth", "net", "web3"},
+		WSModules: []string{"eth", "net", "web3", "zkvm"},
 		WSOrigins: []string{},
 
 		// Metrics

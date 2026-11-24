@@ -11,6 +11,7 @@ import (
 	"github.com/eth2030/eth2030/p2p/wire"
 	"github.com/eth2030/eth2030/proofs"
 	"github.com/eth2030/eth2030/txpool"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 )
 
 // nodeDepsAdapter wraps *Node to implement backend.NodeDeps.
@@ -61,6 +62,8 @@ func (a *nodeDepsAdapter) FCStateManager() backend.FCStateManagerDeps {
 func (a *nodeDepsAdapter) StarkFrameProver() proofs.ValidationFrameProver {
 	return a.n.starkFrameProver
 }
+
+func (a *nodeDepsAdapter) CanonicalProofService() *canonicalproof.Service { return a.n.canonicalProver }
 
 func (a *nodeDepsAdapter) EthHandler() backend.EthHandlerDeps {
 	if a.n.ethHandler == nil {

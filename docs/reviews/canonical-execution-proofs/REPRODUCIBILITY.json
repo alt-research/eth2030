@@ -1,0 +1,7 @@
+{
+  "builder": "risczero/risc0-guest-builder:r0.1.97.0@sha256:7ae0a27fa72b10fb5c1066005bd949ae43dc4ead8a284f2d6572b99c82ab4468",
+  "original_image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "independent_image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "source_and_target_directories_differ": true,
+  "image_equal": true
+}

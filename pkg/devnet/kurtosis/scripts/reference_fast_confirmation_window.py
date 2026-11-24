@@ -11,6 +11,18 @@ import urllib.error
 from pathlib import Path
 
 
+def canonical_ancestry(parents, tip, genesis):
+    result = set()
+    current = tip
+    while current != genesis:
+        assert current not in result, "cyclic captured ancestry"
+        assert current in parents, "missing captured parent block"
+        result.add(current)
+        current = parents[current]
+    result.add(genesis)
+    return result
+
+
 def verify(args):
     from eth_consensus_specs.gloas import mainnet as spec
     from eth_consensus_specs.utils import bls
@@ -83,7 +95,9 @@ def verify(args):
         header0 = captured("genesis-header")
         assert "0x" + bytes(spec.hash_tree_root(state0)).hex() == header0["header"]["message"]["state_root"]
         roster = [bytes(validator.pubkey) for validator in state0.validators]
-        previous = header0["root"]
+        genesis_root = header0["root"]
+        roots = {genesis_root: 0}
+        parents = {}
         for slot in range(1, result["final_slot"] + 1):
             if slot in manifest["missed_slots"]:
                 count("missed_slots")
@@ -93,7 +107,10 @@ def verify(args):
             block = parsed(raw_block, spec.SignedBeaconBlock)
             retained(f"block-{slot}", raw_block)
             block_root = "0x" + bytes(spec.hash_tree_root(block.message)).hex()
-            assert "0x" + bytes(block.message.parent_root).hex() == previous
+            parent_root = "0x" + bytes(block.message.parent_root).hex()
+            assert parent_root in roots and roots[parent_root] < slot, "missing or invalid captured parent"
+            parents[block_root] = parent_root
+            roots[block_root] = slot
             state_root = "0x" + bytes(block.message.state_root).hex()
             raw_state = captured(f"state-{slot}")
             retained(f"state-{slot}", raw_state)
@@ -158,13 +175,23 @@ def verify(args):
             altered = copy.deepcopy(envelope); altered.signature = changed_signature(envelope.signature)
             reject("execution_envelope", lambda: spec.verify_execution_payload_envelope_signature(state, altered))
             count("execution_envelope_signatures"); count("blocks")
-            previous = block_root
+        tip = captured("canonical-tip")
+        tip_header = parsed(tip["header"], spec.SignedBeaconBlockHeader)
+        assert tip["canonical"] and int(tip_header.message.slot) == result["final_slot"]
+        assert "0x" + bytes(spec.hash_tree_root(tip_header.message)).hex() == tip["root"]
+        assert tip["root"] in roots
+        canonical = canonical_ancestry(parents, tip["root"], genesis_root)
+        report["canonical_tip"] = tip["root"]
+        report["canonical_blocks"] = len(canonical) - 1
+        report["canonical_skipped_slots"] = result["final_slot"] - (len(canonical) - 1)
+        report["verified_orphan_roots"] = sorted(set(roots) - canonical)
+        report["orphan_blocks"] = len(report["verified_orphan_roots"])
         assert counts["blocks"] >= 80
         for category in ["proposer", "randao", "attestation", "payload_attestation", "sync_aggregate", "execution_envelope"]:
             assert controls.get(category), "missing real category/control: " + category
         report["offline_retained_window"] = True
         report["passed"] = True
-        report["scope"] = "Every available block in the declared private window: proposer, RANDAO, included attestation/PTC aggregates, sync aggregates and execution envelopes, with authenticated state-root/roster bindings. Self-build bids are not counted as separate BLS signatures. This is not a new 48h, scale or complete Ethereum STF acceptance."
+        report["scope"] = "Every captured signed block in the declared private window, including retained orphan blocks, with the final canonical ancestry checked independently: proposer, RANDAO, included attestation/PTC aggregates, sync aggregates and execution envelopes, with authenticated state-root/roster bindings. Self-build bids are not counted as separate BLS signatures. This is not a new 48h, scale or complete Ethereum STF acceptance."
     finally:
         (output / "result.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))

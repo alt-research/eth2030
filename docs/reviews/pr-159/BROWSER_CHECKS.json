@@ -1,0 +1,118 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "route": "/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/roadmap/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/eips/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/eips/eip-7495/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/eips/eip-8025/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/eips/feature-evm-asm-canonical-quest/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/eips/eip-7904/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/roadmap/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/eips/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/eips/eip-7495/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/eips/eip-8025/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/eips/feature-evm-asm-canonical-quest/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "route": "/eips/eip-7904/",
+      "status": 200,
+      "page_errors": [],
+      "overflow": false
+    }
+  ],
+  "official_core": {
+    "complete_labels": 20,
+    "total": 20,
+    "open": []
+  },
+  "later_proof_links_interacted": true,
+  "bottom_disclosures_default_closed": true,
+  "remaining_workstreams": 7,
+  "displayed_pending_entries": 31,
+  "screenshots": [
+    "/tmp/eth2030-eip7495-browser-20261124/later-proof-1440.png",
+    "/tmp/eth2030-eip7495-browser-20261124/later-proof-375.png",
+    "/tmp/eth2030-eip7495-browser-20261124/official-scope-1440.png",
+    "/tmp/eth2030-eip7495-browser-20261124/official-scope-375.png"
+  ]
+}

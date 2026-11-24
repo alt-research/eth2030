@@ -194,7 +194,7 @@ for (const path of ['docs/reviews/development-scope-20261124/CURRENT_STATE.json'
 assert.equal(remaining.adoptedDevelopmentTodos, accounting.active_development_todos.length);
 assert.deepEqual(remaining.excludedAcceptance, ['G-03', 'G-04']);
 assert.equal(remaining.mergedProgressPr, 148);
-assert.equal(remaining.items.length, 8);
+assert.equal(remaining.items.length, 7);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.target), ['master', 'master', 'eth2030']);
 assert.deepEqual(remaining.specificationRepairs.map(item => item.url), [
   'https://github.com/alt-research/eth2030/pull/155',
@@ -241,14 +241,14 @@ assert.deepEqual(officialScope.informational.map(item => item.number), officialI
 assert.equal(officialScope.scheduledCore.length, 20);
 assert.equal(new Set(officialScope.scheduledCore).size, 20);
 assert.equal(glamsterdamMapped.length, 20);
-assert.equal(glamsterdamMapped.filter(entry => entry.status === 'complete').length, 19);
-assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').map(entry => [entry.id, entry.status]), [['eip-7495', 'functional']]);
+assert.equal(glamsterdamMapped.filter(entry => entry.status === 'complete').length, 20);
+assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').map(entry => entry.id), []);
 assert.deepEqual(officialScope.networking, [7975, 8070, 8136, 8159, 8189]);
 assert.deepEqual(officialScope.informational.map(entry => entry.number), [7904, 8261]);
 assert.ok(!officialScope.scheduledCore.includes(8025) && !officialScope.scheduledCore.includes(7904));
 for (const html of [home, roadmap]) {
-  assert.match(html, /data-official-complete="19" data-official-total="20"/);
-  assert.match(html, /19\/20 scheduled core EIPs labelled Complete/);
+  assert.match(html, /data-official-complete="20" data-official-total="20"/);
+  assert.match(html, /20\/20 scheduled core EIPs labelled Complete/);
   assert.match(html, /Networking references/);
   assert.match(html, /Informational references/);
   assert.match(html, /Later rounds/);
@@ -332,7 +332,7 @@ for (const [id, expected, obsolete] of [
   ['eip-7928', 'BAL header commitment encoded', 'block_access_list_hash header field not yet added'],
   ['eip-7805', 'Inclusion-list gossip validation', 'CL P2P gossip validation rules for ILs'],
   ['eip-8141', 'exact APPROVE scopes and atomic rollback', 'Payer gas-approval logic'],
-  ['eip-7495', 'ssz/stable_container_test.go', 'No tests'],
+  ['eip-7495', 'ssz/progressive_reference_test.go', 'No tests'],
 ]) {
   const page = readFileSync(new URL(`../out/eips/${id}/index.html`, import.meta.url), 'utf8');
   assert.ok(page.includes(expected), `Missing current evidence on ${id}`);
@@ -354,7 +354,7 @@ assert.match(refundPage, /Block Gas Accounting without Refunds/);
 assert.match(refundPage, /User refunds remain applied/);
 assert.doesNotMatch(refundPage, /Remove SSTORE Gas Refunds/);
 const builderPage = readFileSync(new URL('../out/eips/eip-7732/index.html', import.meta.url), 'utf8');
-assert.match(home, /19\/20 scheduled core EIPs labelled Complete/);
+assert.match(home, /20\/20 scheduled core EIPs labelled Complete/);
 assert.match(builderPage, /legacy EL bid-hash\/registry\/header extensions retired in PR127/);
 assert.ok(builderPage.includes(`/blob/${current.historical_el.revision}/docs/reviews/builder-authority/STATUS.md`));
 assert.doesNotMatch(builderPage, /Legacy EL builder extensions accept unsigned registrations/);
@@ -400,3 +400,15 @@ for (const workflow of [siteWorkflow, pagesWorkflow]) {
 }
 assert.match(pagesWorkflow, /echo 'eth2030\.altllm\.ai' > out\/CNAME/);
 console.log('Export claims, retained milestones, shared progress, evidence paths and tracker links verified.');
+
+const eip7495Result = readRecord('docs/reviews/pr-159/RESULTS.json');
+assert.equal(eip7495Result.passed, true);
+assert.equal(eip7495Result.container_cases, 29);
+assert.equal(eip7495Result.container_proofs, 1016);
+assert.equal(eip7495Result.list_proofs, 487);
+assert.equal(eip7495Result.mutation_controls_rejected, 7);
+assert.equal(eip7495Result.captured_cl_state.fields, 46);
+const containerPage = readFileSync(new URL('../out/eips/eip-7495/index.html', import.meta.url), 'utf8');
+assert.ok(containerPage.includes('/blob/36b3e62d9f2b3f8f71db25980930ce9d37a5d6ba/docs/reviews/pr-159/RESULTS.json'));
+assert.match(containerPage, /Immutable active-field layouts/);
+assert.match(home, /All scheduled core entries have reviewed implementation evidence/);

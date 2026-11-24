@@ -1,8 +1,8 @@
 # ETH2030 development roadmap
 
-Updated November 24, 2026 against master `1f9b427f`, including merged PRs 155–157 and Lighthouse eth2030 `983f62e9`. Current Glamsterdam inclusion follows [official EIP-7773](https://eips.ethereum.org/EIPS/eip-7773), pinned at `b055feec322fbc37e9d77a393a50b3ff56b31c92`.
+Updated November 24, 2026 against master `b14dbb15`, including merged PRs 155–158 and EIP-7495 functional source `36b3e62d` in PR159 and Lighthouse eth2030 `983f62e9`. Current Glamsterdam inclusion follows [official EIP-7773](https://eips.ethereum.org/EIPS/eip-7773), pinned at `b055feec322fbc37e9d77a393a50b3ff56b31c92`.
 
-The official core denominator is **20 scheduled EIPs**. Current reviewed ETH2030 labels are **19 Complete / 1 Functional (EIP-7495 ProgressiveContainer)**, or 95%. This scope update preserves the Functional label and does not assert a new current-spec conformance result. Five networking EIPs and two informational references are listed separately. EIP-7904 is now an informational gas-cost analysis, not a required repricing change.
+The official core denominator is **20 scheduled EIPs**. Current reviewed ETH2030 labels are **20 Complete**, including EIP-7495 ProgressiveContainer qualification in [PR159](reviews/pr-159/STATUS.md), or 100% of implementation labels. This denominator is not whole-public-network readiness. Five networking EIPs and two informational references are listed separately. EIP-7904 is now an informational gas-cost analysis, not a required repricing change.
 
 EIP-8025 and canonical Ethereum STF guest research belong to **later proof proposals, with no official fork assignment**. They are excluded from Glamsterdam progress. Other Strawmap cards remain project planning views rather than announced official schedules.
 
@@ -35,9 +35,9 @@ Original rounds 03/04 remain failed. The later captured FCU convoy is a confirme
 
 ## Explicit remaining-work view
 
-The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists eight later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
+The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists seven later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
 
-The current display uses the official Glamsterdam core list and retains future project work separately. EIP-7495 is the outstanding official core label. EIP-8025 and canonical Ethereum guest research appear after the six planning cards and in the later-proof inventory. Earlier 16/17 snapshots retain their historical meaning; they are superseded for current page accounting. EL #155/#156 and the documentation review #157 are merged; Lighthouse #17 is merged into eth2030.
+The current display uses the official Glamsterdam core list and retains future project work separately. EIP-7495 current schemas, canonical bytes and stable proofs are independently qualified. EIP-8025 and canonical Ethereum guest research appear after the six planning cards and in the later-proof inventory. Earlier 16/17 snapshots retain their historical meaning; they are superseded for current page accounting. EL #155/#156 and the documentation review #157 are merged; Lighthouse #17 is merged into eth2030.
 
 ## Other roadmap phases
 

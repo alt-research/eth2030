@@ -34,13 +34,17 @@ func makeSTFExecTestBlock(numTx int) *types.Block {
 	return types.NewBlock(header, body)
 }
 
-// buildSTFExecTestProgram builds a minimal RISC-V program for STF testing.
+// buildSTFExecTestProgram is a transparent fixture that emits a fixed root
+// and gas. Its proof demonstrates output binding, not Ethereum STF correctness.
 func buildSTFExecTestProgram() []byte {
-	instrs := []uint32{
-		EncodeIType(0x13, 17, 0, 0, 0), // a7 = 0 (halt)
-		EncodeIType(0x13, 10, 0, 0, 0), // a0 = 0 (exit code)
-		0x00000073,                     // ECALL
+	output := make([]byte, 40)
+	output[0] = 0xAA
+	binary.LittleEndian.PutUint64(output[32:], 42000)
+	instrs := []uint32{EncodeIType(0x13, 17, 0, 0, 1)}
+	for _, value := range output {
+		instrs = append(instrs, EncodeIType(0x13, 10, 0, 0, int32(value)), 0x73)
 	}
+	instrs = append(instrs, EncodeIType(0x13, 17, 0, 0, 0), EncodeIType(0x13, 10, 0, 0, 0), 0x73)
 	code := make([]byte, len(instrs)*4)
 	for i, instr := range instrs {
 		binary.LittleEndian.PutUint32(code[i*4:], instr)
@@ -96,6 +100,7 @@ func TestRealSTFExec_RegisterSTFProgram(t *testing.T) {
 }
 
 func TestRealSTFExec_ExecuteSTF(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultRealSTFConfig()
 	exec, err := NewRealSTFExecutor(config, reg)
@@ -117,6 +122,7 @@ func TestRealSTFExec_ExecuteSTF(t *testing.T) {
 		t.Fatalf("GenerateSTFWitness: %v", err)
 	}
 
+	stfInput.PostStateRoot = types.Hash{0xAA}
 	output, err := exec.ExecuteSTF(stfInput)
 	if err != nil {
 		t.Fatalf("ExecuteSTF: %v", err)
@@ -136,6 +142,7 @@ func TestRealSTFExec_ExecuteSTF(t *testing.T) {
 }
 
 func TestRealSTFExec_ExecuteSTFMismatch(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultRealSTFConfig()
 	exec, err := NewRealSTFExecutor(config, reg)
@@ -158,7 +165,6 @@ func TestRealSTFExec_ExecuteSTFMismatch(t *testing.T) {
 
 	// Tamper with the post-state root.
 	stfInput.PostStateRoot = types.Hash{0xFF}
-
 	output, err := exec.ExecuteSTF(stfInput)
 	if !errors.Is(err, ErrRealSTFRootMismatch) {
 		t.Fatalf("expected ErrRealSTFRootMismatch, got %v", err)
@@ -203,6 +209,7 @@ func TestRealSTFExec_NoSTFProgram(t *testing.T) {
 }
 
 func TestRealSTFExec_VerifySTFProof(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultRealSTFConfig()
 	exec, err := NewRealSTFExecutor(config, reg)
@@ -223,6 +230,7 @@ func TestRealSTFExec_VerifySTFProof(t *testing.T) {
 		t.Fatalf("GenerateSTFWitness: %v", err)
 	}
 
+	stfInput.PostStateRoot = types.Hash{0xAA}
 	output, err := exec.ExecuteSTF(stfInput)
 	if err != nil {
 		t.Fatalf("ExecuteSTF: %v", err)
@@ -343,6 +351,7 @@ func TestRealSTFExec_DefaultConfig(t *testing.T) {
 var _ = crypto.Keccak256
 
 func TestRealSTFExec_FullRoundTrip(t *testing.T) {
+	requireRealCanonicalProof(t)
 	// Full round-trip: state transition -> witness -> proof -> verify.
 	reg := NewGuestRegistry()
 	config := DefaultRealSTFConfig()
@@ -367,6 +376,7 @@ func TestRealSTFExec_FullRoundTrip(t *testing.T) {
 		}
 
 		// Step 2: Execute and produce proof.
+		stfInput.PostStateRoot = types.Hash{0xAA}
 		output, err := exec.ExecuteSTF(stfInput)
 		if err != nil {
 			t.Fatalf("ExecuteSTF: %v", err)
@@ -401,6 +411,7 @@ func TestRealSTFExec_FullRoundTrip(t *testing.T) {
 		preState := types.Hash{0xFF}
 
 		stfInput, _ := exec.GenerateSTFWitness(preState, block)
+		stfInput.PostStateRoot = types.Hash{0xAA}
 		output, err := exec.ExecuteSTF(stfInput)
 		if err != nil {
 			t.Fatalf("ExecuteSTF: %v", err)

@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 42.73411971499445,
+  "metadata": {
+    "image_id": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+    "sdk": "3.1.0",
+    "system": "risc0",
+    "version": 1
+  },
+  "proof_file": "/tmp/eth2030-canonical-proof-20261124/published-image-proof.json"
+}

@@ -59,6 +59,7 @@ import (
 	"github.com/eth2030/eth2030/txpool/encrypted"
 	txjournal "github.com/eth2030/eth2030/txpool/journal"
 	"github.com/eth2030/eth2030/txpool/tracking"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 
 	execpkg "github.com/eth2030/eth2030/core/execution"
 
@@ -103,6 +104,7 @@ import (
 var ErrNodeStopped = errors.New("node is stopped; create a new instance to retry")
 
 type Node struct {
+	canonicalProver *canonicalproof.Service
 	config          *Config
 	closed          bool
 	listeners       []net.Listener
@@ -712,6 +714,7 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	}
 
 	// Initialize RPC server with blockchain backend.
+	n.canonicalProver = canonicalproof.NewService(n.lifecycleCtx, canonicalproof.Prover{})
 	rpcBackend := nodebackend.NewRPCBackend(toNodeDeps(n), n.engBackend)
 	adminBackend := nodebackend.NewAdminBackend(toNodeDeps(n))
 	netBackend := nodebackend.NewNetBackend(toNodeDeps(n))
@@ -1119,6 +1122,9 @@ func (n *Node) stopLocked() error {
 	n.running = false
 	if n.lifecycleCancel != nil {
 		n.lifecycleCancel()
+	}
+	if n.canonicalProver != nil {
+		n.canonicalProver.Close()
 	}
 	if n.stop != nil {
 		close(n.stop)

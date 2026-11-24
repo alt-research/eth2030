@@ -1,0 +1,82 @@
+name: Real canonical execution proof
+
+on:
+  pull_request:
+    branches: [master]
+    paths: ['pkg/zkvm/**', 'pkg/node/**', 'pkg/rpc/**', 'pkg/cmd/eth2030/**', 'tools/canonical-prover/**', '.github/workflows/canonical-proof.yml']
+  push:
+    branches: [master]
+    paths: ['pkg/zkvm/**', 'pkg/node/**', 'pkg/rpc/**', 'pkg/cmd/eth2030/**', 'tools/canonical-prover/**', '.github/workflows/canonical-proof.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonical-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  real-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      CARGO_BUILD_JOBS: 2
+      RISC0_BUILD_LOCKED: 1
+      GOTOOLCHAIN: go1.26.11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select the isolated pinned proving toolchain
+        run: echo "RISC0_HOME=$RUNNER_TEMP/eth2030-risc0-3.1.0" >> "$GITHUB_ENV"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.11'
+          cache-dependency-path: pkg/go.sum
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/canonical-prover
+      - name: Install pinned local proving components
+        run: bash tools/canonical-prover/bootstrap.sh
+      - name: Build the native node and complete real-prover bundle
+        run: |
+          bash tools/canonical-prover/build.sh
+          echo "$GITHUB_WORKSPACE/tools/canonical-prover/target/node-bundle" >> "$GITHUB_PATH"
+      - name: Require actual proof backend and reject fake/modified seals
+        run: |
+          command -v eth2030-prover
+          command -v r0vm
+          cargo fmt --manifest-path tools/canonical-prover/Cargo.toml --all --check
+          cargo test --manifest-path tools/canonical-prover/Cargo.toml --release --locked
+      - name: Execute all actual producer, verifier and native-node cases
+        working-directory: pkg
+        run: go test -p 1 -tags canonicalproof_integration ./zkvm/... ./node -count=1 -timeout=90m -json > canonical-proof-results.jsonl
+      - name: Require every real-proof acceptance case
+        run: |
+          python3 - <<'PYTHON'
+          import json,os
+          from pathlib import Path
+          required={'TestCanonExec_ExecuteAndProve','TestCanonExec_VerifyGuestProof','TestCanonExec_VerifyGuestProofTampered','TestCanonExec_ProofStatementConsistency','TestRealSTFExec_ExecuteSTF','TestRealSTFExec_VerifySTFProof','TestZKISABridge_ExecuteZKISA','TestRealReceiptIndependentVerificationAndBindings','TestIndependentRV32IMExecutionVectors','TestRealCanonicalProofThroughNativeNode','TestRealExplicitBackendAndProductionVerifier'}
+          events=[json.loads(line) for line in Path('pkg/canonical-proof-results.jsonl').read_text().splitlines()]
+          passed={event.get('Test') for event in events if event.get('Action')=='pass'}
+          skipped={event.get('Test') for event in events if event.get('Action')=='skip'}
+          assert required<=passed,sorted(required-passed)
+          assert not required&skipped,sorted(required&skipped)
+          image=json.loads(Path('tools/canonical-prover/target/node-bundle/prover-image.json').read_text())
+          assert image['image_id']==Path('tools/canonical-prover/image-id.txt').read_text().strip()
+          Path('pkg/canonical-proof-summary.json').write_text(json.dumps({'source':os.environ['GITHUB_SHA'],'required_passed':sorted(required),'image':image,'required_skipped':[]},indent=2)+'\n')
+          PYTHON
+      - name: Retain exact real-proof results and source/image identities
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-proof-${{ github.sha }}
+          path: |
+            pkg/canonical-proof-results.jsonl
+            pkg/canonical-proof-summary.json
+            tools/canonical-prover/target/node-bundle/build-info.json
+            tools/canonical-prover/target/node-bundle/prover-image.json
+          if-no-files-found: error
+          retention-days: 90

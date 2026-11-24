@@ -7,14 +7,19 @@
 package zkvm
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 )
 
 // CanonicalExecutor errors.
@@ -83,6 +88,9 @@ type GuestOutput struct {
 
 // GuestProof holds a proof of correct guest execution.
 type GuestProof struct {
+	// ProgramID is the trusted registry key, distinct from the SHA-256 image
+	// input digest used by the execution statement.
+	ProgramID types.Hash
 	// ProofResult is the raw proof from the proof backend.
 	ProofResult *ProofResult
 
@@ -191,17 +199,19 @@ func (ce *CanonicalExecutor) ExecuteGuest(programID types.Hash, input []byte) (*
 
 // ExecuteAndProve runs a guest program and generates a ZK proof of execution.
 func (ce *CanonicalExecutor) ExecuteAndProve(programID types.Hash, input []byte) (*GuestOutput, *GuestProof, error) {
-	// Force witness collection for proof generation.
-	origWitness := ce.config.CollectWitness
-	ce.config.CollectWitness = true
-	defer func() { ce.config.CollectWitness = origWitness }()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	return ce.ExecuteAndProveContext(ctx, programID, input)
+}
 
-	output, witness, err := ce.ExecuteGuest(programID, input)
+func (ce *CanonicalExecutor) proofConfig() canonicalproof.Config {
+	return canonicalproof.Config{MaxCycles: ce.config.GasLimit, MemoryPages: uint32(ce.config.MemoryPages), ProgramBase: ce.config.ProgramBase, EntryPC: ce.config.ProgramBase, StackBase: ce.config.StackBase, InputBase: ce.config.InputBase, LoadInput: true}
+}
+
+func (ce *CanonicalExecutor) ExecuteAndProveContext(ctx context.Context, programID types.Hash, input []byte) (*GuestOutput, *GuestProof, error) {
+	output, _, err := ce.ExecuteGuest(programID, input)
 	if err != nil {
 		return output, nil, err
-	}
-	if witness == nil || witness.StepCount() == 0 {
-		return output, nil, ErrCanonExecProofFailed
 	}
 
 	// Build public inputs: programHash || inputHash || outputHash.
@@ -213,19 +223,30 @@ func (ce *CanonicalExecutor) ExecuteAndProve(programID types.Hash, input []byte)
 	publicInputs = append(publicInputs, inputHash[:]...)
 	publicInputs = append(publicInputs, outputHash[:]...)
 
-	// Generate proof via the proof backend.
-	req := &ProofRequest{
-		Trace:        witness,
-		PublicInputs: publicInputs,
-		ProgramHash:  output.ProgramHash,
+	program, err := ce.registry.GetGuest(programID)
+	if err != nil {
+		return output, nil, err
 	}
-
-	proofResult, err := ProveExecution(req)
+	prover := canonicalproof.Prover{}
+	receipt, err := prover.Prove(ctx, program, input, ce.proofConfig())
 	if err != nil {
 		return output, nil, fmt.Errorf("%w: %v", ErrCanonExecProofFailed, err)
 	}
+	if err := prover.Verify(ctx, receipt, canonicalproof.Expected{Program: program, Input: input, Output: output.Output, Config: ce.proofConfig(), Cycles: &output.GasUsed}); err != nil {
+		return output, nil, err
+	}
+	encoded, err := json.Marshal(receipt)
+	if err != nil {
+		return output, nil, err
+	}
+	key, _ := hex.DecodeString(receipt.ImageID)
+	state, _ := hex.DecodeString(receipt.Statement.StateHash)
+	var stateHash [32]byte
+	copy(stateHash[:], state)
+	proofResult := &ProofResult{ProofBytes: encoded, VerificationKey: key, TraceCommitment: stateHash, PublicInputsHash: sha256.Sum256(publicInputs)}
 
 	proof := &GuestProof{
+		ProgramID:    programID,
 		ProofResult:  proofResult,
 		ProgramHash:  output.ProgramHash,
 		PublicInputs: publicInputs,
@@ -242,21 +263,32 @@ func (ce *CanonicalExecutor) VerifyGuestProof(proof *GuestProof) error {
 		return ErrCanonExecNilProof
 	}
 
-	valid, err := VerifyExecProof(proof.ProofResult, proof.ProgramHash)
+	if len(proof.PublicInputs) != 96 {
+		return ErrCanonExecVerifyFailed
+	}
+	program, err := ce.registry.GetGuest(proof.ProgramID)
+	if err != nil || HashProgram(program) != proof.ProgramHash {
+		return ErrCanonExecVerifyFailed
+	}
+	receipt, err := canonicalproof.DecodeProof(proof.ProofResult.ProofBytes)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrCanonExecVerifyFailed, err)
 	}
-	if !valid {
-		return ErrCanonExecVerifyFailed
-	}
-
-	// Verify the public inputs hash matches.
 	expectedPIHash := sha256.Sum256(proof.PublicInputs)
 	if expectedPIHash != proof.ProofResult.PublicInputsHash {
 		return fmt.Errorf("%w: public inputs hash mismatch", ErrCanonExecVerifyFailed)
 	}
-
-	return nil
+	if hex.EncodeToString(proof.PublicInputs[:32]) != hex.EncodeToString(proof.ProgramHash[:]) || hex.EncodeToString(proof.PublicInputs[64:]) != hex.EncodeToString(proof.OutputHash[:]) || hex.EncodeToString(proof.ProofResult.VerificationKey) != receipt.ImageID || hex.EncodeToString(proof.ProofResult.TraceCommitment[:]) != receipt.Statement.StateHash {
+		return ErrCanonExecVerifyFailed
+	}
+	expected := receipt.Statement
+	expected.ProgramHash = hex.EncodeToString(proof.ProgramHash[:])
+	expected.InputHash = hex.EncodeToString(proof.PublicInputs[32:64])
+	expected.OutputHash = hex.EncodeToString(proof.OutputHash[:])
+	expected.Config = ce.proofConfig()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	return (canonicalproof.Prover{}).VerifyClaim(ctx, receipt, expected)
 }
 
 // ComputeProgramID computes the program ID (hash) for a given program binary.

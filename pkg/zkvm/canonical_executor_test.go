@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 )
 
 // buildHaltProgram constructs a minimal RISC-V program that halts with exit code 0.
@@ -174,6 +175,7 @@ func TestCanonExec_GasExhausted(t *testing.T) {
 }
 
 func TestCanonExec_ExecuteAndProve(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultCanonicalExecutorConfig()
 	exec, err := NewCanonicalExecutor(reg, config)
@@ -200,12 +202,13 @@ func TestCanonExec_ExecuteAndProve(t *testing.T) {
 	if proof.ProofResult == nil {
 		t.Fatal("proof.ProofResult is nil")
 	}
-	if len(proof.ProofResult.ProofBytes) != groth16ProofSize {
-		t.Errorf("proof size: got %d, want %d", len(proof.ProofResult.ProofBytes), groth16ProofSize)
+	if _, err := canonicalproof.DecodeProof(proof.ProofResult.ProofBytes); err != nil {
+		t.Fatal(err)
 	}
 }
 
 func TestCanonExec_VerifyGuestProof(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultCanonicalExecutorConfig()
 	exec, err := NewCanonicalExecutor(reg, config)
@@ -230,6 +233,7 @@ func TestCanonExec_VerifyGuestProof(t *testing.T) {
 }
 
 func TestCanonExec_VerifyGuestProofTampered(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultCanonicalExecutorConfig()
 	exec, err := NewCanonicalExecutor(reg, config)
@@ -329,7 +333,8 @@ func TestCanonExec_WitnessTrace(t *testing.T) {
 	}
 }
 
-func TestCanonExec_ProofDeterminism(t *testing.T) {
+func TestCanonExec_ProofStatementConsistency(t *testing.T) {
+	requireRealCanonicalProof(t)
 	reg := NewGuestRegistry()
 	config := DefaultCanonicalExecutorConfig()
 	exec, err := NewCanonicalExecutor(reg, config)
@@ -355,13 +360,21 @@ func TestCanonExec_ProofDeterminism(t *testing.T) {
 		t.Fatalf("second ExecuteAndProve: %v", err)
 	}
 
-	// Same program + same input = same proof.
-	if len(proof1.ProofResult.ProofBytes) != len(proof2.ProofResult.ProofBytes) {
-		t.Fatal("proof sizes differ")
+	// Proof bytes need not be deterministic. Their verified statements must be.
+	one, err := canonicalproof.DecodeProof(proof1.ProofResult.ProofBytes)
+	if err != nil {
+		t.Fatal(err)
 	}
-	for i := range proof1.ProofResult.ProofBytes {
-		if proof1.ProofResult.ProofBytes[i] != proof2.ProofResult.ProofBytes[i] {
-			t.Fatalf("proof byte %d differs", i)
+	two, err := canonicalproof.DecodeProof(proof2.ProofResult.ProofBytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if one.Statement != two.Statement {
+		t.Fatal("same execution produced different statements")
+	}
+	for _, proof := range []*GuestProof{proof1, proof2} {
+		if err := exec.VerifyGuestProof(proof); err != nil {
+			t.Fatal(err)
 		}
 	}
 }

@@ -85,10 +85,10 @@ func unmarshalExecutionSSZList(data []byte) ([][]byte, error) {
 	return out, nil
 }
 
-func executionProgressiveRoot(fields [][32]byte, mask uint32) [32]byte {
+func executionProgressiveRoot(fields [][32]byte, mask uint32) ([32]byte, error) {
 	var active [32]byte
 	binary.LittleEndian.PutUint32(active[:], mask)
-	return ssz.HashTreeRootProgressiveContainer(fields, active)
+	return ssz.HashTreeRootProgressiveContainerChecked(fields, active)
 }
 
 func progressiveBytesRoot(data []byte) [32]byte {

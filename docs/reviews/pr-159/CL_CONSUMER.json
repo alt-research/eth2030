@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "repository": "jiayaoqijia/lighthouse",
+  "source_revision": "274100659f310772e68c11c684eed2ce4b407a62",
+  "merged_revision": "983f62e9b08e3ee655df951909df099e80e5ad7b",
+  "qualified_and_merged_tree_equal": true,
+  "command": "CARGO_TARGET_DIR=/projects/eth2030/lighthouse/target CARGO_BUILD_JOBS=2 cargo test --release -p types --test types_tests captured_nondefault_gloas_state_and_three_proofs_match_independent_reference -- --nocapture",
+  "tests_passed": 1,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "scope": "Captured nondefault 384-validator Gloas state, exact SSZ/root identity, current/next/finalized branches and changed leaf/sibling/index rejection; unchanged CL source, not new long-duration admission."
+}

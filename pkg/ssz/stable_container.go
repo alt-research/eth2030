@@ -1,20 +1,9 @@
-// EIP-7495: SSZ StableContainer
+// Legacy mutable field-root utilities.
 //
-// A StableContainer is a fixed-capacity container where fields can be
-// optional (wrapped in Optional[T]). This enables forward-compatible
-// consensus structures: new optional fields can be appended without
-// changing the Merkle tree shape of existing fields.
-//
-// The hash tree root is computed by:
-//  1. Collecting the hash tree root of each field (or zero for inactive).
-//  2. Merkleizing the field roots padded to the container's capacity.
-//  3. Mixing in the active bitvector as a hash.
-//
-// A Profile is a subtype of StableContainer with a fixed set of active
-// fields and no optional fields exposed, providing a concrete schema on
-// top of the stable Merkle structure.
-//
-// Spec: https://eips.ethereum.org/EIPS/eip-7495
+// StableContainer and Profile preserve the older optional-field API for callers
+// that already hold field roots. They are not EIP-7495 type declarations or
+// codecs. Current ProgressiveContainer schemas have immutable active_fields;
+// use NewProgressiveContainerSchema for validated layouts, bytes and proofs.
 package ssz
 
 import (
@@ -41,7 +30,8 @@ type FieldDef struct {
 	Optional bool
 }
 
-// StableContainer implements EIP-7495.
+// StableContainer is a legacy mutable field-root utility.
+// Deprecated: use ProgressiveContainerSchema for current EIP-7495 semantics.
 type StableContainer struct {
 	capacity int        // maximum number of fields (fixed at creation)
 	fields   []FieldDef // definitions of added fields (up to capacity)
@@ -49,8 +39,9 @@ type StableContainer struct {
 	active   []bool     // per-field active flag
 }
 
-// NewStableContainer creates a new StableContainer with the given maximum
-// field capacity. Capacity must be positive.
+// NewStableContainer creates a legacy root utility with the given maximum
+// field capacity. Historical capacity normalization is retained for compatibility.
+// Deprecated: use NewProgressiveContainerSchema, which rejects illegal schemas.
 func NewStableContainer(capacity int) *StableContainer {
 	if capacity <= 0 {
 		capacity = 1
@@ -148,7 +139,8 @@ func (sc *StableContainer) ActiveBitvector() []byte {
 	return MarshalBitvector(bits)
 }
 
-// HashTreeRoot computes the EIP-7495 hash tree root of the container:
+// HashTreeRoot computes a progressive root for the legacy mutable slots.
+// It does not validate an EIP-7495 type declaration:
 //
 //	mix_in_active_fields(merkleize_progressive([field roots]), active_fields)
 //
@@ -197,6 +189,7 @@ func (sc *StableContainer) Field(index int) (FieldDef, error) {
 // concrete message types that always include a known set of fields
 // while still being Merkle-compatible with the underlying
 // StableContainer capacity.
+// Deprecated: use ProgressiveContainerSchema for current EIP-7495 type layouts.
 type Profile struct {
 	container *StableContainer
 	// activeIndices lists the field indices that this profile requires.
@@ -206,6 +199,7 @@ type Profile struct {
 // NewProfile creates a Profile over the given StableContainer.
 // activeIndices specifies which fields must be active (all others are
 // forced inactive). Returns an error if any index is out of bounds.
+// Deprecated: use NewProgressiveContainerSchema.
 func NewProfile(sc *StableContainer, activeIndices []int) (*Profile, error) {
 	for _, idx := range activeIndices {
 		if idx < 0 || idx >= sc.Len() {

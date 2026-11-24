@@ -1,6 +1,7 @@
 import unittest
 
 from qualify_fast_confirmation import profile, restarted_endpoint, archive_signed_block
+from reference_fast_confirmation_window import canonical_ancestry
 from unittest.mock import patch
 import json
 import gzip
@@ -33,6 +34,16 @@ class FastConfirmationProfileTest(unittest.TestCase):
                 archive_signed_block(root, "http://cl", 7)
             self.assertEqual(list(root.iterdir()), [])
             values[-1].close()
+
+    def test_fork_graph_keeps_orphans_and_checks_canonical_parents(self):
+        parents = {"one": "genesis", "two-orphan": "one", "three": "one", "four": "three"}
+        canonical = canonical_ancestry(parents, "four", "genesis")
+        self.assertEqual(canonical, {"genesis", "one", "three", "four"})
+        self.assertEqual(set(parents) - canonical, {"two-orphan"})
+        with self.assertRaises(AssertionError):
+            canonical_ancestry({"four": "unknown"}, "four", "genesis")
+        with self.assertRaises(AssertionError):
+            canonical_ancestry({"four": "three", "three": "four"}, "four", "genesis")
 
     def test_real_cl_authority_and_native_consumers_are_enabled(self):
         result = profile("native:qualified", "lighthouse:qualified")

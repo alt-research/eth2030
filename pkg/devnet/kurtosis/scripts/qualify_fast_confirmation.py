@@ -217,6 +217,7 @@ def observe(args):
             observed_events = list(events)
         assert archive_next > records[-1]["slot"], "signed-window archive is incomplete"
         archive_json(archive, "manifest", {"slots": archived_slots, "missed_slots": missed_slots, "through_slot": records[-1]["slot"]})
+        archive_json(archive, "canonical-tip", get(cl + "/eth/v1/beacon/headers/" + str(records[-1]["slot"]))["data"])
         assert len(records) >= 30 and len(observed_events) >= 10, "missing actual FCR observations"
         parents = {}
         with (root / "confirmed-blocks.jsonl").open("x") as output:

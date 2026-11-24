@@ -1,0 +1,15 @@
+{
+  "base": "45e8c145236da03ecbcd89ad73eba05780923c12",
+  "consensus_specs": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "reproduced_before_fix": [
+    "foreign-root votes confirmed first root",
+    "unknown indices supplied quorum",
+    "external config mutation changed quorum"
+  ],
+  "full_counter_race_passed": true,
+  "native_http_consumer_passed": true,
+  "native_http_race_passed": true,
+  "process_window_pending": true,
+  "actual48h_passed": false,
+  "original_waiter_resolved": false
+}

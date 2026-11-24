@@ -18,6 +18,8 @@ var (
 	ErrFCDuplicateAttester = fastconfirm.ErrFCDuplicateAttester
 	ErrFCSlotExpired       = fastconfirm.ErrFCSlotExpired
 	ErrFCNotFound          = fastconfirm.ErrFCNotFound
+	ErrFCBlockRootMismatch = fastconfirm.ErrFCBlockRootMismatch
+	ErrFCUnknownValidator  = fastconfirm.ErrFCUnknownValidator
 )
 
 // Fast confirmation function wrappers.

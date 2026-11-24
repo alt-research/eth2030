@@ -3,6 +3,7 @@
 import argparse
 import collections
 import json
+import gzip
 import subprocess
 import threading
 import time
@@ -74,6 +75,24 @@ def restarted_endpoint(container_id, internal_port="4000/tcp"):
     return "http://127.0.0.1:" + local[0]["HostPort"]
 
 
+def archive_json(root, name, value):
+    path = root / (name + ".json.gz")
+    path.write_bytes(gzip.compress(json.dumps(value, separators=(",", ":")).encode(), mtime=0))
+
+
+def archive_signed_block(root, base, slot):
+    block = get(base + "/eth/v2/beacon/blocks/" + str(slot))
+    header = get(base + "/eth/v1/beacon/headers/" + str(slot))["data"]
+    message = block["data"]["message"]
+    state = get(base + "/eth/v2/debug/beacon/states/" + message["state_root"])["data"]
+    envelope = get(base + "/eth/v1/beacon/execution_payload_envelopes/" + header["root"])
+    # Fetch the complete triple before recording success; a just-published
+    # envelope can be temporarily absent and must be retried.
+    archive_json(root, f"block-{slot}", block)
+    archive_json(root, f"state-{slot}", state)
+    archive_json(root, f"envelope-{slot}", envelope)
+
+
 def observe(args):
     root = args.output
     root.mkdir(parents=True, exist_ok=False)
@@ -118,6 +137,13 @@ def observe(args):
     proof_complete = None
     start = time.monotonic()
     last_head, last_change = None, start
+    archive = root / "signed-window"
+    archive.mkdir()
+    archive_json(archive, "network-spec", get(cl + "/eth/v1/config/spec")["data"])
+    archive_json(archive, "genesis-state", get(cl + "/eth/v2/debug/beacon/states/0")["data"])
+    archive_json(archive, "genesis-header", get(cl + "/eth/v1/beacon/headers/0")["data"])
+    archive_next = 1
+    archived_slots, missed_slots = [], []
     genesis = get(cl + "/eth/v1/beacon/genesis")["data"]
     (root / "genesis.json").write_text(json.dumps(genesis, indent=2) + "\n")
     try:
@@ -133,6 +159,24 @@ def observe(args):
                     slot = int(header["slot"])
                     record = {"at": now(), "slot": slot, "head": latest["hash"], "head_number": int(latest["number"], 16), "safe": None if safe is None else safe["hash"], "safe_number": None if safe is None else int(safe["number"], 16), "finalized": None if finalized is None else finalized["hash"], "finalized_number": None if finalized is None else int(finalized["number"], 16), "follower_head": other["hash"], "elapsed_seconds": time.monotonic() - stamp}
                     output.write(json.dumps(record) + "\n"); output.flush(); records.append(record)
+                    while archive_next <= slot:
+                        try:
+                            archive_signed_block(archive, cl, archive_next)
+                        except urllib.error.HTTPError as error:
+                            if error.code == 404:
+                                try:
+                                    get(cl + "/eth/v2/beacon/blocks/" + str(archive_next))
+                                except urllib.error.HTTPError as missing:
+                                    if missing.code == 404 and archive_next < slot:
+                                        missed_slots.append(archive_next); archive_next += 1
+                                        continue
+                                    raise
+                                # The block exists, so missing state/envelope is
+                                # incomplete capture, not a missed slot.
+                                break
+                            raise
+                        archived_slots.append(archive_next)
+                        archive_next += 1
                     if latest["hash"] != last_head:
                         last_head, last_change = latest["hash"], time.monotonic()
                     if int(latest["number"], 16) > 0 and time.monotonic() - last_change > 36:
@@ -171,6 +215,8 @@ def observe(args):
                 stop.wait(1)
         with event_lock:
             observed_events = list(events)
+        assert archive_next > records[-1]["slot"], "signed-window archive is incomplete"
+        archive_json(archive, "manifest", {"slots": archived_slots, "missed_slots": missed_slots, "through_slot": records[-1]["slot"]})
         assert len(records) >= 30 and len(observed_events) >= 10, "missing actual FCR observations"
         parents = {}
         with (root / "confirmed-blocks.jsonl").open("x") as output:
@@ -194,6 +240,7 @@ def observe(args):
             assert len(postevents) >= 10, "missing reconnected FCR events"
             assert min(int(event["slot"]) for event in postevents) >= precrash_confirmed_slot, "crash regressed announced FCR confidence"
         assert not args.proof or proof_complete is not None, "actual proving did not complete"
+        assert not restarted or records[-1]["safe_number"] > crash_record["safe_number"], "FCR did not resume advancement after restart"
         # Poll for a common native head after the requested crash and proof work.
         deadline = time.monotonic() + 30
         while time.monotonic() < deadline:

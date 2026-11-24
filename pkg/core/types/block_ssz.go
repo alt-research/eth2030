@@ -267,16 +267,23 @@ func (h ExecutionHeaderSSZ) HashTreeRoot() (Hash, error) {
 		switch i {
 		case 6, 7, 13:
 			amounts := decodeExecutionGas(f[i])
-			roots[i] = executionProgressiveRoot([][32]byte{ssz.HashTreeRootUint64(amounts.Regular), ssz.HashTreeRootUint64(amounts.Blob)}, 3)
+			roots[i], err = executionProgressiveRoot([][32]byte{ssz.HashTreeRootUint64(amounts.Regular), ssz.HashTreeRootUint64(amounts.Blob)}, 3)
+			if err != nil {
+				return Hash{}, err
+			}
 		case 9:
 			roots[i] = ssz.HashTreeRootByteList(f[i], 32)
 		case 11:
-			roots[i] = executionProgressiveRoot(ssz.Pack(f[i]), 3)
+			roots[i], err = executionProgressiveRoot(ssz.Pack(f[i]), 3)
+			if err != nil {
+				return Hash{}, err
+			}
 		default:
 			copy(roots[i][:], f[i])
 		}
 	}
-	return Hash(executionProgressiveRoot(roots[:], executionPayloadMask)), nil
+	root, err := executionProgressiveRoot(roots[:], executionPayloadMask)
+	return Hash(root), err
 }
 
 func executionEnvelopeRoot(elements [][]byte) Hash {

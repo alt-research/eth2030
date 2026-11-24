@@ -414,7 +414,10 @@ func TransactionSSZRoot(tx *Transaction) (Hash, error) {
 		case sszTxMaxFees, sszTxTip:
 			if f[i] != nil {
 				fees := ssz.Pack(f[i])
-				roots[i] = executionProgressiveRoot(fees, uint32(1<<len(fees))-1)
+				roots[i], err = executionProgressiveRoot(fees, uint32(1<<len(fees))-1)
+				if err != nil {
+					return Hash{}, err
+				}
 			}
 		case sszTxInput:
 			roots[i] = progressiveBytesRoot(f[i])
@@ -456,7 +459,11 @@ func TransactionSSZRoot(tx *Transaction) (Hash, error) {
 						copy(fields[1][:], chainID)
 						mask, selector = 0xf, 2
 					}
-					payload := ssz.HashTreeRootCompatibleUnion(executionProgressiveRoot(fields[:], mask), selector)
+					authRoot, err := executionProgressiveRoot(fields[:], mask)
+					if err != nil {
+						return Hash{}, err
+					}
+					payload := ssz.HashTreeRootCompatibleUnion(authRoot, selector)
 					authRoots[j] = ssz.HashTreeRootContainer([][32]byte{payload, progressiveBytesRoot(sig)})
 				}
 				roots[i] = ssz.HashTreeRootProgressiveList(authRoots)
@@ -465,7 +472,11 @@ func TransactionSSZRoot(tx *Transaction) (Hash, error) {
 			copy(roots[i][:], f[i])
 		}
 	}
-	payload := ssz.HashTreeRootCompatibleUnion(executionProgressiveRoot(roots, layout.active), selector)
+	root, err := executionProgressiveRoot(roots, layout.active)
+	if err != nil {
+		return Hash{}, err
+	}
+	payload := ssz.HashTreeRootCompatibleUnion(root, selector)
 	return Hash(ssz.HashTreeRootContainer([][32]byte{payload, progressiveBytesRoot(signature)})), nil
 }
 

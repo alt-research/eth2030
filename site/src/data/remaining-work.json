@@ -3,24 +3,8 @@
   "reviewedMaster": "45e8c145236da03ecbcd89ad73eba05780923c12",
   "mergedProgressPr": 148,
   "adoptedDevelopmentTodos": 0,
-  "policy": "Glamsterdam progress follows the twenty officially scheduled core EIPs in EIP-7773, preserving the Functional EIP-7495 label. The earlier frozen development ledger is separate. EIP-8025 and canonical Ethereum STF guest research belong to later rounds without an official fork assignment.",
+  "policy": "Glamsterdam progress follows the twenty officially scheduled core EIPs in EIP-7773. All twenty project entries now have Complete implementation labels, with current EIP-7495 qualification in PR159. The frozen development ledger remains separate. EIP-8025 and canonical Ethereum guest research remain later proposals without an official fork assignment.",
   "items": [
-    {
-      "id": "progressive-container",
-      "phase": "glamsterdam",
-      "kind": "Qualification",
-      "title": "EIP-7495 ProgressiveContainer conformance",
-      "current": "Officially scheduled by EIP-7773. The project retains a Functional label and existing StableContainer code/tests; no new current-spec conformance result is claimed.",
-      "remaining": "Review the current ProgressiveContainer semantics and qualify its active-field, serialization, Merkleization and independent-vector behavior before promotion.",
-      "doneWhen": "Current normative vectors and independent consumers establish the complete ProgressiveContainer contract at pinned sources.",
-      "evidence": [
-        "pkg/ssz/stable_container.go",
-        "pkg/ssz/stable_container_test.go"
-      ],
-      "entries": [
-        "eip-7495"
-      ]
-    },
     {
       "id": "frame-independent",
       "phase": "hegota",

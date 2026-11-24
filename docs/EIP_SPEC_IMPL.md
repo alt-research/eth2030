@@ -100,7 +100,7 @@ They do not invent new positions in the November 2 Strawmap drawing.
 | 7916 | SSZ ProgressiveList | Complete | [EIP-7916](https://eips.ethereum.org/EIPS/eip-7916) | `ssz/progressive_list.go`, `ssz/progressive_encoder.go` | `ssz/progressive_list_test.go`, `ssz/progressive_encoder_test.go` |
 | 8077 | Announce Nonce (ETH/72) | Complete | [EIP-8077](https://eips.ethereum.org/EIPS/eip-8077) | `eth/announce_nonce.go`, `p2p/announce_nonce.go` | via eth tests |
 | 7691 | Blob Throughput Increase | Complete | [EIP-7691](https://eips.ethereum.org/EIPS/eip-7691) | `core/blob_schedule.go`, `core/blob_gas.go` | `core/eip7691_test.go`, `core/blob_schedule_test.go` |
-| 7495 | SSZ ProgressiveContainer | Functional | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/stable_container.go` | `ssz/stable_container_test.go` |
+| 7495 | SSZ ProgressiveContainer | Complete | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/progressive_container.go`, `ssz/progressive_list.go`, `core/types/execution_ssz_fields.go` | `ssz/progressive_reference_test.go`, `ssz/progressive_captured_test.go` |
 
 ---
 
@@ -371,7 +371,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 ## Historical coverage summary (retained)
 
-The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current official-scope Glamsterdam labels are 19/20; EIP-7495 remains Functional. The executable canonical Ethereum STF guest remains later research outside that denominator. The extension record distinguishes exact source and test receipts.
+The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current official-scope Glamsterdam implementation labels are 20/20, including independent current EIP-7495 qualification in PR159. The executable canonical Ethereum STF guest remains later research outside that denominator. The extension record distinguishes exact source and test receipts.
 
 | Metric | Value |
 |--------|-------|

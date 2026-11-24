@@ -1,0 +1,40 @@
+{
+  "source_repository_modified": false,
+  "controls": [
+    {
+      "mutation": "ordinary_merkle",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495IndependentReferenceCorpus"
+    },
+    {
+      "mutation": "missing_type_mix_in",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495IndependentReferenceCorpus"
+    },
+    {
+      "mutation": "old_gindex_suffix",
+      "rejected_by_assertions": true,
+      "tests": "TestProgressiveProofsAllIndicesAndGrowth|TestEIP7495IndependentReferenceCorpus"
+    },
+    {
+      "mutation": "trailing_gap_accepted",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495IllegalSchemas"
+    },
+    {
+      "mutation": "borrowed_schema_sizes",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495SquareReferenceAndImmutableSchema"
+    },
+    {
+      "mutation": "offset_gap_accepted",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495CanonicalContainerOffsets"
+    },
+    {
+      "mutation": "inactive_slot_root",
+      "rejected_by_assertions": true,
+      "tests": "TestEIP7495CheckedSlots"
+    }
+  ]
+}

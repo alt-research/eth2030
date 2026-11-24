@@ -1,0 +1,31 @@
+{
+  "reviewed_master": "b14dbb15674d42e6b49e741275f45d0d920fb951",
+  "ssz_and_core_types_identical_to_reviewed_checkout": true,
+  "existing_race_packages_passed": [
+    "github.com/eth2030/eth2030/ssz",
+    "github.com/eth2030/eth2030/core/types"
+  ],
+  "existing_package_failures": [],
+  "legal_square_matches_independent_reference": true,
+  "invalid_schema_legacy_behaviour": {
+    "capacity_zero_normalized_to": 1,
+    "capacity_257_clamped_to": 256,
+    "trailing_gap_hash_returned": true
+  },
+  "shared_progressive_list_proof": {
+    "cases": 487,
+    "original_gindex_failures": 477,
+    "corrected_prefix_passes": 487,
+    "reference_example": {
+      "reference_root": "0bf6848f5c62ed7241d5461b8b28ba0a433f49a205643b1460748b1441342f73",
+      "field_1_expected_gindex_40_valid": true,
+      "go_returned_gindex_48_valid": "SSZValueError:the path descends into the mixed-in word of ProgressiveList[Root]"
+    }
+  },
+  "test_strength_control": {
+    "mutant": "Replace progressive Merkleization with ordinary binary Merkleization in the legacy StableContainer helper, in a temporary copy only.",
+    "existing_eip7495_tests_still_pass": true,
+    "source_repository_modified": false
+  },
+  "source_files_modified": false
+}

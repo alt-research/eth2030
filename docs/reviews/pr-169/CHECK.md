@@ -27,3 +27,12 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Add independent expected-value and negative regression coverage for each finding.
 - [x] Refresh Group B and affected Group A source-bound evidence; run local build, vet, full tests and affected race checks.
 - [x] Commit/push fixes and verify the published source head and English description; final documentation-only descendant checks are reported on PR #169.
+
+## Third independent clause audit, 2026-11-26
+
+- [ ] Recheck current upstream source identity and read all Group B normative clauses against reachable implementation.
+- [ ] Audit approval/default-account behavior, introspection widths, gas ownership, rollback and nonce domains beyond the previous dispatch fixes.
+- [ ] Audit codec, receipts, block commitments, persistence, deployment and recent-root boundaries for all 12 tasks.
+- [ ] Reproduce and correct concrete omissions with unit tests and independent expected values.
+- [ ] Refresh affected source-bound evidence and complete local build, vet, full and focused race qualification.
+- [ ] Commit and push only owned changes, update the English PR description, and verify CI at the published head.

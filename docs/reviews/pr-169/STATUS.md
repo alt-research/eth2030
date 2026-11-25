@@ -20,3 +20,7 @@ Public transaction/receipt wire and storage schemas are unchanged. Research hist
 EIP-8250 D01 remains open because its current three-fee example conflicts with its nonce-only replacement instruction and current 8141 total fee budget. HGT-017 is verified under the plan's isolated state/vector profile allowance; no public decoder, activation, pool/import path or public database migration is added. EIP-8272 uses the verbatim ordinary contract. Public-pool extension work remains Group C.
 
 [PR #169](https://github.com/alt-research/eth2030/pull/169) remains the publication target. All 10 triggered checks passed on the corrected source head `0e633951` ([main CI](https://github.com/alt-research/eth2030/actions/runs/45689792178), [snap2](https://github.com/alt-research/eth2030/actions/runs/45689792174)). The committed evidence records that immutable tested revision; final documentation-only descendant checks are reported separately on PR #169. No public composed Hegota release, independent-client Frame equivalence or Group C–J completion is claimed.
+
+## Third audit in progress
+
+A fresh independent clause audit is checking all Group B tasks against current upstream text. Previous completion labels and passing tests are not treated as proof of absence of omissions. New findings, corrections and current-source qualification will be recorded before completion.

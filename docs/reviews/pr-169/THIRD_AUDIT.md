@@ -43,3 +43,7 @@ These corrections change consensus behavior for research blocks exercising the d
 EIP-8250's three-fee example still conflicts with its nonce-only instruction and the current EIP-8141 two-fee budget. No new upstream resolution was found. The isolated nonce-only state/vector profile completes HGT-017 only under the development plan's explicit allowance; no public composed activation, decoder, importer or pool route is introduced.
 
 Fresh local qualification and exact source hashes are in the A/B evidence. Hosted checks must be read against their tested commit on PR #169; the previous green head contains the two reproduced defects and is not current-head qualification.
+
+## Fresh local qualification
+
+At functional revision `f68ba648ed0448650cf67c73df46d6b253ff9679`, the full suite completed all 240 packages with 23,746 named passes, zero failures and 124 explicit skips. The focused race run completed all 36 packages with 7,986 named passes, zero failures and 74 explicit skips. All 75 required B tests and 62 required A tests passed. Build/vet, both CLI builds, the 12-case historical differential baseline and 75 Python tests in both interpreter modes passed. Individual skip reasons and source/log digests are retained in the evidence.

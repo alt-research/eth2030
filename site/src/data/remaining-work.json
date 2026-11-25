@@ -161,10 +161,10 @@
   ],
   "specificationAuditUrl": "https://github.com/alt-research/eth2030/pull/152",
   "currentConformanceReview": {
-    "state": "qualifying",
+    "state": "qualified",
     "title": "Current conformance review",
-    "summary": "The 20/20 count describes the retained implementation labels. A new current-spec audit found additional execution, consensus and light-client defects; their separate correction reviews and qualification are listed below.",
-    "detail": "The full native EL corpus passes 43,790 signed cases and 52,620 block checks: 45,221 accepted and 7,399 expected rejections. Current-source CL qualification is being completed against the unchanged d2021d27 reference. Final CI and review delivery remain explicit; this is not a new all-conformance or public-readiness claim.",
+    "summary": "The 20/20 count describes retained implementation labels. Current-spec corrections now pass pinned-source qualification; the linked reviews record their delivery and merge state.",
+    "detail": "All 43,790 native EL cases pass, covering 52,620 block checks: 45,221 accepted and 7,399 expected rejections. All 12,195 selected CL full-node and compatibility cases pass with crypto modes separately recorded. Real BLS/KZG wire consumers and the combined native node build pass. Lighthouse corrections are merged into eth2030; EL delivery is preserved in the master-targeted reviews.",
     "originalFaultStatus": "unconfirmed",
     "boundary": "Original-04 attribution remains unconfirmed. 48h/scale and Lodestar upstream approval remain excluded, not passed. EIP-8025 and a full Ethereum STF guest remain later work.",
     "reviews": [
@@ -172,35 +172,35 @@
         "id": "engine-quantity",
         "title": "Engine slot quantity parsing",
         "target": "master",
-        "state": "Open review",
+        "state": "Qualified review",
         "url": "https://github.com/alt-research/eth2030/pull/160"
       },
       {
         "id": "gas-authority",
         "title": "Gas specification authority",
         "target": "master",
-        "state": "Open review",
+        "state": "Qualified review",
         "url": "https://github.com/alt-research/eth2030/pull/161"
       },
       {
         "id": "native-rlp",
         "title": "Native block framing",
         "target": "master",
-        "state": "Open review",
+        "state": "Qualified review",
         "url": "https://github.com/alt-research/eth2030/pull/162"
       },
       {
         "id": "native-blockchain",
         "title": "Complete native block conformance",
         "target": "master",
-        "state": "Open review",
+        "state": "Qualified review",
         "url": "https://github.com/alt-research/eth2030/pull/163"
       },
       {
         "id": "independent-bal",
         "title": "Independent BAL recovery",
         "target": "master",
-        "state": "Open review",
+        "state": "Qualified review",
         "url": "https://github.com/alt-research/eth2030/pull/164"
       },
       {
@@ -214,7 +214,7 @@
         "id": "cl-fcr",
         "title": "Fast confirmation vote accounting",
         "target": "eth2030",
-        "state": "Qualifying",
+        "state": "Merged",
         "url": "https://github.com/jiayaoqijia/lighthouse/pull/19"
       },
       {
@@ -228,21 +228,21 @@
         "id": "cl-independent-peer",
         "title": "Independent peer interoperability",
         "target": "eth2030",
-        "state": "Qualifying",
+        "state": "Merged",
         "url": "https://github.com/jiayaoqijia/lighthouse/pull/21"
       },
       {
         "id": "cl-light-client",
         "title": "Canonical light-client serving",
         "target": "eth2030",
-        "state": "Qualifying",
+        "state": "Merged",
         "url": "https://github.com/jiayaoqijia/lighthouse/pull/22"
       },
       {
         "id": "cl-current-reference",
         "title": "Complete current consensus reference",
         "target": "eth2030",
-        "state": "Qualifying",
+        "state": "Merged",
         "url": "https://github.com/jiayaoqijia/lighthouse/pull/23"
       }
     ]

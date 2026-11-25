@@ -50,14 +50,14 @@ resulting tree. Final published heads and CI are checked again after the
 documentation commit; the final PR metadata records that outcome without a
 self-referential commit hash.
 
-Lighthouse #18/#19/#20/#21/#22 are merged into `eth2030` with successful latest checks
-and only the workflow-defined checkpoint-sync skip. Review #23 is synchronized to
-the resulting target at head
-`50c23b97270e16d430b618cab4b769fd8ec2843b`. It changes zero files relative to
-its already qualified predecessor and has the identical tree
-`59e45eb596e7695fea22605425f1bd124a4aeaa7`, also verified against hosted
-checkout `370699564056bba8809dc03b2094f00b39d6bf3b`. Its final latest CI and
-authorized merge remain pending in this checkpoint.
+Lighthouse #18–23 are actually merged into `eth2030`, ending at
+`e021d1bb17c16579432aa402441c82ed375a93ef`. The final review head
+`50c23b97270e16d430b618cab4b769fd8ec2843b` synchronizes all prerequisites
+without changing any files. Its tree
+`59e45eb596e7695fea22605425f1bd124a4aeaa7` equals the already qualified
+predecessor and hosted checkout. All required latest source checks complete
+successfully before merge; `LIGHTHOUSE_DELIVERY.json` preserves each exact
+review SHA, check result and actual merge receipt.
 
 The artifact-upload path failure is repaired and hosted evidence is retained:
 job 138908083879 / run 45525625554 succeeds, including upload. Artifact 14982933817

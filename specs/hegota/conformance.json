@@ -495,6 +495,29 @@
         "HGT-008"
       ],
       "release_blocker": false
+    },
+    {
+      "requirement_id": "PRE-3675",
+      "repair_id": "HGT-006-R16",
+      "eip": 3675,
+      "section": "Fork choice rule: atomic canonical-head updates on POS_FORKCHOICE_UPDATED",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
+      "owner": "EL core/Engine integration",
+      "caller": "pkg/node/backend/engine_fcu.go",
+      "status": "open_conformance_gap",
+      "target_fork": "PoS baseline before Hegota activation",
+      "positive_vector": "known non-current FCU head actually switches canonical index/state/head and subsequent RPC/pool agree",
+      "negative_vector": "unapplied head switch must not be counted as verified reorg; failed transition is atomic",
+      "oracle": "pinned EIP-3675 and Engine API; production route inspection",
+      "test_result": "not_claimed_conformant; current test covers actual chain rewind plus installed listener, not automatic FCU head switching",
+      "open_question": "Native FCU resolves requested head and updates safe/finalized/cache but does not apply canonical head/state or forward the update to the forkchoice manager. Pool activation now follows the actual blockchain head; canonical selection itself remains a release blocker. Startup persistence/config compatibility also needs validation before claiming recovery.",
+      "affected_tasks": [
+        "HGT-013",
+        "HGT-080",
+        "HGT-087"
+      ],
+      "release_blocker": true
     }
   ]
 }

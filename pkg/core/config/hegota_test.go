@@ -1,6 +1,7 @@
 package config
 
 import (
+	"math/big"
 	"testing"
 )
 
@@ -63,5 +64,44 @@ func TestLegacyFrameConfigChangeAfterActivationIsIncompatible(t *testing.T) {
 	}
 	if err := CheckConfigCompatible(&after, &before, 1, 101); err == nil {
 		t.Fatal("prototype deactivation accepted for executed history")
+	}
+}
+
+func TestConfigCompatibilityRejectsRetroactiveRemoteActivation(t *testing.T) {
+	for _, name := range []string{"Hogota", "IPlus"} {
+		t.Run(name, func(t *testing.T) {
+			local := *TestConfig
+			remote := local
+			at := uint64(100)
+			if name == "Hogota" {
+				remote.HogotaTime = &at
+			} else {
+				remote.IPlusTime = &at
+			}
+			if err := CheckConfigCompatible(&local, &remote, 1, 99); err != nil {
+				t.Fatal(err)
+			}
+			if err := CheckConfigCompatible(&local, &remote, 1, 100); err == nil || err.ForkName != name {
+				t.Fatal("retroactive remote activation accepted", err)
+			}
+			if err := CheckConfigCompatible(&remote, &local, 1, 100); err == nil {
+				t.Fatal("retroactive deactivation accepted")
+			}
+		})
+	}
+}
+func TestLegacyFrameGateIncludesBlockPrerequisites(t *testing.T) {
+	c := *TestConfigHogota
+	c.ExperimentalLegacyFrames = true
+	c.LondonBlock = big.NewInt(10)
+	if c.IsLegacyFrameEnabledAt(big.NewInt(9), 100) {
+		t.Fatal("enabled before London")
+	}
+	if !c.IsLegacyFrameEnabledAt(big.NewInt(10), 100) {
+		t.Fatal("explicit profile disabled at prerequisites")
+	}
+	c.TerminalTotalDifficulty = nil
+	if c.IsLegacyFrameEnabledAt(big.NewInt(10), 100) {
+		t.Fatal("enabled before Merge")
 	}
 }

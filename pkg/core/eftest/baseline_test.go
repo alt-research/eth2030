@@ -23,7 +23,7 @@ func TestBaselineRejectsInvalidOrUnsupportedEvidence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, mode := range []string{"missing fixture", "hash mismatch", "zero root", "missing logs", "negative index", "exception wildcard", "unsupported tx fields", "empty corpus", "case count"} {
+	for _, mode := range []string{"missing fixture", "hash mismatch", "zero root", "missing logs", "negative index", "exception wildcard", "unsupported tx fields", "empty corpus", "case count", "trailing JSON", "trailing garbage"} {
 		t.Run(mode, func(t *testing.T) {
 			dir := t.TempDir()
 			var raw map[string]map[string]any
@@ -62,6 +62,12 @@ func TestBaselineRejectsInvalidOrUnsupportedEvidence(t *testing.T) {
 				m.ExpectedCases = 6
 			}
 			b, _ := json.Marshal(m)
+			if mode == "trailing JSON" {
+				b = append(b, []byte(` {"ignored":true}`)...)
+			}
+			if mode == "trailing garbage" {
+				b = append(b, []byte(` garbage`)...)
+			}
 			path := filepath.Join(dir, "manifest.json")
 			if err := os.WriteFile(path, b, 0600); err != nil {
 				t.Fatal(err)

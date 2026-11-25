@@ -1,10 +1,10 @@
 # A 组交付：规范、基线与运行路径
 
-日期：2026-11-25（Asia/Shanghai）。实施分支：`codex/hegota-a-baseline`；起点 `8ac0ec4`。A 组包含 HGT-001、004、005、006、007、008、009 七项。本目录与 `specs/hegota/`、`evidence/hegota-a/` 构成一份可检查的交付，不改变 B–J 组尚未实现的事实。
+日期：2026-11-25（Asia/Shanghai）。实施分支：`codex/hegota-a-baseline`；起点 `8ac0ec4`。A 组包含 HGT-001、004、005、006、007、008、009 七项。补充复核见 [提交前审计](follow-up-audit.md)。本目录与 `specs/hegota/`、`evidence/hegota-a/` 构成一份可检查的交付，不改变 B–J 组尚未实现的事实。
 
 | 任务 | 交付与验收入口 |
 | --- | --- |
-| HGT-001 | [固定版本与组合](specification-profiles.md)、[来源锁](../../../specs/hegota/source-lock.json)、[决策与 profile](../../../specs/hegota/profiles.json)；14 个仓库版本、106 个文件校验值，未决组合隔离 |
+| HGT-001 | [固定版本与组合](specification-profiles.md)、[来源锁](../../../specs/hegota/source-lock.json)、[决策与 profile](../../../specs/hegota/profiles.json)；14 个仓库版本、108 个文件校验值，未决组合隔离 |
 | HGT-004 | [实际运行路径](runtime-and-activation.md)、`TestNativeRuntimePathAndUnsupportedBogotaAPI`、二进制身份与源文件校验；native、wrapper、容器分别登记 |
 | HGT-005 | [激活矩阵](runtime-and-activation.md)、配置别名冲突检查、processor/VM/pool/Engine 边界与 reorg 测试；canonical fork 不隐式启用旧 Frames |
 | HGT-006 | [前置与历史基线](baseline-and-gaps.md)、[逐规则登记](../../../specs/hegota/conformance.json)、严格差分 CLI；12 个官方历史用例，native 与上游 geth 分开执行 |

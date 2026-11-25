@@ -162,6 +162,12 @@ func (c *ChainConfig) IsLegacyFrameEnabled(time uint64) bool {
 	return c != nil && c.IsMerge() && c.IsHogota(time) && c.ExperimentalLegacyFrames
 }
 
+// IsLegacyFrameEnabledAt also checks the block-based prerequisites. Timestamp
+// activation cannot enable a post-merge transaction before London rules apply.
+func (c *ChainConfig) IsLegacyFrameEnabledAt(number *big.Int, time uint64) bool {
+	return c.IsLegacyFrameEnabled(time) && c.IsLondon(number)
+}
+
 // IsGlamsterdam is the correctly spelled alias for the historical config API.
 func (c *ChainConfig) IsGlamsterdam(time uint64) bool { return c.IsGlamsterdan(time) }
 

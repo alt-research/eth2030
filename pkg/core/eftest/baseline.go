@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -67,6 +68,9 @@ func RunBaseline(manifestPath string) (*BaselineReport, error) {
 	dec.DisallowUnknownFields()
 	if err = dec.Decode(&m); err != nil {
 		return nil, err
+	}
+	if err := dec.Decode(new(any)); err != io.EOF {
+		return nil, fmt.Errorf("baseline manifest must contain exactly one JSON value")
 	}
 	if m.Version != 1 || m.ExpectedCases <= 0 || len(m.Fixtures) == 0 {
 		return nil, fmt.Errorf("empty or unsupported baseline manifest")

@@ -812,6 +812,20 @@
       "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "2772bdb675d90d89ebb4bf74269e48c8ea46745e78161c8574ffa78328b31885",
       "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-4844.md"
+    },
+    {
+      "eip": 3675,
+      "local_path": "refs/EIPs/EIPS/eip-3675.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3675.md"
+    },
+    {
+      "eip": 7594,
+      "local_path": "refs/EIPs/EIPS/eip-7594.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "34b8426335cfd3f6f335ac2e3d3d0ef42bd0b007b0cc653fef130e29e3b212e4",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7594.md"
     }
   ],
   "go_module": "pkg/go.mod",
@@ -826,5 +840,28 @@
     "bogota_devnet_2": "ethpandaops/lighthouse:unstable-8e0aeef",
     "heze_devnet_2": "ethpandaops/lighthouse:heze-devnet-2",
     "image_digest_status": "mutable tags excluded from reproducible runtime baseline; descriptors only, image digest/build evidence required by HGT-070/091"
-  }
+  },
+  "file_updates": [
+    {
+      "date": "2026-11-25",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3675.md",
+      "previous_sha256": null,
+      "new_sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
+      "affected_tasks": [
+        "HGT-004",
+        "HGT-006"
+      ],
+      "rationale": "Follow-up audit pins PoS canonical-head requirements for the newly recorded native FCU routing gap; no release profile activated."
+    },
+    {
+      "date": "2026-11-25",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7594.md",
+      "previous_sha256": null,
+      "new_sha256": "34b8426335cfd3f6f335ac2e3d3d0ef42bd0b007b0cc653fef130e29e3b212e4",
+      "affected_tasks": [
+        "HGT-006"
+      ],
+      "rationale": "Pins PeerDAS context for the pre-existing local stream session identity collision exposed by the full baseline suite; the fix changes no PeerDAS data or commitment format."
+    }
+  ]
 }

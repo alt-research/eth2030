@@ -12,7 +12,7 @@
     },
     {
       "id": "legacy-frame-prototype-v0",
-      "activation": "ExperimentalLegacyFrames AND merge AND HogotaTime<=headTime",
+      "activation": "ExperimentalLegacyFrames AND merge AND London(headNumber) AND HogotaTime<=headTime",
       "status": "explicit_experimental_only",
       "eips": [],
       "oracle": "historical local model only",

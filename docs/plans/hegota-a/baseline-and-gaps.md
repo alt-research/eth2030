@@ -4,7 +4,7 @@ HGT-006。验收入口是 `pkg/cmd/eth2030-baseline`，固定输入在 `pkg/core
 
 实际覆盖：7 个旧文件用例（Frontier、Homestead、EIP150、EIP158、Byzantium、Constantinople、ConstantinopleFix）和 5 个新文件用例（Berlin、London、Paris、Shanghai、Cancun）。准确 fork 名以 [baseline.json](../../../evidence/hegota-a/baseline.json) 为准，防止用“支持的 fork 列表”冒充执行数量。这是最小历史基线，不能推导为完整历史回归，更不包含 Prague/Glamsterdam/Hegotá。
 
-该 runner 拒绝：缺文件/错误哈希、空 corpus/缺 post、未知执行字段（例如尚未由 native GST adapter 解析的 access list/blob/auth）、未知 fork、负索引/越界索引、零或缺失 roots/logs、任意 `expectException` 通配与用例数变化。异常分类尚未引入之前，明确排除 exception fixture 的支持，不能把任意错误或 panic 记作预期异常。运行期 panic/执行错误非零退出。Go 单测用九类破损输入验证这些失败路径。
+该 runner 拒绝：缺文件/错误哈希、空 corpus/缺 post、未知执行字段（例如尚未由 native GST adapter 解析的 access list/blob/auth）、未知 fork、负索引/越界索引、零或缺失 roots/logs、任意 `expectException` 通配与用例数变化。异常分类尚未引入之前，明确排除 exception fixture 的支持，不能把任意错误或 panic 记作预期异常。运行期 panic/执行错误非零退出。Go 单测用十一类破损输入验证这些失败路径。
 
 原有宽松 runner 为兼容旧 helper 测试保留，其 `Passed` 不构成验收。它的缺失 fixture/skip、geth wrapper 与 native backend 在测试清单中分别标出。上游 geth `cmd/evm/testdata/statetest.json` 的 root/logs 全零，现以 `rejected-upstream-zero-root.json` 保存作为不可接受 oracle 的证据，未纳入 12 项必需语料。没有下载整个官方 corpus，也没有将 fixture generator 的源码数量统计为测试通过数量。
 
@@ -25,6 +25,8 @@ HGT-006。验收入口是 `pkg/cmd/eth2030-baseline`，固定输入在 `pkg/core
 | 7702 delegation | `applyMessage` / authorization list / VM | `HGT-006-R13`：有执行路径，未锁当前组合与 8151/8298 生效时机 | auth nonce/chain/delegation/fault proof；HGT-019/035/036 |
 | 7708 ETH logs / 7976 data costs / 3607 / 3529 | processor、VM、receipts | `HGT-006-R14`：现有功能不等于与 latest Frames 的组合符合性 | transfer log、approval/new account、rollback、logs root；HGT-011/012/014 |
 | native Frame 字段转换 | `TransactionToMessage` → `applyMessage` 重建旧 FrameTx | `HGT-006-R15`：高位 keyed nonce、chain ID/新字段不能被当前旧 message 完整保持 | typed→message→VM→receipt 字段完整性；HGT-002/010/013/017 |
+
+新增 `HGT-006-R16`：实际 native FCU 没有接通 canonical head/state 切换，依据固定 EIP-3675；详见运行路径报告。新增 pool/reorg 测试验证的是已应用的链回退及真实 listener，没有把它计作 FCU head 切换通过。
 
 这些修复项是 M0 审计的明确输出，状态均为 `open`，不以 A 组完成而标实现完成。它们有 owner、规范 SHA、正反向向量/任务依赖和 release blocker，见 [conformance.json](../../../specs/hegota/conformance.json)。主线若消费相应规则，必须先关闭对应 R 项，再关闭 HGT-013/015；修复成本计入 M0 重估，原来的 18–28 周范围不能直接维持。
 

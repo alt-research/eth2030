@@ -1,5 +1,12 @@
 # Lean4 Verification Check-list
 
+## Hegotá A follow-up audit and push (2026-11-25)
+
+- [x] Recheck every A acceptance criterion against code, artifacts, source pins and evidence.
+- [x] Audit fork gates, canonical-head/reorg propagation, validation failures and source-update tooling; fix omissions with regression tests.
+- [x] Verify the local build, relevant tests and evidence hashes; update task tracking and audit findings.
+- [x] Commit only follow-up changes, push the authorized branch, and verify the remote commit.
+
 ## Hegotá A: specifications, baseline, and runtime paths (2026-11-25)
 
 - [x] HGT-001: Lock EIP/EELS/EEST/CL/Engine/devnet sources, hashes, profiles, compatibility gaps, and decisions.

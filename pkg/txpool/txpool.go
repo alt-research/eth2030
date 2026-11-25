@@ -94,6 +94,7 @@ type Config struct {
 	// Canonical head context is required for legacy Frame admission.
 	ChainConfig *coreconfig.ChainConfig
 	HeadTime    uint64
+	HeadNumber  uint64
 
 	MaxSize           int               // Maximum number of transactions in pool
 	MaxPerSender      int               // Maximum pending per sender
@@ -521,7 +522,7 @@ func isDynamic(tx *types.Transaction) bool {
 
 // validateTx performs comprehensive validation of a transaction.
 func (pool *TxPool) validateTx(tx *types.Transaction) error {
-	if tx.Type() == types.FrameTxType && !pool.config.ChainConfig.IsLegacyFrameEnabled(pool.config.HeadTime) {
+	if tx.Type() == types.FrameTxType && !pool.config.ChainConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.config.HeadNumber), pool.config.HeadTime) {
 		return errors.New("frame transactions unavailable at canonical head")
 	}
 	// BB-2.2: gate type-0x08 LocalTx behind --experimental-local-tx flag.
@@ -1060,11 +1061,12 @@ func (pool *TxPool) Reset(stateReader StateReader) {
 }
 
 // ResetAtHead updates activation from the canonical head, including reorgs.
-func (pool *TxPool) ResetAtHead(stateReader StateReader, config *coreconfig.ChainConfig, timestamp uint64) {
+func (pool *TxPool) ResetAtHead(stateReader StateReader, config *coreconfig.ChainConfig, timestamp, number uint64) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 	pool.config.ChainConfig = config
 	pool.config.HeadTime = timestamp
+	pool.config.HeadNumber = number
 	pool.config.IsPrague = false
 	pool.config.IsGlamsterdan = false
 	if config != nil {
@@ -1076,7 +1078,7 @@ func (pool *TxPool) ResetAtHead(stateReader StateReader, config *coreconfig.Chai
 
 func (pool *TxPool) resetLocked(stateReader StateReader) {
 	pool.state = stateReader
-	if !pool.config.ChainConfig.IsLegacyFrameEnabled(pool.config.HeadTime) {
+	if !pool.config.ChainConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.config.HeadNumber), pool.config.HeadTime) {
 		for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
 			for addr, list := range lists {
 				for _, tx := range append([]*types.Transaction(nil), list.items...) {

@@ -49,3 +49,28 @@ func TestProcessorFrameGateBeforeStateMutation(t *testing.T) {
 		t.Fatal("gate remained closed at activation")
 	}
 }
+
+// This vector deliberately exercises the frozen legacy prototype, whose scope
+// numbering differs from current EIP-8141. It is not a current-spec oracle.
+func TestProcessorOptedInLegacyFrameExecutesAtFork(t *testing.T) {
+	c := *config.TestConfigHogota
+	c.ExperimentalLegacyFrames = true
+	activation := uint64(100)
+	c.HogotaTime = &activation
+	sender := types.EntryPointAddress
+	for _, timestamp := range []uint64{100, 101} {
+		s := state.NewMemoryStateDB()
+		s.AddBalance(sender, big.NewInt(1000000000))
+		// Legacy combined scope=2; push scope, length, offset, then APPROVE.
+		s.SetCode(sender, []byte{0x60, 0x02, 0x60, 0x00, 0x60, 0x00, 0xaa})
+		tx := types.NewTransaction(&types.FrameTx{ChainID: big.NewInt(1), Nonce: big.NewInt(0), Sender: sender, Frames: []types.Frame{{Mode: types.ModeVerify, GasLimit: 50000}}, MaxFeePerGas: big.NewInt(100), MaxPriorityFeePerGas: big.NewInt(1)})
+		tx.SetSender(sender)
+		h := newTestHeader()
+		h.Time = timestamp
+		gp := new(gaspool.GasPool).AddGas(h.GasLimit)
+		receipt, used, err := ApplyTransaction(&c, s, h, tx, gp)
+		if err != nil || receipt == nil || receipt.Status != types.ReceiptStatusSuccessful || used == 0 || s.GetNonce(sender) != 1 {
+			t.Fatalf("selected prototype did not execute at %d: receipt=%+v used=%d nonce=%d err=%v", timestamp, receipt, used, s.GetNonce(sender), err)
+		}
+	}
+}

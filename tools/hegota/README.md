@@ -15,7 +15,7 @@ All Python verification uses only the standard library; it performs no network
 calls and does not change locks/oracles. Source check requires the two pinned
 reference submodules. `check.py --compare-lock NEW_LOCK --compare-admission
 NEW_ADMISSION` prints old/new source and disposition changes plus affected tasks;
-changed EIP sources require a dated impact/admission history entry. It never
+changed EIP hashes, revisions or activation decisions require an appended dated impact/admission history entry. New source locks must match admission records; old history cannot be rewritten. Repository SHA changes require dated `source_updates` records naming repo/ref, previous/new SHA, affected tasks and rationale. Immutable source URLs cannot silently change their digest. Additional/removal of non-scope source files requires `file_updates` old/new digests, date, tasks and rationale unless covered by a reviewed repository change. It never
 adopts the new files. New scope requires a new explicit baseline version.
 
 `codec_goldens.py --write` and `cd pkg && go run

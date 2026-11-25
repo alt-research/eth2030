@@ -62,6 +62,7 @@ func (c *ChainConfig) ForkSchedule() []ForkID {
 		{Name: "Amsterdam", Timestamp: c.AmsterdamTime},
 		{Name: "Glamsterdan", Timestamp: c.GlamsterdanTime},
 		{Name: "Hogota", Timestamp: c.HogotaTime},
+		{Name: "IPlus", Timestamp: c.IPlusTime},
 	}
 	return schedule
 }
@@ -189,16 +190,17 @@ func CheckConfigCompatible(local, remote *ChainConfig, headNum uint64, headTime 
 	}
 
 	diffs := ConfigDiff(local, remote)
+	localSchedule, remoteSchedule := local.ForkSchedule(), remote.ForkSchedule()
 	num := new(big.Int).SetUint64(headNum)
 
 	for _, d := range diffs {
 		// Find the fork in the local schedule.
-		for _, f := range local.ForkSchedule() {
+		for i, f := range localSchedule {
 			if f.Name != d.ForkName {
 				continue
 			}
-			// Only report incompatibility if the fork is already active.
-			if f.IsActive(num, headTime) {
+			// A retroactive activation in either configuration changes executed history.
+			if f.IsActive(num, headTime) || remoteSchedule[i].IsActive(num, headTime) {
 				return &ConfigCompatError{
 					ForkName:  d.ForkName,
 					LocalVal:  d.Local,

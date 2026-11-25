@@ -459,6 +459,7 @@ func New(config *Config) (*Node, error) {
 		poolCfg.ChainConfig = chainCfg
 		if head := bc.CurrentBlock(); head != nil {
 			poolCfg.HeadTime = head.Header().Time
+			poolCfg.HeadNumber = head.NumberU64()
 			poolCfg.BlockGasLimit = head.Header().GasLimit
 		}
 		poolCfg.IsPrague = chainCfg.IsPrague(poolCfg.HeadTime)
@@ -574,7 +575,7 @@ func New(config *Config) (*Node, error) {
 	n.ethHandler.SetDownloader(n.syncer)
 	// Reset the tx pool after P2P block insertion to evict confirmed txs.
 	n.ethHandler.SetOnBlockInserted(func() {
-		n.txPool.Reset(n.blockchain.State())
+		n.resetTxPoolAtHead()
 	})
 
 	// Initialize P2P server with bootnodes, discovery port, and NAT.
@@ -857,7 +858,7 @@ func New(config *Config) (*Node, error) {
 	n.fcStateManager.OnReorg(func(ev forkchoice.ReorgEvent) {
 		// Reset tx pool state views so pending/queued reflect the new chain tip.
 		if n.txPool != nil && n.blockchain != nil {
-			n.txPool.Reset(n.blockchain.State())
+			n.resetTxPoolAtHead()
 		}
 	})
 	n.fcStateManager.OnReorg(func(ev forkchoice.ReorgEvent) {
@@ -1632,5 +1633,16 @@ func (n *Node) runDiscV5PeerFeed() {
 				}
 			}
 		}
+	}
+}
+
+// resetTxPoolAtHead is shared by P2P import and reorg listeners. Both state and
+// activation context must follow the actual canonical blockchain head.
+func (n *Node) resetTxPoolAtHead() {
+	if n.txPool == nil || n.blockchain == nil {
+		return
+	}
+	if head := n.blockchain.CurrentBlock(); head != nil {
+		n.txPool.ResetAtHead(n.blockchain.State(), n.blockchain.Config(), head.Time(), head.NumberU64())
 	}
 }

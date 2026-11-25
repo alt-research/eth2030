@@ -865,7 +865,7 @@ func applyTransactionFull(config *corconfig.ChainConfig, getHash vm.GetHashFunc,
 // variants. tracker enables EIP-7928 BAL recording; slasher enables EIP-8141
 // paymaster slashing on bad gas settlement.
 func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, slasher corconfig.PaymasterSlasher) (*types.Receipt, uint64, error) {
-	if tx.Type() == types.FrameTxType && !config.IsLegacyFrameEnabled(header.Time) {
+	if tx.Type() == types.FrameTxType && !config.IsLegacyFrameEnabledAt(header.Number, header.Time) {
 		return nil, 0, fmt.Errorf("frame transactions unavailable: legacy prototype requires explicit opt-in and Bogota fork")
 	}
 	// Enforce I+ fork guard for PQ transactions.
@@ -1389,7 +1389,7 @@ func applyMessage(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,
-			IsLegacyFrames:   config.IsLegacyFrameEnabled(header.Time),
+			IsLegacyFrames:   config.IsLegacyFrameEnabledAt(header.Number, header.Time),
 			IsPrague:         rules.IsPrague,
 			IsCancun:         rules.IsCancun,
 			IsShanghai:       rules.IsShanghai,

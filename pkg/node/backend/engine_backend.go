@@ -300,7 +300,8 @@ func (b *EngineBackend) processBlockInternal(
 			"blockHash", p.BlockHash,
 		)
 		b.registerBlockInFCState(p)
-		b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), bc.CurrentBlock().Header().Time)
+		head := bc.CurrentBlock()
+		b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), head.Time(), head.NumberU64())
 		return payload.PayloadStatusV1{Status: engine.StatusValid, LatestValidHash: &h}, nil
 	}
 
@@ -434,7 +435,8 @@ func (b *EngineBackend) processBlockInternal(
 	b.cacheBlobsFromBlock(block)
 
 	// Sync txpool state.
-	b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), bc.CurrentBlock().Header().Time)
+	head := bc.CurrentBlock()
+	b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), head.Time(), head.NumberU64())
 
 	// Notify gas oracle.
 	if oracle := b.node.GasOracle(); oracle != nil {

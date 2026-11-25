@@ -504,4 +504,4 @@ M0 的逐规则矩阵至少包含：`EIP + section + spec SHA + requirement ID +
 
 A 组 7 个任务的完整交付见 [A 组报告](hegota-a/README.md)，固定来源、6 个 profile、D01–D09、72 项准入、逐规则前置缺口、组合 schema/ADR、真实运行路径及安全修复均有对应产物。严格 native/upstream geth 最小差分执行 12 项，零失败/零跳过；新编码及语义 oracle 不被冒充为当前 native 的完整 Hegotá 执行通过。构建、vet、全仓库测试、相关 race 和 blst 构建标签测试通过，旧 skip 清单保留。
 
-HGT-006-R01…R15 是本次明确登记的 M0 修复工作，消费其规则的后续任务必须先关闭它们；D01–D09 对联合发布仍有开放项，不能拼接草案或用旧原型冒充最新规范。当前没有可宣称已验证的联合 Hegotá 发布 profile。Docker/Kurtosis、兄弟 CL 仓库构建与正式 devnet 互通留在 HGT-070/080/091 的既定验收范围。
+HGT-006-R01…R16 是本次明确登记的 M0 修复工作，消费其规则的后续任务必须先关闭它们；D01–D09 对联合发布仍有开放项，不能拼接草案或用旧原型冒充最新规范。当前没有可宣称已验证的联合 Hegotá 发布 profile。Docker/Kurtosis、兄弟 CL 仓库构建与正式 devnet 互通留在 HGT-070/080/091 的既定验收范围。

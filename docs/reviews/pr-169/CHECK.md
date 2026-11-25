@@ -22,8 +22,8 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 
 ## Second clause-level audit, 2026-11-26
 
-- [ ] Recheck upstream text and review every Group B normative requirement against reachable implementation.
-- [ ] Reproduce and fix any missing execution, rollback, receipt, persistence or controlled-profile behavior.
-- [ ] Add independent expected-value and negative regression coverage for each finding.
-- [ ] Refresh Group B and affected Group A source-bound evidence; run local build, vet, full tests and affected race checks.
+- [x] Recheck upstream text and review every Group B normative requirement against reachable implementation.
+- [x] Reproduce and fix any missing execution, rollback, receipt, persistence or controlled-profile behavior.
+- [x] Add independent expected-value and negative regression coverage for each finding.
+- [x] Refresh Group B and affected Group A source-bound evidence; run local build, vet, full tests and affected race checks.
 - [ ] Commit/push fixes and verify the final PR head and English description.

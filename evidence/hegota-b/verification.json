@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "0852d394522e9012651245180134edc7a7dba2592190385b89bc2b9375c92b51",
+    "log_sha256": "0d06dc1727cc59b37bc91d165cbf5e2f9fdff5dd6494844f846f9566deb1cfc9",
     "named": {
-      "pass": 23693,
+      "pass": 23729,
       "skip": 124
     },
     "packages": {
@@ -15,7 +15,7 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "c89c4326743c04a38234becac9488a23c358d7403d92ec10815fc7e5de9dff8e",
+  "source_fingerprint_sha256": "f34884d214fac89f625baf9b4c0c3213631d3c425bc1688e71ea7ebf673b393a",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
@@ -37,6 +37,7 @@
     "pkg/core/execution/frame_8250.go": "73b353ed34d20c7f6a054f92b6c86abf9a6e6ebee4b8e40cee93ea6622d5d0d5",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
+    "pkg/core/execution/frame_dispatch_audit_test.go": "20df81361f0e70eeb24787163dd39c50401d5770011a1a1395237223b1372b37",
     "pkg/core/execution/frame_system_deployment_test.go": "f15f277d644e7a4b76348d338f265557eeb44f0ca333099113dcd30ff5a413e5",
     "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
@@ -57,11 +58,16 @@
     "pkg/core/types/receipt_codec_test.go": "0ea76d0b49761a25854fa6f2fdcf5649b02a008e56f727026dfcc2b405eb1d07",
     "pkg/core/types/transaction_rlp_test.go": "392084e533e8acb1c38927137d63df07df240ac406aef7b9aaa2d0d1e52870b5",
     "pkg/core/types/tx_frame_test.go": "0ed4abee48bc3e1e28525e8bbf5753f07f9d768ec988df43ac1572ecb86c71e6",
-    "pkg/core/vm/frame_8141.go": "72f201264beae9d2e60f6cf7506cc756e555cbfcc0030b0052cdd41f9a0f45bd",
+    "pkg/core/vm/amsterdam_gas_table.go": "06dab2b7dd77ffbf267d3c1dff21e6f1b45fe77e970066bffed59fdf8b6dca8b",
+    "pkg/core/vm/delegation_gas.go": "8ef2b9e10e80bd1b87451e870907113825319b14ceffbf189f84d171e63720ad",
+    "pkg/core/vm/frame_8141.go": "b7ed24cbe1dee64c7e6e9f27accaf3651f289a43f8278266450fe3f49ecf111c",
     "pkg/core/vm/frame_8141_bal.go": "d02a1f6edf5b753427bb5fbb9554acecf7da496b545a510d7f73940ed48f8d74",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
+    "pkg/core/vm/interpreter.go": "c48d0ef8f7dc0048f2dbf6330c9f3b60f9248e9e1f8cfd65408388f850af7dad",
     "refs/EIPs/EIPS/eip-2718.md": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
+    "refs/EIPs/EIPS/eip-2929.md": "177b2040bf0376b1182eb5571c7fda7a41b6f594083fa816506d65cfcf2acc4a",
+    "refs/EIPs/EIPS/eip-7702.md": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
     "refs/EIPs/EIPS/eip-7843.md": "6b4500f8aa5a97009258831476efa1de89c4b1c0dfce760b6ccd9a75a415e470",
     "refs/EIPs/EIPS/eip-7928.md": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
     "refs/EIPs/EIPS/eip-7934.md": "99528dc7d4af27ac450b6d845f5617f395036a98222bc523e1af88255dcd62a9",
@@ -72,10 +78,10 @@
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "specs/hegota/b-codec-goldens.json": "b9c7aa32de028e67aa4932bf64f6cffb83f766b6e76cd4132498d65bd6418bbc",
     "specs/hegota/codec-goldens.json": "74c6c5122a8909a6fa7e5e0f4153feb8e3de19dff9af79fd3d4022153e872b52",
-    "specs/hegota/group-b.json": "f8428556d67735e64c698971f2cf9dfdcf743c20c36ca3e08d6491d95cc684dc",
+    "specs/hegota/group-b.json": "bd1da2c85e65b6057c4e2225f4c67d710bec4139327ea80c3aec8aa169c683ef",
     "tools/hegota/b_vectors.py": "f07a8a4536dbd83e1a5859e3f024c0506d348a81d6c8cc26df92073a777399ad",
-    "tools/hegota/check_b.py": "04a4c2f5948a92bf815133de9508419e5e4255f9257d89c4305edc845d844ba7",
-    "tools/hegota/test_group_b.py": "b480302ce3290d46add0d42d712f9102a2f9b5000a001b1e6780f062f2ce8cc6"
+    "tools/hegota/check_b.py": "abbabf6d99ea2e964f5484866bc092ecdb29356c9d495ce5b8f4903481d5072f",
+    "tools/hegota/test_group_b.py": "de60cd525683111a1142bf5c1448db6468ab256595fc49cbfba9faedaa88c0e8"
   },
   "passed_tests": {
     "github.com/eth2030/eth2030/bal::TestBALItemCostLimitExceeded": "pass",
@@ -106,9 +112,15 @@
     "github.com/eth2030/eth2030/core/execution::TestCanonicalPreBlockSystemsAgainstIndependentSDK": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141ApprovalScopeMatrix": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141DefaultCodeDoesNotAuthenticateArbitraryWitness": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141DirectPrecompileBALGasBoundary": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141IntrospectionBoundaries": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141P256NativeValidationAndDefaultCode": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaCreateAndLegacyIntrospection": "pass",
@@ -146,13 +158,13 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "7769210ffe14beb83f7424e7b3443188fa1ae3bc",
+  "source_revision": "157d98868be152d24c0712c88d43501bd9216b3a",
   "baseline_revision": "960baab3103e0d34435433be0f8314f127521052",
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "bc1f3d88d4a055c8305e01fd615002bf506857d5384ac5de06a95cce4e1d4b28",
-    "race_named_pass": 7933,
+    "race_log_sha256": "71244fdf0af3762d901ab843b0a9a0503b21bb28ef9b89b16a87b8581780694e",
+    "race_named_pass": 7969,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "full_named_skip": 124,
@@ -167,26 +179,39 @@
   },
   "negative_controls": [
     {
-      "name": "wrong-base-gas-budget",
+      "name": "restore-original-Frame-VM",
+      "original_revision": "95d4be4e4a09ba3938cae9d3064def24e2ad231b",
       "expected_exit_code": 1,
-      "log_sha256": "ed292656e4dc1f2164b66967df9b0b8825e4d3d64b57f263aeaf2fd1e9ad59f7"
-    },
-    {
-      "name": "wrong-consumed-keyed-nonce",
-      "expected_exit_code": 1,
-      "log_sha256": "fdd40fc73cb76bc5e0d539cf710ff2d02523ded86f001d88d8284b2a328151da"
-    },
-    {
-      "name": "wrong-recent-root-age-predicate",
-      "expected_exit_code": 1,
-      "log_sha256": "c0a29dc38770cb8281c97218d51a61d8477074cd0742c285a95520917e03dce2"
+      "log_sha256": "2343302938d631f07f0563cce2b87a596fbfb93613d2f32114a7f6c598cac145",
+      "failed_parent_tests": [
+        "TestFrame8141DirectPrecompileBALGasBoundary",
+        "TestFrame8141SstoreBALReadSurvivesPostStateFailure",
+        "TestFrame8141DelegatedCallGasAndForwarding",
+        "TestFrame8141SelfdestructBALPreStateBoundary",
+        "TestFrame8141DelegationBALBeforeFailedChildChecks",
+        "TestFrame8141DelegationWarmnessSurvivesChildRevert"
+      ],
+      "failed_test_or_subtest_events": 29,
+      "original_vm_file_sha256": {
+        "pkg/core/vm/frame_8141.go": "72f201264beae9d2e60f6cf7506cc756e555cbfcc0030b0052cdd41f9a0f45bd",
+        "pkg/core/vm/interpreter.go": "5c16250a365a5b547a048338f1e85a7ed0f2fd365b71a6084ba025c2cc4ed72c",
+        "pkg/core/vm/delegation_gas.go": "6cf5d57f633ea95edcbbeb0dc8e639de19ab2749d3eb0988268cd08cae9d5c63",
+        "pkg/core/vm/amsterdam_gas_table.go": "7651ac6d2b647729ddc8bfbad0e7d10bee9d0072cb0c7977770bc9fbe432efa7"
+      }
     }
   ],
+  "second_audit": {
+    "review": "docs/reviews/pr-169/SECOND_AUDIT.md",
+    "finding_families": 4,
+    "new_regression_parents": 6,
+    "independent_oracle": "Unchanged go-ethereum v1.17.10 Amsterdam VM; cold delegated call bodies only, not Frame envelopes",
+    "public_composition": "D01 remains open; no public 8250 activation"
+  },
   "hosted_predecessor": {
-    "revision": "b7e646ff57cc8601566cce0e9354ba0e4582a668",
+    "revision": "95d4be4e4a09ba3938cae9d3064def24e2ad231b",
     "passed_checks": 10,
-    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45677820968",
-    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45677820888",
-    "scope": "Predecessor evidence only; excludes the later warmness test. Final current-head CI is recorded on PR #169 after publication."
+    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45679007553",
+    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45679007521",
+    "scope": "Predecessor evidence only; contains the defects reproduced by this audit. Final current-head checks are reported separately."
   }
 }

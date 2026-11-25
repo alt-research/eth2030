@@ -294,3 +294,24 @@ func TestFrame8250DeltaRevertedApprovalCanBeRetried(t *testing.T) {
 		t.Fatal("nonce/escrow consumed more than once")
 	}
 }
+
+func TestFrame8250DeltaKeyedSponsorDoesNotCreateLegacySender(t *testing.T) {
+	base, db, cfg, header := frameExecutionFixture(t)
+	db.SetNonce(types.NonceManager8250, 1)
+	db.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+	db.SubBalance(base.Sender, new(big.Int).Set(db.GetBalance(base.Sender)))
+	sponsor := types.Address{19: 0x90}
+	db.AddBalance(sponsor, big.NewInt(100000000))
+	db.SetCode(sponsor, []byte{0x60, 1, 0x5f, 0x5f, 0xaa})
+	base.Frames[0].Flags = 2
+	base.Frames = append(base.Frames, types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &sponsor, Limits: types.FrameGasLimits{Execution: 5000, State: 97920}})
+	tx := delta8250(base, 0)
+	signDelta8250(t, tx)
+	receipt, _, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if receipt.Payer != sponsor || !db.Empty(tx.Sender) || receipt.FrameResults8141[0].GasUsed.State != 0 || receipt.FrameResults8141[1].GasUsed.State != 97920 {
+		t.Fatal("keyed payment incorrectly consumed/created legacy sender")
+	}
+}

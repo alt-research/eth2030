@@ -48,12 +48,13 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
 		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
 	}
-	legacyNonce := db.GetNonce(tx.Sender)
+	var legacyNonce uint64
 	var budget types.FrameGasBudget
 	if profile == nil {
 		if err := tx.Validate(); err != nil {
 			return nil, 0, err
 		}
+		legacyNonce = db.GetNonce(tx.Sender)
 		if legacyNonce != tx.Nonce {
 			return nil, 0, errors.New("EIP-8141 nonce mismatch")
 		}
@@ -62,6 +63,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		if err := profile.Validate(); err != nil {
 			return nil, 0, err
 		}
+		legacyNonce = db.GetNonce(tx.Sender)
 		if err := validateNonceSet8250(db, profile); err != nil {
 			return nil, 0, err
 		}

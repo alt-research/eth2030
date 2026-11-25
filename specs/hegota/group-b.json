@@ -561,7 +561,8 @@
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback",
             "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaCreateAndLegacyIntrospection",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaRevertedApprovalCanBeRetried"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaRevertedApprovalCanBeRetried",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaKeyedSponsorDoesNotCreateLegacySender"
           ]
         },
         {
@@ -663,7 +664,8 @@
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/types::TestFrame8141ProtocolSignatures",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141P256NativeValidationAndDefaultCode"
           ]
         },
         {

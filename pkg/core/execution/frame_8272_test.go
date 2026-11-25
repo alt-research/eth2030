@@ -46,6 +46,12 @@ func TestRecentRoot8272NativeWriteVerifyAndReorg(t *testing.T) {
 func TestRecentRoot8272NormativeRuntimeBoundaries(t *testing.T) {
 	source := types.HexToHash("0xb9382d35273c75a50631a3e84d3c75ec9266e2b18c35a627e16cdbf26a18ca85")
 	reference := types.RecentRootReference{Source: source, Slot: 1, Root: types.Hash{31: 2}}
+	wrongRoot := reference
+	wrongRoot.Root[31] = 3
+	wrongSource := reference
+	wrongSource.Source[31] ^= 1
+	wrongSlot := reference
+	wrongSlot.Slot = 0
 	for _, tc := range []struct {
 		name       string
 		slot       uint64
@@ -54,6 +60,9 @@ func TestRecentRoot8272NormativeRuntimeBoundaries(t *testing.T) {
 		undeployed bool
 		want       bool
 	}{
+		{"wrong_root", 2, wrongRoot.AppendTo(nil), 12000, false, false},
+		{"wrong_source", 2, wrongSource.AppendTo(nil), 12000, false, false},
+		{"wrong_slot", 2, wrongSlot.AppendTo(nil), 12000, false, false},
 		{"previous", 2, reference.AppendTo(nil), 12000, false, true},
 		{"last_usable", 8192, reference.AppendTo(nil), 12000, false, true},
 		{"expired", 8193, reference.AppendTo(nil), 12000, false, false},

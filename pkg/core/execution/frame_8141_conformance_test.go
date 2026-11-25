@@ -1,6 +1,9 @@
 package execution
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"fmt"
 	"math/big"
 	"testing"
@@ -126,6 +129,55 @@ func TestFrame8141InvalidProtocolSignatureBeforeExecution(t *testing.T) {
 			}
 			if db.GetRoot() != before || gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit {
 				t.Fatal("invalid signature executed approval or reserved gas")
+			}
+		})
+	}
+}
+
+func TestFrame8141P256NativeValidationAndDefaultCode(t *testing.T) {
+	for _, withCode := range []bool{false, true} {
+		t.Run(fmt.Sprintf("contract_%v", withCode), func(t *testing.T) {
+			tx, db, cfg, header := frameExecutionFixture(t)
+			key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tx.Sender = types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
+			db.AddBalance(tx.Sender, big.NewInt(100000000))
+			if withCode {
+				db.SetCode(tx.Sender, []byte{0x60, 3, 0x5f, 0x5f, 0xaa})
+			}
+			tx.Signatures = []types.FrameSignature{{Scheme: types.FrameSignatureP256, Signature: make([]byte, 128)}}
+			hash, err := tx.SigningHash()
+			if err != nil {
+				t.Fatal(err)
+			}
+			r, s, err := ecdsa.Sign(rand.Reader, key, hash[:])
+			if err != nil {
+				t.Fatal(err)
+			}
+			order := key.Params().N
+			if s.Cmp(new(big.Int).Rsh(order, 1)) > 0 {
+				s.Sub(order, s)
+			}
+			witness := tx.Signatures[0].Signature
+			r.FillBytes(witness[:32])
+			s.FillBytes(witness[32:64])
+			key.X.FillBytes(witness[64:96])
+			key.Y.FillBytes(witness[96:])
+			if err := tx.Validate(); err != nil {
+				t.Fatal(err)
+			}
+			before := db.GetRoot()
+			receipt, _, err := ApplyTransaction(cfg, db, header, types.NewTransaction(tx), new(gaspool.GasPool).AddGas(header.GasLimit))
+			if (err == nil) != withCode {
+				t.Fatalf("native P256 validation/default code: %v", err)
+			}
+			if withCode && (receipt.Payer != tx.Sender || db.GetNonce(tx.Sender) != 1) {
+				t.Fatal("P256 protocol signature did not execute sender contract")
+			}
+			if !withCode && db.GetRoot() != before {
+				t.Fatal("default code accepted unsupported signature scheme")
 			}
 		})
 	}

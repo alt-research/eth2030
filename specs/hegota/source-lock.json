@@ -76,12 +76,19 @@
     {
       "repo": "ethereum/go-ethereum",
       "ref": "v1.17.1",
-      "sha": "16783c167c4be5e6675fd8de0d1b762c88d6232f"
+      "sha": "16783c167c4be5e6675fd8de0d1b762c88d6232f",
+      "role": "historical_reference_not_active"
     },
     {
       "repo": "ethereum/legacytests",
       "ref": "ethereum/tests LegacyTests gitlink",
       "sha": "1f581b8ccdc4c63acf5f2c5c1b155c690c32a8eb"
+    },
+    {
+      "repo": "ethereum/go-ethereum",
+      "ref": "v1.17.10",
+      "sha": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "role": "active_historical_differential_reference"
     }
   ],
   "files": [
@@ -875,6 +882,27 @@
         "HGT-006"
       ],
       "rationale": "Preserve master security/dependency upgrades, including Go 1.26.8, gnark-crypto and Geth v1.17.10. Reexecute the historical native/reference baseline; normative EIP/CL pins are unchanged."
+    }
+  ],
+  "active_reference": {
+    "module": "github.com/ethereum/go-ethereum",
+    "version": "v1.17.10",
+    "revision": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+    "module_sum": "h1:b3WO+xux3pItpm13kqT5Xddv01zOxBFZxQgk/Ate4/M=",
+    "provenance": "Go module origin and go.sum; direct upstream tests.StateTest.RunNoVerify, without ETH2030 wrapper or injected precompiles"
+  },
+  "source_updates": [
+    {
+      "repo": "ethereum/go-ethereum",
+      "ref": "v1.17.10",
+      "previous_sha": null,
+      "new_sha": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "date": "2026-11-25",
+      "affected_tasks": [
+        "HGT-001",
+        "HGT-006"
+      ],
+      "rationale": "Record the integrated runtime reference explicitly. Preserve v1.17.1 as historical provenance; EIP, CL and fixture pins remain unchanged."
     }
   ]
 }

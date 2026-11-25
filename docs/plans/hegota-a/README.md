@@ -1,19 +1,19 @@
-# Hegotá Group A delivery and integration
+# Hegota Group A delivery
 
-The seven A tasks (HGT-001, 004, 005, 006, 007, 008 and 009) establish specification sources, runtime identity, activation boundaries, prerequisite gaps, historical differential tests, semantic oracles and the 72-proposal admission register. They do not establish complete Hegotá conformance.
+The seven A tasks establish pinned sources/admission, current runtime routes, activation and safety boundaries, prerequisite inventory, a strict minimum differential baseline and reproducible semantic fixtures. [Criterion-level acceptance](../../../specs/hegota/acceptance.json) and [source-bound verification](../../../evidence/hegota-a/verification.json) govern completion; task labels alone are insufficient.
 
-The [PR #167 integration audit](master-integration-167.md) is authoritative for the merge with upstream `98d43177`. The earlier audit documents retain their original findings as historical evidence. Master now implements canonical Frames, Bogotá APIs, native forkchoice selection and real snap persistence; earlier statements that these paths are absent must not be applied to the integrated tree.
-
-| Task | Artifacts |
+| Task | Current deliverables |
 | --- | --- |
-| HGT-001 | [Source profiles](specification-profiles.md), [source lock](../../../specs/hegota/source-lock.json), [composition decisions](../../../specs/hegota/profiles.json): 14 revisions, 108 file hashes, six isolated profiles. |
-| HGT-004 | [Runtime audit](runtime-and-activation.md), current binary/source identities and actual native dispatcher tests. |
-| HGT-005 | Genesis alias conflict tests; explicit legacy processor/VM/pool scope; canonical Frame isolation and real FCU/reorg regressions. |
-| HGT-006 | [Historical baseline](baseline-and-gaps.md), [conformance register](../../../specs/hegota/conformance.json), 12 required native/direct-Geth cases with no skips. Historical repair findings are requalification items unless current evidence closes them. |
-| HGT-007 | [Semantic ADRs](semantic-adrs.md), independent codec/hash and arithmetic/domain oracles. Nine semantic seeds remain unexecuted latest-spec oracles. |
-| HGT-008 | [Validation audit](validation-audit.md), authenticated BLS and negative acceptance tests. Upstream retired state/builder stubs stay retired. |
-| HGT-009 | [Admission register](../../../specs/hegota/admission.json): 72 proposals, pinned sources, discussions, decisions and impact histories. |
+| HGT-001 | [Profiles/source roles](specification-profiles.md): 15 repository records, 108 file hashes, six profiles, nine decisions; active Geth v1.17.10 separately identified from historical v1.17.1. |
+| HGT-004 | [Current runtime matrix](runtime-and-activation.md), actual native/wrapper identities, wire and FCU/restart tests. |
+| HGT-005 | Configuration aliases/compatibility, legacy isolation, canonical prefix using actual head height, before/at/after fork and reorg regressions. |
+| HGT-006 | [Baseline/inventory](baseline-and-gaps.md): 12 mandatory native/direct-Geth cases, zero skips; all 16 prerequisite findings reassessed with current sources/tests and remaining consumer scope. |
+| HGT-007 | [Six ADRs](semantic-adrs.md), schema, seven codec goldens, five gas and one root-domain oracle; all nine former trace seeds replaced by concrete fixtures with seven native and two core conditional-rule consumers, plus 25 concrete conditional boundary vectors. |
+| HGT-008 | [Current caller audit](validation-audit.md): bid/BLS/PQ/KZG, native backend, unavailable IL evidence and experimental defaults/provider boundaries; retired implementations stay retired. |
+| HGT-009 | [Admission](../../../specs/hegota/admission.json): all 72 proposals, source/discussion/disposition and append-only impact decisions. |
 
-Run `python3 tools/hegota/check.py`, both golden checkers and `python3 -m unittest discover -s tools/hegota -p 'test_*.py'` from the repository root. From `pkg`, run `env -u GOROOT go run ./cmd/eth2030-baseline`, `go build ./...`, `go vet ./...` and the full Go suite. [Current verification evidence](../../../evidence/hegota-a/verification.json) separates full-suite skips from the mandatory zero-skip baseline. [Historical evidence](../../../evidence/hegota-a/history/6a17479/verification.json) preserves the pre-merge audit.
+The [current seven-task review](../../reviews/pr-168/FINAL_REVIEW.md) maps the original A deliverables to live checks and the 26-criterion matrix. The [case-level baseline and gas audit](../../reviews/pr-168/CASE_LEVEL_AUDIT.md) records the latest implementation/vector closures. The [earlier adverse-input recheck](../../reviews/pr-168/AUDIT.md), [initial completion report](../../reviews/pr-167/ACCEPTANCE_COMPLETION.md), [original audit](../../reviews/pr-167/GROUP_A_ACCEPTANCE_AUDIT.md), [merge audit](master-integration-167.md) and [77-task reuse inventory](../../reviews/pr-167/DUPLICATION_REVIEW.md) remain dated history. Existing master canonical Frames, Bogota APIs, FCU, real snap and test infrastructure are reused.
 
-The [post-integration duplicate-work review](../../reviews/pr-167/DUPLICATION_REVIEW.md) reconciles all 77 planning tasks with existing master code and records removal of redundant pool context and the equivalent compatibility rewrite.
+Run `python3 tools/hegota/check.py`, both golden checkers and `python3 -m unittest discover -s tools/hegota -p 'test_*.py'` from the root. From `pkg`, run `env -u GOROOT go run ./cmd/eth2030-baseline`, build/vet and Go tests. Full/race skip inventories are distinct from the mandatory zero-skip baseline. The current gate validates all seven tasks' individual criteria, executed test events, recomputed source/artifact hashes, nonempty successful full/race runs and consistent reference identity; review/blocked statuses can be represented truthfully and fail the completion gate.
+
+Completion is limited to A. Full selected-spec qualification, conditional extension production integration, independent CL/network agreement, containers/RC and long-duration/resource acceptance remain later tasks. `hegota-release` stays inactive; open composition decisions do not become implementation defaults.

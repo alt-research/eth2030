@@ -71,7 +71,7 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 	if pool.config.MinGasPrice != nil && payment.GasPrice().Cmp(pool.config.MinGasPrice) < 0 {
 		return ErrUnderpriced
 	}
-	header := &types.Header{Number: new(big.Int), GasLimit: pool.config.BlockGasLimit, Time: pool.frameTime, BaseFee: pool.baseFee}
+	header := &types.Header{Number: new(big.Int).SetUint64(pool.frameNumber), GasLimit: pool.config.BlockGasLimit, Time: pool.frameTime, BaseFee: pool.baseFee}
 	payer, err := execution.ValidateFrame8141Prefix(pool.frameConfig, db, header, tx, blobFee)
 	if err != nil {
 		return err

@@ -1,34 +1,29 @@
-# 真实运行路径与激活矩阵
+# Current runtime routes and activation boundaries
 
-> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+HGT-004 / HGT-005. Baseline: integrated master `89b3b1f2`; current source fingerprints and executed tests are in [runtime evidence](../../../evidence/hegota-a/runtime.json), [verification](../../../evidence/hegota-a/verification.json) and the [criterion matrix](../../../specs/hegota/acceptance.json). The pre-merge route table is preserved [at its historical revision](https://github.com/alt-research/eth2030/blob/6a17479/docs/plans/hegota-a/runtime-and-activation.md).
 
-HGT-004 / HGT-005。代码证据对应本次提交，源文件校验见运行证据；表内的“支持”指已检查的路径边界，不代表整个 fork 符合性。
-
-| 入口 | 实际路径 | 验收归属 |
+| Entrypoint | Actual route | Evidence and limits |
 | --- | --- | --- |
-| `cmd/eth2030` | `node.New` → `core/chain.Blockchain`、`core/block.BlockBuilder` → `core/execution.StateProcessor` → native VM/state | 主验收二进制；新差分 runner 也明确调用 native `execution.ApplyTransaction`，但不是节点 wire 测试 |
-| native Engine | `node.New` 注入 `node/backend.EngineBackend` → `engine.EngineAPI`/`HandleRequest` → backend process channel → `Blockchain.InsertBlock`/processor | `TestNativeRuntimePathAndUnsupportedBogotaAPI` 检查实际注入对象和 wire 拒绝；不把另一个 backend 单测混入 |
-| helper Engine | `engine.NewEngineBackend` → 自有 state copy、processor、异步 builder | 独立 helper；FOCIL post-state/prefix 未接线时返回明确 error，不能当 native 通过 |
-| RPC | `rpc.Server` / `ExtServer` → `node/backend.RPCBackend` → 实际 pool/chain；`eth_call` 使用 native VM | 与 processor 共用显式 Frame 激活条件；pool 使用 canonical head 时间，Engine/P2P 导入及已应用的 reorg 后更新，跨 fork 移除旧 Frame |
-| `cmd/eth2030-geth` | upstream `node.New` → upstream `eth.New` → upstream `catalyst.Register` | geth wrapper；额外预编译注入不等于 native processor 或 Hegotá codec 已接通 |
-| `pkg/Dockerfile` | builder 构建两种二进制，`ENTRYPOINT ["eth2030"]`；`geth` 链接到原生二进制 | 静态容器入口已核实；本任务未运行 Docker，不把宿主构建当镜像执行结果 |
-| Kurtosis local | `run-devnet.sh` 选择配置 → `network_params.json`/ethereum-package → image/entrypoint | `full-feature` 是旧实验组合，不是官方 Hegotá profile；HGT-070/080/090 继续负责实际 CL 互通和脚本整改 |
-| baseline 参考 | `go-ethereum@v1.17.1/tests.StateTest.RunNoVerify` | 直接 upstream EVM，不经过 ETH2030 geth wrapper，也不注入自定义预编译 |
+| `pkg/cmd/eth2030` | `node.New` -> native `core/chain.Blockchain` / `core/block.BlockBuilder` -> `core/execution.StateProcessor` -> native VM/state | `TestNativeRuntimePathAndVersionedBogotaAPI` records the injected `*backend.EngineBackend`. Canonical Frames use `executeFrame8141`. |
+| Native Engine | Dispatcher -> `node/backend.EngineBackend` -> block processing / deferred Bogota validation / FCU | `TestBogotaDeferredWireAcrossRestart`, `TestCanonicalFrame8141ThroughEngineAndRestart`. NewPayload V6 and FCU V5 exist; malformed calls reject parameters and unknown V99 returns method-not-found. |
+| Canonical selection | Native FCU -> validated canonical head/state -> pool `Reset(state, header)` and fee refresh | `TestNativeForkchoiceRefreshesFrameActivationAndReorg` uses actual selection/rewind. Its explicit CL-view fixture is not an independent CL interoperability result. P2P announcements cannot select an optimistic PoS head. |
+| Canonical pool | `TxPool.Add*` -> canonical validation -> `ValidateFrame8141Prefix` on duplicated state -> shared `ConfigureBlockEVM` | `TestCanonicalFramePrefixUsesHeadBlockPrerequisites`: London at height 10, heads 9/10/11, rewind to 9, recovery to 10. Preserve head number, time, fee and gas limit; live state stays unchanged. |
+| RPC | `rpc.Server` -> `node/backend.RPCBackend` -> real chain/pool or shared native simulation | Reuse master's shared simulation/override/cancellation route. Processor tests do not become HTTP/CL evidence. |
+| Helper Engine | `engine.NewEngineBackend` -> its own builder/state-copy/processor orchestration | Separate backend; missing IL evidence returns unavailable/error. Never substitute its result for the native node. |
+| Geth wrapper | `pkg/cmd/eth2030-geth` -> upstream `node.New`, `eth.New`, `catalyst.Register` | Distinct binary, executor and precompile context from native and direct reference. |
+| Historical reference | Direct `go-ethereum@v1.17.10/tests.StateTest.RunNoVerify` | No ETH2030 wrapper or added precompiles. Twelve pinned cases compare native/reference and independent root/log/gas oracles. |
+| Docker | Builds both binaries; `ENTRYPOINT ["eth2030"]`; `geth` symlink points to native | Dockerfile and host binaries verified; image execution/digest and CL/devnet qualification remain separate. |
+| Kurtosis | Scripts -> network configuration -> ethereum-package/images | Existing experimental presets are not an officially qualified combined Hegota network. |
 
-| 配置/规则 | processor / VM | pool / API | 边界验证 |
-| --- | --- | --- | --- |
-| 历史 block forks → `Rules(number, merge, timestamp)` | 原有 cumulative rules 保留；TangerineWhistle fixture config 修正为 EIP150 level | 与时间 fork 分开 | 官方 EIP150/EIP158/Homestead/Byzantium/Constantinople 样本差分 |
-| Prague / Amsterdam | 按旧配置时间启用已有执行规则，未宣称完整符合性 | Engine 版本使用区间：Cancun V3 在 Prague 前；Prague V4 在 Amsterdam 前；Amsterdam V5 在 Bogotá 前 | `TestEngineVersionForkIntervals` 前一秒/当秒/后一秒；native/helper 均使用相同区间函数 |
-| `glamsterdamTime` / `glamsterdanTime` | 两种 JSON 名归一到原有 `GlamsterdanTime`，保留存储兼容；新增正确拼写查询别名 | 同值别名可共存，不同值拒绝 | `TestHegotaGenesisAliases` 的 legacy/canonical/equal/conflicting 用例 |
-| `bogotaTime` / `hegotaTime` / `hogotaTime` | 归一到原有 `HogotaTime`；不设置任何官方主网日期 | 别名冲突拒绝，旧 CLI override 保留 | 同上；这里是配置名称适配，不意味着支持 Bogotá 共识 |
-| 旧 Frame prototype | 只有 `ExperimentalLegacyFrames && merge && London(blockNumber) && HogotaTime<=time` 才能到达执行；普通 Glamsterdam、I+、Verkle 不装旧 APPROVE/TXPARAM 指令 | genesis 中 `experimentalLegacyFrames` 显式 opt-in；无 chain config、未到 fork、canonical schedule 均拒绝；公开 RPC/pool 无单独绕过开关 | config、processor（状态/gas 不变）、VM、pool exact/reorg 四层测试 |
-| 最新 8141 | 当前 native codec/processor 未实现，research profile 不激活 | 不能拿新时间点启用旧类型作为实现 | HGT-002…019/020…029 待实施；新 schema/goldens 单列 |
-| AATx / LocalTx / PQ / STARK prototype | PQ 原有 I+ 门；其他旧实验接口纳入审计 | AATx 默认改为关闭；LocalTx/STARK 明确实验 opt-in；不列入 Hegotá admission | 默认配置、交易池负向测试；不是新候选自动激活 |
-| Bogotá Engine | 新 `newPayloadV6`、`FCUV5` 未实现 | wire 返回 method-not-found，过期旧版本返回 unsupported-fork；旧 builder bid 提交拒绝 unsupported | 真实 native dispatcher 与 Engine 单测 |
+| Configuration / boundary | Consumers and admission | Evidence |
+| --- | --- | --- |
+| Block forks plus merge/time | `ChainConfig.Rules(number, merge, time)` -> shared VM table/precompiles | Use actual head number; timestamp alone cannot select post-merge VM rules. |
+| Prague / Osaka / Amsterdam / Bogota | Backend predicates stay monotonic; dispatcher validates method versions/schemas | FCU V3 is reused after Prague/Osaka; Bogota still requires Amsterdam rules. Do not restore exclusive predicate intervals. |
+| `glamsterdamTime` / `glamsterdanTime` | Normalize to stored legacy field; unequal aliases reject | `TestHegotaGenesisAliases`: legacy, canonical, equal, conflicting. |
+| `bogotaTime` / `hegotaTime` / `hogotaTime` | Normalize to `HogotaTime`; no invented mainnet date | Alias tests and symmetric retroactive schedule compatibility checks. |
+| Canonical `FrameTx8141` | Direct typed dispatch and Bogota public-prefix validation | Independent of `ExperimentalLegacyFrames`. Dedicated canonical processor and pool tests cover timestamps 99/100/101, pre-mutation rejection and reorg eviction; native semantics and Engine/restart tests retain explicit scope. |
+| Frozen legacy `FrameTx` | `ExperimentalLegacyFrames && merge && London(number) && HogotaTime<=time` | Pre-mutation rejection, exact activation, VM isolation and reorg eviction. Canonical Frames survive legacy-profile resets. |
+| Legacy AA / LocalTx / STARK | AA default off, LocalTx opt-in, unavailable STARK proof provider fails node creation | `TestAATxDisabled`, `TestLocalTx_DefaultConfigDisallows`, `TestStarkFrames_EnabledRequiresProvider`. |
+| Conditional nonce/root/PQ | Explicit profiles and D01–D09 decisions | Isolated research oracles do not activate the combined release. |
 
-兼容性限制：加载旧 genesis 仍可读取原有字段和 CLI override，不静默重写数据库。旧实验链若依赖缺省开启 Frame/AATx、无签名 ePBS 或无验证状态写入，升级后会被拒绝，必须显式承认原型范围；这类历史原型从未被本任务认定为规范兼容链。不存在通过开关把当前正式网络切到旧 schema 的迁移。
-
-
-复核补充：pool context 同时携带 block number 与 timestamp，P2P 与真实 reorg listener 共用 head-aware 刷新；新增节点集成测试通过真实 NewBlock 消息导入并在实际 `Blockchain.SetHead` 后触发已安装的重组监听器。VM 先选择 base fork，再仅叠加四个显式原型指令，避免 I+ 覆盖 Frame 门或 Frame 覆盖 Verkle 计费。配置比较同时检查两份配置的已生效点，并包含 IPlus，拒绝从 nil/future 改为历史已生效的 schedule。
-
-**原生 FCU 的未接线部分：HGT-006-R16。** `engine_fcu.go` 当前解析请求 head、异步更新 safe/finalized 与 cache，但没有设置 canonical head/state，也未将该 FCU 送入 forkchoice manager。新增测试没有把手动 rewind + listener 的通过说成“FCU 已自动完成重组”。HGT-013/080/087 必须修复并验证 head/state/index/RPC/pool 的原子切换后，才能宣称正式 CL 联调或恢复通过。另在节点测试准备中观察到 legacy builder 默认 gas-limit 调整可能达到 validator 拒绝的精确 delta 边界；HGT-013 的 build/import 一致性需要覆盖，当前集成向量明确固定 target gas limit。
+Head changes refresh fees before revalidation. Historical genesis/database names stay readable; incompatible prototype behavior is not silently reclassified as canonical compatibility. The pool uses one stored fork context and existing production setters/reset rather than a second test-only API.

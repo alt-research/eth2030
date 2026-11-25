@@ -7,8 +7,9 @@
       "activation": "test-only; explicit fixture fork",
       "status": "verified_minimal_corpus",
       "eips": [],
-      "oracle": "upstream geth v1.17.1 and pinned legacytests",
-      "excludes": "Prague/Glamsterdam/Hegota conformance, receipts/BAL roots, CL/network"
+      "oracle": "upstream geth v1.17.10 and pinned legacytests",
+      "excludes": "Prague/Glamsterdam/Hegota conformance, receipts/BAL roots, CL/network",
+      "reference_version": "v1.17.10"
     },
     {
       "id": "legacy-frame-prototype-v0",

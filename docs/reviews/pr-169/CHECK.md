@@ -35,4 +35,4 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Audit codec, receipts, block commitments, persistence, deployment and recent-root boundaries for all 12 tasks.
 - [x] Reproduce and correct concrete omissions with unit tests and independent expected values.
 - [x] Refresh affected source-bound evidence and complete local build, vet, full and focused race qualification.
-- [ ] Commit and push only owned changes, update the English PR description, and verify CI at the published head.
+- [x] Commit and push only owned changes, update the English PR description, and verify all 10 checks at corrected source head `46f57ce4`; final documentation-only descendant checks are reported on PR #169.

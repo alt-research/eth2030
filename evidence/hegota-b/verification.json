@@ -221,5 +221,12 @@
     "review": "docs/reviews/pr-169/SECOND_AUDIT.md",
     "finding_families": 4,
     "regression_parents": 6
+  },
+  "hosted_qualification": {
+    "revision": "46f57ce4c6c22e6dc4ad1801b8658ac803ae21d0",
+    "passed_checks": 10,
+    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45693637673",
+    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45693637672",
+    "scope": "All third-audit source changes included. Later documentation-only descendant checks are reported separately on PR #169."
   }
 }

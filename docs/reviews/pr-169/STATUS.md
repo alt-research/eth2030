@@ -17,4 +17,4 @@ Local qualification at functional revision `24d2553a`:
 
 The first full run exposed an existing checkpoint ETA test clock-tick flake. The test now explicitly establishes elapsed time; a fresh complete run passed. No production checkpoint behavior changed.
 
-Publication and exact-head hosted CI checks are pending. No public composed Hegota release, independent-client Frames equivalence or Group C–J completion is claimed.
+Published as [PR #169](https://github.com/alt-research/eth2030/pull/169). Exact-head hosted CI checks are pending. No public composed Hegota release, independent-client Frames equivalence or Group C–J completion is claimed.

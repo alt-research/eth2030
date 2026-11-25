@@ -164,7 +164,7 @@
     "state": "qualifying",
     "title": "Current conformance review",
     "summary": "The 20/20 count describes the retained implementation labels. A new current-spec audit found additional execution, consensus and light-client defects; their separate correction reviews and qualification are listed below.",
-    "detail": "The full native EL corpus passes 43,790 signed cases and 52,620 imported blocks. Current-source CL qualification is being completed against the unchanged d2021d27 reference. Final CI and review delivery remain explicit; this is not a new all-conformance or public-readiness claim.",
+    "detail": "The full native EL corpus passes 43,790 signed cases and 52,620 block checks: 45,221 accepted and 7,399 expected rejections. Current-source CL qualification is being completed against the unchanged d2021d27 reference. Final CI and review delivery remain explicit; this is not a new all-conformance or public-readiness claim.",
     "originalFaultStatus": "unconfirmed",
     "boundary": "Original-04 attribution remains unconfirmed. 48h/scale and Lodestar upstream approval remain excluded, not passed. EIP-8025 and a full Ethereum STF guest remain later work.",
     "reviews": [

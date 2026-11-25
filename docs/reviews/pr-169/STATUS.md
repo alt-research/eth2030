@@ -22,3 +22,5 @@ Published as [PR #169](https://github.com/alt-research/eth2030/pull/169). All 10
 ## Second audit in progress, 2026-11-26
 
 The user requested a fresh no-omission review. Previous results above remain historical qualification, not proof that the new audit found no gaps. Every Group B requirement is being checked against normative clauses and actual execution before the audit is closed.
+
+The second audit reproduced four missing semantics: direct-precompile frame targets absent from BAL; missing/misplaced EIP-7702 resolution gas in nested CALL/CALLCODE/DELEGATECALL/STATICCALL; implicit SSTORE reads lost on post-state failure; and SELFDESTRUCT beneficiary accesses recorded on the wrong side of pre-state gas validation. Native regressions now cover exact warm/cold gas, EIP-150 forwarding, failed child balance checks and access boundaries. Focused execution/VM tests pass after fixes; complete requalification remains pending.

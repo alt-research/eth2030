@@ -169,7 +169,7 @@ func gasAmsterdamSelfdestruct(evm *EVM, c *Contract, s *Stack, m *Memory, size u
 
 func (evm *EVM) executionCode(address types.Address) []byte {
 	code := evm.StateDB.GetCode(address)
-	if evm.forkRules.IsPrague || evm.forkRules.IsAmsterdam || evm.forkRules.IsGlamsterdan {
+	if evm.frame8141 != nil || evm.forkRules.IsPrague || evm.forkRules.IsAmsterdam || evm.forkRules.IsGlamsterdan {
 		if delegate, ok := types.ParseDelegation(code); ok {
 			if evm.balTracker != nil {
 				evm.balTracker.RecordAddressTouch(delegate)

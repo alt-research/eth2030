@@ -225,6 +225,11 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 		return 0, ErrOutOfGas
 	}
 	gasLeft -= accessGas
+	// Entry access is paid before dispatch, including explicit precompiles and
+	// frames that subsequently fail. Underfunded entry does not access state.
+	if evm.balTracker != nil {
+		evm.balTracker.RecordAddressTouch(target)
+	}
 	caller := types.EntryPointAddress
 	if frame.Mode == types.ModeSender {
 		if !ctx.Approved {
@@ -288,6 +293,10 @@ func gasFrameSstore8141(evm *EVM, contract *Contract, stack *Stack, _ *Memory, _
 	}
 	current := evm.StateDB.GetState(contract.Address, key)
 	original := evm.StateDB.GetCommittedState(contract.Address, key)
+	// This implicit read survives post-state execution/state gas failures.
+	if evm.balTracker != nil {
+		evm.balTracker.RecordStorageRead(contract.Address, key, current)
+	}
 	cost := uint64(100)
 	if cold != 0 {
 		cost = cold
@@ -598,6 +607,12 @@ func gasFrameCall8141(op OpCode, evm *EVM, contract *Contract, stack *Stack, mem
 		return 0, err
 	}
 	cost = safeAdd(cost, memory)
+	// Resolve and charge delegation in the parent, before EIP-150 forwarding
+	// and before child balance/depth checks (EIP-7702 / EIP-7928).
+	cost, err = gasDelegationResolution(evm, contract, address, cost)
+	if err != nil {
+		return 0, err
+	}
 	requested := ^uint64(0)
 	if stack.Back(0).IsUint64() {
 		requested = stack.Back(0).Uint64()
@@ -693,6 +708,12 @@ func gasFrameSelfdestruct8141(evm *EVM, contract *Contract, stack *Stack, _ *Mem
 	if !evm.StateDB.AddressInAccessList(beneficiary) {
 		evm.StateDB.AddAddressToAccessList(beneficiary)
 		cost = 3000
+	}
+	if contract.Gas < cost {
+		return 0, ErrOutOfGas
+	}
+	if evm.balTracker != nil {
+		evm.balTracker.RecordAddressTouch(beneficiary)
 	}
 	if evm.StateDB.GetBalance(contract.Address).Sign() > 0 && evm.StateDB.Empty(beneficiary) {
 		cost += 9000

@@ -681,7 +681,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 	// is followed exactly once — resolved code is never re-resolved.
 	if types.HasDelegationPrefix(code) {
 		if delegate, ok := types.ParseDelegation(code); ok {
-			if evm.frame8141 != nil {
+			if evm.frame8141 != nil && evm.depth == 0 {
 				cost := uint64(100)
 				if !evm.StateDB.AddressInAccessList(delegate) {
 					cost = 3000

@@ -1,14 +1,14 @@
 {
-  "review_head": "f4991136aeedfdae4e4bdc64a1bf7715f7dfaf1b",
-  "qualified_ci_checkout": "370699564056bba8809dc03b2094f00b39d6bf3b",
+  "review_head": "50c23b97270e16d430b618cab4b769fd8ec2843b",
+  "qualified_ci_checkout": "91a44285c813385dbfd8f791b8460442ebe7b923",
   "reference": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
-  "job": 138908083879,
-  "run": 45525625554,
-  "job_url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45525625554/job/138908083879",
+  "job": 138927210347,
+  "run": 45531361913,
+  "job_url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45531361913/job/138927210347",
   "job_conclusion": "success",
-  "artifact_id": 14982933817,
-  "artifact_bytes": 1120752,
-  "artifact_sha256": "7d2d3ee19d7deb0fa29c03b20d9e8f27f81060bbe296e0bc56cca710ac6d5e72",
+  "artifact_id": 14985594607,
+  "artifact_bytes": 1124159,
+  "artifact_sha256": "d691bc8f10a141e4b2945ff749257d841af8fcc02766c6cc9f6e5f0b6af8ebdf",
   "artifact_download_verified": true,
   "per_case_records_reparsed": 12195,
   "unique_case_paths": 12195,
@@ -54,20 +54,20 @@
   },
   "consumer_binaries": {
     "real": {
-      "revision": "370699564056bba8809dc03b2094f00b39d6bf3b",
+      "revision": "91a44285c813385dbfd8f791b8460442ebe7b923",
       "tree": "59e45eb596e7695fea22605425f1bd124a4aeaa7",
       "dirty": false,
       "features": "ef_tests",
       "mode": "real",
-      "sha256": "72e6a26d3a28dd4f42a8c68ac29ae76ad60e324f0270f102e3e8ed9d4a0930fc"
+      "sha256": "9062588ee173dd19040ce6277bd4e79f3fad69be2d6d1d83765519ead86ed9e3"
     },
     "fixture_fake": {
-      "revision": "370699564056bba8809dc03b2094f00b39d6bf3b",
+      "revision": "91a44285c813385dbfd8f791b8460442ebe7b923",
       "tree": "59e45eb596e7695fea22605425f1bd124a4aeaa7",
       "dirty": false,
       "features": "ef_tests,fake_crypto_real_pubkeys",
       "mode": "fixture_fake",
-      "sha256": "050a60552773bf74a6cdcd82a87965e842f85e75ff5135e7114b754fbb279c2c"
+      "sha256": "70bb637a95c575eb0c87ed8edaeafff14ac01b87c4d2b333c7bf593145200114"
     }
   },
   "merge_gate": "Other required latest-head checks remain separate and must complete before merge."

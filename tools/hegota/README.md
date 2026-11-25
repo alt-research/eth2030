@@ -26,8 +26,17 @@ normal builds test gnark verification against the frozen bytes. The fixture's
 key is exclusively a public test vector. Neither command is invoked to update
 an oracle during acceptance.
 
-`semantic_goldens.py` recomputes two hand-worked gas/fee oracles and one recent-root
-domain oracle; nine semantic trace seeds remain for the future native EVM
-conformance suite. Passing the oracle arithmetic does not count as executing
-those traces. CI executes the source/admission checks and strict native/upstream
-baseline before the full Go build/test checks.
+`semantic_goldens.py` checks two hand-worked gas/fee oracles, a root-domain oracle,
+structured fixture coverage and two isolated nonce/window rule oracles. All nine
+former trace seeds now have concrete inputs/outputs. Seven base cases are executed
+by `core/execution.TestHegotaSemanticGoldens` using the existing native VM/executor;
+the two conditional oracles do not activate a composed network profile.
+
+`acceptance.py` validates the criterion matrix, actual passing native test events,
+current artifact/source hashes, skip counts, prerequisite assessments and active
+reference identity. It permits truthful review/blocked task records, while the
+completion gate rejects unresolved criteria. Neither `verified` labels nor
+existing artifact filenames replace execution evidence. Negative regressions
+cover missing criteria/tests, skipped/incomplete/stale runs, version drift and
+incorrect conditional semantics. CI runs the source/acceptance checks and strict
+baseline before the normal Go checks; Go tests execute the native fixtures.

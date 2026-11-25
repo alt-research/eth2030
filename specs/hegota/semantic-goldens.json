@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "purpose": "frozen semantic expectations for future native conformance; arithmetic/domain oracles checked independently, traces are specified seeds, not executed EVM claims",
+  "version": 2,
+  "purpose": "Concrete frozen semantic inputs and expected outputs. Seven base-profile cases execute the native VM; two conditional-extension rule oracles are independently checked without combined network activation.",
   "gas_vectors": [
     {
       "id": "gas-standard",
@@ -81,66 +81,489 @@
   "trace_vectors": [
     {
       "id": "approval-zero",
-      "input": "APPROVE scope=0, flags=3",
-      "expected": "current call reverts; no approval/payment/nonce mutation",
+      "kind": "approval_calls",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-003",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000091": "0x60005f5faa"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000091",
+            "flags": 3,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "steps": [
+          {
+            "error": "reverted",
+            "approved": false,
+            "payer": null,
+            "nonce": 7,
+            "sender_balance": 1000000,
+            "payer_balance": 1000000,
+            "execution_gas": 107
+          }
+        ]
+      }
     },
     {
       "id": "approval-wrong-target",
-      "input": "execution scope=2, flags=2, target != sender",
-      "expected": "current call reverts; sender_approved remains false",
+      "kind": "approval_calls",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-003",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000092": "0x60025f5faa"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 2,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "steps": [
+          {
+            "error": "reverted",
+            "approved": false,
+            "payer": null,
+            "nonce": 7,
+            "sender_balance": 1000000,
+            "payer_balance": 1000000,
+            "execution_gas": 3007
+          }
+        ]
+      }
     },
     {
       "id": "approval-payment-first",
-      "input": "payment scope=1, flags=1, sender_approved=false",
-      "expected": "current call reverts; nonce unchanged; payer unset",
+      "kind": "approval_calls",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-003",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000092": "0x60015f5faa"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 1,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "steps": [
+          {
+            "error": "reverted",
+            "approved": false,
+            "payer": null,
+            "nonce": 7,
+            "sender_balance": 1000000,
+            "payer_balance": 1000000,
+            "execution_gas": 3007
+          }
+        ]
+      }
     },
     {
       "id": "approval-once",
-      "input": "execution approval, then successful payment, then repeated payment",
-      "expected": "nonce_delta=1; first payer preserved; repeated call reverts",
+      "kind": "approval_calls",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-003",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000091": "0x60025f5faa",
+          "0x0000000000000000000000000000000000000092": "0x60015f5faa"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000091",
+            "flags": 2,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 1,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 1,
+            "mode": 0,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "escrow": 103425,
+        "steps": [
+          {
+            "error": "",
+            "approved": true,
+            "payer": null,
+            "nonce": 7,
+            "sender_balance": 1000000,
+            "payer_balance": 1000000,
+            "execution_gas": 107
+          },
+          {
+            "error": "",
+            "approved": true,
+            "payer": "0x0000000000000000000000000000000000000092",
+            "nonce": 8,
+            "sender_balance": 1000000,
+            "payer_balance": 896575,
+            "execution_gas": 3007
+          },
+          {
+            "error": "reverted",
+            "approved": true,
+            "payer": "0x0000000000000000000000000000000000000092",
+            "nonce": 8,
+            "sender_balance": 1000000,
+            "payer_balance": 896575,
+            "execution_gas": 107
+          }
+        ]
+      }
     },
     {
       "id": "verify-rollback",
-      "input": "VERIFY calls APPROVE successfully then enclosing call reverts",
-      "expected": "whole transaction invalid; nonce/payment/state/logs restored",
+      "kind": "transaction",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-012",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000091": "0x5f5f5f5f730000000000000000000000000000000000000093617530f4505f5ffd",
+          "0x0000000000000000000000000000000000000093": "0x60035f5faa"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000091",
+            "flags": 3,
+            "mode": 1,
+            "execution": 50000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "invalid": true,
+        "nonce": 7,
+        "root_unchanged": true,
+        "logs": 0,
+        "gas_used": 0,
+        "execution_pool_restored": true,
+        "state_pool_restored": true
+      }
     },
     {
       "id": "atomic-body-rollback",
-      "input": "payment approved before a three-frame body batch; second body frame fails",
-      "expected": "payment/nonce before batch preserved; body logs/state discarded; first body receipt retains execution status/gas and zero state gas; third body skipped=2",
+      "kind": "transaction",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-012",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000091": "0x60035f5faa",
+          "0x0000000000000000000000000000000000000092": "0x60015f555f5fa000",
+          "0x0000000000000000000000000000000000000093": "0x5f5ffd"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000091",
+            "flags": 3,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 4,
+            "mode": 2,
+            "execution": 30000,
+            "state": 97920,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000093",
+            "flags": 4,
+            "mode": 2,
+            "execution": 5000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 0,
+            "mode": 2,
+            "execution": 30000,
+            "state": 97920,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "invalid": false,
+        "nonce": 8,
+        "payer": "0x0000000000000000000000000000000000000091",
+        "logs": 0,
+        "statuses": [
+          1,
+          1,
+          0,
+          2
+        ],
+        "state_gas": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "execution_gas": [
+          107,
+          15484,
+          3004,
+          0
+        ],
+        "storage": {
+          "0x0000000000000000000000000000000000000092": "0x0"
+        }
+      }
     },
     {
       "id": "cross-frame-refill-rollback",
-      "input": "A creates slot and owns state charge; B deletes slot then reverts",
-      "expected": "A outstanding charge and receipt state gas restored; B state gas zero; A spendable pool never reopened",
+      "kind": "transaction",
+      "eip": 8141,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-011",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "TestHegotaSemanticGoldens",
+      "qualification": "native_vm",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "nonce": 7,
+        "balance": 1000000,
+        "codes": {
+          "0x0000000000000000000000000000000000000091": "0x60035f5faa",
+          "0x0000000000000000000000000000000000000092": "0x5f355f5500",
+          "0x0000000000000000000000000000000000000093": "0x5f5ffd"
+        },
+        "frames": [
+          {
+            "target": "0x0000000000000000000000000000000000000091",
+            "flags": 3,
+            "mode": 1,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 0,
+            "mode": 2,
+            "execution": 30000,
+            "state": 97920,
+            "data": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 4,
+            "mode": 2,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000093",
+            "flags": 4,
+            "mode": 2,
+            "execution": 5000,
+            "state": 0,
+            "data": "0x"
+          },
+          {
+            "target": "0x0000000000000000000000000000000000000092",
+            "flags": 0,
+            "mode": 2,
+            "execution": 30000,
+            "state": 0,
+            "data": "0x"
+          }
+        ]
+      },
+      "expected": {
+        "invalid": false,
+        "nonce": 8,
+        "payer": "0x0000000000000000000000000000000000000091",
+        "logs": 0,
+        "statuses": [
+          1,
+          1,
+          1,
+          0,
+          2
+        ],
+        "state_gas": [
+          0,
+          97920,
+          0,
+          0,
+          0
+        ],
+        "execution_gas": [
+          107,
+          15107,
+          207,
+          3004,
+          0
+        ],
+        "storage": {
+          "0x0000000000000000000000000000000000000092": "0x1"
+        }
+      }
     },
     {
       "id": "keyed-nonce-single-use",
-      "input": "8250 nonempty sorted keys, nonce_seq=MAX_NONCE_SEQ; approval succeeds, body reverts",
-      "expected": "selected keys consumed once; legacy account nonce unaffected; combined envelope BLOCKED by D01",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-017",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "legacy_nonce": 7,
+        "stored": [
+          18446744073709551615,
+          18446744073709551615
+        ],
+        "state_charge": 195840,
+        "execution_access": 24200,
+        "replay_valid": false
+      }
     },
     {
       "id": "recent-root-slot-window",
-      "input": "root written at slot S, evaluate at S, S+1, S+8191, S+8192",
-      "expected": "not referenceable at S; within usable window at +1/+8191; expired at +8192; use canonical slotNumber and revalidate on reorg",
+      "kind": "root_window",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "consumer_task": "HGT-018",
-      "native_status": "not_implemented_for_current_spec"
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "written_slot": 8193,
+        "current_slots": [
+          8193,
+          8194,
+          16384,
+          16385
+        ],
+        "canonical_entry_matches": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "orphaned_entry_matches": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "expected": {
+        "index": 1,
+        "canonical_valid": [
+          false,
+          true,
+          true,
+          false
+        ],
+        "after_reorg_valid": [
+          false,
+          false,
+          false,
+          false
+        ]
+      }
     }
   ]
 }

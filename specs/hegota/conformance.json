@@ -12,20 +12,36 @@
       "spec_sha256": "0b147a11e313e11713479bd4a9e09983929eb54afaa9dd962d7857832918d49c",
       "owner": "EL/CL integration",
       "caller": "pkg/epbs/validation.go",
-      "status": "open_conformance_gap",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "canonical SSZ/domain/registry, requests and actual CL route",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent CL registry/domain/signing-root qualification and the admitted ePBS composition remain HGT-040/070/080.",
       "affected_tasks": [
         "HGT-040",
         "HGT-070",
         "HGT-080"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "canonical SSZ/domain/registry, requests and actual CL route",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/epbs/validation.go",
+          "pkg/node/backend/engine_bogota.go"
+        ],
+        "observation": "Legacy bid authentication fails closed; native Bogota processing is a separate CL-facing route.",
+        "tests": [
+          "github.com/eth2030/eth2030/epbs::TestBuilderBidNeverAcceptsUnauthenticatedInput",
+          "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart"
+        ],
+        "remaining_scope": "Independent CL registry/domain/signing-root qualification and the admitted ePBS composition remain HGT-040/070/080."
+      }
     },
     {
       "requirement_id": "PRE-7928",
@@ -35,20 +51,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
       "owner": "EL core/test",
-      "caller": "pkg/core/chain/blockchain.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/execution/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "published BAL serialization, replay and system access coverage",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Qualify published selected-profile BAL serialization and every system transition independently in HGT-015.",
       "affected_tasks": [
         "HGT-013",
         "HGT-015"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "published BAL serialization, replay and system access coverage",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/frame_8141.go",
+          "pkg/core/chain/block_access_list.go"
+        ],
+        "observation": "Canonical Frames journal BAL changes and chain storage validates persisted BAL integrity.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
+          "github.com/eth2030/eth2030/core/chain::TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody"
+        ],
+        "remaining_scope": "Qualify published selected-profile BAL serialization and every system transition independently in HGT-015."
+      }
     },
     {
       "requirement_id": "PRE-7685",
@@ -58,21 +90,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "99b3272f275293fd5e9af5f45d673132a909dbf28816a7ea7804c247485622a2",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/execution/requests.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "new builder/PQ request types and full ordering/limit conformance",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Selected PQ request admission and independent CL SSZ/count rules remain conditional HGT-075/076; do not duplicate EL request queues.",
       "affected_tasks": [
         "HGT-013",
         "HGT-075",
         "HGT-076"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "new builder/PQ request types and full ordering/limit conformance",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/requests.go"
+        ],
+        "observation": "collectRequests consumes receipt deposit events and ordered 0x01/0x02 queues, plus Amsterdam builder 0x03/0x04 queues; outputs are opaque EL request_data.",
+        "tests": [
+          "github.com/eth2030/eth2030/core::TestProcessRequests_RevertsEarlierQueueIfLaterCallFails",
+          "github.com/eth2030/eth2030/core/execution::TestEIP8282NativeRecordsFeesAndRequestHash"
+        ],
+        "remaining_scope": "Selected PQ request admission and independent CL SSZ/count rules remain conditional HGT-075/076; do not duplicate EL request queues."
+      }
     },
     {
       "requirement_id": "PRE-6110",
@@ -82,20 +129,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "5e3d603bbf83dd7da977825475c2f0214704bc64a1e6426cbba6421344211962",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/execution/requests.go",
+      "status": "historical_finding_resolved",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "replace legacy storage collection with normative deposit-log path",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Complete selected-network block-order/CL deposit agreement remains HGT-081; the specific missing log-collection path is resolved.",
       "affected_tasks": [
         "HGT-013",
         "HGT-081"
       ],
-      "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "release_blocker": false,
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "replace legacy storage collection with normative deposit-log path",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/requests.go",
+          "pkg/core/types/deposit.go"
+        ],
+        "observation": "The historical storage-collection finding is obsolete: collectRequests calls DepositRequestData on receipts and rejects malformed matching events.",
+        "tests": [
+          "github.com/eth2030/eth2030/core::TestProcessRequests_RejectsMalformedMatchingDeposit",
+          "github.com/eth2030/eth2030/core/eips::TestParseDepositLogs"
+        ],
+        "remaining_scope": "Complete selected-network block-order/CL deposit agreement remains HGT-081; the specific missing log-collection path is resolved."
+      }
     },
     {
       "requirement_id": "PRE-8037",
@@ -105,21 +168,37 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "37abe522c5dee68a47a27db6f7b88a71da5b66c8a72ebc601c467940b577b715",
       "owner": "EL core/test",
-      "caller": "pkg/core/vm/gas_table.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/vm/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "selected model/parameters and explicit frame pools/ownership",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent parameter and full creation/refill/rollback coverage for the admitted composition remains HGT-011/012.",
       "affected_tasks": [
         "HGT-011",
         "HGT-012",
         "HGT-013"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "selected model/parameters and explicit frame pools/ownership",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/vm/frame_8141.go",
+          "pkg/core/execution/frame_8141.go"
+        ],
+        "observation": "Canonical Frames have explicit state pools and ownership journal; the legacy reservoir is not their executor.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
+          "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/cross-frame-refill-rollback"
+        ],
+        "remaining_scope": "Independent parameter and full creation/refill/rollback coverage for the admitted composition remains HGT-011/012."
+      }
     },
     {
       "requirement_id": "PRE-8038",
@@ -129,20 +208,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "ad09e7c9a7c78855b00e793109056e6d30022bf4bbf0e237e757226de0e544e2",
       "owner": "EL core/test",
-      "caller": "pkg/core/vm/dynamic_gas.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/vm/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "warm/cold cost table, pool/processor parity",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Full independent warm/cold CALL/SLOAD/SSTORE/delegation access matrix remains HGT-011/020.",
       "affected_tasks": [
         "HGT-011",
         "HGT-020"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "warm/cold cost table, pool/processor parity",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/vm/frame_8141.go",
+          "pkg/core/vm/amsterdam_gas_table.go"
+        ],
+        "observation": "Shared fork setup selects pricing and canonical Frame account/storage operations implement separate execution charges.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/atomic-body-rollback",
+          "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites"
+        ],
+        "remaining_scope": "Full independent warm/cold CALL/SLOAD/SSTORE/delegation access matrix remains HGT-011/020."
+      }
     },
     {
       "requirement_id": "PRE-2780",
@@ -153,19 +248,35 @@
       "spec_sha256": "dd86d5ddef5c5eae38db787302df44cb2a183c5a0b36f63b48c566ad1a5913cf",
       "owner": "EL core/test",
       "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "current existence/value/intrinsic rules",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Selected-profile account-existence and all value/intrinsic boundary oracles remain HGT-011/020.",
       "affected_tasks": [
         "HGT-011",
         "HGT-020"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "current existence/value/intrinsic rules",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/processor.go",
+          "pkg/core/vm/frame_8141.go"
+        ],
+        "observation": "Both legacy intrinsic and canonical Frame creation/value paths exist; approval charges new sender creation as state gas.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsoredSenderCreation",
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CreationChargesAndCodeDeposit"
+        ],
+        "remaining_scope": "Selected-profile account-existence and all value/intrinsic boundary oracles remain HGT-011/020."
+      }
     },
     {
       "requirement_id": "PRE-7778",
@@ -175,20 +286,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "4be38cd987afd0c0106622316f925ccfd50f98ee62110e5efa8a9d3d9fb36592",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/execution/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "dual dimensions versus settlement refund/capacity",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Exhaustive independent refund/floor/multi-transaction capacity combinations remain HGT-011/015.",
       "affected_tasks": [
         "HGT-011",
         "HGT-015"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "dual dimensions versus settlement refund/capacity",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/frame_8141.go",
+          "pkg/core/gaspool/gas_pool.go"
+        ],
+        "observation": "Canonical settlement separates post-refund payer cost from pre-refund block execution and net state capacity.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback",
+          "github.com/eth2030/eth2030/core::TestEIP7778BlockGasPoolCorrectness"
+        ],
+        "remaining_scope": "Exhaustive independent refund/floor/multi-transaction capacity combinations remain HGT-011/015."
+      }
     },
     {
       "requirement_id": "PRE-7976",
@@ -198,20 +325,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "e8ca247a5565f78af284f1211f3e24d37813f892b73058c79c53562914204859",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/types/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "frame/signature pricing, floor and reservation composition",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Large signature/data/floor boundary differential qualification remains HGT-011/020.",
       "affected_tasks": [
         "HGT-011",
         "HGT-020"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "frame/signature pricing, floor and reservation composition",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/types/frame_8141.go",
+          "pkg/core/execution/frame_8141.go"
+        ],
+        "observation": "Canonical GasBudget includes frame/signature data, floor and exact dimension reservations.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/types::TestFrame8141BudgetAndFeeSettlement",
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ClippedTipUsesActualEscrowSettlement"
+        ],
+        "remaining_scope": "Large signature/data/floor boundary differential qualification remains HGT-011/020."
+      }
     },
     {
       "requirement_id": "PRE-7825",
@@ -221,21 +364,37 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "86e82af6cfba9593efb3f8cc16ccc23f13bb0e82c4e7782679cf71b95fcc2fe3",
       "owner": "EL core/test",
-      "caller": "pkg/core/block/validator.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/types/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "cap applies to correct dimension across ingress/build/import",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Exact cap-1/cap/cap+1 across every selected-profile ingress/build/import path remains HGT-002/011/015.",
       "affected_tasks": [
         "HGT-002",
         "HGT-011",
         "HGT-015"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "cap applies to correct dimension across ingress/build/import",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/types/frame_8141.go",
+          "pkg/core/block/validator.go"
+        ],
+        "observation": "Canonical GasBudget and Validate apply the execution transaction cap; state reservation is separate.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/types::TestFrame8141StaticRejections",
+          "github.com/eth2030/eth2030/core/types::TestFrame8141BudgetAndFeeSettlement"
+        ],
+        "remaining_scope": "Exact cap-1/cap/cap+1 across every selected-profile ingress/build/import path remains HGT-002/011/015."
+      }
     },
     {
       "requirement_id": "PRE-7934",
@@ -246,19 +405,33 @@
       "spec_sha256": "99528dc7d4af27ac450b6d845f5617f395036a98222bc523e1af88255dcd62a9",
       "owner": "EL core/test",
       "caller": "pkg/core/block/validator.go",
-      "status": "open_conformance_gap",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "full RLP size and omitted-tx fit boundary",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Dedicated full-RLP prefix-growth and omitted-transaction fit boundary oracle remains HGT-015/044; successful small blocks are not a size-boundary proof.",
       "affected_tasks": [
         "HGT-015",
         "HGT-044"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "full RLP size and omitted-tx fit boundary",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/block/validator.go"
+        ],
+        "observation": "validateRLPBlockSize measures full encoded blocks at Osaka against the execution-layer 8 MiB bound.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+        ],
+        "remaining_scope": "Dedicated full-RLP prefix-growth and omitted-transaction fit boundary oracle remains HGT-015/044; successful small blocks are not a size-boundary proof."
+      }
     },
     {
       "requirement_id": "PRE-7843",
@@ -268,21 +441,38 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "6b4500f8aa5a97009258831476efa1de89c4b1c0dfce760b6ccd9a75a415e470",
       "owner": "EL core/test",
-      "caller": "pkg/core/types/header.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/block/validator.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "actual Engine to header SLOTNUM conversion and skipped slots",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent CL empty/skipped-slot and conditional recent-root public-pool rules remain HGT-018/042/070.",
       "affected_tasks": [
         "HGT-018",
         "HGT-042",
         "HGT-070"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "actual Engine to header SLOTNUM conversion and skipped slots",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/block/validator.go",
+          "pkg/core/execution/processor.go",
+          "pkg/node/backend/engine_bogota.go"
+        ],
+        "observation": "Amsterdam requires a non-nil header slot and ConfigureBlockEVM copies it; native Engine/restart preserves slot commitment.",
+        "tests": [
+          "github.com/eth2030/eth2030/node::TestAmsterdamSlotCommitmentAcrossEngineAndRestart",
+          "github.com/eth2030/eth2030/core/eftest::TestNativeBlockchainRejectsMissingAmsterdamSlot"
+        ],
+        "remaining_scope": "Independent CL empty/skipped-slot and conditional recent-root public-pool rules remain HGT-018/042/070."
+      }
     },
     {
       "requirement_id": "PRE-7702",
@@ -292,21 +482,36 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/vm/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "selected delegation semantics and migration compatibility",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent 8151/8298 code-adoption/fault-proof composition and migration remain HGT-019/035/036.",
       "affected_tasks": [
         "HGT-019",
         "HGT-035",
         "HGT-036"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "selected delegation semantics and migration compatibility",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/vm/frame_8141.go",
+          "pkg/core/execution/processor.go"
+        ],
+        "observation": "Canonical Frames execute delegated code with approval identity and nested rollback tests.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback"
+        ],
+        "remaining_scope": "Independent 8151/8298 code-adoption/fault-proof composition and migration remain HGT-019/035/036."
+      }
     },
     {
       "requirement_id": "PRE-7708",
@@ -316,21 +521,37 @@
       "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "spec_sha256": "95856501ff4103783d792505ee90a6cacfcdbe95c7fb452992fb82258358ca74",
       "owner": "EL core/test",
-      "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "caller": "pkg/core/vm/frame_8141.go",
+      "status": "implementation_present_qualification_pending",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "new frame gas/log/refund and account creation composition",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "All selected-profile creation/transfer/approval log and receipt-root combinations remain HGT-011/012/014.",
       "affected_tasks": [
         "HGT-011",
         "HGT-012",
         "HGT-014"
       ],
       "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "new frame gas/log/refund and account creation composition",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/vm/frame_8141.go",
+          "pkg/core/vm/eip7708.go"
+        ],
+        "observation": "Canonical value transfer/rollback paths and transaction/frame receipt logs are implemented.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/atomic-body-rollback",
+          "github.com/eth2030/eth2030/core/vm::TestEIP7708CallTransferEmitsLog"
+        ],
+        "remaining_scope": "All selected-profile creation/transfer/approval log and receipt-root combinations remain HGT-011/012/014."
+      }
     },
     {
       "requirement_id": "PRE-8141",
@@ -341,21 +562,38 @@
       "spec_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
       "owner": "EL core/test",
       "caller": "pkg/core/execution/processor.go",
-      "status": "open_conformance_gap",
+      "status": "historical_finding_resolved",
       "target_fork": "selected Hegota composition and prerequisite forks",
       "positive_vector": "fixed external valid boundary/state transition oracle required",
       "negative_vector": "tamper/limit+1/missing prerequisite/rollback edge required",
       "oracle": "pinned EIP/EELS plus independent generated fixtures; not yet executed",
-      "test_result": "not_claimed_conformant",
-      "open_question": "new schema/full nonce/chain ID/signatures/blob fields must survive conversion",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent schema-width/scheme/blob differential coverage and conditional extension fields remain HGT-002/019/081; the specific legacy reconstruction issue is resolved.",
       "affected_tasks": [
         "HGT-002",
         "HGT-010",
         "HGT-013",
         "HGT-017"
       ],
-      "release_blocker": true,
-      "integration_status": "requires_specification_requalification_on_integrated_master"
+      "release_blocker": false,
+      "integration_status": "assessed_against_integrated_master",
+      "historical_status": "open_conformance_gap",
+      "historical_finding": "new schema/full nonce/chain ID/signatures/blob fields must survive conversion",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/core/execution/processor.go",
+          "pkg/core/execution/frame_8141.go",
+          "pkg/core/types/frame_8141.go"
+        ],
+        "observation": "applyTransactionInternal dispatches the canonical typed envelope directly; it does not reconstruct it through the frozen legacy Message.",
+        "tests": [
+          "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ArbitrarySignatureIntrospection",
+          "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart"
+        ],
+        "remaining_scope": "Independent schema-width/scheme/blob differential coverage and conditional extension fields remain HGT-002/019/081; the specific legacy reconstruction issue is resolved."
+      }
     },
     {
       "requirement_id": "A-VERIFIED-01",
@@ -525,14 +763,30 @@
       "positive_vector": "known non-current FCU head actually switches canonical index/state/head and subsequent RPC/pool agree",
       "negative_vector": "unapplied head switch must not be counted as verified reorg; failed transition is atomic",
       "oracle": "pinned EIP-3675 and Engine API; production route inspection",
-      "test_result": "TestNativeForkchoiceRefreshesFrameActivationAndReorg plus upstream native FCU/restart regressions",
-      "open_question": "Specific missing-head issue closed; combined fork/CL interoperability remains independently gated.",
+      "test_result": "see current_assessment.tests and source-bound verification acceptance results; not full fork conformance",
+      "open_question": "Independent CL composed-fork interoperability remains HGT-070/080; the missing native head-propagation finding is closed.",
       "affected_tasks": [
         "HGT-013",
         "HGT-080",
         "HGT-087"
       ],
-      "release_blocker": false
+      "release_blocker": false,
+      "historical_status": "verified_native_fcu_head_propagation",
+      "historical_finding": "Specific missing-head issue closed; combined fork/CL interoperability remains independently gated.",
+      "current_assessment": {
+        "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+        "date": "2026-11-25",
+        "files": [
+          "pkg/node/backend/engine_fcu.go",
+          "pkg/node/hegota_head_test.go"
+        ],
+        "observation": "Native FCU switches canonical state/head and refreshes pool on validated selection and rewind.",
+        "tests": [
+          "github.com/eth2030/eth2030/node::TestNativeForkchoiceRefreshesFrameActivationAndReorg"
+        ],
+        "remaining_scope": "Independent CL composed-fork interoperability remains HGT-070/080; the missing native head-propagation finding is closed."
+      },
+      "integration_status": "assessed_against_integrated_master"
     }
   ],
   "integration_review": {

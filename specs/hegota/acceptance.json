@@ -1,0 +1,396 @@
+{
+  "version": 1,
+  "source_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
+  "purpose": "Acceptance of Group A artifacts and bounded runtime behavior, independently of later implementation/release qualification.",
+  "tasks": [
+    {
+      "id": "HGT-001",
+      "criteria": [
+        {
+          "id": "source_pins",
+          "status": "verified",
+          "statement": "Immutable normative source pins and hashes.",
+          "artifacts": [
+            "specs/hegota/source-lock.json",
+            "docs/plans/hegota-a/specification-profiles.md"
+          ],
+          "tests": [],
+          "commands": [
+            "source_lock"
+          ]
+        },
+        {
+          "id": "composition",
+          "status": "verified",
+          "statement": "Six isolated profiles and all nine decision gates.",
+          "artifacts": [
+            "specs/hegota/profiles.json"
+          ],
+          "tests": [],
+          "commands": [
+            "profiles"
+          ]
+        },
+        {
+          "id": "reference_identity",
+          "status": "verified",
+          "statement": "The lock, active profile, module and runner agree on the direct reference.",
+          "artifacts": [
+            "specs/hegota/source-lock.json",
+            "specs/hegota/profiles.json",
+            "pkg/go.mod"
+          ],
+          "tests": [],
+          "commands": [
+            "reference_identity"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-004",
+      "criteria": [
+        {
+          "id": "native_route",
+          "status": "verified",
+          "statement": "Native node uses its actual injected backend/processor and versioned wire dispatcher.",
+          "artifacts": [
+            "docs/plans/hegota-a/runtime-and-activation.md",
+            "pkg/node/hegota_backend_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestNativeRuntimePathAndVersionedBogotaAPI"
+          ],
+          "commands": []
+        },
+        {
+          "id": "wrapper_route",
+          "status": "verified",
+          "statement": "Identify upstream wrapper and container separately from native execution.",
+          "artifacts": [
+            "docs/plans/hegota-a/runtime-and-activation.md",
+            "pkg/cmd/eth2030-geth/main.go",
+            "pkg/Dockerfile"
+          ],
+          "tests": [],
+          "commands": [
+            "runtime_manifest"
+          ]
+        },
+        {
+          "id": "head_selection",
+          "status": "verified",
+          "statement": "Actual native FCU controls head selection and reorg updates.",
+          "artifacts": [
+            "docs/plans/hegota-a/runtime-and-activation.md",
+            "pkg/node/hegota_head_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestNativeForkchoiceRefreshesFrameActivationAndReorg"
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "id": "HGT-005",
+      "criteria": [
+        {
+          "id": "legacy_boundaries",
+          "status": "verified",
+          "statement": "Legacy experimental format stays isolated before mutation and across reorgs.",
+          "artifacts": [
+            "docs/plans/hegota-a/runtime-and-activation.md",
+            "pkg/core/execution/hegota_activation_test.go",
+            "pkg/txpool/hegota_activation_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestProcessorFrameGateBeforeStateMutation",
+            "github.com/eth2030/eth2030/core/execution::TestProcessorOptedInLegacyFrameExecutesAtFork",
+            "github.com/eth2030/eth2030/txpool::TestFrameAdmissionTracksCanonicalHeadAndReorg",
+            "github.com/eth2030/eth2030/core/vm::TestFrameActivationPreservesOtherForkTables"
+          ],
+          "commands": []
+        },
+        {
+          "id": "canonical_head_height",
+          "status": "verified",
+          "statement": "Canonical prefix simulation uses actual block prerequisites before/at/after activation and on reorg.",
+          "artifacts": [
+            "docs/plans/hegota-a/runtime-and-activation.md",
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/hegota_activation_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFramesSurviveLegacyGateReset"
+          ],
+          "commands": []
+        },
+        {
+          "id": "genesis_migration",
+          "status": "verified",
+          "statement": "Legacy/canonical aliases agree and conflicting or retroactive schedules are rejected.",
+          "artifacts": [
+            "pkg/node/genesis_loader_test.go",
+            "pkg/core/config/hegota_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestHegotaGenesisAliases",
+            "github.com/eth2030/eth2030/core/config::TestConfigCompatibilityRejectsRetroactiveRemoteActivation",
+            "github.com/eth2030/eth2030/core/config::TestLegacyFrameConfigChangeAfterActivationIsIncompatible"
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "id": "HGT-006",
+      "criteria": [
+        {
+          "id": "differential",
+          "status": "verified",
+          "statement": "Mandatory native/direct-reference corpus is nonempty, pinned and zero-skip.",
+          "artifacts": [
+            "docs/plans/hegota-a/baseline-and-gaps.md",
+            "pkg/core/eftest/baseline.go",
+            "pkg/core/eftest/testdata/hegota/manifest.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/eftest::TestLockedNativeReferenceBaseline",
+            "github.com/eth2030/eth2030/core/eftest::TestBaselineRejectsInvalidOrUnsupportedEvidence"
+          ],
+          "commands": [
+            "baseline"
+          ]
+        },
+        {
+          "id": "prerequisite_inventory",
+          "status": "verified",
+          "statement": "Every historical prerequisite finding is assessed against integrated code, with scoped evidence and remaining consumers.",
+          "artifacts": [
+            "docs/plans/hegota-a/baseline-and-gaps.md",
+            "specs/hegota/conformance.json"
+          ],
+          "tests": [],
+          "commands": [
+            "prerequisite_inventory"
+          ]
+        },
+        {
+          "id": "skip_inventory",
+          "status": "verified",
+          "statement": "Fresh full/race skip lists remain distinct from the mandatory baseline.",
+          "artifacts": [
+            "docs/plans/hegota-a/baseline-and-gaps.md"
+          ],
+          "tests": [],
+          "commands": [
+            "skip_inventory"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-007",
+      "criteria": [
+        {
+          "id": "encoding",
+          "status": "verified",
+          "statement": "Independent RLP, transaction/signature hash and schema goldens.",
+          "artifacts": [
+            "docs/plans/hegota-a/semantic-adrs.md",
+            "specs/hegota/frame-schema.json",
+            "specs/hegota/codec-goldens.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/eftest::TestHegotaIndependentEncodingGoldens"
+          ],
+          "commands": []
+        },
+        {
+          "id": "approval",
+          "status": "verified",
+          "statement": "Concrete native opcode cases include zero/wrong-target/payment-first/duplicate payment and once-only nonce/escrow.",
+          "artifacts": [
+            "specs/hegota/semantic-goldens.json",
+            "pkg/core/execution/hegota_semantic_goldens_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/approval-zero",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/approval-wrong-target",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/approval-payment-first",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/approval-once"
+          ],
+          "commands": []
+        },
+        {
+          "id": "rollback",
+          "status": "verified",
+          "statement": "Native enclosing VERIFY and atomic-body/state-refill rollback preserve specified state, fees, nonce and gas dimensions.",
+          "artifacts": [
+            "docs/plans/hegota-a/semantic-adrs.md",
+            "specs/hegota/semantic-goldens.json",
+            "pkg/core/execution/hegota_semantic_goldens_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/verify-rollback",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/atomic-body-rollback",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens/cross-frame-refill-rollback"
+          ],
+          "commands": []
+        },
+        {
+          "id": "conditional_nonce_roots",
+          "status": "verified",
+          "statement": "Executable independent numeric nonce/window/reorg oracles remain isolated under D01/D04.",
+          "artifacts": [
+            "docs/plans/hegota-a/semantic-adrs.md",
+            "specs/hegota/semantic-goldens.json",
+            "tools/hegota/semantic_goldens.py",
+            "tools/hegota/test_semantic_goldens.py"
+          ],
+          "tests": [],
+          "commands": [
+            "semantic_oracles"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-008",
+      "criteria": [
+        {
+          "id": "bid_authentication",
+          "status": "verified",
+          "statement": "Untrusted legacy bid inputs cannot be admitted as authenticated bids.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/epbs/hegota_validation_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/epbs::TestBuilderBidNeverAcceptsUnauthenticatedInput"
+          ],
+          "commands": []
+        },
+        {
+          "id": "bls",
+          "status": "verified",
+          "statement": "A real standard backend verifies an independent vector and fails unavailable backend selection.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/crypto/bls/consensus_backend.go",
+            "specs/hegota/bls-vector.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/crypto/bls::TestConsensusBLSIndependentBlstVector",
+            "github.com/eth2030/eth2030/crypto/bls::TestConsensusBackendSelection"
+          ],
+          "commands": []
+        },
+        {
+          "id": "pq",
+          "status": "verified",
+          "statement": "Public metadata/digests cannot authenticate registrations.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/crypto/pqc/pubkey_registry.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/crypto/pqc::TestVerifyRegistration"
+          ],
+          "commands": []
+        },
+        {
+          "id": "kzg",
+          "status": "verified",
+          "statement": "Missing verifier cannot retain blobs; node backend initialization fails closed.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/engine/blobsbundle/bundle.go",
+            "pkg/node/node.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/engine/blobsbundle::TestBlobsBundleMissingVerifierFailsClosed"
+          ],
+          "commands": []
+        },
+        {
+          "id": "native_backend",
+          "status": "verified",
+          "statement": "Use actual native APIs and real snap negative controls, not retired stubs.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/node/hegota_backend_test.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestNativeSnapRejectsUnknownStateRoots",
+            "github.com/eth2030/eth2030/node::TestNativeRuntimePathAndVersionedBogotaAPI"
+          ],
+          "commands": []
+        },
+        {
+          "id": "il_validation",
+          "status": "verified",
+          "statement": "Missing post-state/sender/prefix evidence yields unavailable, never a fabricated verdict.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/focil/il_satisfaction.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/focil::TestILSatisfaction_NilPostState",
+            "github.com/eth2030/eth2030/focil::TestILSatisfactionUnrecoverableSenderUnavailable",
+            "github.com/eth2030/eth2030/focil::TestILSatisfaction_FrameTx_NoVerifier_Unavailable"
+          ],
+          "commands": []
+        },
+        {
+          "id": "experimental",
+          "status": "verified",
+          "statement": "AA, LocalTx and STARK models cannot bypass default or unavailable-provider gates.",
+          "artifacts": [
+            "docs/plans/hegota-a/validation-audit.md",
+            "pkg/node/node.go",
+            "pkg/txpool/txpool.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestStarkFrames_EnabledRequiresProvider",
+            "github.com/eth2030/eth2030/txpool::TestAATxDisabled",
+            "github.com/eth2030/eth2030/txpool::TestLocalTx_DefaultConfigDisallows"
+          ],
+          "commands": []
+        }
+      ]
+    },
+    {
+      "id": "HGT-009",
+      "criteria": [
+        {
+          "id": "scope",
+          "status": "verified",
+          "statement": "All 72 source-backed proposal dispositions and task dependencies are retained.",
+          "artifacts": [
+            "specs/hegota/admission.json"
+          ],
+          "tests": [],
+          "commands": [
+            "admission"
+          ]
+        },
+        {
+          "id": "update_history",
+          "status": "verified",
+          "statement": "Source/admission updates preserve history and require affected tasks and rationale.",
+          "artifacts": [
+            "tools/hegota/check.py",
+            "tools/hegota/test_check.py"
+          ],
+          "tests": [],
+          "commands": [
+            "update_history"
+          ]
+        }
+      ]
+    }
+  ]
+}

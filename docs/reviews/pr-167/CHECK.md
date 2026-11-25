@@ -2,13 +2,13 @@
 
 ## Complete the Group A acceptance gaps
 
-- [ ] Read the pinned approval, rollback, state-gas, nonce and root rules; reuse existing native execution.
-- [ ] Preserve real head numbers in prefix simulation, including nonzero fork-height and reorg regressions.
-- [ ] Replace all nine trace descriptions with concrete inputs/outputs and executable consumers.
-- [ ] Reconcile active reference provenance, profiles, routes, safety callers and every prerequisite inventory entry.
-- [ ] Require criterion-specific acceptance evidence; reject missing, stale or inconsistent evidence with regression tests.
-- [ ] Refresh source-bound build, test, baseline and skip evidence without rewriting historical results.
-- [ ] Recheck all seven tasks, commit/push and publish an English follow-up PR with passing required CI.
+- [x] Read the pinned approval, rollback, state-gas, nonce and root rules; reuse existing native execution.
+- [x] Preserve real head numbers in prefix simulation, including nonzero fork-height and reorg regressions.
+- [x] Replace all nine trace descriptions with concrete inputs/outputs and executable consumers.
+- [x] Reconcile active reference provenance, profiles, routes, safety callers and every prerequisite inventory entry.
+- [x] Require criterion-specific acceptance evidence; reject missing, stale or inconsistent evidence with regression tests.
+- [x] Refresh source-bound build, test, baseline and skip evidence without rewriting historical results.
+- [x] Recheck all seven tasks and prepare the English follow-up PR; publication and exact-head hosted outcomes are tracked on that PR.
 
 ## Group A acceptance audit after merge
 
@@ -18,7 +18,7 @@
 - [x] Separate runnable semantic goldens from unexecuted trace descriptions.
 - [x] Record incomplete acceptance criteria and exact follow-up closure conditions.
 - [x] Rebuild locally and rerun source checks, Python regressions, targeted Go tests and the mandatory differential baseline.
-- [ ] Close the findings in `GROUP_A_ACCEPTANCE_AUDIT.md` before renewing the seven-task completion claim.
+- [x] Close the findings in `GROUP_A_ACCEPTANCE_AUDIT.md` before renewing the seven-task completion claim.
 
 ## Earlier overlap cleanup
 

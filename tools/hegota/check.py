@@ -8,6 +8,8 @@ import subprocess
 from pathlib import Path
 from codec_goldens import vectors
 from semantic_goldens import check as check_semantics
+from acceptance import (validate_acceptance, validate_inventory, validate_reference,
+                        validate_skips)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -140,7 +142,6 @@ def main():
     task_register=read(ROOT/'specs/hegota/tasks.json')
     require({t['id'] for t in task_register['tasks']}=={'HGT-001','HGT-004','HGT-005','HGT-006','HGT-007','HGT-008','HGT-009'},'A task omission')
     for task in task_register['tasks']:
-        require(task['status']=='verified' and task['owner'] and task['scope_limit'],'incomplete A task status')
         for path in task['artifacts']:require((ROOT/path).is_file(),f'missing A artifact: {path}')
     runtime=read(ROOT/'evidence/hegota-a/runtime.json')
     for path,expected_hash in runtime['source_file_sha256'].items():
@@ -150,9 +151,17 @@ def main():
         require(digest(ROOT/path)==expected_hash,f'verification artifact changed: {path}')
     baseline=read(ROOT/'evidence/hegota-a/baseline.json')
     require(baseline['expected']==baseline['executed']==baseline['passed']==12 and baseline['failed']==baseline['skipped']==0,'baseline incomplete')
+    validate_reference(ROOT,lock,profile,baseline)
+    validate_inventory(ROOT,read(ROOT/'specs/hegota/conformance.json'),verification)
+    validate_skips(read(ROOT/'evidence/hegota-a/skipped-tests.json'),verification)
+    require({b['path_role'] for b in runtime['binaries']}=={'native','upstream_geth_wrapper'} and runtime['native_runtime_identity'],'missing runtime identity')
+    require(verification['python_checks']['checker_regressions']>=12,'source/admission regressions not executed')
+    acceptance=validate_acceptance(ROOT,task_register,read(ROOT/'specs/hegota/acceptance.json'),verification,runtime,
+        {'source_lock','profiles','reference_identity','runtime_manifest','baseline','prerequisite_inventory','skip_inventory','semantic_oracles','admission','update_history'})
+    require(acceptance['complete'],'Group A has unresolved acceptance criteria; preserve truthful review/blocked statuses')
     if args.compare_lock or args.compare_admission:
         require(args.compare_lock and args.compare_admission,'provide both update artifacts')
         newadmission=read(args.compare_admission);validate_admission(newadmission,expected,tasks)
         print(json.dumps(compare(lock,read(args.compare_lock),admission,newadmission),ensure_ascii=False,indent=2))
-    else:print(json.dumps({'result':'pass','scope_eips':72,'local_source_hashes_checked':count,'source_files_locked':len(lock['files']),'profiles':len(profile['profiles']),'decisions':9,'codec_goldens':7},ensure_ascii=False))
+    else:print(json.dumps({'result':'pass','scope_eips':72,'local_source_hashes_checked':count,'source_files_locked':len(lock['files']),'profiles':len(profile['profiles']),'decisions':9,'codec_goldens':7,'acceptance':acceptance},ensure_ascii=False))
 if __name__=='__main__':main()

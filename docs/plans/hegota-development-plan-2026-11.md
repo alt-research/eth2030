@@ -114,7 +114,7 @@
 
 每个任务进入开发前补齐：owner、采用规范条款/SHA、修改文件、正向与反向用例、估工、PR/commit、产物路径。统一状态为 `planned → ready → in_progress → review → verified`；另外使用 `blocked_by_spec`、`deferred`、`out_of_scope` 并写明解除条件。`verified` 必须指向可复现证据。
 
-HGT-001/002/003/004 保留宏观计划中的编号与职责；其他任务在此细化。最初 77 项均为 `planned`。2026-11-25 已完成 A 组 7 项（HGT-001/004/005/006/007/008/009）；[任务状态登记](../../specs/hegota/tasks.json)与[验证证据](../../evidence/hegota-a/verification.json)逐项对应。其余任务仍未因本轮基线工作被认定实现，条件项尚未承诺为最终发布范围。
+The seven Group A tasks (HGT-001/004/005/006/007/008/009) are accepted only through the [criterion matrix](../../specs/hegota/acceptance.json), current [task register](../../specs/hegota/tasks.json) and [source-bound verification](../../evidence/hegota-a/verification.json). The [post-merge completion report](../reviews/pr-167/ACCEPTANCE_COMPLETION.md) records the repaired head-context defect, concrete semantic fixtures and reconciled runtime/reference/inventory artifacts. Existing implementations are reused. A completion does not close B–J qualification or activate conditional proposals as a combined release.
 
 ### A. 规范、基线与运行路径
 

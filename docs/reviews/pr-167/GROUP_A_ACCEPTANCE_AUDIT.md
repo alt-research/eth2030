@@ -1,5 +1,7 @@
 # Group A acceptance audit
 
+> Historical findings on the merged PR #167 tree. The [acceptance completion report](ACCEPTANCE_COMPLETION.md) records the subsequent fixes and current verification; the original observations below are retained unchanged.
+
 Audited on 2026-11-25 against merged master `89b3b1f2d12352777903de9803f3c93285bdcdf1`, whose tree equals PR #167 head `a86473ea6c04fa33a2fd488c33506380d2b96a8f`. The PR is merged and its 15 hosted checks passed. This is an acceptance review of the seven Group A deliverables, not a requirement to implement all later groups before completing A.
 
 **Conclusion: Group A cannot currently be accepted as fully complete.** The task register's seven `verified` flags predate this audit. Existing code and qualified tests should be reused; unresolved specification combinations remain isolated.

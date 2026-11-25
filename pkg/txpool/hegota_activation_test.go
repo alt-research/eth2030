@@ -7,6 +7,38 @@ import (
 	"testing"
 )
 
+// A timestamp does not activate post-merge VM rules before the London block.
+// Public-prefix simulation must use the same head height as block execution.
+func TestCanonicalFramePrefixUsesHeadBlockPrerequisites(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	cfg := *config.TestConfig
+	zero := uint64(0)
+	cfg.HogotaTime, cfg.LondonBlock = &zero, big.NewInt(10)
+	pool.SetForkRules(&cfg, 100)
+	db.SetCode(frame.Sender, []byte{0x60, 3, 0x5f, 0x5f, 0xaa})
+	frame.Frames[0].Limits.Execution = 30000
+	tx := signPoolFrame(t, frame, 1)
+	root := db.GetRoot()
+	for _, head := range []uint64{9, 10, 11, 9, 10} {
+		pool.Reset(db, &types.Header{Number: new(big.Int).SetUint64(head), Time: 100, GasLimit: 30000000, BaseFee: big.NewInt(1)})
+		if head < 10 {
+			if pool.Get(tx.Hash()) != nil {
+				t.Fatal("reorg retained a Frame requiring a later VM fork")
+			}
+			if err := pool.AddRemote(tx); err == nil {
+				t.Fatal("pre-London prefix accepted PUSH0")
+			}
+		} else if pool.Get(tx.Hash()) == nil {
+			if err := pool.AddRemote(tx); err != nil {
+				t.Fatalf("Frame rejected at active head %d: %v", head, err)
+			}
+		}
+		if db.GetRoot() != root || db.GetNonce(frame.Sender) != 0 {
+			t.Fatal("prefix validation mutated live state")
+		}
+	}
+}
+
 func TestFrameAdmissionTracksCanonicalHeadAndReorg(t *testing.T) {
 	s := newMockState()
 	sender := types.Address{1}

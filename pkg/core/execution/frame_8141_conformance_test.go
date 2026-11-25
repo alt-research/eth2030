@@ -7,6 +7,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/types"
+	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 func TestFrame8141ApprovalScopeMatrix(t *testing.T) {
@@ -91,5 +92,41 @@ func TestFrame8141DefaultCodeDoesNotAuthenticateArbitraryWitness(t *testing.T) {
 	}
 	if db.GetRoot() != before {
 		t.Fatal("failed default validation mutated state")
+	}
+}
+
+func TestFrame8141InvalidProtocolSignatureBeforeExecution(t *testing.T) {
+	for _, kind := range []string{"recovery_id", "high_s", "wrong_signer", "unknown_scheme", "short_signature"} {
+		t.Run(kind, func(t *testing.T) {
+			tx, db, cfg, header := frameExecutionFixture(t)
+			db.SetCode(tx.Sender, []byte{0x60, 3, 0x5f, 0x5f, 0xaa})
+			transaction := signFrameExecution(t, tx, false)
+			frame := transaction.Inner().(*types.FrameTx8141)
+			sig := &frame.Signatures[0]
+			switch kind {
+			case "recovery_id":
+				sig.Signature[0] = 27
+			case "high_s":
+				s := new(big.Int).SetBytes(sig.Signature[33:])
+				s.Sub(gethcrypto.S256().Params().N, s)
+				s.FillBytes(sig.Signature[33:])
+				sig.Signature[0] ^= 1
+			case "wrong_signer":
+				other := types.Address{19: 99}
+				sig.Signer = &other
+			case "unknown_scheme":
+				sig.Scheme = 3
+			case "short_signature":
+				sig.Signature = sig.Signature[:64]
+			}
+			before := db.GetRoot()
+			gp := new(gaspool.GasPool).AddGas(header.GasLimit)
+			if _, _, err := ApplyTransaction(cfg, db, header, types.NewTransaction(frame), gp); err == nil {
+				t.Fatal("malformed protocol signature accepted")
+			}
+			if db.GetRoot() != before || gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit {
+				t.Fatal("invalid signature executed approval or reserved gas")
+			}
+		})
 	}
 }

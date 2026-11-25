@@ -2,8 +2,11 @@ package types
 
 import (
 	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"math"
 	"math/big"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/rlp"
@@ -126,5 +129,66 @@ func TestFrame8250DeltaDataAndAccessPricing(t *testing.T) {
 	}
 	if empty.Intrinsic != base.Intrinsic+32 || empty.CalldataFloor != base.CalldataFloor+128 {
 		t.Fatal("empty list and sequence not priced")
+	}
+}
+
+func TestFrame8250DeltaIndependentWireGoldens(t *testing.T) {
+	raw, err := os.ReadFile("../../../specs/hegota/b-codec-goldens.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var corpus struct {
+		Vectors []struct {
+			ID          string `json:"id"`
+			Wire        string `json:"wire"`
+			Hash        string `json:"hash"`
+			SigningHash string `json:"signing_hash"`
+			KeySetHash  string `json:"key_set_hash"`
+		} `json:"vectors"`
+	}
+	if err = json.Unmarshal(raw, &corpus); err != nil {
+		t.Fatal(err)
+	}
+	if len(corpus.Vectors) != 4 {
+		t.Fatal("missing independent vectors")
+	}
+	for _, v := range corpus.Vectors {
+		t.Run(v.ID, func(t *testing.T) {
+			wire, err := hex.DecodeString(v.Wire[2:])
+			if err != nil {
+				t.Fatal(err)
+			}
+			tx, err := DecodeFrameTx8250Delta(wire[1:])
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = tx.Validate(); err != nil {
+				t.Fatal(err)
+			}
+			encoded, err := tx.Encode()
+			if err != nil || !bytes.Equal(encoded, wire) {
+				t.Fatal("independent wire differs", err)
+			}
+			hash, _ := tx.Hash()
+			signing, _ := tx.SigningHash()
+			if hash != HexToHash(v.Hash) || signing != HexToHash(v.SigningHash) || NonceKeysHash8250(tx.NonceKeys) != HexToHash(v.KeySetHash) {
+				t.Fatal("independent digest differs")
+			}
+		})
+	}
+}
+
+func TestFrame8141RejectsNoncanonicalIntegerRLP(t *testing.T) {
+	tx := nonceProfile8250().ExecutionFields()
+	fields := []any{tx.ChainID, uint64(0), tx.Sender, tx.Frames, tx.Signatures, tx.Fees, tx.BlobVersionedHashes}
+	for _, bad := range []rlp.RawValue{{0x00}, {0x81, 0x01}, {0x82, 0x00, 0x01}, {0x89, 1, 0, 0, 0, 0, 0, 0, 0, 0}} {
+		fields[1] = bad
+		wire, err := rlp.EncodeToBytes(fields)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := DecodeFrameTx8141(wire); err == nil {
+			t.Fatalf("accepted noncanonical/overflow nonce %x", bad)
+		}
 	}
 }

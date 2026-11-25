@@ -144,6 +144,24 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			if replay.GetRoot() != built.Root() || result.BlockAccessList.Hash() != *built.Header().BlockAccessListHash {
 				t.Fatal("builder/replay state or BAL differs")
 			}
+			for name, corrupt := range map[string]func(*types.Header){
+				"receipt_root":   func(h *types.Header) { h.ReceiptHash[0] ^= 1 },
+				"state_root":     func(h *types.Header) { h.Root[0] ^= 1 },
+				"bal_commitment": func(h *types.Header) { (*h.BlockAccessListHash)[0] ^= 1 },
+				"block_gas":      func(h *types.Header) { h.GasUsed++ },
+				"logs_bloom":     func(h *types.Header) { h.Bloom[0] ^= 1 },
+			} {
+				t.Run("reject_"+name, func(t *testing.T) {
+					header := built.Header()
+					corrupt(header)
+					if err := bc.InsertBlock(types.NewBlock(header, built.Body())); err == nil {
+						t.Fatal("native import accepted corrupted Frame block")
+					}
+					if bc.CurrentBlock().Hash() != genesis.Hash() || bc.State().GetRoot() != alloc.GetRoot() {
+						t.Fatal("rejected Frame block changed canonical state")
+					}
+				})
+			}
 			if err := bc.InsertBlock(built); err != nil {
 				t.Fatalf("canonical import: %v", err)
 			}

@@ -222,3 +222,40 @@ func TestFrame8250DeltaCreateAndLegacyIntrospection(t *testing.T) {
 		})
 	}
 }
+
+func TestFrame8250DeltaSequenceExhaustionAndWholeSetAtomicity(t *testing.T) {
+	base, db, cfg, header := frameExecutionFixture(t)
+	db.SetNonce(types.NonceManager8250, 1)
+	db.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+	base.Frames[0].Limits.State = 16 * 97920
+	tx := delta8250(base)
+	for i := int64(0); i < 16; i++ {
+		tx.NonceKeys = append(tx.NonceKeys, big.NewInt(i))
+	}
+	signDelta8250(t, tx)
+	if _, _, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil); err != nil {
+		t.Fatal(err)
+	}
+	// A mismatch on the final key must leave all earlier keys unchanged.
+	tx.NonceSeq = 1
+	lastSlot := types.NonceSlot8250(tx.Sender, big.NewInt(15))
+	db.SetState(types.NonceManager8250, lastSlot, types.Hash{31: 2})
+	signDelta8250(t, tx)
+	before := db.GetRoot()
+	if _, _, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil); err == nil || db.GetRoot() != before {
+		t.Fatal("nonce mismatch consumed part of set")
+	}
+	tx.NonceKeys = tx.NonceKeys[:1]
+	tx.NonceSeq = math.MaxUint64 - 1
+	slot := types.NonceSlot8250(tx.Sender, tx.NonceKeys[0])
+	db.SetState(types.NonceManager8250, slot, types.BytesToHash(new(big.Int).SetUint64(tx.NonceSeq).Bytes()))
+	signDelta8250(t, tx)
+	if _, _, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil); err != nil {
+		t.Fatal(err)
+	}
+	tx.NonceSeq = math.MaxUint64
+	signDelta8250(t, tx)
+	if _, _, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil); err == nil {
+		t.Fatal("exhausted key selected again as single-use")
+	}
+}

@@ -181,6 +181,19 @@ func TestCanonicalFrame8141IntrospectionOnExecutedState(t *testing.T) {
 		want       func(*types.FrameTx8141) *big.Int
 		fail       bool
 	}{
+		{"nonce", []byte{0x60, 1, 0xb0}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(tx.Nonce) }, false},
+		{"priority fee", []byte{0x60, 3, 0xb0}, func(tx *types.FrameTx8141) *big.Int { return tx.Fees.MaxPriorityFeePerGas }, false},
+		{"blob count", []byte{0x60, 7, 0xb0}, func(tx *types.FrameTx8141) *big.Int {
+			return new(big.Int).SetUint64(uint64(len(tx.BlobVersionedHashes)))
+		}, false},
+		{"resolved target", []byte{0x60, 0, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetBytes(tx.Frames[1].Target[:]) }, false},
+		{"execution limit", []byte{0x60, 1, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(tx.Frames[1].Limits.Execution) }, false},
+		{"mode", []byte{0x60, 2, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(uint64(tx.Frames[1].Mode)) }, false},
+		{"flags", []byte{0x60, 3, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(uint64(tx.Frames[1].Flags)) }, false},
+		{"data length", []byte{0x60, 4, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(uint64(len(tx.Frames[1].Data))) }, false},
+		{"atomic flag", []byte{0x60, 7, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return big.NewInt(0) }, false},
+		{"frame value", []byte{0x60, 8, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return big.NewInt(0) }, false},
+		{"state limit", []byte{0x60, 9, 0x60, 1, 0xb3}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetUint64(tx.Frames[1].Limits.State) }, false},
 		{"transaction type", []byte{0x60, 0, 0xb0}, func(_ *types.FrameTx8141) *big.Int { return big.NewInt(6) }, false},
 		{"sender", []byte{0x60, 2, 0xb0}, func(tx *types.FrameTx8141) *big.Int { return new(big.Int).SetBytes(tx.Sender[:]) }, false},
 		{"max fee", []byte{0x60, 4, 0xb0}, func(tx *types.FrameTx8141) *big.Int { return tx.Fees.MaxFee }, false},

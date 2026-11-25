@@ -259,3 +259,38 @@ func TestFrame8250DeltaSequenceExhaustionAndWholeSetAtomicity(t *testing.T) {
 		t.Fatal("exhausted key selected again as single-use")
 	}
 }
+
+func TestFrame8250DeltaRevertedApprovalCanBeRetried(t *testing.T) {
+	base, db, cfg, header := frameExecutionFixture(t)
+	db.SetNonce(types.NonceManager8250, 1)
+	db.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+	library := types.Address{19: 0x90}
+	db.SetCode(library, []byte{0x60, 3, 0x5f, 0x5f, 0xaa})
+	// The nonempty-data DEFAULT frame approves through a library then reverts;
+	// the later empty-data VERIFY frame approves directly in sender context.
+	code := []byte{0x36, 0x15, 0x60, 0, 0x57, 0x5f, 0x5f, 0x5f, 0x5f, 0x73}
+	code = append(code, library[:]...)
+	code = append(code, 0x61, 0x75, 0x30, 0xf4, 0x50, 0x5f, 0x5f, 0xfd)
+	code[3] = byte(len(code))
+	code = append(code, 0x5b, 0x60, 3, 0x5f, 0x5f, 0xaa)
+	db.SetCode(base.Sender, code)
+	base.Frames = []types.Frame8141{
+		{Mode: types.ModeDefault, Flags: 3, Data: []byte{1}, Limits: types.FrameGasLimits{Execution: 50000, State: 97920}},
+		{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000, State: 97920}},
+	}
+	tx := delta8250(base, 0)
+	signDelta8250(t, tx)
+	before := new(big.Int).Set(db.GetBalance(tx.Sender))
+	receipt, used, err := ExecuteFrame8250Delta(cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if receipt.FrameResults8141[0].Status != 0 || receipt.FrameResults8141[0].GasUsed.State != 0 || receipt.FrameResults8141[1].GasUsed.State != 97920 {
+		t.Fatal("approval state charge did not roll back/retry")
+	}
+	value := db.GetState(types.NonceManager8250, types.NonceSlot8250(tx.Sender, big.NewInt(0)))
+	charge := new(big.Int).Sub(before, db.GetBalance(tx.Sender))
+	if value != (types.Hash{31: 1}) || db.GetNonce(tx.Sender) != 0 || charge.Cmp(new(big.Int).SetUint64(used*3)) != 0 {
+		t.Fatal("nonce/escrow consumed more than once")
+	}
+}

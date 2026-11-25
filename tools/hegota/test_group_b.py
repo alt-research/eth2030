@@ -1,0 +1,58 @@
+import copy
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from check_b import ROOT, fingerprint, read_events, validate_manifest, verify_report
+
+class GroupBCoverageTests(unittest.TestCase):
+    def manifest(self):
+        return json.loads((ROOT/'specs/hegota/group-b.json').read_text())
+
+    def test_all_twelve_tasks_have_executable_consumers(self):
+        tests, artifacts = validate_manifest(ROOT, self.manifest())
+        self.assertGreaterEqual(len(tests), 50)
+        self.assertIn('pkg/core/vm/frame_8250.go', artifacts)
+
+    def test_missing_task_rejected(self):
+        manifest = self.manifest()
+        manifest['tasks'].pop()
+        with self.assertRaisesRegex(ValueError, 'task omission'):
+            validate_manifest(ROOT, manifest)
+
+    def test_missing_criterion_rejected(self):
+        manifest = self.manifest()
+        manifest['tasks'][0]['criteria'].pop()
+        with self.assertRaisesRegex(ValueError, 'criterion omission'):
+            validate_manifest(ROOT, manifest)
+
+    def test_public_nonce_activation_rejected(self):
+        manifest = self.manifest()
+        manifest['profiles']['8250-nonce-only-delta-isolated-v1']['public_activation'] = True
+        with self.assertRaisesRegex(ValueError, 'stay isolated'):
+            validate_manifest(ROOT, manifest)
+
+    def test_nonexistent_native_test_rejected(self):
+        manifest = self.manifest()
+        manifest['tasks'][0]['criteria'][0]['tests'] = ['github.com/eth2030/eth2030/core/types::TestInventedAcceptance']
+        with self.assertRaisesRegex(ValueError, 'missing native test'):
+            validate_manifest(ROOT, manifest)
+
+    def test_missing_or_skipped_native_evidence_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'omitted/failed/skipped'):
+            verify_report({'source_fingerprint_sha256': 'digest', 'artifacts': {}, 'passed_tests': {}},
+                          {'package::TestRequired'}, {}, 'digest')
+
+    def test_stale_fingerprint_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'stale B'):
+            verify_report({'source_fingerprint_sha256': 'old', 'artifacts': {}}, set(), {}, 'new')
+
+    def test_incomplete_and_failed_go_runs_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp)/'run.jsonl'
+            for events, message in [([{'Action':'start','Package':'p'}], 'incomplete'),
+                                    ([{'Action':'start','Package':'p'}, {'Action':'fail','Package':'p'}], 'failed')]:
+                log.write_text(''.join(json.dumps(e)+'\n' for e in events))
+                with self.assertRaisesRegex(ValueError, message):
+                    read_events(log)

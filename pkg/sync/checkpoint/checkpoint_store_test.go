@@ -231,6 +231,9 @@ func TestCheckpointStore_UpdateProgress(t *testing.T) {
 	store := NewCheckpointStore(DefaultCheckpointStoreConfig())
 	cp := makeTrustedCheckpoint(10, 320, "embedded")
 	store.StartSync(cp, 1320)
+	// ETA requires elapsed time. Immediate consecutive calls can share one
+	// monotonic clock tick; establish a deterministic nonzero observation.
+	store.progress.StartedAt = time.Now().Add(-time.Second)
 	store.UpdateProgress(820, 500, 0, 0)
 	p := store.Progress()
 	if p.CurrentBlock != 820 || p.HeadersDown != 500 {

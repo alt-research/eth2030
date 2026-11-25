@@ -94,9 +94,6 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
-	ChainConfig       *config.ChainConfig // explicit legacy prototype profile; canonical 8141 uses SetForkRules
-	HeadTime          uint64
-	HeadNumber        uint64
 	MaxSize           int               // Maximum number of transactions in pool
 	MaxPerSender      int               // Maximum pending per sender
 	MinGasPrice       *big.Int          // Minimum gas price to accept
@@ -231,6 +228,7 @@ type TxPool struct {
 	config      Config
 	frameConfig *config.ChainConfig
 	frameTime   uint64
+	frameNumber uint64
 	chainID     *big.Int
 	pqForkKnown bool
 	pqActive    bool
@@ -255,7 +253,7 @@ func New(config Config, state StateReader) *TxPool {
 	if config.MinGasPrice != nil {
 		bumperCfg.IgnorePrice = new(big.Int).Set(config.MinGasPrice)
 	}
-	pool := &TxPool{
+	return &TxPool{
 		config:    config,
 		state:     state,
 		suggestor: pricing.NewPriceBumper(bumperCfg),
@@ -263,10 +261,6 @@ func New(config Config, state StateReader) *TxPool {
 		queue:     make(map[types.Address]*txSortedList),
 		lookup:    newTxLookup(),
 	}
-	if config.ChainConfig != nil {
-		pool.SetForkRules(config.ChainConfig, config.HeadTime)
-	}
-	return pool
 }
 
 // RecordBlock feeds fee data from a newly processed block into the gas price
@@ -309,7 +303,6 @@ func (pool *TxPool) SetForkRules(cfg *config.ChainConfig, time uint64) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 	pool.frameConfig, pool.frameTime = cfg, time
-	pool.config.ChainConfig, pool.config.HeadTime = cfg, time
 	pool.config.IsPrague = cfg.IsPrague(time)
 	pool.config.IsGlamsterdan = cfg.IsGlamsterdan(time)
 	pool.config.IsOsaka = cfg.IsOsaka(time)
@@ -629,7 +622,7 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) (result
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return pool.validateFrame8141(tx)
 	}
-	if tx.Type() == types.FrameTxType && !pool.config.ChainConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.config.HeadNumber), pool.config.HeadTime) {
+	if tx.Type() == types.FrameTxType && !pool.frameConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.frameNumber), pool.frameTime) {
 		return errors.New("frame transactions unavailable at canonical head")
 	}
 	// BB-2.2: gate type-0x08 LocalTx behind --experimental-local-tx flag.
@@ -1237,11 +1230,11 @@ func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 	if len(heads) > 0 {
 		pool.updateHeadFeesLocked(heads[0])
 		if heads[0] != nil && heads[0].Number != nil {
-			pool.config.HeadNumber = heads[0].Number.Uint64()
+			pool.frameNumber = heads[0].Number.Uint64()
 		}
 	}
 	pool.revalidateFrames8141()
-	if !pool.config.ChainConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.config.HeadNumber), pool.config.HeadTime) {
+	if !pool.frameConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.frameNumber), pool.frameTime) {
 		for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
 			for addr, list := range lists {
 				for _, tx := range append([]*types.Transaction(nil), list.items...) {
@@ -1784,13 +1777,4 @@ func (pool *TxPool) SetBlobBaseFee(blobBaseFee *big.Int) {
 
 func (pool *TxPool) amsterdamOrdinary(tx *types.Transaction) bool {
 	return pool.frameConfig != nil && pool.frameConfig.IsMerge() && pool.frameConfig.IsAmsterdam(pool.frameTime) && tx.Type() <= types.SetCodeTxType
-}
-
-// ResetAtHead updates an explicit legacy profile; production callers pass the full header to Reset.
-func (pool *TxPool) ResetAtHead(reader StateReader, cfg *config.ChainConfig, timestamp, number uint64) {
-	pool.SetForkRules(cfg, timestamp)
-	pool.mu.Lock()
-	pool.config.HeadNumber = number
-	pool.mu.Unlock()
-	pool.Reset(reader)
 }

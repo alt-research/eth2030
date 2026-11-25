@@ -2,8 +2,8 @@
   "date": "2026-11-25",
   "timezone": "Asia/Shanghai",
   "source_base_commit": "98d4317784b755ab75eefbec1ae7d8dca813ae96",
-  "branch_baseline": "6a17479ce45ad60ef6d35c9c6b4eaed198728085",
-  "source_fingerprint_sha256": "d3e79401894e9cb682dcc869c4d59386a90df202569332bea74185e493967cde",
+  "branch_baseline": "dca42829c9bc059244d10efc0a835b220944a6aa",
+  "source_fingerprint_sha256": "4b04533d08ffa6d7c63e7fd7756bed78a02d2d90cf89d121a9a6a2b22a84c30e",
   "host": {
     "os": "Darwin",
     "architecture": "arm64",
@@ -14,12 +14,12 @@
     "exit_code": 0
   },
   "vet": {
-    "command": "cd pkg && env -u GOROOT GOFLAGS=-p=4 go vet ./...; go vet ./eiptest after framework changes",
+    "command": "cd pkg && env -u GOROOT GOFLAGS=-p=4 go vet ./...",
     "exit_code": 0
   },
   "full_suite": {
-    "command": "cd pkg && env -u GOROOT GOFLAGS=-p=4 go test -json ./... -timeout=15m -count=1",
-    "log_sha256": "f5a4b57818dc7a94ef3451b8bd5869d4f7b2803a3cb37d48eb12f7eaa0e6d03c",
+    "command": "go test -json ./... -timeout=15m -count=1",
+    "log_sha256": "774a38a26b3851e4aa2b7b93b408afb141d8158a513c1ea0a853877c51a49736",
     "named_test_or_subtest_events": {
       "pass": 23520,
       "fail": 0,
@@ -35,72 +35,21 @@
     "exit_code": 0
   },
   "race_suite": {
-    "command": "go test -race ./core/config ./core/execution ./core/vm ./core/eftest ./crypto/bls ./txpool ./node/... ./engine/... ./epbs/... ./focil ./crypto/vdf ./txpool/encrypted ./das/streaming",
-    "log_sha256": "ce80a000e9ad045659d2ae4ece0079752b51d66f4e60ce1d8ed7444bf4c6e0ec",
+    "command": "go test -race -json ./core/config ./txpool ./node/... ./eiptest/... ./engine/... ./crypto/pqc -count=1 -timeout=15m",
+    "log_sha256": "bc7e5eb1832f371ab96c7cd28edc17271cbed26ee7d42e82d8aba62583b6bb73",
     "named_test_or_subtest_events": {
-      "pass": 6652,
+      "pass": 2615,
       "fail": 0,
-      "skip": 111
+      "skip": 6
     },
     "package_events": {
-      "pass": 38,
+      "pass": 24,
       "fail": 0,
-      "skip": 2
+      "skip": 3
     },
-    "completed_packages": 40,
-    "started_packages": 40,
+    "completed_packages": 27,
+    "started_packages": 27,
     "exit_code": 0
-  },
-  "ci_race_suite": {
-    "command": "go test -race ./consensus ./focil ./das/custody ./ssz ./core/types ./eiptest/... ./core/rawdb ./core/chain ./sync/beacon",
-    "log_sha256": "6aed9633275c8d9fc8e217ab71c9f6a85a02a8e90a19b0166d7c3a27807793f4",
-    "named_test_or_subtest_events": {
-      "pass": 3916,
-      "fail": 0,
-      "skip": 4
-    },
-    "package_events": {
-      "pass": 9,
-      "fail": 0,
-      "skip": 1
-    },
-    "completed_packages": 10,
-    "started_packages": 10,
-    "exit_code": 0
-  },
-  "other_checks": {
-    "merge-blst.log": {
-      "sha256": "54b82e3a811502ce34624af320d2d52b26d3a7a7640d7421f137a46fe425206b",
-      "result": "pass"
-    },
-    "merge-goethkzg.log": {
-      "sha256": "3a1077ffa109ef622e43bd4f9b2d76a0c5a7816fa86981d050fc0d5cdf15eb4d",
-      "result": "pass"
-    },
-    "merge-integration-tag-verified.log": {
-      "sha256": "53f3ab0bb533cf7f4f9bcfaa359d88d0b220d1e9c1eabc0090afd794df94e1af",
-      "result": "pass"
-    },
-    "merge-eiptest-verified.log": {
-      "sha256": "487c0c0a63bae14409836493d0eed68009a6bde5f5310287d03addb934540d49",
-      "result": "pass"
-    },
-    "merge-consensus-replay.log": {
-      "sha256": "496a43ba360b5a519e0bcb584ebe762ac3df9d32891a4b1599552f20d1ea15f0",
-      "result": "pass"
-    },
-    "merge-python314.log": {
-      "sha256": "abea8e6dcccd24194e4111dd070cb57ca8d95ffc69f3c2389b2f6b6cdc2163d9",
-      "result": "pass"
-    },
-    "merge-hegota-python.log": {
-      "sha256": "1d2d14bd7d1f93cf868ebd5f37f53489517720fd9440b34a493338e48318bae9",
-      "result": "pass"
-    },
-    "merge-runtime.txt": {
-      "sha256": "6e9381a5d489ec2eaaa17187e5d5ece890cea6b8c100e5d0be44e4e59aeb09c8",
-      "result": "pass"
-    }
   },
   "baseline": {
     "reference_backend": "upstream/go-ethereum@v1.17.10/tests.StateTest.RunNoVerify",
@@ -111,214 +60,57 @@
     "skipped": 0
   },
   "python_checks": {
-    "source_lock_and_admission": "72 EIPs, 108 sources, 99 local normative hashes; current runtime/artifact fingerprints checked separately",
+    "source_admission": "72 proposals; 108 locked source files; 99 local normative hashes",
     "checker_regressions": 12,
-    "devnet_control_tests_python314": 70,
     "codec_goldens": 7,
     "arithmetic_oracles": 2,
     "domain_oracles": 1,
-    "latest_spec_semantic_seeds_not_executed": 9
+    "unexecuted_latest_spec_seeds": 9
   },
-  "consensus_fixture": {
-    "codec": "eth2030-a05a56de",
-    "slot": 192,
-    "validators": 256,
-    "ptc_window": 96,
-    "state_root": "0x59b82ac0e16aa1659084fa702a9e05b24f390f79dde306b4565d70a1c91aa63a",
-    "historical_blocks_verified": 2
-  },
-  "merge_audit": {
-    "report": "docs/plans/hegota-a/master-integration-167.md",
-    "merge_base": "dbe10116b703f88a97a6c45f1443b489e8e3b4ce",
-    "upstream_exclusive_commits": 1204,
-    "conflict_files": 19,
-    "initial_full_suite_failures": [
+  "duplication_review": {
+    "report": "docs/reviews/pr-167/DUPLICATION_REVIEW.md",
+    "task_ids_accounted_for": 77,
+    "initial_diff_files_reviewed": 117,
+    "eip8141_implementation_pin": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+    "eip8141_research_pin": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+    "eip8141_byte_identical": true,
+    "eip8141_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+    "changes": [
+      "single pool fork context; existing setters and full-header reset reused",
+      "test-only production reset API removed",
+      "master compatibility algorithm reused; explicit legacy compatibility guard retained",
+      "unused two-state IL wrapper removed; legacy PQ digest fixture moved to test-only code",
+      "plan rebaselined on current implementations with all 77 task IDs inventoried"
+    ],
+    "gas_source_comparison": [
       {
-        "package": "github.com/eth2030/eth2030/core/rawdb",
-        "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
-        "diagnostic": "=== RUN   TestFileDBLegacyAliasesDoNotResurrectAfterDelete\n    filedb_layout_test.go:149: legacy alias selection\"inactive\" <nil>\n--- FAIL: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.10s)\n"
+        "eip": 8037,
+        "byte_identical": true,
+        "sha256": "37abe522c5dee68a47a27db6f7b88a71da5b66c8a72ebc601c467940b577b715"
       },
       {
-        "package": "github.com/eth2030/eth2030/crypto/vdf",
-        "test": "TestVDFv2_SingleIteration",
-        "diagnostic": "d, repanicked]\n\ngoroutine 121 [running]:\ntesting.tRunner.func1.2({0x102b94020, 0x102bc0d50})\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:1974 +0x1a0\ntesting.tRunner.func1()\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:1977 +0x318\npanic({0x102b94020?, 0x102bc0d50?})\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/runtime/panic.go:860 +0x12c\ngithub.com/harmony-one/vdf/src/vdf_go.calculateVDF(0x4d5342bac000, 0x4d5342bac080, 0x1, 0x400?)\n\t/Users/fy/.gopath/pkg/mod/github.com/harmony-one/vdf@v1.0.0/src/vdf_go/proof_wesolowski.go:228 +0x90\ngithub.com/harmony-one/vdf/src/vdf_go.GenerateVDF({0x4d5342bc3e50, 0x20, 0x20}, 0x1, 0x400)\n\t/Users/fy/.gopath/pkg/mod/github.com/harmony-one/vdf@v1.0.0/src/vdf_go/proof_wesolowski.go:69 +0x14c\ngithub.com/eth2030/eth2030/crypto/vdf.Evaluate({0x4d5342b21f30, 0x10, 0x62?}, 0x1)\n\t/Users/fy/Projects/eth2030/pkg/crypto/vdf/vdf.go:49 +0x80\ngithub.com/eth2030/eth2030/crypto/vdf.(*VDFv2).Evaluate(...)\n\t/Users/fy/Projects/eth2030/pkg/crypto/vdf/enhanced.go:60\ngithub.com/eth2030/eth2030/crypto/vdf.TestVDFv2_SingleIteration(0x4d53428c0248)\n\t/Users/fy/Projects/eth2030/pkg/crypto/vdf/enhanced_test.go:298 +0x48\ntesting.tRunner(0x4d53428c0248, 0x102bbfd30)\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:2036 +0xc4\ncreated by testing.(*T).Run in goroutine 1\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:2101 +0x3a8\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/crypto/vdf",
-        "test": null,
-        "diagnostic": "FAIL\tgithub.com/eth2030/eth2030/crypto/vdf\t2.584s\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/core/rawdb",
-        "test": null,
-        "diagnostic": "FAIL\nFAIL\tgithub.com/eth2030/eth2030/core/rawdb\t36.059s\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/eiptest",
-        "test": "TestEIP7701_AATransaction",
-        "diagnostic": "=== RUN   TestEIP7701_AATransaction\n{\"time\":\"2026-11-25T19:40:08.6461+08:00\",\"level\":\"INFO\",\"msg\":\"block_added\",\"module\":\"eth/blockchain\",\"event\":\"block_added\",\"hash\":\"0x88f5dd6a4fcb746a46b106b5d1fcfb3a7961f05b8d906590649f5fc8ba005ef2\",\"num\":1,\"txCount\":1,\"gasUsed\":21000,\"gasLimit\":30000000}\n{\"time\":\"2026-11-25T19:40:08.646338+08:00\",\"level\":\"INFO\",\"msg\":\"block_added\",\"module\":\"eth/blockchain\",\"event\":\"block_added\",\"hash\":\"0x4d29d67e62adfe627d75555d787169829829700a69c1490580c074d9363ab324\",\"num\":2,\"txCount\":1,\"gasUsed\":21000,\"gasLimit\":30000000}\n{\"time\":\"2026-11-25T19:40:08.646517+08:00\",\"level\":\"INFO\",\"msg\":\"block_added\",\"module\":\"eth/blockchain\",\"event\":\"block_added\",\"hash\":\"0xd7aeae2d2f307087b5439461a4188cec66a4b5042ccfa15fa880a371df117aca\",\"num\":3,\"txCount\":0,\"gasUsed\":0,\"gasLimit\":30000000}\n    eip7701_test.go:57: pool rejected tx (type 5, nonce 1): AA transactions not enabled; set --txpool.allow-aa\n--- FAIL: TestEIP7701_AATransaction (0.00s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/eiptest",
-        "test": "TestEIP8141_ApprovedFrameAndReplay",
-        "diagnostic": "=== RUN   TestEIP8141_ApprovedFrameAndReplay\n    eip8141_test.go:24: pool rejected tx (type 6, nonce 0): frame transactions unavailable at canonical head\n--- FAIL: TestEIP8141_ApprovedFrameAndReplay (0.00s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/eiptest",
-        "test": "TestEIP8141_SponsoredFrameTxBillerPath",
-        "diagnostic": "=== RUN   TestEIP8141_SponsoredFrameTxBillerPath\n{\"time\":\"2026-11-25T19:40:10.155073+08:00\",\"level\":\"INFO\",\"msg\":\"block_added\",\"module\":\"eth/blockchain\",\"event\":\"block_added\",\"hash\":\"0x5c53143da2dcb7b2432e2c899f6af9053ce0ab1046a7ef564fbf58fb61608caf\",\"num\":1,\"txCount\":0,\"gasUsed\":0,\"gasLimit\":30000000}\n    eip8141_test.go:54: tx 0: want status 1, got status 0 (missing=true)\n        block 1 (0 txs, gasUsed 0):\n        BAL: null\n        requests: \n        state roots: 0xa29cab2e16b7bfed1a287961b4a75c486ee7ed67adb51c3088d4f4a8994bce1f -> 0x9ccf9af0b7d5704805c724821e3f9901089ac0369063435c32f0f700a16b4130\n--- FAIL: TestEIP8141_SponsoredFrameTxBillerPath (0.00s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/eiptest",
-        "test": "TestEngineCanonicalForkSchemaThroughActualHTTP",
-        "diagnostic": "=== RUN   TestEngineCanonicalForkSchemaThroughActualHTTP\n    engine_fork_schema_test.go:41: engine_forkchoiceUpdatedV3: rpc error -38005: unsupported fork\n--- FAIL: TestEngineCanonicalForkSchemaThroughActualHTTP (0.00s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/eiptest",
-        "test": null,
-        "diagnostic": "FAIL\nFAIL\tgithub.com/eth2030/eth2030/eiptest\t5.131s\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node/backend",
-        "test": "TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation/estimate",
-        "diagnostic": "=== RUN   TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation/estimate\n    request_context_test.go:72: execution returned before cancellation: out of gas\n--- FAIL: TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation/estimate (0.05s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node/backend",
-        "test": "TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation",
-        "diagnostic": "=== RUN   TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation\n--- FAIL: TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation (0.26s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node/backend",
-        "test": null,
-        "diagnostic": "FAIL\nFAIL\tgithub.com/eth2030/eth2030/node/backend\t2.494s\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestSignedBlobSchedulesThroughActualHTTPAndRestart",
-        "diagnostic": "=== RUN   TestSignedBlobSchedulesThroughActualHTTPAndRestart\n2026/11/25 19:40:26 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:26 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:26 INFO finality mode mode=ssf\n2026/11/25 19:40:26 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestSignedBlobSchedulesThroughActualHTTPAndRestart1111170238/001/jwtsecret\n2026/11/25 19:40:27 INFO tx journal replayed count=0\n2026/11/25 19:40:27 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:27 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:27 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:27 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:27 INFO finality mode mode=ssf\n2026/11/25 19:40:27 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestSignedBlobSchedulesThroughActualHTTPAndRestart1111170238/002/jwtsecret\n2026/11/25 19:40:27 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:27 INFO tx journal replayed count=0\n2026/11/25 19:40:27 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:27 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:27 INFO AA proof circuit ready constraints=3\n    blob_schedule_integration_test.go:124: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestSignedBlobSchedulesThroughActualHTTPAndRestart (1.48s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestBogotaDeferredWireAcrossRestart",
-        "diagnostic": "ted reason=\"no external proxy reachable\"\n2026/11/25 19:40:28 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:28 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:28 INFO finality mode mode=ssf\n2026/11/25 19:40:28 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestBogotaDeferredWireAcrossRestart616719381/002/jwtsecret\n2026/11/25 19:40:28 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:28 INFO tx journal replayed count=0\n2026/11/25 19:40:28 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:28 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:28 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:29 INFO engine_forkchoiceUpdated: built payload payloadID=0xc3911c3f60df151e blockNumber=1 blockHash=0xb12f8347ce4118b3155814d6241a2ff9684073c292edc543315e6ae0ab39ec1c txCount=0\n2026/11/25 19:40:29 INFO engine_forkchoiceUpdated: built payload payloadID=0x441bbca0962f24b0 blockNumber=1 blockHash=0xd4c4a963625ea3b12f4bb93fbd538f24d7cae2a91202dcb1e0b65134fe1bc37d txCount=0\n2026/11/25 19:40:29 INFO engine_newPayload: accepted blockNumber=1 blockHash=0xb12f8347ce4118b3155814d6241a2ff9684073c292edc543315e6ae0ab39ec1c\n2026/11/25 19:40:29 INFO engine_newPayload: accepted blockNumber=1 blockHash=0xd4c4a963625ea3b12f4bb93fbd538f24d7cae2a91202dcb1e0b65134fe1bc37d\n    bogota_deferred_integration_test.go:111: engine_forkchoiceUpdatedV5: RPC -38005: unsupported fork\n--- FAIL: TestBogotaDeferredWireAcrossRestart (0.39s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestCanonicalFrame8141ThroughEngineAndRestart/nonce_0",
-        "diagnostic": "=== RUN   TestCanonicalFrame8141ThroughEngineAndRestart/nonce_0\n2026/11/25 19:40:30 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:30 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:30 INFO finality mode mode=ssf\n2026/11/25 19:40:30 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestCanonicalFrame8141ThroughEngineAndRestartnonce_03497666257/001/jwtsecret\n2026/11/25 19:40:30 INFO tx journal replayed count=0\n2026/11/25 19:40:30 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:30 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:30 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:30 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:30 INFO finality mode mode=ssf\n2026/11/25 19:40:30 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestCanonicalFrame8141ThroughEngineAndRestartnonce_03497666257/002/jwtsecret\n2026/11/25 19:40:30 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:30 INFO tx journal replayed count=0\n2026/11/25 19:40:30 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:30 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n    frame_8141_integration_test.go:97: engine_forkchoiceUpdatedV5: RPC -38005: unsupported fork\n2026/11/25 19:40:30 INFO AA proof circuit ready constraints=3\n--- FAIL: TestCanonicalFrame8141ThroughEngineAndRestart/nonce_0 (0.18s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestCanonicalFrame8141ThroughEngineAndRestart/nonce_18446744073709551614",
-        "diagnostic": "t/nonce_18446744073709551614\n2026/11/25 19:40:30 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:30 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:30 INFO finality mode mode=ssf\n2026/11/25 19:40:30 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestCanonicalFrame8141ThroughEngineAndRestartnonce_1844674407371930774319/001/jwtsecret\n2026/11/25 19:40:30 INFO tx journal replayed count=0\n2026/11/25 19:40:30 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:30 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:30 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:30 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:30 INFO finality mode mode=ssf\n2026/11/25 19:40:30 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:30 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestCanonicalFrame8141ThroughEngineAndRestartnonce_1844674407371930774319/002/jwtsecret\n2026/11/25 19:40:30 INFO tx journal replayed count=0\n2026/11/25 19:40:30 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:30 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:30 INFO AA proof circuit ready constraints=3\n    frame_8141_integration_test.go:97: engine_forkchoiceUpdatedV5: RPC -38005: unsupported fork\n--- FAIL: TestCanonicalFrame8141ThroughEngineAndRestart/nonce_18446744073709551614 (0.17s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestCanonicalFrame8141ThroughEngineAndRestart",
-        "diagnostic": "=== RUN   TestCanonicalFrame8141ThroughEngineAndRestart\n--- FAIL: TestCanonicalFrame8141ThroughEngineAndRestart (0.35s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestNativeP2PAndReorgRefreshFrameActivation",
-        "diagnostic": "=== RUN   TestNativeP2PAndReorgRefreshFrameActivation\n2026/11/25 19:40:31 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:31 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:31 INFO finality mode mode=ssf\n2026/11/25 19:40:31 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestNativeP2PAndReorgRefreshFrameActivation1943126907/001/jwtsecret\n2026/11/25 19:40:31 INFO tx journal replayed count=0\n2026/11/25 19:40:31 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:31 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n    hegota_head_test.go:68: P2P block was not imported\n2026/11/25 19:40:31 INFO AA proof circuit ready constraints=3\n--- FAIL: TestNativeP2PAndReorgRefreshFrameActivation (0.09s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestRetainedHistoricalHeaderReadsColdStateAndProofs/Osaka",
-        "diagnostic": "=== RUN   TestRetainedHistoricalHeaderReadsColdStateAndProofs/Osaka\n2026/11/25 19:40:31 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:31 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:31 INFO finality mode mode=ssf\n2026/11/25 19:40:31 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestRetainedHistoricalHeaderReadsColdStateAndProofsOsaka737962952/001/jwtsecret\n2026/11/25 19:40:31 INFO tx journal replayed count=0\n2026/11/25 19:40:31 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:31 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n    historical_state_readback_test.go:86: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n2026/11/25 19:40:31 INFO AA proof circuit ready constraints=3\n--- FAIL: TestRetainedHistoricalHeaderReadsColdStateAndProofs/Osaka (0.10s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestRetainedHistoricalHeaderReadsColdStateAndProofs",
-        "diagnostic": "=== RUN   TestRetainedHistoricalHeaderReadsColdStateAndProofs\n--- FAIL: TestRetainedHistoricalHeaderReadsColdStateAndProofs (1.67s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestOsakaInvalidAuthorizationWarmsThroughEngine",
-        "diagnostic": "=== RUN   TestOsakaInvalidAuthorizationWarmsThroughEngine\n2026/11/25 19:40:44 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:44 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:44 INFO finality mode mode=ssf\n2026/11/25 19:40:44 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestOsakaInvalidAuthorizationWarmsThroughEngine735178415/001/jwtsecret\n2026/11/25 19:40:44 INFO tx journal replayed count=0\n2026/11/25 19:40:44 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:44 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:44 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:44 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:44 INFO finality mode mode=ssf\n2026/11/25 19:40:44 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestOsakaInvalidAuthorizationWarmsThroughEngine735178415/002/jwtsecret\n2026/11/25 19:40:44 INFO AA proof circuit ready constraints=3\n2026/11/25 19:40:44 INFO tx journal replayed count=0\n2026/11/25 19:40:44 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:44 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:44 INFO AA proof circuit ready constraints=3\n    osaka_authorization_integration_test.go:93: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestOsakaInvalidAuthorizationWarmsThroughEngine (0.14s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestActualNodeRestartRejectsHistoricalConfigChanges",
-        "diagnostic": "=== RUN   TestActualNodeRestartRejectsHistoricalConfigChanges\n2026/11/25 19:40:44 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:44 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:44 INFO finality mode mode=ssf\n2026/11/25 19:40:44 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestActualNodeRestartRejectsHistoricalConfigChanges3045359081/001/jwtsecret\n2026/11/25 19:40:44 INFO tx journal replayed count=0\n2026/11/25 19:40:44 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:44 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:44 INFO AA proof circuit ready constraints=3\n    persisted_chain_config_test.go:286: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestActualNodeRestartRejectsHistoricalConfigChanges (0.09s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart/Osaka",
-        "diagnostic": "=== RUN   TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart/Osaka\n2026/11/25 19:40:44 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:40:44 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:40:44 INFO finality mode mode=ssf\n2026/11/25 19:40:44 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNode2000847645/001/jwtsecret\n2026/11/25 19:40:45 INFO tx journal replayed count=0\n2026/11/25 19:40:45 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:40:45 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:40:45 INFO AA proof circuit ready constraints=3\n    receipt_readback_integration_test.go:175: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart/Osaka (0.09s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart",
-        "diagnostic": "=== RUN   TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart\n--- FAIL: TestHistoricalReceiptsAndTransactionsSurviveCacheEvictionAndNodeRestart (0.80s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/txpool/encrypted",
-        "test": "TestVDFDecryptionTimer_SubmitSolution",
-        "diagnostic": "ner.func1.2({0x104db9800, 0x104e0fc40})\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:1974 +0x1a0\ntesting.tRunner.func1()\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:1977 +0x318\npanic({0x104db9800?, 0x104e0fc40?})\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/runtime/panic.go:860 +0x12c\ngithub.com/harmony-one/vdf/src/vdf_go.calculateVDF(0x26e058914000, 0x26e058914080, 0x2, 0x400?)\n\t/Users/fy/.gopath/pkg/mod/github.com/harmony-one/vdf@v1.0.0/src/vdf_go/proof_wesolowski.go:228 +0x90\ngithub.com/harmony-one/vdf/src/vdf_go.GenerateVDF({0x26e058902dc0, 0x20, 0x20}, 0x2, 0x400)\n\t/Users/fy/.gopath/pkg/mod/github.com/harmony-one/vdf@v1.0.0/src/vdf_go/proof_wesolowski.go:69 +0x14c\ngithub.com/eth2030/eth2030/crypto/vdf.Evaluate({0x26e05890c5e0, 0x20, 0x20?}, 0x2)\n\t/Users/fy/Projects/eth2030/pkg/crypto/vdf/vdf.go:49 +0x80\ngithub.com/eth2030/eth2030/txpool/encrypted.SolveVDFPuzzle(0x26e05892e348?)\n\t/Users/fy/Projects/eth2030/pkg/txpool/encrypted/vdf_timer.go:196 +0x30\ngithub.com/eth2030/eth2030/txpool/encrypted.TestVDFDecryptionTimer_SubmitSolution(0x26e058946248)\n\t/Users/fy/Projects/eth2030/pkg/txpool/encrypted/vdf_timer_test.go:42 +0x78\ntesting.tRunner(0x26e058946248, 0x104e0e418)\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:2036 +0xc4\ncreated by testing.(*T).Run in goroutine 1\n\t/Users/fy/.gopath/pkg/mod/golang.org/toolchain@v0.0.1-go1.26.8.darwin-arm64/src/testing/testing.go:2101 +0x3a8\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/txpool/encrypted",
-        "test": null,
-        "diagnostic": "FAIL\tgithub.com/eth2030/eth2030/txpool/encrypted\t0.911s\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality/Osaka",
-        "diagnostic": "=== RUN   TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality/Osaka\n2026/11/25 19:41:21 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:21 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:21 INFO finality mode mode=ssf\n2026/11/25 19:41:21 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality2029851809/001/jwtsecret\n2026/11/25 19:41:21 INFO tx journal replayed count=0\n2026/11/25 19:41:21 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:21 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n    stale_forkchoice_integration_test.go:89: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n2026/11/25 19:41:21 INFO AA proof circuit ready constraints=3\n--- FAIL: TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality/Osaka (0.15s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality",
-        "diagnostic": "=== RUN   TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality\n--- FAIL: TestRecoveringCLStaleCanonicalForkchoicePreservesDurableFinality (2.17s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestStartupRequiredBindingsRollbackAndFreshRetry/p2p",
-        "diagnostic": "=== RUN   TestStartupRequiredBindingsRollbackAndFreshRetry/p2p\n2026/11/25 19:41:24 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:24 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:24 INFO finality mode mode=ssf\n2026/11/25 19:41:24 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestStartupRequiredBindingsRollbackAndFreshRetryp2p3229415809/001/jwtsecret\n2026/11/25 19:41:24 INFO tx journal replayed count=0\n2026/11/25 19:41:24 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:24 INFO AA proof circuit ready constraints=3\n2026/11/25 19:41:24 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:41:24 INFO node started successfully p2p=[::]:54744 rpc=127.0.0.1:54748 engine=127.0.0.1:54749\n    startup_rollback_test.go:103: occupied required p2p listener accepted\n--- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry/p2p (0.17s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestStartupRequiredBindingsRollbackAndFreshRetry",
-        "diagnostic": "=== RUN   TestStartupRequiredBindingsRollbackAndFreshRetry\n--- FAIL: TestStartupRequiredBindingsRollbackAndFreshRetry (1.10s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestTrack4IndependentEngineAndRPC",
-        "diagnostic": "=== RUN   TestTrack4IndependentEngineAndRPC\n2026/11/25 19:41:35 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:35 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:35 INFO finality mode mode=ssf\n2026/11/25 19:41:35 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestTrack4IndependentEngineAndRPC2900974844/001/jwtsecret\n2026/11/25 19:41:35 INFO tx journal replayed count=0\n2026/11/25 19:41:35 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:35 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:41:35 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:35 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:35 INFO finality mode mode=ssf\n2026/11/25 19:41:35 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestTrack4IndependentEngineAndRPC2900974844/002/jwtsecret\n2026/11/25 19:41:35 INFO AA proof circuit ready constraints=3\n2026/11/25 19:41:35 INFO tx journal replayed count=0\n2026/11/25 19:41:35 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:35 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:41:35 INFO AA proof circuit ready constraints=3\n    track4_integration_test.go:347: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestTrack4IndependentEngineAndRPC (0.18s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestSignedOrdinaryAdmissionAndBoundEngineRejections/Osaka",
-        "diagnostic": "dOrdinaryAdmissionAndBoundEngineRejections/Osaka\n2026/11/25 19:41:35 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:35 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:35 INFO finality mode mode=ssf\n2026/11/25 19:41:35 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestSignedOrdinaryAdmissionAndBoundEngineRejectionsOsaka48631741/001/jwtsecret\n2026/11/25 19:41:35 INFO tx journal replayed count=0\n2026/11/25 19:41:35 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:35 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:41:35 INFO BLS backend backend=gnark-consensus\n2026/11/25 19:41:35 INFO KZG backend initialized backend=go-eth-kzg\n2026/11/25 19:41:35 INFO finality mode mode=ssf\n2026/11/25 19:41:35 INFO generated JWT secret path=/var/folders/hs/dz4bxns93hd3v4skrp4644nr0000gn/T/TestSignedOrdinaryAdmissionAndBoundEngineRejectionsOsaka48631741/002/jwtsecret\n2026/11/25 19:41:35 INFO AA proof circuit ready constraints=3\n2026/11/25 19:41:35 INFO tx journal replayed count=0\n2026/11/25 19:41:35 INFO EP-3 post-quantum config lean_chain=false lean_validators=512 stark_frames=false\n2026/11/25 19:41:35 INFO anonymous transport selected mode=simulated reason=\"no external proxy reachable\"\n2026/11/25 19:41:35 INFO AA proof circuit ready constraints=3\n    transaction_validation_integration_test.go:143: engine_forkchoiceUpdatedV3: RPC -38005: unsupported fork\n--- FAIL: TestSignedOrdinaryAdmissionAndBoundEngineRejections/Osaka (0.16s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": "TestSignedOrdinaryAdmissionAndBoundEngineRejections",
-        "diagnostic": "=== RUN   TestSignedOrdinaryAdmissionAndBoundEngineRejections\n--- FAIL: TestSignedOrdinaryAdmissionAndBoundEngineRejections (0.58s)\n"
-      },
-      {
-        "package": "github.com/eth2030/eth2030/node",
-        "test": null,
-        "diagnostic": "FAIL\nFAIL\tgithub.com/eth2030/eth2030/node\t75.239s\n"
+        "eip": 8038,
+        "byte_identical": true,
+        "sha256": "ad09e7c9a7c78855b00e793109056e6d30022bf4bbf0e237e757226de0e544e2"
       }
-    ],
-    "initial_log_sha256": "66112725a35de84cea03b8882a397a560af8ca508bf27c365fc7aca9d7ecf2aa",
-    "additional_failures_repaired": [
-      "legacy test registry coverage after explicit prototype renaming; replaced with signed canonical pool/builder/replay test",
-      "integration-tag FOCIL tests expected a verdict without post-state; now require validation-unavailable"
-    ],
-    "local_platform_limits": [
-      "Linux /proc collector tests are not runnable on macOS; hosted Linux job remains required",
-      "Case-insensitive filesystem cannot represent the legacy hex-alias fixture"
-    ],
-    "original_audit": "evidence/hegota-a/history/6a17479/verification.json"
+    ]
+  },
+  "previous_qualification": {
+    "revision": "dca42829c9bc059244d10efc0a835b220944a6aa",
+    "verification": "https://github.com/alt-research/eth2030/blob/dca42829c9bc059244d10efc0a835b220944a6aa/evidence/hegota-a/verification.json",
+    "verification_bytes_sha256": "45e78adc4e51e1cc30889c7a831d810b2e63ed7fa1a61fa09ebbc9af39603544",
+    "hosted_result": "all 15 checks passed on that revision; not reused as new-head CI",
+    "hosted_runs": [
+      45608887882,
+      45608887908,
+      45608887912
+    ]
   },
   "not_claimed": [
-    "Complete Hegota composed specification conformance",
-    "Official CL/devnet interoperability from local host runs",
-    "Hosted real proof and complete official native corpus results; see PR checks"
+    "All 77 tasks completed or full composed Hegota conformance",
+    "Independent-client Frame/FOCIL acceptance from code presence",
+    "Container/RC or long-duration acceptance from host tests",
+    "Fresh blst/integration/goethkzg or real proof results from the local focused rerun; new-head results are tracked on PR #167"
   ],
   "artifacts": {
     "specs/hegota/admission.json": "5882fd8a0eadce618522fc96182f7defbc0085de2e9eeff29fcea97c4c37e453",

@@ -102,7 +102,7 @@ func (r *PQKeyRegistry) GetKey(validatorIndex uint64) (*RegistryEntry, error) {
 	return cpy, nil
 }
 
-// VerifyRegistration fails closed: the old publicly computable registrationDigest
+// VerifyRegistration fails closed: the old publicly computable key/index digest
 // is not a signature. This in-memory registry has no selected canonical proof of
 // possession scheme or trusted CL context yet (HGT-008 / EIP-8483).
 // RegisterKey stores metadata only and does not authenticate a registration.
@@ -240,14 +240,6 @@ func merkleRoot(leaves [][]byte) types.Hash {
 	}
 
 	return types.BytesToHash(layer[0])
-}
-
-// registrationDigest computes the expected signature digest for a
-// registration verification: keccak256(classicPubKey || validatorIndex).
-func registrationDigest(classicPubKey []byte, validatorIndex uint64) []byte {
-	buf := make([]byte, 8)
-	binary.BigEndian.PutUint64(buf, validatorIndex)
-	return crypto.Keccak256(classicPubKey, buf)
 }
 
 // ValidateRegistryEntry checks that a registry entry has valid fields:

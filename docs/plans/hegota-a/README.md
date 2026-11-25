@@ -15,3 +15,5 @@ The [PR #167 integration audit](master-integration-167.md) is authoritative for 
 | HGT-009 | [Admission register](../../../specs/hegota/admission.json): 72 proposals, pinned sources, discussions, decisions and impact histories. |
 
 Run `python3 tools/hegota/check.py`, both golden checkers and `python3 -m unittest discover -s tools/hegota -p 'test_*.py'` from the repository root. From `pkg`, run `env -u GOROOT go run ./cmd/eth2030-baseline`, `go build ./...`, `go vet ./...` and the full Go suite. [Current verification evidence](../../../evidence/hegota-a/verification.json) separates full-suite skips from the mandatory zero-skip baseline. [Historical evidence](../../../evidence/hegota-a/history/6a17479/verification.json) preserves the pre-merge audit.
+
+The [post-integration duplicate-work review](../../reviews/pr-167/DUPLICATION_REVIEW.md) reconciles all 77 planning tasks with existing master code and records removal of redundant pool context and the equivalent compatibility rewrite.

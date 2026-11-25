@@ -16,18 +16,17 @@ func TestFrameAdmissionTracksCanonicalHeadAndReorg(t *testing.T) {
 	chain.HogotaTime = &activation
 	chain.ExperimentalLegacyFrames = true
 	cfg := DefaultConfig()
-	cfg.ChainConfig = &chain
-	cfg.HeadTime = 99
 	pool := New(cfg, s)
+	resetFramePoolHead(pool, s, &chain, 99, 0)
 	tx := types.NewTransaction(&types.FrameTx{ChainID: big.NewInt(1), Nonce: big.NewInt(0), Sender: sender, Frames: []types.Frame{{Mode: types.ModeVerify, GasLimit: 50000}}, MaxFeePerGas: big.NewInt(100), MaxPriorityFeePerGas: big.NewInt(1)})
 	if err := pool.AddLocal(tx); err == nil {
 		t.Fatal("admitted before fork")
 	}
-	pool.ResetAtHead(s, &chain, 100, 0)
+	resetFramePoolHead(pool, s, &chain, 100, 0)
 	if err := pool.AddLocal(tx); err != nil {
 		t.Fatal(err)
 	}
-	pool.ResetAtHead(s, &chain, 99, 0)
+	resetFramePoolHead(pool, s, &chain, 99, 0)
 	if pool.Get(tx.Hash()) != nil {
 		t.Fatal("prototype survived reorg across fork")
 	}
@@ -44,19 +43,17 @@ func TestFramePoolGateTracksBlockPrerequisites(t *testing.T) {
 	chain.ExperimentalLegacyFrames = true
 	chain.LondonBlock = big.NewInt(10)
 	cfg := DefaultConfig()
-	cfg.ChainConfig = &chain
-	cfg.HeadTime = 100
-	cfg.HeadNumber = 9
 	pool := New(cfg, s)
+	resetFramePoolHead(pool, s, &chain, 100, 9)
 	tx := types.NewTransaction(&types.FrameTx{ChainID: big.NewInt(1), Nonce: big.NewInt(0), Sender: sender, Frames: []types.Frame{{Mode: types.ModeVerify, GasLimit: 50000}}, MaxFeePerGas: big.NewInt(100), MaxPriorityFeePerGas: big.NewInt(1)})
 	if err := pool.AddLocal(tx); err == nil {
 		t.Fatal("admitted before London")
 	}
-	pool.ResetAtHead(s, &chain, 100, 10)
+	resetFramePoolHead(pool, s, &chain, 100, 10)
 	if err := pool.AddLocal(tx); err != nil {
 		t.Fatal(err)
 	}
-	pool.ResetAtHead(s, &chain, 100, 9)
+	resetFramePoolHead(pool, s, &chain, 100, 9)
 	if pool.Get(tx.Hash()) != nil {
 		t.Fatal("retained transaction after prerequisite deactivation")
 	}
@@ -73,9 +70,15 @@ func TestCanonicalFramesSurviveLegacyGateReset(t *testing.T) {
 	chain := *pool.frameConfig
 	for _, legacy := range []bool{false, true, false} {
 		chain.ExperimentalLegacyFrames = legacy
-		pool.ResetAtHead(db, &chain, 100, 1)
+		resetFramePoolHead(pool, db, &chain, 100, 1)
 		if pool.Get(tx.Hash()) == nil {
 			t.Fatalf("canonical Frame evicted with legacy opt-in=%t", legacy)
 		}
 	}
+}
+
+// Exercise the same public head-update path used by native FCU/reorg callers.
+func resetFramePoolHead(pool *TxPool, db StateReader, chain *config.ChainConfig, timestamp, number uint64) {
+	pool.SetForkRules(chain, timestamp)
+	pool.Reset(db, &types.Header{Number: new(big.Int).SetUint64(number), Time: timestamp, GasLimit: 30_000_000, BaseFee: big.NewInt(1)})
 }

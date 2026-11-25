@@ -1,5 +1,7 @@
 # ETH2030 Hegotá 完整开发计划
 
+> **Current implementation baseline (post-merge review, 2026-11-25):** This plan was drafted against an older tree. Its original task ledger is not evidence that an implementation is absent from current master. Read the [77-task reuse and qualification inventory](../reviews/pr-167/DUPLICATION_REVIEW.md) before opening a development task. Master already implements canonical Frames, prefix admission, persistent receipts, native Bogotá/FCU paths and broad validation infrastructure. EIP-8141 at its implementation pin and this plan's research pin is byte-identical. Reuse those implementations and implement only demonstrated deltas; completion still requires the selected-spec and independent qualification gates. The historical observations below retain their original source boundary. The original 18–28 week estimate must be re-estimated from the remaining qualification/delta inventory.
+
 > 版本：v1.1；制定日期与研究截点：2026-11-25（Asia/Shanghai）；A 组实施记录已补齐。
 > 本文是后续实施的主计划，覆盖规范、实现、兼容性、测试、跨客户端联调、发布与维护。A 组 7 项基线任务已交付并验证，其余功能任务仍按下述规范和验收门实施。
 > 依据：[宏观研究](hegota-macro-plan-2026-11.md)、[72 项 EIP 与讨论登记](hegota-eip-review-2026-11.md)、[固定来源与版本](hegota-sources-2026-11.json)。A 组的当前交付见 [实施报告](hegota-a/README.md)。

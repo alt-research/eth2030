@@ -164,14 +164,10 @@ func (s *Sim) WirePool() *txpool.TxPool {
 	if s.poolConfig != nil {
 		cfg = *s.poolConfig
 	}
-	rules := s.cfg.Rules(s.CurrentBlock().Number(), s.cfg.IsMerge(), s.CurrentBlock().Time())
-	cfg.IsPrague, cfg.IsGlamsterdan = rules.IsPrague, rules.IsGlamsterdan
-	cfg.IsOsaka = s.cfg.IsOsaka(s.CurrentBlock().Time())
-	cfg.ChainConfig = s.cfg
-	cfg.HeadTime = s.CurrentBlock().Time()
-	cfg.HeadNumber = s.CurrentBlock().NumberU64()
 	reader := s.bc.State()
 	s.pool = txpool.New(cfg, reader)
+	s.pool.SetForkRules(s.cfg, s.CurrentBlock().Time())
+	s.pool.Reset(reader, s.CurrentBlock().Header())
 	s.pool.SetCodeReader(&poolCodeReader{sim: s})
 	s.pool.SetBaseFee(s.CurrentBlock().Header().BaseFee)
 	return s.pool

@@ -1702,11 +1702,6 @@ func (b *EngineBackend) SetSlasher(s coreconfig.PaymasterSlasher) {
 	b.processor.SetSlasher(s)
 }
 
-// focilCheckILSatisfaction wraps focil.CheckILSatisfaction for use in engine_newPayload.
-func focilCheckILSatisfaction(block *types.Block, ils []*focil.InclusionList, gasRemaining uint64) bool {
-	return focil.CheckILSatisfaction(block, ils, nil, gasRemaining) == focil.ILSatisfied
-}
-
 // --- Actor-based accessor methods (Phase 6 of engine-channel-refactor) ---
 // These methods use actors for state access, providing lock-free concurrent access.
 // They can be used alongside mutex-protected methods during migration.

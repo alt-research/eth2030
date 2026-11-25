@@ -1602,8 +1602,8 @@ func TestTxPool_FrameTx_VerifyStructuralValidation(t *testing.T) {
 	cfg := DefaultConfig()
 	legacy := *coreconfig.TestConfigHogota
 	legacy.ExperimentalLegacyFrames = true
-	cfg.ChainConfig = &legacy
 	pool := New(cfg, state)
+	pool.SetForkRules(&legacy, 0)
 
 	// A FrameTx with only VERIFY frames should pass structural validation.
 	verifyOnlyFrames := []types.Frame{

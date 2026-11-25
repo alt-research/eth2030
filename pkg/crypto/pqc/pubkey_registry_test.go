@@ -1,6 +1,7 @@
 package pqc
 
 import (
+	"encoding/binary"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -392,4 +393,12 @@ func TestValidateRegistrySize(t *testing.T) {
 	if err := ValidateRegistrySize(nil, 100); err == nil {
 		t.Error("expected error for nil registry")
 	}
+}
+
+// registrationDigest recreates the rejected legacy pseudo-signature for
+// regression fixtures only. It is never a production authenticator.
+func registrationDigest(classicPubKey []byte, validatorIndex uint64) []byte {
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, validatorIndex)
+	return crypto.Keccak256(classicPubKey, buf)
 }

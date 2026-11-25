@@ -500,27 +500,21 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	poolCfg.AllowAATx = config.AllowAATx
 	// EIP-2780: tell the pool whether the chain runs Glamsterdan so it uses
 	// the correct (lower) base intrinsic gas for validation.
-	// Also read the genesis block gas limit so the pool accepts txs up to that size.
-	if chainCfg := bc.Config(); chainCfg != nil {
-		poolCfg.ChainConfig = chainCfg
-		if head := bc.CurrentBlock(); head != nil {
-			poolCfg.HeadTime = head.Header().Time
-			poolCfg.HeadNumber = head.NumberU64()
-			poolCfg.BlockGasLimit = head.Header().GasLimit
-		}
-		poolCfg.IsOsaka = chainCfg.IsOsaka(poolCfg.HeadTime)
-		poolCfg.IsPrague = chainCfg.IsPrague(poolCfg.HeadTime)
-		poolCfg.IsGlamsterdan = chainCfg.IsGlamsterdan(poolCfg.HeadTime)
+	// Seed the block gas limit from the restored head; SetForkRules and Reset
+	// below install its complete admission context before journal replay.
+	if head := bc.CurrentBlock(); head != nil {
+		poolCfg.BlockGasLimit = head.GasLimit()
 	}
 	// --txpool.price-history: number of blocks for the gas-price suggestor.
 	if config.TxpoolPriceHistory > 0 {
 		poolCfg.PriceHistoryBlocks = config.TxpoolPriceHistory
 	}
 	n.txPool = txpool.New(poolCfg, bc.State())
-	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
 	if bc.Config() != nil {
 		n.txPool.SetForkRules(bc.Config(), bc.CurrentBlock().Time())
 	}
+	n.txPool.Reset(bc.State(), bc.CurrentBlock().Header())
+	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
 
 	// Initialize tx journal for pending tx persistence across restarts.
 	// Journal replay must happen after n.txPool is initialized.

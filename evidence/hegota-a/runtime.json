@@ -1,8 +1,8 @@
 {
   "date": "2026-11-25",
   "source_base_commit": "98d4317784b755ab75eefbec1ae7d8dca813ae96",
-  "branch_baseline": "6a17479ce45ad60ef6d35c9c6b4eaed198728085",
-  "source_fingerprint_sha256": "d3e79401894e9cb682dcc869c4d59386a90df202569332bea74185e493967cde",
+  "branch_baseline": "dca42829c9bc059244d10efc0a835b220944a6aa",
+  "source_fingerprint_sha256": "4b04533d08ffa6d7c63e7fd7756bed78a02d2d90cf89d121a9a6a2b22a84c30e",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "c77912da12d62afcfdff740bcfda1d76d55eea7b6a0f58186d628069b902ce10",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -13,7 +13,7 @@
     "pkg/core/chain/blockchain.go": "9a72a09593c23414d87095dd0d6df930994e47d68766ea0ffc8cd7356b41c2d2",
     "pkg/core/chain/execution_forkchoice.go": "911fd13a9b2ec944d5134819a4bc5d1c0ff898f99be49e05abc014113b67f076",
     "pkg/core/config/chain_config.go": "8b8642dde73323c6efce97d6b98819e258e6be5c535a2142e4b2ed6c19852fb8",
-    "pkg/core/config/chain_config_forks.go": "4014b6fd8fbb9d464e8a87bd7438e711888efd14ccbc5754296e5eb8e4aadefd",
+    "pkg/core/config/chain_config_forks.go": "91ef6b0c5d6d5ef42fc5977a4be4bb995200b10753023da637214fab4ed8b841",
     "pkg/core/config/chain_config_forks_test.go": "1ee467e2056d98a4b10516879e3dac7d987442a3c1a8dfda2e48e6f8751a4a3d",
     "pkg/core/config/hegota_test.go": "6e713ce12acab7fb0f1839f12fff441a5491092c7fbf0709caad27ed6d0cff05",
     "pkg/core/e2e_eip_spec_test.go": "bab684f8a3bd9216219ae06f01c06deaa6d3c4e8eacc4587de6208cf9e7a588b",
@@ -41,8 +41,8 @@
     "pkg/crypto/bls/bls_integration_test.go": "750a77158e8f275a174d3d44f0b7c5b66d7f04aa8c44c1d7efdba76d22dd3280",
     "pkg/crypto/bls/consensus_backend.go": "b9603d997b9192741fc9dc3677897dddc464f0b8ef248db5e4c46deb1947ae71",
     "pkg/crypto/bls/consensus_backend_test.go": "d729680005c93fa0d0231cd07529ceb4126fbf83da83333f39d3799c96500466",
-    "pkg/crypto/pqc/pubkey_registry.go": "509d84841bb6e39442cec681dcccdcea3b9e2ecdb2050a0b8944a74f4de19260",
-    "pkg/crypto/pqc/pubkey_registry_test.go": "e827411a1d94c8d8c798df884a6744ee613c693a50834235f6899d55456bb2cc",
+    "pkg/crypto/pqc/pubkey_registry.go": "7ec34e0c376f1a2a2c9238de112e45126c6fd88c5de423fde1e60adfa7830ceb",
+    "pkg/crypto/pqc/pubkey_registry_test.go": "266ffc56eebb9d87802d4286f0a7f119910510a08f9b8b02b4c1ec72fd050e0a",
     "pkg/crypto/vdf/small_iterations_test.go": "224bfa6f8c43702d68c9b993ba68058457c8c346a218c8efc10fcad8f4456cd5",
     "pkg/crypto/vdf/vdf.go": "4e2ae2e50f03aa75f86559c9291829a49edd117f1ab0c1873143f5104cee29cb",
     "pkg/das/streaming/streaming_proto.go": "41f53c838eda3a44bf071859aa0f0ee3ad57beb57771aeff5cf16f933fefb7d9",
@@ -51,8 +51,8 @@
     "pkg/eiptest/eip7701_test.go": "7a84e580f32069ffd35e66211004561e142247709a1c28a5f516b5def3dd295d",
     "pkg/eiptest/eip8141_test.go": "df8435d0fc5583ac7327ec87797c06cb36eb6db8b657a8a52f25d19c9a379fe8",
     "pkg/eiptest/option.go": "5e8ecb995325770dae839c5014820d185fdebc900a3d8a0b92cf45bbf0f84ec4",
-    "pkg/eiptest/sim.go": "3d38f81e034eccf2cbfff0e4e5bf47dc98a205c5ad2d36030c5cb26e2e379fb7",
-    "pkg/engine/backend.go": "7a84ca68f2e8585ac4e95f8e2e325e0eb27781ce86649b41528eb14019062435",
+    "pkg/eiptest/sim.go": "fd0f420860a52004f0cf2052d7b62614bb5406059140f430acb85e244494fa8f",
+    "pkg/engine/backend.go": "a361bbdf2a544f8ed8f1e7f4bcb543d89b2ea1f510143369c6a08c873ceccb8c",
     "pkg/engine/blobsbundle/bundle.go": "1ff7622122765e436d282e9b9a91d78d6935ae405ce37c95bf21b1851efe253a",
     "pkg/engine/blobsbundle/bundle_test.go": "8c1d8ed2dafc2db45b24292b6860892b24f8d6f645f588975e83c1c9c1d6fc69",
     "pkg/engine/bogota.go": "c322feb675a4f0c815bb214e33005134f5942526a969f92372c087c1535a0b1f",
@@ -83,13 +83,13 @@
     "pkg/node/genesis_loader_test.go": "2ec22a5a4043ea7ce5e262ff0283864bd13848b3a0e94455ae187c36851c2649",
     "pkg/node/hegota_backend_test.go": "d3588342e20be21525c0c8d0424d4c80021ae9e4a6cfb6dd669f0ebca364a5c4",
     "pkg/node/hegota_head_test.go": "1acfaf4e4e70baf9ddcd2c683f409e18f6cfa5e41be5415b5f657dc36b57aab3",
-    "pkg/node/node.go": "b2cc0268c9e08e7ca17d1f6ef03e6a77f565ed981be78a64c8c06818866b3a32",
+    "pkg/node/node.go": "c17cc2b0478ae269ec31e9a2a1193a9f987343ecdc8b8bf0470e6a40263e0890",
     "pkg/node/startup_rollback_test.go": "b613f1d07aaf34186335e1d0115a6c6104d24fe7881e0c47ccb6a1f10d60bc47",
     "pkg/node/sync_runtime.go": "753a01b27848da97d815631afcda9eb4169530da1b5e786f30a77c2e6f707dff",
     "pkg/txpool/frame_8141.go": "60fbf0255480759ed624e6c2c84ca2a49ff604cd439fbfd9c37d45ccb7513d80",
-    "pkg/txpool/hegota_activation_test.go": "1a3dda783b3de7b92c6d46bfa93e831a37adfc5e2fbb39c9956a54027d13e3f7",
-    "pkg/txpool/txpool.go": "dc0b49e0aef932328b0e422aea1dc4bf81177e2208898f5a2fc539ba9b089c4f",
-    "pkg/txpool/txpool_test.go": "a1967c78b05939120cb96975282b7f229703bdcb85156ff938ed983e7ae0ddfa",
+    "pkg/txpool/hegota_activation_test.go": "02ec6e692c8f06dd00152472288ee15546bfd0f4c42cee2ea264023dc082af45",
+    "pkg/txpool/txpool.go": "ad803926ba2bea830f4d41f6592a23edaf4d75ac3592938e55df2be1ce19848f",
+    "pkg/txpool/txpool_test.go": "837a8b0af5d6a239552ff8e772a5095b92a2c8e221efeadd7531af8ea5aaedc9",
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "9d7fddf1fc87d65e9b17c1a052db4a9c970693cd22d9f242cf7578043afa3aa2",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
@@ -100,16 +100,16 @@
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "279b18a350adc586a6103b48f1362c1ae29aeada6b790e9ab4f4fb214be212ca",
+      "sha256": "a3a1d1bb1e1a97f55d856c6186a5f63909f38839317906e7b630feabe5bf3824",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
-      "run": "host --version; actual native node separately exercised by runtime tests"
+      "run": "host --version; actual native node separately exercised by the current full and race suites"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "ae5d7118930cff0130ad9022363ffcc3996bc1699980c8db75aa2279d375921d",
+      "sha256": "8196aa6d709a025fa017d386934a1de9574426c482b8e6c5e7be5232d54a5e0e",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
-      "run": "host --version; actual native node separately exercised by runtime tests"
+      "run": "host --version; actual native node separately exercised by the current full and race suites"
     }
   ],
   "native_runtime_identity": "hegota_backend_test.go:43: runtime=native node=*node.Node engine=*backend.EngineBackend processor=core/execution.StateProcessor",
@@ -127,5 +127,6 @@
   "helper_engine": "pkg/engine/backend.go remains separate from actual native node backend",
   "baseline_reference": "direct upstream go-ethereum v1.17.10 tests.StateTest.RunNoVerify",
   "canonical_head_selection_status": "native FCU switches validated canonical head/state and refreshes pool; specific HGT-006-R16 closed",
-  "historical_evidence": "evidence/hegota-a/history/6a17479/runtime.json"
+  "historical_evidence": "evidence/hegota-a/history/6a17479/runtime.json",
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/dca42829c9bc059244d10efc0a835b220944a6aa/evidence/hegota-a/runtime.json"
 }

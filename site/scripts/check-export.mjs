@@ -209,6 +209,20 @@ assert.equal(remaining.specificationAuditUrl, 'https://github.com/alt-research/e
 assert.ok(roadmap.includes(remaining.specificationAuditUrl));
 assert.match(roadmap, /These repairs and proof extensions are merged/);
 
+// The retained implementation score must not conceal newly found audit defects
+// or present pending review delivery as a merged/current conformance result.
+for (const html of [home, roadmap]) {
+  assert.ok(html.includes(remaining.currentConformanceReview.summary));
+  assert.ok(html.includes('Current correction reviews'));
+}
+assert.equal(remaining.currentConformanceReview.originalFaultStatus, 'unconfirmed');
+assert.equal(remaining.currentConformanceReview.reviews.length, 11);
+for (const review of remaining.currentConformanceReview.reviews) {
+  assert.ok(roadmap.includes(review.url));
+  assert.ok(roadmap.includes(`data-conformance-review="${review.id}" data-state="${review.state}"`));
+  assert.equal(review.target, review.url.includes('/lighthouse/') ? 'eth2030' : 'master');
+}
+
 assert.equal(new Set(remaining.items.map(item => item.id)).size, remaining.items.length);
 assert.match(roadmap, /id="remaining-work"/);
 assert.match(roadmap, /data-remaining-adopted-todos="0"/);

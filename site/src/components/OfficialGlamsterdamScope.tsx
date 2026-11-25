@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import scope from '@/data/official-glamsterdam.json';
+import remaining from '@/data/remaining-work.json';
 import { EIPS } from '@/data/eips';
 import { roadmapProgress } from '@/lib/roadmap';
 
@@ -10,6 +11,7 @@ export default function OfficialGlamsterdamScope() {
     <p className="text-xs uppercase tracking-wider text-eth-teal">Official upgrade scope · {scope.reviewed}</p>
     <h3 className="mt-2 text-lg font-bold text-eth-text">{`Glamsterdam · ${counts.complete}/${entries.length} scheduled core EIPs labelled Complete`}</h3>
     <p className="mt-2 text-eth-dim">Scope: <a className="text-eth-teal underline" href={scope.source}>EIP-7773 ↗</a> · official meta status: {scope.officialStatus}. Completion counts ETH2030 implementation labels, not Ethereum network activation or a new conformance measurement.</p>
+    <p data-current-conformance-review={remaining.currentConformanceReview.state} className="mt-2 text-eth-dim">{remaining.currentConformanceReview.summary} <Link className="text-eth-teal underline" href="/roadmap/#remaining-work">Current correction reviews ↗</Link></p>
     {pending.length ? <p className="mt-2 text-eth-dim">Open core label: {pending.map(entry => <Link key={entry.id} className="text-eth-teal underline" href={`/eips/${entry.id}/`}>EIP-{entry.number} · {entry.title} ({entry.status}) ↗</Link>)}</p> : <p className="mt-2 text-eth-dim">All scheduled core entries have reviewed implementation evidence. <Link className="text-eth-teal underline" href="/eips/eip-7495/">EIP-7495 independent qualification ↗</Link></p>}
     <div className="mt-3 border-t border-eth-teal/20 pt-3">
       <p className="font-bold text-eth-text">Networking references · separate from the core denominator</p>

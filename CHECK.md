@@ -1,3 +1,12 @@
+## Current Glamsterdam conformance closure (2026-11-25)
+
+- [x] Preserve the original checkout, isolate major corrections and keep all EL reviews targeted at master.
+- [x] Complete the native official block corpus, independent BAL peer campaign and all 120 EL composition orders.
+- [x] Merge qualified Lighthouse admission/schema repairs into eth2030 and publish separate current-reference/light-client reviews.
+- [x] Expose current audit corrections separately from retained implementation labels on the homepage/roadmap.
+- [ ] Complete final source-stamped CL qualification, broad tests/builds, hosted CI and authorized Lighthouse integration.
+- [ ] Publish final integration evidence and verify every pending EL review target, exact head and cumulative merge result.
+
 ## Remaining-code closure (2026-11-22)
 
 - [x] Preserve the original checkout and freeze shared source at PR126 head43002a5d; all new PRs target master with explicit ancestry.

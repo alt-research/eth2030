@@ -1,5 +1,9 @@
 # Project Status
 
+## PR #167 master integration (2026-11-25)
+
+In progress: merging canonical upstream master `98d43177` into the Hegotá baseline branch. The merge base is `dbe10116`; upstream contains 1,204 commits absent from the branch and changes 2,340 files. Twenty files require manual conflict resolution, including interfaces retired upstream. Local and hosted validation will be recorded after integration.
+
 ## Hegotá Group A: Specifications, Baseline and Runtime Paths (2026-11-25)
 
 ### Current Status: ALL SEVEN A TASKS VERIFIED; FOLLOW-UP AUDIT COMPLETE; COMBINED FORK RELEASE NOT READY

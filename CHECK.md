@@ -1,5 +1,13 @@
 # Lean4 Verification Check-list
 
+## PR #167 master integration and CI (2026-11-25)
+
+- [ ] Record the merge base, upstream divergence and each conflict resolution.
+- [ ] Integrate current master without restoring retired interfaces or losing native execution fixes.
+- [ ] Reconcile specification locks, runtime evidence, regression tests and CI workflows.
+- [ ] Run local build, required checks and regression suites; repair failures.
+- [ ] Commit, push, verify hosted CI and update the PR description in English.
+
 ## Hegotá A follow-up audit and push (2026-11-25)
 
 - [x] Recheck every A acceptance criterion against code, artifacts, source pins and evidence.

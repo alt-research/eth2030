@@ -17,7 +17,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -35,7 +35,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 0.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -58,7 +58,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -79,7 +79,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -100,7 +100,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -120,7 +120,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
@@ -139,7 +139,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 0.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md",
+      "follow_up_audit": "docs/reviews/pr-168/FINAL_REVIEW.md",
       "acceptance": "specs/hegota/acceptance.json"
     }
   ],

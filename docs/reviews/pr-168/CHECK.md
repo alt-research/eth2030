@@ -15,3 +15,10 @@
 - [x] Preserve approval-time legacy nonce in the isolated keyed oracle; cover the 16-key valid boundary.
 - [x] Reject canceled/unknown run counters and malformed completion types.
 - [x] Verify all original A deliverables and refresh evidence; publication and exact-head hosted results are tracked on the English PR.
+
+## Final review against the original seven A tasks
+
+- [x] Reconcile every original acceptance requirement with the current 26-criterion matrix.
+- [x] Correct stale current-report navigation while preserving historical reports.
+- [x] Rerun source/oracle checks, both Python modes, every required Go test, the differential baseline and local build/vet.
+- [x] Record the absence of further functional omissions and prepare the reviewed documentation changes; publication/exact-head outcomes are tracked on PR #168.

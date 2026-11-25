@@ -26,4 +26,4 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Reproduce and fix any missing execution, rollback, receipt, persistence or controlled-profile behavior.
 - [x] Add independent expected-value and negative regression coverage for each finding.
 - [x] Refresh Group B and affected Group A source-bound evidence; run local build, vet, full tests and affected race checks.
-- [ ] Commit/push fixes and verify the final PR head and English description.
+- [x] Commit/push fixes and verify the published source head and English description; final documentation-only descendant checks are reported on PR #169.

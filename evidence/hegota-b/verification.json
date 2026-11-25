@@ -213,5 +213,12 @@
     "main_run": "https://github.com/alt-research/eth2030/actions/runs/45679007553",
     "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45679007521",
     "scope": "Predecessor evidence only; contains the defects reproduced by this audit. Final current-head checks are reported separately."
+  },
+  "hosted_qualification": {
+    "revision": "0e6339511bfb5b59e0c7287d9ba1591ab3ecad04",
+    "passed_checks": 10,
+    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45689792178",
+    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45689792174",
+    "scope": "All second-audit source changes included; later documentation-only descendants are checked separately on PR #169."
   }
 }

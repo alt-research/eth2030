@@ -1,5 +1,15 @@
 # PR #167 overlap review
 
+## Complete the Group A acceptance gaps
+
+- [ ] Read the pinned approval, rollback, state-gas, nonce and root rules; reuse existing native execution.
+- [ ] Preserve real head numbers in prefix simulation, including nonzero fork-height and reorg regressions.
+- [ ] Replace all nine trace descriptions with concrete inputs/outputs and executable consumers.
+- [ ] Reconcile active reference provenance, profiles, routes, safety callers and every prerequisite inventory entry.
+- [ ] Require criterion-specific acceptance evidence; reject missing, stale or inconsistent evidence with regression tests.
+- [ ] Refresh source-bound build, test, baseline and skip evidence without rewriting historical results.
+- [ ] Recheck all seven tasks, commit/push and publish an English follow-up PR with passing required CI.
+
 ## Group A acceptance audit after merge
 
 - [x] Verify the merged revision and compare its source tree with the qualified PR head.

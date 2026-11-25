@@ -14,7 +14,7 @@ func newFrameTestEVM(sender types.Address, frames []Frame) *EVM {
 		BaseFee:     big.NewInt(1),
 	}
 	evm := NewEVM(blockCtx, TxContext{}, Config{})
-	evm.SetJumpTable(NewGlamsterdanJumpTable())
+	evm.SetJumpTable(NewLegacyFrameJumpTable())
 	evm.FrameCtx = &FrameContext{
 		TxType:            0x06,
 		Nonce:             new(big.Int).SetUint64(42),
@@ -292,7 +292,7 @@ func TestApprove_Scope1_InsufficientBalance(t *testing.T) {
 func TestApprove_NoFrameContext(t *testing.T) {
 	blockCtx := BlockContext{BlockNumber: big.NewInt(1), BaseFee: big.NewInt(1)}
 	evm := NewEVM(blockCtx, TxContext{}, Config{})
-	evm.SetJumpTable(NewGlamsterdanJumpTable())
+	evm.SetJumpTable(NewLegacyFrameJumpTable())
 	// FrameCtx is nil
 
 	sender := types.Address{0x01}
@@ -861,7 +861,7 @@ func TestTxParamCopy_ZeroLength(t *testing.T) {
 // --- Gas cost tests ---
 
 func TestEIP8141_GasCosts(t *testing.T) {
-	jt := NewGlamsterdanJumpTable()
+	jt := NewLegacyFrameJumpTable()
 
 	tests := []struct {
 		name string
@@ -910,7 +910,7 @@ func TestEIP8141_NotInPrague(t *testing.T) {
 }
 
 func TestEIP8141_InGlamsterdan(t *testing.T) {
-	jt := NewGlamsterdanJumpTable()
+	jt := NewLegacyFrameJumpTable()
 
 	opcodes := []OpCode{APPROVE, TXPARAMLOAD, TXPARAMSIZE, TXPARAMCOPY}
 	for _, op := range opcodes {

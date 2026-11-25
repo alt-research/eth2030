@@ -1,0 +1,2739 @@
+{
+  "version": 1,
+  "date": "2026-11-25",
+  "count": 72,
+  "default": "disabled until profile admission; research priority is not network activation",
+  "records": [
+    {
+      "eip": 2488,
+      "title": "Deprecate the CALLCODE opcode",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e606d541a486a736c43cc9fbb2849bdcc1cab911bba54e0b891b3ccfb9d6ecd0",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-2488.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-2488-deprecate-the-callcode-opcode/3957",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "e606d541a486a736c43cc9fbb2849bdcc1cab911bba54e0b891b3ccfb9d6ecd0",
+          "new_spec_sha256": "e606d541a486a736c43cc9fbb2849bdcc1cab911bba54e0b891b3ccfb9d6ecd0",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 3298,
+      "title": "Remove storage-clear refund and refund cap",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-051"
+      ],
+      "reason": "refund/floor/Frames 回归",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "623a5db8d64dd86cdaa2409905df785ec9dc58acdd59be8a18f29d8e9f86eb31",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3298.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430",
+      "activation_conditions": [
+        "refund/floor/Frames 回归",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "6324c6a709528776e07e17655d6c66349152b19c4094ff1c304397e0487cd3b2",
+          "new_spec_sha256": "623a5db8d64dd86cdaa2409905df785ec9dc58acdd59be8a18f29d8e9f86eb31",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-051"
+          ],
+          "decision": "conditional",
+          "rationale": "refund/floor/Frames 回归",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 4758,
+      "title": "Deactivate SELFDESTRUCT",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-052"
+      ],
+      "reason": "与 TCREATE 配套决定",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "8e4973a1ea21de41953a6ff56ba17f2e45067559963e8f9ab5aeb3b624ea5def",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-4758.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-4758-deactivate-selfdestruct/8710",
+      "activation_conditions": [
+        "与 TCREATE 配套决定",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "8e4973a1ea21de41953a6ff56ba17f2e45067559963e8f9ab5aeb3b624ea5def",
+          "new_spec_sha256": "8e4973a1ea21de41953a6ff56ba17f2e45067559963e8f9ab5aeb3b624ea5def",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-052"
+          ],
+          "decision": "conditional",
+          "rationale": "与 TCREATE 配套决定",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 5920,
+      "title": "PAY opcode",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-053"
+      ],
+      "reason": "无 recipient execution 的转账语义",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "f9b6d29381744114128f035d4a2a989a3d6ae08f838506fff96cd3c76e26ff11",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-5920.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717",
+      "activation_conditions": [
+        "无 recipient execution 的转账语义",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "b6b2d248b1aa15283a52073a500fe53355521b535dc72c30c9bf9b38d0340e38",
+          "new_spec_sha256": "f9b6d29381744114128f035d4a2a989a3d6ae08f838506fff96cd3c76e26ff11",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-053"
+          ],
+          "decision": "conditional",
+          "rationale": "无 recipient execution 的转账语义",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7645,
+      "title": "Alias ORIGIN to SENDER",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "57c2d8606b731a01ae2077f817032f31629a379fa8b403fe66e67a5fc6660647",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7645.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7645-alias-origin-to-sender/19047",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "57c2d8606b731a01ae2077f817032f31629a379fa8b403fe66e67a5fc6660647",
+          "new_spec_sha256": "57c2d8606b731a01ae2077f817032f31629a379fa8b403fe66e67a5fc6660647",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7666,
+      "title": "EVM-ify the identity precompile",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ea392f32efc0ae218c2f37d75577976a067f6a846caeb228fb76fa2ae3c2227b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7666.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7561-evm-ify-the-identity-precompile/19445",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "ff62b461a38139522c951d834895920a90122077812ee2ddebb1c6e8fe08db97",
+          "new_spec_sha256": "ea392f32efc0ae218c2f37d75577976a067f6a846caeb228fb76fa2ae3c2227b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7668,
+      "title": "Remove bloom filters",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-055"
+      ],
+      "reason": "单独准入，收据/RPC/日志历史回归",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "816047a5594113227ddc9f64b7bcc1bc56bb66f4135c03c3cb526d3049ae3882",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7668.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447",
+      "activation_conditions": [
+        "单独准入，收据/RPC/日志历史回归",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "816047a5594113227ddc9f64b7bcc1bc56bb66f4135c03c3cb526d3049ae3882",
+          "new_spec_sha256": "816047a5594113227ddc9f64b7bcc1bc56bb66f4135c03c3cb526d3049ae3882",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-055"
+          ],
+          "decision": "conditional",
+          "rationale": "单独准入，收据/RPC/日志历史回归",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7709,
+      "title": "Read BLOCKHASH from Storage and Update Cost",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-054"
+      ],
+      "reason": "history 系统写入/窗口/gas/BAL",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ed806dda2e43f8c887e52a89988dbe7354a8dfd305587955e09b6254994716ea",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7709.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7709-read-blockhash-opcode-from-storage-and-adjust-gas-cost/20052",
+      "activation_conditions": [
+        "history 系统写入/窗口/gas/BAL",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "92c41f3115805cfd500bc5a5c7dc0b542a4e9445d00d120f6c325a0b952bbfb7",
+          "new_spec_sha256": "ed806dda2e43f8c887e52a89988dbe7354a8dfd305587955e09b6254994716ea",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-054"
+          ],
+          "decision": "conditional",
+          "rationale": "history 系统写入/窗口/gas/BAL",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7716,
+      "title": "Anti-Correlation Attestation Penalties",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "759f1689c19cfa2b95eb3ec4ce21dd0fcd0e0e2c7145b78ae7d31852bda557d7",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7716.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7716-anti-correlation-attestation-penalties/20137",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "d0009150ec00e361372faf9d879d877a4a8a57cda5981c021278f5921a2467c2",
+          "new_spec_sha256": "759f1689c19cfa2b95eb3ec4ce21dd0fcd0e0e2c7145b78ae7d31852bda557d7",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7805,
+      "title": "Fork-choice enforced Inclusion Lists (FOCIL)",
+      "disposition": "implement",
+      "upstream_stage": "SFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-040",
+        "HGT-041",
+        "HGT-042",
+        "HGT-043",
+        "HGT-044",
+        "HGT-045",
+        "HGT-046",
+        "HGT-047",
+        "HGT-048"
+      ],
+      "reason": "完整列入，按正式范围变化调整",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7805.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7805-committee-based-fork-choice-enforced-inclusion-lists-focil/21578",
+      "activation_conditions": [
+        "retain SFI planning unless a dated scope decision supersedes it; D03/D04 and API contract resolved",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
+          "new_spec_sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-040",
+            "HGT-041",
+            "HGT-042",
+            "HGT-043",
+            "HGT-044",
+            "HGT-045",
+            "HGT-046",
+            "HGT-047",
+            "HGT-048"
+          ],
+          "decision": "implement",
+          "rationale": "完整列入，按正式范围变化调整",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7807,
+      "title": "SSZ execution blocks",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "75a4aae64ad35a43fef8dc18fd51d90f7459f925900d9dac380dc41982da91ff",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7807.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7807-ssz-execution-blocks/21580",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "fdb8e972a8f9dcc766c39c63dd8df954017f0537af0da4558f557026e2b947de",
+          "new_spec_sha256": "75a4aae64ad35a43fef8dc18fd51d90f7459f925900d9dac380dc41982da91ff",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7819,
+      "title": "SETDELEGATE instruction",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "431cc6e41caf5e4ada27a3a94e55af40cc9bec7434502c05e87fbeabdade346e",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7819.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7819-create-delegate/21763",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "19d1dd51b4ed32e86070a3517d8a73fcf024572f3f2315c1fc448b2de7ada498",
+          "new_spec_sha256": "431cc6e41caf5e4ada27a3a94e55af40cc9bec7434502c05e87fbeabdade346e",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7851,
+      "title": "Code-Controlled EOA Delegation",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "439e4826ef1aa6a370b59da167d553d4b3cf33a8038db7e010f3950b0aa3aae5",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7851.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7851-code-controlled-eoa-delegation/22344",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "316391e6c64947f4dd5f26e0dd901917868f78262be328e7d3e92aaabb9a192f",
+          "new_spec_sha256": "439e4826ef1aa6a370b59da167d553d4b3cf33a8038db7e010f3950b0aa3aae5",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7862,
+      "title": "Delayed State Root",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "2f044dc1c00ae5558aa3c17367da056acf0f76701f492ae63e77fb0b9b293cdc",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7862.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7862-delayed-execution-layer-state-root/22559",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "2f044dc1c00ae5558aa3c17367da056acf0f76701f492ae63e77fb0b9b293cdc",
+          "new_spec_sha256": "2f044dc1c00ae5558aa3c17367da056acf0f76701f492ae63e77fb0b9b293cdc",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7906,
+      "title": "Transaction Assertions via State Diff Opcode",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-037"
+      ],
+      "reason": "断言与 paymaster 回滚决策门",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "fcde21b02c0c7c04b9e787fbfb5bc33e9fa3cbef419b53b47d979a7451777fea",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7906.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-restricted-behavior-transaction-type/23130",
+      "activation_conditions": [
+        "断言与 paymaster 回滚决策门",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "63d2c834b81f5c4b6b9e93521fa34ce4687303818ea710962d53c6b05bc6fc5b",
+          "new_spec_sha256": "fcde21b02c0c7c04b9e787fbfb5bc33e9fa3cbef419b53b47d979a7451777fea",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-037"
+          ],
+          "decision": "conditional",
+          "rationale": "断言与 paymaster 回滚决策门",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7907,
+      "title": "Meter Contract Code Size",
+      "disposition": "conditional",
+      "upstream_stage": "PFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-059"
+      ],
+      "reason": "代码加载计量与资源报告",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5ab7597f76df7da70806003e7a3a4ee1167442a766af868d4d321429fe38de6b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7907.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156",
+      "activation_conditions": [
+        "代码加载计量与资源报告",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "75f1dc8d22e303df5dcbabb3a1787e6d6780c9df345baeeafdffdfe14052f541",
+          "new_spec_sha256": "5ab7597f76df7da70806003e7a3a4ee1167442a766af868d4d321429fe38de6b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-059"
+          ],
+          "decision": "conditional",
+          "rationale": "代码加载计量与资源报告",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7923,
+      "title": "Linear, Page-Based Memory Costing",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "38077cfd67bac06d3ccf95979440d99d8eb9218da855a68a097bfb8084677844",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7923.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-linearize-memory-costing/23290",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "38077cfd67bac06d3ccf95979440d99d8eb9218da855a68a097bfb8084677844",
+          "new_spec_sha256": "38077cfd67bac06d3ccf95979440d99d8eb9218da855a68a097bfb8084677844",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7973,
+      "title": "Warm Account Write Metering",
+      "disposition": "watch",
+      "upstream_stage": null,
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "未确认本 fork 纳入，不排新实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1762762e76102f0bfd20789bd96016bec8b8116d00f0b804275cbf5f77a87f7e",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7973.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7973-warm-account-write-metering/25907",
+      "activation_conditions": [
+        "explicit new admission decision and executable consumer specification",
+        "未确认本 fork 纳入，不排新实现"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "1762762e76102f0bfd20789bd96016bec8b8116d00f0b804275cbf5f77a87f7e",
+          "new_spec_sha256": "1762762e76102f0bfd20789bd96016bec8b8116d00f0b804275cbf5f77a87f7e",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "watch",
+          "rationale": "未确认本 fork 纳入，不排新实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 7979,
+      "title": "Call and Return Opcodes for the EVM",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-056"
+      ],
+      "reason": "return stack 与编译器消费",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9a3906c2a5bc4a197b96f3644f21a073f731057b39801bb259a80aa02ee6eab5",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7979.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-7979-call-and-return-opcodes-for-the-evm/24615",
+      "activation_conditions": [
+        "return stack 与编译器消费",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "9b870708dd06eb68ce2a760ad39a553d5e2f2a00b72ebb4c2ff149b0b911288b",
+          "new_spec_sha256": "9a3906c2a5bc4a197b96f3644f21a073f731057b39801bb259a80aa02ee6eab5",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-056"
+          ],
+          "decision": "conditional",
+          "rationale": "return stack 与编译器消费",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8015,
+      "title": "Remove `deposit` and `eth1data` fields",
+      "disposition": "implement",
+      "upstream_stage": "SFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-070"
+      ],
+      "reason": "CL 主责，EL 联调验收",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ce565f18648ce6bf7c61d4bb9d964c712d1c3f11e10f7bafbda0a67da129b216",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8015.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8015-remove-legacy-deposit-and-eth1data-fields/25401",
+      "activation_conditions": [
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "9145bcb188639c2c796207b66c833e7d8190a55f87a5417522c6dda6e2e13e48",
+          "new_spec_sha256": "ce565f18648ce6bf7c61d4bb9d964c712d1c3f11e10f7bafbda0a67da129b216",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-070"
+          ],
+          "decision": "implement",
+          "rationale": "CL 主责，EL 联调验收",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8025,
+      "title": "Optional Execution Proofs",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c358101a47c8be0c565ef6d19fae7f2200d30c9dfad7f979c02c76fa3b6b715f",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8025.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-optional-execution-proofs/25500",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "0e2fb88e69c5e6a1194ecd7fa76127d16b1d6eba107d0093979caf78c7880dd3",
+          "new_spec_sha256": "c358101a47c8be0c565ef6d19fae7f2200d30c9dfad7f979c02c76fa3b6b715f",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8077,
+      "title": "eth/XX - announce transactions with nonce",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-060"
+      ],
+      "reason": "公告 wire schema 与多 key 兼容",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "05eb72ad5ae885653963ad34d451aa2b27661daccc6c69067b781865c7fa1604",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8077.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8077-eth-xx-add-nonce-and-source-to-transactions-announcement/26505",
+      "activation_conditions": [
+        "公告 wire schema 与多 key 兼容",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "fdbb52add5a5ff565826aa8e0af1210d28dad4fb1bd942337874cef41127a53a",
+          "new_spec_sha256": "05eb72ad5ae885653963ad34d451aa2b27661daccc6c69067b781865c7fa1604",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-060"
+          ],
+          "decision": "conditional",
+          "rationale": "公告 wire schema 与多 key 兼容",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8094,
+      "title": "eth/vhash - Blob-Aware Mempool",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c5a94b085a47477e1eef3b12c49f88f3ce1b4219137db8f476ad56c73a3c1347",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8094.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8094-eth-vhash-blob-aware-mempool/26834",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "c5a94b085a47477e1eef3b12c49f88f3ce1b4219137db8f476ad56c73a3c1347",
+          "new_spec_sha256": "c5a94b085a47477e1eef3b12c49f88f3ce1b4219137db8f476ad56c73a3c1347",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8105,
+      "title": "Universal Enshrined Encrypted Mempool",
+      "disposition": "excluded",
+      "upstream_stage": "撤回",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "7486cb72d3a4776cf37fed93d893865ab5a607647400797f8cbd58800544ccef",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8105.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8105-universal-enshrined-encrypted-mempool/27201",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "7486cb72d3a4776cf37fed93d893865ab5a607647400797f8cbd58800544ccef",
+          "new_spec_sha256": "7486cb72d3a4776cf37fed93d893865ab5a607647400797f8cbd58800544ccef",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8115,
+      "title": "Batch priority fees at end of block",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "55ab16f6b3f9778ea5ce777dbbc67a95d627cda00c78f1de4922f36da79d4e23",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8115.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8115-batch-priority-fees-at-end-of-block/27358",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "55ab16f6b3f9778ea5ce777dbbc67a95d627cda00c78f1de4922f36da79d4e23",
+          "new_spec_sha256": "55ab16f6b3f9778ea5ce777dbbc67a95d627cda00c78f1de4922f36da79d4e23",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8116,
+      "title": "Replace cumulative receipt fields",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-055"
+      ],
+      "reason": "单独准入，receipt gas/logIndex 回归",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "587ad8509b9df4473a75366a7361bb191b87941726f45cde79ff85ef7559fea5",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8116.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8116-replace-cumulative-receipt-fields/27359",
+      "activation_conditions": [
+        "单独准入，receipt gas/logIndex 回归",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "unchanged",
+          "previous_local_sha256": "587ad8509b9df4473a75366a7361bb191b87941726f45cde79ff85ef7559fea5",
+          "new_spec_sha256": "587ad8509b9df4473a75366a7361bb191b87941726f45cde79ff85ef7559fea5",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-055"
+          ],
+          "decision": "conditional",
+          "rationale": "单独准入，receipt gas/logIndex 回归",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8131,
+      "title": "Unified Transaction Content Floor",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-050"
+      ],
+      "reason": "与 BAL byte floor 组合验证",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1a4b65e01ec304dc2f67452c75db8ef49d8d6cda008aecb8a2b0fd1c11ee36ee",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8131.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8131-add-auth-data-to-eip-7623-floor/27567",
+      "activation_conditions": [
+        "与 BAL byte floor 组合验证",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "bb14f8146b2497717dee2204f1bc4d960c0054dcaee5012613283c8954eed940",
+          "new_spec_sha256": "1a4b65e01ec304dc2f67452c75db8ef49d8d6cda008aecb8a2b0fd1c11ee36ee",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-050"
+          ],
+          "decision": "conditional",
+          "rationale": "与 BAL byte floor 组合验证",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8141,
+      "title": "Frame Transaction",
+      "disposition": "implement",
+      "upstream_stage": "SFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-002",
+        "HGT-003",
+        "HGT-010",
+        "HGT-011",
+        "HGT-012",
+        "HGT-013",
+        "HGT-014",
+        "HGT-015",
+        "HGT-016",
+        "HGT-019",
+        "HGT-020",
+        "HGT-021",
+        "HGT-022",
+        "HGT-023",
+        "HGT-024",
+        "HGT-025",
+        "HGT-026",
+        "HGT-027",
+        "HGT-028",
+        "HGT-029"
+      ],
+      "reason": "按选定规范完整实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8141.md",
+      "discussion": "https://ethereum-magicians.org/t/frame-transaction/27617",
+      "activation_conditions": [
+        "D01/D02/D09 resolved for production profile; legacy frame prototype is not the selected schema",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "770987fc47d449bc5bd86bb15820ce3c63262338905cf95468086cef438053ba",
+          "new_spec_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-002",
+            "HGT-003",
+            "HGT-010",
+            "HGT-011",
+            "HGT-012",
+            "HGT-013",
+            "HGT-014",
+            "HGT-015",
+            "HGT-016",
+            "HGT-019",
+            "HGT-020",
+            "HGT-021",
+            "HGT-022",
+            "HGT-023",
+            "HGT-024",
+            "HGT-025",
+            "HGT-026",
+            "HGT-027",
+            "HGT-028",
+            "HGT-029"
+          ],
+          "decision": "implement",
+          "rationale": "按选定规范完整实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8142,
+      "title": "Block-in-Blobs (BiB)",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "8153607a02e4e06b9ced70860b8f6400a68d9728a86e59c61321bb78449fe3fa",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8142.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8142-block-in-blobs-bib/27621",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "c1b29ac56051f56687dd45af2d401158c1d1001b5ee0f1c22fd59111c72f6378",
+          "new_spec_sha256": "8153607a02e4e06b9ced70860b8f6400a68d9728a86e59c61321bb78449fe3fa",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8146,
+      "title": "Block Access List Sidecars",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "d2e2b20121e35dabe18a3eb37a8144ddeb772db08f09e2e6e99ace5a2372155b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8146.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8146-block-access-list-sidecars/27757",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "9d28e73306c861829c44d6865c0555b6a3a963e6c392cb2d7cbe1d6909af1980",
+          "new_spec_sha256": "d2e2b20121e35dabe18a3eb37a8144ddeb772db08f09e2e6e99ace5a2372155b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8148,
+      "title": "Custom sweep threshold for validators",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-075"
+      ],
+      "reason": "请求/threshold/withdrawals 联测",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "58a0123e5d983f51c4485ab6d1630a5388ff8bb00596bcdb5f0667aec0d3a700",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8148.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8148-custom-sweep-threshold-for-validators/27669",
+      "activation_conditions": [
+        "请求/threshold/withdrawals 联测",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "a5ef8ef87b48fde16eef85c2c7fb9a7f1e4caaaf5f959ff2b702b4218b112057",
+          "new_spec_sha256": "58a0123e5d983f51c4485ab6d1630a5388ff8bb00596bcdb5f0667aec0d3a700",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-075"
+          ],
+          "decision": "conditional",
+          "rationale": "请求/threshold/withdrawals 联测",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8151,
+      "title": "Account Code Restricted ecRecover",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-021",
+        "HGT-036"
+      ],
+      "reason": "不可变合约/fault-proof 与重验门",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8151.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8151-account-code-restricted-ecrecover/27690",
+      "activation_conditions": [
+        "不可变合约/fault-proof 与重验门",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "source_changed",
+          "previous_local_sha256": "15247314d7b33edff1b07e6b8d24770ce293fc939f78f5f662cc45c43080b7e3",
+          "new_spec_sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-021",
+            "HGT-036"
+          ],
+          "decision": "conditional",
+          "rationale": "不可变合约/fault-proof 与重验门",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8163,
+      "title": "Reserve `EXTENSION (0xae)` opcode",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-057"
+      ],
+      "reason": "L1 exceptional halt 保持不变",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "dbd3bcf2bd669e4b83ca6d12e172ee5cdaafb470210ec3db7254fc07bb4f07bb",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8163.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8163-reserve-0xae-extension-opcode/27756",
+      "activation_conditions": [
+        "L1 exceptional halt 保持不变",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "dbd3bcf2bd669e4b83ca6d12e172ee5cdaafb470210ec3db7254fc07bb4f07bb",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-057"
+          ],
+          "decision": "conditional",
+          "rationale": "L1 exceptional halt 保持不变",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8173,
+      "title": "Foundations of EVM Control Flow",
+      "disposition": "watch",
+      "upstream_stage": null,
+      "document_status": "Review",
+      "document_type": "Informational",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-007",
+        "HGT-056"
+      ],
+      "reason": "按具体消费 EIP 验收，不独立虚构功能",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "41a9fd6186dc5c1672edb2b86ac78577d435ea51f4dfa41bd068821364f171b2",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8173.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8173-foundations-of-evm-control-flow/27855",
+      "activation_conditions": [
+        "explicit new admission decision and executable consumer specification",
+        "按具体消费 EIP 验收，不独立虚构功能"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "41a9fd6186dc5c1672edb2b86ac78577d435ea51f4dfa41bd068821364f171b2",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-007",
+            "HGT-056"
+          ],
+          "decision": "watch",
+          "rationale": "按具体消费 EIP 验收，不独立虚构功能",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8182,
+      "title": "Private ETH and ERC-20 Transfers",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5fcacb0f71bec7f46b37edacc7060a2a0c03dc4538caa809453460ee2d0e809e",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8182.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8182-private-eth-and-erc-20-transfers/27889",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "5fcacb0f71bec7f46b37edacc7060a2a0c03dc4538caa809453460ee2d0e809e",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8184,
+      "title": "LUCID encrypted mempool",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "146e5450a3ec8a180a0e18df658e2fb7a4b171b2908daadcc1006c3a64cfde07",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8184.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8184-lucid-encrypted-mempool/28017",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "146e5450a3ec8a180a0e18df658e2fb7a4b171b2908daadcc1006c3a64cfde07",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8188,
+      "title": "Last-Written Block for Accounts and Slots",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "dc2306ba2877472dc2f5d85ae4024adc8127a02a0388130f656afa6e815e807f",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8188.md",
+      "discussion": "https://ethereum-magicians.org/t/eip8188-state-tiering-by-write-age/28234",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "dc2306ba2877472dc2f5d85ae4024adc8127a02a0388130f656afa6e815e807f",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8198,
+      "title": "Quick Slots",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "3b8ff3656f4736a6acdc707e4560e6470024a49631e2cf7f1a493bc3e912e7cc",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8198.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8198-quick-slots/28057",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "3b8ff3656f4736a6acdc707e4560e6470024a49631e2cf7f1a493bc3e912e7cc",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8200,
+      "title": "EVMification",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "15d2e9e885d61c6fe3004754fb907b3c9d46ab5610863257ab0a5cd2cf33ed1c",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8200.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8200-evmification/28036",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "15d2e9e885d61c6fe3004754fb907b3c9d46ab5610863257ab0a5cd2cf33ed1c",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8205,
+      "title": "Withdrawal credentials preregistration",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c6259cbcdd486f0354f852d92d1355d34f0332a02b7faef11f84440542cae9f0",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8205.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8205-withdrawal-credentials-preregistration/28084",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "c6259cbcdd486f0354f852d92d1355d34f0332a02b7faef11f84440542cae9f0",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8219,
+      "title": "Checked Arithmetic Opcodes",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "609d426fc454180b8b79c6da5e59d66c7e723508aeca9376f3761f5a22d73e12",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8219.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8219-checked-arithmetic-opcodes/27913",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "609d426fc454180b8b79c6da5e59d66c7e723508aeca9376f3761f5a22d73e12",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8237,
+      "title": "Independent CL/EL Sync",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "192437824e82227014f4675cee81b4b24bcca7027406c321e6142838f22542af",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8237.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8237-independent-cl-el-sync/28331",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "192437824e82227014f4675cee81b4b24bcca7027406c321e6142838f22542af",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8243,
+      "title": "Batching Attestations at Source",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "877bc6b37c3b1a71bd71a132ab8e9a6641c900b31966f92cda1f1f16375085a7",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8243.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8243-batching-attestations-at-source/28606",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "877bc6b37c3b1a71bd71a132ab8e9a6641c900b31966f92cda1f1f16375085a7",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8250,
+      "title": "Keyed Nonces for Frame Transactions",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-017",
+        "HGT-022"
+      ],
+      "reason": "组合编码/nonce 与激活范围门",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8250.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8250-keyed-nonces-for-frame-transactions/28437",
+      "activation_conditions": [
+        "组合编码/nonce 与激活范围门",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-017",
+            "HGT-022"
+          ],
+          "decision": "conditional",
+          "rationale": "组合编码/nonce 与激活范围门",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8253,
+      "title": "Bump nonce of zero-nonce storage accounts",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-058"
+      ],
+      "reason": "逐链状态名单和 fork 转换",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "00f0047eefb41228d82400f792081fa83555ee0a094785409180d4e6bb7d0f6b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8253.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8253-upgrade-pre-spurious-dragon-accounts/28505",
+      "activation_conditions": [
+        "逐链状态名单和 fork 转换",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "00f0047eefb41228d82400f792081fa83555ee0a094785409180d4e6bb7d0f6b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-058"
+          ],
+          "decision": "conditional",
+          "rationale": "逐链状态名单和 fork 转换",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8272,
+      "title": "Recent Roots for Frame Transactions",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-018",
+        "HGT-022"
+      ],
+      "reason": "canonical verifier、slot/root 与重组",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8272.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8272-recent-roots-for-frame-transactions/28621",
+      "activation_conditions": [
+        "canonical verifier、slot/root 与重组",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-018",
+            "HGT-022"
+          ],
+          "decision": "conditional",
+          "rationale": "canonical verifier、slot/root 与重组",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8279,
+      "title": "Block Access List Byte Floor",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-050"
+      ],
+      "reason": "运行时资源上界与组合计费",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9d68b6670efa1ce22157bd367042aee00746223eaaf598fad57c211b495475dc",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8279.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8279-block-access-list-byte-floor/28662",
+      "activation_conditions": [
+        "运行时资源上界与组合计费",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "9d68b6670efa1ce22157bd367042aee00746223eaaf598fad57c211b495475dc",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-050"
+          ],
+          "decision": "conditional",
+          "rationale": "运行时资源上界与组合计费",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8288,
+      "title": "In-mempool signature and proof aggregation",
+      "disposition": "watch",
+      "upstream_stage": null,
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009",
+        "HGT-030"
+      ],
+      "reason": "保留兼容设计，不承诺完整聚合",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "0536c4333e5ee8b16bd4dd13a8dfac33f9fa66defc0cd1a2ecabaedf40c9c7c2",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8288.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8288-frame-type-for-pq-sig-and-stark-aggregation/28723",
+      "activation_conditions": [
+        "explicit new admission decision and executable consumer specification",
+        "保留兼容设计，不承诺完整聚合"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "0536c4333e5ee8b16bd4dd13a8dfac33f9fa66defc0cd1a2ecabaedf40c9c7c2",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009",
+            "HGT-030"
+          ],
+          "decision": "watch",
+          "rationale": "保留兼容设计，不承诺完整聚合",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8298,
+      "title": "SETCODEFROM Code Reuse Instruction",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-035",
+        "HGT-036"
+      ],
+      "reason": "与 8151 配套兼容准入",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8298.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8298-setcodefrom-code-reuse-instruction/28779",
+      "activation_conditions": [
+        "与 8151 配套兼容准入",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-035",
+            "HGT-036"
+          ],
+          "decision": "conditional",
+          "rationale": "与 8151 配套兼容准入",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8304,
+      "title": "Trustless log and transaction index",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c03c929fdf37d7be2d65866bc2801d9f13b14a86c18b360bd01951d9618c5861",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8304.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8304-trustless-log-and-transaction-index/28824",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "c03c929fdf37d7be2d65866bc2801d9f13b14a86c18b360bd01951d9618c5861",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8321,
+      "title": "Hash-Chain RANDAO",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "387b8dafcef6df198386f53969ac834afa0e16763728d084d01d8b1fd864c3be",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8321.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8321-hash-chain-randao/28942",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "387b8dafcef6df198386f53969ac834afa0e16763728d084d01d8b1fd864c3be",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8333,
+      "title": "Align Checkpoint with Epoch Boundary Block",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Withdrawn",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "11b027538796f9b8aa53a7a4c0d5a66b08fc42120131b4ddd97d4d1750a4855f",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8333.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8333-align-checkpoint-with-epoch-boundary-block/29003",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "11b027538796f9b8aa53a7a4c0d5a66b08fc42120131b4ddd97d4d1750a4855f",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8334,
+      "title": "Bundled Attestation Propagation",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-072"
+      ],
+      "reason": "mixed-peer 与网络资源",
+      "spec_commit": "f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04",
+      "spec_sha256": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+      "spec_url": "https://raw.githubusercontent.com/sukunrt/EIPs/f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04/EIPS/eip-8334.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8334-bundled-attestation-propagation/29008",
+      "activation_conditions": [
+        "mixed-peer 与网络资源",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-072"
+          ],
+          "decision": "conditional",
+          "rationale": "mixed-peer 与网络资源",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8341,
+      "title": "Partial Execution Payload Commitments",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "7c0a835f2be7a1678990473a20212fb97e3ed017",
+      "spec_sha256": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+      "spec_url": "https://raw.githubusercontent.com/nerolation/EIPs/7c0a835f2be7a1678990473a20212fb97e3ed017/EIPS/eip-8341.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8341-partial-execution-payload-commitments/29030",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8355,
+      "title": "Precompiles for ML-DSA Verification",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "01207bab5558e0692ba295b81a64e1d349f634a3b6dc127433fc3f4d31aed714",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8355.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8355-precompiles-for-ml-dsa-verification/29211",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "01207bab5558e0692ba295b81a64e1d349f634a3b6dc127433fc3f4d31aed714",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8358,
+      "title": "Net Gas Metering for Account Changes",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e28022d3734416969a287cb651e675d0f91ac67dde4c6b03c0d84de61c8c926e",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8358.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8358-net-gas-metering-for-account-changes/29304",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "e28022d3734416969a287cb651e675d0f91ac67dde4c6b03c0d84de61c8c926e",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8359,
+      "title": "Beacon Block Reporting Field",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "06ee26f2b86f36c839f9c41d99fcf49ab8323e5d",
+      "spec_sha256": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+      "spec_url": "https://raw.githubusercontent.com/hanniabu/EIPs/06ee26f2b86f36c839f9c41d99fcf49ab8323e5d/EIPS/eip-8359.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8359-beacon-block-reporting-field/29224",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8360,
+      "title": "TCREATE Opcode",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-052"
+      ],
+      "reason": "临时合约生命周期与兼容性",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "a9de2df039c4aee07c4b6fe4d6ab1dd2c7dd35358e024d36d117ef853e37323b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8360.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8360-tcreate-opcode/29258",
+      "activation_conditions": [
+        "临时合约生命周期与兼容性",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "a9de2df039c4aee07c4b6fe4d6ab1dd2c7dd35358e024d36d117ef853e37323b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-052"
+          ],
+          "decision": "conditional",
+          "rationale": "临时合约生命周期与兼容性",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8363,
+      "title": "Tapered Issuance Burn",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c7401db129b5fd2e523ab02707d0efe8312444ec902e46a5e71885a480058a84",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8363.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8363-tapered-issuance-burn/29263",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "c7401db129b5fd2e523ab02707d0efe8312444ec902e46a5e71885a480058a84",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8365,
+      "title": "Disallow new 0x00 validators",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-071"
+      ],
+      "reason": "停止新 0x00，与旧 validator 区分",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "6c400df484c77c34e674541c70f58415de199dc030a3d92733667523f0c1cbd2",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8365.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8365-bls-withdrawal-credential-retirement/29284",
+      "activation_conditions": [
+        "停止新 0x00，与旧 validator 区分",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "6c400df484c77c34e674541c70f58415de199dc030a3d92733667523f0c1cbd2",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-071"
+          ],
+          "decision": "conditional",
+          "rationale": "停止新 0x00，与旧 validator 区分",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8367,
+      "title": "Balance sunset for retired BLS validators",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "c55245baa104ff8f6e02285cb9e58d66640cf829",
+      "spec_sha256": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+      "spec_url": "https://raw.githubusercontent.com/ensi321/EIPs/c55245baa104ff8f6e02285cb9e58d66640cf829/EIPS/eip-8367.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8367-balance-sunset-for-retired-bls-validators/29299",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8368,
+      "title": "CPSB Recalibration for New Gas Limit",
+      "disposition": "conditional",
+      "upstream_stage": "PFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-061"
+      ],
+      "reason": "与 8372 联评，参数未定不激活",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5092c19d1dff03b1dc647ffff28653bf02eb224f4ad15ff9b42100b69d49b9c7",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8368.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8368-cpsb-recalibration-for-new-gas-limit/29293",
+      "activation_conditions": [
+        "与 8372 联评，参数未定不激活",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "5092c19d1dff03b1dc647ffff28653bf02eb224f4ad15ff9b42100b69d49b9c7",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-061"
+          ],
+          "decision": "conditional",
+          "rationale": "与 8372 联评，参数未定不激活",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8369,
+      "title": "VOPS Profiles for FOCIL Eligibility",
+      "disposition": "conditional",
+      "upstream_stage": null,
+      "document_status": "Draft",
+      "document_type": "Informational",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-007",
+        "HGT-046"
+      ],
+      "reason": "执行性扩展与 ePBS 职责闭合后实施",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "d599b45c5a5d7a40d7d2f81b3440ea75b6d30658e678f061a9a56267c2c7404d",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8369.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8369-vops-profiles-for-focil-eligibility/29298",
+      "activation_conditions": [
+        "执行性扩展与 ePBS 职责闭合后实施",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "d599b45c5a5d7a40d7d2f81b3440ea75b6d30658e678f061a9a56267c2c7404d",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-007",
+            "HGT-046"
+          ],
+          "decision": "conditional",
+          "rationale": "执行性扩展与 ePBS 职责闭合后实施",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8371,
+      "title": "RowDAS - Distributed Blob Reconstruction",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e28d183b0c5d4445014bd3863949e20023d59b270003098b933875b145fc1816",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8371.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8371-rowdas-distributed-blobspace-reconstruction/29320",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "e28d183b0c5d4445014bd3863949e20023d59b270003098b933875b145fc1816",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8372,
+      "title": "Normalized state gas limit",
+      "disposition": "conditional",
+      "upstream_stage": "PFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-061"
+      ],
+      "reason": "与 8368 联评，计费/归一化门",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "db7eae2b26e156041353154d196c5d6373f4b176e42ca4f76129d9f7603a5515",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8372.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8372-normalized-state-gas-limit/29332",
+      "activation_conditions": [
+        "与 8368 联评，计费/归一化门",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "db7eae2b26e156041353154d196c5d6373f4b176e42ca4f76129d9f7603a5515",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-061"
+          ],
+          "decision": "conditional",
+          "rationale": "与 8368 联评，计费/归一化门",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8374,
+      "title": "Persist Warm Access Sets Across Reverts",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "577593d70590e5997fbd8f9b64b799fd5cb6531d8f3e3a61bcf410f97e997155",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8374.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8374-persist-warm-access-sets-across-reverts/29341",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "577593d70590e5997fbd8f9b64b799fd5cb6531d8f3e3a61bcf410f97e997155",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8375,
+      "title": "ePBS Mandatory Burn of Execution Rewards",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "b2bb0ef69e4b236703c30468d5773e896410a679",
+      "spec_sha256": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+      "spec_url": "https://raw.githubusercontent.com/benaadams/EIPs/b2bb0ef69e4b236703c30468d5773e896410a679/EIPS/eip-8375.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8375-ember-epbs-mandatory-burn-of-execution-rewards/29380",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8379,
+      "title": "Top-up Sync",
+      "disposition": "excluded",
+      "upstream_stage": "DFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-009"
+      ],
+      "reason": "保留研究；无新的重新纳入决定，不排本版本实现",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "b9d674ce711f1814088311453f97a4195c830f8bcc256ed9a89d69ddc3ede02b",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8379.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8379-top-up-sync/29405",
+      "activation_conditions": [
+        "new dated ACD scope evidence reverses decline/withdrawal",
+        "new implementation task and reviewed specification lock"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "b9d674ce711f1814088311453f97a4195c830f8bcc256ed9a89d69ddc3ede02b",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-009"
+          ],
+          "decision": "excluded",
+          "rationale": "保留研究；无新的重新纳入决定，不排本版本实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8383,
+      "title": "Reduce CL Block Retention Window",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-073"
+      ],
+      "reason": "CL retention 与恢复契约",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5d65f73db81174beeabaa309538bf23e5c49e1daae4625fdc9a15a0ab380dea1",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8383.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8383-reduce-cl-block-retention-window/29449",
+      "activation_conditions": [
+        "CL retention 与恢复契约",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "5d65f73db81174beeabaa309538bf23e5c49e1daae4625fdc9a15a0ab380dea1",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-073"
+          ],
+          "decision": "conditional",
+          "rationale": "CL retention 与恢复契约",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8411,
+      "title": "Fast Execution Payload Broadcast",
+      "disposition": "conditional",
+      "upstream_stage": "CFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-074"
+      ],
+      "reason": "chunk 可用性与 payload 导入",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9d4bdb57522b7ea5c788e531c4bb8ca925630114e96641a51f49955b49563c08",
+      "spec_url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8411.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8411-fast-execution-payload-broadcast/29613",
+      "activation_conditions": [
+        "chunk 可用性与 payload 导入",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "9d4bdb57522b7ea5c788e531c4bb8ca925630114e96641a51f49955b49563c08",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-074"
+          ],
+          "decision": "conditional",
+          "rationale": "chunk 可用性与 payload 导入",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8483,
+      "title": "Post-Quantum Material Registration",
+      "disposition": "conditional",
+      "upstream_stage": "PFI",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-076"
+      ],
+      "reason": "PQ 请求与 CL 存储所有权",
+      "spec_commit": "d62cd56be2b898ec187d4d215d20c07b052a78bb",
+      "spec_sha256": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+      "spec_url": "https://raw.githubusercontent.com/potuz/EIPs/d62cd56be2b898ec187d4d215d20c07b052a78bb/EIPS/eip-8483.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8483-post-quantum-material-registration/30186",
+      "activation_conditions": [
+        "PQ 请求与 CL 存储所有权",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-076"
+          ],
+          "decision": "conditional",
+          "rationale": "PQ 请求与 CL 存储所有权",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    },
+    {
+      "eip": 8504,
+      "title": "Proof frames for leanSPHINCS signatures",
+      "disposition": "conditional",
+      "upstream_stage": null,
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "implementation_state": "not_claimed_complete_by_group_A",
+      "tasks": [
+        "HGT-030",
+        "HGT-031",
+        "HGT-032",
+        "HGT-033",
+        "HGT-034"
+      ],
+      "reason": "接口冻结后条件实现",
+      "spec_commit": "654c0c3b2b5e066073012284fa93b2fea0522763",
+      "spec_sha256": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+      "spec_url": "https://raw.githubusercontent.com/lambdaclass/EIPs/654c0c3b2b5e066073012284fa93b2fea0522763/EIPS/eip-8504.md",
+      "discussion": "https://ethereum-magicians.org/t/eip-8504-proof-frames-for-leansphincs-signatures/30448",
+      "activation_conditions": [
+        "接口冻结后条件实现",
+        "target network/fork/timestamp explicitly selected",
+        "exact schema and prerequisite rules fixed",
+        "native processor, public ingress, independent vectors and CL contract verified"
+      ],
+      "history": [
+        {
+          "date": "2026-11-25",
+          "change": "new_in_reference",
+          "previous_local_sha256": null,
+          "new_spec_sha256": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+          "old_reference_commit": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+          "affected_tasks": [
+            "HGT-030",
+            "HGT-031",
+            "HGT-032",
+            "HGT-033",
+            "HGT-034"
+          ],
+          "decision": "conditional",
+          "rationale": "接口冻结后条件实现",
+          "review": "docs/plans/hegota-eip-review-2026-11.md"
+        }
+      ]
+    }
+  ]
+}

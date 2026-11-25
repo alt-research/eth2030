@@ -184,6 +184,10 @@ func CheckConfigCompatible(local, remote *ChainConfig, headNum uint64, headTime 
 		return nil
 	}
 
+	if local.ExperimentalLegacyFrames != remote.ExperimentalLegacyFrames && (local.IsHogota(headTime) || remote.IsHogota(headTime)) {
+		return &ConfigCompatError{ForkName: "ExperimentalLegacyFrames", LocalVal: fmt.Sprint(local.ExperimentalLegacyFrames), RemoteVal: fmt.Sprint(remote.ExperimentalLegacyFrames), HeadBlock: headNum, HeadTime: headTime}
+	}
+
 	diffs := ConfigDiff(local, remote)
 	num := new(big.Int).SetUint64(headNum)
 

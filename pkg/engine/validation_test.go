@@ -648,7 +648,10 @@ func TestBackend_GetHeadTimestamp(t *testing.T) {
 func TestBackend_IsCancun(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
 	genesis := makeGenesis()
-	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
+	cfg := *coreconfig.TestConfig
+	cfg.AmsterdamTime = nil
+	cfg.PragueTime = nil
+	b := NewEngineBackend(&cfg, statedb, genesis)
 
 	// TestConfig has Cancun at timestamp 0, so any timestamp should be Cancun.
 	if !b.IsCancun(1700000000) {

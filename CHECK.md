@@ -1,5 +1,16 @@
 # Lean4 Verification Check-list
 
+## Hegotá A: specifications, baseline, and runtime paths (2026-11-25)
+
+- [x] HGT-001: Lock EIP/EELS/EEST/CL/Engine/devnet sources, hashes, profiles, compatibility gaps, and decisions.
+- [x] HGT-004: Verify native/wrapper/container/Engine/processor routing with executable evidence.
+- [x] HGT-005: Audit and repair fork configuration, activation gates, historical behavior, and config compatibility; add tests.
+- [x] HGT-006: Audit prerequisites and fixture coverage; provide native/reference differential runner and baseline results.
+- [x] HGT-007: Record composed schemas and semantic ADRs with independent goldens and unresolved rules isolated.
+- [x] HGT-008: Audit and remove production validation bypasses and stub acceptance; add negative tests.
+- [x] HGT-009: Register all 72 EIPs, admission decisions, affected tasks, changes, and activation conditions.
+- [x] Validate all A deliverables, run local builds and appropriate tests, update STATUS.md and the development plan, and commit only task changes.
+
 ## Hegotá executable development plan (2026-11-25)
 
 - [x] Expand the macro research into one complete implementation and release plan.

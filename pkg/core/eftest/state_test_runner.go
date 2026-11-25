@@ -97,16 +97,18 @@ type StateSubtest struct {
 
 // RunResult holds the outcome of running a single subtest.
 type RunResult struct {
-	Name         string
-	Fork         string
-	Index        int
-	Passed       bool
-	ExpectedRoot types.Hash
-	GotRoot      types.Hash
-	ExpectedLogs types.Hash
-	GotLogs      types.Hash
-	Error        error
-	StateDB      *state.MemoryStateDB
+	Name           string
+	Fork           string
+	Index          int
+	Passed         bool
+	GasUsed        uint64
+	ExecutionError error
+	ExpectedRoot   types.Hash
+	GotRoot        types.Hash
+	ExpectedLogs   types.Hash
+	GotLogs        types.Hash
+	Error          error
+	StateDB        *state.MemoryStateDB
 }
 
 // LoadStateTests parses a state test JSON file and returns the tests.
@@ -225,8 +227,10 @@ func (st *StateTest) Run(subtest StateSubtest) *RunResult {
 				applyErr = fmt.Errorf("EVM panic: %v", r)
 			}
 		}()
-		_, _, applyErr = execution.ApplyTransaction(config, statedb, header, tx, gasPool)
+		_, result.GasUsed, applyErr = execution.ApplyTransaction(config, statedb, header, tx, gasPool)
 	}()
+
+	result.ExecutionError = applyErr
 
 	// If we expect an exception and got one, that's a pass.
 	if post.ExpectException != "" {
@@ -292,7 +296,7 @@ func (st *StateTest) buildHeader(config *coreconfig.ChainConfig) *types.Header {
 		ParentHash: hexToHash(env.PreviousHash),
 	}
 
-	if env.CurrentBaseFee != "" {
+	if config.IsLondon(header.Number) && env.CurrentBaseFee != "" {
 		header.BaseFee = hexToBigInt(env.CurrentBaseFee)
 	}
 
@@ -300,7 +304,7 @@ func (st *StateTest) buildHeader(config *coreconfig.ChainConfig) *types.Header {
 		header.MixDigest = hexToHash(env.CurrentRandom)
 	}
 
-	if env.ExcessBlobGas != "" {
+	if config.IsCancun(header.Time) && env.ExcessBlobGas != "" {
 		ebg := hexToUint64(env.ExcessBlobGas)
 		header.ExcessBlobGas = &ebg
 	}
@@ -384,7 +388,7 @@ func computeLogsHash(logs []*types.Log) types.Hash {
 // forkLevel maps fork names to numeric ordering for cumulative config building.
 var forkLevel = map[string]int{
 	"Frontier": 0, "Homestead": 1, "EIP150": 2,
-	"EIP158": 3, "SpuriousDragon": 3, "TangerineWhistle": 3,
+	"EIP158": 3, "SpuriousDragon": 3, "TangerineWhistle": 2,
 	"Byzantium":      4,
 	"Constantinople": 5, "ConstantinopleFix": 5,
 	"Istanbul": 6, "Berlin": 7, "London": 8,

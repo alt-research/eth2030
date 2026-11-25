@@ -330,8 +330,8 @@ func TestFullBidValidationPass(t *testing.T) {
 	config := DefaultBidValidatorConfig()
 
 	err := FullBidValidation(bid, addr, commitment, 32_000_000_000, config)
-	if err != nil {
-		t.Errorf("full validation pass: %v", err)
+	if !errors.Is(err, epbs.ErrBidAuthenticationUnavailable) {
+		t.Errorf("unauthenticated bid must fail closed: %v", err)
 	}
 }
 

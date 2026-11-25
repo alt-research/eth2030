@@ -248,6 +248,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 type ForkRules struct {
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
 	IsGlamsterdan    bool
+	IsLegacyFrames   bool
 	IsPrague         bool
 	IsCancun         bool
 	IsShanghai       bool
@@ -280,6 +281,8 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 	switch {
 	case rules.IsIPlus:
 		return NewIPlusJumpTable()
+	case rules.IsLegacyFrames:
+		return NewLegacyFrameJumpTable()
 	case rules.IsVerkle:
 		return NewVerkleJumpTable()
 	case rules.IsGlamsterdan:

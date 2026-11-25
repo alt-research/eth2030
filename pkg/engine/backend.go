@@ -718,7 +718,7 @@ func (b *EngineBackend) GetBlockTimestamp(hash types.Hash) uint64 {
 
 // IsCancun returns true if the given timestamp falls within the Cancun fork.
 func (b *EngineBackend) IsCancun(timestamp uint64) bool {
-	return b.config.IsCancun(timestamp)
+	return b.config.IsEngineCancun(timestamp)
 }
 
 // ForkchoiceUpdated processes a forkchoice state update from the CL.
@@ -1207,7 +1207,11 @@ func (b *EngineBackend) ProcessBlockV5(
 	if ilsLen > 0 {
 		ils := b.ilsAsFocil()
 		gasRemaining := blk.GasLimit() - blk.GasUsed()
-		if result := focilCheckILSatisfaction(blk, ils, gasRemaining); !result {
+		ilResult := focil.CheckILSatisfaction(blk, ils, nil, gasRemaining)
+		if ilResult == focil.ILValidationUnavailable {
+			return PayloadStatusV1{}, fmt.Errorf("IL validation unavailable: post-state/prefix validator not integrated")
+		}
+		if ilResult == focil.ILUnsatisfied {
 			errMsg := focil.InclusionListUnsatisfied
 			backendLog.Warn("payload_il_unsatisfied",
 				"event", "payload_il_unsatisfied",
@@ -1575,12 +1579,12 @@ func collectBlobsBundleV2(txs []*types.Transaction) *enginepayload.BlobsBundleV2
 
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
-	return b.config.IsPrague(timestamp)
+	return b.config.IsEnginePrague(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
-	return b.config.IsAmsterdam(timestamp)
+	return b.config.IsEngineAmsterdam(timestamp)
 }
 
 // ProcessInclusionList validates and stores a new inclusion list from the CL.

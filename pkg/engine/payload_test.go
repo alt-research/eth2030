@@ -782,7 +782,9 @@ func TestForkchoiceUpdatedV4_RealBackend(t *testing.T) {
 func TestBackend_IsPrague(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
 	genesis := makeGenesis()
-	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
+	cfg := *coreconfig.TestConfig
+	cfg.AmsterdamTime = nil
+	b := NewEngineBackend(&cfg, statedb, genesis)
 
 	// TestConfig has Prague at timestamp 0, so any timestamp should be Prague.
 	if !b.IsPrague(1700000000) {

@@ -2,6 +2,7 @@ package epbs
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -191,7 +192,7 @@ func newValidSignedBid() *SignedBuilderBid {
 }
 
 func TestValidateBuilderBidValid(t *testing.T) {
-	if err := ValidateBuilderBid(newValidSignedBid()); err != nil {
+	if err := ValidateBuilderBid(newValidSignedBid()); !errors.Is(err, ErrBLSSignatureInvalid) {
 		t.Errorf("valid bid: %v", err)
 	}
 }

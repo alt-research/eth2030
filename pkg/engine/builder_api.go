@@ -9,10 +9,8 @@ import (
 // The bid contains a commitment to an execution payload (by block hash)
 // along with a value the builder is willing to pay the proposer.
 func (api *EngineAPI) SubmitBuilderBidV1(signed SignedExecutionPayloadBid) error {
-	if api.builderRegistry == nil {
-		return ErrBuilderNotFound
-	}
-	return api.builderRegistry.SubmitBid(&signed)
+	return ErrUnsupportedFork
+
 }
 
 // GetBuilderBidsV1 returns the bids for a given slot, ordered by value.
@@ -34,10 +32,8 @@ func (api *EngineAPI) GetBestBuilderBidV1(slot uint64) (*SignedExecutionPayloadB
 
 // RegisterBuilderV1 registers a new builder in the registry.
 func (api *EngineAPI) RegisterBuilderV1(signed SignedBuilderRegistrationV1) (*Builder, error) {
-	if api.builderRegistry == nil {
-		return nil, ErrBuilderNotFound
-	}
-	return api.builderRegistry.RegisterBuilder(&signed.Message, MinBuilderStake)
+	return nil, ErrUnsupportedFork
+
 }
 
 // handleSubmitBuilderBidV1 is the JSON-RPC handler for engine_submitBuilderBidV1.

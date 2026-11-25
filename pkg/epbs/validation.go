@@ -5,26 +5,48 @@ import (
 	"fmt"
 
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/crypto"
 )
 
 // Validation errors.
 var (
-	ErrEmptyBlockHash       = errors.New("block hash must not be empty")
-	ErrEmptyParentBlockHash = errors.New("parent block hash must not be empty")
-	ErrZeroBidValue         = errors.New("bid value must be greater than zero")
-	ErrInvalidPayloadStatus = errors.New("invalid payload status")
-	ErrEmptyBeaconRoot      = errors.New("beacon block root must not be empty")
-	ErrEmptyPayloadRoot     = errors.New("payload root must not be empty")
-	ErrEmptyStateRoot       = errors.New("state root must not be empty")
-	ErrZeroSlot             = errors.New("slot must be greater than zero")
-	ErrBidSlotMismatch      = errors.New("bid slot does not match envelope slot")
-	ErrBuilderMismatch      = errors.New("builder index mismatch between bid and envelope")
-	ErrBLSSignatureInvalid  = errors.New("BLS signature verification failed")
+	ErrEmptyBlockHash               = errors.New("block hash must not be empty")
+	ErrEmptyParentBlockHash         = errors.New("parent block hash must not be empty")
+	ErrZeroBidValue                 = errors.New("bid value must be greater than zero")
+	ErrInvalidPayloadStatus         = errors.New("invalid payload status")
+	ErrEmptyBeaconRoot              = errors.New("beacon block root must not be empty")
+	ErrEmptyPayloadRoot             = errors.New("payload root must not be empty")
+	ErrEmptyStateRoot               = errors.New("state root must not be empty")
+	ErrZeroSlot                     = errors.New("slot must be greater than zero")
+	ErrBidSlotMismatch              = errors.New("bid slot does not match envelope slot")
+	ErrBuilderMismatch              = errors.New("builder index mismatch between bid and envelope")
+	ErrBidAuthenticationUnavailable = errors.New("canonical SSZ signing domain and trusted builder registry unavailable")
+	ErrBLSSignatureInvalid          = errors.New("BLS signature verification failed")
 )
 
-// ValidateBuilderBid checks a signed builder bid for basic correctness.
+// ValidateBuilderBid checks structure and fails closed while canonical CL authentication is unavailable.
 func ValidateBuilderBid(signed *SignedBuilderBid) error {
+	if signed == nil {
+		return ErrBLSSignatureInvalid
+	}
+	if err := ValidateBuilderBidStructure(signed); err != nil {
+		return err
+	}
+	bid := &signed.Message
+
+	if signed.Signature == (BLSSignature{}) || bid.BuilderPubkey == (BLSPubkey{}) {
+		return ErrBLSSignatureInvalid
+	}
+	// BidHash is a historical helper, not an SSZ signing root. Verifying it with
+	// a self-supplied key would authenticate neither the CL domain nor registry.
+	// Fail closed until the canonical CL authentication context is integrated.
+	return ErrBidAuthenticationUnavailable
+}
+
+// ValidateBuilderBidStructure checks fields only; success never authenticates a bid.
+func ValidateBuilderBidStructure(signed *SignedBuilderBid) error {
+	if signed == nil {
+		return ErrBLSSignatureInvalid
+	}
 	bid := &signed.Message
 
 	if bid.BlockHash == (types.Hash{}) {
@@ -38,20 +60,6 @@ func ValidateBuilderBid(signed *SignedBuilderBid) error {
 	}
 	if bid.Slot == 0 {
 		return ErrZeroSlot
-	}
-
-	// BLS signature verification: verify the builder's signature over the bid hash.
-	// Only verify when both pubkey and signature are non-zero (allows unsigned bids
-	// during testing, but requires valid BLS in production with registered builders).
-	if signed.Signature != (BLSSignature{}) && bid.BuilderPubkey != (BLSPubkey{}) {
-		bidHash := bid.BidHash()
-		if !crypto.DefaultBLSBackend().Verify(
-			bid.BuilderPubkey[:],
-			bidHash[:],
-			signed.Signature[:],
-		) {
-			return ErrBLSSignatureInvalid
-		}
 	}
 
 	return nil

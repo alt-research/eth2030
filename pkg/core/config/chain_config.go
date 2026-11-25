@@ -34,6 +34,10 @@ type ChainConfig struct {
 	HogotaTime      *uint64
 	IPlusTime       *uint64
 
+	// ExperimentalLegacyFrames permits only the repository's pre-November Frame
+	// prototype. It is not an activation switch for the current EIP-8141 schema.
+	ExperimentalLegacyFrames bool
+
 	// BPO (Blob Parameter Optimization) fork timestamps for blob schedule upgrades.
 	BPO1Time *uint64
 	BPO2Time *uint64
@@ -151,6 +155,18 @@ func (c *ChainConfig) IsGlamsterdan(time uint64) bool {
 func (c *ChainConfig) IsHogota(time uint64) bool {
 	return isTimestampForked(c.HogotaTime, time)
 }
+
+// IsLegacyFrameEnabled isolates the old prototype from canonical Hegotá networks.
+// A fork timestamp alone must never enable an incompatible transaction schema.
+func (c *ChainConfig) IsLegacyFrameEnabled(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsHogota(time) && c.ExperimentalLegacyFrames
+}
+
+// IsGlamsterdam is the correctly spelled alias for the historical config API.
+func (c *ChainConfig) IsGlamsterdam(time uint64) bool { return c.IsGlamsterdan(time) }
+
+// IsBogota names the EL half of Hegotá; Hogota remains a legacy storage alias.
+func (c *ChainConfig) IsBogota(time uint64) bool { return c.IsHogota(time) }
 
 // IsIPlus returns whether the given block time is at or past I+.
 // I+ includes NTT precompile (EIP-7885), native rollups, zkVM, proof aggregation.
@@ -525,4 +541,16 @@ var TestConfigBPO2 = &ChainConfig{
 	IPlusTime:               nil,
 	BPO1Time:                newUint64(0),
 	BPO2Time:                newUint64(0),
+}
+
+// Engine API methods are valid only inside their fork interval. These checks
+// intentionally differ from monotonically increasing execution rule flags.
+func (c *ChainConfig) IsEngineCancun(time uint64) bool {
+	return c.IsCancun(time) && !c.IsPrague(time) && !c.IsAmsterdam(time) && !c.IsBogota(time)
+}
+func (c *ChainConfig) IsEnginePrague(time uint64) bool {
+	return c.IsPrague(time) && !c.IsAmsterdam(time) && !c.IsBogota(time)
+}
+func (c *ChainConfig) IsEngineAmsterdam(time uint64) bool {
+	return c.IsAmsterdam(time) && !c.IsBogota(time)
 }

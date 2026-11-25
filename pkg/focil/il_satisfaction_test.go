@@ -78,8 +78,8 @@ func TestILSatisfactionAllInBlock(t *testing.T) {
 	}
 }
 
-func TestILSatisfactionAbsentValidTx(t *testing.T) {
-	// IL tx absent, gas available, nonce/balance valid → unsatisfied.
+func TestILSatisfactionUnrecoverableSenderUnavailable(t *testing.T) {
+	// This unsigned fixture has no recoverable sender; no verdict can be proven.
 	tx1 := makeMinimalTx(1)
 	block := makeBlockWithTxs() // empty block
 	il := makeILWithRawTxs(tx1)
@@ -90,8 +90,8 @@ func TestILSatisfactionAbsentValidTx(t *testing.T) {
 	state.balances[sender] = 1e18 // plenty of balance
 
 	result := CheckILSatisfaction(block, []*InclusionList{il}, state, 1000000)
-	if result != ILUnsatisfied {
-		t.Errorf("expected ILUnsatisfied for absent valid tx, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("expected unavailable for unrecoverable sender, got %v", result)
 	}
 }
 
@@ -171,10 +171,10 @@ func TestILSatisfaction_FrameTx_VerifyTargetHasCode(t *testing.T) {
 	verifier := newMockFrameVerifier()
 	verifier.codeSizes[verifyTarget] = 100 // VERIFY target has code
 
-	// Frame tx with valid nonce and VERIFY target with code → must include → unsatisfied.
+	// Code existence is insufficient to establish complete prefix validity.
 	result := CheckILSatisfactionWithVerifier(block, []*InclusionList{il}, state, verifier, 1000000)
-	if result != ILUnsatisfied {
-		t.Errorf("frame tx with coded VERIFY target: want ILUnsatisfied, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("frame tx with coded VERIFY target: want ILValidationUnavailable, got %v", result)
 	}
 }
 
@@ -191,10 +191,10 @@ func TestILSatisfaction_FrameTx_VerifyTargetNoCode(t *testing.T) {
 	verifier := newMockFrameVerifier()
 	// verifyTarget has NO code (code size = 0)
 
-	// Frame tx whose VERIFY target has no code → can't call APPROVE → exempt.
+	// Current default-code semantics do not permit a code-size invalidity shortcut.
 	result := CheckILSatisfactionWithVerifier(block, []*InclusionList{il}, state, verifier, 1000000)
-	if result != ILSatisfied {
-		t.Errorf("frame tx with EOA VERIFY target: want ILSatisfied (exempt), got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("frame tx with EOA VERIFY target: want ILValidationUnavailable, got %v", result)
 	}
 }
 
@@ -216,12 +216,12 @@ func TestILSatisfaction_FrameTx_SkipsBalanceCheck(t *testing.T) {
 	// Per EIP-8141, the payer is determined at APPROVE time (may differ from sender).
 	// FOCIL should NOT exempt based on sender balance for frame txs.
 	result := CheckILSatisfactionWithVerifier(block, []*InclusionList{il}, state, verifier, 1000000)
-	if result != ILUnsatisfied {
-		t.Errorf("frame tx with zero-balance sender: want ILUnsatisfied (balance not checked), got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("frame tx with zero-balance sender: want ILValidationUnavailable (balance not checked), got %v", result)
 	}
 }
 
-func TestILSatisfaction_FrameTx_NoVerifier_FallsBack(t *testing.T) {
+func TestILSatisfaction_FrameTx_NoVerifier_Unavailable(t *testing.T) {
 	sender := types.Address{0x10}
 	verifyTarget := types.Address{0x20}
 	frameTxBytes := makeMinimalFrameTx(0, sender, verifyTarget)
@@ -231,11 +231,11 @@ func TestILSatisfaction_FrameTx_NoVerifier_FallsBack(t *testing.T) {
 	state := newMockPostState()
 	state.nonces[[20]byte(sender)] = 0
 
-	// No verifier provided → skip VERIFY check, treat as potentially valid.
+	// A missing verifier never enables a signature/eligibility bypass.
 	var verifier FrameVerifier // nil
 	result := CheckILSatisfactionWithVerifier(block, []*InclusionList{il}, state, verifier, 1000000)
-	if result != ILUnsatisfied {
-		t.Errorf("frame tx without verifier: want ILUnsatisfied, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("frame tx without verifier: want ILValidationUnavailable, got %v", result)
 	}
 }
 
@@ -252,9 +252,9 @@ func TestILSatisfaction_FrameTx_WrongNonce_Exempt(t *testing.T) {
 	verifier := newMockFrameVerifier()
 	verifier.codeSizes[verifyTarget] = 100
 
-	// Wrong nonce → exempt (same as EOA).
+	// Frame nonce semantics are not supplied by this legacy code-size interface.
 	result := CheckILSatisfactionWithVerifier(block, []*InclusionList{il}, state, verifier, 1000000)
-	if result != ILSatisfied {
-		t.Errorf("frame tx with wrong nonce: want ILSatisfied (exempt), got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("frame tx with wrong nonce: want ILValidationUnavailable, got %v", result)
 	}
 }

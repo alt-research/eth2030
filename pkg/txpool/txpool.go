@@ -7,6 +7,7 @@ import (
 	"sort"
 	"sync"
 
+	coreconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
@@ -90,6 +91,10 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
+	// Canonical head context is required for legacy Frame admission.
+	ChainConfig *coreconfig.ChainConfig
+	HeadTime    uint64
+
 	MaxSize           int               // Maximum number of transactions in pool
 	MaxPerSender      int               // Maximum pending per sender
 	MinGasPrice       *big.Int          // Minimum gas price to accept
@@ -100,7 +105,7 @@ type Config struct {
 	// When false (default), LocalTx are rejected at pool entry.
 	AllowLocalTx bool
 	// AllowAATx enables acceptance of EIP-7701 type-0x05 AA transactions (--txpool.allow-aa).
-	// Defaults to true; set false to disable AA tx acceptance on networks without Glamsterdam.
+	// Defaults to false; this legacy prototype is outside the selected Hegotá scope.
 	AllowAATx bool
 	// IsPrague indicates the chain is at or past the Prague fork.
 	// When true, the EIP-7623 calldata floor is applied during validation.
@@ -121,7 +126,7 @@ func DefaultConfig() Config {
 		MinGasPrice:        big.NewInt(1), // 1 wei minimum
 		BlockGasLimit:      30_000_000,
 		PaymasterStrict:    true,
-		AllowAATx:          true, // EIP-7701 AA is enabled by default (Glamsterdam+)
+		AllowAATx:          false, // explicit prototype opt-in only
 		PriceHistoryBlocks: pricing.DefaultFeeHistoryDepth,
 	}
 }
@@ -516,6 +521,9 @@ func isDynamic(tx *types.Transaction) bool {
 
 // validateTx performs comprehensive validation of a transaction.
 func (pool *TxPool) validateTx(tx *types.Transaction) error {
+	if tx.Type() == types.FrameTxType && !pool.config.ChainConfig.IsLegacyFrameEnabled(pool.config.HeadTime) {
+		return errors.New("frame transactions unavailable at canonical head")
+	}
 	// BB-2.2: gate type-0x08 LocalTx behind --experimental-local-tx flag.
 	if tx.Type() == types.LocalTxType && !pool.config.AllowLocalTx {
 		return errors.New("local tx (type 0x08) not enabled; set --experimental-local-tx")
@@ -1048,7 +1056,41 @@ func (pool *TxPool) Reset(stateReader StateReader) {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
+	pool.resetLocked(stateReader)
+}
+
+// ResetAtHead updates activation from the canonical head, including reorgs.
+func (pool *TxPool) ResetAtHead(stateReader StateReader, config *coreconfig.ChainConfig, timestamp uint64) {
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+	pool.config.ChainConfig = config
+	pool.config.HeadTime = timestamp
+	pool.config.IsPrague = false
+	pool.config.IsGlamsterdan = false
+	if config != nil {
+		pool.config.IsPrague = config.IsPrague(timestamp)
+		pool.config.IsGlamsterdan = config.IsGlamsterdan(timestamp)
+	}
+	pool.resetLocked(stateReader)
+}
+
+func (pool *TxPool) resetLocked(stateReader StateReader) {
 	pool.state = stateReader
+	if !pool.config.ChainConfig.IsLegacyFrameEnabled(pool.config.HeadTime) {
+		for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
+			for addr, list := range lists {
+				for _, tx := range append([]*types.Transaction(nil), list.items...) {
+					if tx.Type() == types.FrameTxType {
+						list.Remove(tx.Nonce())
+						pool.lookup.Remove(tx.Hash())
+					}
+				}
+				if list.Len() == 0 {
+					delete(lists, addr)
+				}
+			}
+		}
+	}
 
 	var totalConfirmed, totalDemoted int
 	for addr, list := range pool.pending {

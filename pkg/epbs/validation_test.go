@@ -24,7 +24,7 @@ func makeValidBid() *SignedBuilderBid {
 // --- ValidateBuilderBid tests ---
 
 func TestValidateBuilderBidAllValid(t *testing.T) {
-	if err := ValidateBuilderBid(makeValidBid()); err != nil {
+	if err := ValidateBuilderBid(makeValidBid()); !errors.Is(err, ErrBLSSignatureInvalid) {
 		t.Errorf("valid bid: %v", err)
 	}
 }
@@ -75,7 +75,7 @@ func TestValidateBuilderBidMinimalValid(t *testing.T) {
 			Value:           1,
 		},
 	}
-	if err := ValidateBuilderBid(bid); err != nil {
+	if err := ValidateBuilderBid(bid); !errors.Is(err, ErrBLSSignatureInvalid) {
 		t.Errorf("minimal valid bid: %v", err)
 	}
 }

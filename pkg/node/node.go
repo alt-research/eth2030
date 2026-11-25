@@ -271,18 +271,19 @@ func New(config *Config) (*Node, error) {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
-	// GAP-7.2: select BLS signature backend based on config.
-	if config.BLSBackend == "pure-go" {
-		crypto.SetBLSBackend(&crypto.PureGoBLSBackend{})
-		slog.Info("BLS backend: pure-go")
-	} else {
-		slog.Info("BLS backend: blst (default)")
+	// Use canonical hash-to-curve and subgroup-checked pairing in normal builds.
+	// The historical pure-Go prototype and its former secret registry are not an oracle.
+	blsBackend, err := bls.SelectConsensusBLSBackend(config.BLSBackend)
+	if err != nil {
+		return nil, err
 	}
+	crypto.SetBLSBackend(blsBackend)
+	slog.Info("BLS backend", "backend", crypto.DefaultBLSBackend().Name())
 
 	// Initialize KZG backend for EIP-4844 blobs and EIP-7594 PeerDAS cell proofs.
 	// This is required for computing cell proofs in BlobsBundleV2 (Fulu+).
 	if kzgBackend, err := bls.NewGoEthKZGBackend(); err != nil {
-		slog.Warn("failed to initialize KZG backend, using placeholder (cell proofs will be zero)", "err", err)
+		return nil, fmt.Errorf("initialize mandatory KZG backend: %w", err)
 	} else {
 		bls.SetKZGBackend(kzgBackend)
 		slog.Info("KZG backend initialized", "backend", kzgBackend.Name())
@@ -455,14 +456,13 @@ func New(config *Config) (*Node, error) {
 	// the correct (lower) base intrinsic gas for validation.
 	// Also read the genesis block gas limit so the pool accepts txs up to that size.
 	if chainCfg := bc.Config(); chainCfg != nil {
-		var genesisTime uint64
-		if gen := bc.Genesis(); gen != nil {
-			genesisTime = gen.Header().Time
-			if gen.Header().GasLimit > 0 {
-				poolCfg.BlockGasLimit = gen.Header().GasLimit
-			}
+		poolCfg.ChainConfig = chainCfg
+		if head := bc.CurrentBlock(); head != nil {
+			poolCfg.HeadTime = head.Header().Time
+			poolCfg.BlockGasLimit = head.Header().GasLimit
 		}
-		poolCfg.IsGlamsterdan = chainCfg.IsGlamsterdan(genesisTime)
+		poolCfg.IsPrague = chainCfg.IsPrague(poolCfg.HeadTime)
+		poolCfg.IsGlamsterdan = chainCfg.IsGlamsterdan(poolCfg.HeadTime)
 	}
 	// --txpool.price-history: number of blocks for the gas-price suggestor.
 	if config.TxpoolPriceHistory > 0 {
@@ -768,8 +768,10 @@ func New(config *Config) (*Node, error) {
 	n.sharedPool = shared.NewSharedMempool(shared.DefaultSharedMempoolConfig())
 
 	// Initialize snap sync state healer and state sync scheduler (stub writer).
-	n.stateHealer = synchealer.NewStateHealer(types.Hash{}, &stubStateWriter{})
-	n.stateSyncSched = syncstatesync.NewStateSyncScheduler(&stubStateSyncWriter{}, nil)
+	// Unwired writers cannot establish successful persistence or healing.
+	// Keep these optional subsystems disabled until real trie writers are supplied.
+	n.stateHealer = nil
+	n.stateSyncSched = nil
 
 	// Initialize engine EL-side builder auction.
 	n.engineAuction = engineauction.NewBuilderAuction(engineauction.DefaultAuctionConfig())
@@ -1464,51 +1466,79 @@ func (b *snapStateBackend) Code(hash types.Hash) ([]byte, error) {
 
 // TrieNode returns a trie node by path. Full proof generation requires the
 // underlying MPT; this returns nil until the MPT backend is wired.
-func (b *snapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error) { return nil, nil }
+func (b *snapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error) {
+	return nil, errStateBackendUnsupported
+}
 
 // AccountProof returns a Merkle proof for an account. Requires the MPT backend.
-func (b *snapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error) { return nil, nil }
+func (b *snapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error) {
+	return nil, errStateBackendUnsupported
+}
 
 // StorageProof returns a Merkle proof for a storage slot. Requires the MPT backend.
-func (b *snapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) { return nil, nil }
+func (b *snapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) {
+	return nil, errStateBackendUnsupported
+}
+
+var errStateBackendUnsupported = fmt.Errorf("state backend operation unsupported")
 
 // stubSnapStateBackend is a no-op fallback used when the database does not
 // implement snapshot.SnapshotDB (e.g. a minimal read-only adapter).
 type stubSnapStateBackend struct{}
 
 func (s *stubSnapStateBackend) AccountIterator(_ types.Hash, _ types.Hash, _ func(types.Hash, []byte) bool) error {
-	return nil
+	return errStateBackendUnsupported
 }
 func (s *stubSnapStateBackend) StorageIterator(_ types.Hash, _ types.Hash, _ []byte, _ func(types.Hash, []byte) bool) error {
-	return nil
+	return errStateBackendUnsupported
 }
-func (s *stubSnapStateBackend) Code(_ types.Hash) ([]byte, error)                 { return nil, nil }
-func (s *stubSnapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error)   { return nil, nil }
-func (s *stubSnapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error)    { return nil, nil }
-func (s *stubSnapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) { return nil, nil }
+func (s *stubSnapStateBackend) Code(_ types.Hash) ([]byte, error) {
+	return nil, errStateBackendUnsupported
+}
+func (s *stubSnapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error) {
+	return nil, errStateBackendUnsupported
+}
+func (s *stubSnapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error) {
+	return nil, errStateBackendUnsupported
+}
+func (s *stubSnapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) {
+	return nil, errStateBackendUnsupported
+}
 
 // stubStateWriter is a no-op synchealer.StateWriter used until a real trie
 // database is wired as the state healer write target.
 type stubStateWriter struct{}
 
-func (s *stubStateWriter) WriteAccount(_ types.Hash, _ synchealer.AccountData) error { return nil }
-func (s *stubStateWriter) WriteStorage(_, _ types.Hash, _ []byte) error              { return nil }
-func (s *stubStateWriter) WriteBytecode(_ types.Hash, _ []byte) error                { return nil }
-func (s *stubStateWriter) WriteTrieNode(_ []byte, _ []byte) error                    { return nil }
-func (s *stubStateWriter) HasBytecode(_ types.Hash) bool                             { return false }
-func (s *stubStateWriter) HasTrieNode(_ []byte) bool                                 { return false }
-func (s *stubStateWriter) MissingTrieNodes(_ types.Hash, _ int) [][]byte             { return nil }
+func (s *stubStateWriter) WriteAccount(_ types.Hash, _ synchealer.AccountData) error {
+	return errStateBackendUnsupported
+}
+func (s *stubStateWriter) WriteStorage(_, _ types.Hash, _ []byte) error {
+	return errStateBackendUnsupported
+}
+func (s *stubStateWriter) WriteBytecode(_ types.Hash, _ []byte) error {
+	return errStateBackendUnsupported
+}
+func (s *stubStateWriter) WriteTrieNode(_ []byte, _ []byte) error        { return errStateBackendUnsupported }
+func (s *stubStateWriter) HasBytecode(_ types.Hash) bool                 { return false }
+func (s *stubStateWriter) HasTrieNode(_ []byte) bool                     { return false }
+func (s *stubStateWriter) MissingTrieNodes(_ types.Hash, _ int) [][]byte { return nil }
 
 // stubStateSyncWriter is a no-op syncstatesync.StateWriter used until the real
 // snap-sync state write target is wired.
 type stubStateSyncWriter struct{}
 
 func (s *stubStateSyncWriter) WriteAccount(_ types.Hash, _ syncstatesync.AccountData) error {
-	return nil
+	return errStateBackendUnsupported
 }
-func (s *stubStateSyncWriter) WriteStorage(_, _ types.Hash, _ []byte) error  { return nil }
-func (s *stubStateSyncWriter) WriteBytecode(_ types.Hash, _ []byte) error    { return nil }
-func (s *stubStateSyncWriter) WriteTrieNode(_ []byte, _ []byte) error        { return nil }
+func (s *stubStateSyncWriter) WriteStorage(_, _ types.Hash, _ []byte) error {
+	return errStateBackendUnsupported
+}
+func (s *stubStateSyncWriter) WriteBytecode(_ types.Hash, _ []byte) error {
+	return errStateBackendUnsupported
+}
+func (s *stubStateSyncWriter) WriteTrieNode(_ []byte, _ []byte) error {
+	return errStateBackendUnsupported
+}
 func (s *stubStateSyncWriter) HasBytecode(_ types.Hash) bool                 { return false }
 func (s *stubStateSyncWriter) HasTrieNode(_ []byte) bool                     { return false }
 func (s *stubStateSyncWriter) MissingTrieNodes(_ types.Hash, _ int) [][]byte { return nil }

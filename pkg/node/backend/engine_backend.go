@@ -209,17 +209,17 @@ func (b *EngineBackend) GetBlockTimestamp(hash types.Hash) uint64 {
 
 // IsCancun returns true if the given timestamp falls within the Cancun fork.
 func (b *EngineBackend) IsCancun(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsCancun(timestamp)
+	return b.node.Blockchain().Config().IsEngineCancun(timestamp)
 }
 
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsPrague(timestamp)
+	return b.node.Blockchain().Config().IsEnginePrague(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsAmsterdam(timestamp)
+	return b.node.Blockchain().Config().IsEngineAmsterdam(timestamp)
 }
 
 // ProcessBlock validates and executes a new payload from the consensus layer.
@@ -300,7 +300,7 @@ func (b *EngineBackend) processBlockInternal(
 			"blockHash", p.BlockHash,
 		)
 		b.registerBlockInFCState(p)
-		b.node.TxPool().Reset(bc.State())
+		b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), bc.CurrentBlock().Header().Time)
 		return payload.PayloadStatusV1{Status: engine.StatusValid, LatestValidHash: &h}, nil
 	}
 
@@ -434,7 +434,7 @@ func (b *EngineBackend) processBlockInternal(
 	b.cacheBlobsFromBlock(block)
 
 	// Sync txpool state.
-	b.node.TxPool().Reset(bc.State())
+	b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), bc.CurrentBlock().Header().Time)
 
 	// Notify gas oracle.
 	if oracle := b.node.GasOracle(); oracle != nil {

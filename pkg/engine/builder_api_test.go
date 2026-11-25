@@ -85,8 +85,11 @@ func TestSubmitBuilderBidV1_API(t *testing.T) {
 	}
 
 	err := api.SubmitBuilderBidV1(bid)
-	if err != nil {
+	if err != ErrUnsupportedFork {
 		t.Fatalf("SubmitBuilderBidV1 error: %v", err)
+	}
+	if len(api.GetBuilderBidsV1(10)) != 0 {
+		t.Fatal("unsupported bid was stored")
 	}
 }
 
@@ -98,8 +101,8 @@ func TestSubmitBuilderBidV1_NilRegistry(t *testing.T) {
 
 	bid := SignedExecutionPayloadBid{}
 	err := api.SubmitBuilderBidV1(bid)
-	if err != ErrBuilderNotFound {
-		t.Fatalf("want ErrBuilderNotFound, got %v", err)
+	if err != ErrUnsupportedFork {
+		t.Fatalf("want ErrUnsupportedFork, got %v", err)
 	}
 }
 
@@ -120,7 +123,7 @@ func TestGetBuilderBidsV1_API(t *testing.T) {
 				FeeRecipient:    types.HexToAddress("0xaaaa"),
 			},
 		}
-		if err := api.SubmitBuilderBidV1(bid); err != nil {
+		if err := api.builderRegistry.SubmitBid(&bid); err != nil {
 			t.Fatalf("submit bid %d: %v", i, err)
 		}
 	}
@@ -170,7 +173,7 @@ func TestGetBestBuilderBidV1_API(t *testing.T) {
 				FeeRecipient:    types.HexToAddress("0xaaaa"),
 			},
 		}
-		if err := api.SubmitBuilderBidV1(bid); err != nil {
+		if err := api.builderRegistry.SubmitBid(&bid); err != nil {
 			t.Fatalf("submit bid: %v", err)
 		}
 	}
@@ -209,11 +212,8 @@ func TestRegisterBuilderV1_API(t *testing.T) {
 	}
 
 	builder, err := api.RegisterBuilderV1(signed)
-	if err != nil {
-		t.Fatalf("RegisterBuilderV1 error: %v", err)
-	}
-	if builder.Status != BuilderStatusActive {
-		t.Fatalf("want active status, got %d", builder.Status)
+	if err != ErrUnsupportedFork || builder != nil {
+		t.Fatalf("unauthenticated registration accepted: %v", err)
 	}
 }
 
@@ -224,8 +224,8 @@ func TestRegisterBuilderV1_NilRegistry(t *testing.T) {
 
 	signed := SignedBuilderRegistrationV1{}
 	_, err := api.RegisterBuilderV1(signed)
-	if err != ErrBuilderNotFound {
-		t.Fatalf("want ErrBuilderNotFound, got %v", err)
+	if err != ErrUnsupportedFork {
+		t.Fatalf("want ErrUnsupportedFork, got %v", err)
 	}
 }
 
@@ -249,11 +249,8 @@ func TestHandleSubmitBuilderBidV1_RPC(t *testing.T) {
 	bidJSON, _ := json.Marshal(bid)
 	params := []json.RawMessage{bidJSON}
 	result, rpcErr := api.handleSubmitBuilderBidV1(params)
-	if rpcErr != nil {
-		t.Fatalf("handleSubmitBuilderBidV1 error: code=%d msg=%s", rpcErr.Code, rpcErr.Message)
-	}
-	if result != true {
-		t.Fatalf("want true, got %v", result)
+	if rpcErr == nil || rpcErr.Code != UnsupportedForkCode || result != nil {
+		t.Fatalf("unauthenticated extension accepted: result=%v err=%+v", result, rpcErr)
 	}
 }
 
@@ -405,7 +402,7 @@ func TestBuilderRegistry_PruneSlotAPI(t *testing.T) {
 			FeeRecipient:    types.HexToAddress("0xaaaa"),
 		},
 	}
-	if err := api.SubmitBuilderBidV1(bid); err != nil {
+	if err := api.builderRegistry.SubmitBid(&bid); err != nil {
 		t.Fatalf("submit bid: %v", err)
 	}
 
@@ -414,5 +411,13 @@ func TestBuilderRegistry_PruneSlotAPI(t *testing.T) {
 	bids := api.GetBuilderBidsV1(10)
 	if len(bids) != 0 {
 		t.Fatalf("want 0 bids after prune, got %d", len(bids))
+	}
+}
+
+func TestUnsupportedBuilderExtensionNotAdvertised(t *testing.T) {
+	for _, method := range newBuilderTestAPI().ExchangeCapabilities(nil) {
+		if method == "engine_submitBuilderBidV1" {
+			t.Fatal("unsupported authenticated extension advertised")
+		}
 	}
 }

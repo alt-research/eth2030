@@ -62,15 +62,15 @@ func TestILSatisfaction_EmptyILs(t *testing.T) {
 }
 
 func TestILSatisfaction_NilPostState(t *testing.T) {
-	// nil postState → no state exemption → absent tx with gas causes unsatisfied.
+	// Missing post-state cannot establish a satisfaction verdict.
 	tx1 := makeMinimalTx(1)
 	block := makeBlockWithTxs() // empty
 	il := makeILWithRawTxs(tx1)
 
-	// With nil postState, state check is skipped entirely; absent tx → unsatisfied.
+	// Missing post-state must be explicit.
 	result := CheckILSatisfaction(block, []*InclusionList{il}, nil, 1_000_000)
-	if result != ILUnsatisfied {
-		t.Errorf("nil postState: expected ILUnsatisfied for absent tx, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("nil postState: expected ILValidationUnavailable for absent tx, got %v", result)
 	}
 }
 
@@ -94,8 +94,8 @@ func TestILSatisfaction_PartialPresence(t *testing.T) {
 	il := makeILWithRawTxs(tx1, tx2)
 
 	result := CheckILSatisfaction(block, []*InclusionList{il}, nil, 1_000_000)
-	if result != ILUnsatisfied {
-		t.Errorf("partial: expected ILUnsatisfied, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("partial: expected ILValidationUnavailable, got %v", result)
 	}
 }
 
@@ -107,8 +107,8 @@ func TestILSatisfaction_MultipleILsOneSatisfied(t *testing.T) {
 	il2 := makeILWithRawTxs(tx2)   // unsatisfied
 
 	result := CheckILSatisfaction(block, []*InclusionList{il1, il2}, nil, 1_000_000)
-	if result != ILUnsatisfied {
-		t.Errorf("second IL unsatisfied: expected ILUnsatisfied, got %v", result)
+	if result != ILValidationUnavailable {
+		t.Errorf("second IL unsatisfied: expected ILValidationUnavailable, got %v", result)
 	}
 }
 

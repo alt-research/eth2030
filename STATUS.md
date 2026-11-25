@@ -1,5 +1,17 @@
 # Project Status
 
+## Hegotá Group A: Specifications, Baseline and Runtime Paths (2026-11-25)
+
+### Current Status: ALL SEVEN A TASKS VERIFIED; COMBINED FORK RELEASE NOT READY
+
+Completed HGT-001, HGT-004, HGT-005, HGT-006, HGT-007, HGT-008 and HGT-009. The [A delivery report](docs/plans/hegota-a/README.md) links every task to its artifacts and reproducible evidence. Locked 14 repository revisions and 106 source-file hashes; registered six separate profiles, D01–D09 and all 72 EIPs (3 implementation tracks, 29 conditional, 3 watch, 37 excluded). Open composition decisions remain isolated rather than silently resolved.
+
+Implemented canonical/legacy genesis aliases with conflict rejection, explicit legacy Frame activation across processor/VM/pool/RPC and canonical-head pool updates, historical Engine method intervals, and legacy AA disabled by default. Removed unsigned/unauthenticated ePBS acceptance, publicly computable PQ proof acceptance, optional KZG-verifier acceptance and false-success state backends; unwired state repair stays disabled. Normal BLS operations now use canonical, subgroup-checked gnark cryptography without a private-key registry fallback; an independent blst vector cross-checks signing/verification and aggregation. Explicit uncompiled blst requests fail.
+
+Added a strict native/direct-upstream differential CLI, locked official historical fixtures, independent encoding/hash goldens, arithmetic/domain oracles, semantic trace seeds, prerequisite conformance/repair records, source/admission update checks and CI checks. All 12 required historical cases execute and agree on state root, logs hash and gas, with zero skips. Fifteen prerequisite repairs remain explicitly open for later feature conformance; nine semantic trace seeds have not been executed in a latest-spec native EVM. These limitations do not disappear when A is complete.
+
+Verification: local `go build ./...`, `go vet ./...`, full suite (22,085 named test/subtest pass events, zero failures; 131 existing skips recorded separately), focused race suite (5,040 pass events, zero failures), `-tags blst` crypto tests, five Python checker negative tests, source/golden checks and actual native runtime identity tests. [Evidence](evidence/hegota-a/verification.json) separates native, upstream reference, helper, wrapper and unrun container/devnet paths. No Docker/CL interoperability or complete Hegotá conformance is claimed. Only this task's changes are committed.
+
 ## EIP and Consensus Reference Update (2026-11-25)
 
 ### Current Status: COMPLETE

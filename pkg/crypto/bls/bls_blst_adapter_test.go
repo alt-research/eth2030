@@ -419,7 +419,7 @@ func TestBLSTBackend(t *testing.T) {
 	for i := range ikm {
 		ikm[i] = byte(i + 1)
 	}
-	sk, pk, err := BlstKeyGen(ikm)
+	pk, sk, err := BlstKeyGen(ikm)
 	if err != nil {
 		t.Fatalf("BlstKeyGen: %v", err)
 	}
@@ -480,7 +480,7 @@ func TestBLSAttestation(t *testing.T) {
 	for i := 0; i < numAttesters; i++ {
 		ikm := make([]byte, 32)
 		ikm[0] = byte(i + 1)
-		sk, pk, err := BlstKeyGen(ikm)
+		pk, sk, err := BlstKeyGen(ikm)
 		if err != nil {
 			t.Fatalf("BlstKeyGen[%d]: %v", i, err)
 		}

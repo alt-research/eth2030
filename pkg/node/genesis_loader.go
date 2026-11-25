@@ -42,16 +42,20 @@ type chainConfigJSON struct {
 
 	TerminalTotalDifficulty *bigIntJSON `json:"terminalTotalDifficulty"`
 
-	ShanghaiTime         *uint64 `json:"shanghaiTime"`
-	CancunTime           *uint64 `json:"cancunTime"`
-	PragueTime           *uint64 `json:"pragueTime"`
-	AmsterdamTime        *uint64 `json:"amsterdamTime"`
-	GlamsterdanTime      *uint64 `json:"glamsterdanTime"`
-	HogotaTime           *uint64 `json:"hogotaTime"`
-	IPlusTime            *uint64 `json:"iPlusTime"`
-	BPO1Time             *uint64 `json:"bpo1Time"`
-	BPO2Time             *uint64 `json:"bpo2Time"`
-	EIP7864FinalHashTime *uint64 `json:"eip7864FinalHashTime"`
+	ShanghaiTime             *uint64 `json:"shanghaiTime"`
+	CancunTime               *uint64 `json:"cancunTime"`
+	PragueTime               *uint64 `json:"pragueTime"`
+	AmsterdamTime            *uint64 `json:"amsterdamTime"`
+	GlamsterdanTime          *uint64 `json:"glamsterdanTime"`
+	GlamsterdamTime          *uint64 `json:"glamsterdamTime"`
+	BogotaTime               *uint64 `json:"bogotaTime"`
+	HegotaTime               *uint64 `json:"hegotaTime"`
+	ExperimentalLegacyFrames bool    `json:"experimentalLegacyFrames"`
+	HogotaTime               *uint64 `json:"hogotaTime"`
+	IPlusTime                *uint64 `json:"iPlusTime"`
+	BPO1Time                 *uint64 `json:"bpo1Time"`
+	BPO2Time                 *uint64 `json:"bpo2Time"`
+	EIP7864FinalHashTime     *uint64 `json:"eip7864FinalHashTime"`
 }
 
 // allocAccountJSON is an account in the genesis alloc.
@@ -238,8 +242,15 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 	chainCfg.CancunTime = gj.Config.CancunTime
 	chainCfg.PragueTime = gj.Config.PragueTime
 	chainCfg.AmsterdamTime = gj.Config.AmsterdamTime
-	chainCfg.GlamsterdanTime = gj.Config.GlamsterdanTime
-	chainCfg.HogotaTime = gj.Config.HogotaTime
+	chainCfg.GlamsterdanTime, err = resolveForkAliases("glamsterdam", gj.Config.GlamsterdamTime, gj.Config.GlamsterdanTime)
+	if err != nil {
+		return nil, err
+	}
+	chainCfg.HogotaTime, err = resolveForkAliases("bogota", gj.Config.BogotaTime, gj.Config.HegotaTime, gj.Config.HogotaTime)
+	if err != nil {
+		return nil, err
+	}
+	chainCfg.ExperimentalLegacyFrames = gj.Config.ExperimentalLegacyFrames
 	chainCfg.IPlusTime = gj.Config.IPlusTime
 	chainCfg.BPO1Time = gj.Config.BPO1Time
 	chainCfg.BPO2Time = gj.Config.BPO2Time
@@ -339,4 +350,20 @@ func applyForkOverrides(c *coreconfig.ChainConfig, cfg *Config) {
 	if cfg.IPlusOverride != nil {
 		c.IPlusTime = cfg.IPlusOverride
 	}
+}
+
+// resolveForkAliases preserves old genesis files but rejects ambiguous schedules.
+func resolveForkAliases(name string, times ...*uint64) (*uint64, error) {
+	var selected *uint64
+	for _, value := range times {
+		if value == nil {
+			continue
+		}
+		if selected != nil && *selected != *value {
+			return nil, fmt.Errorf("conflicting %s fork timestamps", name)
+		}
+		v := *value
+		selected = &v
+	}
+	return selected, nil
 }

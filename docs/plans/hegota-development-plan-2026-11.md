@@ -1,8 +1,8 @@
 # ETH2030 Hegotá 完整开发计划
 
-> 版本：v1.0；制定日期与研究截点：2026-11-25（Asia/Shanghai）。
-> 本文是后续实施的主计划，覆盖规范、实现、兼容性、测试、跨客户端联调、发布与维护。任务状态均为计划中，不代表已开发。
-> 依据：[宏观研究](hegota-macro-plan-2026-11.md)、[72 项 EIP 与讨论登记](hegota-eip-review-2026-11.md)、[固定来源与版本](hegota-sources-2026-11.json)。本轮仅交付计划。
+> 版本：v1.1；制定日期与研究截点：2026-11-25（Asia/Shanghai）；A 组实施记录已补齐。
+> 本文是后续实施的主计划，覆盖规范、实现、兼容性、测试、跨客户端联调、发布与维护。A 组 7 项基线任务已交付并验证，其余功能任务仍按下述规范和验收门实施。
+> 依据：[宏观研究](hegota-macro-plan-2026-11.md)、[72 项 EIP 与讨论登记](hegota-eip-review-2026-11.md)、[固定来源与版本](hegota-sources-2026-11.json)。A 组的当前交付见 [实施报告](hegota-a/README.md)。
 
 ## 1. 交付目标与完成定义
 
@@ -112,7 +112,7 @@
 
 每个任务进入开发前补齐：owner、采用规范条款/SHA、修改文件、正向与反向用例、估工、PR/commit、产物路径。统一状态为 `planned → ready → in_progress → review → verified`；另外使用 `blocked_by_spec`、`deferred`、`out_of_scope` 并写明解除条件。`verified` 必须指向可复现证据。
 
-HGT-001/002/003/004 保留宏观计划中的编号与职责；其他任务在此细化。全部 77 项当前均为 `planned`，条件项尚未被承诺为最终发布范围。
+HGT-001/002/003/004 保留宏观计划中的编号与职责；其他任务在此细化。最初 77 项均为 `planned`。2026-11-25 已完成 A 组 7 项（HGT-001/004/005/006/007/008/009）；[任务状态登记](../../specs/hegota/tasks.json)与[验证证据](../../evidence/hegota-a/verification.json)逐项对应。其余任务仍未因本轮基线工作被认定实现，条件项尚未承诺为最终发布范围。
 
 ### A. 规范、基线与运行路径
 
@@ -493,8 +493,15 @@ M0 的逐规则矩阵至少包含：`EIP + section + spec SHA + requirement ID +
 | EIP-8483 | PFI；开放 PR | HGT-076 | PQ 请求与 CL 存储所有权 |
 | EIP-8504 | 开放草案 | HGT-030…034 | 接口冻结后条件实现 |
 
-## 11. 本轮计划交付的验证
+## 11. 原始计划交付的验证（历史记录）
 
 本轮不开展上述协议开发、Docker/Kurtosis 启动、跨仓库修改或外部发布。已核查原生/包装入口、processor、Engine backend、测试脚本、fixture runner 和 CI 的实际文件；本地 `env -u GOROOT go build ./...` 通过。
 
 提交前核验全部任务编号唯一、依赖无环且前置存在、72 项 EIP 无遗漏/重复、所有本地链接存在、范围阶段未被计划优先级覆盖；更新 `CHECK.md`、`STATUS.md` 并单独提交。已有宏观研究与来源清单继续作为审阅证据。
+
+
+## 12. A 组实施与验收（2026-11-25）
+
+A 组 7 个任务的完整交付见 [A 组报告](hegota-a/README.md)，固定来源、6 个 profile、D01–D09、72 项准入、逐规则前置缺口、组合 schema/ADR、真实运行路径及安全修复均有对应产物。严格 native/upstream geth 最小差分执行 12 项，零失败/零跳过；新编码及语义 oracle 不被冒充为当前 native 的完整 Hegotá 执行通过。构建、vet、全仓库测试、相关 race 和 blst 构建标签测试通过，旧 skip 清单保留。
+
+HGT-006-R01…R15 是本次明确登记的 M0 修复工作，消费其规则的后续任务必须先关闭它们；D01–D09 对联合发布仍有开放项，不能拼接草案或用旧原型冒充最新规范。当前没有可宣称已验证的联合 Hegotá 发布 profile。Docker/Kurtosis、兄弟 CL 仓库构建与正式 devnet 互通留在 HGT-070/080/091 的既定验收范围。

@@ -35,6 +35,11 @@ func (a *PayloadAuction) SubmitBid(signed *epbs.SignedBuilderBid) error {
 		return fmt.Errorf("%w: %v", ErrBidValidation, err)
 	}
 
+	return a.insertBid(signed)
+}
+
+// insertBid maintains ordering after authentication; it is not an admission API.
+func (a *PayloadAuction) insertBid(signed *epbs.SignedBuilderBid) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 

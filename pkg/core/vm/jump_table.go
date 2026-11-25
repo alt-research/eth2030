@@ -692,6 +692,13 @@ func NewGlamsterdanJumpTable() JumpTable {
 	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 
+	return tbl
+}
+
+// NewLegacyFrameJumpTable enables only the explicitly selected legacy prototype.
+// It is not the current EIP-8141 instruction table.
+func NewLegacyFrameJumpTable() JumpTable {
+	tbl := NewGlamsterdanJumpTable()
 	tbl[APPROVE] = &operation{execute: opApprove, constantGas: GasLow, minStack: 3, maxStack: 1024, halts: true, memorySize: memoryApprove, dynamicGas: gasMemExpansion}
 	tbl[TXPARAMLOAD] = &operation{execute: opTxParamLoad, constantGas: GasBase, minStack: 2, maxStack: 1024}
 	tbl[TXPARAMSIZE] = &operation{execute: opTxParamSize, constantGas: GasBase, minStack: 2, maxStack: 1024}
@@ -720,7 +727,7 @@ func NewIPlusJumpTable() JumpTable {
 // Per EIP-8141 spec, VERIFY frames MUST NOT use state-modifying opcodes
 // to prevent mempool DoS attacks.
 func NewFrameVerifyJumpTable() JumpTable {
-	tbl := NewGlamsterdanJumpTable()
+	tbl := NewLegacyFrameJumpTable()
 
 	// Remove state-modifying opcodes.
 	tbl[SSTORE] = nil

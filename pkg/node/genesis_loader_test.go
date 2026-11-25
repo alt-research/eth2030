@@ -392,3 +392,51 @@ func TestNodeWithGenesisFile(t *testing.T) {
 		t.Errorf("NetworkID = %d, want 1337 (from genesis chainId)", n.Config().NetworkID)
 	}
 }
+
+func TestHegotaGenesisAliases(t *testing.T) {
+	for _, tt := range []struct {
+		name      string
+		fields    map[string]any
+		wantError bool
+	}{
+		{"legacy", map[string]any{"glamsterdanTime": uint64(10), "hogotaTime": uint64(20)}, false},
+		{"canonical", map[string]any{"glamsterdamTime": uint64(10), "bogotaTime": uint64(20)}, false},
+		{"release alias", map[string]any{"glamsterdamTime": uint64(10), "hegotaTime": uint64(20)}, false},
+		{"equal aliases", map[string]any{"glamsterdamTime": 10, "glamsterdanTime": 10, "bogotaTime": 20, "hogotaTime": 20}, false},
+		{"conflicting glamsterdam", map[string]any{"glamsterdamTime": 10, "glamsterdanTime": 11}, true},
+		{"conflicting bogota", map[string]any{"bogotaTime": 20, "hogotaTime": 21}, true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			var g map[string]any
+			if err := json.Unmarshal(minimalGenesisJSON(1337), &g); err != nil {
+				t.Fatal(err)
+			}
+			config := g["config"].(map[string]any)
+			for k, v := range tt.fields {
+				config[k] = v
+			}
+			raw, _ := json.Marshal(g)
+			cfg := DefaultConfig()
+			cfg.GenesisPath = filepath.Join(t.TempDir(), "genesis.json")
+			if err := os.WriteFile(cfg.GenesisPath, raw, 0600); err != nil {
+				t.Fatal(err)
+			}
+			gen, err := loadGenesisFile(&cfg)
+			if tt.wantError {
+				if err == nil {
+					t.Fatal("conflicting schedule accepted")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if gen.Config.GlamsterdanTime == nil || *gen.Config.GlamsterdanTime != 10 || gen.Config.HogotaTime == nil || *gen.Config.HogotaTime != 20 {
+				t.Fatal("aliases not normalized")
+			}
+			if gen.Config.IsLegacyFrameEnabled(20) {
+				t.Fatal("canonical schedule enabled incompatible prototype")
+			}
+		})
+	}
+}

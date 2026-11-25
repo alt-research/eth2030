@@ -17,6 +17,9 @@ package bls
 import (
 	"crypto/sha256"
 	"math/big"
+
+	g "github.com/consensys/gnark-crypto/ecc/bls12-381"
+	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
 )
 
 // BLS aggregate signature sizes.
@@ -150,29 +153,29 @@ func DeserializeG2(data [BLSSignatureSize]byte) *BlsG2Point {
 // AggregatePublicKeys aggregates multiple BLS12-381 public keys by
 // adding the corresponding G1 points.
 func AggregatePublicKeys(pubkeys [][48]byte) [48]byte {
-	agg := BlsG1Infinity()
-	for _, pk := range pubkeys {
-		p := DeserializeG1(pk)
-		if p == nil {
-			continue
+	var aggregate g.G1Affine
+	for _, encoded := range pubkeys {
+		var p g.G1Affine
+		if _, err := p.SetBytes(encoded[:]); err != nil || p.IsInfinity() || !p.IsInSubGroup() {
+			return [48]byte{}
 		}
-		agg = blsG1Add(agg, p)
+		aggregate.Add(&aggregate, &p)
 	}
-	return SerializeG1(agg)
+	return aggregate.Bytes()
 }
 
 // AggregateSignatures aggregates multiple BLS signatures by adding
 // the corresponding G2 points.
-func AggregateSignatures(sigs [][96]byte) [96]byte {
-	agg := BlsG2Infinity()
-	for _, s := range sigs {
-		p := DeserializeG2(s)
-		if p == nil {
-			continue
+func AggregateSignatures(signatures [][96]byte) [96]byte {
+	var aggregate g.G2Affine
+	for _, encoded := range signatures {
+		var p g.G2Affine
+		if _, err := p.SetBytes(encoded[:]); err != nil || p.IsInfinity() || !p.IsInSubGroup() {
+			return [96]byte{}
 		}
-		agg = blsG2Add(agg, p)
+		aggregate.Add(&aggregate, &p)
 	}
-	return SerializeG2(agg)
+	return aggregate.Bytes()
 }
 
 // HashToG2 hashes a message to a G2 point using a domain separation tag.
@@ -233,35 +236,23 @@ var blsSignDST = []byte("BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_")
 // BLSSign signs a message with a secret key (scalar), returning a G2 signature.
 // secret is the private key scalar.
 func BLSSign(secret *big.Int, msg []byte) [BLSSignatureSize]byte {
-	// Hash message to G2.
-	hm := HashToG2(msg, blsSignDST)
-	// sig = secret * H(m)
-	sig := blsG2ScalarMul(hm, secret)
-	return SerializeG2(sig)
+	if secret == nil || secret.Sign() <= 0 || secret.Cmp(fr.Modulus()) >= 0 {
+		return [BLSSignatureSize]byte{}
+	}
+	point, err := g.HashToG2(msg, blsSignDST)
+	if err != nil {
+		return [BLSSignatureSize]byte{}
+	}
+	var signature g.G2Affine
+	signature.ScalarMultiplication(&point, secret)
+	return signature.Bytes()
 }
 
 // BLSVerify verifies a single BLS signature.
 // Checks: e(pk, H(m)) == e(G1, sig)
 // Equivalent to: e(pk, H(m)) * e(-G1, sig) == 1
 func BLSVerify(pubkey [BLSPubkeySize]byte, msg []byte, sig [BLSSignatureSize]byte) bool {
-	pk := DeserializeG1(pubkey)
-	if pk == nil || pk.blsG1IsInfinity() {
-		return false
-	}
-	s := DeserializeG2(sig)
-	if s == nil || s.blsG2IsInfinity() {
-		return false
-	}
-	hm := HashToG2(msg, blsSignDST)
-
-	// Check e(pk, H(m)) * e(-G1, sig) == 1.
-	g1 := BlsG1Generator()
-	negG1 := blsG1Neg(g1)
-
-	return blsMultiPairing(
-		[]*BlsG1Point{pk, negG1},
-		[]*BlsG2Point{hm, s},
-	)
+	return (&ConsensusBLSBackend{}).Verify(pubkey[:], msg, sig[:])
 }
 
 // VerifyAggregate verifies an aggregate signature where each signer
@@ -269,34 +260,11 @@ func BLSVerify(pubkey [BLSPubkeySize]byte, msg []byte, sig [BLSSignatureSize]byt
 // Checks: e(G1, aggSig) == product(e(pk_i, H(m_i)))
 // Equivalent to: product(e(pk_i, H(m_i))) * e(-G1, aggSig) == 1
 func VerifyAggregate(pubkeys [][48]byte, msgs [][]byte, sig [96]byte) bool {
-	if len(pubkeys) == 0 || len(pubkeys) != len(msgs) {
-		return false
+	keys := make([][]byte, len(pubkeys))
+	for i := range pubkeys {
+		keys[i] = pubkeys[i][:]
 	}
-
-	s := DeserializeG2(sig)
-	if s == nil || s.blsG2IsInfinity() {
-		return false
-	}
-
-	// Build the pairing inputs: (pk_i, H(m_i)) for each signer, plus (-G1, aggSig).
-	n := len(pubkeys)
-	g1Points := make([]*BlsG1Point, n+1)
-	g2Points := make([]*BlsG2Point, n+1)
-
-	for i := 0; i < n; i++ {
-		pk := DeserializeG1(pubkeys[i])
-		if pk == nil || pk.blsG1IsInfinity() {
-			return false
-		}
-		g1Points[i] = pk
-		g2Points[i] = HashToG2(msgs[i], blsSignDST)
-	}
-
-	// Add (-G1, aggSig) for the check.
-	g1Points[n] = blsG1Neg(BlsG1Generator())
-	g2Points[n] = s
-
-	return blsMultiPairing(g1Points, g2Points)
+	return (&ConsensusBLSBackend{}).AggregateVerify(keys, msgs, sig[:])
 }
 
 // FastAggregateVerify verifies an aggregate signature where all signers
@@ -304,46 +272,22 @@ func VerifyAggregate(pubkeys [][48]byte, msgs [][]byte, sig [96]byte) bool {
 // and attestation signatures.
 // Checks: e(aggPK, H(m)) == e(G1, aggSig)
 func FastAggregateVerify(pubkeys [][48]byte, msg []byte, sig [96]byte) bool {
-	if len(pubkeys) == 0 {
-		return false
+	keys := make([][]byte, len(pubkeys))
+	for i := range pubkeys {
+		keys[i] = pubkeys[i][:]
 	}
-
-	s := DeserializeG2(sig)
-	if s == nil || s.blsG2IsInfinity() {
-		return false
-	}
-
-	// Aggregate the public keys.
-	aggPK := BlsG1Infinity()
-	for _, pk := range pubkeys {
-		p := DeserializeG1(pk)
-		if p == nil || p.blsG1IsInfinity() {
-			return false
-		}
-		aggPK = blsG1Add(aggPK, p)
-	}
-	if aggPK.blsG1IsInfinity() {
-		return false
-	}
-
-	// Hash the message to G2.
-	hm := HashToG2(msg, blsSignDST)
-
-	// Check e(aggPK, H(m)) * e(-G1, sig) == 1.
-	negG1 := blsG1Neg(BlsG1Generator())
-	return blsMultiPairing(
-		[]*BlsG1Point{aggPK, negG1},
-		[]*BlsG2Point{hm, s},
-	)
+	return (&ConsensusBLSBackend{}).FastAggregateVerify(keys, msg, sig[:])
 }
 
 // BLSPubkeyFromSecret derives the public key from a secret scalar.
 // pk = secret * G1
-// The key pair is registered for fallback verification in the pure-Go backend.
+// Uses the canonical subgroup generator; no secret-key registry is retained.
 func BLSPubkeyFromSecret(secret *big.Int) [BLSPubkeySize]byte {
-	g1 := BlsG1Generator()
-	pk := blsG1ScalarMul(g1, secret)
-	serialized := SerializeG1(pk)
-	registerBLSPubkey(serialized, secret)
-	return serialized
+	if secret == nil || secret.Sign() <= 0 || secret.Cmp(fr.Modulus()) >= 0 {
+		return [BLSPubkeySize]byte{}
+	}
+	_, _, generator, _ := g.Generators()
+	var pubkey g.G1Affine
+	pubkey.ScalarMultiplication(&generator, secret)
+	return pubkey.Bytes()
 }

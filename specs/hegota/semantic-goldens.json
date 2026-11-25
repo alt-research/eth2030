@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "purpose": "frozen semantic expectations for future native conformance; arithmetic/domain oracles checked independently, traces are specified seeds, not executed EVM claims",
+  "gas_vectors": [
+    {
+      "id": "gas-standard",
+      "input": {
+        "frame_data": "0x0100",
+        "signature": "0x010203",
+        "signature_scheme": "ARBITRARY",
+        "empty_signature_message": true,
+        "execution_limit": 50000,
+        "state_limit": 0,
+        "execution_used": 10000,
+        "state_used": 0,
+        "refund_counter": 0,
+        "base_fee": 7,
+        "blob_base_fee": 2,
+        "blob_count": 0,
+        "max_fee": 10000000,
+        "tip_cap": 1
+      },
+      "expected": {
+        "intrinsic": 12643,
+        "calldata_floor": 12895,
+        "standard_limit": 62643,
+        "max_gas": 62643,
+        "required_max_fee": 438501,
+        "max_cost": 501144,
+        "gas_used": 22643,
+        "payer_refund": 320000,
+        "block_execution_gas": 22643,
+        "block_state_gas": 0
+      }
+    },
+    {
+      "id": "gas-floor-state",
+      "input": {
+        "frame_data": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "signature": "0x010203",
+        "signature_scheme": "ARBITRARY",
+        "empty_signature_message": true,
+        "execution_limit": 100,
+        "state_limit": 5000,
+        "execution_used": 100,
+        "state_used": 5000,
+        "refund_counter": 0,
+        "base_fee": 7,
+        "blob_base_fee": 2,
+        "blob_count": 0,
+        "max_fee": 10000000,
+        "tip_cap": 1
+      },
+      "expected": {
+        "intrinsic": 13023,
+        "calldata_floor": 19167,
+        "standard_limit": 18123,
+        "max_gas": 24167,
+        "required_max_fee": 169169,
+        "max_cost": 193336,
+        "gas_used": 24167,
+        "payer_refund": 0,
+        "block_execution_gas": 19167,
+        "block_state_gas": 5000
+      }
+    }
+  ],
+  "recent_root_vectors": [
+    {
+      "id": "recent-root-domain",
+      "source_address": "0x1111111111111111111111111111111111111111",
+      "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+      "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+      "slot": 8193,
+      "index": 1,
+      "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+      "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+      "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9"
+    }
+  ],
+  "trace_vectors": [
+    {
+      "id": "approval-zero",
+      "input": "APPROVE scope=0, flags=3",
+      "expected": "current call reverts; no approval/payment/nonce mutation",
+      "consumer_task": "HGT-003",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "approval-wrong-target",
+      "input": "execution scope=2, flags=2, target != sender",
+      "expected": "current call reverts; sender_approved remains false",
+      "consumer_task": "HGT-003",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "approval-payment-first",
+      "input": "payment scope=1, flags=1, sender_approved=false",
+      "expected": "current call reverts; nonce unchanged; payer unset",
+      "consumer_task": "HGT-003",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "approval-once",
+      "input": "execution approval, then successful payment, then repeated payment",
+      "expected": "nonce_delta=1; first payer preserved; repeated call reverts",
+      "consumer_task": "HGT-003",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "verify-rollback",
+      "input": "VERIFY calls APPROVE successfully then enclosing call reverts",
+      "expected": "whole transaction invalid; nonce/payment/state/logs restored",
+      "consumer_task": "HGT-012",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "atomic-body-rollback",
+      "input": "payment approved before a three-frame body batch; second body frame fails",
+      "expected": "payment/nonce before batch preserved; body logs/state discarded; first body receipt retains execution status/gas and zero state gas; third body skipped=2",
+      "consumer_task": "HGT-012",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "cross-frame-refill-rollback",
+      "input": "A creates slot and owns state charge; B deletes slot then reverts",
+      "expected": "A outstanding charge and receipt state gas restored; B state gas zero; A spendable pool never reopened",
+      "consumer_task": "HGT-011",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "keyed-nonce-single-use",
+      "input": "8250 nonempty sorted keys, nonce_seq=MAX_NONCE_SEQ; approval succeeds, body reverts",
+      "expected": "selected keys consumed once; legacy account nonce unaffected; combined envelope BLOCKED by D01",
+      "consumer_task": "HGT-017",
+      "native_status": "not_implemented_for_current_spec"
+    },
+    {
+      "id": "recent-root-slot-window",
+      "input": "root written at slot S, evaluate at S, S+1, S+8191, S+8192",
+      "expected": "not referenceable at S; within usable window at +1/+8191; expired at +8192; use canonical slotNumber and revalidate on reorg",
+      "consumer_task": "HGT-018",
+      "native_status": "not_implemented_for_current_spec"
+    }
+  ]
+}

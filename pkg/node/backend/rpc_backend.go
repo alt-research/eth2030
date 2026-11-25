@@ -311,6 +311,7 @@ func (b *RPCBackend) EVMCall(from types.Address, to *types.Address, data []byte,
 		rules := chainCfg.Rules(header.Number, chainCfg.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,
+			IsLegacyFrames:   chainCfg.IsLegacyFrameEnabled(header.Time),
 			IsPrague:         rules.IsPrague,
 			IsCancun:         rules.IsCancun,
 			IsShanghai:       rules.IsShanghai,

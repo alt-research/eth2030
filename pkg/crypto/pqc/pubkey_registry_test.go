@@ -126,8 +126,8 @@ func TestVerifyRegistration(t *testing.T) {
 
 	// Compute the expected signature: keccak256(classicPubKey || validatorIndex).
 	sig := registrationDigest(classic, 10)
-	if !reg.VerifyRegistration(10, sig) {
-		t.Error("expected valid registration verification")
+	if reg.VerifyRegistration(10, sig) {
+		t.Error("public registration digest must not authenticate a registration")
 	}
 
 	// Wrong signature.

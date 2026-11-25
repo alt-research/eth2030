@@ -21,7 +21,7 @@ HGT-004 / HGT-005. Baseline: integrated master `89b3b1f2`; current source finger
 | Prague / Osaka / Amsterdam / Bogota | Backend predicates stay monotonic; dispatcher validates method versions/schemas | FCU V3 is reused after Prague/Osaka; Bogota still requires Amsterdam rules. Do not restore exclusive predicate intervals. |
 | `glamsterdamTime` / `glamsterdanTime` | Normalize to stored legacy field; unequal aliases reject | `TestHegotaGenesisAliases`: legacy, canonical, equal, conflicting. |
 | `bogotaTime` / `hegotaTime` / `hogotaTime` | Normalize to `HogotaTime`; no invented mainnet date | Alias tests and symmetric retroactive schedule compatibility checks. |
-| Canonical `FrameTx8141` | Direct typed dispatch and Bogota public-prefix validation | Independent of `ExperimentalLegacyFrames`. Native semantics and pool/Engine/restart tests have explicit scope. |
+| Canonical `FrameTx8141` | Direct typed dispatch and Bogota public-prefix validation | Independent of `ExperimentalLegacyFrames`. Dedicated canonical processor and pool tests cover timestamps 99/100/101, pre-mutation rejection and reorg eviction; native semantics and Engine/restart tests retain explicit scope. |
 | Frozen legacy `FrameTx` | `ExperimentalLegacyFrames && merge && London(number) && HogotaTime<=time` | Pre-mutation rejection, exact activation, VM isolation and reorg eviction. Canonical Frames survive legacy-profile resets. |
 | Legacy AA / LocalTx / STARK | AA default off, LocalTx opt-in, unavailable STARK proof provider fails node creation | `TestAATxDisabled`, `TestLocalTx_DefaultConfigDisallows`, `TestStarkFrames_EnabledRequiresProvider`. |
 | Conditional nonce/root/PQ | Explicit profiles and D01–D09 decisions | Isolated research oracles do not activate the combined release. |

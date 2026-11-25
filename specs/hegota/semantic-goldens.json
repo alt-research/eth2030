@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "purpose": "Concrete frozen semantic inputs and expected outputs. Seven base-profile cases execute the native VM; two conditional-extension rule oracles are independently checked without combined network activation.",
   "gas_vectors": [
     {
@@ -517,7 +517,8 @@
         ],
         "state_charge": 195840,
         "execution_access": 24200,
-        "replay_valid": false
+        "replay_valid": false,
+        "approval_applied": true
       }
     },
     {
@@ -563,6 +564,796 @@
           false,
           false
         ]
+      }
+    }
+  ],
+  "boundary_vectors": [
+    {
+      "id": "nonce-duplicate",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          1
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-unsorted",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          9,
+          1
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-key-overflow",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          115792089237316195423570985008687907853269984665640564039457584007913129639936
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-too-many-keys",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-sequential-first-use",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 0,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": true,
+        "legacy_nonce": 7,
+        "stored": [
+          1,
+          1
+        ],
+        "state_charge": 195840,
+        "execution_access": 24200,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-sequential-existing",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 5,
+        "stored": [
+          5,
+          5
+        ],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": true,
+        "legacy_nonce": 7,
+        "stored": [
+          6,
+          6
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-exhaustion",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551614,
+        "stored": [
+          18446744073709551614,
+          18446744073709551614
+        ],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": true,
+        "legacy_nonce": 7,
+        "stored": [
+          18446744073709551615,
+          18446744073709551615
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-already-exhausted",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          18446744073709551615,
+          18446744073709551615
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          18446744073709551615,
+          18446744073709551615
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-state-budget-short",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195839,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": true
+      }
+    },
+    {
+      "id": "nonce-approval-revert",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": true,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": true
+      }
+    },
+    {
+      "id": "nonce-transaction-invalid",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [
+          1,
+          9
+        ],
+        "sequence": 18446744073709551615,
+        "stored": [
+          0,
+          0
+        ],
+        "state_budget": 195840,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true,
+        "transaction_invalid": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": false,
+        "legacy_nonce": 7,
+        "stored": [
+          0,
+          0
+        ],
+        "state_charge": 0,
+        "execution_access": 24200,
+        "replay_valid": true
+      }
+    },
+    {
+      "id": "nonce-empty-legacy",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [],
+        "sequence": 7,
+        "stored": [],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": true,
+        "legacy_nonce": 8,
+        "stored": [],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-legacy-created-before-approval",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 7,
+        "keys": [],
+        "sequence": 7,
+        "stored": [],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true,
+        "legacy_nonce_at_approval": 8
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": true,
+        "legacy_nonce": 9,
+        "stored": [],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-empty-max",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 18446744073709551615,
+        "keys": [],
+        "sequence": 18446744073709551615,
+        "stored": [],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true
+      },
+      "expected": {
+        "valid": false,
+        "approval_applied": false,
+        "legacy_nonce": 18446744073709551615,
+        "stored": [],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": false
+      }
+    },
+    {
+      "id": "nonce-legacy-overflow",
+      "kind": "keyed_nonce",
+      "eip": 8250,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-017",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "sender": "0x0000000000000000000000000000000000000091",
+        "legacy_nonce": 18446744073709551614,
+        "keys": [],
+        "sequence": 18446744073709551614,
+        "stored": [],
+        "state_budget": 0,
+        "approval_succeeds": true,
+        "approval_reverts": false,
+        "body_reverts": true,
+        "legacy_nonce_at_approval": 18446744073709551615
+      },
+      "expected": {
+        "valid": true,
+        "approval_applied": false,
+        "legacy_nonce": 18446744073709551614,
+        "stored": [],
+        "state_charge": 0,
+        "execution_access": 0,
+        "replay_valid": true
+      }
+    },
+    {
+      "id": "root-same-slot",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 8193,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": false
+      }
+    },
+    {
+      "id": "root-next-slot",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 8194,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": true
+      }
+    },
+    {
+      "id": "root-last-usable",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 16384,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": true
+      }
+    },
+    {
+      "id": "root-expired",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 16385,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": false
+      }
+    },
+    {
+      "id": "root-source-domain",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x4444444444444444444444444444444444444444",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 8194,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x11b213dcd759949aa3540254d7b034b93f353cb86a6efc40ba314be8cc8cc5fa",
+        "index": 1,
+        "source_id": "0xd5ff2dfc8e81ac8f8db50662f01d14159125538c3eb4cf2a3f27701a0185270f",
+        "storage_key": "0xd290e92a4b48e1281c459aef01fdac10e9b25be1fa8c79b0e083fcd7fda6fe92",
+        "valid": false
+      }
+    },
+    {
+      "id": "root-salt-domain",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 8194,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0xf0cf640669caa8de1fd510b72dcc6f762e9faf92250914b588c329491009e896",
+        "index": 1,
+        "source_id": "0x5c5f450740f20ee61298f75a6dfefdde59da3bf575825241c7f58413f90e1607",
+        "storage_key": "0xeab54a8e8c5365eaa3f82328c0c7082a8158f3788161d1e2845998830992ddea",
+        "valid": false
+      }
+    },
+    {
+      "id": "root-value-mismatch",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x6666666666666666666666666666666666666666666666666666666666666666",
+        "slot": 8193,
+        "current_slot": 8194,
+        "storage": {
+          "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793"
+        }
+      },
+      "expected": {
+        "entry_hash": "0x1bb055e89b981577e98023bb8975a13197bbb53cff74d37fc11ae89d3dd4388e",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": false
+      }
+    },
+    {
+      "id": "root-orphaned",
+      "kind": "root_dependency",
+      "eip": 8272,
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "consumer_task": "HGT-018",
+      "consumer": "tools/hegota/semantic_goldens.py",
+      "qualification": "isolated_spec_oracle_not_network_activation",
+      "input": {
+        "source_address": "0x1111111111111111111111111111111111111111",
+        "salt": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "root": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "slot": 8193,
+        "current_slot": 8194,
+        "storage": {}
+      },
+      "expected": {
+        "entry_hash": "0x965fee45d40ee25969b678d4c57f177100f1ec2c2215d11e7ca78eb7cd4ea793",
+        "index": 1,
+        "source_id": "0x2bc0e4453d022b3e9e099d968a3291ad16b616abdb07af6b9d3b771b8b35da13",
+        "storage_key": "0xcbd89930321a67f9672d364b475bf5c20070477649de36350812546f292711d9",
+        "valid": false
       }
     }
   ]

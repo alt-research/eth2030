@@ -30,7 +30,7 @@ an oracle during acceptance.
 structured fixture coverage and two isolated nonce/window rule oracles. All nine
 former trace seeds now have concrete inputs/outputs. Seven base cases are executed
 by `core/execution.TestHegotaSemanticGoldens` using the existing native VM/executor;
-the two conditional oracles do not activate a composed network profile.
+the two core conditional oracles and 23 additional nonce/root boundary vectors do not activate a composed network profile. Semantic checks reject missing oracle families, unknown fields and type drift, including under Python optimization.
 
 `acceptance.py` validates the criterion matrix, actual passing native test events,
 current artifact/source hashes, skip counts, prerequisite assessments and active

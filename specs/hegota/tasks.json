@@ -5,10 +5,10 @@
       "id": "HGT-001",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/specification-profiles.md",
         "specs/hegota/source-lock.json",
@@ -17,17 +17,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-004",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/runtime-and-activation.md",
         "evidence/hegota-a/runtime.json"
@@ -35,17 +35,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 0.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-005",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/runtime-and-activation.md",
         "pkg/core/config/hegota_test.go",
@@ -58,17 +58,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-006",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/baseline-and-gaps.md",
         "specs/hegota/conformance.json",
@@ -79,17 +79,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-007",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/semantic-adrs.md",
         "specs/hegota/frame-schema.json",
@@ -100,17 +100,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-008",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "docs/plans/hegota-a/validation-audit.md",
         "pkg/crypto/bls/consensus_backend.go",
@@ -120,17 +120,17 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 1.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     },
     {
       "id": "HGT-009",
       "owner": "Codex; specification / EL core / testing",
       "status": "verified",
-      "date": "2026-11-25",
+      "date": "2026-11-26",
       "source_lock": "specs/hegota/source-lock.json",
       "implementation_base": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-      "branch": "codex/hegota-a-baseline",
+      "branch": "codex/hegota-a-acceptance-audit",
       "artifacts": [
         "specs/hegota/admission.json",
         "tools/hegota/check.py",
@@ -139,7 +139,7 @@
       "verification": "evidence/hegota-a/verification.json",
       "estimate_engineer_days": 0.5,
       "scope_limit": "All stated A deliverables require criterion-level evidence. Conditional extension oracles remain isolated; no B–J conformance or composed release activation claim.",
-      "follow_up_audit": "docs/reviews/pr-167/ACCEPTANCE_COMPLETION.md",
+      "follow_up_audit": "docs/reviews/pr-168/AUDIT.md",
       "acceptance": "specs/hegota/acceptance.json"
     }
   ],

@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-25",
+  "date": "2026-11-26",
   "source_base_commit": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
   "branch_baseline": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-  "source_fingerprint_sha256": "f751df376e0aa1d0756954d670a1a1e88ee569ac85bf127c947b89d94212df6d",
+  "source_fingerprint_sha256": "8a5e5bc8e446280d697fb9233f1edeed8011784be673390011279fd15401abf4",
   "source_file_sha256": {
-    ".github/workflows/ci.yml": "c77912da12d62afcfdff740bcfda1d76d55eea7b6a0f58186d628069b902ce10",
+    ".github/workflows/ci.yml": "f68ae095ac48440ef4dacc86bae4443b6fb1bb070faa67a56bf049c46e7e2996",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
     "pkg/cmd/eth2030-baseline/main.go": "98ac0ee8c568e405f2c98edfd2ae99cdaa06ef835642451553539e7548d337f6",
     "pkg/cmd/eth2030-geth/main.go": "f52f60fa69f3e7d074f7554d0ed81714e3a00596277867437c04b8e6151b990f",
@@ -32,8 +32,8 @@
     "pkg/core/execution/builder_requests_8282_test.go": "42fa148e62d88c1d992fc8615a0fb99345625576786246d6ba7492df1b5fd437",
     "pkg/core/execution/frame_8141.go": "9cfd6288f0ed0d42d0b9c7b89d12e09968ae02bf52c31e436e3a8fd84c5b09f1",
     "pkg/core/execution/frame_8141_test.go": "45f6a9bf7738ef5fa3cdb65790f812ed4f7aa63ce63359b9f2cb96653aa89298",
-    "pkg/core/execution/hegota_activation_test.go": "db1d79290cbb60589f611f6eae3d5a5dd0f93ac4c65b075106730d54c7a52427",
-    "pkg/core/execution/hegota_semantic_goldens_test.go": "04932bb95128f2e840256a83608f52f9c5f6702f4655f039de257e290f8cf822",
+    "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
+    "pkg/core/execution/hegota_semantic_goldens_test.go": "4d66c8c1bec3a0015217bf88ee570c0a6c09666ed0705e2c0dbcad4c3e7ba4e1",
     "pkg/core/execution/processor.go": "b8b716255ede58e074347cdddcd2dae25790c70563cd96bd7cee6b73d2698194",
     "pkg/core/execution/requests.go": "c1ede7cd7b431eea81c06565a437ab9ff382913f7013e35b4eb858dcbe881a83",
     "pkg/core/gaspool/gas_pool.go": "ddf46742848055c478936e9798b6b2ecea1c0216ad5a9e5e8dfb014e6d9b281a",
@@ -111,31 +111,31 @@
     "pkg/node/startup_rollback_test.go": "b613f1d07aaf34186335e1d0115a6c6104d24fe7881e0c47ccb6a1f10d60bc47",
     "pkg/node/sync_runtime.go": "753a01b27848da97d815631afcda9eb4169530da1b5e786f30a77c2e6f707dff",
     "pkg/txpool/frame_8141.go": "3d3ad9d82dc747aae7c26d565547af62cb194057c56039da2673579ef17ede9c",
-    "pkg/txpool/hegota_activation_test.go": "4e8aecb8e127328df9f88ed41123d8a81092580f87cb046377884bb1df592d58",
+    "pkg/txpool/hegota_activation_test.go": "48a29ebf0c4bd87d337e94fa086e2793c3b019effa0a4bd0dd7464ae6c566bae",
     "pkg/txpool/local_tx_test.go": "a55ca0c7e00f839d3242c12a0155f71bb15f2f73cc8e455d45a9716a59b59256",
     "pkg/txpool/txpool.go": "ad803926ba2bea830f4d41f6592a23edaf4d75ac3592938e55df2be1ce19848f",
     "pkg/txpool/txpool_test.go": "837a8b0af5d6a239552ff8e772a5095b92a2c8e221efeadd7531af8ea5aaedc9",
-    "tools/hegota/acceptance.py": "d53629c2e3334bcf67cbaf3bbd3336e9d323e298a461129a45576c90485022ff",
+    "tools/hegota/acceptance.py": "877993b711d1d0f2752f87823c411bc2bf46b782ed5601cdf22edd8daf018eb4",
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "3418e440450b8206acf80ec0fd42a22f7c1b7b4ac67fcfdf8efc94e1c66eb958",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
-    "tools/hegota/semantic_goldens.py": "52b9eb624314a94d1d57b64a5dcc66a72a8fc9429b65c29b7bbaa929029071e5",
-    "tools/hegota/test_acceptance.py": "71c7cf6b5d48e8cb630552e686c99682c0da5a37b8fb424fcf1371d9b37cd0b4",
+    "tools/hegota/semantic_goldens.py": "52ff44fc665046df2d20101d88ce742588e3f4a3e642550b9dc0ea14426bf863",
+    "tools/hegota/test_acceptance.py": "349422d2dcf02b079a6e73a1e3fa52dcd8886fd222d162d3350aa8a7d4c9234f",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
-    "tools/hegota/test_semantic_goldens.py": "ac69979eb8716284d1c2bf397b5f139f81662bc25f7cfcc7a15b61c0a4bfccf0"
+    "tools/hegota/test_semantic_goldens.py": "5f1d0805de0e9f673c80b4007b9c278c13ea35358499d9e853c1779152d8fb7f"
   },
   "binaries": [
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "444fbf53003ed3d16c8f9295427fe2bcb95b67cc40c7bf2bc193f5c95b836680",
+      "sha256": "31c6035c9b3f90d9fb7c2d6b28f6c8034690614576b7ab4f0315ca433cd264c4",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "962e3d9e2f861557eadda6c5415cc3d7e5e186080b0d69da1c45b81e8c580467",
+      "sha256": "83f835c796404895796df29f8202b6e704d6670cd36b292c125d6901a7028963",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     }
@@ -147,7 +147,9 @@
     "TestNativeSnapRejectsUnknownStateRoots",
     "TestHegotaGenesisAliases",
     "TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
-    "TestHegotaSemanticGoldens"
+    "TestHegotaSemanticGoldens",
+    "TestCanonicalFrameProcessorForkTimeBeforeMutation",
+    "TestCanonicalFrameAdmissionTracksForkTimeAndReorg"
   ],
   "container": {
     "entrypoint": "eth2030",
@@ -158,5 +160,5 @@
   "baseline_reference": "direct upstream go-ethereum v1.17.10 tests.StateTest.RunNoVerify",
   "canonical_head_selection_status": "native FCU switches validated canonical head/state and refreshes pool; specific HGT-006-R16 closed",
   "historical_evidence": "evidence/hegota-a/history/6a17479/runtime.json",
-  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/a86473ea6c04fa33a2fd488c33506380d2b96a8f/evidence/hegota-a/runtime.json"
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/eaa13674987d2371e3e038a3f360c106cff50697/evidence/hegota-a/runtime.json"
 }

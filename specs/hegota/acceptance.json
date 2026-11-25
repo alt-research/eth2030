@@ -115,15 +115,18 @@
         {
           "id": "canonical_head_height",
           "status": "verified",
-          "statement": "Canonical prefix simulation uses actual block prerequisites before/at/after activation and on reorg.",
+          "statement": "Canonical prefix simulation uses actual block prerequisites before/at/after activation and on reorg. Independently verify canonical timestamp activation and processor pre-mutation rejection.",
           "artifacts": [
             "docs/plans/hegota-a/runtime-and-activation.md",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/hegota_activation_test.go"
+            "pkg/txpool/hegota_activation_test.go",
+            "pkg/core/execution/hegota_activation_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFramesSurviveLegacyGateReset"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFramesSurviveLegacyGateReset",
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrameProcessorForkTimeBeforeMutation"
           ],
           "commands": []
         },

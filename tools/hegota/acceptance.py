@@ -1,5 +1,6 @@
 """Validate criterion-level Group A evidence, independently of completion labels."""
 import hashlib
+import json
 import re
 
 
@@ -16,6 +17,8 @@ COMMANDS = {'source_lock', 'profiles', 'reference_identity', 'runtime_manifest',
             'baseline', 'prerequisite_inventory', 'skip_inventory', 'semantic_oracles',
             'admission', 'update_history'}
 MODULE = 'github.com/eth2030/eth2030/'
+PREREQUISITES = {'PRE-'+str(n) for n in (7732, 7928, 7685, 6110, 8037, 8038, 2780,
+                                        7778, 7976, 7825, 7934, 7843, 7702, 7708, 8141, 3675)}
 
 
 def need(value, message):
@@ -25,6 +28,7 @@ def need(value, message):
 
 def validate_reference(root, lock, profiles, baseline):
     active = lock['active_reference']
+    need(active['module'] == 'github.com/ethereum/go-ethereum', 'active reference module differs')
     version = re.search(r'github.com/ethereum/go-ethereum (v\S+)', (root/'pkg/go.mod').read_text()).group(1)
     need(active['version'] == version, 'active reference differs from go.mod')
     need(any(r['repo'] == 'ethereum/go-ethereum' and r['ref'] == version and r['sha'] == active['revision']
@@ -37,16 +41,39 @@ def validate_reference(root, lock, profiles, baseline):
          f'go-ethereum@{version}/' in baseline['reference_backend'], 'profile/runner reference identity differs')
 
 
+def validate_run(run):
+    need(run['exit_code'] == 0, 'acceptance run failed')
+    tests, packages = run['named_test_or_subtest_events'], run['package_events']
+    need(all(type(v) is int and v >= 0 for v in list(tests.values())+list(packages.values())), 'invalid execution counters')
+    need(tests['fail'] == packages['fail'] == 0, 'acceptance run failed')
+    need(type(run['started_packages']) is int and run['started_packages'] > 0 and tests['pass'] > 0 and packages['pass'] > 0,
+         'acceptance run is empty')
+    need(run['started_packages'] == run['completed_packages'] == sum(packages.values()), 'acceptance run is incomplete')
+
+
+def validate_sources(root, runtime, evidence):
+    sources = runtime['source_file_sha256']
+    need(sources, 'missing runtime source manifest')
+    for path, expected in sources.items():
+        need((root/path).is_file() and hashlib.sha256((root/path).read_bytes()).hexdigest() == expected,
+             'runtime source fingerprint differs: '+path)
+    fingerprint = hashlib.sha256(json.dumps(sources, sort_keys=True).encode()).hexdigest()
+    need(fingerprint == runtime['source_fingerprint_sha256'] == evidence['source_fingerprint_sha256'] == evidence['acceptance']['source_fingerprint_sha256'],
+         'stale source fingerprint')
+    for path, expected in evidence['artifacts'].items():
+        if path.endswith(('.go', '.py')):
+            need(sources.get(path) == expected, 'executable artifact omitted from source manifest: '+path)
+
+
 def validate_acceptance(root, register, matrix, evidence, runtime, checked_commands):
     rows = register['tasks']
     need(len(rows) == len(REQUIRED) and {t['id'] for t in rows} == set(REQUIRED), 'A task omission or duplicate')
     entries = matrix['tasks']
     need(len(entries) == len(REQUIRED) and {t['id'] for t in entries} == set(REQUIRED), 'A acceptance task omission or duplicate')
     recorded = evidence['acceptance']
-    need(recorded['source_fingerprint_sha256'] == runtime['source_fingerprint_sha256'], 'acceptance evidence has a stale source fingerprint')
-    need(evidence['full_suite']['exit_code'] == 0 and evidence['full_suite']['named_test_or_subtest_events']['fail'] == 0,
-         'acceptance run failed')
-    need(evidence['full_suite']['started_packages'] == evidence['full_suite']['completed_packages'], 'acceptance run is incomplete')
+    validate_sources(root, runtime, evidence)
+    validate_run(evidence['full_suite'])
+    need(evidence['full_suite']['named_test_or_subtest_events']['pass'] >= len(recorded['passed_tests']), 'passing evidence exceeds executed test count')
     tasks = {t['id']: t for t in rows}
     all_complete = True
     criteria_count = 0
@@ -86,6 +113,9 @@ def validate_acceptance(root, register, matrix, evidence, runtime, checked_comma
     by_id = {t['id']: {c['id']: c for c in t['criteria']} for t in entries}
     critical = by_id['HGT-005']['canonical_head_height']
     need(MODULE+'txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites' in critical.get('tests', []), 'head-height regression omitted')
+    need({MODULE+'txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg',
+          MODULE+'core/execution::TestCanonicalFrameProcessorForkTimeBeforeMutation'} <= set(critical.get('tests', [])),
+         'canonical timestamp activation coverage omitted')
     semantics = by_id['HGT-007']
     native = set(semantics['approval'].get('tests', []) + semantics['rollback'].get('tests', []))
     expected = {'approval-zero', 'approval-wrong-target', 'approval-payment-first', 'approval-once',
@@ -97,7 +127,7 @@ def validate_acceptance(root, register, matrix, evidence, runtime, checked_comma
 
 def validate_inventory(root, inventory, evidence):
     rows = [r for r in inventory['requirements'] if r['requirement_id'].startswith('PRE-')]
-    need(len(rows) == 16 and len({r['requirement_id'] for r in rows}) == 16, 'prerequisite inventory omission/duplicate')
+    need(len(rows) == len(PREREQUISITES) and {r['requirement_id'] for r in rows} == PREREQUISITES, 'prerequisite inventory omission/duplicate')
     for row in rows:
         current = row.get('current_assessment', {})
         need(current.get('observation') and current.get('remaining_scope') and current.get('files') and current.get('tests'),
@@ -112,4 +142,7 @@ def validate_inventory(root, inventory, evidence):
 
 def validate_skips(inventory, evidence):
     for field in ('full_suite', 'race_suite'):
+        validate_run(evidence[field])
         need(len(inventory[field]) == evidence[field]['named_test_or_subtest_events']['skip'], 'skip inventory/count mismatch')
+        keys = [(r['package'], r['test']) for r in inventory[field]]
+        need(len(keys) == len(set(keys)) and all(r['package'] and r['test'] and r['reason'] for r in inventory[field]), 'duplicate or unexplained skip')

@@ -45,16 +45,18 @@ func TestHegotaSemanticGoldens(t *testing.T) {
 					PayerBalance  uint64 `json:"payer_balance"`
 					ExecutionGas  uint64 `json:"execution_gas"`
 				}
-				Escrow        uint64
-				Invalid       bool
-				Nonce, Logs   uint64
-				Payer         string
-				RootUnchanged bool   `json:"root_unchanged"`
-				GasUsed       uint64 `json:"gas_used"`
-				Statuses      []uint64
-				StateGas      []uint64 `json:"state_gas"`
-				ExecutionGas  []uint64 `json:"execution_gas"`
-				Storage       map[string]string
+				Escrow                *uint64
+				Invalid               bool
+				Nonce, Logs           uint64
+				Payer                 string
+				RootUnchanged         bool   `json:"root_unchanged"`
+				ExecutionPoolRestored bool   `json:"execution_pool_restored"`
+				StatePoolRestored     bool   `json:"state_pool_restored"`
+				GasUsed               uint64 `json:"gas_used"`
+				Statuses              []uint64
+				StateGas              []uint64 `json:"state_gas"`
+				ExecutionGas          []uint64 `json:"execution_gas"`
+				Storage               map[string]string
 			}
 		} `json:"trace_vectors"`
 	}
@@ -106,7 +108,7 @@ func TestHegotaSemanticGoldens(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if golden.Expected.Escrow != 0 && payment.Escrow().Uint64() != golden.Expected.Escrow {
+				if golden.Expected.Escrow != nil && payment.Escrow().Cmp(new(big.Int).SetUint64(*golden.Expected.Escrow)) != 0 {
 					t.Fatal("fee oracle mismatch")
 				}
 				evm := vm.NewEVMWithState(vm.BlockContext{BlockNumber: header.Number, Time: header.Time, BaseFee: header.BaseFee}, vm.TxContext{}, vm.Config{}, db)
@@ -120,6 +122,9 @@ func TestHegotaSemanticGoldens(t *testing.T) {
 					t.Fatal("missing per-call expectations")
 				}
 				for i, want := range golden.Expected.Steps {
+					if want.Error != "" && want.Error != "reverted" {
+						t.Fatalf("unknown expected error %q", want.Error)
+					}
 					left, err := evm.RunFrame8141(i)
 					if (want.Error == "reverted" && !errors.Is(err, vm.ErrExecutionReverted)) || (want.Error == "" && err != nil) {
 						t.Fatalf("step %d: %v", i, err)
@@ -130,7 +135,7 @@ func TestHegotaSemanticGoldens(t *testing.T) {
 						payer = &s
 					}
 					if ctx.Approved != want.Approved || !reflect.DeepEqual(payer, want.Payer) || db.GetNonce(sender) != want.Nonce ||
-						db.GetBalance(sender).Uint64() != want.SenderBalance || db.GetBalance(other).Uint64() != want.PayerBalance ||
+						db.GetBalance(sender).Cmp(new(big.Int).SetUint64(want.SenderBalance)) != 0 || db.GetBalance(other).Cmp(new(big.Int).SetUint64(want.PayerBalance)) != 0 ||
 						tx.Frames[i].Limits.Execution-left != want.ExecutionGas {
 						t.Fatalf("step %d: approved=%v payer=%v nonce=%d balances=%s/%s execution=%d", i, ctx.Approved, payer,
 							db.GetNonce(sender), db.GetBalance(sender), db.GetBalance(other), tx.Frames[i].Limits.Execution-left)
@@ -150,7 +155,8 @@ func TestHegotaSemanticGoldens(t *testing.T) {
 			}
 			if golden.Expected.Invalid {
 				if !golden.Expected.RootUnchanged || db.GetRoot() != before || used != golden.Expected.GasUsed ||
-					gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit || len(db.GetLogs(transaction.Hash())) != int(golden.Expected.Logs) {
+					(gp.Gas() == header.GasLimit) != golden.Expected.ExecutionPoolRestored ||
+					(gp.StateGas() == header.GasLimit) != golden.Expected.StatePoolRestored || len(db.GetLogs(transaction.Hash())) != int(golden.Expected.Logs) {
 					t.Fatal("invalid VERIFY retained effects or gas reservation")
 				}
 				return

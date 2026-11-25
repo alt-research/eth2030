@@ -10,6 +10,26 @@ import (
 	"testing"
 )
 
+func TestCanonicalFrameProcessorForkTimeBeforeMutation(t *testing.T) {
+	for _, timestamp := range []uint64{99, 100, 101} {
+		frame, db, cfg, header := frameExecutionFixture(t)
+		activation := uint64(100)
+		cfg.HogotaTime, header.Time = &activation, timestamp
+		tx := signFrameExecution(t, frame, false)
+		before := db.GetRoot()
+		gp := new(gaspool.GasPool).AddGas(header.GasLimit)
+		receipt, used, err := ApplyTransaction(cfg, db, header, tx, gp)
+		if timestamp < activation {
+			if err == nil || receipt != nil || used != 0 || db.GetRoot() != before ||
+				gp.Gas() != header.GasLimit || gp.StateGas() != header.GasLimit {
+				t.Fatal("pre-fork canonical Frame changed state, receipt or gas")
+			}
+		} else if err != nil || receipt == nil || used == 0 || db.GetNonce(frame.Sender) != 1 {
+			t.Fatalf("canonical execution at %d: receipt=%v gas=%d err=%v", timestamp, receipt, used, err)
+		}
+	}
+}
+
 func TestProcessorFrameGateBeforeStateMutation(t *testing.T) {
 	ts := uint64(100)
 	for _, tt := range []struct {

@@ -7,6 +7,37 @@ import (
 	"testing"
 )
 
+// Canonical and frozen legacy envelopes need independent activation controls.
+func TestCanonicalFrameAdmissionTracksForkTimeAndReorg(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	cfg := *config.TestConfig
+	activation := uint64(100)
+	cfg.HogotaTime = &activation
+	pool.SetForkRules(&cfg, 99)
+	tx := signPoolFrame(t, frame, 1)
+	root := db.GetRoot()
+	for _, timestamp := range []uint64{99, 100, 101, 99, 100} {
+		// Native head updates set fork rules before resetting state/fees.
+		pool.SetForkRules(&cfg, timestamp)
+		pool.Reset(db, &types.Header{Number: big.NewInt(10), Time: timestamp, GasLimit: 30000000, BaseFee: big.NewInt(1)})
+		if timestamp < activation {
+			if pool.Get(tx.Hash()) != nil {
+				t.Fatal("reorg retained canonical Frame before activation")
+			}
+			if err := pool.AddRemote(tx); err == nil {
+				t.Fatal("canonical Frame admitted before activation")
+			}
+		} else if pool.Get(tx.Hash()) == nil {
+			if err := pool.AddRemote(tx); err != nil {
+				t.Fatalf("canonical Frame rejected at timestamp %d: %v", timestamp, err)
+			}
+		}
+		if db.GetRoot() != root || db.GetNonce(frame.Sender) != 0 {
+			t.Fatal("canonical admission/revalidation changed live state")
+		}
+	}
+}
+
 // A timestamp does not activate post-merge VM rules before the London block.
 // Public-prefix simulation must use the same head height as block execution.
 func TestCanonicalFramePrefixUsesHeadBlockPrerequisites(t *testing.T) {

@@ -1,0 +1,17 @@
+{
+  "base": "5fedb7e5733fbef69767a711115ef9925e7bd769",
+  "pre_fix": {
+    "trailing_block_bytes_accepted": true,
+    "declared_string_length_addition_panicked": true,
+    "overflowing_list_length_accepted": true,
+    "test_payload_bytes": 9
+  },
+  "post_fix": {
+    "negative_regressions_passed": true,
+    "full_rlp_and_core_types_race_passed": true,
+    "full_go_suite_exit_code": 0,
+    "native_and_wrapper_build_passed": true
+  },
+  "reference": "https://ethereum.org/developers/docs/data-structures-and-encoding/rlp/",
+  "pins_or_fork_activation_changed": false
+}

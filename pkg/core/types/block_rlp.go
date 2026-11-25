@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/eth2030/eth2030/rlp"
 )
@@ -207,5 +208,8 @@ func DecodeBlockRLP(data []byte) (*Block, error) {
 		return nil, fmt.Errorf("closing block list: %w", err)
 	}
 
+	if _, _, err := s.Kind(); err != io.EOF {
+		return nil, fmt.Errorf("trailing data after block RLP")
+	}
 	return block, nil
 }

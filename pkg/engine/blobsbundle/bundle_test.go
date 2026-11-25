@@ -19,7 +19,7 @@ func testCommitment() []byte { return make([]byte, KZGCommitmentSize) }
 func testProof() []byte { return make([]byte, KZGProofSize) }
 
 func TestNewBlobsBundleBuilder_Empty(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	if b.Count() != 0 {
 		t.Errorf("Count = %d, want 0", b.Count())
 	}
@@ -30,7 +30,7 @@ func TestNewBlobsBundleBuilder_Empty(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_AddBlob(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 
 	if err := b.AddBlob(testBlob(), testCommitment(), testProof()); err != nil {
 		t.Fatalf("AddBlob: %v", err)
@@ -50,7 +50,7 @@ func TestBlobsBundleBuilder_AddBlob(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_InvalidBlobSize(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	err := b.AddBlob(make([]byte, 100), testCommitment(), testProof())
 	if !errors.Is(err, ErrBlobInvalidSize) {
 		t.Errorf("expected ErrBlobInvalidSize, got %v", err)
@@ -58,7 +58,7 @@ func TestBlobsBundleBuilder_InvalidBlobSize(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_InvalidCommitmentSize(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	err := b.AddBlob(testBlob(), make([]byte, 10), testProof())
 	if !errors.Is(err, ErrCommitmentInvalidSize) {
 		t.Errorf("expected ErrCommitmentInvalidSize, got %v", err)
@@ -66,7 +66,7 @@ func TestBlobsBundleBuilder_InvalidCommitmentSize(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_InvalidProofSize(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	err := b.AddBlob(testBlob(), testCommitment(), make([]byte, 10))
 	if !errors.Is(err, ErrProofInvalidSize) {
 		t.Errorf("expected ErrProofInvalidSize, got %v", err)
@@ -74,7 +74,7 @@ func TestBlobsBundleBuilder_InvalidProofSize(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_TooManyBlobs(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	for i := range MaxBlobsPerBundle {
 		if err := b.AddBlob(testBlob(), testCommitment(), testProof()); err != nil {
 			t.Fatalf("AddBlob %d: %v", i, err)
@@ -87,7 +87,7 @@ func TestBlobsBundleBuilder_TooManyBlobs(t *testing.T) {
 }
 
 func TestBlobsBundleBuilder_Reset(t *testing.T) {
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	if err := b.AddBlob(testBlob(), testCommitment(), testProof()); err != nil {
 		t.Fatalf("AddBlob: %v", err)
 	}
@@ -106,7 +106,7 @@ func TestBlobsBundleBuilder_IsolatedCopy(t *testing.T) {
 	blob := testBlob()
 	comm := testCommitment()
 	proof := testProof()
-	b := NewBlobsBundleBuilder(nil)
+	b := NewBlobsBundleBuilder(&mockKZGVerifier{})
 	if err := b.AddBlob(blob, comm, proof); err != nil {
 		t.Fatalf("AddBlob: %v", err)
 	}
@@ -372,5 +372,15 @@ func TestBlobsBundleBuilder_WithVerifier_OK(t *testing.T) {
 	}
 	if b.Count() != 1 {
 		t.Errorf("Count = %d, want 1", b.Count())
+	}
+}
+
+func TestBlobsBundleMissingVerifierFailsClosed(t *testing.T) {
+	b := NewBlobsBundleBuilder(nil)
+	if err := b.AddBlob(testBlob(), testCommitment(), testProof()); !errors.Is(err, ErrVerifierUnavailable) {
+		t.Fatalf("missing verifier: %v", err)
+	}
+	if b.Count() != 0 {
+		t.Fatal("unverified blob retained")
 	}
 }

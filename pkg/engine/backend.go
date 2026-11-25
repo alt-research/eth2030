@@ -1257,7 +1257,11 @@ func (b *EngineBackend) processRequestPayload(
 	if ilsLen > 0 {
 		ils := b.ilsAsFocil()
 		gasRemaining := blk.GasLimit() - blk.GasUsed()
-		if result := focilCheckILSatisfaction(blk, ils, gasRemaining); !result {
+		ilResult := focil.CheckILSatisfaction(blk, ils, nil, gasRemaining)
+		if ilResult == focil.ILValidationUnavailable {
+			return PayloadStatusV1{}, fmt.Errorf("IL validation unavailable: post-state/prefix validator not integrated")
+		}
+		if ilResult == focil.ILUnsatisfied {
 			errMsg := focil.InclusionListUnsatisfied
 			backendLog.Warn("payload_il_unsatisfied",
 				"event", "payload_il_unsatisfied",
@@ -1696,11 +1700,6 @@ func (b *EngineBackend) ilsAsFocil() []*focil.InclusionList {
 // processor can slash paymasters on bad settlement (AA EIP-7701).
 func (b *EngineBackend) SetSlasher(s coreconfig.PaymasterSlasher) {
 	b.processor.SetSlasher(s)
-}
-
-// focilCheckILSatisfaction wraps focil.CheckILSatisfaction for use in engine_newPayload.
-func focilCheckILSatisfaction(block *types.Block, ils []*focil.InclusionList, gasRemaining uint64) bool {
-	return focil.CheckILSatisfaction(block, ils, nil, gasRemaining) == focil.ILSatisfied
 }
 
 // --- Actor-based accessor methods (Phase 6 of engine-channel-refactor) ---

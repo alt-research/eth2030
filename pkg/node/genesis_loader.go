@@ -29,6 +29,9 @@ type genesisJSON struct {
 
 // chainConfigJSON is the JSON-decodable form of coreconfig.ChainConfig.
 type chainConfigJSON struct {
+	GlamsterdamTime          *uint64     `json:"glamsterdamTime"`
+	HegotaTime               *uint64     `json:"hegotaTime"`
+	ExperimentalLegacyFrames bool        `json:"experimentalLegacyFrames"`
 	DepositContractAddress   addressJSON `json:"depositContractAddress"`
 	RequireRequestPredeploys bool        `json:"requireRequestPredeploys"`
 
@@ -273,14 +276,15 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 	chainCfg.DepositContractAddress = gj.Config.DepositContractAddress.Address
 	chainCfg.RequireRequestPredeploys = gj.Config.RequireRequestPredeploys
 	chainCfg.AmsterdamTime = gj.Config.AmsterdamTime
-	chainCfg.GlamsterdanTime = gj.Config.GlamsterdanTime
-	chainCfg.HogotaTime = gj.Config.HogotaTime
-	if gj.Config.BogotaTime != nil {
-		if chainCfg.HogotaTime != nil && *chainCfg.HogotaTime != *gj.Config.BogotaTime {
-			return nil, fmt.Errorf("conflicting bogotaTime and hogotaTime in genesis")
-		}
-		chainCfg.HogotaTime = gj.Config.BogotaTime
+	chainCfg.GlamsterdanTime, err = resolveForkAliases("glamsterdam", gj.Config.GlamsterdamTime, gj.Config.GlamsterdanTime)
+	if err != nil {
+		return nil, err
 	}
+	chainCfg.HogotaTime, err = resolveForkAliases("bogota", gj.Config.BogotaTime, gj.Config.HegotaTime, gj.Config.HogotaTime)
+	if err != nil {
+		return nil, err
+	}
+	chainCfg.ExperimentalLegacyFrames = gj.Config.ExperimentalLegacyFrames
 	chainCfg.SSZBlockTime = gj.Config.SSZBlockTime
 	chainCfg.IPlusTime = gj.Config.IPlusTime
 	chainCfg.OsakaTime = gj.Config.OsakaTime
@@ -395,4 +399,20 @@ func applyForkOverrides(c *coreconfig.ChainConfig, cfg *Config) {
 	if cfg.IPlusOverride != nil {
 		c.IPlusTime = cfg.IPlusOverride
 	}
+}
+
+// resolveForkAliases preserves old genesis files but rejects ambiguous schedules.
+func resolveForkAliases(name string, times ...*uint64) (*uint64, error) {
+	var selected *uint64
+	for _, value := range times {
+		if value == nil {
+			continue
+		}
+		if selected != nil && *selected != *value {
+			return nil, fmt.Errorf("conflicting %s fork timestamps", name)
+		}
+		v := *value
+		selected = &v
+	}
+	return selected, nil
 }

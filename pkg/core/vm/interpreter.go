@@ -263,6 +263,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 type ForkRules struct {
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
 	IsGlamsterdan    bool
+	IsLegacyFrames   bool
 	IsAmsterdam      bool
 	IsPrague         bool
 	IsOsaka          bool
@@ -321,6 +322,14 @@ func selectPrecompileBase(rules ForkRules) map[types.Address]PrecompiledContract
 
 // SelectJumpTable returns the correct jump table for the given fork rules.
 func SelectJumpTable(rules ForkRules) JumpTable {
+	table := selectBaseJumpTable(rules)
+	if rules.IsLegacyFrames {
+		table = enableLegacyFrameOpcodes(table)
+	}
+	return table
+}
+
+func selectBaseJumpTable(rules ForkRules) JumpTable {
 	switch {
 	case rules.IsIPlus:
 		return NewIPlusJumpTable()

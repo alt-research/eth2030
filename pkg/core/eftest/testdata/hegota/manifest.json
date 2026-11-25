@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "expected_cases": 12,
+  "fixtures": [
+    {
+      "path": "legacy-add11.json",
+      "sha256": "e0f32e963df1628eef26bf09431a33ee04469089be147679a2385306a02a02c8",
+      "cases": 7,
+      "source": "https://github.com/ethereum/legacytests/blob/1f581b8ccdc4c63acf5f2c5c1b155c690c32a8eb/Constantinople/GeneralStateTests/stExample/add11.json"
+    },
+    {
+      "path": "cancun-add11.json",
+      "sha256": "e816b52be1ff06ea50a634ee8d598416cabc739eb67f691df6167665de1482fe",
+      "cases": 5,
+      "source": "https://github.com/ethereum/legacytests/blob/1f581b8ccdc4c63acf5f2c5c1b155c690c32a8eb/Cancun/GeneralStateTests/stExample/add11.json"
+    }
+  ]
+}

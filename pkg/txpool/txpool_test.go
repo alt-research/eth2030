@@ -1,6 +1,7 @@
 package txpool
 
 import (
+	coreconfig "github.com/eth2030/eth2030/core/config"
 	"math/big"
 	"testing"
 
@@ -474,7 +475,9 @@ func TestValidateTx_AATxUsesEmbeddedSenderForBalanceCheck(t *testing.T) {
 	sender := types.BytesToAddress([]byte{0xaa})
 	state.balances[sender] = new(big.Int).Mul(big.NewInt(1e18), big.NewInt(10))
 
-	pool := New(DefaultConfig(), state)
+	cfg := DefaultConfig()
+	cfg.AllowAATx = true
+	pool := New(cfg, state)
 
 	tx := types.NewTransaction(&types.AATx{
 		ChainID:              big.NewInt(1),
@@ -496,7 +499,9 @@ func TestValidateTx_AATxIntrinsicGasIgnoresSenderExecutionData(t *testing.T) {
 	sender := types.BytesToAddress([]byte{0xbb})
 	state.balances[sender] = new(big.Int).Mul(big.NewInt(1e18), big.NewInt(10))
 
-	pool := New(DefaultConfig(), state)
+	cfg := DefaultConfig()
+	cfg.AllowAATx = true
+	pool := New(cfg, state)
 
 	tx := types.NewTransaction(&types.AATx{
 		ChainID:              big.NewInt(1),
@@ -1594,7 +1599,11 @@ func TestTxPool_FrameTx_VerifyStructuralValidation(t *testing.T) {
 	sender := types.HexToAddress("0x1111111111111111111111111111111111111111")
 	state.balances[sender] = new(big.Int).Set(richBalance)
 	state.nonces[sender] = 0
-	pool := New(DefaultConfig(), state)
+	cfg := DefaultConfig()
+	legacy := *coreconfig.TestConfigHogota
+	legacy.ExperimentalLegacyFrames = true
+	pool := New(cfg, state)
+	pool.SetForkRules(&legacy, 0)
 
 	// A FrameTx with only VERIFY frames should pass structural validation.
 	verifyOnlyFrames := []types.Frame{

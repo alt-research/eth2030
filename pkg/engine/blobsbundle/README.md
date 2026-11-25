@@ -43,7 +43,8 @@ gossip, each carrying a binary Merkle inclusion proof built by
 ## Usage
 
 ```go
-builder := blobsbundle.NewBlobsBundleBuilder(nil)
+// Supply an implementation that verifies both KZG commitment and proof.
+builder := blobsbundle.NewBlobsBundleBuilder(verifier)
 builder.AddBlob(blobData, commitment, proof)
 bundle, _ := builder.Build()
 

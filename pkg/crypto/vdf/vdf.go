@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"math"
+	"math/big"
 	"time"
 
 	harmonyvdf "github.com/harmony-one/vdf/src/vdf_go"
@@ -46,7 +47,24 @@ func Evaluate(input []byte, iterations uint64) (*VDFv2Result, error) {
 	}
 	seed := vdfSeed(input)
 	start := time.Now()
-	output, proof := harmonyvdf.GenerateVDF(seed[:], int(iterations), discriminantBits)
+	var output, proof []byte
+	if iterations < 3 {
+		// Harmony's parameter estimator takes log(log(T*ln(2)/2)), which is
+		// undefined for T=1,2. The exact Wesolowski quotient is zero here:
+		// 2^T < the 128-bit challenge prime, so the proof is the group identity.
+		d := harmonyvdf.CreateDiscriminant(seed[:], discriminantBits)
+		y := harmonyvdf.NewClassGroupFromAbDiscriminant(big.NewInt(2), big.NewInt(1), d)
+		for i := uint64(0); i < iterations; i++ {
+			y = y.Pow(2)
+			if y == nil {
+				return nil, errVDFEvaluation
+			}
+		}
+		output = y.Serialize()
+		proof = harmonyvdf.IdentityForDiscriminant(d).Serialize()
+	} else {
+		output, proof = harmonyvdf.GenerateVDF(seed[:], int(iterations), discriminantBits)
+	}
 	if len(output) != formSize || len(proof) != formSize {
 		return nil, errVDFEvaluation
 	}

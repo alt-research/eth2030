@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-25",
+  "timezone": "Asia/Shanghai",
+  "source_base_commit": "98d4317784b755ab75eefbec1ae7d8dca813ae96",
+  "branch_baseline": "dca42829c9bc059244d10efc0a835b220944a6aa",
+  "source_fingerprint_sha256": "4b04533d08ffa6d7c63e7fd7756bed78a02d2d90cf89d121a9a6a2b22a84c30e",
+  "host": {
+    "os": "Darwin",
+    "architecture": "arm64",
+    "go": "go version go1.26.8 darwin/arm64"
+  },
+  "build": {
+    "command": "cd pkg && env -u GOROOT GOFLAGS=-p=4 go build ./...",
+    "exit_code": 0
+  },
+  "vet": {
+    "command": "cd pkg && env -u GOROOT GOFLAGS=-p=4 go vet ./...",
+    "exit_code": 0
+  },
+  "full_suite": {
+    "command": "go test -json ./... -timeout=15m -count=1",
+    "log_sha256": "774a38a26b3851e4aa2b7b93b408afb141d8158a513c1ea0a853877c51a49736",
+    "named_test_or_subtest_events": {
+      "pass": 23520,
+      "fail": 0,
+      "skip": 124
+    },
+    "package_events": {
+      "pass": 221,
+      "fail": 0,
+      "skip": 19
+    },
+    "completed_packages": 240,
+    "started_packages": 240,
+    "exit_code": 0
+  },
+  "race_suite": {
+    "command": "go test -race -json ./core/config ./txpool ./node/... ./eiptest/... ./engine/... ./crypto/pqc -count=1 -timeout=15m",
+    "log_sha256": "bc7e5eb1832f371ab96c7cd28edc17271cbed26ee7d42e82d8aba62583b6bb73",
+    "named_test_or_subtest_events": {
+      "pass": 2615,
+      "fail": 0,
+      "skip": 6
+    },
+    "package_events": {
+      "pass": 24,
+      "fail": 0,
+      "skip": 3
+    },
+    "completed_packages": 27,
+    "started_packages": 27,
+    "exit_code": 0
+  },
+  "baseline": {
+    "reference_backend": "upstream/go-ethereum@v1.17.10/tests.StateTest.RunNoVerify",
+    "expected": 12,
+    "executed": 12,
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+  },
+  "python_checks": {
+    "source_admission": "72 proposals; 108 locked source files; 99 local normative hashes",
+    "checker_regressions": 12,
+    "codec_goldens": 7,
+    "arithmetic_oracles": 2,
+    "domain_oracles": 1,
+    "unexecuted_latest_spec_seeds": 9
+  },
+  "duplication_review": {
+    "report": "docs/reviews/pr-167/DUPLICATION_REVIEW.md",
+    "task_ids_accounted_for": 77,
+    "initial_diff_files_reviewed": 117,
+    "eip8141_implementation_pin": "dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f",
+    "eip8141_research_pin": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+    "eip8141_byte_identical": true,
+    "eip8141_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+    "changes": [
+      "single pool fork context; existing setters and full-header reset reused",
+      "test-only production reset API removed",
+      "master compatibility algorithm reused; explicit legacy compatibility guard retained",
+      "unused two-state IL wrapper removed; legacy PQ digest fixture moved to test-only code",
+      "plan rebaselined on current implementations with all 77 task IDs inventoried"
+    ],
+    "gas_source_comparison": [
+      {
+        "eip": 8037,
+        "byte_identical": true,
+        "sha256": "37abe522c5dee68a47a27db6f7b88a71da5b66c8a72ebc601c467940b577b715"
+      },
+      {
+        "eip": 8038,
+        "byte_identical": true,
+        "sha256": "ad09e7c9a7c78855b00e793109056e6d30022bf4bbf0e237e757226de0e544e2"
+      }
+    ]
+  },
+  "previous_qualification": {
+    "revision": "dca42829c9bc059244d10efc0a835b220944a6aa",
+    "verification": "https://github.com/alt-research/eth2030/blob/dca42829c9bc059244d10efc0a835b220944a6aa/evidence/hegota-a/verification.json",
+    "verification_bytes_sha256": "45e78adc4e51e1cc30889c7a831d810b2e63ed7fa1a61fa09ebbc9af39603544",
+    "hosted_result": "all 15 checks passed on that revision; not reused as new-head CI",
+    "hosted_runs": [
+      45608887882,
+      45608887908,
+      45608887912
+    ]
+  },
+  "not_claimed": [
+    "All 77 tasks completed or full composed Hegota conformance",
+    "Independent-client Frame/FOCIL acceptance from code presence",
+    "Container/RC or long-duration acceptance from host tests",
+    "Fresh blst/integration/goethkzg or real proof results from the local focused rerun; new-head results are tracked on PR #167"
+  ],
+  "artifacts": {
+    "specs/hegota/admission.json": "5882fd8a0eadce618522fc96182f7defbc0085de2e9eeff29fcea97c4c37e453",
+    "specs/hegota/bls-vector.json": "e4852c48a48877453b976fb64ec69442d9a49e6046f6ba8504da506d3b782d89",
+    "specs/hegota/codec-goldens.json": "74c6c5122a8909a6fa7e5e0f4153feb8e3de19dff9af79fd3d4022153e872b52",
+    "specs/hegota/conformance.json": "2c7218230d6cf7648a7034f5be6622d171f8669242139fd029f24732855fbbe5",
+    "specs/hegota/frame-schema.json": "7727c65dd6109042b1b3b7bf1e8524a6ad3e6efac0cdfedd50792b23f7805427",
+    "specs/hegota/profiles.json": "4f5a1deff64c0d5b6b969c82ea0d9f75b6b6f8138a9c0324872eda49b81b8439",
+    "specs/hegota/proposals/eip-8334.md": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+    "specs/hegota/proposals/eip-8341.md": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+    "specs/hegota/proposals/eip-8359.md": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+    "specs/hegota/proposals/eip-8367.md": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+    "specs/hegota/proposals/eip-8375.md": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+    "specs/hegota/proposals/eip-8483.md": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+    "specs/hegota/proposals/eip-8504.md": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+    "specs/hegota/semantic-goldens.json": "4e185549337a1e9abd3bdea4ea6e931949eb95d6e650709c425bdc1ebfc6a22d",
+    "specs/hegota/source-lock.json": "ec09fa6205bb8e267fa25e7d4aae4a7071fb0325fb43d241718dc2196650fc82",
+    "specs/hegota/tasks.json": "a4a912f817c67ed2e620b81fb97b871b0e5448d5e6009facce113fe2c81c96ee"
+  }
+}

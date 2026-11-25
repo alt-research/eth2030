@@ -18,6 +18,8 @@ const (
 	ILSatisfied ILSatisfactionResult = iota
 	// ILUnsatisfied means a valid IL tx was absent and gas was available.
 	ILUnsatisfied
+	// ILValidationUnavailable is neither execution invalidity nor proven satisfaction.
+	ILValidationUnavailable
 )
 
 // PostStateReader provides account state needed for IL satisfaction checks.
@@ -26,43 +28,27 @@ type PostStateReader interface {
 	GetBalance(addr [20]byte) uint64
 }
 
-// FrameVerifier provides code-existence checks for EIP-8141 frame transaction
-// VERIFY targets. If nil, frame tx VERIFY validation is skipped (all frame txs
-// are treated as EOA-equivalent for IL purposes).
+// FrameVerifier is the legacy code-size interface, retained for source compatibility.
+// Code size alone cannot establish validation-prefix eligibility.
 type FrameVerifier interface {
 	// GetCodeSize returns the byte length of contract code at addr.
 	// Returns 0 for EOAs and non-existent accounts.
 	GetCodeSize(addr types.Address) int
 }
 
-// CheckILSatisfaction implements the EIP-7805 §satisfaction algorithm with
-// EIP-8141 frame transaction awareness:
-//
-// For each tx T in ILs:
-//  1. If T is in block → skip (satisfied).
-//  2. If gasRemaining < T.gasLimit → skip (gas exemption).
-//  3. Validate T's state validity against postState:
-//     a. For EOA txs: check nonce and balance.
-//     b. For frame txs (type 0x06): check nonce, skip balance check (payer
-//     determined at APPROVE time), and verify VERIFY target(s) have code.
-//     If state-invalid → exempt. If valid but T absent → ILUnsatisfied.
-//
-// The frame tx balance check is intentionally skipped because EIP-8141 defers
-// fee collection to the APPROVE opcode, which may designate a payer different
-// from the sender. The sender may have zero balance and the tx is still valid
-// if the payer (determined during VERIFY frame execution) has sufficient funds.
-//
-// The VERIFY code-existence check catches the most common invalidation vector:
-// a frame tx whose VERIFY target has no code cannot call APPROVE, making the
-// tx consensus-invalid. Without this check, the builder would be penalized for
-// not including an unincludable transaction.
+// CheckILSatisfaction handles presence/gas exemptions and known post-state checks.
+// Missing validation context is ILValidationUnavailable, never a proven verdict.
+// This helper is not the complete selected Bogotá/AA-VOPS execution algorithm.
 func CheckILSatisfaction(block *types.Block, ils []*InclusionList, postState PostStateReader, gasRemaining uint64) ILSatisfactionResult {
 	return CheckILSatisfactionWithVerifier(block, ils, postState, nil, gasRemaining)
 }
 
-// CheckILSatisfactionWithVerifier extends CheckILSatisfaction with an optional
-// FrameVerifier for EIP-8141 frame transaction VERIFY target validation.
+// CheckILSatisfactionWithVerifier retains the legacy signature. The code-size
+// verifier cannot authenticate Frames; absent Frames return unavailable.
 func CheckILSatisfactionWithVerifier(block *types.Block, ils []*InclusionList, postState PostStateReader, verifier FrameVerifier, gasRemaining uint64) ILSatisfactionResult {
+	if block == nil {
+		return ILValidationUnavailable
+	}
 	// Build set of tx hashes in the block.
 	blockTxHashes := make(map[types.Hash]bool, len(block.Transactions()))
 	for _, tx := range block.Transactions() {
@@ -70,6 +56,9 @@ func CheckILSatisfactionWithVerifier(block *types.Block, ils []*InclusionList, p
 	}
 
 	for _, il := range ils {
+		if il == nil {
+			return ILValidationUnavailable
+		}
 		for _, entry := range il.Entries {
 			tx, err := types.DecodeTxRLP(entry.Transaction)
 			if err != nil {
@@ -84,21 +73,24 @@ func CheckILSatisfactionWithVerifier(block *types.Block, ils []*InclusionList, p
 			if gasRemaining < tx.Gas() {
 				continue
 			}
+			// Code existence cannot establish Frame validation-prefix eligibility.
+			// Until HGT-046 supplies the selected execution model, do not guess.
+			if postState == nil || tx.Type() == types.FrameTxType {
+				return ILValidationUnavailable
+			}
 			// Rule 3: validate state for includability.
 			if postState != nil {
 				// Resolve sender: frame txs embed the sender directly,
 				// while EOA txs recover it from the ECDSA signature.
 				var from types.Address
-				if tx.Type() == types.FrameTxType {
-					from = tx.FrameSender()
-				} else if senderPtr := tx.Sender(); senderPtr != nil {
+				if senderPtr := tx.Sender(); senderPtr != nil {
 					from = *senderPtr
 				} else {
 					// Can't determine sender → can't prove tx is invalid.
 					// Per EIP-7805: ILs can contain any tx, and we can only
 					// exempt txs we can prove are state-invalid. Without a
-					// sender, skip state checks and fall through to unsatisfied.
-					return ILUnsatisfied
+					// sender, return an unavailable result rather than a consensus verdict.
+					return ILValidationUnavailable
 				}
 				fromKey := [20]byte(from)
 
@@ -107,26 +99,20 @@ func CheckILSatisfactionWithVerifier(block *types.Block, ils []*InclusionList, p
 					continue // invalid nonce → exempt
 				}
 
-				if tx.Type() == types.FrameTxType {
-					// EIP-8141 frame tx: skip balance check (payer is
-					// determined at APPROVE time, may differ from sender).
-					// Instead, verify VERIFY target(s) have code.
-					if verifier != nil && !frameTxVerifyTargetsHaveCode(tx, verifier) {
-						continue // VERIFY target has no code → can't APPROVE → exempt
-					}
-				} else {
-					// EOA tx: standard balance check.
-					gasPrice := tx.GasPrice()
-					if gasPrice == nil {
-						gasPrice = new(big.Int)
-					}
-					cost := new(big.Int).Mul(new(big.Int).SetUint64(tx.Gas()), gasPrice)
-					if v := tx.Value(); v != nil {
-						cost.Add(cost, v)
-					}
-					if cost.IsUint64() && postState.GetBalance(fromKey) < cost.Uint64() {
-						continue // insufficient balance → exempt
-					}
+				// EOA tx: standard balance check.
+				gasPrice := tx.GasPrice()
+				if gasPrice == nil {
+					gasPrice = new(big.Int)
+				}
+				cost := new(big.Int).Mul(new(big.Int).SetUint64(tx.Gas()), gasPrice)
+				if v := tx.Value(); v != nil {
+					cost.Add(cost, v)
+				}
+				if !cost.IsUint64() {
+					return ILValidationUnavailable
+				}
+				if postState.GetBalance(fromKey) < cost.Uint64() {
+					continue // insufficient balance → exempt
 				}
 			}
 			// Valid tx absent from block → unsatisfied.
@@ -134,29 +120,4 @@ func CheckILSatisfactionWithVerifier(block *types.Block, ils []*InclusionList, p
 		}
 	}
 	return ILSatisfied
-}
-
-// frameTxVerifyTargetsHaveCode checks that all VERIFY frame targets in a frame
-// transaction have deployed code. A VERIFY frame whose target has no code
-// cannot call APPROVE (the opcode requires contract execution), making the
-// entire frame transaction consensus-invalid per EIP-8141.
-func frameTxVerifyTargetsHaveCode(tx *types.Transaction, verifier FrameVerifier) bool {
-	frames := tx.Frames()
-	if len(frames) == 0 {
-		return true // not a frame tx or no frames
-	}
-	sender := tx.FrameSender()
-	for _, f := range frames {
-		if f.Mode != types.ModeVerify {
-			continue
-		}
-		target := sender
-		if f.Target != nil {
-			target = *f.Target
-		}
-		if verifier.GetCodeSize(target) == 0 {
-			return false // VERIFY target is EOA → APPROVE impossible
-		}
-	}
-	return true
 }

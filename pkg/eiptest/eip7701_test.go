@@ -6,6 +6,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/eiptest"
+	"github.com/eth2030/eth2030/txpool"
 )
 
 // TestEIP7701_AATransaction verifies EIP-7701 native AA: a type-0x05 tx
@@ -13,7 +14,9 @@ import (
 // post-execution nonce increment is applied exactly once (the historical
 // replay-parity bug surface).
 func TestEIP7701_AATransaction(t *testing.T) {
-	s := eiptest.New(t)
+	poolCfg := txpool.DefaultConfig()
+	poolCfg.AllowAATx = true
+	s := eiptest.New(t, eiptest.WithPoolConfig(poolCfg))
 	aa := s.Account(10)
 	// The scratch AA account is not genesis-funded by default; fund it via a
 	// transfer from Alice before submitting AA transactions.

@@ -141,6 +141,17 @@ func TestFileDBLegacyAliasesDoNotResurrectAfterDelete(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	lower, err := os.Stat(filepath.Join(dir, "data", "ab"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	upper, err := os.Stat(filepath.Join(dir, "data", "AB"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if os.SameFile(lower, upper) {
+		t.Skip("legacy hex alias fixture requires a case-sensitive filesystem")
+	}
 	db, err := NewFileDB(dir)
 	if err != nil {
 		t.Fatal(err)

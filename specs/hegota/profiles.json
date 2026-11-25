@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "date": "2026-11-25",
+  "profiles": [
+    {
+      "id": "native-history-v1",
+      "activation": "test-only; explicit fixture fork",
+      "status": "verified_minimal_corpus",
+      "eips": [],
+      "oracle": "upstream geth v1.17.1 and pinned legacytests",
+      "excludes": "Prague/Glamsterdam/Hegota conformance, receipts/BAL roots, CL/network"
+    },
+    {
+      "id": "legacy-frame-prototype-v0",
+      "activation": "ExperimentalLegacyFrames AND merge AND London(headNumber) AND HogotaTime<=headTime",
+      "status": "explicit_experimental_only",
+      "eips": [],
+      "oracle": "historical local model only",
+      "excludes": "current 8141 or canonical network activation"
+    },
+    {
+      "id": "8141-base-research-v1",
+      "activation": "disabled on canonical nodes",
+      "status": "research_schema_and_golden_only",
+      "eips": [
+        8141
+      ],
+      "oracle": "pinned EIP; Python RLP/Keccak cross-checked with upstream Go",
+      "excludes": "8250/8272/8369/8504 composition; native conformance"
+    },
+    {
+      "id": "bogota-devnet-2-descriptor",
+      "activation": "GLOAS epoch0; HEZE maxuint64",
+      "status": "source_pinned_not_run",
+      "eips": [],
+      "oracle": "pinned descriptor",
+      "excludes": "mutable image digest, current Heze and combined Frames interoperability"
+    },
+    {
+      "id": "heze-devnet-2-descriptor",
+      "activation": "HEZE epoch5",
+      "status": "source_pinned_not_run",
+      "eips": [
+        7805
+      ],
+      "oracle": "pinned descriptor/lighthouse source",
+      "excludes": "current master parameter parity, image digest and combined Frames interoperability"
+    },
+    {
+      "id": "hegota-release",
+      "activation": "none",
+      "status": "blocked_by_spec_and_implementation",
+      "eips": [
+        7805,
+        8141,
+        8015
+      ],
+      "oracle": "not selected until decisions and prerequisite conformance close",
+      "excludes": "no public release or official devnet claim"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D01",
+      "problem": "8141、8250 的费用与 envelope 组合；8272 的 canonical frame 如何组合",
+      "owner": "规范/EL；编码、哈希、RPC、gas",
+      "status": "open_for_combined_release",
+      "closure": "同一版本的组合 schema 与有效/无效向量固定",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-002",
+        "HGT-007",
+        "HGT-011",
+        "HGT-017",
+        "HGT-022"
+      ]
+    },
+    {
+      "id": "D02",
+      "problem": "signature list / proof frame / witness 与未来 8288 的接口",
+      "owner": "规范/PQ；types、P2P、区块承诺",
+      "status": "open_for_combined_release",
+      "closure": "PR/规范冻结到可实现程度；未采用的变体不混入主路径",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-019",
+        "HGT-030",
+        "HGT-031",
+        "HGT-032"
+      ]
+    },
+    {
+      "id": "D03",
+      "problem": "FOCIL 是否保留 Hegotá；采用哪个 devnet 组合",
+      "owner": "版本/CL；联合 devnet 与发布范围",
+      "status": "open_for_combined_release",
+      "closure": "记录有效 ACD 决定；没有新决定时保留既有 SFI 基线",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-040",
+        "HGT-045",
+        "HGT-047",
+        "HGT-070"
+      ]
+    },
+    {
+      "id": "D04",
+      "problem": "8369 的 claimed-index、预算、状态面与 ePBS post-reveal 职责",
+      "owner": "规范/CL/EL；Profile 2",
+      "status": "open_for_combined_release",
+      "closure": "Standards Track 执行性规则、传输承诺和向量齐全",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-007",
+        "HGT-044",
+        "HGT-046"
+      ]
+    },
+    {
+      "id": "D05",
+      "problem": "8298 code adoption 生效时机及 8151 兼容性",
+      "owner": "VM/生态；旧授权与 fault proof",
+      "status": "open_for_combined_release",
+      "closure": "固定语义、实际应用回放、风险与准入结论",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-021",
+        "HGT-035",
+        "HGT-036"
+      ]
+    },
+    {
+      "id": "D06",
+      "problem": "7906 回滚执行体与 paymaster 补偿",
+      "owner": "VM/txpool；交易断言",
+      "status": "open_for_combined_release",
+      "closure": "补偿/费用/nonce/日志回滚边界有规范和测试",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-012",
+        "HGT-037"
+      ]
+    },
+    {
+      "id": "D07",
+      "problem": "4758 与 8360 是否成对纳入",
+      "owner": "版本/VM；临时合约兼容",
+      "status": "open_for_combined_release",
+      "closure": "正式范围与迁移路径一致；不只实现其中一半并宣称配套完整",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-052"
+      ]
+    },
+    {
+      "id": "D08",
+      "problem": "8368/8372 的 CPSB 与归一化参数",
+      "owner": "规范/性能；状态增长与费用",
+      "status": "open_for_combined_release",
+      "closure": "上游数据与选择明确；不在客户端内自行定参数",
+      "date": "2026-11-25",
+      "adopted_profile": "base-only or excluded until closure",
+      "affected_tasks": [
+        "HGT-061"
+      ]
+    },
+    {
+      "id": "D09",
+      "problem": "EIP-8141 chain_id <2**256 and nonce <2**64-1 differ from locked EELS U64/U256 dataclass",
+      "owner": "specification/EL/test",
+      "status": "open",
+      "closure": "pin converged source and independent width boundary vectors before selecting the release oracle",
+      "date": "2026-11-25",
+      "affected_tasks": [
+        "HGT-001",
+        "HGT-002",
+        "HGT-007",
+        "HGT-081"
+      ]
+    }
+  ]
+}

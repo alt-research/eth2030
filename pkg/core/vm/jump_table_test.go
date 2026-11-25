@@ -350,24 +350,24 @@ func TestGlamsterdanNewOpcodes(t *testing.T) {
 	}
 }
 
-func TestGlamsterdanFrameTxOpcodes(t *testing.T) {
-	tbl := NewGlamsterdanJumpTable()
+func TestLegacyFrameTxOpcodes(t *testing.T) {
+	tbl := NewLegacyFrameJumpTable()
 
 	// EIP-8141 frame transaction opcodes.
 	if tbl[APPROVE] == nil {
-		t.Fatal("Glamsterdan should define APPROVE")
+		t.Fatal("legacy profile should define APPROVE")
 	}
 	if !tbl[APPROVE].halts {
 		t.Error("APPROVE should halt")
 	}
 	if tbl[TXPARAMLOAD] == nil {
-		t.Fatal("Glamsterdan should define TXPARAMLOAD")
+		t.Fatal("legacy profile should define TXPARAMLOAD")
 	}
 	if tbl[TXPARAMSIZE] == nil {
-		t.Fatal("Glamsterdan should define TXPARAMSIZE")
+		t.Fatal("legacy profile should define TXPARAMSIZE")
 	}
 	if tbl[TXPARAMCOPY] == nil {
-		t.Fatal("Glamsterdan should define TXPARAMCOPY")
+		t.Fatal("legacy profile should define TXPARAMCOPY")
 	}
 }
 

@@ -185,6 +185,50 @@ Earlier checklists are retained dated observations. Current completion is reconc
 
 # Lean4 Verification Check-list
 
+## PR #167 master integration and CI (2026-11-25)
+
+- [x] Record the merge base, upstream divergence and each conflict resolution.
+- [x] Integrate current master without restoring retired interfaces or losing native execution fixes.
+- [x] Reconcile specification locks, runtime evidence, regression tests and CI workflows.
+- [x] Run local build, required checks and regression suites; repair failures.
+- [x] Prepare the verified integration commit and English PR update; track publication and hosted outcomes directly on PR #167.
+
+## Hegotá A follow-up audit and push (2026-11-25)
+
+- [x] Recheck every A acceptance criterion against code, artifacts, source pins and evidence.
+- [x] Audit fork gates, canonical-head/reorg propagation, validation failures and source-update tooling; fix omissions with regression tests.
+- [x] Verify the local build, relevant tests and evidence hashes; update task tracking and audit findings.
+- [x] Commit only follow-up changes, push the authorized branch, and verify the remote commit.
+
+## Hegotá A: specifications, baseline, and runtime paths (2026-11-25)
+
+- [x] HGT-001: Lock EIP/EELS/EEST/CL/Engine/devnet sources, hashes, profiles, compatibility gaps, and decisions.
+- [x] HGT-004: Verify native/wrapper/container/Engine/processor routing with executable evidence.
+- [x] HGT-005: Audit and repair fork configuration, activation gates, historical behavior, and config compatibility; add tests.
+- [x] HGT-006: Audit prerequisites and fixture coverage; provide native/reference differential runner and baseline results.
+- [x] HGT-007: Record composed schemas and semantic ADRs with independent goldens and unresolved rules isolated.
+- [x] HGT-008: Audit and remove production validation bypasses and stub acceptance; add negative tests.
+- [x] HGT-009: Register all 72 EIPs, admission decisions, affected tasks, changes, and activation conditions.
+- [x] Validate all A deliverables, run local builds and appropriate tests, update STATUS.md and the development plan, and commit only task changes.
+
+## Hegotá executable development plan (2026-11-25)
+
+- [x] Expand the macro research into one complete implementation and release plan.
+- [x] Verify actual client entrypoints, integration paths, repository boundaries, and test tooling.
+- [x] Define dependency-ordered work items, deliverables, acceptance criteria, and scope decisions.
+- [x] Account for every reviewed EIP, cross-client validation, operational recovery, and release gates.
+- [x] Validate plan consistency and links, run a local build, and update STATUS.md.
+- [x] Commit only this task's documentation changes.
+
+## Hegotá macro planning and EIP discussion review (2026-11-25)
+
+- [x] Verify current EF priorities, Hegotá Meta EIP, and recent All Core Devs decisions.
+- [x] Read relevant local EIP and consensus specifications; compare pinned references with current upstream.
+- [x] Review each scoped/proposed/declined EIP and its public discussion, recording evidence and limitations.
+- [x] Map the critical path and candidate work to ETH2030 implementation evidence.
+- [x] Write a sourced Chinese macro development plan and EIP review register.
+- [x] Verify document links and counts, run a local Go build, and update STATUS.md.
+- [x] Commit only this task's documentation changes.
 ## Glamsterdam implementation checkpoint (2026-11-18)
 
 - [x] Publish separate branches and reviews for scoped major changes.

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -690,4 +691,28 @@ func TestDefaultSessionConfig(t *testing.T) {
 	if cfg.MaxBlobSize != 128*1024 {
 		t.Errorf("MaxBlobSize = %d, want %d", cfg.MaxBlobSize, 128*1024)
 	}
+}
+
+func TestStreamSessionUniqueIDsWithFrozenClock(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		const count = 256
+		ids := make(chan types.Hash, count)
+		var wg sync.WaitGroup
+		for i := 0; i < count; i++ {
+			wg.Add(1)
+			go func() { defer wg.Done(); ids <- NewStreamSession(0, 1024, 512).ID }()
+		}
+		wg.Wait()
+		close(ids)
+		seen := make(map[types.Hash]bool, count)
+		for id := range ids {
+			if seen[id] {
+				t.Fatal("session ID collision at a single fixed clock tick")
+			}
+			seen[id] = true
+		}
+		if len(seen) != count {
+			t.Fatal("session disappeared")
+		}
+	})
 }

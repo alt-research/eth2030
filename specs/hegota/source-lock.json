@@ -1,0 +1,880 @@
+{
+  "version": 1,
+  "date": "2026-11-25",
+  "timezone": "Asia/Shanghai",
+  "baseline_commit": "8ac0ec4",
+  "purpose": "fixed research composition and local historical baseline; not a compatible release claim",
+  "repositories": [
+    {
+      "repo": "ethereum/execution-specs",
+      "ref": "forks/bogota",
+      "sha": "b7e5b4bda2e1e62004b491dd74f119fe6622f0b3",
+      "date": "2026-11-25T06:57:58Z"
+    },
+    {
+      "repo": "ethereum/execution-spec-tests",
+      "ref": "main",
+      "sha": "10eaa63d5da2f50b63d4359968f36542212f9f50",
+      "date": "2026-07-02T11:20:49Z"
+    },
+    {
+      "repo": "ethereum/execution-apis",
+      "ref": "main",
+      "sha": "1ca0818569467cff85b7f41372f22e728d5daa14",
+      "date": "2026-11-23T09:15:54Z"
+    },
+    {
+      "repo": "sigp/lighthouse",
+      "ref": "stable",
+      "sha": "57c2abc13078bf949e4d19df6178a644b064c32c",
+      "date": "2026-11-09T06:19:46Z"
+    },
+    {
+      "repo": "ethpandaops/ethereum-package",
+      "ref": "main",
+      "sha": "90d0f4e795cd4c3298753b428bb588ed7999d4da",
+      "date": "2026-11-24T10:05:50Z"
+    },
+    {
+      "repo": "ethpandaops/spamoor",
+      "ref": "master",
+      "sha": "97fe0b9f36864ec02a73ac4a3da0b6a89ee83365",
+      "date": "2026-11-24T14:36:04Z"
+    },
+    {
+      "repo": "ethpandaops/bogota-devnets",
+      "ref": "master",
+      "sha": "24ef46c39158297e9993d80f734534e89c2e4af0",
+      "date": "2026-11-25T01:29:50Z"
+    },
+    {
+      "repo": "ethpandaops/heze-devnets",
+      "ref": "master",
+      "sha": "7dd667c6ce3c702e002bf26a1d37b869f2440170",
+      "date": "2026-11-25T01:29:42Z"
+    },
+    {
+      "repo": "ethereum/EIPs",
+      "ref": "master",
+      "sha": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "repo": "ethereum/consensus-specs",
+      "ref": "master",
+      "sha": "d2021d2719235f0df4726a1d330502cb15aa8ea3"
+    },
+    {
+      "repo": "sigp/lighthouse",
+      "ref": "heze-devnet-2",
+      "sha": "f66bd5ac1051d443f11b5c701410203f4e3cf4b3"
+    },
+    {
+      "repo": "sigp/lighthouse",
+      "ref": "unstable-8e0aeef",
+      "sha": "8e0aeef872c0bf8921c835344c68e749e15b2da7"
+    },
+    {
+      "repo": "ethereum/go-ethereum",
+      "ref": "v1.17.1",
+      "sha": "16783c167c4be5e6675fd8de0d1b762c88d6232f"
+    },
+    {
+      "repo": "ethereum/legacytests",
+      "ref": "ethereum/tests LegacyTests gitlink",
+      "sha": "1f581b8ccdc4c63acf5f2c5c1b155c690c32a8eb"
+    }
+  ],
+  "files": [
+    {
+      "repo": "ethereum/execution-specs",
+      "commit": "b7e5b4bda2e1e62004b491dd74f119fe6622f0b3",
+      "path": "src/ethereum/forks/bogota/transactions/frame_transaction.py",
+      "url": "https://raw.githubusercontent.com/ethereum/execution-specs/b7e5b4bda2e1e62004b491dd74f119fe6622f0b3/src/ethereum/forks/bogota/transactions/frame_transaction.py",
+      "sha256": "37393df0d98b5430c5220b62e33e13818140cb6577bd91854d2a1d20437f9e6c"
+    },
+    {
+      "repo": "ethereum/execution-apis",
+      "commit": "1ca0818569467cff85b7f41372f22e728d5daa14",
+      "path": "src/engine/bogota.md",
+      "url": "https://raw.githubusercontent.com/ethereum/execution-apis/1ca0818569467cff85b7f41372f22e728d5daa14/src/engine/bogota.md",
+      "sha256": "73630fb0545468653293c6cab6c96e00c9262b07c2991cd7c56fef21c1982ab7"
+    },
+    {
+      "repo": "ethereum/execution-apis",
+      "commit": "1ca0818569467cff85b7f41372f22e728d5daa14",
+      "path": "src/engine/amsterdam.md",
+      "url": "https://raw.githubusercontent.com/ethereum/execution-apis/1ca0818569467cff85b7f41372f22e728d5daa14/src/engine/amsterdam.md",
+      "sha256": "61fe16193676cd08e59e3101507498e84e68917809c12caa51928db2638455dc"
+    },
+    {
+      "repo": "ethpandaops/bogota-devnets",
+      "commit": "24ef46c39158297e9993d80f734534e89c2e4af0",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/ethpandaops/bogota-devnets/24ef46c39158297e9993d80f734534e89c2e4af0/README.md",
+      "sha256": "46e98f2b71606e11dab507a312bc9b3a371080b11643555ec962ac0baed284d3"
+    },
+    {
+      "repo": "ethpandaops/bogota-devnets",
+      "commit": "24ef46c39158297e9993d80f734534e89c2e4af0",
+      "path": "network-configs/devnet-2/metadata/config.yaml",
+      "url": "https://raw.githubusercontent.com/ethpandaops/bogota-devnets/24ef46c39158297e9993d80f734534e89c2e4af0/network-configs/devnet-2/metadata/config.yaml",
+      "sha256": "0a41720601fed63135c26af3f42ab80f7b9007ecfd27f7d928c85cdd923fc295"
+    },
+    {
+      "repo": "ethpandaops/bogota-devnets",
+      "commit": "24ef46c39158297e9993d80f734534e89c2e4af0",
+      "path": "ansible/inventories/devnet-2/group_vars/all/images.yaml",
+      "url": "https://raw.githubusercontent.com/ethpandaops/bogota-devnets/24ef46c39158297e9993d80f734534e89c2e4af0/ansible/inventories/devnet-2/group_vars/all/images.yaml",
+      "sha256": "7b4cb15e48751b68e9aaed57e5210c85b0a4aff9b9297b512c2a2d23ad3a319a"
+    },
+    {
+      "repo": "ethpandaops/heze-devnets",
+      "commit": "7dd667c6ce3c702e002bf26a1d37b869f2440170",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/ethpandaops/heze-devnets/7dd667c6ce3c702e002bf26a1d37b869f2440170/README.md",
+      "sha256": "58329aacca8f463ca8c09bdb578e7dc03abe6847aa6fcc2e6e7bd8cd453fbdbf"
+    },
+    {
+      "repo": "ethpandaops/heze-devnets",
+      "commit": "7dd667c6ce3c702e002bf26a1d37b869f2440170",
+      "path": "network-configs/devnet-2/metadata/config.yaml",
+      "url": "https://raw.githubusercontent.com/ethpandaops/heze-devnets/7dd667c6ce3c702e002bf26a1d37b869f2440170/network-configs/devnet-2/metadata/config.yaml",
+      "sha256": "630d6a6fc2e386230e8723de3503447176471fc4eef4763f6a3fb726c4324e43"
+    },
+    {
+      "repo": "ethpandaops/heze-devnets",
+      "commit": "7dd667c6ce3c702e002bf26a1d37b869f2440170",
+      "path": "ansible/inventories/devnet-2/group_vars/all/images.yaml",
+      "url": "https://raw.githubusercontent.com/ethpandaops/heze-devnets/7dd667c6ce3c702e002bf26a1d37b869f2440170/ansible/inventories/devnet-2/group_vars/all/images.yaml",
+      "sha256": "c169ec112a1544435866e2861f3a7526058174cab5a5484d4b449f01a2f6c767"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/beacon-chain.md",
+      "sha256": "2df221334fe269189cb0c78433f169e97fae21655b2dfd3862ee6fa174356a58",
+      "local_path": "refs/consensus-specs/specs/heze/beacon-chain.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/builder.md",
+      "sha256": "221fb097e1d1e9acc92e2777be0f137826dd83ad879af3b1e797c2f8a8123fd5",
+      "local_path": "refs/consensus-specs/specs/heze/builder.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/fork-choice.md",
+      "sha256": "029bf4c8e3a9301ea169c03a9c3158ed5cadf5e871e253171472486fc12b7985",
+      "local_path": "refs/consensus-specs/specs/heze/fork-choice.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/fork.md",
+      "sha256": "c174c34afbbf755be04ba29edebaf2d6605a1b8b26aa05d80428c3c221ca2485",
+      "local_path": "refs/consensus-specs/specs/heze/fork.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/inclusion-list.md",
+      "sha256": "7a5e2e5f33ad528a4f12a3a949e4b7ca28a03c8d5818d4e7c9d3fdde8ed20d35",
+      "local_path": "refs/consensus-specs/specs/heze/inclusion-list.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/p2p-interface.md",
+      "sha256": "df20b69de69280176fa1ccb085e11b59a22db388f1f95ab4a8d64ad2a4003238",
+      "local_path": "refs/consensus-specs/specs/heze/p2p-interface.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/validator.md",
+      "sha256": "d9a04de954a0082d6e8825638c79f69ebfdaa1632133a79363c7e4a4448fe5d7",
+      "local_path": "refs/consensus-specs/specs/heze/validator.md"
+    },
+    {
+      "eip": 2488,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-2488.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e606d541a486a736c43cc9fbb2849bdcc1cab911bba54e0b891b3ccfb9d6ecd0",
+      "local_path": "refs/EIPs/EIPS/eip-2488.md"
+    },
+    {
+      "eip": 3298,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3298.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "623a5db8d64dd86cdaa2409905df785ec9dc58acdd59be8a18f29d8e9f86eb31",
+      "local_path": "refs/EIPs/EIPS/eip-3298.md"
+    },
+    {
+      "eip": 4758,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-4758.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "8e4973a1ea21de41953a6ff56ba17f2e45067559963e8f9ab5aeb3b624ea5def",
+      "local_path": "refs/EIPs/EIPS/eip-4758.md"
+    },
+    {
+      "eip": 5920,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-5920.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "f9b6d29381744114128f035d4a2a989a3d6ae08f838506fff96cd3c76e26ff11",
+      "local_path": "refs/EIPs/EIPS/eip-5920.md"
+    },
+    {
+      "eip": 7645,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7645.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "57c2d8606b731a01ae2077f817032f31629a379fa8b403fe66e67a5fc6660647",
+      "local_path": "refs/EIPs/EIPS/eip-7645.md"
+    },
+    {
+      "eip": 7666,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7666.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "ea392f32efc0ae218c2f37d75577976a067f6a846caeb228fb76fa2ae3c2227b",
+      "local_path": "refs/EIPs/EIPS/eip-7666.md"
+    },
+    {
+      "eip": 7668,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7668.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "816047a5594113227ddc9f64b7bcc1bc56bb66f4135c03c3cb526d3049ae3882",
+      "local_path": "refs/EIPs/EIPS/eip-7668.md"
+    },
+    {
+      "eip": 7709,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7709.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "ed806dda2e43f8c887e52a89988dbe7354a8dfd305587955e09b6254994716ea",
+      "local_path": "refs/EIPs/EIPS/eip-7709.md"
+    },
+    {
+      "eip": 7716,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7716.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "759f1689c19cfa2b95eb3ec4ce21dd0fcd0e0e2c7145b78ae7d31852bda557d7",
+      "local_path": "refs/EIPs/EIPS/eip-7716.md"
+    },
+    {
+      "eip": 7723,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7723.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "8ea53bb13dfc56645d917b12cffd937f39bf9e6b5283f8e96fbf59eb2d6a1c0a",
+      "local_path": "refs/EIPs/EIPS/eip-7723.md"
+    },
+    {
+      "eip": 7732,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7732.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "0b147a11e313e11713479bd4a9e09983929eb54afaa9dd962d7857832918d49c",
+      "local_path": "refs/EIPs/EIPS/eip-7732.md"
+    },
+    {
+      "eip": 7773,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7773.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "13d6acab704198d116c5a03f3849164ad4ac2af4301f568d31078c1c3201f2da",
+      "local_path": "refs/EIPs/EIPS/eip-7773.md"
+    },
+    {
+      "eip": 7805,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7805.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
+      "local_path": "refs/EIPs/EIPS/eip-7805.md"
+    },
+    {
+      "eip": 7807,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7807.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "75a4aae64ad35a43fef8dc18fd51d90f7459f925900d9dac380dc41982da91ff",
+      "local_path": "refs/EIPs/EIPS/eip-7807.md"
+    },
+    {
+      "eip": 7819,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7819.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "431cc6e41caf5e4ada27a3a94e55af40cc9bec7434502c05e87fbeabdade346e",
+      "local_path": "refs/EIPs/EIPS/eip-7819.md"
+    },
+    {
+      "eip": 7851,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7851.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "439e4826ef1aa6a370b59da167d553d4b3cf33a8038db7e010f3950b0aa3aae5",
+      "local_path": "refs/EIPs/EIPS/eip-7851.md"
+    },
+    {
+      "eip": 7862,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7862.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "2f044dc1c00ae5558aa3c17367da056acf0f76701f492ae63e77fb0b9b293cdc",
+      "local_path": "refs/EIPs/EIPS/eip-7862.md"
+    },
+    {
+      "eip": 7906,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7906.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "fcde21b02c0c7c04b9e787fbfb5bc33e9fa3cbef419b53b47d979a7451777fea",
+      "local_path": "refs/EIPs/EIPS/eip-7906.md"
+    },
+    {
+      "eip": 7907,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7907.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "5ab7597f76df7da70806003e7a3a4ee1167442a766af868d4d321429fe38de6b",
+      "local_path": "refs/EIPs/EIPS/eip-7907.md"
+    },
+    {
+      "eip": 7923,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7923.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "38077cfd67bac06d3ccf95979440d99d8eb9218da855a68a097bfb8084677844",
+      "local_path": "refs/EIPs/EIPS/eip-7923.md"
+    },
+    {
+      "eip": 7928,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7928.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
+      "local_path": "refs/EIPs/EIPS/eip-7928.md"
+    },
+    {
+      "eip": 7973,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7973.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "1762762e76102f0bfd20789bd96016bec8b8116d00f0b804275cbf5f77a87f7e",
+      "local_path": "refs/EIPs/EIPS/eip-7973.md"
+    },
+    {
+      "eip": 7979,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7979.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "9a3906c2a5bc4a197b96f3644f21a073f731057b39801bb259a80aa02ee6eab5",
+      "local_path": "refs/EIPs/EIPS/eip-7979.md"
+    },
+    {
+      "eip": 8015,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8015.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "ce565f18648ce6bf7c61d4bb9d964c712d1c3f11e10f7bafbda0a67da129b216",
+      "local_path": "refs/EIPs/EIPS/eip-8015.md"
+    },
+    {
+      "eip": 8025,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8025.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c358101a47c8be0c565ef6d19fae7f2200d30c9dfad7f979c02c76fa3b6b715f",
+      "local_path": "refs/EIPs/EIPS/eip-8025.md"
+    },
+    {
+      "eip": 8077,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8077.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "05eb72ad5ae885653963ad34d451aa2b27661daccc6c69067b781865c7fa1604",
+      "local_path": "refs/EIPs/EIPS/eip-8077.md"
+    },
+    {
+      "eip": 8081,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8081.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "3277980efee1941de37aa05967172262c0e1b1caa20165f532964e60085b84d6",
+      "local_path": "refs/EIPs/EIPS/eip-8081.md"
+    },
+    {
+      "eip": 8094,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8094.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c5a94b085a47477e1eef3b12c49f88f3ce1b4219137db8f476ad56c73a3c1347",
+      "local_path": "refs/EIPs/EIPS/eip-8094.md"
+    },
+    {
+      "eip": 8105,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8105.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "7486cb72d3a4776cf37fed93d893865ab5a607647400797f8cbd58800544ccef",
+      "local_path": "refs/EIPs/EIPS/eip-8105.md"
+    },
+    {
+      "eip": 8115,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8115.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "55ab16f6b3f9778ea5ce777dbbc67a95d627cda00c78f1de4922f36da79d4e23",
+      "local_path": "refs/EIPs/EIPS/eip-8115.md"
+    },
+    {
+      "eip": 8116,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8116.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "587ad8509b9df4473a75366a7361bb191b87941726f45cde79ff85ef7559fea5",
+      "local_path": "refs/EIPs/EIPS/eip-8116.md"
+    },
+    {
+      "eip": 8131,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8131.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "1a4b65e01ec304dc2f67452c75db8ef49d8d6cda008aecb8a2b0fd1c11ee36ee",
+      "local_path": "refs/EIPs/EIPS/eip-8131.md"
+    },
+    {
+      "eip": 8141,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8141.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+      "local_path": "refs/EIPs/EIPS/eip-8141.md"
+    },
+    {
+      "eip": 8142,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8142.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "8153607a02e4e06b9ced70860b8f6400a68d9728a86e59c61321bb78449fe3fa",
+      "local_path": "refs/EIPs/EIPS/eip-8142.md"
+    },
+    {
+      "eip": 8146,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8146.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "d2e2b20121e35dabe18a3eb37a8144ddeb772db08f09e2e6e99ace5a2372155b",
+      "local_path": "refs/EIPs/EIPS/eip-8146.md"
+    },
+    {
+      "eip": 8148,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8148.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "58a0123e5d983f51c4485ab6d1630a5388ff8bb00596bcdb5f0667aec0d3a700",
+      "local_path": "refs/EIPs/EIPS/eip-8148.md"
+    },
+    {
+      "eip": 8151,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8151.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80",
+      "local_path": "refs/EIPs/EIPS/eip-8151.md"
+    },
+    {
+      "eip": 8163,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8163.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "dbd3bcf2bd669e4b83ca6d12e172ee5cdaafb470210ec3db7254fc07bb4f07bb",
+      "local_path": "refs/EIPs/EIPS/eip-8163.md"
+    },
+    {
+      "eip": 8173,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8173.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "41a9fd6186dc5c1672edb2b86ac78577d435ea51f4dfa41bd068821364f171b2",
+      "local_path": "refs/EIPs/EIPS/eip-8173.md"
+    },
+    {
+      "eip": 8182,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8182.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "5fcacb0f71bec7f46b37edacc7060a2a0c03dc4538caa809453460ee2d0e809e",
+      "local_path": "refs/EIPs/EIPS/eip-8182.md"
+    },
+    {
+      "eip": 8184,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8184.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "146e5450a3ec8a180a0e18df658e2fb7a4b171b2908daadcc1006c3a64cfde07",
+      "local_path": "refs/EIPs/EIPS/eip-8184.md"
+    },
+    {
+      "eip": 8188,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8188.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "dc2306ba2877472dc2f5d85ae4024adc8127a02a0388130f656afa6e815e807f",
+      "local_path": "refs/EIPs/EIPS/eip-8188.md"
+    },
+    {
+      "eip": 8198,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8198.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "3b8ff3656f4736a6acdc707e4560e6470024a49631e2cf7f1a493bc3e912e7cc",
+      "local_path": "refs/EIPs/EIPS/eip-8198.md"
+    },
+    {
+      "eip": 8200,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8200.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "15d2e9e885d61c6fe3004754fb907b3c9d46ab5610863257ab0a5cd2cf33ed1c",
+      "local_path": "refs/EIPs/EIPS/eip-8200.md"
+    },
+    {
+      "eip": 8205,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8205.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c6259cbcdd486f0354f852d92d1355d34f0332a02b7faef11f84440542cae9f0",
+      "local_path": "refs/EIPs/EIPS/eip-8205.md"
+    },
+    {
+      "eip": 8219,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8219.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "609d426fc454180b8b79c6da5e59d66c7e723508aeca9376f3761f5a22d73e12",
+      "local_path": "refs/EIPs/EIPS/eip-8219.md"
+    },
+    {
+      "eip": 8237,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8237.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "192437824e82227014f4675cee81b4b24bcca7027406c321e6142838f22542af",
+      "local_path": "refs/EIPs/EIPS/eip-8237.md"
+    },
+    {
+      "eip": 8243,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8243.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "877bc6b37c3b1a71bd71a132ab8e9a6641c900b31966f92cda1f1f16375085a7",
+      "local_path": "refs/EIPs/EIPS/eip-8243.md"
+    },
+    {
+      "eip": 8250,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8250.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+      "local_path": "refs/EIPs/EIPS/eip-8250.md"
+    },
+    {
+      "eip": 8253,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8253.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "00f0047eefb41228d82400f792081fa83555ee0a094785409180d4e6bb7d0f6b",
+      "local_path": "refs/EIPs/EIPS/eip-8253.md"
+    },
+    {
+      "eip": 8272,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8272.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+      "local_path": "refs/EIPs/EIPS/eip-8272.md"
+    },
+    {
+      "eip": 8279,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8279.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "9d68b6670efa1ce22157bd367042aee00746223eaaf598fad57c211b495475dc",
+      "local_path": "refs/EIPs/EIPS/eip-8279.md"
+    },
+    {
+      "eip": 8288,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8288.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "0536c4333e5ee8b16bd4dd13a8dfac33f9fa66defc0cd1a2ecabaedf40c9c7c2",
+      "local_path": "refs/EIPs/EIPS/eip-8288.md"
+    },
+    {
+      "eip": 8298,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8298.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13",
+      "local_path": "refs/EIPs/EIPS/eip-8298.md"
+    },
+    {
+      "eip": 8304,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8304.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c03c929fdf37d7be2d65866bc2801d9f13b14a86c18b360bd01951d9618c5861",
+      "local_path": "refs/EIPs/EIPS/eip-8304.md"
+    },
+    {
+      "eip": 8321,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8321.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "387b8dafcef6df198386f53969ac834afa0e16763728d084d01d8b1fd864c3be",
+      "local_path": "refs/EIPs/EIPS/eip-8321.md"
+    },
+    {
+      "eip": 8333,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8333.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "11b027538796f9b8aa53a7a4c0d5a66b08fc42120131b4ddd97d4d1750a4855f",
+      "local_path": "refs/EIPs/EIPS/eip-8333.md"
+    },
+    {
+      "eip": 8334,
+      "url": "https://raw.githubusercontent.com/sukunrt/EIPs/f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04/EIPS/eip-8334.md",
+      "commit": "f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04",
+      "sha256": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+      "local_path": "specs/hegota/proposals/eip-8334.md"
+    },
+    {
+      "eip": 8341,
+      "url": "https://raw.githubusercontent.com/nerolation/EIPs/7c0a835f2be7a1678990473a20212fb97e3ed017/EIPS/eip-8341.md",
+      "commit": "7c0a835f2be7a1678990473a20212fb97e3ed017",
+      "sha256": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+      "local_path": "specs/hegota/proposals/eip-8341.md"
+    },
+    {
+      "eip": 8355,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8355.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "01207bab5558e0692ba295b81a64e1d349f634a3b6dc127433fc3f4d31aed714",
+      "local_path": "refs/EIPs/EIPS/eip-8355.md"
+    },
+    {
+      "eip": 8358,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8358.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e28022d3734416969a287cb651e675d0f91ac67dde4c6b03c0d84de61c8c926e",
+      "local_path": "refs/EIPs/EIPS/eip-8358.md"
+    },
+    {
+      "eip": 8359,
+      "url": "https://raw.githubusercontent.com/hanniabu/EIPs/06ee26f2b86f36c839f9c41d99fcf49ab8323e5d/EIPS/eip-8359.md",
+      "commit": "06ee26f2b86f36c839f9c41d99fcf49ab8323e5d",
+      "sha256": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+      "local_path": "specs/hegota/proposals/eip-8359.md"
+    },
+    {
+      "eip": 8360,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8360.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "a9de2df039c4aee07c4b6fe4d6ab1dd2c7dd35358e024d36d117ef853e37323b",
+      "local_path": "refs/EIPs/EIPS/eip-8360.md"
+    },
+    {
+      "eip": 8363,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8363.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c7401db129b5fd2e523ab02707d0efe8312444ec902e46a5e71885a480058a84",
+      "local_path": "refs/EIPs/EIPS/eip-8363.md"
+    },
+    {
+      "eip": 8365,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8365.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "6c400df484c77c34e674541c70f58415de199dc030a3d92733667523f0c1cbd2",
+      "local_path": "refs/EIPs/EIPS/eip-8365.md"
+    },
+    {
+      "eip": 8367,
+      "url": "https://raw.githubusercontent.com/ensi321/EIPs/c55245baa104ff8f6e02285cb9e58d66640cf829/EIPS/eip-8367.md",
+      "commit": "c55245baa104ff8f6e02285cb9e58d66640cf829",
+      "sha256": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+      "local_path": "specs/hegota/proposals/eip-8367.md"
+    },
+    {
+      "eip": 8368,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8368.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "5092c19d1dff03b1dc647ffff28653bf02eb224f4ad15ff9b42100b69d49b9c7",
+      "local_path": "refs/EIPs/EIPS/eip-8368.md"
+    },
+    {
+      "eip": 8369,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8369.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "d599b45c5a5d7a40d7d2f81b3440ea75b6d30658e678f061a9a56267c2c7404d",
+      "local_path": "refs/EIPs/EIPS/eip-8369.md"
+    },
+    {
+      "eip": 8371,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8371.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e28d183b0c5d4445014bd3863949e20023d59b270003098b933875b145fc1816",
+      "local_path": "refs/EIPs/EIPS/eip-8371.md"
+    },
+    {
+      "eip": 8372,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8372.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "db7eae2b26e156041353154d196c5d6373f4b176e42ca4f76129d9f7603a5515",
+      "local_path": "refs/EIPs/EIPS/eip-8372.md"
+    },
+    {
+      "eip": 8374,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8374.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "577593d70590e5997fbd8f9b64b799fd5cb6531d8f3e3a61bcf410f97e997155",
+      "local_path": "refs/EIPs/EIPS/eip-8374.md"
+    },
+    {
+      "eip": 8375,
+      "url": "https://raw.githubusercontent.com/benaadams/EIPs/b2bb0ef69e4b236703c30468d5773e896410a679/EIPS/eip-8375.md",
+      "commit": "b2bb0ef69e4b236703c30468d5773e896410a679",
+      "sha256": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+      "local_path": "specs/hegota/proposals/eip-8375.md"
+    },
+    {
+      "eip": 8379,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8379.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "b9d674ce711f1814088311453f97a4195c830f8bcc256ed9a89d69ddc3ede02b",
+      "local_path": "refs/EIPs/EIPS/eip-8379.md"
+    },
+    {
+      "eip": 8383,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8383.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "5d65f73db81174beeabaa309538bf23e5c49e1daae4625fdc9a15a0ab380dea1",
+      "local_path": "refs/EIPs/EIPS/eip-8383.md"
+    },
+    {
+      "eip": 8411,
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8411.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "9d4bdb57522b7ea5c788e531c4bb8ca925630114e96641a51f49955b49563c08",
+      "local_path": "refs/EIPs/EIPS/eip-8411.md"
+    },
+    {
+      "eip": 8483,
+      "url": "https://raw.githubusercontent.com/potuz/EIPs/d62cd56be2b898ec187d4d215d20c07b052a78bb/EIPS/eip-8483.md",
+      "commit": "d62cd56be2b898ec187d4d215d20c07b052a78bb",
+      "sha256": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+      "local_path": "specs/hegota/proposals/eip-8483.md"
+    },
+    {
+      "eip": 8504,
+      "url": "https://raw.githubusercontent.com/lambdaclass/EIPs/654c0c3b2b5e066073012284fa93b2fea0522763/EIPS/eip-8504.md",
+      "commit": "654c0c3b2b5e066073012284fa93b2fea0522763",
+      "sha256": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+      "local_path": "specs/hegota/proposals/eip-8504.md"
+    },
+    {
+      "eip": 7685,
+      "local_path": "refs/EIPs/EIPS/eip-7685.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "99b3272f275293fd5e9af5f45d673132a909dbf28816a7ea7804c247485622a2",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7685.md"
+    },
+    {
+      "eip": 6110,
+      "local_path": "refs/EIPs/EIPS/eip-6110.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "5e3d603bbf83dd7da977825475c2f0214704bc64a1e6426cbba6421344211962",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-6110.md"
+    },
+    {
+      "eip": 8037,
+      "local_path": "refs/EIPs/EIPS/eip-8037.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "37abe522c5dee68a47a27db6f7b88a71da5b66c8a72ebc601c467940b577b715",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8037.md"
+    },
+    {
+      "eip": 8038,
+      "local_path": "refs/EIPs/EIPS/eip-8038.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "ad09e7c9a7c78855b00e793109056e6d30022bf4bbf0e237e757226de0e544e2",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8038.md"
+    },
+    {
+      "eip": 2780,
+      "local_path": "refs/EIPs/EIPS/eip-2780.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "dd86d5ddef5c5eae38db787302df44cb2a183c5a0b36f63b48c566ad1a5913cf",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-2780.md"
+    },
+    {
+      "eip": 7778,
+      "local_path": "refs/EIPs/EIPS/eip-7778.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "4be38cd987afd0c0106622316f925ccfd50f98ee62110e5efa8a9d3d9fb36592",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7778.md"
+    },
+    {
+      "eip": 7976,
+      "local_path": "refs/EIPs/EIPS/eip-7976.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e8ca247a5565f78af284f1211f3e24d37813f892b73058c79c53562914204859",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7976.md"
+    },
+    {
+      "eip": 7825,
+      "local_path": "refs/EIPs/EIPS/eip-7825.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "86e82af6cfba9593efb3f8cc16ccc23f13bb0e82c4e7782679cf71b95fcc2fe3",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7825.md"
+    },
+    {
+      "eip": 7934,
+      "local_path": "refs/EIPs/EIPS/eip-7934.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "99528dc7d4af27ac450b6d845f5617f395036a98222bc523e1af88255dcd62a9",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7934.md"
+    },
+    {
+      "eip": 7843,
+      "local_path": "refs/EIPs/EIPS/eip-7843.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "6b4500f8aa5a97009258831476efa1de89c4b1c0dfce760b6ccd9a75a415e470",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7843.md"
+    },
+    {
+      "eip": 7702,
+      "local_path": "refs/EIPs/EIPS/eip-7702.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7702.md"
+    },
+    {
+      "eip": 7708,
+      "local_path": "refs/EIPs/EIPS/eip-7708.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "95856501ff4103783d792505ee90a6cacfcdbe95c7fb452992fb82258358ca74",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7708.md"
+    },
+    {
+      "eip": 4844,
+      "local_path": "refs/EIPs/EIPS/eip-4844.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "2772bdb675d90d89ebb4bf74269e48c8ea46745e78161c8574ffa78328b31885",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-4844.md"
+    },
+    {
+      "eip": 3675,
+      "local_path": "refs/EIPs/EIPS/eip-3675.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3675.md"
+    },
+    {
+      "eip": 7594,
+      "local_path": "refs/EIPs/EIPS/eip-7594.md",
+      "commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "34b8426335cfd3f6f335ac2e3d3d0ef42bd0b007b0cc653fef130e29e3b212e4",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7594.md"
+    }
+  ],
+  "go_module": "pkg/go.mod",
+  "go_sum_sha256": "579bc96d5943e44fde656d9f6f344b1892111012abfdb397e766eb2251718af2",
+  "archived_eest": "ethereum/execution-spec-tests is archived; live test sources are in ethereum/execution-specs",
+  "cl_checkouts": {
+    "../lighthouse": "absent; upstream profile source pinned, no local fork build claim",
+    "../dora": "absent",
+    "../spamoor": "absent"
+  },
+  "images": {
+    "bogota_devnet_2": "ethpandaops/lighthouse:unstable-8e0aeef",
+    "heze_devnet_2": "ethpandaops/lighthouse:heze-devnet-2",
+    "image_digest_status": "mutable tags excluded from reproducible runtime baseline; descriptors only, image digest/build evidence required by HGT-070/091"
+  },
+  "file_updates": [
+    {
+      "date": "2026-11-25",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3675.md",
+      "previous_sha256": null,
+      "new_sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
+      "affected_tasks": [
+        "HGT-004",
+        "HGT-006"
+      ],
+      "rationale": "Follow-up audit pins PoS canonical-head requirements for the newly recorded native FCU routing gap; no release profile activated."
+    },
+    {
+      "date": "2026-11-25",
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7594.md",
+      "previous_sha256": null,
+      "new_sha256": "34b8426335cfd3f6f335ac2e3d3d0ef42bd0b007b0cc653fef130e29e3b212e4",
+      "affected_tasks": [
+        "HGT-006"
+      ],
+      "rationale": "Pins PeerDAS context for the pre-existing local stream session identity collision exposed by the full baseline suite; the fix changes no PeerDAS data or commitment format."
+    }
+  ],
+  "dependency_updates": [
+    {
+      "date": "2026-11-25",
+      "previous_go_sum_sha256": "bfc9565154caf9f82db548beca236faf4c3c715abb2d30247ddaed5b35d74c7c",
+      "new_go_sum_sha256": "579bc96d5943e44fde656d9f6f344b1892111012abfdb397e766eb2251718af2",
+      "upstream_revision": "98d43177",
+      "affected_tasks": [
+        "HGT-001",
+        "HGT-006"
+      ],
+      "rationale": "Preserve master security/dependency upgrades, including Go 1.26.8, gnark-crypto and Geth v1.17.10. Reexecute the historical native/reference baseline; normative EIP/CL pins are unchanged."
+    }
+  ]
+}

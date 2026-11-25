@@ -104,7 +104,7 @@ type Config struct {
 	// When false (default), LocalTx are rejected at pool entry.
 	AllowLocalTx bool
 	// AllowAATx enables acceptance of EIP-7701 type-0x05 AA transactions (--txpool.allow-aa).
-	// Defaults to true; set false to disable AA tx acceptance on networks without Glamsterdam.
+	// Disabled by default; requires explicit opt-in.
 	AllowAATx bool
 	// IsPrague indicates the chain is at or past the Prague fork.
 	// When true, the EIP-7623 calldata floor is applied during validation.
@@ -127,7 +127,7 @@ func DefaultConfig() Config {
 		MinGasPrice:        big.NewInt(1), // 1 wei minimum
 		BlockGasLimit:      30_000_000,
 		PaymasterStrict:    true,
-		AllowAATx:          true, // EIP-7701 AA is enabled by default (Glamsterdam+)
+		AllowAATx:          false, // historical AA requires explicit opt-in
 		PriceHistoryBlocks: pricing.DefaultFeeHistoryDepth,
 	}
 }
@@ -228,6 +228,7 @@ type TxPool struct {
 	config      Config
 	frameConfig *config.ChainConfig
 	frameTime   uint64
+	frameNumber uint64
 	chainID     *big.Int
 	pqForkKnown bool
 	pqActive    bool
@@ -621,8 +622,8 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) (result
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return pool.validateFrame8141(tx)
 	}
-	if tx.Type() == types.FrameTxType && pool.frameConfig != nil && pool.frameConfig.IsHogota(pool.frameTime) {
-		return errors.New("historical Frame envelope is not valid at Bogotá")
+	if tx.Type() == types.FrameTxType && !pool.frameConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.frameNumber), pool.frameTime) {
+		return errors.New("frame transactions unavailable at canonical head")
 	}
 	// BB-2.2: gate type-0x08 LocalTx behind --experimental-local-tx flag.
 	if tx.Type() == types.LocalTxType && !pool.config.AllowLocalTx {
@@ -1228,8 +1229,26 @@ func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 	pool.state = stateReader
 	if len(heads) > 0 {
 		pool.updateHeadFeesLocked(heads[0])
+		if heads[0] != nil && heads[0].Number != nil {
+			pool.frameNumber = heads[0].Number.Uint64()
+		}
 	}
 	pool.revalidateFrames8141()
+	if !pool.frameConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.frameNumber), pool.frameTime) {
+		for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
+			for addr, list := range lists {
+				for _, tx := range append([]*types.Transaction(nil), list.items...) {
+					if _, canonical := tx.Inner().(*types.FrameTx8141); tx.Type() == types.FrameTxType && !canonical {
+						list.Remove(tx.Nonce())
+						pool.lookup.Remove(tx.Hash())
+					}
+				}
+				if list.Len() == 0 {
+					delete(lists, addr)
+				}
+			}
+		}
+	}
 
 	var totalConfirmed, totalDemoted int
 	for addr, list := range pool.pending {

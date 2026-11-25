@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -62,6 +63,11 @@ type StreamSession struct {
 	createdAt time.Time
 }
 
+// Local session identities must remain distinct even when the wall clock has
+// insufficient resolution or moves backwards. These IDs are internal tracking
+// keys, not PeerDAS commitments or authentication credentials.
+var streamSessionSequence atomic.Uint64
+
 // NewStreamSession creates a new streaming session for a blob.
 func NewStreamSession(blobIndex uint64, totalSize uint64, chunkSize uint64) *StreamSession {
 	if chunkSize == 0 || totalSize == 0 {
@@ -73,11 +79,12 @@ func NewStreamSession(blobIndex uint64, totalSize uint64, chunkSize uint64) *Str
 		numChunks++
 	}
 
-	// Derive session ID from blob index + total size + creation entropy.
-	idData := make([]byte, 24)
+	// Include a process-unique sequence; wall-clock samples alone can collide.
+	idData := make([]byte, 32)
 	putLE64(idData[0:8], blobIndex)
 	putLE64(idData[8:16], totalSize)
 	putLE64(idData[16:24], uint64(time.Now().UnixNano()))
+	putLE64(idData[24:32], streamSessionSequence.Add(1))
 	id := crypto.Keccak256Hash(idData)
 
 	return &StreamSession{

@@ -150,7 +150,7 @@ type Config struct {
 	// FinalityMode selects the finality engine: "ssf" (default) or "minimmit" (GAP-5.2).
 	FinalityMode string // --finality-mode
 
-	// BLSBackend selects the BLS signature backend: "blst" (default) or "pure-go" (GAP-7.2).
+	// BLSBackend selects the BLS signature backend: "pure-go" (gnark, default) or "blst" (requires build tag).
 	BLSBackend string // --bls-backend
 
 	// MixnetMode selects the anonymous transport: "simulated" (default), "tor", "nym".
@@ -303,14 +303,14 @@ func DefaultConfig() Config {
 		// GAP-5.2: default to SSF finality.
 		FinalityMode: "ssf",
 
-		// GAP-7.2: default to blst BLS backend.
-		BLSBackend: "blst",
+		// Use the maintained pure-Go consensus verifier in ordinary builds.
+		BLSBackend: "pure-go",
 
 		// BB-1.1: default to simulated mixnet (no external daemon required).
 		MixnetMode: "simulated",
 
-		// EIP-7701: AA transactions are accepted by default on Glamsterdam+ networks.
-		AllowAATx: true,
+		// Legacy EIP-7701 prototypes require an explicit local opt-in.
+		AllowAATx: false,
 
 		// 20-block fee history window for the txpool gas-price suggestor.
 		TxpoolPriceHistory: 20,

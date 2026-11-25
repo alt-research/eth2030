@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "HGT-001",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/specification-profiles.md",
+        "specs/hegota/source-lock.json",
+        "specs/hegota/profiles.json"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 1,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-004",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/runtime-and-activation.md",
+        "evidence/hegota-a/runtime.json"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 0.5,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-005",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/runtime-and-activation.md",
+        "pkg/core/config/hegota_test.go",
+        "pkg/core/execution/hegota_activation_test.go",
+        "pkg/txpool/hegota_activation_test.go",
+        "pkg/node/genesis_loader_test.go",
+        "pkg/node/hegota_head_test.go"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 1,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-006",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/baseline-and-gaps.md",
+        "specs/hegota/conformance.json",
+        "pkg/core/eftest/baseline.go",
+        "evidence/hegota-a/baseline.json",
+        "evidence/hegota-a/skipped-tests.json"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 1.5,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-007",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/semantic-adrs.md",
+        "specs/hegota/frame-schema.json",
+        "specs/hegota/codec-goldens.json",
+        "specs/hegota/semantic-goldens.json"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 1,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-008",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "docs/plans/hegota-a/validation-audit.md",
+        "pkg/crypto/bls/consensus_backend.go",
+        "pkg/epbs/hegota_validation_test.go",
+        "pkg/node/hegota_backend_test.go"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 1.5,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    },
+    {
+      "id": "HGT-009",
+      "owner": "Codex; specification / EL core / testing",
+      "status": "verified",
+      "date": "2026-11-25",
+      "source_lock": "specs/hegota/source-lock.json",
+      "implementation_base": "8ac0ec4",
+      "branch": "codex/hegota-a-baseline",
+      "artifacts": [
+        "specs/hegota/admission.json",
+        "tools/hegota/check.py",
+        "tools/hegota/test_check.py"
+      ],
+      "verification": "evidence/hegota-a/verification.json",
+      "estimate_engineer_days": 0.5,
+      "scope_limit": "A artifacts and safe boundaries verified; no B–J feature conformance or combined release activation claim",
+      "follow_up_audit": "docs/plans/hegota-a/follow-up-audit.md"
+    }
+  ],
+  "prerequisite_repairs": "specs/hegota/conformance.json",
+  "commit_reference": "git commit containing this file; source fingerprints avoid self-referential commit hashes"
+}

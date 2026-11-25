@@ -13,6 +13,9 @@ on:
       - 'IFLOW.md'
       - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
+      - 'specs/hegota/**'
+      - 'tools/hegota/**'
+      - 'docs/plans/hegota-a/**'
   pull_request:
     branches: [master]
     paths:
@@ -25,6 +28,9 @@ on:
       - 'IFLOW.md'
       - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
+      - 'specs/hegota/**'
+      - 'tools/hegota/**'
+      - 'docs/plans/hegota-a/**'
   workflow_dispatch:
 
 permissions:
@@ -79,6 +85,18 @@ jobs:
         with:
           go-version: '1.26'
           cache-dependency-path: pkg/go.sum
+
+      - name: Fixed Hegota sources and admission register
+        run: |
+          git submodule update --init --depth=1 refs/EIPs refs/consensus-specs
+          python3 tools/hegota/check.py
+          python3 tools/hegota/codec_goldens.py
+          python3 tools/hegota/semantic_goldens.py
+          python3 -m unittest discover -s tools/hegota -p 'test_*.py'
+
+      - name: Native versus upstream historical baseline
+        working-directory: pkg
+        run: go run ./cmd/eth2030-baseline
 
       - name: gofmt
         working-directory: pkg

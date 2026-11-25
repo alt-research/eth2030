@@ -81,6 +81,7 @@ type simOptions struct {
 	alloc       config.GenesisAlloc
 	poolConfig  *txpool.Config
 
+	legacyFrames             bool
 	requireRequestPredeploys bool
 }
 
@@ -175,6 +176,7 @@ func WithPoolConfig(cfg txpool.Config) SimOption {
 func (o *simOptions) buildChainConfig() (*config.ChainConfig, error) {
 	cfg := &config.ChainConfig{
 		RequireRequestPredeploys: o.requireRequestPredeploys,
+		ExperimentalLegacyFrames: o.legacyFrames,
 
 		ChainID:                 new(big.Int).SetUint64(o.chainID),
 		HomesteadBlock:          big.NewInt(0),
@@ -209,4 +211,10 @@ func (o *simOptions) buildChainConfig() (*config.ChainConfig, error) {
 		}
 	}
 	return cfg, nil
+}
+
+// WithLegacyFrames selects the frozen prototype for historical integration tests.
+// It is not an EIP-8141 conformance profile.
+func WithLegacyFrames() SimOption {
+	return func(o *simOptions) error { o.legacyFrames = true; o.forkTimes[ForkHogota] = 0; return nil }
 }

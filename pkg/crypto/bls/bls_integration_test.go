@@ -163,6 +163,9 @@ func TestBLSIntegrationInvalidPubkeyFormat(t *testing.T) {
 
 func TestBLSIntegrationBackendSwitching(t *testing.T) {
 	original := DefaultBLSBackend()
+	if original.Name() != "gnark-consensus" && original.Name() != "blst-real" {
+		t.Errorf("default backend must use a consensus verifier, got %q", original.Name())
+	}
 	t.Cleanup(func() { SetBLSBackend(original) })
 
 	// Switch to blst.
@@ -173,7 +176,7 @@ func TestBLSIntegrationBackendSwitching(t *testing.T) {
 
 	// Switch back.
 	SetBLSBackend(nil)
-	if BLSIntegrationStatus() != "pure-go" {
+	if BLSIntegrationStatus() != "gnark-consensus" {
 		t.Errorf("status should be pure-go after nil reset, got %q", BLSIntegrationStatus())
 	}
 }
@@ -339,7 +342,7 @@ func TestBLSIntegrationConcurrentBackendSwitch(t *testing.T) {
 	wg.Wait()
 	// Reset to default.
 	SetBLSBackend(nil)
-	if BLSIntegrationStatus() != "pure-go" {
+	if BLSIntegrationStatus() != "gnark-consensus" {
 		t.Errorf("after concurrent ops, status should be pure-go, got %q", BLSIntegrationStatus())
 	}
 }

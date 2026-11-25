@@ -9,7 +9,8 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-// EIP-8141 Frame Transaction constants.
+// Legacy Frame prototype constants. This schema predates the pinned November
+// EIP-8141 and is isolated by ExperimentalLegacyFrames; see specs/hegota.
 const (
 	FrameTxType          byte   = 0x06
 	FrameTxIntrinsicCost uint64 = 15000
@@ -32,7 +33,7 @@ type Frame struct {
 	Data     []byte
 }
 
-// FrameTx represents an EIP-8141 (type 0x06) frame transaction.
+// FrameTx is the historical type-0x06 prototype, not the current EIP-8141 wire schema.
 type FrameTx struct {
 	ChainID              *big.Int
 	Nonce                *big.Int // 256-bit: upper 192 bits = key, lower 64 bits = sequence

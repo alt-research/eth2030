@@ -74,7 +74,11 @@ func requireStartupRolledBack(t *testing.T, n *Node) {
 func TestStartupRequiredBindingsRollbackAndFreshRetry(t *testing.T) {
 	for _, role := range []string{"p2p", "rpc", "engine", "ws", "metrics"} {
 		t.Run(role, func(t *testing.T) {
-			held, err := net.Listen("tcp", "127.0.0.1:0")
+			bind := "127.0.0.1:0"
+			if role == "p2p" {
+				bind = ":0"
+			}
+			held, err := net.Listen("tcp", bind)
 			if err != nil {
 				t.Fatal(err)
 			}

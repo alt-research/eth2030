@@ -292,13 +292,14 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 		return nil, proofs.ErrFrameProofUnavailable
 	}
 
-	// GAP-7.2: select BLS signature backend based on config.
-	if config.BLSBackend == "pure-go" {
-		crypto.SetBLSBackend(&crypto.PureGoBLSBackend{})
-		slog.Info("BLS backend: pure-go")
-	} else {
-		slog.Info("BLS backend: blst (default)")
+	// Use canonical hash-to-curve and subgroup-checked pairing in normal builds.
+	// The historical pure-Go prototype and its former secret registry are not an oracle.
+	blsBackend, err := bls.SelectConsensusBLSBackend(config.BLSBackend)
+	if err != nil {
+		return nil, err
 	}
+	crypto.SetBLSBackend(blsBackend)
+	slog.Info("BLS backend", "backend", crypto.DefaultBLSBackend().Name())
 
 	// Initialize KZG backend for EIP-4844 blobs and EIP-7594 PeerDAS cell proofs.
 	// This is required for computing cell proofs in BlobsBundleV2 (Fulu+).
@@ -499,28 +500,21 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	poolCfg.AllowAATx = config.AllowAATx
 	// EIP-2780: tell the pool whether the chain runs Glamsterdan so it uses
 	// the correct (lower) base intrinsic gas for validation.
-	// Also read the genesis block gas limit so the pool accepts txs up to that size.
-	if chainCfg := bc.Config(); chainCfg != nil {
-		var genesisTime uint64
-		if gen := bc.Genesis(); gen != nil {
-			genesisTime = gen.Header().Time
-			if gen.Header().GasLimit > 0 {
-				poolCfg.BlockGasLimit = gen.Header().GasLimit
-			}
-		}
-		poolCfg.IsGlamsterdan = chainCfg.IsGlamsterdan(genesisTime)
-		poolCfg.IsPrague = chainCfg.IsPrague(genesisTime)
-		poolCfg.IsOsaka = chainCfg.IsOsaka(genesisTime)
+	// Seed the block gas limit from the restored head; SetForkRules and Reset
+	// below install its complete admission context before journal replay.
+	if head := bc.CurrentBlock(); head != nil {
+		poolCfg.BlockGasLimit = head.GasLimit()
 	}
 	// --txpool.price-history: number of blocks for the gas-price suggestor.
 	if config.TxpoolPriceHistory > 0 {
 		poolCfg.PriceHistoryBlocks = config.TxpoolPriceHistory
 	}
 	n.txPool = txpool.New(poolCfg, bc.State())
-	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
 	if bc.Config() != nil {
 		n.txPool.SetForkRules(bc.Config(), bc.CurrentBlock().Time())
 	}
+	n.txPool.Reset(bc.State(), bc.CurrentBlock().Header())
+	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
 
 	// Initialize tx journal for pending tx persistence across restarts.
 	// Journal replay must happen after n.txPool is initialized.

@@ -45,6 +45,7 @@ const (
 
 // Blob bundle errors.
 var (
+	ErrVerifierUnavailable    = errors.New("blobs bundle: KZG verifier unavailable")
 	ErrBlobBundleEmpty        = errors.New("blobs bundle: empty bundle")
 	ErrBlobBundleMismatch     = errors.New("blobs bundle: commitments/proofs/blobs length mismatch")
 	ErrBlobBundleTooMany      = errors.New("blobs bundle: too many blobs")
@@ -56,8 +57,7 @@ var (
 )
 
 // KZGVerifier defines the interface for verifying KZG commitments against
-// blobs. Implementations may use real cryptographic verification or a
-// trusted setup stub.
+// blobs. A production implementation must perform cryptographic verification.
 type KZGVerifier interface {
 	// VerifyBlobCommitment checks that the KZG commitment matches the blob data.
 	// Returns nil if the commitment is valid.
@@ -86,11 +86,10 @@ type BlobsBundleBuilder struct {
 	commitments [][]byte
 	proofs      [][]byte
 	blobs       [][]byte
-	verifier    KZGVerifier // optional; nil skips verification
+	verifier    KZGVerifier // required to admit blobs
 }
 
-// NewBlobsBundleBuilder creates a new builder. If verifier is nil, KZG
-// commitment/proof verification is skipped.
+// NewBlobsBundleBuilder creates a builder. A nil verifier rejects blob admission.
 func NewBlobsBundleBuilder(verifier KZGVerifier) *BlobsBundleBuilder {
 	return &BlobsBundleBuilder{
 		verifier: verifier,
@@ -117,8 +116,11 @@ func (b *BlobsBundleBuilder) AddBlob(blob, commitment, proof []byte) error {
 		return ErrBlobBundleTooMany
 	}
 
-	// Optionally verify the commitment against the blob.
-	if b.verifier != nil {
+	// A missing verifier must not turn unverified blob data into a valid bundle.
+	if b.verifier == nil {
+		return ErrVerifierUnavailable
+	}
+	{
 		if err := b.verifier.VerifyBlobCommitment(blob, commitment); err != nil {
 			return fmt.Errorf("commitment verification failed: %w", err)
 		}

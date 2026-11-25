@@ -113,7 +113,7 @@ type BLSBackend interface {
 // activeBLSBackend is the currently selected BLS backend.
 var (
 	activeBLSMu      sync.RWMutex
-	activeBLSBackend BLSBackend = &PureGoBLSBackend{}
+	activeBLSBackend BLSBackend = &ConsensusBLSBackend{}
 )
 
 // DefaultBLSBackend returns the currently active BLS backend.
@@ -124,12 +124,12 @@ func DefaultBLSBackend() BLSBackend {
 }
 
 // SetBLSBackend sets the active BLS backend. This is safe for concurrent use.
-// Passing nil resets to the default pure-Go backend.
+// Passing nil resets to the consensus backend.
 func SetBLSBackend(b BLSBackend) {
 	activeBLSMu.Lock()
 	defer activeBLSMu.Unlock()
 	if b == nil {
-		b = &PureGoBLSBackend{}
+		b = &ConsensusBLSBackend{}
 	}
 	activeBLSBackend = b
 }

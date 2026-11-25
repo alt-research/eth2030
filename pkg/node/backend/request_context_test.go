@@ -48,7 +48,9 @@ func TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation(t *testin
 			defer cancel()
 			scoped := backend.WithContext(ctx).(*RPCBackend)
 			done := make(chan error, 1)
+			started := make(chan struct{})
 			go func() {
+				close(started)
 				var err error
 				switch method {
 				case "call":
@@ -67,11 +69,9 @@ func TestRequestContextStopsNativeExecutionWithoutCrossRequestMutation(t *testin
 				}
 				done <- err
 			}()
-			select {
-			case err := <-done:
-				t.Fatalf("execution returned before cancellation: %v", err)
-			case <-time.After(50 * time.Millisecond):
-			}
+			// Synchronize request launch instead of assuming the bounded Osaka
+			// gas budget will outlast a fixed wall-clock delay on every machine.
+			<-started
 			// A different request remains usable while the expensive scoped execution is active.
 			otherTo, otherGas := types.Address{18: 0x43, 19: 1}.Hex(), "0x5208"
 			if _, _, err := backend.CallAtHeader(rpctypes.CallArgs{To: &otherTo, Gas: &otherGas}, header); err != nil {

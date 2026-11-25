@@ -164,33 +164,25 @@ func (s *Sim) WirePool() *txpool.TxPool {
 	if s.poolConfig != nil {
 		cfg = *s.poolConfig
 	}
-	rules := s.cfg.Rules(s.CurrentBlock().Number(), s.cfg.IsMerge(), s.CurrentBlock().Time())
-	cfg.IsPrague, cfg.IsGlamsterdan = rules.IsPrague, rules.IsGlamsterdan
-	cfg.IsOsaka = s.cfg.IsOsaka(s.CurrentBlock().Time())
-	reader := &poolStateReader{sim: s}
+	reader := s.bc.State()
 	s.pool = txpool.New(cfg, reader)
-	s.pool.SetCodeReader(reader)
+	s.pool.SetForkRules(s.cfg, s.CurrentBlock().Time())
+	s.pool.Reset(reader, s.CurrentBlock().Header())
+	s.pool.SetCodeReader(&poolCodeReader{sim: s})
 	s.pool.SetBaseFee(s.CurrentBlock().Header().BaseFee)
 	return s.pool
 }
 
-// poolStateReader adapts the chain state to the txpool StateReader interface.
-type poolStateReader struct{ sim *Sim }
+// Code checks follow the current canonical state even when Reset replaces it.
+type poolCodeReader struct{ sim *Sim }
 
-func (r *poolStateReader) snapshot() state.StateDB {
-	st, err := r.sim.bc.StateAtBlock(r.sim.bc.CurrentBlock())
-	if err != nil {
-		panic(fmt.Errorf("eiptest: read pool head state: %w", err))
-	}
-	return st
+func (r *poolCodeReader) GetCodeSize(addr types.Address) int {
+	return r.sim.bc.State().GetCodeSize(addr)
 }
-
-func (r *poolStateReader) GetCodeSize(addr types.Address) int { return r.snapshot().GetCodeSize(addr) }
-
-func (r *poolStateReader) GetNonce(addr types.Address) uint64 { return r.snapshot().GetNonce(addr) }
-func (r *poolStateReader) GetBalance(addr types.Address) *big.Int {
-	return r.snapshot().GetBalance(addr)
+func (r *poolCodeReader) GetBalance(addr types.Address) *big.Int {
+	return r.sim.bc.State().GetBalance(addr)
 }
+func (r *poolCodeReader) GetNonce(addr types.Address) uint64 { return r.sim.bc.State().GetNonce(addr) }
 
 // Config returns the chain config.
 func (s *Sim) Config() *config.ChainConfig { return s.cfg }
@@ -344,7 +336,7 @@ func (s *Sim) resetPool() {
 	}
 	head := s.CurrentBlock()
 	s.pool.SetForkRules(s.cfg, head.Time())
-	s.pool.Reset(&poolStateReader{sim: s})
+	s.pool.Reset(s.bc.State(), head.Header())
 	s.pool.SetBaseFee(head.Header().BaseFee)
 }
 

@@ -266,7 +266,8 @@ func SelectWinningBid(bids []ScoredBid) (*ScoredBid, int, error) {
 
 // FullBidValidation performs all validation steps on a bid: structural
 // validation, commitment verification, collateral check, and value range.
-// It returns nil if the bid passes all checks.
+// Commitment equality is not authentication; canonical CL authentication is
+// unavailable, so passing the constraints still returns an explicit error.
 func FullBidValidation(
 	bid *epbs.BuilderBid,
 	builderAddr types.Address,
@@ -280,7 +281,7 @@ func FullBidValidation(
 
 	// 1. Structural validation (reuse existing).
 	signed := &epbs.SignedBuilderBid{Message: *bid}
-	if err := epbs.ValidateBuilderBid(signed); err != nil {
+	if err := epbs.ValidateBuilderBidStructure(signed); err != nil {
 		return fmt.Errorf("structural: %w", err)
 	}
 
@@ -299,5 +300,5 @@ func FullBidValidation(
 		return err
 	}
 
-	return nil
+	return epbs.ErrBidAuthenticationUnavailable
 }

@@ -102,32 +102,12 @@ func (r *PQKeyRegistry) GetKey(validatorIndex uint64) (*RegistryEntry, error) {
 	return cpy, nil
 }
 
-// VerifyRegistration verifies a registration signature for the given
-// validator. The signature is validated against the stored classic public
-// key using a stub scheme: the expected signature is keccak256(classicPubKey || validatorIndex).
-// A production implementation would use ECDSA or BLS verification.
+// VerifyRegistration fails closed: the old publicly computable key/index digest
+// is not a signature. This in-memory registry has no selected canonical proof of
+// possession scheme or trusted CL context yet (HGT-008 / EIP-8483).
+// RegisterKey stores metadata only and does not authenticate a registration.
 func (r *PQKeyRegistry) VerifyRegistration(validatorIndex uint64, signature []byte) bool {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	entry, exists := r.entries[validatorIndex]
-	if !exists {
-		return false
-	}
-	if entry.Status == StatusRevoked {
-		return false
-	}
-
-	expected := registrationDigest(entry.ClassicPubKey, validatorIndex)
-	if len(signature) != len(expected) {
-		return false
-	}
-	// Constant-time comparison to avoid timing attacks.
-	var diff byte
-	for i := range expected {
-		diff |= signature[i] ^ expected[i]
-	}
-	return diff == 0
+	return false
 }
 
 // MigrateKey transitions a validator to a new PQ public key. The entry
@@ -260,14 +240,6 @@ func merkleRoot(leaves [][]byte) types.Hash {
 	}
 
 	return types.BytesToHash(layer[0])
-}
-
-// registrationDigest computes the expected signature digest for a
-// registration verification: keccak256(classicPubKey || validatorIndex).
-func registrationDigest(classicPubKey []byte, validatorIndex uint64) []byte {
-	buf := make([]byte, 8)
-	binary.BigEndian.PutUint64(buf, validatorIndex)
-	return crypto.Keccak256(classicPubKey, buf)
 }
 
 // ValidateRegistryEntry checks that a registry entry has valid fields:

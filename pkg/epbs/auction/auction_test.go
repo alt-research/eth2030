@@ -31,14 +31,14 @@ func TestPayloadAuctionNew(t *testing.T) {
 	}
 }
 
-func TestPayloadAuctionSubmitBidValid(t *testing.T) {
+// The public auction has no canonical CL authentication context yet.
+func TestPayloadAuctionRejectsUnauthenticatedBid(t *testing.T) {
 	a := NewPayloadAuction()
-	bid := validSignedBid(10, 5000, 1)
-	if err := a.SubmitBid(bid); err != nil {
-		t.Fatalf("SubmitBid: %v", err)
+	if err := a.SubmitBid(validSignedBid(10, 5000, 1)); err == nil {
+		t.Fatal("unauthenticated bid admitted")
 	}
-	if a.BidCount(10) != 1 {
-		t.Errorf("expected 1 bid, got %d", a.BidCount(10))
+	if a.BidCount(10) != 0 {
+		t.Fatal("rejected bid stored")
 	}
 }
 
@@ -57,10 +57,10 @@ func TestPayloadAuctionSubmitInvalidBid(t *testing.T) {
 func TestPayloadAuctionGetWinningBidHighestValue(t *testing.T) {
 	a := NewPayloadAuction()
 
-	// Submit bids with different values.
+	// Exercise ordering using internal already-authenticated model fixtures.
 	for i, v := range []uint64{3000, 7000, 5000, 1000} {
 		bid := validSignedBid(100, v, epbs.BuilderIndex(i+1))
-		if err := a.SubmitBid(bid); err != nil {
+		if err := a.insertBid(bid); err != nil {
 			t.Fatalf("SubmitBid: %v", err)
 		}
 	}
@@ -88,7 +88,7 @@ func TestPayloadAuctionGetBidsForSlotOrdering(t *testing.T) {
 	values := []uint64{100, 500, 300, 200, 400}
 	for i, v := range values {
 		bid := validSignedBid(50, v, epbs.BuilderIndex(i))
-		a.SubmitBid(bid)
+		a.insertBid(bid)
 	}
 
 	bids := a.GetBidsForSlot(50)
@@ -115,7 +115,7 @@ func TestPayloadAuctionGetBidsForSlotEmpty(t *testing.T) {
 func TestPayloadAuctionGetBidsReturnsDefensiveCopy(t *testing.T) {
 	a := NewPayloadAuction()
 	bid := validSignedBid(10, 5000, 1)
-	a.SubmitBid(bid)
+	a.insertBid(bid)
 
 	bids := a.GetBidsForSlot(10)
 	bids[0] = nil // Mutate the copy.
@@ -130,9 +130,9 @@ func TestPayloadAuctionGetBidsReturnsDefensiveCopy(t *testing.T) {
 func TestPayloadAuctionBidCountMultipleSlots(t *testing.T) {
 	a := NewPayloadAuction()
 
-	a.SubmitBid(validSignedBid(10, 1000, 1))
-	a.SubmitBid(validSignedBid(10, 2000, 2))
-	a.SubmitBid(validSignedBid(20, 3000, 1))
+	a.insertBid(validSignedBid(10, 1000, 1))
+	a.insertBid(validSignedBid(10, 2000, 2))
+	a.insertBid(validSignedBid(20, 3000, 1))
 
 	if a.BidCount(10) != 2 {
 		t.Errorf("slot 10: expected 2 bids, got %d", a.BidCount(10))
@@ -148,9 +148,9 @@ func TestPayloadAuctionBidCountMultipleSlots(t *testing.T) {
 func TestPayloadAuctionPruneSlot(t *testing.T) {
 	a := NewPayloadAuction()
 
-	a.SubmitBid(validSignedBid(10, 1000, 1))
-	a.SubmitBid(validSignedBid(10, 2000, 2))
-	a.SubmitBid(validSignedBid(20, 3000, 1))
+	a.insertBid(validSignedBid(10, 1000, 1))
+	a.insertBid(validSignedBid(10, 2000, 2))
+	a.insertBid(validSignedBid(20, 3000, 1))
 
 	a.PruneSlot(10)
 
@@ -166,7 +166,7 @@ func TestPayloadAuctionPruneBefore(t *testing.T) {
 	a := NewPayloadAuction()
 
 	for slot := uint64(1); slot <= 10; slot++ {
-		a.SubmitBid(validSignedBid(slot, slot*100, 1))
+		a.insertBid(validSignedBid(slot, slot*100, 1))
 	}
 
 	a.PruneBefore(5)
@@ -185,7 +185,7 @@ func TestPayloadAuctionPruneBefore(t *testing.T) {
 
 func TestPayloadAuctionPruneBeforeZero(t *testing.T) {
 	a := NewPayloadAuction()
-	a.SubmitBid(validSignedBid(1, 100, 1))
+	a.insertBid(validSignedBid(1, 100, 1))
 	a.PruneBefore(0)
 	if a.BidCount(1) != 1 {
 		t.Error("PruneBefore(0) should not prune anything")

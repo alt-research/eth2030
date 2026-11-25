@@ -756,6 +756,68 @@ New CREATE/CREATE2 exact-limit tests and transaction/pool boundary regressions f
 
 # Project Status
 
+## PR #167 master integration (2026-11-25)
+
+### Current status: LOCAL INTEGRATION VERIFIED; PUBLICATION AND HOSTED RESULTS TRACKED ON PR #167
+
+Integrated canonical upstream `98d43177` from merge base `dbe10116`, resolving all 19 conflict paths after 1,204 upstream-exclusive commits. Earlier fork-master comparison was not a comparison with the actual PR target. Preserved upstream canonical Frames, monotonic Engine backend predicates, FCU-owned head/fee updates, real snap sync, retired builder API deletion, dependency/security upgrades and every CI workflow. Historical website commits are already upstream. See the [complete conflict and semantic integration audit](docs/plans/hegota-a/master-integration-167.md).
+
+Added signed canonical Frame pool/builder/replay coverage independently of explicitly opted-in legacy fixtures; repaired low-iteration class-group VDF evaluation, integration FOCIL missing-context assertions and host-dependent test assumptions. Native FCU/reorg regression closes the specific R16 head-propagation issue; other historical findings require requalification against the chosen specification composition. Pre-merge evidence is preserved separately.
+
+Local verification: build and vet; full Go suite (23,520 test/subtest pass events, zero failures, 124 explicitly recorded skips); focused race suite (6,652 pass events) and the exact CI race selection (3,916 pass events), both with zero failures; integration/blst/goethkzg tags; 12/12 native/direct-Geth v1.17.10 baseline cases with zero skips; 12 Python checker regressions, 70 Python 3.14 control tests, independent goldens/source hashes and finalized consensus fixture replay. Linux `/proc` capture tests and actual proof/full official corpus workflows remain hosted checks. Current evidence: [verification.json](evidence/hegota-a/verification.json). Publication and hosted outcomes: [PR #167](https://github.com/alt-research/eth2030/pull/167).
+
+## Hegotá Group A: Specifications, Baseline and Runtime Paths (2026-11-25)
+
+### Current Status: ALL SEVEN A TASKS VERIFIED; FOLLOW-UP AUDIT COMPLETE; COMBINED FORK RELEASE NOT READY
+
+Follow-up audit of `f490fe9`: repaired missing head-context propagation on P2P/reorg callbacks, block-based prerequisites, combined fork VM selection, retroactive remote/IPlus schedule compatibility, manifest trailing-data rejection and source/admission update validation. Added real-node P2P/listener and positive processor activation regressions. Recorded native FCU canonical-head switching as explicit release-blocking HGT-006-R16. The first full run exposed a reproducible existing DAS session-ID collision; fixed timestamp collisions with an atomic sequence and a frozen-clock concurrency test. The original failed attempt and final passing runs are both recorded in the verification evidence. See [follow-up audit](docs/plans/hegota-a/follow-up-audit.md).
+
+Completed HGT-001, HGT-004, HGT-005, HGT-006, HGT-007, HGT-008 and HGT-009. The [A delivery report](docs/plans/hegota-a/README.md) links every task to its artifacts and reproducible evidence. Locked 14 repository revisions and 108 source-file hashes; registered six separate profiles, D01–D09 and all 72 EIPs (3 implementation tracks, 29 conditional, 3 watch, 37 excluded). Open composition decisions remain isolated rather than silently resolved.
+
+Implemented canonical/legacy genesis aliases with conflict rejection, explicit legacy Frame activation across processor/VM/pool/RPC and canonical-head pool updates, historical Engine method intervals, and legacy AA disabled by default. Removed unsigned/unauthenticated ePBS acceptance, publicly computable PQ proof acceptance, optional KZG-verifier acceptance and false-success state backends; unwired state repair stays disabled. Normal BLS operations now use canonical, subgroup-checked gnark cryptography without a private-key registry fallback; an independent blst vector cross-checks signing/verification and aggregation. Explicit uncompiled blst requests fail.
+
+Added a strict native/direct-upstream differential CLI, locked official historical fixtures, independent encoding/hash goldens, arithmetic/domain oracles, semantic trace seeds, prerequisite conformance/repair records, source/admission update checks and CI checks. All 12 required historical cases execute and agree on state root, logs hash and gas, with zero skips. Sixteen prerequisite repairs remain explicitly open for later feature conformance; nine semantic trace seeds have not been executed in a latest-spec native EVM. These limitations do not disappear when A is complete.
+
+Verification: local `go build ./...`, `go vet ./...`, full suite (22,096 named test/subtest pass events, zero failures; 131 existing skips recorded separately), focused race suite (5,120 pass events, zero failures), `-tags blst` crypto tests, twelve Python checker regression tests, source/golden checks and actual native runtime identity tests. [Evidence](evidence/hegota-a/verification.json) separates native, upstream reference, helper, wrapper and unrun container/devnet paths. No Docker/CL interoperability or complete Hegotá conformance is claimed. Only this task's changes are committed.
+
+## EIP and Consensus Reference Update (2026-11-25)
+
+### Current Status: COMPLETE
+
+Updated the two reference submodules to their upstream default branch (`master`) heads, as explicitly requested:
+
+- `refs/EIPs`: `49beda901dcf3747ed4b91f853a333595fb2cbc4` → `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa` (2026-11-25 UTC).
+- `refs/consensus-specs`: `14e6ce5a5334910b0d0575d782e468305ad92373` → `d2021d2719235f0df4726a1d330502cb15aa8ea3` (2026-11-23 UTC).
+
+Both submodule working trees were clean before and after the update. The new pins match the Hegotá research snapshot; all 70 published EIP file hashes in that manifest match the updated checkout. Updated the development plan's current-reference note while preserving historical research provenance. No upstream specification text or client implementation was edited.
+
+Verification: each submodule HEAD equals its fetched `origin/master`; `cd pkg && env -u GOROOT go build ./...`; `git diff --check`.
+
+## Hegotá Executable Development Plan (2026-11-25)
+
+### Current Status: PLAN COMPLETE; IMPLEMENTATION TASKS NOT STARTED
+
+Created [the complete development plan](docs/plans/hegota-development-plan-2026-11.md) with 77 dependency-ordered tasks and individual dispositions for all 72 reviewed proposals. It defines specification decisions, native-client integration, Frames/state/gas/receipts, public mempool/P2P/RPC, conditional PQ and migration work, FOCIL/CL integration, candidate admission, differential and cross-client tests, recovery, release gates, and maintenance. The 18–28 week initial scheduling range explicitly assumes two EL engineers, one CL/integration engineer, shared testing support, stable core scope and limited mature candidates; it must be re-estimated after the baseline audit and is not an official fork date.
+
+Additional repository findings: native and geth-wrapper binaries follow distinct paths; Docker's native entrypoint differs from parts of the devnet README; existing Frames/FOCIL smoke checks and the feature-runner verdict aggregation are insufficient for conformance acceptance. The expected sibling checkouts are absent locally. The plan makes these prerequisite tasks and does not claim that implementation, official devnet interoperability, fixture conformance, or external deployment has been completed.
+
+Verification: `cd pkg && env -u GOROOT go build ./...`; task-ID/dependency DAG validation; 72-EIP coverage and local-link checks; `git diff --check`. Only documentation and task tracking changed.
+
+## Hegotá Macro Planning and EIP Discussion Review (2026-11-25)
+
+### Current Status: RESEARCH AND PLANNING COMPLETE; IMPLEMENTATION NOT STARTED IN THIS TASK
+
+Created a Chinese macro development plan, an individual review register for 72 proposals, and a source manifest with 77 EIP/context records. The research compares the current Hegotá Meta EIP with EF priorities, public proposal discussions, and dated ACD/breakout records through November 25. It records stale Meta entries, the Quick Slots withdrawal, continuing FOCIL scope review, evolving Frames/PQ interfaces, and inter-EIP specification inconsistencies. Public topic streams were fetched completely; the analysis reviews selected consequential replies and scope history, not every historical PR, video, private discussion, or implementation rule.
+
+The implementation baseline is `dbe10116b703f88a97a6c45f1443b489e8e3b4ce`. Read-only reference submodules remain pinned to February 2026. The plan identifies old FrameTx/APPROVE semantics, the node backend's unsupported inclusion-list storage path, and the need for a versioned specification composition and conformance matrix before feature work.
+
+Deliverables:
+
+- [Macro development plan](docs/plans/hegota-macro-plan-2026-11.md)
+- [Individual EIP/discussion register](docs/plans/hegota-eip-review-2026-11.md)
+- [Pinned sources and discussion coverage](docs/plans/hegota-sources-2026-11.json)
+
+Verification: `cd pkg && env -u GOROOT go build ./...`; `cd pkg && env -u GOROOT go test ./core/types ./core/eips ./core/vm ./txpool/frametx ./focil ./engine/... ./node/backend/...`; document/source coverage, snapshot hashes and local-link checks. These establish the local baseline only; current Hegotá conformance and cross-client devnet validation remain future implementation gates. No protocol code, reference submodules, or sibling repositories were changed.
 ## README Link and Quick Start Audit (2026-11-13)
 
 - Updated the GitHub Pages URL, clone commands, badges, and release links. Fixed the fixture and devnet setup commands, documented the Go version required by the module, and directed readers to local devnet setup while the public endpoints are unavailable.

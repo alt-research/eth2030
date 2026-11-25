@@ -735,6 +735,7 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
 			IsGlamsterdan:    rules.IsGlamsterdan,
+			IsLegacyFrames:   config.IsLegacyFrameEnabledAt(header.Number, header.Time),
 			IsAmsterdam:      rules.IsAmsterdam,
 			IsPrague:         rules.IsPrague,
 			IsOsaka:          rules.IsOsaka,
@@ -825,8 +826,8 @@ func applyTransactionInternal(config *corconfig.ChainConfig, getHash vm.GetHashF
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		return applyFrame8141(config, getHash, statedb, header, tx, gp, tracker, tracing...)
 	}
-	if tx.Type() == types.FrameTxType && config != nil && config.IsHogota(header.Time) {
-		return nil, 0, errors.New("historical Frame envelope is not valid at Bogotá")
+	if tx.Type() == types.FrameTxType && !config.IsLegacyFrameEnabledAt(header.Number, header.Time) {
+		return nil, 0, errors.New("frame transactions unavailable: historical envelope requires an explicit legacy profile")
 	}
 	// EIP-2200 original storage is scoped to this transaction, not to the
 	// last disk/block commit. Builders and staged sync may execute many txs

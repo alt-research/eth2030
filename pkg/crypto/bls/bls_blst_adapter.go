@@ -191,3 +191,5 @@ func blstGenKeyPair(ikm []byte) (pk, sk []byte) {
 	}
 	return pubkey, secretKey
 }
+
+func init() { blstConsensusFactory = func() BLSBackend { return &BlstRealBackend{} } }

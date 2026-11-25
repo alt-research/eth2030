@@ -229,7 +229,7 @@ func newFlagSet(cfg *node.Config) *flagSet {
 	// --- EP-5 Roadmap Gaps ---
 	fs.IntVar(&cfg.AttesterSampleSize, "attester-sample-size", cfg.AttesterSampleSize, "per-slot attester sample: 0=full committee, 256, 512, or 1024 (GAP-3.4)")
 	fs.StringVar(&cfg.FinalityMode, "finality-mode", cfg.FinalityMode, "finality engine: ssf (default) or minimmit (GAP-5.2)")
-	fs.StringVar(&cfg.BLSBackend, "bls-backend", cfg.BLSBackend, "BLS backend: blst (default) or pure-go (GAP-7.2)")
+	fs.StringVar(&cfg.BLSBackend, "bls-backend", cfg.BLSBackend, "BLS backend: pure-go (gnark, default) or blst (requires blst build tag)")
 
 	// --- EP-6 Block Building Pipeline ---
 	fs.StringVar(&cfg.MixnetMode, "mixnet", cfg.MixnetMode, "anonymous tx transport: simulated (default) | tor | nym (BB-1.1)")

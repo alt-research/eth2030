@@ -59,45 +59,22 @@ func TestE2E_Roadmap_GlamsterdamRepricing(t *testing.T) {
 	}
 }
 
-// TestE2E_Roadmap_EPBSBuilderAuction tests builder bid submission, auction
-// winner selection, and bid ordering.
-func TestE2E_Roadmap_EPBSBuilderAuction(t *testing.T) {
-	auction := epbsauction.NewPayloadAuction()
-	slot := uint64(100)
-
-	bid1 := e2e.MakeBuilderBid(slot, 5000, 1)
-	bid2 := e2e.MakeBuilderBid(slot, 8000, 2)
-	bid3 := e2e.MakeBuilderBid(slot, 3000, 3)
-
-	for i, bid := range []*epbs.SignedBuilderBid{bid1, bid2, bid3} {
-		if err := auction.SubmitBid(bid); err != nil {
-			t.Fatalf("SubmitBid[%d]: %v", i, err)
+// Public ePBS admission must reject prototype fixtures without CL authentication.
+func TestE2E_Roadmap_EPBSRejectsUnauthenticatedAuction(t *testing.T) {
+	a := epbsauction.NewPayloadAuction()
+	for _, bid := range []*epbs.SignedBuilderBid{e2e.MakeBuilderBid(100, 5000, 1), e2e.MakeBuilderBid(100, 8000, 2)} {
+		if err := a.SubmitBid(bid); err == nil {
+			t.Fatal("unauthenticated bid accepted")
 		}
 	}
-
-	winner, err := auction.GetWinningBid(slot)
-	if err != nil {
-		t.Fatalf("GetWinningBid: %v", err)
+	if a.BidCount(100) != 0 {
+		t.Fatal("rejected bid stored")
 	}
-	if winner.Message.Value != 8000 {
-		t.Errorf("winning bid value: got %d, want 8000", winner.Message.Value)
-	}
-
-	bids := auction.GetBidsForSlot(slot)
-	if len(bids) != 3 {
-		t.Fatalf("bids count: got %d, want 3", len(bids))
-	}
-	// Verify descending order.
-	for i := 1; i < len(bids); i++ {
-		if bids[i].Message.Value > bids[i-1].Message.Value {
-			t.Errorf("bids not sorted: %d > %d at index %d",
-				bids[i].Message.Value, bids[i-1].Message.Value, i)
-		}
+	if _, err := a.GetWinningBid(100); err == nil {
+		t.Fatal("winner selected without authenticated bid")
 	}
 }
 
-// TestE2E_Roadmap_FOCILInclusionCompliance builds an inclusion list and
-// checks that a block satisfies the IL requirements.
 func TestE2E_Roadmap_FOCILInclusionCompliance(t *testing.T) {
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})

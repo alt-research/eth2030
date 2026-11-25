@@ -67,6 +67,12 @@
       "path": "refs/EIPs/EIPS/eip-2929.md",
       "sha256": "177b2040bf0376b1182eb5571c7fda7a41b6f594083fa816506d65cfcf2acc4a",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 214,
+      "path": "refs/EIPs/EIPS/eip-214.md",
+      "sha256": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
     }
   ],
   "profiles": {
@@ -138,16 +144,20 @@
       "criteria": [
         {
           "id": "scope_identity",
-          "statement": "APPROVE enforces flags, sender, payer and ADDRESS.",
+          "statement": "APPROVE enforces flags, sender, payer and ADDRESS. APPROVE returns exactly its designated memory region under RETURN gas semantics, including an ignored full-width offset for zero length.",
           "clauses": [
-            "8141/APPROVE/Behavior"
+            "8141/APPROVE/Behavior",
+            "8141/APPROVE/Gas"
           ],
           "files": [
-            "pkg/core/vm/frame_8141.go"
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/vm/jump_table.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestFrame8141ApprovalScopeMatrix",
-            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback"
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveEmptyReturnIgnoresOffset",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveReturnMemoryBoundaries"
           ]
         },
         {
@@ -437,13 +447,14 @@
       "criteria": [
         {
           "id": "bal",
-          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets.",
+          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets. Static write prohibition is checked before SSTORE gas calculation and must not introduce a storage read.",
           "clauses": [
             "7928/Recording Semantics",
             "8141/Behavior",
             "7928/Gas Validation Before State Access",
             "7928/EIP-7702 Delegation",
-            "7928/SSTORE"
+            "7928/SSTORE",
+            "214/Specification"
           ],
           "files": [
             "pkg/core/vm/frame_8141_bal.go"
@@ -454,7 +465,8 @@
             "github.com/eth2030/eth2030/core/execution::TestFrame8141DirectPrecompileBALGasBoundary",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess"
           ]
         },
         {

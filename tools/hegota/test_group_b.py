@@ -57,16 +57,25 @@ class GroupBCoverageTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, message):
                     read_events(log)
 
-    def test_missing_delegation_source_rejected(self):
-        manifest = self.manifest()
-        manifest['normative_sources'] = [s for s in manifest['normative_sources'] if s['eip'] != 7702]
-        with self.assertRaisesRegex(ValueError, 'missing normative source'):
-            validate_manifest(ROOT, manifest)
+    def test_missing_normative_source_rejected(self):
+        for eip in (7702, 2929, 214):
+            with self.subTest(eip=eip):
+                manifest = self.manifest()
+                manifest['normative_sources'] = [s for s in manifest['normative_sources'] if s['eip'] != eip]
+                with self.assertRaisesRegex(ValueError, 'missing normative source'):
+                    validate_manifest(ROOT, manifest)
 
     def test_missing_dispatch_boundary_regression_rejected(self):
-        manifest = self.manifest()
-        row = next(t for t in manifest['tasks'] if t['id'] == 'HGT-015')
-        criterion = next(c for c in row['criteria'] if c['id'] == 'bal')
-        criterion['tests'] = [t for t in criterion['tests'] if not t.endswith('TestFrame8141DirectPrecompileBALGasBoundary')]
-        with self.assertRaisesRegex(ValueError, 'mandatory boundary regression omitted'):
-            validate_manifest(ROOT, manifest)
+        for task, criterion_id, name in (
+            ('HGT-015', 'bal', 'TestFrame8141DirectPrecompileBALGasBoundary'),
+            ('HGT-015', 'bal', 'TestFrame8141StaticSstoreHasNoStorageAccess'),
+            ('HGT-003', 'scope_identity', 'TestFrame8141ApproveEmptyReturnIgnoresOffset'),
+            ('HGT-003', 'scope_identity', 'TestFrame8141ApproveReturnMemoryBoundaries'),
+        ):
+            with self.subTest(test=name):
+                manifest = self.manifest()
+                row = next(t for t in manifest['tasks'] if t['id'] == task)
+                criterion = next(c for c in row['criteria'] if c['id'] == criterion_id)
+                criterion['tests'] = [t for t in criterion['tests'] if not t.endswith(name)]
+                with self.assertRaisesRegex(ValueError, 'mandatory boundary regression omitted'):
+                    validate_manifest(ROOT, manifest)

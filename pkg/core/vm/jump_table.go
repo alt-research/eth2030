@@ -176,15 +176,9 @@ func memoryMcopy(stack *Stack) (uint64, bool) {
 // memoryApprove returns the required memory size for APPROVE (EIP-8141).
 // Stack: [offset, length, scope] (top-0 = offset, top-1 = length)
 func memoryApprove(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	// EIP-8141 uses RETURN semantics, including ignoring offset when length
+	// is zero. Validate full-width words only for a nonempty memory region.
+	return memoryReturn(stack)
 }
 
 // memoryTxParamCopy returns the required memory size for TXPARAMCOPY (EIP-8141).

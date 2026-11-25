@@ -140,7 +140,7 @@ func (evm *EVM) SetFrameTransaction(tx *types.FrameTx8141, payment *types.FrameP
 	create2 := *evm.jumpTable[CREATE2]
 	create2.constantGas = 12000
 	evm.jumpTable[CREATE2] = &create2
-	evm.jumpTable[SSTORE] = &operation{execute: opFrameSstore8141, minStack: 2, maxStack: 1024, dynamicGas: gasFrameSstore8141}
+	evm.jumpTable[SSTORE] = &operation{execute: opFrameSstore8141, minStack: 2, maxStack: 1024, dynamicGas: gasFrameSstore8141, writes: true}
 	return ctx
 }
 

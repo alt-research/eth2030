@@ -7,7 +7,6 @@ import LaterProofWork from '@/components/LaterProofWork';
 import officialScope from '@/data/official-glamsterdam.json';
 import DevelopmentProgress from '@/components/DevelopmentProgress';
 import RemainingRoadmapWork from '@/components/RemainingRoadmapWork';
-import { developmentSnapshot } from '@/lib/data';
 import { type Layer } from '@/data/eips';
 import { roadmapStages, roadmapStatuses, roadmapStatusNames, roadmapLayer, roadmapProgress, groupRoadmapNodes } from '@/lib/roadmap';
 import styles from './roadmap.module.css';
@@ -80,7 +79,7 @@ export default function RoadmapPage() {
         <div className={styles.heroAside}><span>THE BIG PICTURE</span><strong>G* <i>→</i> L*</strong><p>Six upgrades. One evolving map.</p><a href={source} target="_blank" rel="noreferrer">View the original EF drawing ↗</a></div>
       </section>
 
-      <div className={styles.intro}><div><span>01 / PROTOCOL ROADMAP</span><h2>Six upgrades. One view.</h2><p>Glamsterdam follows the official scheduled core list; later cards retain project planning labels.</p></div><div className={styles.snapshot}><i /> REVIEWED UPDATE <b>{developmentSnapshot.date}</b></div></div>
+      <div className={styles.intro}><div><span>01 / PROTOCOL ROADMAP</span><h2>Six upgrades. One view.</h2><p>Glamsterdam follows the official scheduled core list; later cards retain project planning labels.</p></div><div className={styles.snapshot}><i /> REVIEWED UPDATE <b>{officialScope.reviewed}</b></div></div>
       <OfficialGlamsterdamScope />
       <section className={styles.cards} aria-label="Ethereum roadmap upgrades">{roadmapStages.map((phase, index) => <PhaseCard key={phase.id} phase={phase} index={index} />)}</section>
       <LaterProofWork />

@@ -39,6 +39,9 @@ func validateFrame8141Receipt(result frame8141ResultRLP) error {
 	if result.Status > FrameStatusSkipped {
 		return errors.New("invalid frame status")
 	}
+	if result.Status == ReceiptStatusFailed && (result.GasUsed.State != 0 || len(result.Logs) != 0) {
+		return errors.New("failed frame has state gas or logs")
+	}
 	if result.Status == FrameStatusSkipped &&
 		(result.GasUsed != (FrameGasLimits{}) || len(result.Logs) != 0) {
 		return errors.New("skipped frame has gas usage or logs")

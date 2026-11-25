@@ -12,6 +12,8 @@ import (
 // FrameStateGas tracks EIP-8141's explicit, isolated state pools. Snapshots
 // are taken with the same StateDB snapshot that journals the corresponding writes.
 type FrameStateGas struct {
+	NonceProfile     *types.FrameTx8250Delta
+	LegacyNonce      uint64
 	Tx               *types.FrameTx8141
 	Payment          *types.FramePayment
 	Index            int
@@ -80,6 +82,7 @@ func (f *FrameStateGas) Charge(amount uint64) error {
 }
 
 var ErrFrameStateGas = errors.New("frame state gas exhausted before child call")
+var ErrFrameNonceOverflow = errors.New("Frame sender nonce overflow")
 
 const (
 	frameNewAccountGas = 120 * 1530
@@ -159,16 +162,9 @@ func (evm *EVM) approve8141(target types.Address, scope uint64) error {
 		if evm.StateDB.GetBalance(target).Cmp(f.Payment.Escrow()) < 0 {
 			return ErrInsufficientBalance
 		}
-		if evm.StateDB.Empty(f.Tx.Sender) {
-			if err := f.Charge(frameNewAccountGas); err != nil {
-				return err
-			}
+		if err := evm.consumeFrameNonce(); err != nil {
+			return err
 		}
-		nonce := evm.StateDB.GetNonce(f.Tx.Sender)
-		if nonce == ^uint64(0) {
-			return errors.New("Frame sender nonce overflow")
-		}
-		evm.StateDB.SetNonce(f.Tx.Sender, nonce+1)
 		evm.StateDB.SubBalance(target, f.Payment.Escrow())
 		payer := target
 		f.Payer = &payer
@@ -191,7 +187,7 @@ func opApprove8141(_ *uint64, evm *EVM, contract *Contract, memory *Memory, stac
 		return nil, ErrExecutionReverted
 	}
 	if err := evm.approve8141(target, scope.Uint64()); err != nil {
-		if errors.Is(err, ErrOutOfGas) {
+		if errors.Is(err, ErrOutOfGas) || errors.Is(err, ErrFrameNonceOverflow) {
 			return nil, err
 		}
 		return nil, ErrExecutionReverted
@@ -364,6 +360,9 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 		value = big.NewInt(int64(types.FrameTxType))
 	case 1:
 		value = new(big.Int).SetUint64(tx.Nonce)
+		if ctx.NonceProfile != nil {
+			value.SetUint64(ctx.NonceProfile.NonceSeq)
+		}
 	case 2:
 		value = new(big.Int).SetBytes(tx.Sender[:])
 	case 3:
@@ -380,6 +379,9 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 		value = new(big.Int).SetUint64(uint64(len(tx.BlobVersionedHashes)))
 	case 8:
 		hash, err := tx.SigningHash()
+		if ctx.NonceProfile != nil {
+			hash, err = ctx.NonceProfile.SigningHash()
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -392,6 +394,25 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 		value = new(big.Int).SetUint64(uint64(len(tx.Signatures)))
 	case 12:
 		value = new(big.Int).SetUint64(ctx.Left)
+	case 13, 14, 15, 16:
+		if ctx.NonceProfile == nil {
+			return nil, ErrInvalidTxParamIndex
+		}
+		keys := ctx.NonceProfile.NonceKeys
+		value = new(big.Int)
+		switch param.Uint64() {
+		case 13:
+			value.SetUint64(ctx.LegacyNonce)
+		case 14:
+			value.SetUint64(uint64(len(keys)))
+		case 15:
+			hash := types.NonceKeysHash8250(keys)
+			value.SetBytes(hash[:])
+		case 16:
+			if len(keys) > 0 {
+				value.Set(keys[0])
+			}
+		}
 	default:
 		return nil, ErrInvalidTxParamIndex
 	}

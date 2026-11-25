@@ -9,7 +9,6 @@ import (
 
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
@@ -39,6 +38,7 @@ type BuildBlockAttributes struct {
 	Withdrawals  []*types.Withdrawal
 	BeaconRoot   *types.Hash
 	GasLimit     uint64
+	SlotNumber   *uint64
 
 	// InclusionListTxs contains RLP-encoded transactions from inclusion lists
 	// that MUST be included in this block (EIP-7547/7805 FOCIL).
@@ -68,7 +68,7 @@ func NewBlockBuilder(config *config.ChainConfig, chain BlockchainReader, pool Tx
 // transaction lists, each ordered by effective gas price descending.
 func sortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blobs []*types.Transaction) {
 	for _, tx := range pending {
-		if tx.Type() == types.BlobTxType {
+		if len(tx.BlobHashes()) > 0 {
 			blobs = append(blobs, tx)
 		} else {
 			regular = append(regular, tx)
@@ -95,20 +95,6 @@ func validateBlobHashes(hashes []types.Hash) error {
 		}
 	}
 	return nil
-}
-
-// calcExcessBlobGasFromParent returns the excess blob gas for a new block
-// given the parent header. Uses parent's ExcessBlobGas and BlobGasUsed;
-// returns 0 if either is nil (pre-Cancun parent).
-func calcExcessBlobGasFromParent(parent *types.Header) uint64 {
-	var parentExcess, parentUsed uint64
-	if parent.ExcessBlobGas != nil {
-		parentExcess = *parent.ExcessBlobGas
-	}
-	if parent.BlobGasUsed != nil {
-		parentUsed = *parent.BlobGasUsed
-	}
-	return gas.CalcExcessBlobGas(parentExcess, parentUsed)
 }
 
 // calldataFloorDelta computes the additional gas to charge under EIP-7623
@@ -150,6 +136,16 @@ func logBuilderAAPostExecution(header *types.Header, tx *types.Transaction, txIn
 // After all transactions are applied, withdrawals are processed (EIP-4895),
 // requests are accumulated (EIP-7685), and the state root is computed.
 func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttributes) (*types.Block, []*types.Receipt, error) {
+	block, result, err := b.BuildBlockWithResult(parent, attrs)
+	if err != nil {
+		return nil, nil, err
+	}
+	return block, result.Receipts, nil
+}
+
+// BuildBlockWithResult returns the receipts, requests, and BAL from the build.
+func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBlockAttributes) (*types.Block, *execution.ProcessResult, error) {
+	getHash := b.getHashFnForParent(parent)
 	// Determine gas limit: use attributes if provided, otherwise derive from parent.
 	gasLimit := attrs.GasLimit
 	if gasLimit == 0 {
@@ -168,6 +164,16 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		UncleHash:  EmptyUncleHash,
 	}
 
+	if b.config != nil && b.config.IsAmsterdam(attrs.Timestamp) {
+		header.SlotNumber = attrs.SlotNumber
+		// The low-level constructor defaults an omitted slot to uint64 zero.
+		// Engine callers validate and provide the authoritative CL slot.
+		if header.SlotNumber == nil {
+			slot := uint64(0)
+			header.SlotNumber = &slot
+		}
+	}
+
 	if attrs.BeaconRoot != nil {
 		header.ParentBeaconRoot = attrs.BeaconRoot
 	}
@@ -177,7 +183,11 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 	var blobGasUsed uint64
 	var excessBlobGas uint64
 	if cancunActive {
-		excessBlobGas = calcExcessBlobGasFromParent(parent)
+		var blobErr error
+		excessBlobGas, blobErr = gas.CalcExcessBlobGasForHeader(parent, b.config, header.Time)
+		if blobErr != nil {
+			return nil, nil, blobErr
+		}
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = &blobGasUsed // updated later
 	}
@@ -219,8 +229,16 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		}
 	}
 	if statedb == nil {
+		if b.chain != nil && b.config != nil && b.config.BinaryOverlayTime != nil {
+			return nil, nil, fmt.Errorf("binary overlay parent %s: %w", parent.Hash(), ErrUnknownParent)
+		}
 		// Fallback: create an empty state (useful for testing).
 		statedb = state.NewMemoryStateDB()
+	}
+
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
@@ -238,48 +256,9 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		preTracker = bal.NewTracker()
 	}
 
-	// EIP-4788: store the parent beacon block root before any user transactions.
-	if b.config != nil && b.config.IsCancun(header.Time) {
-		if balActive && header.ParentBeaconRoot != nil {
-			timestampIdx := header.Time % eips.BeaconHistoryBufferLength
-			rootIdx := timestampIdx + eips.BeaconHistoryBufferLength
-			tsSlot := eips.Uint64ToHash(timestampIdx)
-			rootSlot := eips.Uint64ToHash(rootIdx)
-			oldTsVal := statedb.GetState(eips.BeaconRootAddress, tsSlot)
-			oldRootVal := statedb.GetState(eips.BeaconRootAddress, rootSlot)
-			eips.ProcessBeaconBlockRoot(statedb, header)
-			newTsVal := eips.Uint64ToHash(header.Time)
-			preTracker.RecordStorageChange(eips.BeaconRootAddress, tsSlot, oldTsVal, newTsVal)
-			preTracker.RecordStorageChange(eips.BeaconRootAddress, rootSlot, oldRootVal, *header.ParentBeaconRoot)
-		} else {
-			eips.ProcessBeaconBlockRoot(statedb, header)
-		}
-	}
-
-	// EIP-2935: store parent block hash in history storage contract (Prague+).
 	pragueActive := b.config != nil && b.config.IsPrague(header.Time)
-	if pragueActive && header.Number.Uint64() > 0 {
-		if balActive {
-			parentNum := header.Number.Uint64() - 1
-			slotBig := new(big.Int).SetUint64(parentNum % eips.HistoryServeWindow)
-			var slotHash types.Hash
-			if slotBig.Sign() > 0 {
-				slotBig.FillBytes(slotHash[32-len(slotBig.Bytes()):])
-			}
-			oldVal := statedb.GetState(eips.HistoryStorageAddress, slotHash)
-			eips.ProcessParentBlockHash(statedb, parentNum, header.ParentHash)
-			preTracker.RecordStorageChange(eips.HistoryStorageAddress, slotHash, oldVal, header.ParentHash)
-		} else {
-			eips.ProcessParentBlockHash(statedb, header.Number.Uint64()-1, header.ParentHash)
-		}
-	}
-
-	// EIP-7997: deploy the deterministic CREATE2 factory at Glamsterdam activation.
-	if b.config != nil && b.config.IsGlamsterdan(header.Time) {
-		if balActive && statedb.GetCodeSize(eips.FactoryAddress) == 0 {
-			preTracker.RecordAddressTouch(eips.FactoryAddress)
-		}
-		eips.ApplyEIP7997(statedb)
+	if err := execution.ApplyPreExecutionSystems(b.config, getHash, statedb, header, preTracker); err != nil {
+		return nil, nil, err
 	}
 
 	// Merge pre-execution system contract accesses into the block BAL.
@@ -309,8 +288,8 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 			}
 			ilTxHashes[ilTx.Hash()] = struct{}{}
 
-			// Check gas pool.
-			if gp.Gas() < ilTx.Gas() {
+			// EIP-7825 caps individual transactions at Osaka.
+			if !fitsTransaction(b.config, header.Time, gp, ilTx) || exceedsTxGasCap(b.config, header.Time, ilTx) {
 				continue
 			}
 			// Check base fee.
@@ -320,6 +299,11 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 				}
 			}
 
+			if cancunActive && len(ilTx.BlobHashes()) > 0 {
+				if ilTx.BlobGas() > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed || validateBlobHashes(ilTx.BlobHashes()) != nil {
+					continue
+				}
+			}
 			statedb.SetTxContext(ilTx.Hash(), txIndex)
 
 			// EIP-7928: create per-transaction BAL tracker before execution.
@@ -330,11 +314,12 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 			var tracker *bal.AccessTracker
 			if balActive {
 				tracker = bal.NewTracker()
-				preBalances, preNonces = execution.CapturePreState(statedb, ilTx)
+				preBalances, preNonces = execution.CapturePreState(b.config, statedb, ilTx, header.Coinbase)
 			}
 
 			snap := statedb.Snapshot()
-			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
+			gpBefore := *gp
+			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
 			if applyErr != nil {
 				statedb.RevertToSnapshot(snap)
 				continue
@@ -343,7 +328,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 			// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 			if glamActive && !vm.CheckDimStorageCap(blockDimStorageUsed, receipt.DimStorageGas) {
 				statedb.RevertToSnapshot(snap)
-				gp.AddGas(used)
+				*gp = gpBefore
 				continue
 			}
 			blockDimStorageUsed += receipt.DimStorageGas
@@ -362,7 +347,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 				gasUsed += used
 			}
 
-			if ilTx.Type() == types.BlobTxType && cancunActive {
+			if len(ilTx.BlobHashes()) > 0 && cancunActive {
 				blobGasUsed += ilTx.BlobGas()
 			}
 
@@ -391,7 +376,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 	regularTxs, blobTxs := sortedTxLists(pendingTxs, header.BaseFee)
 	var validBlobTxs []*types.Transaction
 	for _, tx := range blobTxs {
-		if tx.BlobSidecar() != nil {
+		if types.HasFullBlobSidecar(tx) {
 			validBlobTxs = append(validBlobTxs, tx)
 		}
 	}
@@ -428,14 +413,14 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		}
 
 		// Skip if not enough gas left for this tx.
-		if gp.Gas() < tx.Gas() {
+		if !fitsTransaction(b.config, header.Time, gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
 		// EIP-4844: validate blob transactions and enforce blob gas limit.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
-			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
+			if txBlobGas > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed {
 				continue // would exceed block blob gas limit
 			}
 			// Validate versioned hashes.
@@ -443,8 +428,8 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 				continue
 			}
 			// Validate blob fee cap against current blob base fee.
-			blobBaseFee := execution.CalcBlobBaseFee(excessBlobGas)
-			if tx.BlobGasFeeCap() == nil || tx.BlobGasFeeCap().Cmp(blobBaseFee) < 0 {
+			blobBaseFee := gas.BlobBaseFeeForHeader(b.config, header)
+			if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical && (tx.BlobGasFeeCap() == nil || tx.BlobGasFeeCap().Cmp(blobBaseFee) < 0) {
 				continue
 			}
 		}
@@ -460,13 +445,13 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		var tracker *bal.AccessTracker
 		if balActive {
 			tracker = bal.NewTracker()
-			preBalances, preNonces = execution.CapturePreState(statedb, tx)
+			preBalances, preNonces = execution.CapturePreState(b.config, statedb, tx, header.Coinbase)
 		}
 
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
-		gpBefore := gp.Gas()
-		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
+		gpBefore := *gp
+		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
 			statedb.RevertToSnapshot(snap)
@@ -479,7 +464,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 			statedb.RevertToSnapshot(snap)
 			// Restore the exact amount debited from the pool (EIP-7778 uses
 			// pre-refund gas for pool accounting, which may differ from used).
-			gp.AddGas(gpBefore - gp.Gas())
+			*gp = gpBefore
 			continue
 		}
 		blockDimStorageUsed += receipt.DimStorageGas
@@ -533,7 +518,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		recGen.GenerateReceipt(outcome, uint(txIndex))
 
 		// Track blob gas for EIP-4844 blob transactions.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			blobGasUsed += tx.BlobGas()
 		}
 
@@ -549,7 +534,7 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 		txIndex++
 	}
 
-	header.GasUsed = gasUsed
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && (b.config.IsGlamsterdan(header.Time) || b.config.IsAmsterdam(header.Time)))
 
 	// EIP-4844: set blob gas used in header.
 	if cancunActive {
@@ -599,51 +584,31 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 	header.TxHash = deriveTxsRoot(txs)
 	header.ReceiptHash = deriveReceiptsRoot(receipts)
 
-	// Compute state root after applying all transactions.
-	header.Root = statedb.GetRoot()
-
-	// Build the block body with withdrawals. Post-Shanghai blocks must always
-	// include withdrawals (even if empty) per consensus rules.
+	// Post-Shanghai blocks include an empty withdrawals list when necessary.
 	withdrawals := attrs.Withdrawals
-	shanghaiActive := b.config != nil && b.config.IsShanghai(header.Time)
-	if withdrawals == nil && shanghaiActive {
-		withdrawals = []*types.Withdrawal{}
-	}
-
-	body := &types.Body{
-		Transactions: txs,
-		Withdrawals:  withdrawals,
-	}
-
-	// EIP-4895: process withdrawals and credit each recipient.
-	if withdrawals != nil {
-		wHash := deriveWithdrawalsRoot(withdrawals)
-		header.WithdrawalsHash = &wHash
-
-		for _, w := range withdrawals {
-			// Withdrawal amount is in Gwei; convert to wei.
-			amount := new(big.Int).SetUint64(w.Amount)
-			amount.Mul(amount, big.NewInt(1_000_000_000)) // Gwei -> wei
-			statedb.AddBalance(w.Address, amount)
+	if b.config != nil && b.config.IsShanghai(header.Time) {
+		if withdrawals == nil {
+			withdrawals = []*types.Withdrawal{}
 		}
-		// Recompute state root after withdrawals.
-		header.Root = statedb.GetRoot()
+		hash := deriveWithdrawalsRoot(withdrawals)
+		header.WithdrawalsHash = &hash
 	}
+	body := &types.Body{Transactions: txs, Withdrawals: withdrawals}
 
-	// EIP-7685: accumulate execution layer requests (Prague+).
+	requests, err := execution.FinalizeBlockExecution(b.config, getHash, statedb, header, withdrawals, receipts, blockBAL)
+	if err != nil {
+		return nil, nil, err
+	}
 	if pragueActive {
-		requests, err := execution.ProcessRequests(b.config, statedb, header)
-		if err == nil && requests != nil {
-			rHash := types.ComputeRequestsHash(requests)
-			header.RequestsHash = &rHash
-			// Recompute state root after request processing.
-			header.Root = statedb.GetRoot()
-		} else if err == nil {
-			// No requests: set empty requests hash.
-			emptyReqs := types.Requests{}
-			rHash := types.ComputeRequestsHash(emptyReqs)
-			header.RequestsHash = &rHash
-		}
+		hash := types.ComputeRequestsHash(requests)
+		header.RequestsHash = &hash
+	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
+	}
+	header.Root = statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return nil, nil, err
 	}
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
@@ -660,13 +625,20 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 	}
 
 	block := types.NewBlock(header, body)
+	if err := validateRLPBlockSize(b.config, block); err != nil {
+		return nil, nil, err
+	}
+	return block, &execution.ProcessResult{Receipts: receipts, Requests: requests, BlockAccessList: blockBAL}, nil
+}
 
-	return block, receipts, nil
+func exceedsTxGasCap(cfg *config.ChainConfig, timestamp uint64, tx *types.Transaction) bool {
+	return gas.ValidateTransactionGasForFork(cfg, timestamp, tx) != nil
 }
 
 // BuildBlockLegacy constructs a new block using the legacy interface (for backward
 // compatibility with existing tests). Transactions are provided directly.
 func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*types.Transaction, timestamp uint64, coinbase types.Address, extra []byte) (*types.Block, []*types.Receipt, error) {
+	getHash := b.getHashFnForParent(parent)
 	gasLimit := calcGasLimit(parent.GasLimit, parent.GasUsed)
 
 	header := &types.Header{
@@ -687,6 +659,11 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		statedb = state.NewMemoryStateDB()
 	}
 
+	statedb, err := execution.PrepareBlockState(b.config, header.Time, statedb)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
 	// Determine if BAL tracking is active for this block.
@@ -702,47 +679,8 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		preTrackerLegacy = bal.NewTracker()
 	}
 
-	// EIP-4788: store the parent beacon block root before any user transactions.
-	if b.config != nil && b.config.IsCancun(header.Time) {
-		if balActive && header.ParentBeaconRoot != nil {
-			timestampIdx := header.Time % eips.BeaconHistoryBufferLength
-			rootIdx := timestampIdx + eips.BeaconHistoryBufferLength
-			tsSlot := eips.Uint64ToHash(timestampIdx)
-			rootSlot := eips.Uint64ToHash(rootIdx)
-			oldTsVal := statedb.GetState(eips.BeaconRootAddress, tsSlot)
-			oldRootVal := statedb.GetState(eips.BeaconRootAddress, rootSlot)
-			eips.ProcessBeaconBlockRoot(statedb, header)
-			newTsVal := eips.Uint64ToHash(header.Time)
-			preTrackerLegacy.RecordStorageChange(eips.BeaconRootAddress, tsSlot, oldTsVal, newTsVal)
-			preTrackerLegacy.RecordStorageChange(eips.BeaconRootAddress, rootSlot, oldRootVal, *header.ParentBeaconRoot)
-		} else {
-			eips.ProcessBeaconBlockRoot(statedb, header)
-		}
-	}
-
-	// EIP-2935: store parent block hash in history storage contract (Prague+).
-	if b.config != nil && b.config.IsPrague(header.Time) && header.Number.Uint64() > 0 {
-		if balActive {
-			parentNum := header.Number.Uint64() - 1
-			slotBig := new(big.Int).SetUint64(parentNum % eips.HistoryServeWindow)
-			var slotHash types.Hash
-			if slotBig.Sign() > 0 {
-				slotBig.FillBytes(slotHash[32-len(slotBig.Bytes()):])
-			}
-			oldVal := statedb.GetState(eips.HistoryStorageAddress, slotHash)
-			eips.ProcessParentBlockHash(statedb, parentNum, header.ParentHash)
-			preTrackerLegacy.RecordStorageChange(eips.HistoryStorageAddress, slotHash, oldVal, header.ParentHash)
-		} else {
-			eips.ProcessParentBlockHash(statedb, header.Number.Uint64()-1, header.ParentHash)
-		}
-	}
-
-	// EIP-7997: deploy the deterministic CREATE2 factory at Glamsterdam activation.
-	if b.config != nil && b.config.IsGlamsterdan(header.Time) {
-		if balActive && statedb.GetCodeSize(eips.FactoryAddress) == 0 {
-			preTrackerLegacy.RecordAddressTouch(eips.FactoryAddress)
-		}
-		eips.ApplyEIP7997(statedb)
+	if err := execution.ApplyPreExecutionSystems(b.config, getHash, statedb, header, preTrackerLegacy); err != nil {
+		return nil, nil, err
 	}
 
 	// Merge pre-execution system contract accesses into the block BAL.
@@ -757,7 +695,10 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	cancunActive := b.config != nil && b.config.IsCancun(header.Time)
 	var blobGasUsed uint64
 	if cancunActive {
-		excessBlobGas := calcExcessBlobGasFromParent(parent)
+		excessBlobGas, blobErr := gas.CalcExcessBlobGasForHeader(parent, b.config, header.Time)
+		if blobErr != nil {
+			return nil, nil, blobErr
+		}
 		header.ExcessBlobGas = &excessBlobGas
 		header.BlobGasUsed = &blobGasUsed
 	}
@@ -802,14 +743,14 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		}
 
 		// Skip if not enough gas left for this tx.
-		if gp.Gas() < tx.Gas() {
+		if !fitsTransaction(b.config, header.Time, gp, tx) || exceedsTxGasCap(b.config, header.Time, tx) {
 			continue
 		}
 
 		// EIP-4844: enforce blob gas limit.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			txBlobGas := tx.BlobGas()
-			if blobGasUsed+txBlobGas > gas.MaxBlobGasPerBlock {
+			if txBlobGas > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed {
 				continue
 			}
 			if err := validateBlobHashes(tx.BlobHashes()); err != nil {
@@ -828,12 +769,13 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		var tracker *bal.AccessTracker
 		if balActive {
 			tracker = bal.NewTracker()
-			preBalances, preNonces = execution.CapturePreState(statedb, tx)
+			preBalances, preNonces = execution.CapturePreState(b.config, statedb, tx, header.Coinbase)
 		}
 
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
-		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, b.getHashFn(), statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
+		gpBefore := *gp
+		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
 			statedb.RevertToSnapshot(snap)
@@ -844,7 +786,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 		if glamActiveLegacy && !vm.CheckDimStorageCap(blockDimStorageUsedLegacy, receipt.DimStorageGas) {
 			statedb.RevertToSnapshot(snap)
-			gp.AddGas(used)
+			*gp = gpBefore
 			continue
 		}
 		blockDimStorageUsedLegacy += receipt.DimStorageGas
@@ -864,7 +806,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		}
 
 		// Track blob gas.
-		if tx.Type() == types.BlobTxType && cancunActive {
+		if len(tx.BlobHashes()) > 0 && cancunActive {
 			blobGasUsed += tx.BlobGas()
 		}
 
@@ -880,7 +822,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		txIndex++
 	}
 
-	header.GasUsed = gasUsed
+	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && (b.config.IsGlamsterdan(header.Time) || b.config.IsAmsterdam(header.Time)))
 	if cancunActive {
 		header.BlobGasUsed = &blobGasUsed
 	}
@@ -912,8 +854,21 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	header.TxHash = deriveTxsRoot(txs)
 	header.ReceiptHash = deriveReceiptsRoot(receipts)
 
-	// Compute state root.
+	requests, err := execution.FinalizeBlockExecution(b.config, getHash, statedb, header, nil, receipts, blockBAL)
+	if err != nil {
+		return nil, nil, err
+	}
+	if b.config != nil && b.config.IsPrague(header.Time) {
+		hash := types.ComputeRequestsHash(requests)
+		header.RequestsHash = &hash
+	}
+	if err := execution.FinalizeOverlayState(statedb); err != nil {
+		return nil, nil, err
+	}
 	header.Root = statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return nil, nil, err
+	}
 
 	// Set Block Access List hash (EIP-7928) when Amsterdam is active.
 	// Sort entries into lexicographic order before hashing (EIP-7928 §ordering).
@@ -935,7 +890,9 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 	}
 
 	block := types.NewBlock(header, body)
-
+	if err := validateRLPBlockSize(b.config, block); err != nil {
+		return nil, nil, err
+	}
 	return block, receipts, nil
 }
 
@@ -946,9 +903,17 @@ func (b *BlockBuilder) SetState(statedb state.StateDB) {
 
 // getHashFn returns the BLOCKHASH lookup function from the chain, or nil if
 // the builder was created without a chain (standalone/test mode).
-func (b *BlockBuilder) getHashFn() func(uint64) types.Hash {
+func (b *BlockBuilder) getHashFn(parent *types.Header) func(uint64) types.Hash {
 	if b.chain == nil {
 		return nil
+	}
+	if b.config != nil && b.config.BinaryOverlayTime != nil {
+		return AncestorHashFn(parent.Hash(), parent.Number.Uint64(), func(hash types.Hash, _ uint64) *types.Header {
+			if block := b.chain.GetBlock(hash); block != nil {
+				return block.Header()
+			}
+			return nil
+		})
 	}
 	return b.chain.GetHashFn()
 }
@@ -980,6 +945,13 @@ func SortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blo
 // effectiveGasPrice returns the effective gas price for a transaction
 // considering the base fee (EIP-1559).
 func effectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		payment, err := frame.Payment(baseFee, big.NewInt(1))
+		if err != nil {
+			return new(big.Int)
+		}
+		return payment.GasPrice()
+	}
 	if baseFee == nil || tx.GasFeeCap() == nil || tx.GasTipCap() == nil {
 		return tx.GasPrice()
 	}
@@ -1086,3 +1058,23 @@ func CalcGasLimit(parentGasLimit, parentGasUsed uint64) uint64 {
 
 // Suppress unused import.
 var _ = calldataFloorDelta
+
+func (b *BlockBuilder) getHashFnForParent(parent *types.Header) func(uint64) types.Hash {
+	if chain, ok := b.chain.(interface {
+		BranchHashFn(*types.Header) func(uint64) types.Hash
+	}); ok {
+		return chain.BranchHashFn(parent)
+	}
+	return b.getHashFn(parent)
+}
+
+func fitsTransaction(cfg *config.ChainConfig, timestamp uint64, gp *gaspool.GasPool, tx *types.Transaction) bool {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		budget, err := frame.GasBudget()
+		return err == nil && gp.FitsFrame(budget.ExecutionReservation, budget.StateReservation)
+	}
+	if cfg != nil && cfg.IsMerge() && cfg.IsAmsterdam(timestamp) && tx.Type() <= types.SetCodeTxType {
+		return gp.FitsFrame(min(tx.Gas(), vm.AmsterdamMaxExecutionGas), tx.Gas())
+	}
+	return gp.Gas() >= tx.Gas()
+}

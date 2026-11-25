@@ -1,0 +1,32 @@
+[
+  {
+    "name": "tracker",
+    "exit": 0,
+    "seconds": 0.11601377101032995,
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/verify-eips.ts",
+      "--files"
+    ]
+  },
+  {
+    "name": "build",
+    "exit": 0,
+    "seconds": 4.020771177019924,
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ]
+  },
+  {
+    "name": "export",
+    "exit": 0,
+    "seconds": 0.046467687003314495,
+    "command": [
+      "node",
+      "scripts/check-export.mjs"
+    ]
+  }
+]

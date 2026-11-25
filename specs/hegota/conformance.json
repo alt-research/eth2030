@@ -24,7 +24,8 @@
         "HGT-070",
         "HGT-080"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7928",
@@ -46,7 +47,8 @@
         "HGT-013",
         "HGT-015"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7685",
@@ -69,7 +71,8 @@
         "HGT-075",
         "HGT-076"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-6110",
@@ -91,7 +94,8 @@
         "HGT-013",
         "HGT-081"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-8037",
@@ -114,7 +118,8 @@
         "HGT-012",
         "HGT-013"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-8038",
@@ -136,7 +141,8 @@
         "HGT-011",
         "HGT-020"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-2780",
@@ -158,7 +164,8 @@
         "HGT-011",
         "HGT-020"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7778",
@@ -180,7 +187,8 @@
         "HGT-011",
         "HGT-015"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7976",
@@ -202,7 +210,8 @@
         "HGT-011",
         "HGT-020"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7825",
@@ -225,7 +234,8 @@
         "HGT-011",
         "HGT-015"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7934",
@@ -247,7 +257,8 @@
         "HGT-015",
         "HGT-044"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7843",
@@ -270,7 +281,8 @@
         "HGT-042",
         "HGT-070"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7702",
@@ -293,7 +305,8 @@
         "HGT-035",
         "HGT-036"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-7708",
@@ -316,7 +329,8 @@
         "HGT-012",
         "HGT-014"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "PRE-8141",
@@ -340,7 +354,8 @@
         "HGT-013",
         "HGT-017"
       ],
-      "release_blocker": true
+      "release_blocker": true,
+      "integration_status": "requires_specification_requalification_on_integrated_master"
     },
     {
       "requirement_id": "A-VERIFIED-01",
@@ -505,19 +520,26 @@
       "spec_sha256": "7345c394b8726383a667b3e5114fa0916410c95de3c1a031663a8e07cbe40e03",
       "owner": "EL core/Engine integration",
       "caller": "pkg/node/backend/engine_fcu.go",
-      "status": "open_conformance_gap",
+      "status": "verified_native_fcu_head_propagation",
       "target_fork": "PoS baseline before Hegota activation",
       "positive_vector": "known non-current FCU head actually switches canonical index/state/head and subsequent RPC/pool agree",
       "negative_vector": "unapplied head switch must not be counted as verified reorg; failed transition is atomic",
       "oracle": "pinned EIP-3675 and Engine API; production route inspection",
-      "test_result": "not_claimed_conformant; current test covers actual chain rewind plus installed listener, not automatic FCU head switching",
-      "open_question": "Native FCU resolves requested head and updates safe/finalized/cache but does not apply canonical head/state or forward the update to the forkchoice manager. Pool activation now follows the actual blockchain head; canonical selection itself remains a release blocker. Startup persistence/config compatibility also needs validation before claiming recovery.",
+      "test_result": "TestNativeForkchoiceRefreshesFrameActivationAndReorg plus upstream native FCU/restart regressions",
+      "open_question": "Specific missing-head issue closed; combined fork/CL interoperability remains independently gated.",
       "affected_tasks": [
         "HGT-013",
         "HGT-080",
         "HGT-087"
       ],
-      "release_blocker": true
+      "release_blocker": false
     }
-  ]
+  ],
+  "integration_review": {
+    "upstream_revision": "98d43177",
+    "date": "2026-11-25",
+    "historical_snapshot": "6a17479",
+    "report": "docs/plans/hegota-a/master-integration-167.md",
+    "rule": "Historical prerequisite findings require requalification on integrated master; do not infer current missing implementation from old audit text."
+  }
 }

@@ -1,0 +1,55 @@
+{
+  "source": "4e224659179dc8050344b48a397f1791450bf24c",
+  "command": [
+    "/projects/eth2030/qualification/node26/pnpm",
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "--project",
+    "unit-minimal",
+    "--coverage",
+    "--maxWorkers=2"
+  ],
+  "started": "2026-11-23T09:31:06.370164+00:00",
+  "finished": "2026-11-23T09:43:27.129419+00:00",
+  "exit": 0,
+  "first_run_failure_retained": "lodestar-full-unit.log",
+  "passed": 5547,
+  "skipped": 9,
+  "test_files_passed": 478,
+  "test_files_skipped": 1,
+  "coverage_claim": "No coverage percentage inferred; v8 summary emitted All files0. Execution counts only.",
+  "original_failure": "First run5546 passed,1 failed,9 skipped because build-time git metadata was cad22db while source was4e22465. Original log retained; normal CLI package build refreshed generated metadata, without editing lib manually.",
+  "logs": [
+    {
+      "name": "lodestar-full-unit.log",
+      "bytes": 537788,
+      "sha256": "cd3087ba8db535f71bfd245fce167d58193309f18581379b1b739be72055fca8"
+    },
+    {
+      "name": "lodestar-cli-build-exact.log",
+      "bytes": 92,
+      "sha256": "2e63a1f9aa60e7db5ba76d2670919fc09a8eaa5d912438b4fa81975cad52c70e"
+    },
+    {
+      "name": "lodestar-full-unit-rebuilt.log",
+      "bytes": 536794,
+      "sha256": "6cf21755d5367ba321d7dd181e3ec45e816a6be34d65909bba16ebf9dd6fc11f"
+    }
+  ],
+  "upstream_ci": {
+    "state": "action_required",
+    "requires": "Upstream maintainer approval; current checks are not executed passes",
+    "pr": "https://github.com/ChainSafe/lodestar/pull/10693"
+  },
+  "corrected_coverage": {
+    "source": "4e224659179dc8050344b48a397f1791450bf24c",
+    "passed": 5547,
+    "skipped": 9,
+    "executed_typescript_records": 821,
+    "line_percent": 63.47,
+    "scope": "Frozen source with corrected include, not upstream hosted approval or native-code coverage.",
+    "upstream_correction_pr": "https://github.com/ChainSafe/lodestar/pull/10725"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "elapsed_seconds": 45.98671369499061,
+  "image": "sha256:0e54acfa45a8d1f7279ebfaed89847b3f498948aece92ac3c83da34b8d8e749e",
+  "network": "none",
+  "sdk_installed": false,
+  "guest_image": "48b22fafa4f7f1759ab61bed7d1386ea61d61fdc7c186b6162be09838a67447a",
+  "source": "7901a25767a8ad3f53d99b3f1821b30bd9d28d75"
+}

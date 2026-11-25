@@ -1,6 +1,5 @@
 // hasher_blake3.go adds BLAKE3 hashing support for the binary trie (EIP-7864).
 // hashBLAKE3 implements the EIP-7864 hash rule: hash(left||right) = BLAKE3-256.
-// Add lukechampine.com/blake3 to go.mod before using.
 package bintrie
 
 import (
@@ -14,13 +13,16 @@ import (
 const (
 	// HashFunctionSHA256 selects SHA-256 for binary trie hashing (default).
 	HashFunctionSHA256 = "sha256"
-	// HashFunctionBlake3 selects BLAKE3-256 for binary trie hashing (EIP-7864 final hash).
+	// HashFunctionBlake3 selects BLAKE3-256 for binary trie hashing (EIP-7864 draft hash).
 	HashFunctionBlake3 = "blake3"
 )
 
 // hashBLAKE3 computes BLAKE3-256(left || right) for two 32-byte hash inputs.
 // This is the EIP-7864 hash rule for binary internal nodes.
 func hashBLAKE3(left, right []byte) types.Hash {
+	if len(left) == 32 && len(right) == 32 && types.BytesToHash(left) == (types.Hash{}) && types.BytesToHash(right) == (types.Hash{}) {
+		return types.Hash{}
+	}
 	h := blake3.New(32, nil)
 	h.Write(left)
 	h.Write(right)

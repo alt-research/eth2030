@@ -42,7 +42,7 @@ func makeChainBlocks(parent *types.Block, count int, statedb state.StateDB) []*t
 // testChain is a helper that creates a blockchain with a genesis block.
 func testChain(t *testing.T) (*Blockchain, *state.MemoryStateDB) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -121,7 +121,7 @@ func TestBlockchain_InsertSingleBlock(t *testing.T) {
 }
 
 func TestBlockchain_InsertBlockWithTx(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -137,7 +137,7 @@ func TestBlockchain_InsertBlockWithTx(t *testing.T) {
 	tx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(7),
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiver,
 		Value:    big.NewInt(100),
 	})
@@ -477,7 +477,7 @@ func TestBlockchain_WriteReadBlock_EmptyBlock(t *testing.T) {
 }
 
 func TestBlockchain_WriteReadBlock_WithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -599,7 +599,7 @@ func TestBlockchain_StateCachePopulatedForEveryBlock(t *testing.T) {
 	// verify every block is cached.  The default cache (4) would evict old
 	// entries once the 5th block is inserted.
 	const nBlocks = 5
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := NewBlockchain(config.TestConfig, genesis, statedb, db, BlockchainOpts{
@@ -636,7 +636,7 @@ func TestBlockchain_StateCachePopulatedForEveryBlock(t *testing.T) {
 }
 
 func TestBlockchain_StateAtUsesCachedState(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000))
@@ -654,7 +654,7 @@ func TestBlockchain_StateAtUsesCachedState(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    uint64(i),
 			GasPrice: big.NewInt(7),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(1),
 		})

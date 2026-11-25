@@ -187,6 +187,7 @@ func TestGetBlockByNumber_NotFound(t *testing.T) {
 
 func TestServer_HTTPPost(t *testing.T) {
 	srv := NewServer(testutil.NewMockBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -209,6 +210,7 @@ func TestServer_HTTPPost(t *testing.T) {
 
 func TestServer_MethodNotAllowed(t *testing.T) {
 	srv := NewServer(testutil.NewMockBackend())
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 

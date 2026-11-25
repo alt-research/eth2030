@@ -3,7 +3,9 @@
 package core
 
 import (
+	"errors"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/bal"
@@ -23,7 +25,7 @@ import (
 // Even without user transactions, EIP-4788 (beacon root) and EIP-2935
 // (parent block hash) system contracts write to state and are tracked.
 func TestProcessWithBAL_EmptyBlock(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	proc := execution.NewStateProcessor(config.TestConfig)
 
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
@@ -41,18 +43,27 @@ func TestProcessWithBAL_EmptyBlock(t *testing.T) {
 	if result.BlockAccessList.Len() == 0 {
 		t.Error("expected system contract entries in BAL for empty block with Cancun/Prague active")
 	}
-	// Verify that all entries have AccessIndex 0 (pre-execution system contracts).
+	// Pre-execution calls use index 0; post-execution request queues use n+1.
+	seenQueues := make(map[types.Address]bool)
 	for _, entry := range result.BlockAccessList.Entries {
-		if entry.AccessIndex != 0 {
-			t.Errorf("system contract entry for %v has AccessIndex %d, want 0", entry.Address, entry.AccessIndex)
+		want := uint64(0)
+		if entry.Address == types.BuilderDepositRequestAddress || entry.Address == types.BuilderExitRequestAddress {
+			want = 1
+			seenQueues[entry.Address] = true
 		}
+		if entry.AccessIndex != want {
+			t.Errorf("system contract entry for %v has AccessIndex %d, want %d", entry.Address, entry.AccessIndex, want)
+		}
+	}
+	if len(seenQueues) != 2 {
+		t.Fatal("both mandatory post-execution queues must appear in the BAL")
 	}
 }
 
 // TestProcessWithBAL_WithTransactions verifies that transactions produce
 // BAL entries tracking balance and nonce changes.
 func TestProcessWithBAL_WithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -141,7 +152,7 @@ func TestProcessWithBAL_PreAmsterdam(t *testing.T) {
 
 // TestBALHash_Computed verifies the BAL hash computation is deterministic.
 func TestBALHash_Computed(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -192,7 +203,7 @@ func TestBALHash_Computed(t *testing.T) {
 // TestBlockBuilder_SetsBALHash verifies that the block builder sets the
 // BlockAccessListHash in the header when Amsterdam is active.
 func TestBlockBuilder_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -229,7 +240,7 @@ func TestBlockBuilder_SetsBALHash(t *testing.T) {
 // gets a BAL hash when Amsterdam is active. The hash may include system
 // contract entries (EIP-4788, EIP-2935) depending on fork activation.
 func TestBlockBuilder_EmptyBlock_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	builder := newLegacyBuilder(config.TestConfig, statedb)
 
 	parent := &types.Header{
@@ -259,7 +270,7 @@ func TestBlockBuilder_EmptyBlock_SetsBALHash(t *testing.T) {
 
 // TestBlockBuilder_BuildBlock_SetsBALHash tests the new BuildBlock API sets BAL hash.
 func TestBlockBuilder_BuildBlock_SetsBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -318,9 +329,9 @@ func TestValidator_RejectsBALMismatch(t *testing.T) {
 	}
 }
 
-// TestValidator_RejectsMissingBALHash verifies that post-Amsterdam blocks
-// must include a BlockAccessListHash.
-func TestValidator_RejectsMissingBALHash(t *testing.T) {
+// TestValidator_RejectsMissingBALHashPostAmsterdam verifies the EIP-7928
+// rule that post-Amsterdam headers must carry block-access-list-hash.
+func TestValidator_RejectsMissingBALHashPostAmsterdam(t *testing.T) {
 	v := coreblock.NewBlockValidator(config.TestConfig)
 
 	header := &types.Header{
@@ -331,7 +342,10 @@ func TestValidator_RejectsMissingBALHash(t *testing.T) {
 	computedHash := types.HexToHash("0xcafebabe")
 	err := v.ValidateBlockAccessList(header, &computedHash)
 	if err == nil {
-		t.Fatal("expected error for missing BAL hash in post-Amsterdam block")
+		t.Fatal("post-Amsterdam block without a BAL hash must be rejected")
+	}
+	if !strings.Contains(err.Error(), "missing block_access_list_hash") {
+		t.Fatalf("unexpected rejection reason: %v", err)
 	}
 }
 
@@ -395,7 +409,7 @@ func TestValidator_AcceptsCorrectBAL(t *testing.T) {
 // TestBlockchain_BALValidation_EndToEnd verifies the full pipeline:
 // build a block, insert it, and verify the BAL hash is validated.
 func TestBlockchain_BALValidation_EndToEnd(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -450,7 +464,7 @@ func TestBlockchain_BALValidation_EndToEnd(t *testing.T) {
 // TestBlockchain_RejectsWrongBALHash verifies that a block with the wrong
 // BAL hash is rejected during insertion.
 func TestBlockchain_RejectsWrongBALHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -499,10 +513,9 @@ func TestBlockchain_RejectsWrongBALHash(t *testing.T) {
 	}
 }
 
-// TestBAL_OnlyRequiredWhenForkActive verifies the conditional behavior:
-// BAL hash required post-Amsterdam, not required pre-Amsterdam.
-func TestBAL_OnlyRequiredWhenForkActive(t *testing.T) {
-	// Create two configs: one with Amsterdam, one without.
+// TestBAL_HashValidationAcrossFork covers BAL hash validation at activation.
+func TestBAL_HashValidationAcrossFork(t *testing.T) {
+	// Activate Amsterdam at a nonzero timestamp to exercise the fork boundary.
 	amsterdamTime := uint64(100)
 	config := &config.ChainConfig{
 		ChainID:                 big.NewInt(1337),
@@ -521,23 +534,34 @@ func TestBAL_OnlyRequiredWhenForkActive(t *testing.T) {
 
 	v := coreblock.NewBlockValidator(config)
 
-	// Pre-Amsterdam block (time 50): should NOT require BAL hash.
-	preHeader := &types.Header{Time: 50}
-	if err := v.ValidateBlockAccessList(preHeader, nil); err != nil {
-		t.Errorf("pre-Amsterdam should not require BAL: %v", err)
-	}
-
-	// Post-Amsterdam block (time 200): should require BAL hash.
-	postHeader := &types.Header{Time: 200, BlockAccessListHash: nil}
-	if err := v.ValidateBlockAccessList(postHeader, nil); err == nil {
-		t.Error("post-Amsterdam block without BAL hash should be rejected")
-	}
-
-	// Post-Amsterdam block with correct BAL hash: should pass.
+	// EIP-7928 requires the header commitment from activation onward, even
+	// for an empty BAL. Before activation, the field must be absent.
 	emptyHash := bal.NewBlockAccessList().Hash()
-	postHeaderValid := &types.Header{Time: 200, BlockAccessListHash: &emptyHash}
-	if err := v.ValidateBlockAccessList(postHeaderValid, &emptyHash); err != nil {
-		t.Errorf("post-Amsterdam block with correct BAL should pass: %v", err)
+	for _, tc := range []struct {
+		name       string
+		time       uint64
+		headerHash *types.Hash
+		computed   *types.Hash
+		wantErr    bool
+	}{
+		{"before/absent", amsterdamTime - 1, nil, nil, false},
+		{"before/present", amsterdamTime - 1, &emptyHash, &emptyHash, true},
+		{"activation/absent", amsterdamTime, nil, nil, true},
+		{"activation/present", amsterdamTime, &emptyHash, &emptyHash, false},
+		{"after/absent", amsterdamTime + 1, nil, nil, true},
+		{"after/present", amsterdamTime + 1, &emptyHash, &emptyHash, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			header := &types.Header{Time: tc.time, BlockAccessListHash: tc.headerHash}
+			err := v.ValidateBlockAccessList(header, tc.computed)
+			if tc.wantErr {
+				if !errors.Is(err, coreblock.ErrInvalidBlockAccessList) {
+					t.Fatalf("want ErrInvalidBlockAccessList, got %v", err)
+				}
+			} else if err != nil {
+				t.Fatalf("valid BAL header rejected: %v", err)
+			}
+		})
 	}
 }
 

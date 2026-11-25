@@ -16,7 +16,7 @@ import (
 // TestE2EFullBlockLifecycle exercises the complete lifecycle:
 // create accounts -> submit txs to pool -> build block -> process -> verify state.
 func TestE2EFullBlockLifecycle(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -30,7 +30,7 @@ func TestE2EFullBlockLifecycle(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -85,7 +85,7 @@ func TestE2EFullBlockLifecycle(t *testing.T) {
 // TestE2EMultiBlockChain builds 5 consecutive blocks and verifies the chain
 // of parent hashes, gas limit elasticity, and base fee adjustments.
 func TestE2EMultiBlockChain(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -158,7 +158,7 @@ func TestE2EMultiBlockChain(t *testing.T) {
 // TestE2EEIP1559GasPricing builds blocks with varying gas usage and verifies
 // base fee adjustments follow EIP-1559 rules.
 func TestE2EEIP1559GasPricing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -202,7 +202,7 @@ func TestE2EEIP1559GasPricing(t *testing.T) {
 		nonce++
 	}
 
-	statedb2 := state.NewMemoryStateDB()
+	statedb2 := newBuilderRequestTestState()
 	statedb2.AddBalance(sender, big.NewInt(10_000_000_000))
 	builder2 := block.NewBlockBuilder(coreconfig.TestConfig, nil, nil)
 	builder2.SetState(statedb2)
@@ -232,7 +232,7 @@ func TestE2EEIP1559GasPricing(t *testing.T) {
 		GasUsed:  800_000, // above 50% target
 		BaseFee:  big.NewInt(1000),
 	}
-	statedb3 := state.NewMemoryStateDB()
+	statedb3 := newBuilderRequestTestState()
 	statedb3.AddBalance(sender, big.NewInt(10_000_000_000))
 	builder3 := block.NewBlockBuilder(coreconfig.TestConfig, nil, nil)
 	builder3.SetState(statedb3)
@@ -248,7 +248,7 @@ func TestE2EEIP1559GasPricing(t *testing.T) {
 
 // TestE2EContractDeployAndCall deploys a simple contract and calls it.
 func TestE2EContractDeployAndCall(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	coinbase := types.BytesToAddress([]byte{0xff})
 
@@ -269,7 +269,7 @@ func TestE2EContractDeployAndCall(t *testing.T) {
 	createTx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(10),
-		Gas:      100000,
+		Gas:      300_000,
 		To:       nil, // contract creation
 		Value:    big.NewInt(0),
 		Data:     initCode,
@@ -317,8 +317,8 @@ func TestE2EParallelExecution(t *testing.T) {
 	}
 
 	// Set up two identical state DBs.
-	seqState := state.NewMemoryStateDB()
-	parState := state.NewMemoryStateDB()
+	seqState := newBuilderRequestTestState()
+	parState := newBuilderRequestTestState()
 	for _, p := range pairs {
 		seqState.AddBalance(p.sender, big.NewInt(10_000_000))
 		parState.AddBalance(p.sender, big.NewInt(10_000_000))
@@ -455,7 +455,7 @@ func TestE2ERLPBlockRoundTrip(t *testing.T) {
 // TestE2EStateRootConsistency verifies that state root changes consistently
 // as transactions are applied across multiple blocks.
 func TestE2EStateRootConsistency(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 

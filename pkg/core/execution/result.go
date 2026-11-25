@@ -4,12 +4,21 @@ import "github.com/eth2030/eth2030/core/types"
 
 // ExecutionResult holds the outcome of a transaction execution.
 type ExecutionResult struct {
+	MaxUsedGas      uint64 // Consumption before refund, including the calldata floor
+	GasRefund       uint64 // Actual refund before applying the calldata floor
 	UsedGas         uint64
+	StateGasUsed    uint64 // EIP-8037 net durable state gas
 	BlockGasUsed    uint64 // EIP-7778: pre-refund gas used for block accounting
 	DimStorageGas   uint64 // GAP-2.2: DimStorage gas used (SSTORE state-creation premium)
 	Err             error
 	ReturnData      []byte
 	ContractAddress types.Address // set for contract creation
+
+	// EIP-8141 frame transaction fields: PayerApproved/Payer identify the
+	// gas payer approved via APPROVE(1)/(2), FrameResults the per-frame
+	// outcomes (receipt format [cumulative_gas_used, payer, [frame, ...]]).
+	Payer        types.Address
+	FrameResults []types.FrameResult
 }
 
 // Unwrap returns the execution error, if any.

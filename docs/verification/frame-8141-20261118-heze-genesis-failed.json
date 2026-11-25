@@ -1,0 +1,13 @@
+{
+  "enclave": "eth2030-frame-control-979e6ef3",
+  "package": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
+  "source": "88d9c11836223bf14b1b0749ba2d3cd74f9d08dd",
+  "enclave_id": "af19672094fa4811bf8b46d00a383462",
+  "remaining_containers": [],
+  "remaining_volumes": [],
+  "enclave_removed": true,
+  "failure": {
+    "phase": "Heze genesis SSZ loading",
+    "error": "OffsetOutOfBounds(128748053)"
+  }
+}

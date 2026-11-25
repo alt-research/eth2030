@@ -37,11 +37,22 @@ type Receipt struct {
 
 	// EIP-7778: Block gas used (pre-refund) for block gas limit validation
 	BlockGasUsed uint64
+	StateGasUsed uint64 // EIP-8037 derived state dimension; not part of receipt RLP
 
 	// Inclusion information
 	BlockHash        Hash
 	BlockNumber      *big.Int
 	TransactionIndex uint
+
+	// EIP-8141 frame transaction fields (derived, not part of the
+	// consensus receipts-root encoding): Payer is the account that paid the
+	// gas per the receipt format [cumulative_gas_used, payer,
+	// [frame_receipt, ...]]; FrameResults carries the per-frame outcomes.
+	Payer        Address
+	FrameResults []FrameResult
+
+	// Seven-field Frame receipts use the split dimensions in the consensus encoding.
+	FrameResults8141 []FrameResult8141
 }
 
 // NewReceipt creates a new receipt with the given status and cumulative gas.
@@ -85,4 +96,22 @@ func DeriveReceiptFields(receipts []*Receipt, blockHash Hash, blockNumber uint64
 			logIndex++
 		}
 	}
+}
+
+// BlockGasTotal applies EIP-7778 gross execution accounting and EIP-8037's
+// independent state dimension, including explicit EIP-8141 frame state usage.
+func BlockGasTotal(receipts []*Receipt, preRefund bool) uint64 {
+	var execution, state uint64
+	for _, receipt := range receipts {
+		if (preRefund || receipt.FrameResults8141 != nil) && receipt.BlockGasUsed != 0 {
+			execution += receipt.BlockGasUsed
+		} else {
+			execution += receipt.GasUsed
+		}
+		state += receipt.StateGasUsed
+		for _, frame := range receipt.FrameResults8141 {
+			state += frame.GasUsed.State
+		}
+	}
+	return max(execution, state)
 }

@@ -21,6 +21,9 @@ const (
 // blob transaction (EIP-4844). Stored out-of-band alongside the tx so it does
 // not affect the signing hash or on-chain RLP encoding.
 type BlobSidecarData struct {
+	// Version is the ordinary type-3 pool wrapper: 0 is legacy, 1 is PeerDAS.
+	// Canonical Frame envelopes validate their separate wrapper version.
+	Version     byte
 	Blobs       [][]byte
 	Commitments [][]byte
 	Proofs      [][]byte
@@ -460,10 +463,14 @@ func (tx *Transaction) BlobGasFeeCap() *big.Int {
 
 // BlobHashes returns the versioned hashes for EIP-4844 blob transactions.
 func (tx *Transaction) BlobHashes() []Hash {
-	if blob, ok := tx.inner.(*BlobTx); ok {
-		return blob.BlobHashes
+	switch inner := tx.inner.(type) {
+	case *BlobTx:
+		return inner.BlobHashes
+	case *FrameTx8141:
+		return inner.BlobVersionedHashes
+	default:
+		return nil
 	}
-	return nil
 }
 
 // Frames returns the frame list for EIP-8141 frame transactions.
@@ -496,19 +503,20 @@ func (tx *Transaction) PQSigType() uint8 {
 // FrameSender returns the sender address for EIP-8141 frame transactions.
 // Returns the zero address for all other transaction types.
 func (tx *Transaction) FrameSender() Address {
-	if ftx, ok := tx.inner.(*FrameTx); ok {
-		return ftx.Sender
+	switch inner := tx.inner.(type) {
+	case *FrameTx:
+		return inner.Sender
+	case *FrameTx8141:
+		return inner.Sender
+	default:
+		return Address{}
 	}
-	return Address{}
 }
 
 // BlobGas returns the blob gas used by an EIP-4844 blob transaction.
 // Each blob uses 131072 gas (2^17).
 func (tx *Transaction) BlobGas() uint64 {
-	if blob, ok := tx.inner.(*BlobTx); ok {
-		return uint64(len(blob.BlobHashes)) * 131072
-	}
-	return 0
+	return uint64(len(tx.BlobHashes())) * 131072
 }
 
 // CalldataGas returns the EIP-7706 calldata gas for this transaction.
@@ -556,6 +564,8 @@ func (tx *Transaction) RawSignatureValues() (v, r, s *big.Int) {
 		return t.V, t.R, t.S
 	case *SetCodeTx:
 		return t.V, t.R, t.S
+	case *MultiDimFeeTx:
+		return t.rawSignatureValues()
 	case *FrameTx:
 		// Frame transactions have no traditional signature fields.
 		return nil, nil, nil

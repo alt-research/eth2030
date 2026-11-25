@@ -1,0 +1,17 @@
+# Integrated CL and upstream CI repairs
+
+The old merged run45134918940 remains failed. Its four observed failures were traced rather than suppressed.
+
+| Repair | Root cause and retained validation | Delivery |
+| --- | --- | --- |
+| url dependency | Locked2.5.8 failed the published audit; compatible2.5.9 plus form_urlencoded1.2.3 resolve it. No ignore added. Locked build, fresh official advisory comparison and full hosted check-code pass. | Lighthouse13 merged to eth2030. |
+| Optimistic/invalidation fixtures | A producer shared the consumer mock set to SYNCING/INVALID, then demanded a payload ID forbidden by the Engine contract. Produce with a healthy endpoint, then inject the original consumer fault. Preserve real mock non-VALID/no-ID behavior, invalid-parent recovery and optimistic206 assertions. Fulu API216/216 locally; selected mainnet/minimal Fulu/Gloas paths and complete27-job hosted run45151881317 pass. | Lighthouse14 merged to eth2030. |
+| Basic simulator | The3s accelerated Gloas profile published two different previous/current roots around the750ms deadline: canonical slot113's messages arrived796ms after slot start; block114 had15/32 contributions. Primary CI now declares6s minimal slots, preserving32/32 and full finality/block assertions. The original3s failure remains. | Lighthouse15 independently reviewed; exact final-head CI and integration recorded separately. |
+| CI bootstrap retries | cargo-binstall release discovery used anonymous GitHub API, repeated403/402 candidate failures with120s waits before compilation. The archived fallback subsequently completed normally; it was not a simulation deadlock. Set standardGITHUB_TOKEN to the ephemeral job token, without a new secret or elevated permissions. | Part of Lighthouse15. |
+| Lodestar coverage | TypeScript execution5556 cases generated empty LCOV because the include glob matched.js. Correct.ts glob plus fail-empty LCOV guard. Six direct script controls, real old0-byte rejection/new821-record acceptance and full5547pass/9skip rerun. | ChainSafe/lodestar10725, separate from10693 gossip recovery. Both require upstream maintainer approval. |
+
+Local simulator evidence keeps executable metadata and source-content equivalence separate: the retained basic executable embeds932d007 despite source content later committeda4db382; the new actual observer CL binary is separately built from clean ed3ac16. A successful6s simulator is not a3s stress pass, historical incident attribution, or48h operating acceptance.
+
+Sources: [full repaired hosted workflow](https://github.com/jiayaoqijia/lighthouse/actions/runs/45151881317), [PR13](https://github.com/jiayaoqijia/lighthouse/pull/13), [PR14](https://github.com/jiayaoqijia/lighthouse/pull/14), [PR15](https://github.com/jiayaoqijia/lighthouse/pull/15), [coverage PR10725](https://github.com/ChainSafe/lodestar/pull/10725). Full cause/control receipts are retained in the corresponding companion PR documentation. These failures are separate from original04's unobserved storage wait.
+
+The separate PR14 local-testnet workflow retained a Docker registry OAuth connection reset before the doppelganger-failure test could start. Its7 successful jobs, failed preparation and conditional skips are separate from the27-job successful test-suite. The final PR15 workflow reruns the real doppelganger test; it is not converted from a preparation failure into an executed pass by editing the old record. See PR14_LOCAL_TESTNET_FAILURE.json.

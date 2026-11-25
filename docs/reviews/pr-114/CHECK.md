@@ -1,0 +1,7 @@
+# Official execution-API fixture qualification
+
+- [x] Pin and retain upstream call/estimate/access/simulate requests, expected replies and authenticated fixture state/header inputs without editing read-only refs.
+- [x] Verify fixture state roots and execute requests through the native HTTP/RPC/EVM consumers; distinguish supplied fixture pre-state from native historical PoW import.
+- [x] Classify exact response/schema/fork-context mismatches and correct confirmed production defects in separate reviewable scope.
+- [x] Execute all declared fixture cases plus historical/hash/override/trace/cap consumers, meaningful controls and affected/full/race/vet/build checks.
+- [x] Publish the finite matrix and reconcile final acceptance without counting unexecuted cases or weakened expected outputs.

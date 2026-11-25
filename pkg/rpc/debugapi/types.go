@@ -14,22 +14,32 @@ type RPCBlock = rpctypes.RPCBlock
 
 // StructLog is a single step in an EVM execution trace.
 type StructLog struct {
-	PC      uint64            `json:"pc"`
-	Op      string            `json:"op"`
-	Gas     uint64            `json:"gas"`
-	GasCost uint64            `json:"gasCost"`
-	Depth   int               `json:"depth"`
-	Stack   []string          `json:"stack"`
-	Memory  []string          `json:"memory,omitempty"`
-	Storage map[string]string `json:"storage,omitempty"`
+	DisableStack      bool              `json:"-"`
+	EnableMemory      bool              `json:"-"`
+	Refund            *uint64           `json:"refund,omitempty"`
+	ReturnData        *string           `json:"returnData,omitempty"`
+	Error             string            `json:"error,omitempty"`
+	StateGasCost      *int64            `json:"stateGasCost,omitempty"`
+	StateGasReservoir *uint64           `json:"stateGasReservoir,omitempty"`
+	PC                uint64            `json:"pc"`
+	Op                string            `json:"op"`
+	Gas               uint64            `json:"gas"`
+	GasCost           uint64            `json:"gasCost"`
+	Depth             int               `json:"depth"`
+	Stack             []string          `json:"stack"`
+	Memory            []string          `json:"memory,omitempty"`
+	Storage           map[string]string `json:"storage,omitempty"`
 }
 
 // TraceResult is the response for debug_traceTransaction.
 type TraceResult struct {
-	Gas         uint64      `json:"gas"`
-	Failed      bool        `json:"failed"`
-	ReturnValue string      `json:"returnValue"`
-	StructLogs  []StructLog `json:"structLogs"`
+	RegularGasUsed *uint64     `json:"regularGasUsed,omitempty"`
+	StateGasUsed   *uint64     `json:"stateGasUsed,omitempty"`
+	GasRefund      *uint64     `json:"gasRefund,omitempty"`
+	Gas            uint64      `json:"gas"`
+	Failed         bool        `json:"failed"`
+	ReturnValue    string      `json:"returnValue"`
+	StructLogs     []StructLog `json:"structLogs"`
 }
 
 // BlockTraceResult is a single transaction trace within a block trace.
@@ -55,6 +65,8 @@ type DebugMemStats struct {
 // DbgTraceConfig configures how a debug trace should be executed.
 // Mirrors the tracerConfig parameter from debug_traceBlockByNumber et al.
 type DbgTraceConfig struct {
+	EnableMemory bool `json:"enableMemory,omitempty"`
+	Limit        int  `json:"limit,omitempty"`
 	// Tracer selects the tracer type: "callTracer", "prestateTracer",
 	// or empty string for the default struct logger.
 	Tracer string `json:"tracer,omitempty"`
@@ -110,16 +122,22 @@ func parseDbgTimeout(s string) time.Duration {
 
 // DbgCallFrame represents a single call in a callTracer output.
 type DbgCallFrame struct {
-	Type    string          `json:"type"`
-	From    string          `json:"from"`
-	To      string          `json:"to,omitempty"`
-	Value   string          `json:"value,omitempty"`
-	Gas     string          `json:"gas"`
-	GasUsed string          `json:"gasUsed"`
-	Input   string          `json:"input"`
-	Output  string          `json:"output,omitempty"`
-	Error   string          `json:"error,omitempty"`
-	Calls   []*DbgCallFrame `json:"calls,omitempty"`
+	RevertReason      string          `json:"revertReason,omitempty"`
+	StateGasReservoir *string         `json:"stateGasReservoir,omitempty"`
+	RegularGasUsed    *string         `json:"regularGasUsed,omitempty"`
+	StateGasUsed      *string         `json:"stateGasUsed,omitempty"`
+	GasRefund         *string         `json:"gasRefund,omitempty"`
+	Logs              []*DbgCallLog   `json:"logs,omitempty"`
+	Type              string          `json:"type"`
+	From              string          `json:"from"`
+	To                string          `json:"to,omitempty"`
+	Value             string          `json:"value,omitempty"`
+	Gas               string          `json:"gas"`
+	GasUsed           string          `json:"gasUsed"`
+	Input             string          `json:"input"`
+	Output            string          `json:"output,omitempty"`
+	Error             string          `json:"error,omitempty"`
+	Calls             []*DbgCallFrame `json:"calls,omitempty"`
 }
 
 // DbgStorageRangeResult is the response for debug_storageRangeAt.
@@ -208,4 +226,36 @@ type DumpAccount struct {
 // ModifiedAccountsResult lists accounts modified between two blocks.
 type ModifiedAccountsResult struct {
 	Accounts []string `json:"accounts"`
+}
+
+type DbgCallLog struct {
+	Address  string   `json:"address"`
+	Topics   []string `json:"topics"`
+	Data     string   `json:"data"`
+	Position string   `json:"position"`
+	Index    string   `json:"index"`
+}
+
+func (l StructLog) MarshalJSON() ([]byte, error) {
+	type plain StructLog
+	var stack, memory *[]string
+	if !l.DisableStack {
+		values := l.Stack
+		if values == nil {
+			values = []string{}
+		}
+		stack = &values
+	}
+	if l.EnableMemory {
+		values := l.Memory
+		if values == nil {
+			values = []string{}
+		}
+		memory = &values
+	}
+	return json.Marshal(struct {
+		*plain
+		Stack  *[]string `json:"stack,omitempty"`
+		Memory *[]string `json:"memory,omitempty"`
+	}{plain: (*plain)(&l), Stack: stack, Memory: memory})
 }

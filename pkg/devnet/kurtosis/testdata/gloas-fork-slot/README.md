@@ -1,0 +1,7 @@
+# Original independent-client fork-slot divergence
+
+These are original, unmodified SSZ inputs from the owned private network, compressed with deterministic gzip. The pre-state is a 384-validator Fulu slot-63 state whose root agrees in both independent implementations. The original slot-65 block was produced and accepted by unmodified Lodestar 77088eb. It skips the first Gloas slot (64). Its original post-state root is invalid under the selected consensus-specs 2ea9d96a fork-slot clearing rule; this block is retained as a rejection/differential vector, not a valid selected-target golden block.
+
+Lighthouse lcli replays the same complete pre-state/block with real signature verification. The unmodified Lodestar image independently replays and validates its original root. Replayed post-state values differ only in availability bit 64 and the consequent state_roots[64]. Applying the exact selected normative fork-slot clear before the first Gloas slot history hash yields the same complete post-state root as Lighthouse. See manifest.json for exact identities and roots. This diagnostic correction is not represented as a successful unmodified-client network run.
+
+The data is generated for this private development network and contains public chain state and block signatures, not validator private keys. The source SSZ bytes remain unchanged. The recorded independent spec JSON and original block JSON allow reproducing complete context and decoding.

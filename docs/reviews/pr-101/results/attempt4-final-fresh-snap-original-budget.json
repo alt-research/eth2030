@@ -1,0 +1,24 @@
+{
+  "passed": false,
+  "elapsed_since_process_start_seconds": 667.741359,
+  "original_deadline_seconds": 600,
+  "rpc": {
+    "jsonrpc": "2.0",
+    "result": {
+      "startingBlock": "0x0",
+      "currentBlock": "0x0",
+      "highestBlock": "0x0"
+    },
+    "id": 1
+  },
+  "cl": {
+    "data": {
+      "is_syncing": false,
+      "is_optimistic": true,
+      "el_offline": false,
+      "head_slot": "10721",
+      "sync_distance": "0"
+    }
+  },
+  "scope": "Original fresh snap ca45d524 budget result, before any diagnostic deployment."
+}

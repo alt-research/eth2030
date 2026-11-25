@@ -1,142 +1,60 @@
-# L1 Strawmap — ETH2030 Implementation
+# ETH2030 development roadmap
 
-> Derived from the [L1 Strawmap](https://strawmap.org/) — the EF Architecture team's Ethereum protocol roadmap.
-> Last updated: 2026-02-25
+Updated November 24, 2026 against master `b14dbb15`, including merged PRs 155–158 and EIP-7495 functional source `36b3e62d` in PR159 and Lighthouse eth2030 `983f62e9`. Current Glamsterdam inclusion follows [official EIP-7773](https://eips.ethereum.org/EIPS/eip-7773), pinned at `b055feec322fbc37e9d77a393a50b3ff56b31c92`.
 
-## Timeline Overview
+The official core denominator is **20 scheduled EIPs**. Current reviewed ETH2030 labels are **20 Complete**, including EIP-7495 ProgressiveContainer qualification in [PR159](reviews/pr-159/STATUS.md), or 100% of implementation labels. This denominator is not whole-public-network readiness. Five networking EIPs and two informational references are listed separately. EIP-7904 is now an informational gas-cost analysis, not a required repricing change.
 
-| Year | Phase | Key Features | Status |
-|------|-------|-------------|--------|
-| 2026 | Glamsterdam | ePBS, FOCIL, BALs, native AA, repricing, sparse blobpool | ~99% |
-| 2026-2027 | Hegotá | Blob throughput, multidim gas, SSZ blocks/tx, payload chunking | ~97% |
-| 2027 | I+ | Native rollups, zkVM, VOPS, proof aggregation, PQ crypto | ~97% |
-| 2027-2028 | J+ | Encrypted mempool, light client, variable blobs | ~95% |
-| 2028 | K+ | 3SF, quick slots, mandatory proofs, canonical guest | ~97% |
-| 2029 | L+ | Endgame finality, PQ attestations, blob streaming | ~97% |
-| 2029+ | M+ | Gigagas, canonical zkVM, gas futures, PQ transactions | ~95% |
-| 2030++ | Long term | VDF, distributed builders, shielded transfers | ~95% |
+EIP-8025 and canonical Ethereum STF guest research belong to **later proof proposals, with no official fork assignment**. They are excluded from Glamsterdam progress. Other Strawmap cards remain project planning views rather than announced official schedules.
 
-## Strawmap Layers
+## Glamsterdam: adopted node development complete
 
-### Consensus Layer (CL)
+The frozen merged LIFO / signed Gloas scope, 33 original task IDs and R01–R13 are delivered. This does not complete every broader draft/framework or public activation requirement. [Actual progress](PROGRESS.md), [reviewed state](reviews/development-scope-20261124/CURRENT_STATE.json), and [actionable remaining plan](plans/glamsterdam/NEXT_STEPS_20261124.md) retain exact source/evidence boundaries.
 
-| Track | Feature | Phase | Status |
-|-------|---------|-------|--------|
-| Latency | Fast confirmation | Glamsterdam | Done |
-| Latency | Single-slot finality | K+ | Done |
-| Latency | 1-epoch finality | K+ | Done |
-| Latency | 4-slot epochs | K+ | Done |
-| Latency | 6-sec slots (quick slots) | K+ | Done |
-| Latency | Endgame finality | L+ | Done |
-| Latency | Fast L1 finality in seconds | M+ | Done |
-| Accessibility | ePBS | Glamsterdam | Done |
-| Accessibility | FOCIL | Glamsterdam | Done |
-| Accessibility | Modernized beacon state | Hegotá | Done |
-| Accessibility | Attester stake cap | L+ | Done |
-| Accessibility | 1 ETH includers | L+ | Done |
-| Accessibility | APS (committee selection) | L+ | Done |
-| Accessibility | PQ attestations | L+ | Done |
-| Accessibility | Distributed block building | 2030++ | Done |
-| Cryptography | PQ custody replacer | I+ | Done |
-| Cryptography | PQ signature share | L+ | Done |
-| Cryptography | Real-time CL proofs | L+ | Done |
-| Cryptography | PQ L1 hash-based | M+ | Done |
-| Cryptography | VDF randomness | 2030++ | Done |
+| Area | Delivered result / boundary |
+| --- | --- |
+| Execution and APIs |219 combined Go suites, related race checks, vet/native build. Earlier official107 RPC files/108 requests retain their own source. Native and Geth-backed corpus scope stays finite. |
+| Builder/CL | Signed external bids, payments, withheld/late/reorg/registry controls and progressive SSZ. Unsupported local Builder extensions are retired; authoritative state/signatures use the standard CL/EIP-8282 route. The repaired baseline completed27 hosted jobs; final simulator/bootstrap qualification is separate. |
+| Data/networking | eth/70 receipts, eth/71 BALs, eth/72 cells, snap/2 and CL partial columns; earlier external-builder two-row blob 544 KZG proof record retained. |
+| Sync/durability | Independent Geth full/snap late join, restart/retention controls, original-datadir recovery; queued history publication and actual captured FCU fsync/read-lock liveness defects repaired. |
+| Bounded operation | Completed 6h45m05s; 144 healthy samples and 72 stacks after ready 5.5h. 14 unchanged-reference BLS/finality windows and actual stopped slot 97868 authenticated, 160 live + 2 stopped proofs. No 48h verdict. |
 
-### Data Layer (DL)
+Original rounds 03/04 remain failed. The later captured FCU convoy is a confirmed defect with a merged repair; the original 04 precise holder/physical I/O cause is unconfirmed. 73 early missing slots, 686 memory-limit events and three local reveal advisories remain in the successful bounded record. No recurrence is not a root-cause proof.
 
-| Track | Feature | Phase | Status |
-|-------|---------|-------|--------|
-| Throughput | PeerDAS | Glamsterdam | Done |
-| Throughput | Sparse blobpool (EIP-8070) | Glamsterdam | Done |
-| Throughput | Blob throughput increase | Hegotá | Done |
-| Throughput | Local blob reconstruction | Hegotá | Done |
-| Throughput | Decrease sample size | I+ | Done |
-| Throughput | PQ blobs | M+ | Done |
-| Throughput | Teradata L2 | 2030++ | Done |
-| Types | Blob streaming | L+ | Done |
-| Types | Short-dated blob futures | L+ | Done |
-| Types | Variable-size blobs | I+ | Done |
-| Types | Custody proofs | L+ | Done |
-| Types | Forward-cast blobs | M+ | Done |
+## Current completion and next scope
 
-### Execution Layer (EL)
+| Item | Development treatment |
+| --- | --- |
+| Original tasks and confirmed fixes | Complete:33/33 original task IDs and5/5 follow-ups, all merged. No active confirmed adopted-scope implementation TODO. |
+| Integrated CL CI | Complete for the selected profile:27 suite successes and local-testnet9success/1conditional skip; merged tree equals qualified source. |
+|48h/larger-scale acceptance; Lodestar upstream approval | Deferred by the user, excluded from progress; actual acceptance/approval status remains separately recorded. |
+| Original04 attribution | Historical unknown; not declared resolved and not an unimplemented feature. Future actual recurrence capture remains available. |
+| Public activation | Separate chosen-network rollout decision using existing schedule/genesis/override support. No public preset is changed here. |
+| Additional corpus/research/later forks | Separate explicitly adopted scope, not implicit work inside the completed ledger. |
 
-| Track | Feature | Phase | Status |
-|-------|---------|-------|--------|
-| Throughput | Conversion repricing | Glamsterdam | Done |
-| Throughput | Natural gas limit | Hegotá | Done |
-| Throughput | Access gas limit | Hegotá | Done |
-| Throughput | Multidimensional pricing | Hegotá | Done |
-| Throughput | Block in blobs | K+ | Done |
-| Throughput | Mandatory 3-of-5 proofs | K+ | Done |
-| Throughput | Canonical guest | K+ | Done |
-| Throughput | Canonical zkVM | M+ | Done |
-| Throughput | Gas futures | M+ | Done |
-| Throughput | Shared mempools | M+ | Done |
-| Throughput | Gigagas L1 (1 Ggas/sec) | M+ | Done |
-| Sustainability | BALS | Glamsterdam | Done |
-| Sustainability | Binary tree | Hegotá | Done |
-| Sustainability | Payload shrinking | Hegotá | Done |
-| Sustainability | Advance state | L+ | Done |
-| Sustainability | Native rollups | L+ | Done |
-| Sustainability | Exposed ELSA | 2030++ | Done |
-| EVM | Native AA | Glamsterdam | Done |
-| EVM | Misc purges | Hegotá | Done |
-| EVM | Transaction assertions | Hegotá | Done |
-| EVM | NTT precompile(s) | I+ | Done |
-| EVM | Precompiles in zkISA | J+ | Done |
-| EVM | STF in zkISA | J+ | Done |
-| EVM | Proof aggregation | L+ | Done |
-| EVM | PQ transactions | M+ | Done |
-| EVM | AA proofs | M+ | Done |
-| Cryptography | Encrypted mempool | I+ | Done |
-| Cryptography | NII precompile | I+ | Done |
+[Exact policy, activation explanation and source audit](plans/glamsterdam/NEXT_STEPS_20261124.md). Known defects remain actionable even when found during deferred acceptance. No whole-public-fork or unrestricted production-readiness score is asserted.
 
-## Post-Quantum Roadmap Alignment
+## Explicit remaining-work view
 
-Based on Vitalik's quantum resistance roadmap (Feb 27, 2026), eth2030 addresses all 4 vulnerable areas:
+The [roadmap page](https://eth2030.altllm.ai/roadmap/#remaining-work) now lists seven later-scope integration, qualification and research workstreams with current evidence and completion criteria. The detailed [remaining-work review](plans/ROADMAP_REMAINING_20261124.md) distinguishes these from the completed frozen Glamsterdam ledger. Four planned-only entries have no listed implementation/test paths: tapered issuance burn, decentralized state, ethp2p unification and blob-transaction removal.
 
-| Vulnerable Area | Solution | Package |
-|----------------|----------|---------|
-| CL BLS Signatures | STARK-aggregated Dilithium sigs | `pkg/consensus/stark_sig_aggregation.go` |
-| DA KZG Commitments | Lattice-based blob commitments (MLWE) | `pkg/crypto/pqc/lattice_blob.go` |
-| EOA ECDSA Signatures | EIP-8141 frame txs + PQ registry | `pkg/core/`, `pkg/crypto/pqc/registry.go` |
-| Application-layer Proofs | Recursive STARK mempool aggregation | `pkg/proofs/stark_prover.go`, `pkg/txpool/stark_aggregation.go` |
+The current display uses the official Glamsterdam core list and retains future project work separately. EIP-7495 current schemas, canonical bytes and stable proofs are independently qualified. EIP-8025 and canonical Ethereum guest research appear after the six planning cards and in the later-proof inventory. Earlier 16/17 snapshots retain their historical meaning; they are superseded for current page accounting. EL #155/#156 and the documentation review #157 are merged; Lighthouse #17 is merged into eth2030.
 
-Key infrastructure:
-- **Pluggable hash backend**: Keccak256, SHA-256, BLAKE3 (Poseidon2 future)
-- **STARK prover**: FRI-based over Goldilocks field (p = 2^64 - 2^32 + 1)
-- **NTT precompile**: EIP-7885 aligned, BN254 + Goldilocks fields
-- **500ms mempool ticks**: STARK aggregate of all validated transactions
+## Other roadmap phases
 
-See [PQ Roadmap Report](PQ_ROADMAP_REPORT.md) for full details.
+| Strawmap phase | Retained evidence | Next work |
+| --- | --- | --- |
+| Hegotá | Paired native seven-field Frame/FOCIL, sponsored slot 66, blob slot 165, fresh CL join 256 and receiver restart. | Compatible independent Frame/Bogotá contract, Dora production schema/epoch/receipt migration, service cutover and broader CL reliability. |
+| I* | Private binary overlay/conversion and PQ transaction/provider controls. | Public layout/address/witness agreement, authenticated state recovery and resource bounds. |
+| J* | PQ attestation and sampling research. | Authenticated validator-key lifecycle and independent vectors/clients. |
+| K* | Execution-proof and state research. | Agreed proof statements, independent verifiers and actual deciding consumers. |
+| L* | Native rollup and finality research. | Compatible execution/consensus contracts and independent end-to-end acceptance. |
 
-## Key EIPs
+The earlier Frame fresh CL used a synchronized EL. Independent Glamsterdam Geth sync is a different fork/profile and does not close independent Frame acceptance. I*–L* remain placeholder names from the retained EF drawing, without a new schedule assertion.
 
-- **EIP-7732**: Enshrined Proposer-Builder Separation (ePBS)
-- **EIP-7885**: NTT precompile for lattice crypto and STARKs
-- **EIP-7928**: Parallel EVM execution via access lists
-- **EIP-4844**: Blob transactions with KZG commitments
-- **EIP-7594**: PeerDAS (data availability sampling)
-- **EIP-7702**: Set code for EOAs (native account abstraction)
-- **EIP-7805**: FOCIL (fork-choice enforced inclusion lists)
-- **EIP-8079**: Native rollups (EXECUTE precompile)
-- **EIP-8141**: Frame transactions (programmable tx validation)
-- **EIP-7251**: Increase MAX_EFFECTIVE_BALANCE (flexible staking)
-- **EIP-4444**: History expiry (bound historical data retrieval)
+[Next-stage plan](next-stage-work-plan.md) · [CL roadmap](cl-iteration-roadmap.md) · [Review checklist](reviews/development-scope-20261124/CHECK.md)
 
-## Project Stats
+## FCR and real-proof extensions
 
-| Metric | Value |
-|--------|-------|
-| Packages | 48 |
-| Source files | 991 |
-| Test files | 918 |
-| Source LOC | ~316,000 |
-| Test LOC | ~397,000 |
-| Passing tests | 18,257 |
-| EIPs implemented | 58+ (complete), 5 (substantial) |
-| Roadmap items | 65/65 COMPLETE |
-| EF State Tests | 36,126/36,126 (100%) |
-| Reference submodules | 30 |
+See [the current extension review](reviews/glamsterdam-extensions-20261124/STATUS.md). The production FCR authority is the CL: authenticated votes, active balances, fork choice and optimistic exclusion feed standard Engine safeBlockHash. The legacy Go counter is a compatibility utility, with mixed-root votes isolated and validator indices bounded. CL announcements are durably checkpointed before publication; failure falls back to finalized and retries.
+
+The real proof backend verifies a pinned RISC Zero receipt for an RV32IM interpreter with full machine-state, program/input/output, configuration and resource binding. Native asynchronous proof submission, polling, cancellation and independent verification are connected. CPU-only execution cannot masquerade as a proof. The remaining canonical quest requires real Ethereum block/prestate witness execution inside the guest and independent root agreement; its fixed-output STF adapter test does not satisfy that requirement.

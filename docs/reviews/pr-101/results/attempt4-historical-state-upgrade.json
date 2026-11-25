@@ -1,0 +1,1754 @@
+{
+  "started_at": "2026-11-19T18:13:05.541188+00:00",
+  "source": "1bba8a12d5e3a9f05a62638a636decc144f53d0e",
+  "binary_sha256": "2d8e07e5c04779356c2a8b5e3d1c1fbf248c15ccc57f7ca7c71312c25c068ef9",
+  "qualification": "Compose separately qualified PRs 102/103/104/105; exact port discovery, retained finalized history and actual independent current-head convergence. First stale harness failure remains in its original report.",
+  "declared_node_recovery_limit_seconds": 300,
+  "nodes": [
+    {
+      "container": "b7ca3b40e352",
+      "started_at": "2026-11-19T18:13:05.606376+00:00",
+      "old_rpc": "http://127.0.0.1:32872",
+      "frozen_finalized_header": {
+        "number": "0x8b5",
+        "hash": "0xbd679996f5b6e82b53c8c032d6b2256a0bdc41b68796a5cc1e93c7a59e6838b5",
+        "parentHash": "0xaff359ea527b1e4e94100345092e3c3f65eeff075b6a72e41ebc0a94acdff5c7",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+        "stateRoot": "0xa44b39912996f3e02b68f31291083ca4bfac76a7b589014c35e366c54d439612",
+        "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "gasLimit": "0x8f0d180",
+        "gasUsed": "0x0",
+        "timestamp": "0x6aff3b50",
+        "extraData": "0x",
+        "mixHash": "0x3ab1648a8213c087ca24c381d5a73f0809a5de3d904e54bde08c0e91677d05be",
+        "nonce": "0x0000000000000000",
+        "size": "0x300",
+        "baseFeePerGas": "0x7",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x4408ee50b62a688dffc56913cb10bd23aad1906f65ebeb3a1b52f75499f43f33",
+        "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "transactions": [],
+        "uncles": [],
+        "slotNumber": "0xaff",
+        "blockAccessListHash": "0xb50efe658d126273f87325e0284e088f7ef8369a5d56bda666c777ee83f8b407"
+      },
+      "observations": [
+        {
+          "at": "2026-11-19T18:13:06.222340+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:07.223354+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:08.224488+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:09.225722+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:10.226680+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:11.227683+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:12.228700+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:13.229640+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:14.230628+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:15.231584+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:16.232542+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:17.233585+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:18.234555+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:19.235936+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:20.236965+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:21.237920+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:22.238855+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:23.239798+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:24.240850+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:25.241873+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:26.242827+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:27.243850+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:28.244833+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:29.245986+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:30.246979+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:31.247937+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:32.249003+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:33.251066+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:34.252139+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:35.253074+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:36.254064+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:37.254976+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:38.256050+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:39.257032+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:40.257997+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:41.258949+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:42.259926+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:43.260902+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:44.261901+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:45.262872+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:46.263782+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:47.265348+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:48.266435+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:49.267387+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:50.268317+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:51.269280+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:52.270267+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:53.271206+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:54.272140+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:55.273052+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:56.273979+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:57.275082+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:58.276079+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:13:59.277115+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:00.278119+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:01.279045+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:02.282868+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:03.283821+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:04.284771+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:05.285789+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:06.286768+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:07.287723+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:08.288669+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:09.289605+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:10.290586+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:11.291614+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:12.292658+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:13.293602+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:14.294625+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:15.295579+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:16.296535+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:17.297532+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:18.298464+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:19.299485+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:20.300466+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:21.301500+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:22.302449+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:23.303427+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:24.304406+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:25.305412+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:26.306368+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:27.307386+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:28.308348+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:29.309321+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:30.310287+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:31.311242+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:32.312262+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:33.313267+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:34.314242+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:35.315306+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:36.316296+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:37.317300+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:38.318504+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:39.319503+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:40.320455+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:41.321414+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:42.322354+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:43.323314+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:44.324418+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:45.325362+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:46.326350+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:47.327449+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:48.328379+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:49.329316+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:50.330219+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:51.331153+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:52.332139+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:53.333173+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:54.334186+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:55.335188+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:56.336184+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:57.337145+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:58.338088+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:14:59.339078+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:00.340006+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:01.340971+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:02.342084+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:03.343089+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:04.344068+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:05.345050+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:06.345997+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:07.346996+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:08.348020+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:09.348999+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:10.350010+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:11.350953+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:12.351929+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:13.352858+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:14.353843+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:15.354749+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:16.355715+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:17.356779+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:18.357738+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:19.358701+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:20.359706+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:21.360678+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:22.361723+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:23.362707+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:24.363728+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:25.364646+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:26.365705+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:27.366679+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:28.367660+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:29.368624+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:30.369588+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:31.370536+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:32.371494+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:33.372444+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:34.373388+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:35.374317+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:36.375283+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:37.376255+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:38.377295+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:39.378253+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:40.379251+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:41.380426+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:42.381580+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:43.382735+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:44.383743+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:45.384748+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:46.385794+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:47.386810+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:48.387807+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:49.388806+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:50.389790+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:51.390796+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:52.391796+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:53.392797+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:54.393812+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:55.394783+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:56.395829+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:57.396839+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:58.397827+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:15:59.398863+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:00.399804+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:01.400824+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:02.401857+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:03.402896+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:04.403912+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:05.404975+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:06.405993+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:07.406962+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:08.408010+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:09.408998+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:10.410182+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:11.411224+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:12.412229+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:13.413321+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:14.414298+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:15.415436+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:16.416503+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:17.417493+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:18.418604+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:19.419635+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:20.420722+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:21.421732+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:22.422895+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:23.424054+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:24.428842+00:00",
+          "head": "0x4079fd0492b74c07b9c5e66d4b78a0d1a2505401a3840dcd4909d52890a454ad",
+          "number": "0x8ff",
+          "independent_hash_at_number": "0x4079fd0492b74c07b9c5e66d4b78a0d1a2505401a3840dcd4909d52890a454ad",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:25.436170+00:00",
+          "head": "0x893986058f1f45ff043f333974075aa8815a11e82d68b40e8a8a8858642501ad",
+          "number": "0x901",
+          "independent_hash_at_number": "0x893986058f1f45ff043f333974075aa8815a11e82d68b40e8a8a8858642501ad",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:26.440648+00:00",
+          "head": "0xa3a58eebeadb08bae98e68a6b057ebfaf11990eb38712a07387d9e9283ea38a4",
+          "number": "0x907",
+          "independent_hash_at_number": "0xa3a58eebeadb08bae98e68a6b057ebfaf11990eb38712a07387d9e9283ea38a4",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:27.445630+00:00",
+          "head": "0xcc9f9bf3d1fd5017ae0ef65d76ea01494a9007fd41fa8730325adce0e3df27b2",
+          "number": "0x90e",
+          "independent_hash_at_number": "0xcc9f9bf3d1fd5017ae0ef65d76ea01494a9007fd41fa8730325adce0e3df27b2",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:28.453472+00:00",
+          "head": "0xee4bddff152353bb933537bc0a91f7649dcd44e0e91fe87969e111153121600b",
+          "number": "0x915",
+          "independent_hash_at_number": "0xee4bddff152353bb933537bc0a91f7649dcd44e0e91fe87969e111153121600b",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:29.458611+00:00",
+          "head": "0x70cbacd317b6f57a46aab68800689698f4bfc6c61f932c341fac96c2c8fc4f18",
+          "number": "0x91a",
+          "independent_hash_at_number": "0x70cbacd317b6f57a46aab68800689698f4bfc6c61f932c341fac96c2c8fc4f18",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:30.463878+00:00",
+          "head": "0x32cce5de9c57c4767379dc9982f3d76f5e4028831d435625820f91c949c35a0d",
+          "number": "0x920",
+          "independent_hash_at_number": "0x32cce5de9c57c4767379dc9982f3d76f5e4028831d435625820f91c949c35a0d",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:31.468872+00:00",
+          "head": "0xf2a4fe7209a8e53c6da6d5277055f44f504f553ed46180e6711340387c6e15f2",
+          "number": "0x926",
+          "independent_hash_at_number": "0xf2a4fe7209a8e53c6da6d5277055f44f504f553ed46180e6711340387c6e15f2",
+          "independent_latest_number": "0x92f"
+        },
+        {
+          "at": "2026-11-19T18:16:32.473450+00:00",
+          "head": "0xcae81accaefbf9a110da3e862227b31420a6694bf8576106ec3576d14478f74d",
+          "number": "0x92c",
+          "independent_hash_at_number": "0xcae81accaefbf9a110da3e862227b31420a6694bf8576106ec3576d14478f74d",
+          "independent_latest_number": "0x930"
+        },
+        {
+          "at": "2026-11-19T18:16:33.478244+00:00",
+          "head": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+          "number": "0x930",
+          "independent_hash_at_number": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+          "independent_latest_number": "0x930"
+        }
+      ],
+      "new_rpc": "http://127.0.0.1:32898",
+      "completed_at": "2026-11-19T18:16:33.478256+00:00",
+      "elapsed_seconds": 207.77305653499934,
+      "after": {
+        "number": "0x930",
+        "hash": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+        "parentHash": "0x67c41c22cf43ca3aaa7f1a92e22fb076c9627525e00845184c343c821328cbf7",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+        "stateRoot": "0x90d41e1c076d6a6a048c4f05249b23d385d2e14fb5234c4cd174d2285a34a215",
+        "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "gasLimit": "0x8f0d180",
+        "gasUsed": "0x0",
+        "timestamp": "0x6aff3d00",
+        "extraData": "0xd88301110a846765746888676f312e32372e33856c696e7578",
+        "mixHash": "0x76cc006b806096b3c16e313371eaa055ce80ed0bbd5a4297d76da724c13d92ad",
+        "nonce": "0x0000000000000000",
+        "size": "0x319",
+        "baseFeePerGas": "0x7",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0xeceef679819135c1f0d88b234b7ad1949d97abcdca641617c126528e8f11b553",
+        "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "transactions": [],
+        "uncles": [],
+        "withdrawals": [],
+        "slotNumber": "0xb8f",
+        "blockAccessListHash": "0xd53eec7b683fc75195607b5f3f8b874102fb78e571ac042929383b2344707226"
+      },
+      "version": "eth2030 v0.1.0-dev (commit 1bba8a12d5e3a9f05a62638a636decc144f53d0e)",
+      "sha256": "2d8e07e5c04779356c2a8b5e3d1c1fbf248c15ccc57f7ca7c71312c25c068ef9"
+    },
+    {
+      "container": "b82d79245970",
+      "started_at": "2026-11-19T18:16:34.321669+00:00",
+      "old_rpc": "http://127.0.0.1:32880",
+      "frozen_finalized_header": {
+        "number": "0x8d5",
+        "hash": "0x8b5901e3e05f15509efd8e0ced11a25366e1d56bfa0d5ad097d37b1fe676feb3",
+        "parentHash": "0x1f67654c5bac2758b903026a1697d736f430a96b4b9c6e073bdf4647a25b47b9",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+        "stateRoot": "0x21df30aa4256b26c07a1f46e10867965922fd49780c58cfd06c2e5cb0bde0a47",
+        "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "gasLimit": "0x8f0d180",
+        "gasUsed": "0x0",
+        "timestamp": "0x6aff3bb0",
+        "extraData": "0x",
+        "mixHash": "0xa7b26a932593653ec2afe59885108749afcc65698e10bae0cc738496582dd24b",
+        "nonce": "0x0000000000000000",
+        "size": "0x300",
+        "baseFeePerGas": "0x7",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x9c168c2b29db570806252b77ec4cb303f29e064a6d20ba7e3e0da96e64ba338a",
+        "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "transactions": [],
+        "uncles": [],
+        "slotNumber": "0xb1f",
+        "blockAccessListHash": "0x80484fd2aa2ef363cbc034efb815dd4ed2a447f1adf3c680e695601d2afd913b"
+      },
+      "observations": [
+        {
+          "at": "2026-11-19T18:16:34.912659+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:35.914269+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:36.915252+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:37.916194+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:38.917293+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:39.918300+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:40.919284+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:41.921138+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:42.922105+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:43.923117+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:44.924344+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:45.925303+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:46.926347+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:47.927545+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:48.928447+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:49.929528+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:50.930569+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:51.931570+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:52.932565+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:53.933653+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:54.934607+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:55.935557+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:56.937471+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:57.938441+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:58.939481+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:16:59.940592+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:00.941525+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:01.942461+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:02.943478+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:03.944416+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:04.945373+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:05.946476+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:06.947446+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:07.948402+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:08.949444+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:09.950398+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:10.951419+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:11.952394+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:12.953352+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:13.954310+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:14.955294+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:15.956413+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:16.957384+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:17.958372+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:18.959331+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:19.960328+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:20.961289+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:21.962319+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:22.963324+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:23.964443+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:24.965472+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:25.966447+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:26.967402+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:27.968398+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:28.969371+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:29.970425+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:30.971386+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:31.972332+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:32.973321+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:33.974433+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:34.975408+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:35.976381+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:36.977347+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:37.978272+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:38.979206+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:39.980125+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:40.981039+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:41.982014+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:42.982877+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:43.983815+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:44.984757+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:45.985680+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:46.986636+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:47.987638+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:48.988583+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:49.989584+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:50.990592+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:51.991554+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:52.992427+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:53.993376+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:54.994398+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:55.995348+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:56.996374+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:57.997331+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:58.998269+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:17:59.999216+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:01.000196+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:02.001221+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:03.002234+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:04.003177+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:05.004236+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:06.005252+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:07.006250+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:08.007286+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:09.008241+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:10.009157+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:11.010204+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:12.011348+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:13.012301+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:14.013295+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:15.014260+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:16.015232+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:17.016321+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:18.017999+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:19.018966+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:20.020128+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:21.021167+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:22.022171+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:23.023106+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:24.024100+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:25.025096+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:26.026119+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:27.027156+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:28.028108+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:29.029141+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:30.030244+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:31.031191+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:32.032157+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:33.033196+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:34.034156+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:35.035138+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:36.036182+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:37.037148+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:38.038184+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:39.039160+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:40.040099+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:41.041074+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:42.042145+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:43.053050+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:44.054019+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:45.054945+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:46.055753+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:47.056775+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:48.057785+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:49.058673+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:50.059677+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:51.060634+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:52.061606+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:53.062540+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:54.063526+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:55.064452+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:56.065444+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:57.066403+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:58.067389+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:18:59.068594+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:00.069564+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:01.070525+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:02.071473+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:03.072450+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:04.073417+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:05.074397+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:06.075365+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:07.076397+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:08.077391+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:09.078381+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:10.079388+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:11.080422+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:12.081449+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:13.082504+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:14.083500+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:15.084509+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:16.085474+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:17.086517+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:18.087449+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:19.088408+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:20.089342+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:21.090291+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:22.091297+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:23.092362+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:24.093472+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:25.094416+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:26.095357+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:27.096479+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:28.097435+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:29.098591+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:30.099542+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:31.100538+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:32.101483+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:33.102595+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:34.103714+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:35.104839+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:36.105802+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:37.106766+00:00",
+          "error_class": "ConnectionError"
+        },
+        {
+          "at": "2026-11-19T18:19:38.111681+00:00",
+          "head": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+          "number": "0x930",
+          "independent_hash_at_number": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+          "independent_latest_number": "0x932"
+        }
+      ],
+      "new_rpc": "http://127.0.0.1:32903",
+      "completed_at": "2026-11-19T18:19:38.111696+00:00",
+      "elapsed_seconds": 183.6953477040006,
+      "after": {
+        "number": "0x930",
+        "hash": "0xb8acac129de53bf29c4e3632ec0ab495f5032a5faba18410bd247baa6753ea08",
+        "parentHash": "0x67c41c22cf43ca3aaa7f1a92e22fb076c9627525e00845184c343c821328cbf7",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x8943545177806ed17b9f23f0a21ee5948ecaa776",
+        "stateRoot": "0x90d41e1c076d6a6a048c4f05249b23d385d2e14fb5234c4cd174d2285a34a215",
+        "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "gasLimit": "0x8f0d180",
+        "gasUsed": "0x0",
+        "timestamp": "0x6aff3d00",
+        "extraData": "0xd88301110a846765746888676f312e32372e33856c696e7578",
+        "mixHash": "0x76cc006b806096b3c16e313371eaa055ce80ed0bbd5a4297d76da724c13d92ad",
+        "nonce": "0x0000000000000000",
+        "size": "0x319",
+        "baseFeePerGas": "0x7",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0xeceef679819135c1f0d88b234b7ad1949d97abcdca641617c126528e8f11b553",
+        "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "transactions": [],
+        "uncles": [],
+        "withdrawals": [],
+        "slotNumber": "0xb8f",
+        "blockAccessListHash": "0xd53eec7b683fc75195607b5f3f8b874102fb78e571ac042929383b2344707226"
+      },
+      "version": "eth2030 v0.1.0-dev (commit 1bba8a12d5e3a9f05a62638a636decc144f53d0e)",
+      "sha256": "2d8e07e5c04779356c2a8b5e3d1c1fbf248c15ccc57f7ca7c71312c25c068ef9"
+    }
+  ],
+  "passed": true,
+  "completed_at": "2026-11-19T18:19:38.929741+00:00"
+}

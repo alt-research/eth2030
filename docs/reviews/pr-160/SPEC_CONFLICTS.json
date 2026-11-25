@@ -1,0 +1,16 @@
+{
+  "eip": 8282,
+  "status": "Normative clarification required; current client agrees with detailed consensus reference",
+  "prose_source": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-8282.md",
+  "prose_semantics": "For an already registered pubkey, amount is credited and withdrawal_credentials/signature are ignored.",
+  "referenced_consensus_source": "d9663f85be248c4fd0ae95806da6070e17c2442b",
+  "current_consensus_head_verified": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "detailed_semantics": "A withdrawal-credential prefix check precedes registry lookup for every request, including top-ups.",
+  "executed_inputs": "Captured actual registered builder, 1 ETH top-up, zero signature; prefix 0xb0 credits, prefix 0xff drops. Recipient is unchanged in both cases.",
+  "client_reference_divergence": false,
+  "clarification_options": [
+    "State the common prefix validity precondition explicitly in the EIP prose.",
+    "Adopt a consensus-spec transition change after protocol agreement and update reference vectors and clients together."
+  ],
+  "client_consensus_behavior_changed_by_this_audit": false
+}

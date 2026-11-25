@@ -3,10 +3,10 @@ package pq
 import (
 	"crypto/sha256"
 	"errors"
-	"math/big"
-	"sync"
+	"slices"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto/pqc"
 	"github.com/eth2030/eth2030/proofs"
 )
 
@@ -19,13 +19,12 @@ var (
 	ErrSTARKAggMismatch     = errors.New("stark_sig_aggregation: committee root mismatch")
 )
 
-// STARKSignatureAggregation holds a STARK-aggregated set of PQ attestation signatures.
-// Instead of verifying N individual Dilithium/Falcon signatures, a single STARK
-// proves that all N signatures are valid.
+// STARKSignatureAggregation carries the original signed attestations.
+// The legacy proof field is reserved for a future statement-bound provider.
 type STARKSignatureAggregation struct {
 	// Signatures are the original PQ attestations being aggregated.
 	Signatures []PQAttestation
-	// AggregateProof is the STARK proving all signatures are valid.
+	// AggregateProof is reserved. The individual-signature verifier rejects it.
 	AggregateProof *proofs.STARKProofData
 	// CommitteeRoot is the Merkle root of the participating validator public keys.
 	CommitteeRoot types.Hash
@@ -39,103 +38,86 @@ type STARKSignatureAggregation struct {
 	TargetEpoch uint64
 }
 
-// STARKSignatureAggregator creates STARK-aggregated signature proofs.
-type STARKSignatureAggregator struct {
-	mu     sync.RWMutex
-	prover *proofs.STARKProver
-}
+// STARKSignatureAggregator validates each signature in the batch.
+type STARKSignatureAggregator struct{}
 
-// NewSTARKSignatureAggregator creates a new STARK signature aggregator.
-func NewSTARKSignatureAggregator() *STARKSignatureAggregator {
-	return &STARKSignatureAggregator{
-		prover: proofs.NewSTARKProver(),
-	}
-}
+func NewSTARKSignatureAggregator() *STARKSignatureAggregator { return &STARKSignatureAggregator{} }
 
-// Aggregate creates a STARK proof that all given PQ attestation signatures are valid.
-// This replaces iterative O(N) verification with a single STARK verification.
 func (sa *STARKSignatureAggregator) Aggregate(attestations []PQAttestation) (*STARKSignatureAggregation, error) {
 	if len(attestations) == 0 {
 		return nil, ErrSTARKAggNoSigs
 	}
-
-	// Build execution trace: each attestation becomes a row.
-	// Columns: [slot, committee_index, block_root_hi, block_root_lo, sig_hash_hi, sig_hash_lo, validator_index]
-	trace := make([][]proofs.FieldElement, len(attestations))
-	pubkeys := make([][]byte, len(attestations))
-
-	for i, att := range attestations {
-		sigHash := hashSignatureData(att.PQSignature, att.PQPublicKey)
-		blockHi := new(big.Int).SetBytes(att.BeaconBlockRoot[:16])
-		blockLo := new(big.Int).SetBytes(att.BeaconBlockRoot[16:])
-		sigHi := new(big.Int).SetBytes(sigHash[:16])
-		sigLo := new(big.Int).SetBytes(sigHash[16:])
-
-		trace[i] = []proofs.FieldElement{
-			proofs.NewFieldElement(int64(att.Slot)),
-			proofs.NewFieldElement(int64(att.CommitteeIndex)),
-			{Value: blockHi},
-			{Value: blockLo},
-			{Value: sigHi},
-			{Value: sigLo},
-			proofs.NewFieldElement(int64(att.ValidatorIndex)),
-		}
-		pubkeys[i] = att.PQPublicKey
-	}
-
-	// Constraint: each row's sig_hash must be non-zero (signature exists).
-	constraints := []proofs.STARKConstraint{
-		{Degree: 1, Coefficients: []proofs.FieldElement{proofs.NewFieldElement(1)}},
-	}
-
-	starkProof, err := sa.prover.GenerateSTARKProof(trace, constraints)
+	pubkeys, err := verifiedAttestationKeys(attestations)
 	if err != nil {
 		return nil, err
 	}
-
-	// Compute committee root from public keys.
-	committeeRoot := computeCommitteeRoot(pubkeys)
-
+	signed := slices.Clone(attestations)
+	for i := range signed {
+		signed[i].PQPublicKey = slices.Clone(signed[i].PQPublicKey)
+		signed[i].PQSignature = slices.Clone(signed[i].PQSignature)
+		signed[i].ClassicSignature = slices.Clone(signed[i].ClassicSignature)
+	}
 	return &STARKSignatureAggregation{
-		Signatures:     attestations,
-		AggregateProof: starkProof,
-		CommitteeRoot:  committeeRoot,
-		Message:        attestations[0].BeaconBlockRoot,
-		NumValidators:  len(attestations),
-		Slot:           attestations[0].Slot,
-		TargetEpoch:    attestations[0].TargetEpoch,
+		Signatures: signed, CommitteeRoot: computeCommitteeRoot(pubkeys),
+		Message: signed[0].BeaconBlockRoot, NumValidators: len(signed),
+		Slot: signed[0].Slot, TargetEpoch: signed[0].TargetEpoch,
 	}, nil
 }
 
-// Verify checks that a STARK signature aggregation is valid.
 func (sa *STARKSignatureAggregator) Verify(agg *STARKSignatureAggregation) (bool, error) {
 	if agg == nil {
 		return false, ErrSTARKAggNilResult
 	}
-	if agg.AggregateProof == nil {
+	if agg.AggregateProof != nil {
 		return false, ErrSTARKAggInvalidProof
 	}
-
-	// Verify the STARK proof.
-	valid, err := sa.prover.VerifySTARKProof(agg.AggregateProof, nil)
+	if len(agg.Signatures) == 0 || agg.NumValidators != len(agg.Signatures) {
+		return false, ErrSTARKAggVerifyFailed
+	}
+	first := agg.Signatures[0]
+	if first.Slot != agg.Slot || first.TargetEpoch != agg.TargetEpoch || first.BeaconBlockRoot != agg.Message {
+		return false, ErrSTARKAggVerifyFailed
+	}
+	pubkeys, err := verifiedAttestationKeys(agg.Signatures)
 	if err != nil {
 		return false, err
 	}
-	if !valid {
-		return false, ErrSTARKAggVerifyFailed
-	}
-
-	// Verify committee root matches the public keys.
-	pubkeys := make([][]byte, len(agg.Signatures))
-	for i, att := range agg.Signatures {
-		pubkeys[i] = att.PQPublicKey
-	}
-	expectedRoot := computeCommitteeRoot(pubkeys)
-	if expectedRoot != agg.CommitteeRoot {
+	if computeCommitteeRoot(pubkeys) != agg.CommitteeRoot {
 		return false, ErrSTARKAggMismatch
 	}
-
 	return true, nil
+}
+
+// The caller must check committee membership against consensus state.
+func verifiedAttestationKeys(attestations []PQAttestation) ([][]byte, error) {
+	first := attestations[0]
+	indices := make(map[uint64]struct{}, len(attestations))
+	keys := make(map[string]struct{}, len(attestations))
+	pubkeys := make([][]byte, 0, len(attestations))
+	for _, att := range attestations {
+		if ValidatePQAttestation(&att) != nil {
+			return nil, ErrSTARKAggVerifyFailed
+		}
+		if att.Slot != first.Slot || att.CommitteeIndex != first.CommitteeIndex ||
+			att.SourceEpoch != first.SourceEpoch || att.TargetEpoch != first.TargetEpoch ||
+			att.BeaconBlockRoot != first.BeaconBlockRoot {
+			return nil, ErrSTARKAggVerifyFailed
+		}
+		if _, exists := indices[att.ValidatorIndex]; exists {
+			return nil, ErrSTARKAggVerifyFailed
+		}
+		key := string(att.PQPublicKey)
+		if _, exists := keys[key]; exists {
+			return nil, ErrSTARKAggVerifyFailed
+		}
+		message := attestationMessage(att.Slot, att.CommitteeIndex, att.BeaconBlockRoot, att.SourceEpoch, att.TargetEpoch)
+		if !pqc.VerifyDilithium(att.PQPublicKey, message, att.PQSignature) {
+			return nil, ErrSTARKAggVerifyFailed
+		}
+		indices[att.ValidatorIndex], keys[key] = struct{}{}, struct{}{}
+		pubkeys = append(pubkeys, att.PQPublicKey)
+	}
+	return pubkeys, nil
 }
 
 // AggregateCount returns the number of signatures in an aggregation.
@@ -146,30 +128,8 @@ func (agg *STARKSignatureAggregation) AggregateCount() int {
 	return agg.NumValidators
 }
 
-// GasSavings estimates the gas savings from STARK aggregation vs individual verification.
-// Individual Dilithium verification: ~50,000 gas per signature.
-// STARK verification: ~200,000 gas flat (amortized over N signatures).
-func (agg *STARKSignatureAggregation) GasSavings() uint64 {
-	if agg == nil || agg.NumValidators == 0 {
-		return 0
-	}
-	individualCost := uint64(agg.NumValidators) * 50000
-	starkCost := uint64(200000)
-	if individualCost <= starkCost {
-		return 0
-	}
-	return individualCost - starkCost
-}
-
-// hashSignatureData hashes signature and public key into a commitment.
-func hashSignatureData(sig, pubkey []byte) [32]byte {
-	h := sha256.New()
-	h.Write(sig)
-	h.Write(pubkey)
-	var result [32]byte
-	copy(result[:], h.Sum(nil))
-	return result
-}
+// GasSavings reports zero because the current verifier checks each signature.
+func (agg *STARKSignatureAggregation) GasSavings() uint64 { return 0 }
 
 // computeCommitteeRoot computes a Merkle root over validator public keys.
 func computeCommitteeRoot(pubkeys [][]byte) types.Hash {
@@ -212,28 +172,10 @@ func computeCommitteeRoot(pubkeys [][]byte) types.Hash {
 	return root
 }
 
-// BatchVerifyPQAttestations uses STARK aggregation to verify a batch of PQ attestations.
-// This is the integration point with the existing PQAttestationVerifier.
+// BatchVerifyPQAttestations verifies every ML-DSA attestation and binds the
+// ordered public keys to the returned committee commitment.
 func BatchVerifyPQAttestations(attestations []PQAttestation) (*STARKSignatureAggregation, error) {
-	if len(attestations) == 0 {
-		return nil, ErrSTARKAggNoSigs
-	}
-
-	aggregator := NewSTARKSignatureAggregator()
-	agg, err := aggregator.Aggregate(attestations)
-	if err != nil {
-		return nil, err
-	}
-
-	valid, err := aggregator.Verify(agg)
-	if err != nil {
-		return nil, err
-	}
-	if !valid {
-		return nil, ErrSTARKAggVerifyFailed
-	}
-
-	return agg, nil
+	return NewSTARKSignatureAggregator().Aggregate(attestations)
 }
 
 // MerklePQAggregation holds a lightweight Merkle-only aggregation of PQ
@@ -245,14 +187,15 @@ type MerklePQAggregation struct {
 }
 
 // MerkleAggregatePQAttestations computes a SHA-256 Merkle tree over the
-// attestation public key hashes and returns the root. No STARK proof is produced.
+// verified attestation public keys and returns the root. The caller checks
+// the keys against the authorized committee.
 func MerkleAggregatePQAttestations(attestations []PQAttestation) (*MerklePQAggregation, error) {
 	if len(attestations) == 0 {
 		return nil, ErrSTARKAggNoSigs
 	}
-	pubkeys := make([][]byte, len(attestations))
-	for i, att := range attestations {
-		pubkeys[i] = att.PQPublicKey
+	pubkeys, err := verifiedAttestationKeys(attestations)
+	if err != nil {
+		return nil, err
 	}
 	root := computeCommitteeRoot(pubkeys)
 	return &MerklePQAggregation{
@@ -262,25 +205,8 @@ func MerkleAggregatePQAttestations(attestations []PQAttestation) (*MerklePQAggre
 	}, nil
 }
 
-// AggregateWithConfig creates a signature aggregation using the appropriate
-// strategy based on config. In lean available chain mode, only a Merkle root
-// is computed (no STARK proof). Otherwise, the full STARK aggregation is used.
-func (sa *STARKSignatureAggregator) AggregateWithConfig(attestations []PQAttestation, cfg *LeanConfig) (*STARKSignatureAggregation, error) {
-	if cfg != nil && cfg.LeanAvailableChainMode {
-		merkle, err := MerkleAggregatePQAttestations(attestations)
-		if err != nil {
-			return nil, err
-		}
-		return &STARKSignatureAggregation{
-			Signatures:     attestations,
-			AggregateProof: nil,
-			CommitteeRoot:  merkle.MerkleRoot,
-			Message:        attestations[0].BeaconBlockRoot,
-			NumValidators:  merkle.NumValidators,
-			Slot:           merkle.Slot,
-			TargetEpoch:    attestations[0].TargetEpoch,
-		}, nil
-	}
+// AggregateWithConfig verifies individual signatures in both modes.
+func (sa *STARKSignatureAggregator) AggregateWithConfig(attestations []PQAttestation, _ *LeanConfig) (*STARKSignatureAggregation, error) {
 	return sa.Aggregate(attestations)
 }
 

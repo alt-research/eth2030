@@ -31,6 +31,7 @@ func genesisHeader() *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 
@@ -75,6 +76,7 @@ func nextHeader(parent *types.Header) *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 

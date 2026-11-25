@@ -1,0 +1,25 @@
+{
+  "declared_at": "2026-11-19T18:05:40.400722+00:00",
+  "role": "unchanged independent patched Lodestar control",
+  "source": "cf705b46b08ba8172d2e32225964ecb9bb1d2b95",
+  "second_original_budget_exit": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": true,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 137,
+    "Error": "",
+    "StartedAt": "2026-11-19T17:12:25.402438139Z",
+    "FinishedAt": "2026-11-19T17:53:44.471178572Z"
+  },
+  "old_memory_bytes": 4096000000,
+  "existing_upstream_node_options": "--max-old-space-size=8192 --max-semi-space-size=64",
+  "reason": "The image configures an 8192 MiB V8 old heap, exceeding the previously declared 4,096,000,000-byte total cgroup budget before native/young-heap overhead. Two observed OOMs establish that control budget as insufficient, not a proven unbounded heap leak.",
+  "new_declared_memory_bytes": 12288000000,
+  "new_memory_swap_bytes": 12288000000,
+  "cpu_limit_cores": 2,
+  "scope": "Only independent CL control resource allocation changes; native EL/Lighthouse/VC budgets and all execution/signing implementations remain unchanged. Steady capacity remains unqualified until the declared corrected-tuple measurement completes."
+}

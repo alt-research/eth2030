@@ -67,7 +67,7 @@ func (csa *ChainStateAccessor) GetBalance(addr types.Address, blockNum rpctypes.
 	if header == nil {
 		return nil, ErrBackendBlockNotFound
 	}
-	stateDB, err := csa.backend.StateAt(header.Root)
+	stateDB, err := StateAtHeader(csa.backend, header)
 	if err != nil {
 		return nil, ErrBackendStateUnavail
 	}
@@ -80,7 +80,7 @@ func (csa *ChainStateAccessor) GetNonce(addr types.Address, blockNum rpctypes.Bl
 	if header == nil {
 		return 0, ErrBackendBlockNotFound
 	}
-	stateDB, err := csa.backend.StateAt(header.Root)
+	stateDB, err := StateAtHeader(csa.backend, header)
 	if err != nil {
 		return 0, ErrBackendStateUnavail
 	}
@@ -93,7 +93,7 @@ func (csa *ChainStateAccessor) GetCode(addr types.Address, blockNum rpctypes.Blo
 	if header == nil {
 		return nil, ErrBackendBlockNotFound
 	}
-	stateDB, err := csa.backend.StateAt(header.Root)
+	stateDB, err := StateAtHeader(csa.backend, header)
 	if err != nil {
 		return nil, ErrBackendStateUnavail
 	}
@@ -106,7 +106,7 @@ func (csa *ChainStateAccessor) GetStorageAt(addr types.Address, slot types.Hash,
 	if header == nil {
 		return types.Hash{}, ErrBackendBlockNotFound
 	}
-	stateDB, err := csa.backend.StateAt(header.Root)
+	stateDB, err := StateAtHeader(csa.backend, header)
 	if err != nil {
 		return types.Hash{}, ErrBackendStateUnavail
 	}
@@ -119,7 +119,7 @@ func (csa *ChainStateAccessor) GetAccountInfo(addr types.Address, blockNum rpcty
 	if header == nil {
 		return nil, ErrBackendBlockNotFound
 	}
-	stateDB, err := csa.backend.StateAt(header.Root)
+	stateDB, err := StateAtHeader(csa.backend, header)
 	if err != nil {
 		return nil, ErrBackendStateUnavail
 	}

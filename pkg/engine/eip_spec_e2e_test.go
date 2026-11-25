@@ -10,7 +10,6 @@ import (
 
 	coreconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -21,7 +20,7 @@ import (
 // makeE2EBackend creates a full EngineBackend with genesis, usable for e2e tests.
 func makeE2EBackend(t *testing.T, cfg *coreconfig.ChainConfig) (*EngineBackend, *EngineAPI) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	backend := NewEngineBackend(cfg, statedb, genesis)
 	api := NewEngineAPI(backend)
@@ -84,7 +83,7 @@ func TestE2E_Engine_ILSatisfaction_NoILsStoredAlwaysValid(t *testing.T) {
 	backend, _ := makeE2EBackend(t, coreconfig.TestConfig)
 
 	payload := buildNextPayload(t, nil, backend)
-	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, nil)
+	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, [][]byte{})
 	if err != nil {
 		t.Fatalf("ProcessBlockV5: %v", err)
 	}
@@ -111,7 +110,7 @@ func TestE2E_Engine_ProcessInclusionList_ThenProcessBlock(t *testing.T) {
 	}
 
 	payload := buildNextPayload(t, nil, backend)
-	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, nil)
+	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, [][]byte{})
 	if err != nil {
 		t.Fatalf("ProcessBlockV5: %v", err)
 	}
@@ -178,18 +177,12 @@ func TestE2E_Engine_PayloadBodiesV2_RangeIncludesGenesis(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetPayloadBodiesByRangeV2: %v", err)
 	}
-	if len(results) != 3 {
-		t.Fatalf("want 3 results, got %d", len(results))
+	if len(results) != 1 {
+		t.Fatalf("want only genesis with trailing unknown heights trimmed, got %d", len(results))
 	}
-	// Genesis is block 0; blocks 1 and 2 don't exist yet → nil.
+	// Genesis is block 0; unknown trailing blocks must be omitted.
 	if results[0] == nil {
 		t.Error("genesis block (num=0): want non-nil body")
-	}
-	if results[1] != nil {
-		t.Error("block 1 (not yet processed): want nil body")
-	}
-	if results[2] != nil {
-		t.Error("block 2 (not yet processed): want nil body")
 	}
 }
 
@@ -208,8 +201,8 @@ func TestE2E_Engine_PayloadBodiesV2_BodyFields(t *testing.T) {
 	if body.Transactions == nil {
 		t.Error("Transactions must be non-nil slice (may be empty)")
 	}
-	if body.Withdrawals == nil {
-		t.Error("Withdrawals must be non-nil slice (may be empty)")
+	if body.Withdrawals != nil {
+		t.Error("pre-Shanghai withdrawals must be nil")
 	}
 }
 
@@ -241,7 +234,7 @@ func TestE2E_Engine_PayloadBodiesV2_Handler_DispatchRouting(t *testing.T) {
 func TestE2E_Engine_PayloadBodiesV2_RangeHandler_DispatchRouting(t *testing.T) {
 	_, api := makeE2EBackend(t, coreconfig.TestConfig)
 
-	req := []byte(`{"jsonrpc":"2.0","id":2,"method":"engine_getPayloadBodiesByRangeV2","params":[0,1]}`)
+	req := []byte(`{"jsonrpc":"2.0","id":2,"method":"engine_getPayloadBodiesByRangeV2","params":["0x1","0x1"]}`)
 	resp := api.HandleRequest(req)
 	var rpcResp jsonrpcResponse
 	if err := json.Unmarshal(resp, &rpcResp); err != nil {
@@ -447,7 +440,7 @@ func TestE2E_Engine_BALFeasibility_NormalPayloadProcesses(t *testing.T) {
 
 	payload := buildNextPayload(t, nil, backend)
 
-	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, nil)
+	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, [][]byte{})
 	if err != nil {
 		t.Fatalf("ProcessBlockV5 returned error: %v", err)
 	}
@@ -468,7 +461,7 @@ func TestE2E_Engine_BALStoredAfterProcessBlockV5(t *testing.T) {
 
 	// Build and process a block.
 	payload := buildNextPayload(t, nil, backend)
-	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, nil)
+	status, err := backend.ProcessBlockV5(payload, nil, types.Hash{}, [][]byte{})
 	if err != nil {
 		t.Fatalf("ProcessBlockV5: %v", err)
 	}

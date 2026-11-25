@@ -34,20 +34,21 @@ const (
 
 // Prover error variables.
 var (
-	ErrSTARKEmptyTrace     = prover.ErrSTARKEmptyTrace
-	ErrSTARKInvalidBlowup  = prover.ErrSTARKInvalidBlowup
-	ErrSTARKTraceTooLarge  = prover.ErrSTARKTraceTooLarge
-	ErrSTARKInvalidProof   = prover.ErrSTARKInvalidProof
-	ErrSTARKVerifyFailed   = prover.ErrSTARKVerifyFailed
-	ErrSTARKInvalidField   = prover.ErrSTARKInvalidField
-	ErrSTARKNoConstraints  = prover.ErrSTARKNoConstraints
-	ErrSTARKFRIFailed      = prover.ErrSTARKFRIFailed
-	ErrProverAlreadyExists = prover.ErrProverAlreadyExists
-	ErrProverNotRegistered = prover.ErrProverNotRegistered
-	ErrProverAtCapacity    = prover.ErrProverAtCapacity
-	ErrFrameReverted       = prover.ErrFrameReverted
-	ErrFrameNilOutput      = prover.ErrFrameNilOutput
-	ErrFrameEmptyBatch     = prover.ErrFrameEmptyBatch
+	ErrSTARKEmptyTrace       = prover.ErrSTARKEmptyTrace
+	ErrSTARKInvalidBlowup    = prover.ErrSTARKInvalidBlowup
+	ErrSTARKTraceTooLarge    = prover.ErrSTARKTraceTooLarge
+	ErrSTARKInvalidProof     = prover.ErrSTARKInvalidProof
+	ErrSTARKVerifyFailed     = prover.ErrSTARKVerifyFailed
+	ErrSTARKInvalidField     = prover.ErrSTARKInvalidField
+	ErrSTARKNoConstraints    = prover.ErrSTARKNoConstraints
+	ErrSTARKFRIFailed        = prover.ErrSTARKFRIFailed
+	ErrProverAlreadyExists   = prover.ErrProverAlreadyExists
+	ErrProverNotRegistered   = prover.ErrProverNotRegistered
+	ErrProverAtCapacity      = prover.ErrProverAtCapacity
+	ErrFrameReverted         = prover.ErrFrameReverted
+	ErrFrameNilOutput        = prover.ErrFrameNilOutput
+	ErrFrameEmptyBatch       = prover.ErrFrameEmptyBatch
+	ErrFrameProofUnavailable = prover.ErrFrameProofUnavailable
 )
 
 // GoldilocksModulus is the Goldilocks field modulus.

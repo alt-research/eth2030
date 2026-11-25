@@ -6,24 +6,54 @@ import "errors"
 var ErrGasPoolExhausted = errors.New("gas pool exhausted")
 
 // GasPool tracks the amount of gas available during block execution.
-type GasPool uint64
+type GasPool struct {
+	execution   uint64
+	state       uint64
+	initialized bool
+}
 
 // AddGas adds gas to the pool.
 func (gp *GasPool) AddGas(amount uint64) *GasPool {
-	*gp += GasPool(amount)
+	gp.execution += amount
+	if !gp.initialized {
+		gp.state = amount
+		gp.initialized = true
+	}
 	return gp
 }
 
 // SubGas subtracts gas from the pool, returning an error if insufficient.
 func (gp *GasPool) SubGas(amount uint64) error {
-	if uint64(*gp) < amount {
+	if gp.execution < amount {
 		return ErrGasPoolExhausted
 	}
-	*gp -= GasPool(amount)
+	gp.execution -= amount
 	return nil
 }
 
 // Gas returns the amount of gas remaining in the pool.
 func (gp *GasPool) Gas() uint64 {
-	return uint64(*gp)
+	return gp.execution
+}
+
+// StateGas returns the independent EIP-8037 state pool remaining in the block.
+func (gp *GasPool) StateGas() uint64 { return gp.state }
+
+// FitsFrame checks both reservations without adding the two dimensions.
+func (gp *GasPool) FitsFrame(execution, state uint64) bool {
+	return execution <= gp.execution && state <= gp.state
+}
+
+func (gp *GasPool) ReserveFrame(execution, state uint64) error {
+	if !gp.FitsFrame(execution, state) {
+		return ErrGasPoolExhausted
+	}
+	gp.execution -= execution
+	gp.state -= state
+	return nil
+}
+
+func (gp *GasPool) RefundFrame(execution, state uint64) {
+	gp.execution += execution
+	gp.state += state
 }

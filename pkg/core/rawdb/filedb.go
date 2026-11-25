@@ -1,24 +1,18 @@
-// FileDB implements a persistent file-based key-value store using a flat
-// directory layout with a write-ahead log (WAL) for crash safety. Keys are
-// hex-encoded and stored as individual files under a data/ subdirectory.
-// An in-memory index is maintained for fast lookups and rebuilt from disk
-// on open. A file lock prevents concurrent process access.
+// FileDB implements a persistent key-value store with a durable WAL. New
+// values use 256 directories selected by a hash of the full key, avoiding flat
+// directory limits even when application keys share a long common prefix.
+// Legacy data/ files remain readable and migrate only when touched.
 //
-// Layout:
-//
-//	<dir>/
-//	  LOCK          - flock-based exclusive lock
-//	  wal           - write-ahead log (binary, append-only)
-//	  data/         - key-value files (filename = hex(key))
+// Layout: LOCK, wal-v2, wal -> data-v2/ (old-reader guard), data/ (legacy),
+// data-v2/<bucket>/<hex-key>. The index stores membership for new keys without
+// retaining a duplicate full hex filename. Values remain bounded and cold.
 package rawdb
 
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -38,11 +32,14 @@ const (
 // a single process. Cross-process safety is provided by a file lock.
 type FileDB struct {
 	mu      sync.RWMutex
+	cacheMu sync.Mutex        // committed cache/fence only; never held across disk I/O
 	dir     string            // root directory
 	dataDir string            // dir + "/data"
-	index   map[string][]byte // in-memory cache of all key-value pairs
-	walFile *os.File          // write-ahead log file handle
-	lockFd  int               // file descriptor for LOCK file
+	index   map[string]string // startup key/filename metadata only; values are bounded
+	cache   fileValueCache
+	walFile *os.File // write-ahead log file handle
+	lockFd  int      // file descriptor for LOCK file
+	failure error    // a persistent I/O failure requires reopen/recovery
 	closed  bool
 }
 
@@ -64,13 +61,18 @@ func NewFileDB(dir string) (*FileDB, error) {
 	}
 
 	db := &FileDB{
+		index:   make(map[string]string),
 		dir:     dir,
 		dataDir: dataDir,
-		index:   make(map[string][]byte),
 		lockFd:  lockFd,
 	}
 
-	// Load existing data files into in-memory index.
+	if err := prepareFileDBLayout(dir); err != nil {
+		releaseLock(lockFd)
+		return nil, fmt.Errorf("filedb: prepare layout: %w", err)
+	}
+
+	// Load key/filename metadata in bounded directory batches; values remain cold.
 	if err := db.loadIndex(); err != nil {
 		releaseLock(lockFd)
 		return nil, fmt.Errorf("filedb: load index: %w", err)
@@ -82,12 +84,23 @@ func NewFileDB(dir string) (*FileDB, error) {
 		return nil, fmt.Errorf("filedb: replay wal: %w", err)
 	}
 
+	// Sync every touched layout directory before discarding recovery intents.
+	if err := db.syncDataDirectories(); err != nil {
+		releaseLock(lockFd)
+		return nil, err
+	}
+
 	// Open WAL for new writes (truncate after successful replay).
-	walPath := filepath.Join(dir, "wal")
+	walPath := FileDBJournalPath(dir)
 	walFile, err := os.OpenFile(walPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0o644)
 	if err != nil {
 		releaseLock(lockFd)
 		return nil, fmt.Errorf("filedb: open wal: %w", err)
+	}
+	if err := syncDir(dir); err != nil {
+		walFile.Close()
+		releaseLock(lockFd)
+		return nil, fmt.Errorf("filedb: sync WAL directory: %w", err)
 	}
 	db.walFile = walFile
 
@@ -98,8 +111,8 @@ func NewFileDB(dir string) (*FileDB, error) {
 func (db *FileDB) Has(key []byte) (bool, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
-	if db.closed {
-		return false, errors.New("filedb: database closed")
+	if err := db.stateError(); err != nil {
+		return false, err
 	}
 	_, ok := db.index[string(key)]
 	return ok, nil
@@ -107,18 +120,59 @@ func (db *FileDB) Has(key []byte) (bool, error) {
 
 // Get retrieves the value for a key. Returns ErrNotFound if the key does not exist.
 func (db *FileDB) Get(key []byte) ([]byte, error) {
-	db.mu.RLock()
-	defer db.mu.RUnlock()
-	if db.closed {
-		return nil, errors.New("filedb: database closed")
+	if value, ok, err := db.cachedRead(string(key)); ok || err != nil {
+		return value, err
 	}
-	val, ok := db.index[string(key)]
-	if !ok {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	if value, ok, err := db.cachedRead(string(key)); ok || err != nil {
+		return value, err
+	}
+	k := string(key)
+	name, exists := db.index[k]
+	if !exists {
 		return nil, ErrNotFound
 	}
-	ret := make([]byte, len(val))
-	copy(ret, val)
-	return ret, nil
+	value, err := os.ReadFile(db.indexedPath(key, name))
+	if err != nil {
+		return nil, db.fenceRead(fmt.Errorf("filedb: reopen required after indexed read failure: %w", err))
+	}
+	db.cacheMu.Lock()
+	db.cache.put(k, value)
+	db.cacheMu.Unlock()
+	return bytes.Clone(value), nil
+}
+
+// cachedRead serves only the last fully committed cache view. Writers retain
+// the storage mutex during fsync but do not mutate this view until publication.
+func (db *FileDB) cachedRead(key string) ([]byte, bool, error) {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	if err := db.stateErrorLocked(); err != nil {
+		return nil, false, err
+	}
+	value, ok := db.cache.get(key, true)
+	if !ok {
+		return nil, false, nil
+	}
+	return bytes.Clone(value), true, nil
+}
+func (db *FileDB) stateErrorLocked() error {
+	if db.closed {
+		return errors.New("filedb: database closed")
+	}
+	return db.failure
+}
+func (db *FileDB) stateError() error {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	return db.stateErrorLocked()
+}
+func (db *FileDB) fenceRead(err error) error {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	db.failure = err
+	return err
 }
 
 // Put stores a key-value pair. The write is persisted to the WAL and data
@@ -126,71 +180,43 @@ func (db *FileDB) Get(key []byte) ([]byte, error) {
 func (db *FileDB) Put(key, value []byte) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if db.closed {
-		return errors.New("filedb: database closed")
+	if err := db.stateError(); err != nil {
+		return err
 	}
 	return db.putLocked(key, value)
 }
 
 // putLocked performs Put while the caller already holds db.mu.
 func (db *FileDB) putLocked(key, value []byte) error {
-	// Write WAL record.
-	if err := db.walWrite(walPut, key, value); err != nil {
-		return err
-	}
-	// Persist to data file.
-	if err := db.writeDataFile(key, value); err != nil {
-		return err
-	}
-	// Write commit marker.
-	if err := db.walWriteCommit(); err != nil {
-		return err
-	}
-	// Update in-memory index.
-	cp := make([]byte, len(value))
-	copy(cp, value)
-	db.index[string(key)] = cp
-	return nil
+	return db.applyOpsLocked([]fileBatchOp{{key: key, value: value}})
 }
 
 // Delete removes a key. Returns nil even if the key does not exist.
 func (db *FileDB) Delete(key []byte) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	if db.closed {
-		return errors.New("filedb: database closed")
+	if err := db.stateError(); err != nil {
+		return err
 	}
 	return db.deleteLocked(key)
 }
 
 // deleteLocked performs Delete while the caller already holds db.mu.
 func (db *FileDB) deleteLocked(key []byte) error {
-	// Write WAL record.
-	if err := db.walWrite(walDelete, key, nil); err != nil {
-		return err
-	}
-	// Remove data file (ignore not-exist errors).
-	path := db.keyPath(key)
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("filedb: remove data file: %w", err)
-	}
-	// Write commit marker.
-	if err := db.walWriteCommit(); err != nil {
-		return err
-	}
-	// Update in-memory index.
-	delete(db.index, string(key))
-	return nil
+	return db.applyOpsLocked([]fileBatchOp{{key: key, delete: true}})
 }
 
 // Close closes the database, syncs the WAL, and releases the file lock.
 func (db *FileDB) Close() error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
+	db.cacheMu.Lock()
 	if db.closed {
+		db.cacheMu.Unlock()
 		return nil
 	}
 	db.closed = true
+	db.cacheMu.Unlock()
 	var errs []error
 	if db.walFile != nil {
 		if err := db.walFile.Sync(); err != nil {
@@ -201,6 +227,10 @@ func (db *FileDB) Close() error {
 		}
 	}
 	releaseLock(db.lockFd)
+	db.cacheMu.Lock()
+	db.cache = fileValueCache{}
+	db.cacheMu.Unlock()
+	db.index = nil
 	if len(errs) > 0 {
 		return fmt.Errorf("filedb: close: %v", errs)
 	}
@@ -215,22 +245,37 @@ func (db *FileDB) NewBatch() Batch {
 // NewIterator returns an iterator over all keys with the given prefix,
 // in ascending key order.
 func (db *FileDB) NewIterator(prefix []byte) Iterator {
-	db.mu.RLock()
-	defer db.mu.RUnlock()
-
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	failed := func(err error) Iterator {
+		failure := db.fenceRead(fmt.Errorf("filedb: reopen required after iterator read failure: %w", err))
+		return &memIterator{pos: -1, err: failure}
+	}
+	if err := db.stateError(); err != nil {
+		return &memIterator{pos: -1, err: err}
+	}
 	var keys []string
-	for k := range db.index {
-		if bytes.HasPrefix([]byte(k), prefix) {
-			keys = append(keys, k)
+	for key := range db.index {
+		if bytes.HasPrefix([]byte(key), prefix) {
+			keys = append(keys, key)
 		}
 	}
 	sort.Strings(keys)
-
-	items := make([]kv, len(keys))
-	for i, k := range keys {
-		val := make([]byte, len(db.index[k]))
-		copy(val, db.index[k])
-		items[i] = kv{key: []byte(k), value: val}
+	items := make([]kv, 0, len(keys))
+	for _, key := range keys {
+		db.cacheMu.Lock()
+		value, cached := db.cache.get(key, false)
+		db.cacheMu.Unlock()
+		if !cached {
+			var err error
+			value, err = os.ReadFile(db.indexedPath([]byte(key), db.index[key]))
+			if err != nil {
+				return failed(fmt.Errorf("filedb: iterator read: %w", err))
+			}
+		}
+		clone := make([]byte, len(value))
+		copy(clone, value)
+		items = append(items, kv{key: []byte(key), value: clone})
 	}
 	return &memIterator{items: items, pos: -1}
 }
@@ -284,95 +329,111 @@ func (db *FileDB) walWriteCommit() error {
 // Uncommitted operations (those without a trailing commit marker) are
 // discarded. After replay, the data files and index are consistent.
 func (db *FileDB) replayWAL() error {
-	walPath := filepath.Join(db.dir, "wal")
-	f, err := os.Open(walPath)
+	f, err := os.Open(FileDBJournalPath(db.dir))
+	if os.IsNotExist(err) {
+		return nil
+	}
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil // No WAL, nothing to replay.
-		}
 		return err
 	}
 	defer f.Close()
-
-	data, err := io.ReadAll(f)
+	info, err := f.Stat()
 	if err != nil {
 		return err
 	}
-	if len(data) == 0 {
-		return nil
+	size := info.Size()
+	// Retain last committed intent offsets, never the whole WAL/value history.
+	type intent struct {
+		op     byte
+		offset int64
+		size   uint32
 	}
-
-	// Parse WAL records into transactions. Each transaction is a sequence
-	// of put/delete records followed by a commit marker.
-	type walRecord struct {
-		op    byte
-		key   []byte
-		value []byte
-	}
-
-	var pending []walRecord
-	pos := 0
-	for pos < len(data) {
-		op := data[pos]
+	committed := make(map[string]intent)
+	pending := make(map[string]intent)
+	var pos int64
+	read := func(offset int64, dst []byte) error { _, err := f.ReadAt(dst, offset); return err }
+parse:
+	for pos < size {
+		var tag [1]byte
+		if err := read(pos, tag[:]); err != nil {
+			return err
+		}
 		pos++
-
-		switch op {
+		switch tag[0] {
 		case walCommit:
-			// Apply all pending records.
-			for _, rec := range pending {
-				switch rec.op {
-				case walPut:
-					if err := db.writeDataFile(rec.key, rec.value); err != nil {
-						return err
-					}
-					cp := make([]byte, len(rec.value))
-					copy(cp, rec.value)
-					db.index[string(rec.key)] = cp
-				case walDelete:
-					path := db.keyPath(rec.key)
-					if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-						return err
-					}
-					delete(db.index, string(rec.key))
-				}
+			for key, record := range pending {
+				committed[key] = record
 			}
-			pending = pending[:0]
-
+			pending = make(map[string]intent)
 		case walPut, walDelete:
-			// Read key.
-			if pos+4 > len(data) {
-				return nil // Truncated WAL, discard.
+			var number [4]byte
+			if size-pos < 4 {
+				break parse
 			}
-			kl := binary.BigEndian.Uint32(data[pos : pos+4])
+			if err := read(pos, number[:]); err != nil {
+				return err
+			}
 			pos += 4
-			if pos+int(kl) > len(data) {
-				return nil
+			keySize := int64(binary.BigEndian.Uint32(number[:]))
+			if keySize > size-pos {
+				break parse
 			}
-			key := make([]byte, kl)
-			copy(key, data[pos:pos+int(kl)])
-			pos += int(kl)
-
-			// Read value.
-			if pos+4 > len(data) {
-				return nil
+			key := make([]byte, int(keySize))
+			if err := read(pos, key); err != nil {
+				return err
 			}
-			vl := binary.BigEndian.Uint32(data[pos : pos+4])
+			pos += keySize
+			if size-pos < 4 {
+				break parse
+			}
+			if err := read(pos, number[:]); err != nil {
+				return err
+			}
 			pos += 4
-			if pos+int(vl) > len(data) {
-				return nil
+			valueSize := binary.BigEndian.Uint32(number[:])
+			if int64(valueSize) > size-pos {
+				break parse
 			}
-			value := make([]byte, vl)
-			copy(value, data[pos:pos+int(vl)])
-			pos += int(vl)
-
-			pending = append(pending, walRecord{op: op, key: key, value: value})
-
+			pending[string(key)] = intent{tag[0], pos, valueSize}
+			pos += int64(valueSize)
 		default:
-			// Unknown record type -- WAL is corrupted past this point.
-			return nil
+			break parse
 		}
 	}
-	// Any remaining pending records without a commit marker are discarded.
+	keys := make([]string, 0, len(committed))
+	for key := range committed {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		record := committed[key]
+		path := db.keyPath([]byte(key))
+		if name, ok := db.index[key]; ok {
+			path = db.indexedPath([]byte(key), name)
+		}
+		if record.op == walDelete {
+			if err := db.removeDataFiles([]byte(key)); err != nil {
+				return err
+			}
+			delete(db.index, key)
+			continue
+		}
+
+		value := make([]byte, int(record.size))
+		if len(value) > 0 {
+			if err := read(record.offset, value); err != nil {
+				return err
+			}
+		}
+		if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, value) {
+			continue
+		}
+		if err := db.writeDataFile([]byte(key), value); err != nil {
+			return err
+		}
+		db.index[key] = ""
+	}
+
 	return nil
 }
 
@@ -380,53 +441,38 @@ func (db *FileDB) replayWAL() error {
 
 // keyPath returns the filesystem path for a key's data file.
 func (db *FileDB) keyPath(key []byte) string {
-	return filepath.Join(db.dataDir, hex.EncodeToString(key))
+	return FileDBValuePath(db.dir, key)
 }
 
 // writeDataFile atomically writes a value to the data file for key.
 // It writes to a temporary file first, then renames for atomicity.
 func (db *FileDB) writeDataFile(key, value []byte) error {
 	path := db.keyPath(key)
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return err
+	}
 	tmpPath := path + ".tmp"
 
-	if err := os.WriteFile(tmpPath, value, 0o644); err != nil {
+	file, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+	if err != nil {
 		return fmt.Errorf("filedb: write tmp: %w", err)
+	}
+	_, err = file.Write(value)
+	if err == nil {
+		err = file.Sync()
+	}
+	closeErr := file.Close()
+	if err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		return fmt.Errorf("filedb: flush tmp: %w", err)
 	}
 	if err := os.Rename(tmpPath, path); err != nil {
 		os.Remove(tmpPath) // Best-effort cleanup.
 		return fmt.Errorf("filedb: rename: %w", err)
 	}
-	return nil
-}
-
-// loadIndex scans the data directory and loads all key-value pairs into
-// the in-memory index.
-func (db *FileDB) loadIndex() error {
-	entries, err := os.ReadDir(db.dataDir)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-		name := entry.Name()
-		// Skip temporary files from incomplete writes.
-		if len(name) > 4 && name[len(name)-4:] == ".tmp" {
-			os.Remove(filepath.Join(db.dataDir, name))
-			continue
-		}
-		key, err := hex.DecodeString(name)
-		if err != nil {
-			continue // Skip non-hex filenames.
-		}
-		value, err := os.ReadFile(filepath.Join(db.dataDir, name))
-		if err != nil {
-			return err
-		}
-		db.index[string(key)] = value
-	}
-	return nil
+	return db.removeLegacyValue(key)
 }
 
 // --- File locking ---
@@ -492,53 +538,125 @@ func (b *fileBatch) ValueSize() int { return b.size }
 func (b *fileBatch) Write() error {
 	b.db.mu.Lock()
 	defer b.db.mu.Unlock()
-	if b.db.closed {
-		return errors.New("filedb: database closed")
-	}
+	return b.db.applyOpsLocked(b.ops)
+}
 
-	// Write all WAL records first (without commit markers).
-	for _, op := range b.ops {
-		if op.delete {
-			if err := b.db.walWrite(walDelete, op.key, nil); err != nil {
-				return err
-			}
-		} else {
-			if err := b.db.walWrite(walPut, op.key, op.value); err != nil {
-				return err
-			}
-		}
-	}
-
-	// Apply all data file changes.
-	for _, op := range b.ops {
-		if op.delete {
-			path := b.db.keyPath(op.key)
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-				return fmt.Errorf("filedb: batch remove: %w", err)
-			}
-		} else {
-			if err := b.db.writeDataFile(op.key, op.value); err != nil {
-				return err
-			}
-		}
-	}
-
-	// Write commit marker and sync.
-	if err := b.db.walWriteCommit(); err != nil {
+// Commit the WAL before materializing data files. Otherwise a crash after the
+// first rename but before the commit marker leaves uncommitted file contents
+// that replay cannot undo. Any write error fences this DB until recovery.
+func (db *FileDB) applyOpsLocked(ops []fileBatchOp) error {
+	if err := db.prepareOpsLocked(ops); err != nil {
 		return err
 	}
+	db.publishOpsLocked(ops)
+	return nil
+}
 
-	// Update in-memory index.
-	for _, op := range b.ops {
+// WriteAndPublish retains the old committed cache while durable I/O runs.
+// Cold reads wait on mu and must not retain the caller's publication lock.
+func (b *fileBatch) WriteAndPublish(lock sync.Locker, publish func()) error {
+	b.db.mu.Lock()
+	defer b.db.mu.Unlock()
+	if err := b.db.prepareOpsLocked(b.ops); err != nil {
+		return err
+	}
+	lock.Lock()
+	defer lock.Unlock()
+	b.db.publishOpsLocked(b.ops)
+	publish()
+	return nil
+}
+
+func (db *FileDB) prepareOpsLocked(ops []fileBatchOp) (err error) {
+	if len(ops) == 0 {
+		return db.stateError()
+	}
+	if err := db.stateError(); err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			db.fenceRead(fmt.Errorf("filedb: reopen required after write failure: %w", err))
+		}
+	}()
+	for _, op := range ops {
+		kind := walPut
 		if op.delete {
-			delete(b.db.index, string(op.key))
-		} else {
-			cp := make([]byte, len(op.value))
-			copy(cp, op.value)
-			b.db.index[string(op.key)] = cp
+			kind = walDelete
+		}
+		if err = db.walWrite(kind, op.key, op.value); err != nil {
+			return err
+		}
+	}
+	if err = db.walWriteCommit(); err != nil {
+		return err
+	}
+	return db.materializeOpsLocked(ops)
+}
+
+// Materialize independent keys concurrently only after the complete WAL commit.
+// Coalesce repeated keys first: recovery also retains the last committed intent.
+// All workers finish before publication or error fencing, so no write can escape
+// a failed batch's lifetime or reorder a later batch.
+func (db *FileDB) materializeOpsLocked(ops []fileBatchOp) error {
+	last := make(map[string]int, len(ops))
+	for i, op := range ops {
+		last[string(op.key)] = i
+	}
+	indices := make([]int, 0, len(last))
+	for i, op := range ops {
+		if last[string(op.key)] == i {
+			indices = append(indices, i)
+		}
+	}
+	// Avoid goroutine/queue overhead on the normal small-batch path.
+	if len(indices) < 64 {
+		for _, i := range indices {
+			if err := db.materializeOp(ops[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	const workers = 16
+	work := make(chan int)
+	failures := make([]error, len(indices))
+	var wait sync.WaitGroup
+	for range workers {
+		wait.Add(1)
+		go func() {
+			defer wait.Done()
+			for i := range work {
+				failures[i] = db.materializeOp(ops[indices[i]])
+			}
+		}()
+	}
+	for i := range indices {
+		work <- i
+	}
+	close(work)
+	wait.Wait()
+	for _, err := range failures {
+		if err != nil {
+			return err
 		}
 	}
 	return nil
+}
+
+func (db *FileDB) publishOpsLocked(ops []fileBatchOp) {
+	db.cacheMu.Lock()
+	defer db.cacheMu.Unlock()
+	for _, op := range ops {
+		if op.delete {
+			delete(db.index, string(op.key))
+			db.cache.remove(string(op.key))
+		} else {
+			db.index[string(op.key)] = ""
+			db.cache.put(string(op.key), op.value)
+		}
+	}
+
 }
 
 func (b *fileBatch) Reset() {
@@ -548,3 +666,14 @@ func (b *fileBatch) Reset() {
 
 // Compile-time interface checks.
 var _ Database = (*FileDB)(nil)
+
+func syncDir(path string) error {
+	dir, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	return errors.Join(dir.Sync(), dir.Close())
+}
+
+// Error reports a fenced or closed store to lazy state/proof consumers.
+func (db *FileDB) Error() error { return db.stateError() }

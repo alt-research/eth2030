@@ -1,0 +1,3 @@
+constants: txBase=4500 cpsb=662 coldAccount=3500 coldStorage=2800 warm=150 codeLimit=32768 initLimit=65536
+clear=false used=4500 blockUsed=4500 refund=0 logs=1 failed=<nil>
+clear=true used=7456 blockUsed=7456 refund=0 logs=1 failed=<nil>

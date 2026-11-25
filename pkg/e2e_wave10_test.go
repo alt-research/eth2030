@@ -32,7 +32,7 @@ func makeGenesisBlock() (*types.Block, *state.MemoryStateDB) {
 	calldataExcessGas := uint64(0)
 	emptyWHash := types.EmptyRootHash
 	emptyBeaconRoot := types.EmptyRootHash
-	emptyRequestsHash := types.EmptyRootHash
+	emptyRequestsHash := types.EmptyRequestsHash
 	header := &types.Header{
 		Number:            big.NewInt(0),
 		GasLimit:          30000000,
@@ -48,8 +48,9 @@ func makeGenesisBlock() (*types.Block, *state.MemoryStateDB) {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	// Fund a sender for transactions.
 	sender := types.HexToAddress("0x1111")
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18)))
@@ -80,7 +81,7 @@ func buildBlock(t *testing.T, parent *types.Block, statedb *state.MemoryStateDB,
 	calldataGasUsed := uint64(0)
 	emptyWHash := types.EmptyRootHash
 	emptyBeaconRoot2 := types.EmptyRootHash
-	emptyRequestsHash2 := types.EmptyRootHash
+	emptyRequestsHash2 := types.EmptyRequestsHash
 	header := &types.Header{
 		ParentHash:        parent.Hash(),
 		Number:            new(big.Int).Add(parentHeader.Number, big.NewInt(1)),
@@ -96,6 +97,7 @@ func buildBlock(t *testing.T, parent *types.Block, statedb *state.MemoryStateDB,
 		RequestsHash:      &emptyRequestsHash2,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{
@@ -404,6 +406,7 @@ func TestRPCE2E_BlockchainQueries(t *testing.T) {
 
 	backend := &blockchainBackend{bc: bc, chainID: big.NewInt(1337)}
 	srv := rpc.NewServer(backend)
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -447,6 +450,7 @@ func TestRPCE2E_ClientVersion(t *testing.T) {
 
 	backend := &blockchainBackend{bc: bc, chainID: big.NewInt(1337)}
 	srv := rpc.NewServer(backend)
+	srv.SetAllowedModules([]string{"*"})
 	ts := httptest.NewServer(srv.Handler())
 	defer ts.Close()
 
@@ -1307,7 +1311,7 @@ func TestE2E_TransientStorage_SurvivesRevert(t *testing.T) {
 // handling in the block builder: proper inclusion, gas accounting, and
 // blob gas limit enforcement.
 func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1340,7 +1344,7 @@ func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
 			Nonce:      uint64(i),
 			GasTipCap:  big.NewInt(2000),
 			GasFeeCap:  big.NewInt(100000),
-			Gas:        21000,
+			Gas:        300_000,
 			To:         recipient,
 			Value:      big.NewInt(100),
 			BlobFeeCap: big.NewInt(100000),
@@ -1387,7 +1391,7 @@ func TestE2E_BlockBuilder_BlobTransactions(t *testing.T) {
 // builder enforces the MaxBlobGasPerBlock limit and skips blob txs that
 // would exceed it.
 func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1408,11 +1412,9 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 		ExcessBlobGas: &excessBlobGas,
 	}
 
-	// Create 7 blob transactions, each with 1 blob. Since MaxBlobGasPerBlock =
-	// 786432 and GasPerBlob = 131072, the maximum is 6 blobs per block.
-	// The 7th should be excluded.
+	// Ten candidates exceed the active Prague capacity of nine.
 	var blobTxs []*types.Transaction
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 10; i++ {
 		blobHash := types.Hash{}
 		blobHash[0] = 0x01
 		blobHash[1] = byte(i + 1)
@@ -1437,16 +1439,8 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 		t.Fatalf("BuildBlockLegacy: %v", err)
 	}
 
-	// At most 6 blob txs should be included (MaxBlobGasPerBlock / GasPerBlob = 6).
-	included := len(block.Transactions())
-	if included > 6 {
-		t.Errorf("included %d blob txs, want at most 6", included)
-	}
-
-	if block.Header().BlobGasUsed != nil {
-		if *block.Header().BlobGasUsed > gas.MaxBlobGasPerBlock {
-			t.Errorf("BlobGasUsed %d exceeds max %d", *block.Header().BlobGasUsed, gas.MaxBlobGasPerBlock)
-		}
+	if len(block.Transactions()) != 9 || block.Header().BlobGasUsed == nil || *block.Header().BlobGasUsed != 9*gas.GasPerBlob {
+		t.Fatalf("Prague builder must include nine and exclude the tenth: tx=%d blobGas=%v", len(block.Transactions()), block.Header().BlobGasUsed)
 	}
 }
 
@@ -1454,7 +1448,7 @@ func TestE2E_BlockBuilder_BlobGasLimitEnforcement(t *testing.T) {
 // transaction with an invalid versioned hash (wrong version byte) is
 // skipped by the block builder.
 func TestE2E_BlockBuilder_BlobTxInvalidHashRejected(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1508,7 +1502,7 @@ func TestE2E_BlockBuilder_BlobTxInvalidHashRejected(t *testing.T) {
 // correctly handles a mix of regular and blob transactions, including proper
 // separate gas accounting.
 func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	recipient := types.BytesToAddress([]byte{0x20})
 	coinbase := types.BytesToAddress([]byte{0xff})
@@ -1536,7 +1530,7 @@ func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    uint64(i),
 			GasPrice: big.NewInt(100000),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &recipient,
 			Value:    big.NewInt(1),
 		})
@@ -1555,7 +1549,7 @@ func TestE2E_BlockBuilder_MixedRegularAndBlobTxs(t *testing.T) {
 			Nonce:      uint64(3 + i),
 			GasTipCap:  big.NewInt(2000),
 			GasFeeCap:  big.NewInt(100000),
-			Gas:        21000,
+			Gas:        300_000,
 			To:         recipient,
 			Value:      big.NewInt(1),
 			BlobFeeCap: big.NewInt(100000),
@@ -1647,3 +1641,5 @@ func buildCallContract(value byte, slot byte, target types.Address) []byte {
 	)
 	return code
 }
+
+func (b *blockchainBackend) IsOsaka(uint64) bool { return false }

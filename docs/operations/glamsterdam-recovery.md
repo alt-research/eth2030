@@ -1,0 +1,78 @@
+# Glamsterdam qualified development network operations
+
+## Supported target and identity
+
+This runbook applies to the explicitly pinned private-chain implementation, not a public Ethereum/mainnet release. Resolve the final campaign manifest before deployment: source commits, executable SHA-256, image IDs, genesis, fork schedule, resource limits, cryptographic backends and independent clients must match. The selected merged LIFO gas model and signed payload-envelope format remain in force. Open alternatives are not implicitly compatible.
+
+Use the native `cmd/eth2030` executable. `cmd/eth2030-geth` is a different backend and cannot replace native execution acceptance. Build from a clean recorded composition with Go 1.26.11, `-trimpath`, and the actual source revision in `main.commit`. Preserve the build command and resulting executable digest. An image tag or CLI version alone cannot establish the running inode; the campaign capture tool hashes `/proc/<pid>/exe` inside the exact container.
+
+## Safe rolling EL upgrade
+
+1. Discover the exact owned service and live published ports from Docker/Kurtosis. Require the expected chain ID and exact genesis hash. Capture common finalized hashes, full commitments, original application receipts/getters/proofs and the runtime/resource inventory.
+2. Upgrade one original pair at a time. Stop the EL and verify its process ended and its database lock is available. Preserve the stopped complete datadir, original genesis/configuration and exact previous executable. Do not copy validator keys or run duplicate validator clients.
+3. Build missing immutable authenticated history with the maintenance executable from the same recorded source:
+
+```sh
+eth2030-state-history --datadir=/path/to/original/execution-data --genesis=/path/to/original/genesis.json
+```
+
+The command requires exclusive access and never starts network/RPC/validators. It follows only the original locally validated canonical path and checks reconstructed roots. SIGTERM cancels the operation and retains completed atomic index batches. A completed index is not itself proof that the normal node starts or catches up within its separate deadline.
+
+4. Start the new native executable with the original datadir/genesis and recorded fork schedule. Capture startup duration separately from RPC polling and catch-up. Require nonoptimistic CL, expected finalized ancestry, independent full header/state/receipt commitments and exact retained historical consumers. Only then proceed to the next pair.
+5. Keep the original restart/full/snap budgets (300/3600/600 seconds for the recorded roles). A missed deadline remains a failed attempt. Investigate the cause before declaring a new attempt with a new source or workload tuple.
+
+## Storage failure and crash recovery
+
+The database's durable WAL commit is the recovery authority. A materialization error may occur after commit, so a failed RPC cannot by itself establish that the operation was rolled back. FileDB fences further reads/writes after a failed write; Engine must preserve a local storage error rather than return fabricated state, consensus INVALID or peer SYNCING. Stop the process and repair the actual filesystem problem before reopening.
+
+Preserve the complete failed datadir and WAL. Never delete, truncate, synthesize or selectively copy its WAL/head/finality files. Reopen through normal FileDB recovery: complete committed intent is materialized, and an incomplete suffix is discarded. Require exact recovered head, safe/finalized ancestry, authenticated state and normal next-block execution. Restore an older executable only with its matching stopped database/genesis backup unless cross-version recovery has been explicitly qualified. Retain post-upgrade data separately; do not overwrite it with the rollback backup.
+
+The process qualification uses three actual OS faults on isolated data: a temporary head-file directory collision (EISDIR), a process file-size limit permitting only one additional WAL byte (short write/EFBIG), and a dedicated limited tmpfs filled to ENOSPC. SIGKILL and restart happen after the fault. The expected head is derived from actual complete WAL commits, never from a permissive choice of either old or new head. These tests do not authorize fault injection into an unrelated or production database.
+
+## Partial data and availability
+
+The qualified peer target uses partial-message group version 0x01 and strict bitmap/row/index/KZG checks. To observe actual peer acquisition, the receiving CL uses its existing `--disable-get-blobs` option; ordinary full gossip fallback and all validation remain enabled. Capture useful verified partial-cell counters and actual imported commitments so an HTTP response or fallback alone cannot be counted as partial acquisition. Unknown extension versions are ignored according to the pinned spec; known-invalid messages retain rejection/scoring behavior.
+
+## Historical retention and pruning
+
+Record retention policy and wall-clock/epoch schedule before running pruning. EIP-7928 requires exact BAL availability for at least 14,299 epochs; block count cannot substitute for elapsed epochs when slots are missed. Distinguish unavailable history, explicitly pruned state, malformed/corrupt committed data and temporary storage failure. Never treat missing/corrupt committed state as zero or silently replace the root. Full startup/maintenance audits remain explicit even though normal point reads and persistence use authenticated changed paths.
+
+## Qualification and release handoff
+
+Run the final steady and valid/invalid pressure profiles only after source, actual binaries and resource limits are frozen. Retain complete failed RPC/Engine samples, original missing slots and independently authenticated finality. Changing resources, peers, binaries or workload during a window invalidates that window's unchanged-tuple claim. The original 129/400 missing-slot failure remains separate. Publish compatible artifacts, license/source inventory, supported boundaries, exact reproducible commands and all outstanding gates before a release decision.
+
+## Independent gossip reconnect qualification
+
+ReqResp connectivity and a healthy node HTTP endpoint alone do not establish gossip publication. Retain actual peer protocols, pubsub peers/subscriptions, ordinary peer scores and canonical proposals from the affected validator range. The final network correction is the explicit libp2p 3.4.0 patch in Lodestar review 10693. Apply the patch at its pinned dependency version, use the normal package/build pipeline and verify the source/runtime/declaration/map hashes in the protocol manifest. The running application remains cf705; a base-image tag or its CLI application version does not identify this dependency override.
+
+The original dependency has three failing installed-runtime regressions; the completed patch passes seven, including normal final disconnect, unrelated-peer and limited-connection controls. Three real six-second provider losses recover automatically in 6.605/0.082/2.241 seconds under 90 seconds with ordinary scores and validation. The final 400-slot and 60-slot operating windows retain all produced slots. The network-recovery archive contains the exact image context, original module backup, compiler evidence, source tests and deployment hashes.
+
+## Builder runtime restoration and registry observation
+
+The unchanged producer's CLI startup fleet target and in-memory runtime target are distinct. After a producer restart, restore the desired fleet size through POST /api/v1/builder-keys/target before enabling lifecycle through PATCH /api/v1/config, then read back the complete original configuration. Enabling lifecycle while the target is still one can submit an ordinary irreversible exit for a newly activated second key. The stateful regression and actual disabled-lifecycle endpoint preflight cover this ordering.
+
+Observe deposits, finalized activation, exit epoch, the unchanged 64-epoch withdrawability delay, zero-balance sweep and new-public-key index reuse separately. Capture exact signed blocks and state roots before pruning, and bind the debit to full execution headers/withdrawal commitments and account proofs on all original ELs. The retired-key control changes only the signature over an actual original current-key message: require 400 BadSignature, no availability 404, original current-key acceptance 200 and byte-identical positive GET availability. Restore the original executable, target, network/IP/aliases and ordinary lifecycle after the case. Any later ordinary cleanup exit is a new on-chain lifecycle and is not counted as another observed sweep.
+
+## Post-merge BAL expiry and large stopped-database backups
+
+PR 123 corrects historical snap cursor recovery after legally pruning an expired BAL. Present BAL bytes still require the original Keccak commitment. Missing bytes remain mandatory at the exact 14,299-epoch boundary, inside the window or when actual beacon slot metadata is unavailable; only finalized-slot expiry permits absence. Saved bodies/headers and pivot ancestry remain authenticated, and historical acquisition still grants no execution/state authority. FileDB reopen controls use ordinary executed sparse-slot fixtures, not a modified live clock.
+
+Keep backup preparation and daemon startup separate. For the retained million-file FileDB, a Docker directory copy may spend most preparation time extracting tiny files on the host. Retain a complete stopped-datadir tar stream instead, validate every regular member length and record the full archive digest before replacing the executable. Keep complete databases, WAL and previous executables privately; public qualification bundles contain reports/proofs rather than database archives. If preparation fails before replacement, restart the original service and retain the failed preparation. A partial directory is not a rollback backup.
+
+The post-merge campaign keeps the original 300-second daemon recovery limit. Its distinct tar preparation has a separately declared limit, and source-specific original failures remain unchanged. After restart require nonoptimistic CL, the original common finalized commitments and independently verified account proofs before upgrading the next role. Original validator processes, genesis, chain time, scores and resource limits remain unchanged.
+
+## Final qualified normal startup profile (2026-11-22)
+
+The final post-merge source composition is d9201b0 (masterc27a5bb0 plus independent fixes123/124); the verified Go1.26.11 executable SHA-256 is8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec. PR124 restores authenticated indexed snap descendants only after complete pivot/head state, canonical body/marker and finalized-prefix validation. Its checked finalized metadata reader treats malformed bytes and storage IO failure as errors. Missing old indexes/markers use normal replay. Do not discard the original checkpoint snapshot, ancestry, database or retained executable.
+
+In the actual main2/main3 campaign, the one-time state-history migration was already complete. Their retained custom startup script redundantly invoked that migration before each daemon launch. After confirming completion and preserving the original launcher/migration executable hashes, the normal profile directly executes the verified native daemon with the same original flags. An operator must first confirm migration completion for that specific datadir; an incomplete migration still requires the ordinary migration procedure. Preserve the stopped matching backup and original script before changing a custom launcher. This is separate from skipping required normal startup state/ancestry audits: those still execute and authenticate the original commitments.
+
+The final normal main2/main3/full/snap Docker-start recovery bounds are189.038/212.551/219.661/176.953seconds under300s. Original directory-backup timeout, snap replay timeout and redundant-migration over-budget run remain failed. No resource/clock/configuration change is used to recast them as passes. Full source/runtime/proof records are in docs/reviews/glamsterdam-postmerge-20261121.
+
+The final Lodestar patch isb1b03520dcf17504a10641301d16abca4e8434c02b1c9e81dd5e7baf9fc8e156 from functional sourcecad22db, with fifteen normal-root regressions including logical topology aliases. Its actual recovery times0.155/5.493/1.168seconds and final400/60-slot operating windows supersede the earlier source-specific seven-case qualification above for current acceptance. The historical records remain valid only for their original source tuples. The required upstream lockfile review/full hosted CI remains explicit.
+
+## FileDB value-layout version 2
+
+The directory-capacity repair writes new values under `data-v2/<bucket>/<hex-key>` and keeps existing `data/` values readable until touched. `wal-v2` is the active journal; the `wal` directory symlink is an intentional old-reader guard. Opening an old store installs the guard before new-layout values can be published, including when later node startup fails. The journal transition preserves interrupted upgrades.
+
+Use a binary supporting this layout for restart and recovery. A legacy binary is expected to refuse the guarded store; deleting the guard or truncating its journal does not perform a downgrade. A downgrade requires an intact stopped pre-upgrade backup with its matching binary and checkpoint/fork configuration. Keep current journal and both value directories together in backups. This changes physical paths, not Ethereum keys, values or state roots.

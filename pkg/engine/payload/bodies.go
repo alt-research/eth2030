@@ -16,7 +16,7 @@ type ExecutionPayloadBodyV1 struct {
 type ExecutionPayloadBodyV2 struct {
 	Transactions    [][]byte      `json:"transactions"`
 	Withdrawals     []*Withdrawal `json:"withdrawals"`
-	BlockAccessList []byte        `json:"blockAccessList,omitempty"`
+	BlockAccessList []byte        `json:"blockAccessList"`
 }
 
 // BlockToPayloadBodyV1 converts a types.Block to an ExecutionPayloadBodyV1.
@@ -28,7 +28,10 @@ func BlockToPayloadBodyV1(block *types.Block) *ExecutionPayloadBodyV1 {
 			txs = append(txs, enc)
 		}
 	}
-	ws := make([]*Withdrawal, 0, len(block.Withdrawals()))
+	var ws []*Withdrawal
+	if block.Header().WithdrawalsHash != nil || block.Withdrawals() != nil {
+		ws = make([]*Withdrawal, 0, len(block.Withdrawals()))
+	}
 	for _, w := range block.Withdrawals() {
 		if w != nil {
 			ws = append(ws, &Withdrawal{

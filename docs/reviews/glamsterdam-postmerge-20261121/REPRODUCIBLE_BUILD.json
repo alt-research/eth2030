@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+  "source_branch": "qualification/glamsterdam-reviewed-runtime-20261121",
+  "toolchain": "go1.26.11",
+  "binary_sha256": "8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec",
+  "isolated_clean_second_build_sha256": "8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec",
+  "trimpath": true
+}

@@ -1,0 +1,13 @@
+# Original multi-hour stall: diagnostic collector fixed
+
+Confirmed and fixed a real evidence-loss bug: TextIOWrapper could retain the only Engine timeout line after select had drained the kernel pipe. The quiet-after-burst control reproduces it with a live writer; restoring that reader as an executed mutation fails the new test. Raw bounded reads, partial/EOF draining, explicit startup/stream failures and atomic status fix the diagnostic path. Eight tests and all26 baseline devnet controls pass; the existing CI job runs the new controls.
+
+The verified collector was deployed on the unchanged original-source diagnostic without resetting its clock or either daemon. Both actual executable hashes/start identities and the live native baseline stack were verified. Optional post-timeout CL native backtraces now accompany Go profiles. A real independent debugger PID-namespace/cleanup control passed. No clean operating node was paused for that control.
+
+Original03/04 root cause is still unknown. Their history worker finished before original04 acceptance, so PR135's separate startup fix does not close the later incident. The new30min run and fresh BLS closure must be assessed after actual completion and clean stop. A separate isolated original-source8s503 recovery control is in progress; its result will not be represented as the cause of the original native delay. See RUNBOOK.md and retained negative controls.
+
+The bounded30min observation and independent BLS replay have now completed. The actual stopped head was additionally bound through the authenticated full beacon body, persisted native execution header and SDK account proofs; no online closing RPC was invented. See OBSERVATIONS_20261122.md and FAST_LIVE_RESULT.json. Original04 multi-hour root attribution remains open; the unchanged source diagnostic and isolated timeout-recovery control continue separately.
+
+The two distinct recovery controls have completed. The first had parallel lookup rescue of an already-executed payload; the second held a real checked native commit for150s and verified canonical execution recovery after release. Both are explicitly limited controls. Original04 still requires its actual live waiting chain. CONTROLLED_RECOVERY_RESULTS.json also records the early debugger phase accurately.
+
+Further original stopped-file metadata narrows chronology: WAL/header writes began before the logged SIGTERM, so explicit shutdown cancellation is not established as the release mechanism. An additional passive bounded real-goroutine sampler is active on the unchanged diagnosis. The repeated original background restoration did not yet reproduce a sustained wait. Original04 remains unresolved; see ACTUAL_WAIT_PROGRESS_20261123.md/json.

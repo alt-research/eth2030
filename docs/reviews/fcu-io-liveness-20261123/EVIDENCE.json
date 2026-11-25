@@ -1,0 +1,44 @@
+{
+  "old_el_source": "19a3f1bbf7a52460d3528b65e47ecfc897bb494d",
+  "old_el_binary_sha256": "bb3d8b4492a8b55963aabf455f3936a998309ff28e56c69424bc3c3968938bda",
+  "old_cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e",
+  "actual48h_passed": false,
+  "original04_same_holder_proven": false,
+  "receipts": [
+    {
+      "artifact": "diagnostic04-import-long/result.json",
+      "sha256": "2d13c7c34acd6fed5436b9b784e7e367148f6a93e5913a047a7c97f43f27d5e7",
+      "bytes": 2476
+    },
+    {
+      "artifact": "diagnostic04-import-long/stack-171635653854/goroutines.txt",
+      "sha256": "3aa991926928a8ed841040cf83d58526a15f0478a8fcff468cc7fc690b848592",
+      "bytes": 102307
+    },
+    {
+      "artifact": "diagnostic04-import-long/early-engine-captures-v3/stack-171804182995/el-pressure.txt",
+      "sha256": "f8902a2bbf60a9c23fe2e71bd39e31b6302b5677d6b078f6fb94881f9a039771",
+      "bytes": 503
+    },
+    {
+      "artifact": "diagnostic04-import-long/actual-native-wait-sampling/request-58897-171840/event.json",
+      "sha256": "87ba6cd008f8db862fa4e19a63fc54b96a73f5568f179bb659196885623abe9d",
+      "bytes": 338
+    },
+    {
+      "artifact": "diagnostic04-import-long/actual-native-wait-sampling/request-58897-171840/request-stack.txt",
+      "sha256": "088ee57cbb932c802129f90368be6315861e4c0366b472eed56d7eae7f68761d",
+      "bytes": 4756
+    },
+    {
+      "artifact": "actual-fcu-io-causal-red.log",
+      "sha256": "0fc86e554f17b15d9412148ae2c52865a6d70e5c6c3dd44c12a60d0710c48683",
+      "bytes": 1760
+    },
+    {
+      "artifact": "actual-fcu-progress-red.log",
+      "sha256": "95e91c041d1c36f32b232727b307ff239bcf7070e5f34f4f4f262fe228014376",
+      "bytes": 221
+    }
+  ]
+}

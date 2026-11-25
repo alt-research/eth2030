@@ -1,0 +1,63 @@
+[
+  {
+    "name": "moving-repeat",
+    "command": [
+      "go",
+      "test",
+      "-count=20",
+      "./sync/beacon",
+      "-run",
+      "TestRestoredSnapMovingTargets|TestMovingTargets|TestGenesisHeadStill"
+    ],
+    "seconds": 2.0170802710053977,
+    "exit": 0
+  },
+  {
+    "name": "affected",
+    "command": [
+      "go",
+      "test",
+      "-count=1",
+      "./sync/beacon",
+      "./node"
+    ],
+    "seconds": 29.723788065020926,
+    "exit": 0
+  },
+  {
+    "name": "race",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "./sync/beacon",
+      "./node"
+    ],
+    "seconds": 74.0363641710137,
+    "exit": 0
+  },
+  {
+    "name": "vet",
+    "command": [
+      "go",
+      "vet",
+      "./sync/beacon",
+      "./node"
+    ],
+    "seconds": 1.6348472359823063,
+    "exit": 0
+  },
+  {
+    "name": "build",
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/projects/eth2030/qualification/remaining-code-20261122/resume-native-preliminary",
+      "./cmd/eth2030"
+    ],
+    "seconds": 2.2661846310074907,
+    "exit": 0
+  }
+]

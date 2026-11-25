@@ -1,5 +1,7 @@
 # 真实运行路径与激活矩阵
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 HGT-004 / HGT-005。代码证据对应本次提交，源文件校验见运行证据；表内的“支持”指已检查的路径边界，不代表整个 fork 符合性。
 
 | 入口 | 实际路径 | 验收归属 |

@@ -32,7 +32,7 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 	receiver2 := types.BytesToAddress([]byte{0xa3})
 
 	// Initialize state with sender having a large balance.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(1_000_000_000_000)) // 1 trillion wei
 	statedb.SetNonce(sender, 0)
 
@@ -41,7 +41,7 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 	tx1 := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: gasPrice,
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiver1,
 		Value:    big.NewInt(1000),
 	})
@@ -50,7 +50,7 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 	tx2 := types.NewTransaction(&types.LegacyTx{
 		Nonce:    1,
 		GasPrice: gasPrice,
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiver2,
 		Value:    big.NewInt(2000),
 	})
@@ -59,7 +59,7 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 	tx3 := types.NewTransaction(&types.LegacyTx{
 		Nonce:    2,
 		GasPrice: gasPrice,
-		Gas:      21000,
+		Gas:      300_000,
 		To:       &receiver1,
 		Value:    big.NewInt(500),
 	})
@@ -93,14 +93,18 @@ func TestEndToEndBlockProcessing(t *testing.T) {
 		if r.Status != types.ReceiptStatusSuccessful {
 			t.Errorf("receipt %d: status = %d, want %d", i, r.Status, types.ReceiptStatusSuccessful)
 		}
-		if r.GasUsed != 21000 {
-			t.Errorf("receipt %d: gasUsed = %d, want 21000", i, r.GasUsed)
+		wantGas := uint64(21000)
+		if i < 2 {
+			wantGas = 204600
+		}
+		if r.GasUsed != wantGas {
+			t.Errorf("receipt %d: gasUsed = %d, want %d", i, r.GasUsed, wantGas)
 		}
 	}
 
 	// Verify state changes.
-	// Sender: initial 1T - (1000 + 2000 + 500) value - (3 * 21000 * 1) gas
-	expectedSenderBal := new(big.Int).SetInt64(1_000_000_000_000 - 1000 - 2000 - 500 - 3*21000)
+	// Two newly live recipients cost 204600 each, then an existing receiver costs 21000.
+	expectedSenderBal := new(big.Int).SetInt64(1_000_000_000_000 - 1000 - 2000 - 500 - (2*204600 + 21000))
 	actualBal := statedb.GetBalance(sender)
 	if actualBal.Cmp(expectedSenderBal) != 0 {
 		t.Errorf("sender balance = %s, want %s", actualBal, expectedSenderBal)
@@ -396,7 +400,7 @@ func TestEndToEndBlockBuilder(t *testing.T) {
 	receiver := types.BytesToAddress([]byte{0xb2})
 
 	// Initialize state.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
 
 	// Create transactions.
@@ -405,7 +409,7 @@ func TestEndToEndBlockBuilder(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(1000),
 		})
@@ -451,8 +455,8 @@ func TestEndToEndBlockBuilder(t *testing.T) {
 	}
 
 	// Verify final state.
-	// sender: 10M - (3 * 1000 value) - (3 * 21000 * 10 gas)
-	expectedBal := int64(10_000_000 - 3*1000 - 3*21000*10)
+	// sender: 10M - (3 * 1000 value) - ((204600 + 2*21000) * 10 gas)
+	expectedBal := int64(10_000_000 - 3*1000 - (204600+2*21000)*10)
 	if bal := statedb.GetBalance(sender); bal.Int64() != expectedBal {
 		t.Errorf("sender balance = %d, want %d", bal.Int64(), expectedBal)
 	}

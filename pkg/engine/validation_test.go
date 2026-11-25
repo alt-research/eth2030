@@ -15,14 +15,15 @@ import (
 
 func TestNewPayloadV3_MissingBeaconRoot(t *testing.T) {
 	// EIP-4788: parentBeaconBlockRoot must be provided (non-zero).
-	backend := &mockBackend{}
+	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false }}
 	api := NewEngineAPI(backend)
 
 	payload := makeTestPayloadV3(types.Hash{}, 100)
 	payloadJSON, _ := json.Marshal(payload)
 	hashesJSON, _ := json.Marshal([]types.Hash{})
-	// Zero beacon root should fail.
-	rootJSON, _ := json.Marshal(types.Hash{})
+	// Null is absent; a present zero root is valid DATA.
+	rootJSON := []byte("null") // required parameter absent
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_newPayloadV3","params":[%s,%s,%s],"id":1}`,
 		payloadJSON, hashesJSON, rootJSON)
@@ -74,13 +75,14 @@ func TestNewPayloadV3_UnsupportedFork(t *testing.T) {
 }
 
 func TestNewPayloadV4_MissingBeaconRoot(t *testing.T) {
-	backend := &mockBackend{}
+	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false }}
 	api := NewEngineAPI(backend)
 
 	payload := makeTestPayloadV3(types.Hash{}, 100)
 	payloadJSON, _ := json.Marshal(payload)
 	hashesJSON, _ := json.Marshal([]types.Hash{})
-	rootJSON, _ := json.Marshal(types.Hash{}) // zero = missing
+	rootJSON := []byte("null") // required parameter absent
 	requestsJSON, _ := json.Marshal([][]byte{})
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_newPayloadV4","params":[%s,%s,%s,%s],"id":1}`,
@@ -102,7 +104,8 @@ func TestNewPayloadV4_MissingBeaconRoot(t *testing.T) {
 
 func TestNewPayloadV4_NilExecutionRequests(t *testing.T) {
 	// EIP-7685: executionRequests must be provided (not null).
-	backend := &mockBackend{}
+	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false }}
 	api := NewEngineAPI(backend)
 
 	payload := makeTestPayloadV3(types.Hash{}, 100)
@@ -166,7 +169,12 @@ func TestNewPayloadV4_UnsupportedFork(t *testing.T) {
 func TestForkchoiceUpdatedV3_TimestampProgression(t *testing.T) {
 	// Validate that timestamp must be greater than the head block timestamp.
 	backend := &mockBackend{
-		headTimestamp: 1700000000, // head block timestamp
+		blockTimestampFn: func(hash types.Hash) uint64 {
+			if hash == types.HexToHash("0x1111") {
+				return 1700000000
+			}
+			return 0
+		},
 	}
 	api := NewEngineAPI(backend)
 
@@ -232,6 +240,10 @@ func TestForkchoiceUpdatedV3_MissingBeaconRoot(t *testing.T) {
 
 	stateJSON, _ := json.Marshal(state)
 	attrsJSON, _ := json.Marshal(attrs)
+	var fields map[string]json.RawMessage
+	_ = json.Unmarshal(attrsJSON, &fields)
+	delete(fields, "parentBeaconBlockRoot")
+	attrsJSON, _ = json.Marshal(fields)
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_forkchoiceUpdatedV3","params":[%s,%s],"id":1}`,
 		stateJSON, attrsJSON)
@@ -295,6 +307,8 @@ func TestForkchoiceUpdatedV3_WithWithdrawals(t *testing.T) {
 	// Verify withdrawals are properly forwarded through V3 attributes.
 	expectedID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
+		isPragueFn:    func(uint64) bool { return false },
 		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
 			if attrs == nil {
 				t.Fatal("expected non-nil attributes")
@@ -366,6 +380,7 @@ func TestGetPayloadV3_ResponseFormat(t *testing.T) {
 	// It should NOT have executionRequests.
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		getPayloadByIDFn: func(id PayloadID) (*GetPayloadResponse, error) {
 			return &GetPayloadResponse{
 				ExecutionPayload: &ExecutionPayloadV4{
@@ -438,6 +453,8 @@ func TestGetPayloadV4_ResponseFormat(t *testing.T) {
 	// V4 response should have: executionPayload, blockValue, blobsBundle, shouldOverrideBuilder, executionRequests.
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isOsakaFn:     func(uint64) bool { return false },
+		isAmsterdamFn: func(uint64) bool { return false },
 		getPayloadV4ByIDFn: func(id PayloadID) (*GetPayloadV4Response, error) {
 			return &GetPayloadV4Response{
 				ExecutionPayload: &ExecutionPayloadV3{
@@ -660,42 +677,21 @@ func TestBackend_IsCancun(t *testing.T) {
 }
 
 func TestBackend_ProcessBlockV4(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
-	genesis := makeGenesis()
-	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
-	genesisHash := genesis.Hash()
+	cfg := *coreconfig.TestConfig
+	cfg.AmsterdamTime = nil
+	backend, api := makeE2EBackend(t, &cfg)
+	t.Cleanup(backend.Close)
+	built := buildNextPayload(t, api, backend)
 
-	payload := &ExecutionPayloadV3{
-		ExecutionPayloadV2: ExecutionPayloadV2{
-			ExecutionPayloadV1: ExecutionPayloadV1{
-				ParentHash:    genesisHash,
-				FeeRecipient:  types.HexToAddress("0xfee"),
-				PrevRandao:    types.HexToHash("0xrandao"),
-				BlockNumber:   1,
-				GasLimit:      30_000_000,
-				GasUsed:       0,
-				Timestamp:     1700000012,
-				BaseFeePerGas: big.NewInt(875_000_000),
-				Transactions:  [][]byte{},
-			},
-			Withdrawals: []*Withdrawal{},
-		},
+	status, err := backend.ProcessBlockV4(&built.ExecutionPayloadV3, nil, types.Hash{}, [][]byte{{0, 1}})
+	if err != nil || status.Status != StatusInvalid || status.LatestValidHash != nil {
+		t.Fatalf("payload with a changed requests commitment: %+v: %v", status, err)
 	}
-
-	status, err := b.ProcessBlockV4(payload, nil, types.HexToHash("0xbeacon"), [][]byte{{0x00}})
-	if err != nil {
-		t.Fatalf("ProcessBlockV4 returned error: %v", err)
-	}
-	if status.Status != StatusValid {
-		errMsg := ""
-		if status.ValidationError != nil {
-			errMsg = *status.ValidationError
-		}
-		t.Fatalf("expected VALID status, got %s: %s", status.Status, errMsg)
+	status, err = backend.ProcessBlockV4(&built.ExecutionPayloadV3, nil, types.Hash{}, [][]byte{})
+	if err != nil || status.Status != StatusValid || status.LatestValidHash == nil || *status.LatestValidHash != built.BlockHash {
+		t.Fatalf("valid Prague payload: %+v: %v", status, err)
 	}
 }
-
-// --- ForkchoiceUpdated with real backend timestamp validation ---
 
 func TestForkchoiceUpdated_TimestampValidation_RealBackend(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
@@ -732,7 +728,7 @@ func TestForkchoiceUpdated_TimestampValidation_RealBackend(t *testing.T) {
 // --- Full round-trip test: forkchoice -> getPayload with response format ---
 
 func TestFullRoundtrip_ForkchoiceToGetPayload(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis()
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	genesisHash := genesis.Hash()

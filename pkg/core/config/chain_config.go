@@ -1,6 +1,10 @@
 package config
 
-import "math/big"
+import (
+	"math/big"
+
+	"github.com/eth2030/eth2030/core/types"
+)
 
 // ChainConfig holds chain-level configuration for fork scheduling.
 // Pre-merge forks are activated by block number, post-merge by timestamp.
@@ -29,10 +33,36 @@ type ChainConfig struct {
 	ShanghaiTime    *uint64
 	CancunTime      *uint64
 	PragueTime      *uint64
+	OsakaTime       *uint64
 	AmsterdamTime   *uint64
 	GlamsterdanTime *uint64
 	HogotaTime      *uint64
 	IPlusTime       *uint64
+	// SSZBlockTime activates EIP-7807 SSZ execution blocks: from this time
+	// the Engine API serves and accepts SSZ-encoded payloads with the
+	// SSZ block hash (hash_tree_root of the ExecutionBlockHeader).
+	SSZBlockTime *uint64
+
+	// DepositContractAddress selects the EIP-6110 event emitter. Zero uses
+	// the mainnet deposit contract address.
+	DepositContractAddress types.Address
+	// RequireRequestPredeploys enforces the EIP-7002/7251 code requirement.
+	// Minimal private chains may omit the queue contracts.
+	RequireRequestPredeploys bool
+
+	// LegacyNativeBLSUntil preserves the experimental native precompile
+	// layout before the given timestamp. Nil selects the Ethereum layout.
+	LegacyNativeBLSUntil *uint64 `json:",omitempty"`
+
+	// PQDraft configures the pinned PQ drafts on a private chain.
+	PQDraft *PQDraftConfig `json:",omitempty"`
+
+	// BinaryOverlayTime activates the pinned BLAKE3 overlay on a private chain.
+	// BinaryConversionTime and BinaryConversionStride optionally schedule its
+	// ordered conversion before transactions.
+	BinaryOverlayTime      *uint64 `json:",omitempty"`
+	BinaryConversionTime   *uint64 `json:",omitempty"`
+	BinaryConversionStride int     `json:",omitempty"`
 
 	// ExperimentalLegacyFrames permits only the repository's pre-November Frame
 	// prototype. It is not an activation switch for the current EIP-8141 schema.
@@ -41,6 +71,8 @@ type ChainConfig struct {
 	// BPO (Blob Parameter Optimization) fork timestamps for blob schedule upgrades.
 	BPO1Time *uint64
 	BPO2Time *uint64
+
+	BlobScheduleConfig *BlobScheduleConfig `json:"blobSchedule,omitempty"`
 
 	// EIP7864FinalHashTime is the timestamp at which the binary trie switches
 	// from SHA-256 to BLAKE3-256 as the canonical hash function (BL-1.3).
@@ -52,6 +84,15 @@ type ChainConfig struct {
 	// This field is derived from EIP7864FinalHashTime but can be set directly
 	// for testing.
 	BinaryTreeHashFunc string
+}
+
+// PQDraftConfig selects private-chain addresses for the conflicting draft
+// contracts. A nil Time keeps the extension inactive.
+type PQDraftConfig struct {
+	Time       *uint64       `json:"time"`
+	SigRecover types.Address `json:"sigRecover"`
+	MLDSA      types.Address `json:"mldsa"`
+	MLDSAETH   types.Address `json:"mldsaEth"`
 }
 
 // Block-number fork checks
@@ -139,6 +180,11 @@ func (c *ChainConfig) IsPrague(time uint64) bool {
 	return isTimestampForked(c.PragueTime, time)
 }
 
+// IsOsaka reports whether the configured Osaka timestamp has been reached.
+func (c *ChainConfig) IsOsaka(t uint64) bool {
+	return isTimestampForked(c.OsakaTime, t)
+}
+
 // IsAmsterdam returns whether the given block time is at or past Amsterdam.
 func (c *ChainConfig) IsAmsterdam(time uint64) bool {
 	return isTimestampForked(c.AmsterdamTime, time)
@@ -178,6 +224,11 @@ func (c *ChainConfig) IsBogota(time uint64) bool { return c.IsHogota(time) }
 // I+ includes NTT precompile (EIP-7885), native rollups, zkVM, proof aggregation.
 func (c *ChainConfig) IsIPlus(time uint64) bool {
 	return isTimestampForked(c.IPlusTime, time)
+}
+
+// IsSSZBlock reports whether EIP-7807 SSZ execution blocks are active.
+func (c *ChainConfig) IsSSZBlock(time uint64) bool {
+	return isTimestampForked(c.SSZBlockTime, time)
 }
 
 // IsEIP7864FinalHash returns whether the binary trie BLAKE3 hash function
@@ -272,6 +323,12 @@ func (c *ChainConfig) IsEIP7981(time uint64) bool {
 	return c.IsGlamsterdan(time)
 }
 
+// IsEIP7954 follows the canonical Amsterdam activation, independently of
+// the legacy private gas-repricing timestamp.
+func (c *ChainConfig) IsEIP7954(time uint64) bool {
+	return c.IsAmsterdam(time) || c.IsGlamsterdan(time)
+}
+
 // IsEIP8037 returns whether EIP-8037 (state creation gas increase) is active.
 func (c *ChainConfig) IsEIP8037(time uint64) bool {
 	return c.IsGlamsterdan(time)
@@ -317,14 +374,15 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsCancun:         isMerge && c.IsCancun(timestamp),
 		IsEIP4844:        isMerge && c.IsCancun(timestamp),
 		IsPrague:         isMerge && c.IsPrague(timestamp),
+		IsOsaka:          isMerge && c.IsOsaka(timestamp),
 		IsEIP7702:        isMerge && c.IsPrague(timestamp),
 		IsAmsterdam:      isMerge && c.IsAmsterdam(timestamp),
 		IsGlamsterdan:    isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7904:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7706:        isMerge && c.IsGlamsterdan(timestamp),
-		IsEIP7708:        isMerge && c.IsGlamsterdan(timestamp),
-		IsEIP7954:        isMerge && c.IsGlamsterdan(timestamp),
-		IsEIP7778:        isMerge && c.IsGlamsterdan(timestamp),
+		IsEIP7708:        isMerge && (c.IsAmsterdam(timestamp) || c.IsGlamsterdan(timestamp)),
+		IsEIP7954:        isMerge && c.IsEIP7954(timestamp),
+		IsEIP7778:        isMerge && (c.IsAmsterdam(timestamp) || c.IsGlamsterdan(timestamp)),
 		IsEIP2780:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7976:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP7981:        isMerge && c.IsGlamsterdan(timestamp),
@@ -333,6 +391,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsHogota:         isMerge && c.IsHogota(timestamp),
 		IsEIP7999:        isMerge && c.IsHogota(timestamp),
 		IsIPlus:          isMerge && c.IsIPlus(timestamp),
+		LegacyNativeBLS:  isMerge && c.LegacyNativeBLSUntil != nil && timestamp < *c.LegacyNativeBLSUntil,
 		IsEIP7885:        isMerge && c.IsIPlus(timestamp),
 	}
 }
@@ -348,6 +407,7 @@ type Rules struct {
 	IsShanghai                                              bool
 	IsCancun, IsEIP4844                                     bool
 	IsPrague, IsEIP7702                                     bool
+	IsOsaka                                                 bool
 	IsAmsterdam                                             bool
 	IsGlamsterdan, IsEIP7904, IsEIP7706, IsEIP7708          bool
 	IsEIP7954                                               bool
@@ -355,6 +415,7 @@ type Rules struct {
 	IsEIP8037, IsEIP8038                                    bool
 	IsHogota, IsEIP7999                                     bool
 	IsIPlus, IsEIP7885                                      bool
+	LegacyNativeBLS                                         bool
 }
 
 func newUint64(v uint64) *uint64 { return &v }
@@ -364,6 +425,9 @@ var MainnetTerminalTotalDifficulty, _ = new(big.Int).SetString("5875000000000000
 
 // MainnetConfig is the chain config for Ethereum mainnet.
 var MainnetConfig = &ChainConfig{
+	DepositContractAddress:   types.DepositContractAddress,
+	RequireRequestPredeploys: true,
+
 	ChainID:                 big.NewInt(1),
 	HomesteadBlock:          big.NewInt(1_150_000),
 	EIP150Block:             big.NewInt(2_463_000),
@@ -381,17 +445,21 @@ var MainnetConfig = &ChainConfig{
 	TerminalTotalDifficulty: MainnetTerminalTotalDifficulty,
 	ShanghaiTime:            newUint64(1681338455),
 	CancunTime:              newUint64(1710338135),
-	PragueTime:              nil, // not yet scheduled
-	AmsterdamTime:           nil, // not yet scheduled
-	GlamsterdanTime:         nil, // not yet scheduled
-	HogotaTime:              nil, // not yet scheduled
-	IPlusTime:               nil, // not yet scheduled
-	BPO1Time:                nil, // not yet scheduled
-	BPO2Time:                nil, // not yet scheduled
+	PragueTime:              newUint64(1746612311),
+	OsakaTime:               newUint64(1764798551),
+	AmsterdamTime:           nil,                   // not yet scheduled
+	GlamsterdanTime:         nil,                   // not yet scheduled
+	HogotaTime:              nil,                   // not yet scheduled
+	IPlusTime:               nil,                   // not yet scheduled
+	BPO1Time:                newUint64(1765290071), // pinned Geth v1.17.10 mainnet BPO1
+	BPO2Time:                newUint64(1767747671), // pinned Geth v1.17.10 mainnet BPO2
 }
 
 // SepoliaConfig is the chain config for the Sepolia test network.
 var SepoliaConfig = &ChainConfig{
+	DepositContractAddress:   types.HexToAddress("0x7f02c3e3c98b133055b8b348b2ac625669ed295d"),
+	RequireRequestPredeploys: true,
+
 	ChainID:                 big.NewInt(11155111),
 	HomesteadBlock:          big.NewInt(0),
 	EIP150Block:             big.NewInt(0),
@@ -408,16 +476,20 @@ var SepoliaConfig = &ChainConfig{
 	ShanghaiTime:            newUint64(1677557088),
 	CancunTime:              newUint64(1706655072),
 	PragueTime:              newUint64(1741159776),
+	OsakaTime:               newUint64(1760427360),
 	AmsterdamTime:           nil,
 	GlamsterdanTime:         nil,
 	HogotaTime:              nil,
 	IPlusTime:               nil,
-	BPO1Time:                nil,
-	BPO2Time:                nil,
+	BPO1Time:                newUint64(1761017184),
+	BPO2Time:                newUint64(1761607008),
 }
 
 // HoleskyConfig is the chain config for the Holesky test network.
 var HoleskyConfig = &ChainConfig{
+	DepositContractAddress:   types.HexToAddress("0x4242424242424242424242424242424242424242"),
+	RequireRequestPredeploys: true,
+
 	ChainID:                 big.NewInt(17000),
 	HomesteadBlock:          big.NewInt(0),
 	EIP150Block:             big.NewInt(0),
@@ -433,6 +505,7 @@ var HoleskyConfig = &ChainConfig{
 	ShanghaiTime:            newUint64(1696000704),
 	CancunTime:              newUint64(1707305664),
 	PragueTime:              newUint64(1740434112),
+	OsakaTime:               newUint64(1759308480),
 	AmsterdamTime:           nil,
 	GlamsterdanTime:         nil,
 	HogotaTime:              nil,
@@ -460,6 +533,7 @@ var TestConfig = &ChainConfig{
 	ShanghaiTime:            newUint64(0),
 	CancunTime:              newUint64(0),
 	PragueTime:              newUint64(0),
+	OsakaTime:               newUint64(0),
 	AmsterdamTime:           newUint64(0),
 	GlamsterdanTime:         nil,
 	HogotaTime:              nil,
@@ -487,6 +561,7 @@ var TestConfigGlamsterdan = &ChainConfig{
 	ShanghaiTime:            newUint64(0),
 	CancunTime:              newUint64(0),
 	PragueTime:              newUint64(0),
+	OsakaTime:               newUint64(0),
 	AmsterdamTime:           newUint64(0),
 	GlamsterdanTime:         newUint64(0),
 	HogotaTime:              nil,
@@ -514,6 +589,7 @@ var TestConfigHogota = &ChainConfig{
 	ShanghaiTime:            newUint64(0),
 	CancunTime:              newUint64(0),
 	PragueTime:              newUint64(0),
+	OsakaTime:               newUint64(0),
 	AmsterdamTime:           newUint64(0),
 	GlamsterdanTime:         newUint64(0),
 	HogotaTime:              newUint64(0),
@@ -541,22 +617,11 @@ var TestConfigBPO2 = &ChainConfig{
 	ShanghaiTime:            newUint64(0),
 	CancunTime:              newUint64(0),
 	PragueTime:              newUint64(0),
+	OsakaTime:               newUint64(0),
 	AmsterdamTime:           newUint64(0),
 	GlamsterdanTime:         newUint64(0),
 	HogotaTime:              newUint64(0),
 	IPlusTime:               nil,
 	BPO1Time:                newUint64(0),
 	BPO2Time:                newUint64(0),
-}
-
-// Engine API methods are valid only inside their fork interval. These checks
-// intentionally differ from monotonically increasing execution rule flags.
-func (c *ChainConfig) IsEngineCancun(time uint64) bool {
-	return c.IsCancun(time) && !c.IsPrague(time) && !c.IsAmsterdam(time) && !c.IsBogota(time)
-}
-func (c *ChainConfig) IsEnginePrague(time uint64) bool {
-	return c.IsPrague(time) && !c.IsAmsterdam(time) && !c.IsBogota(time)
-}
-func (c *ChainConfig) IsEngineAmsterdam(time uint64) bool {
-	return c.IsAmsterdam(time) && !c.IsBogota(time)
 }

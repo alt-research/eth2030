@@ -1,0 +1,24 @@
+{
+  "actual48h_passed": false,
+  "hash": "0x5e59955a4fabe8d97dc3a9305bcb47f8f7e4f761c0d18e6172dc3bc0344e51c9",
+  "independent_account_proofs": [
+    {
+      "address": "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf",
+      "balance": "9999998905913535304425867",
+      "changed_balance_rejected": true,
+      "nodes": 4
+    },
+    {
+      "address": "0xee9ede56b61f213e69233a001b17fd6414c93675",
+      "balance": "7",
+      "changed_balance_rejected": true,
+      "nodes": 4
+    }
+  ],
+  "number": 94502,
+  "passed": true,
+  "reference_header_agreed": true,
+  "scope": "Read-only stopped native head/MPT audit, not an online closing RPC or added uptime",
+  "slot": 97868,
+  "state_root": "0x46acba042a7cb54b2eb92a6dc228f9d08d515614195cfd49da567db375a71c99"
+}

@@ -34,7 +34,7 @@ func TestE2E_BALOrdering_InProcessedBlock(t *testing.T) {
 	sender := crypto.PubkeyToAddress(key.PublicKey)
 	recipient := types.HexToAddress("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, ether(10))
 
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
@@ -124,7 +124,7 @@ func TestE2E_CalldataGasHeader_UpdatesAcrossBlocks(t *testing.T) {
 	coinbase := types.HexToAddress("0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
 	// Use Glamsterdan config so CalldataGasUsed/CalldataExcessGas headers are populated.
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	statedb.AddBalance(sender, ether(100))
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
@@ -321,7 +321,7 @@ func TestE2E_ILSatisfaction_AgainstBuiltBlock(t *testing.T) {
 		},
 	}
 
-	// IL2: contains tx2 → unsatisfied (tx2 is not in the block, gas is available).
+	// IL2: tx2 is absent. Gas alone cannot prove includability without post-state.
 	il2 := &focil.InclusionList{
 		Slot:          1,
 		ProposerIndex: 2,
@@ -339,16 +339,16 @@ func TestE2E_ILSatisfaction_AgainstBuiltBlock(t *testing.T) {
 		t.Errorf("IL1 (tx in block): expected ILSatisfied, got %v", result1)
 	}
 
-	// Check IL2 (unsatisfied: tx2 absent with enough gas remaining).
+	// With no post-state, absent transactions have an unavailable verdict.
 	result2 := focil.CheckILSatisfaction(block, []*focil.InclusionList{il2}, nil, gasRemaining)
-	if result2 != focil.ILUnsatisfied {
-		t.Errorf("IL2 (tx absent): expected ILUnsatisfied, got %v", result2)
+	if result2 != focil.ILValidationUnavailable {
+		t.Errorf("IL2 (no post-state): expected ILValidationUnavailable, got %v", result2)
 	}
 
-	// Check both ILs together → overall unsatisfied because of IL2.
+	// Presence in IL1 cannot manufacture the missing IL2 validation context.
 	resultBoth := focil.CheckILSatisfaction(block, []*focil.InclusionList{il1, il2}, nil, gasRemaining)
-	if resultBoth != focil.ILUnsatisfied {
-		t.Errorf("IL1+IL2: expected ILUnsatisfied (IL2 fails), got %v", resultBoth)
+	if resultBoth != focil.ILValidationUnavailable {
+		t.Errorf("IL1+IL2: expected ILValidationUnavailable, got %v", resultBoth)
 	}
 }
 
@@ -391,10 +391,10 @@ func TestE2E_ILSatisfaction_GasExemptionInFullBlock(t *testing.T) {
 		t.Errorf("gas=0 exemption: expected ILSatisfied, got %v", result)
 	}
 
-	// gasRemaining=absentTx.Gas() → tx could fit → unsatisfied.
+	// Sufficient gas cannot establish eligibility without the post-state.
 	result2 := focil.CheckILSatisfaction(block, []*focil.InclusionList{il}, nil, absentTx.Gas())
-	if result2 != focil.ILUnsatisfied {
-		t.Errorf("gas sufficient: expected ILUnsatisfied, got %v", result2)
+	if result2 != focil.ILValidationUnavailable {
+		t.Errorf("gas sufficient, no post-state: expected ILValidationUnavailable, got %v", result2)
 	}
 }
 
@@ -441,7 +441,7 @@ func TestE2E_MultiBlock_BALAccessIndex(t *testing.T) {
 
 		// Re-process with BAL to get access indices.
 		// Build a state that mirrors the chain state: correct nonce + remaining balance.
-		blockState := state.NewMemoryStateDB()
+		blockState := newBuilderRequestTestState()
 		spent := new(big.Int).Mul(big.NewInt(int64(nonce)), new(big.Int).Mul(big.NewInt(21000), big.NewInt(10)))
 		remaining := new(big.Int).Sub(ether(100), spent)
 		blockState.AddBalance(sender, remaining)

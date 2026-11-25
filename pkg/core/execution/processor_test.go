@@ -1,13 +1,17 @@
 package execution
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto/pqc"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
 
 // newTransferTx creates a simple transfer transaction.
@@ -34,7 +38,7 @@ func newTestHeader() *types.Header {
 
 func TestProcessEmptyBlock(t *testing.T) {
 	proc := NewStateProcessor(config.TestConfig)
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	header := newTestHeader()
 
 	block := types.NewBlock(header, &types.Body{})
@@ -58,8 +62,8 @@ func TestSimpleTransfer(t *testing.T) {
 	statedb.AddBalance(sender, tenETH)
 
 	oneETH := new(big.Int).SetUint64(1e18)
-	gasPrice := big.NewInt(1) // 1 wei gas price for simplicity
-	gasLimit := uint64(21000)
+	gasPrice := big.NewInt(1)  // 1 wei gas price for simplicity
+	gasLimit := uint64(300000) // Includes the fresh account state charge.
 
 	tx := newTransferTx(0, recipient, oneETH, gasLimit, gasPrice)
 	msg := config.TransactionToMessage(tx)
@@ -77,7 +81,7 @@ func TestSimpleTransfer(t *testing.T) {
 	if result.Failed() {
 		t.Fatalf("transfer should not fail: %v", result.Err)
 	}
-	if result.UsedGas != TxGas {
+	if result.UsedGas != 204600 {
 		t.Fatalf("expected gas used %d, got %d", TxGas, result.UsedGas)
 	}
 
@@ -88,7 +92,7 @@ func TestSimpleTransfer(t *testing.T) {
 	}
 
 	// Sender should have 10 ETH - 1 ETH - gasCost
-	gasCost := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(TxGas))
+	gasCost := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(204600))
 	expectedSender := new(big.Int).Sub(tenETH, oneETH)
 	expectedSender.Sub(expectedSender, gasCost)
 	senderBal := statedb.GetBalance(sender)
@@ -175,7 +179,7 @@ func TestNonceValidation(t *testing.T) {
 	statedb.SetNonce(sender, 5) // state nonce = 5
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(21000)
+	gasLimit := uint64(300000)
 
 	// Test nonce too low
 	tx := newTransferTx(3, recipient, big.NewInt(100), gasLimit, gasPrice)
@@ -242,9 +246,9 @@ func TestChainConfig(t *testing.T) {
 		t.Fatal("config.MainnetConfig should have Cancun active at time 2B")
 	}
 
-	// config.MainnetConfig: Prague and Amsterdam not yet scheduled
-	if config.MainnetConfig.IsPrague(2_000_000_000) {
-		t.Fatal("config.MainnetConfig should NOT have Prague active")
+	const pragueTime = 1_746_612_311
+	if config.MainnetConfig.IsPrague(pragueTime-1) || !config.MainnetConfig.IsPrague(pragueTime) {
+		t.Fatal("Mainnet Prague activation does not match Geth")
 	}
 	if config.MainnetConfig.IsAmsterdam(2_000_000_000) {
 		t.Fatal("config.MainnetConfig should NOT have Amsterdam active")
@@ -434,7 +438,7 @@ func TestContractCreation(t *testing.T) {
 	statedb.AddBalance(sender, tenETH)
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(100000)
+	gasLimit := uint64(500000)
 
 	// Contract creation tx: To is nil, Data is init code.
 	// Simple init code: PUSH1 0x42, PUSH1 0x00, MSTORE, PUSH1 0x01, PUSH1 0x1f, RETURN
@@ -640,7 +644,7 @@ func TestProcessBlockWithTransfer(t *testing.T) {
 
 	oneETH := new(big.Int).SetUint64(1e18)
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(21000)
+	gasLimit := uint64(300000)
 
 	tx := newTransferTx(0, recipient, oneETH, gasLimit, gasPrice)
 
@@ -669,7 +673,172 @@ func TestProcessBlockWithTransfer(t *testing.T) {
 	if receipt.Status != types.ReceiptStatusSuccessful {
 		t.Fatal("receipt should be successful")
 	}
-	if receipt.CumulativeGasUsed != TxGas {
+	if receipt.CumulativeGasUsed != 204600 {
 		t.Fatalf("receipt cumulative gas: want %d, got %d", TxGas, receipt.CumulativeGasUsed)
+	}
+}
+
+func TestApplyTransactionAuthenticatesPQSender(t *testing.T) {
+	cfg := *config.MainnetConfig
+	fork := uint64(0)
+	cfg.IPlusTime = &fork
+	cfg.TerminalTotalDifficulty = big.NewInt(0)
+	header := &types.Header{
+		Number: big.NewInt(24_000_000), Time: 1_800_000_000,
+		GasLimit: 30_000_000, Difficulty: new(big.Int), BaseFee: big.NewInt(1),
+	}
+	for _, scheme := range []pqc.PQSignatureType{pqc.SigDilithium3, pqc.SigFalcon512, pqc.SigSPHINCS128} {
+		t.Run(fmt.Sprint(scheme), func(t *testing.T) {
+			signer, err := pqc.NewPQTxSigner(scheme)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sk, pk, err := signer.GenerateKey()
+			if err != nil {
+				t.Fatal(err)
+			}
+			to := types.Address{0x42}
+			pq := types.NewPQTransaction(cfg.ChainID, 0, &to, big.NewInt(100), 300_000, big.NewInt(10), nil)
+			from := types.PQPubKeyToAddress(pk.Raw)
+			db := state.NewMemoryStateDB()
+			db.AddBalance(from, big.NewInt(100_000_000))
+			gp := new(gaspool.GasPool).AddGas(header.GasLimit)
+			unsigned := types.NewTransaction(pq)
+			unsigned.SetSender(from)
+			if _, _, err := ApplyTransaction(&cfg, db, header, unsigned, gp); err == nil {
+				t.Fatal("unsigned transaction accepted with cached sender")
+			}
+			sig, err := signer.SignTransaction(unsigned, sk)
+			if err != nil {
+				t.Fatal(err)
+			}
+			pq.SignWithPQ(uint8(scheme), pk.Raw, sig)
+			if err := types.NewPQTxPool(types.NewPQTxValidator(), 1).AcceptPQTx(pq); err != nil {
+				t.Fatalf("pool rejected valid signature: %v", err)
+			}
+			pq.Data = []byte{1}
+			if _, _, err := ApplyTransaction(&cfg, db, header, types.NewTransaction(pq), gp); err == nil {
+				t.Fatal("transaction with changed data accepted")
+			}
+			pq.Data = nil
+			signed := types.NewTransaction(pq)
+			signed.SetSender(types.Address{0xff})
+			if _, _, err := ApplyTransaction(&cfg, db, header, signed, gp); err != nil {
+				t.Fatalf("valid transaction failed: %v", err)
+			}
+			if db.GetBalance(to).Cmp(big.NewInt(100)) != 0 || signed.Sender() == nil || *signed.Sender() != from {
+				t.Fatal("transfer did not use the verified sender")
+			}
+		})
+	}
+}
+
+func TestApplyPipelinePQTransaction(t *testing.T) {
+	cfg := *config.MainnetConfig
+	fork := uint64(0)
+	cfg.IPlusTime = &fork
+	cfg.TerminalTotalDifficulty = big.NewInt(0)
+	header := &types.Header{Number: big.NewInt(24_000_000), Time: 1_800_000_000, GasLimit: 30_000_000, Difficulty: new(big.Int), BaseFee: big.NewInt(1)}
+	for _, tc := range []struct {
+		name         string
+		alg, sigType uint8
+	}{
+		{"ML-DSA-65", pqc.PipelineAlgMLDSA65, types.PQSigDilithium},
+		{"FN-DSA-512", pqc.PipelineAlgFalcon512, types.PQSigFalcon},
+		{"SLH-DSA", pqc.PipelineAlgSPHINCS, types.PQSigSPHINCS},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			signer := pqc.NewPQSigningPipeline()
+			pk, sk, err := signer.GenerateKey(tc.alg)
+			if err != nil {
+				t.Fatal(err)
+			}
+			to := types.Address{0x42}
+			pq := types.NewPQTransaction(cfg.ChainID, 0, &to, big.NewInt(100), 300_000, big.NewInt(10), nil)
+			sig, key, err := signer.SignTransaction(pq, tc.alg, sk, pk)
+			if err != nil {
+				t.Fatal(err)
+			}
+			pq.SignWithPQ(tc.sigType, key, sig)
+			encoded, err := pq.EncodePQ()
+			if err != nil {
+				t.Fatal(err)
+			}
+			pq, err = types.DecodePQTransaction(encoded)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := types.NewPQTxPool(types.NewPQTxValidator(), 1).AcceptPQTx(pq); err != nil {
+				t.Fatalf("pool validation: %v", err)
+			}
+			from := types.PQPubKeyToAddress(pk)
+			db := state.NewMemoryStateDB()
+			db.AddBalance(from, big.NewInt(100_000_000))
+			tx := types.NewTransaction(pq)
+			if _, _, err := ApplyTransaction(&cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit)); err != nil {
+				t.Fatal(err)
+			}
+			if db.GetBalance(to).Cmp(big.NewInt(100)) != 0 || tx.Sender() == nil || *tx.Sender() != from {
+				t.Fatal("verified sender did not fund the transfer")
+			}
+		})
+	}
+}
+
+func TestExecutionStateBinaryMaterialization(t *testing.T) {
+	cfg := *config.TestConfig
+	header := newTestHeader()
+	from, to := types.Address{0x11}, types.Address{0x22}
+	db := state.NewMemoryStateDB()
+	db.AddBalance(from, big.NewInt(10_000_000))
+	before, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshot := db.Snapshot()
+	tx := newTransferTx(0, to, big.NewInt(100), 300_000, big.NewInt(10))
+	tx.SetSender(from)
+	receipt, _, err := ApplyTransaction(&cfg, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if receipt.Status != types.ReceiptStatusSuccessful {
+		t.Fatalf("receipt status %d", receipt.Status)
+	}
+	after, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after.Hash() == before.Hash() {
+		t.Fatal("execution did not change binary root")
+	}
+	destination, err := after.GetAccount(to)
+	if err != nil || destination == nil || destination.Balance.Cmp(big.NewInt(100)) != 0 {
+		t.Fatalf("recipient: %+v %v", destination, err)
+	}
+	source, err := after.GetAccount(from)
+	if err != nil || source == nil || source.Nonce != 1 || source.Balance.Cmp(db.GetBalance(from)) != 0 {
+		t.Fatalf("sender: %+v %v", source, err)
+	}
+	store := rawdb.NewMemoryDB()
+	root, err := after.Persist(store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	restored, err := bintrie.OpenPersisted(store, bintrie.HashFunctionBlake3, root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dest2, err := restored.GetAccount(to)
+	if err != nil || dest2 == nil || dest2.Balance.Cmp(big.NewInt(100)) != 0 {
+		t.Fatalf("persisted recipient: %+v %v", dest2, err)
+	}
+	db.RevertToSnapshot(snapshot)
+	reverted, err := state.BuildBinaryTreeFromMemory(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reverted.Hash() != before.Hash() {
+		t.Fatal("snapshot revert did not restore pre-execution root")
 	}
 }

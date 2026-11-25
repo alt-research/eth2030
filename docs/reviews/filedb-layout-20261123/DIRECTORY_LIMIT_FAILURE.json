@@ -1,0 +1,13 @@
+{
+  "copy_exit": 1,
+  "client_started": false,
+  "source_snapshots_read_only": true,
+  "target_directory_inode": 59287759,
+  "target_directory_bytes": 532676608,
+  "source_directory_bytes": 481296384,
+  "filesystem_available_bytes_label": "37GiB",
+  "filesystem_free_inodes": 26758271,
+  "kernel_evidence": "EXT4 ext4_dx_add_entry: Directory(ino59287759) index full, max htree level2; large_dir feature not enabled",
+  "scope": "Confirmed new directory-capacity limit while cloning FileDB flat data. No original04 attribution and no node-runtime pass.",
+  "log_sha256": "3bd2d98086c7304da551edbd056ce8519a638b2e93c25693fcf0b03e6344451c"
+}

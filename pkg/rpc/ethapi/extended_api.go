@@ -3,6 +3,7 @@ package ethapi
 import (
 	"crypto/ecdsa"
 	"errors"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 	"sync"
 
@@ -107,7 +108,7 @@ func (api *EthExtendedAPI) GetStorageAt(addr types.Address, key types.Hash) type
 	if header == nil {
 		return types.Hash{}
 	}
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return types.Hash{}
 	}

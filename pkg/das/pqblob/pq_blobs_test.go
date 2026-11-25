@@ -2,6 +2,7 @@ package pqblob
 
 import (
 	"bytes"
+	"encoding/hex"
 	"testing"
 )
 
@@ -125,11 +126,6 @@ func TestGenerateBlobProof(t *testing.T) {
 		t.Error("ChunkHash is all zeros")
 	}
 
-	// LatticeWitness should not be zero.
-	zeroWitness := [PQProofSize]byte{}
-	if proof.LatticeWitness == zeroWitness {
-		t.Error("LatticeWitness is all zeros")
-	}
 }
 
 func TestGenerateBlobProofLastChunk(t *testing.T) {
@@ -189,7 +185,7 @@ func TestVerifyBlobProofInvalid(t *testing.T) {
 
 	// Tamper with witness.
 	tampered := *proof
-	tampered.LatticeWitness[0] ^= 0xff
+	tampered.ChunkHash[0] ^= 0xff
 	if VerifyBlobProof(&tampered, commitment) {
 		t.Error("VerifyBlobProof returned true for tampered witness")
 	}
@@ -265,7 +261,7 @@ func TestBatchVerifyProofsOneBad(t *testing.T) {
 	}
 
 	// Tamper with one proof.
-	proofs[numChunks/2].LatticeWitness[10] ^= 0xff
+	proofs[numChunks/2].Siblings[0][10] ^= 0xff
 	if BatchVerifyProofs(proofs, commitments) {
 		t.Error("BatchVerifyProofs returned true with one tampered proof")
 	}
@@ -390,34 +386,6 @@ func TestCommitBlobMaxSize(t *testing.T) {
 	}
 }
 
-func TestLatticeHashCombine(t *testing.T) {
-	a := make([]byte, 32)
-	b := make([]byte, 32)
-	for i := range a {
-		a[i] = byte(i)
-		b[i] = byte(32 - i)
-	}
-
-	result := latticeHashCombine(a, b)
-	if len(result) != 32 {
-		t.Errorf("latticeHashCombine result len = %d, want 32", len(result))
-	}
-
-	// Verify determinism.
-	result2 := latticeHashCombine(a, b)
-	if !bytes.Equal(result, result2) {
-		t.Error("latticeHashCombine is not deterministic")
-	}
-
-	// Different inputs -> different output.
-	c := make([]byte, 32)
-	c[0] = 0xff
-	result3 := latticeHashCombine(a, c)
-	if bytes.Equal(result, result3) {
-		t.Error("latticeHashCombine produced same result for different inputs")
-	}
-}
-
 func TestProofDifferentChunks(t *testing.T) {
 	data := bytes.Repeat([]byte("different chunk proof data "), 4) // multiple chunks
 
@@ -433,9 +401,6 @@ func TestProofDifferentChunks(t *testing.T) {
 		}
 	}
 
-	if p0.LatticeWitness == p1.LatticeWitness {
-		t.Error("Different chunk indices produced same LatticeWitness")
-	}
 }
 
 func TestValidatePQBlob(t *testing.T) {
@@ -467,5 +432,48 @@ func TestValidatePQBlobProof(t *testing.T) {
 
 	if err := ValidatePQBlobProof(nil); err == nil {
 		t.Error("expected error for nil proof")
+	}
+}
+
+func TestBlobCommitmentBindsChunkOrderAndLength(t *testing.T) {
+	left := bytes.Repeat([]byte{1}, ChunkSize)
+	right := bytes.Repeat([]byte{2}, ChunkSize)
+	blob := append(bytes.Clone(left), right...)
+	original, err := CommitBlob(blob)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Independent PyCryptodome Keccak vector for the two full chunks.
+	const expected = "f34f64f3928b0ca1042a00f7748548f24584428860f233f2ce3a4c16fe28d5658a00d0b183efb505cb1bde0b12becb064276b5ee28585510b0d2451c4fccfbe3"
+	if hex.EncodeToString(original.Digest[:]) != expected {
+		t.Fatalf("commitment = %x, want %s", original.Digest, expected)
+	}
+
+	swapped, err := CommitBlob(append(bytes.Clone(right), left...))
+	if err != nil || swapped.Digest == original.Digest {
+		t.Fatalf("swapping chunks preserved digest: %v", err)
+	}
+	proof, err := GenerateBlobProof(blob, 0)
+	if err != nil || !VerifyBlobProof(proof, original) {
+		t.Fatalf("valid opening: %v", err)
+	}
+	wrongIndex := *proof
+	wrongIndex.ChunkIndex = 1
+	if VerifyBlobProof(&wrongIndex, original) {
+		t.Fatal("accepted an opening at another position")
+	}
+	wrongLength := *original
+	wrongLength.DataSize--
+	if VerifyBlobProof(proof, &wrongLength) {
+		t.Fatal("accepted an opening for a different blob length")
+	}
+	padded := append(bytes.Clone(left), 0)
+	a, err := CommitBlob(padded)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := CommitBlob(append(padded, 0))
+	if err != nil || a.Digest == b.Digest {
+		t.Fatalf("explicit trailing zero matched implicit padding: %v", err)
 	}
 }

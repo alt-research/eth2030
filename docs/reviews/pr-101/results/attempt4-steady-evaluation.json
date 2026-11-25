@@ -1,0 +1,153 @@
+{
+  "profile": {
+    "declared_at": "2026-11-19T19:44:13.365993+00:00",
+    "phase": "corrected_tuple_steady_20_minutes",
+    "steady_window_started": true,
+    "end_not_before": "2026-11-19T20:04:13.365993+00:00",
+    "duration_seconds": 1200,
+    "control_profile": "attempt4-control-memory-profile-revision.json",
+    "changes_during_window": "No container, consensus, workload configuration or binary changes. Host compilation may contend for shared host resources and is not excluded.",
+    "workload": "384 actual validators, private mainnet preset, 3-second slots, live external builder lifecycle; existing monitor samples each EL eth_blockNumber every 3 seconds. No synthetic application workload is claimed.",
+    "slo": {
+      "rpc_p95_ms": 500,
+      "rpc_p99_ms": 2000,
+      "engine_upstream_p95_ms": 1000,
+      "engine_upstream_p99_ms": 3000,
+      "steady_missing_slot_fraction_max": 0.1
+    },
+    "evaluation": "Enumerate canonical beacon headers by slot under a finalized common end checkpoint, never infer missing beacon slots from EL block count; retain exact complete Engine exchanges including failed/rejected requests."
+  },
+  "passed": false,
+  "declared_window_elapsed": true,
+  "started_evaluation_at": "2026-11-19T20:05:54.270072+00:00",
+  "engine": {
+    "4c43bad3ffae": {
+      "requests": 2017,
+      "p95_ms": 1.646767,
+      "p99_ms": 2.033682,
+      "statuses": {
+        "engine_forkchoiceUpdatedV4:VALID": 1007,
+        "engine_newPayloadV5:VALID": 275,
+        "eth_syncing:success": 400,
+        "engine_getPayloadV6:success": 328,
+        "engine_getClientVersionV1:success": 6,
+        "engine_exchangeCapabilities:success": 1
+      },
+      "transport_failures": [],
+      "rpc_errors": [],
+      "source_capture": "attempt4-steady-engine-4c43bad3ffae.jsonl",
+      "passed": true
+    },
+    "b7ca3b40e352": {
+      "requests": 1050,
+      "p95_ms": 116.738959,
+      "p99_ms": 160.916044,
+      "statuses": {
+        "engine_newPayloadV5:VALID": 272,
+        "engine_forkchoiceUpdatedV4:VALID": 643,
+        "engine_getPayloadV6:success": 135
+      },
+      "transport_failures": [],
+      "rpc_errors": [],
+      "source_capture": "attempt4-steady-engine-b7ca3b40e352.jsonl",
+      "passed": true
+    },
+    "b82d79245970": {
+      "requests": 1653,
+      "p95_ms": 123.127955,
+      "p99_ms": 134.578306,
+      "statuses": {
+        "eth_syncing:success": 400,
+        "engine_forkchoiceUpdatedV4:VALID": 287,
+        "engine_getPayloadV6:success": 142,
+        "engine_forkchoiceUpdatedV5:VALID": 548,
+        "engine_newPayloadV5:VALID": 273,
+        "engine_getClientVersionV1:success": 2,
+        "engine_exchangeCapabilities:success": 1
+      },
+      "transport_failures": [],
+      "rpc_errors": [],
+      "source_capture": "attempt4-steady-engine-b82d79245970.jsonl",
+      "passed": true
+    }
+  },
+  "resource_samples": 400,
+  "rpc_errors": [],
+  "rpc": {
+    "4c43bad3ffae": {
+      "samples": 400,
+      "p95_ms": 1.1267380032222718,
+      "p99_ms": 1.4788199987378903,
+      "passed": true
+    },
+    "b7ca3b40e352": {
+      "samples": 400,
+      "p95_ms": 1.2356890001683496,
+      "p99_ms": 30.804795998847112,
+      "passed": true
+    },
+    "b82d79245970": {
+      "samples": 400,
+      "p95_ms": 1.074886997230351,
+      "p99_ms": 4.907826005364768,
+      "passed": true
+    }
+  },
+  "requested_beacon_slot_window": {
+    "first_inclusive": 4713,
+    "end_exclusive": 5113,
+    "slots": 400
+  },
+  "failure": {
+    "class": "RuntimeError",
+    "message": "no cryptographically authenticated finalized checkpoint covered the complete declared steady window"
+  },
+  "memory_summary": {
+    "d96b94434ce1": {
+      "samples": 400,
+      "maximum_used_bytes": 393635430,
+      "maximum_usage_text": "375.4MiB / 976.6MiB"
+    },
+    "2a97e3e0910f": {
+      "samples": 400,
+      "maximum_used_bytes": 38744883,
+      "maximum_usage_text": "36.95MiB / 976.6MiB"
+    },
+    "9ff7332cc954": {
+      "samples": 400,
+      "maximum_used_bytes": 38042337,
+      "maximum_usage_text": "36.28MiB / 976.6MiB"
+    },
+    "d01ee49c0c9e": {
+      "samples": 400,
+      "maximum_used_bytes": 6542308933,
+      "maximum_usage_text": "6.093GiB / 11.44GiB"
+    },
+    "a6e54fb93e7c": {
+      "samples": 400,
+      "maximum_used_bytes": 336383180,
+      "maximum_usage_text": "320.8MiB / 3.815GiB"
+    },
+    "87799773fc57": {
+      "samples": 400,
+      "maximum_used_bytes": 361129574,
+      "maximum_usage_text": "344.4MiB / 3.815GiB"
+    },
+    "b82d79245970": {
+      "samples": 400,
+      "maximum_used_bytes": 423624704,
+      "maximum_usage_text": "404MiB / 3.815GiB"
+    },
+    "b7ca3b40e352": {
+      "samples": 400,
+      "maximum_used_bytes": 444805939,
+      "maximum_usage_text": "424.2MiB / 3.815GiB"
+    },
+    "4c43bad3ffae": {
+      "samples": 400,
+      "maximum_used_bytes": 318452531,
+      "maximum_usage_text": "303.7MiB / 3.815GiB"
+    }
+  },
+  "original_complete_memory_samples": "attempt4-corrected-operating-samples.jsonl.gz"
+}

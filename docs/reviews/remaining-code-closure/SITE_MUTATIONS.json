@@ -1,0 +1,12 @@
+[
+  {
+    "mutation": "false-duration",
+    "detected": true,
+    "exit": 1
+  },
+  {
+    "mutation": "missing-source-review",
+    "detected": true,
+    "exit": 1
+  }
+]

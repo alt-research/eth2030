@@ -1,0 +1,13 @@
+{
+  "failed_head": "98b7f67edef494d3ae9dec2f150625ace3ddc7a9",
+  "run": 45428904745,
+  "job": 138568582860,
+  "group": "bridge-backend",
+  "failing_step": "Install pinned local proving components",
+  "observed_error": "GitHub public API 403: API rate limit exceeded during risc0/rust release r0.1.97.0 lookup",
+  "client_build_or_proof_execution_started": false,
+  "correction": "Expose the existing read-only workflow github.token as GITHUB_TOKEN only to the pinned installer step. rzup documents this variable and upstream CI uses it.",
+  "toolchain_pins_or_image_or_acceptance_assertions_changed": false,
+  "upstream_reference": "https://github.com/risc0/risc0/blob/main/rzup/README.md",
+  "final_hosted_validation": "Tracked on PR160; the failed job is retained separately from the corrected run."
+}

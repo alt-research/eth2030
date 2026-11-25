@@ -1,0 +1,32 @@
+{
+  "scope": "Controlled real native commit-pause recovery, not the original unknown5.5h holder and not clean operating acceptance",
+  "original04_root_resolved": false,
+  "actual48h_passed": false,
+  "fixture_source": "e63d0bd9843b106aae3ea03ae4a81a51b972a5ce",
+  "fixture_binary_sha256": "180c9a521be2dbc8d83e9f11900d75851f60f2a3e90fccee41db2be9696a89c4",
+  "cl_source": "57ccb4661822406adc490089e8d5ae5bfb36003e",
+  "cl_binary_sha256": "3158ae6dc22db03e406b710bd9188ade72d9aad1c0d8cc4a493e4a0d09d6f142",
+  "cpus_each": 2,
+  "memory_each_bytes": 4096000000,
+  "held_commit": {
+    "at": "2026-11-22T15:13:24.266767244Z",
+    "hash": "0xe4d3d1d1a50789c4f68d1a11cf84ed364ca9dbf12b84553c0ef5cfdf5b6fb213",
+    "hold_seconds": 150,
+    "number": 83061,
+    "phase": "released",
+    "released_at": "2026-11-22T15:15:54.267315964Z",
+    "scope": "Deliberately held native checked batch before atomic commit; not the original unknown holder or operating acceptance",
+    "slot": 85696
+  },
+  "actual_hold_seconds": 150.000548,
+  "held_block_agrees_with_canonical_reference": true,
+  "recovered": true,
+  "recovery_number": 83113,
+  "recovery_slot": 85748,
+  "recovery_hash": "0x1ba9a6e17b06098e95be454fd377f7c2f482a12bed10aaa9b6d53c1159aa6cdb",
+  "recovery_state_root": "0xef979b8b920c3964984f5aaee7a33dde86acaf595c464722620d583bd56291b0",
+  "reference_header_agreed": true,
+  "both_exit0": true,
+  "oom_killed": false,
+  "debugger_interference": "Native/CL stacks were captured about1s after the deliberately blocked commit, before the first8s timeout. This is explicit control interference; the private helper generic post-timeout text is not that phase. No diagnostic pause counts as clean uptime."
+}

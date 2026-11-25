@@ -1,0 +1,31 @@
+{
+  "full_package_suites_passed": 216,
+  "affected_race_suites_passed": 22,
+  "tagged_integration_suites_passed": 45,
+  "full_vet": true,
+  "native_build": true,
+  "original_continuous_target_downloads": 1280,
+  "original_no_progress_until_updates_stop": 384,
+  "mutations": [
+    {
+      "mutation": "forget_completed_transfers",
+      "detected_by_executed_test": true
+    },
+    {
+      "mutation": "oversized_cache_exception",
+      "detected_by_executed_test": true
+    },
+    {
+      "mutation": "downloaded_is_validated",
+      "detected_by_executed_test": true
+    }
+  ],
+  "sources_restored": true,
+  "limits": {
+    "header_records": 65536,
+    "encoded_body_and_key_bytes": 67108864
+  },
+  "staging_confers_execution_validity": false,
+  "actual_original_localhost_sync_eventually_completed_before_freeze": true,
+  "fixed_target_control_exercised": false
+}

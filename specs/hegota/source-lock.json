@@ -829,7 +829,7 @@
     }
   ],
   "go_module": "pkg/go.mod",
-  "go_sum_sha256": "bfc9565154caf9f82db548beca236faf4c3c715abb2d30247ddaed5b35d74c7c",
+  "go_sum_sha256": "579bc96d5943e44fde656d9f6f344b1892111012abfdb397e766eb2251718af2",
   "archived_eest": "ethereum/execution-spec-tests is archived; live test sources are in ethereum/execution-specs",
   "cl_checkouts": {
     "../lighthouse": "absent; upstream profile source pinned, no local fork build claim",
@@ -862,6 +862,19 @@
         "HGT-006"
       ],
       "rationale": "Pins PeerDAS context for the pre-existing local stream session identity collision exposed by the full baseline suite; the fix changes no PeerDAS data or commitment format."
+    }
+  ],
+  "dependency_updates": [
+    {
+      "date": "2026-11-25",
+      "previous_go_sum_sha256": "bfc9565154caf9f82db548beca236faf4c3c715abb2d30247ddaed5b35d74c7c",
+      "new_go_sum_sha256": "579bc96d5943e44fde656d9f6f344b1892111012abfdb397e766eb2251718af2",
+      "upstream_revision": "98d43177",
+      "affected_tasks": [
+        "HGT-001",
+        "HGT-006"
+      ],
+      "rationale": "Preserve master security/dependency upgrades, including Go 1.26.8, gnark-crypto and Geth v1.17.10. Reexecute the historical native/reference baseline; normative EIP/CL pins are unchanged."
     }
   ]
 }

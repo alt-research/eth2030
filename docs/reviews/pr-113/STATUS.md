@@ -1,0 +1,9 @@
+# Final acceptance composition: stopped for PR review
+
+The current official RPC correction is independently published in [PR 114](https://github.com/alt-research/eth2030/pull/114), based directly on PR 112. This draft composes it with PRs 106-112 and the later PR 101 replay tools and actual process inputs. Each production review retains its own base and ancestry. Master remains 5fbc7c133b0e57352ca2a3d6fdd9a63726c42502; no EL merge is performed.
+
+Fresh peer snap recovery now passes in 273.973 seconds under the unchanged 600-second budget. Original pair 2 completed exclusive historical indexing and resumed its ordinary EL, Lodestar and validator processes. Final read-only health shows all three original pairs at slot 13078, non-optimistic, online and caught up; all three ELs agree on the independent Geth finalized hash and state root. Pair 3 still uses its previous native binary. Completed auxiliary sync roles are stopped and their data retained. Neither this maintenance nor earlier auxiliary success supplies a new steady-window pass.
+
+Published evidence also includes larger-chain local restart in 28.459 seconds under 300 seconds, fresh full application history, the independent signed 9600-to-9601 transition and 0.101-ETH builder debit/credit, and period-one 512-participant finality authenticating that payment. The complete production/test tree matches qualified composed source 247d2f87; subsequent differences are review documents only. Original failures remain explicit.
+
+The user instructed finishing the current work, submitting PRs, checking conflicts and stopping for merge consideration. See [the exact merge and stop handoff](../../plans/glamsterdam/PR_MERGE_HANDOFF_20261120.md) for the 27-review audit, merge-commit order and outstanding acceptance gates. This PR remains draft: peer acquisition, lifecycle/storage-fault coverage, the final runtime tuple and steady/pressure/release acceptance are not all complete.

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "actual_old_source": "6db8d49b3b78077627124b75f2419e35bd6eecc7",
+  "old_probe_sha256": "b40542ebe8a912edf89744e81f861d20fede7a49f48a51b67df78ebc14d06c96",
+  "new_probe_sha256": "6809e2691b8da1c5498414886e722df124fbe27d850f5e06f6af9466c3cc368a",
+  "actual_old_reader_rejected": true,
+  "new_value_unchanged_after_old_attempt": true,
+  "observations": [
+    {
+      "opened": true,
+      "value": "new-head"
+    },
+    {
+      "error": "filedb: replay wal: read /projects/eth2030/qualification/remaining-20261123/filedb-layout-old-reader-control/wal: is a directory",
+      "opened": false
+    },
+    {
+      "opened": true,
+      "value": "new-head"
+    }
+  ],
+  "scope": "Compiled old FileDB, not a simulated reader; does not replace full live-runtime/BLS validation"
+}

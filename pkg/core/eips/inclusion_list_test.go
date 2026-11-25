@@ -245,6 +245,18 @@ func TestSelectTransactionsForInclusionListSkipsOversizedEntries(t *testing.T) {
 	}
 }
 
+func TestSelectTransactionsForInclusionListSkipsBlobTransactions(t *testing.T) {
+	addr := types.HexToAddress("0x1234567890abcdef1234567890abcdef12345678")
+	ordinary := makeILTx(0, 21000, big.NewInt(1e9), addr, big.NewInt(0))
+	blob := types.NewTransaction(&types.BlobTx{})
+	want := encodeTx(t, ordinary)
+	frame := types.NewTransaction(&types.FrameTx8141{BlobVersionedHashes: []types.Hash{{0: 1}}})
+	selected, size := SelectTransactionsForInclusionList([]*types.Transaction{nil, blob, frame, ordinary}, MaxBytesPerInclusionList)
+	if len(selected) != 1 || string(selected[0]) != string(want) || size != len(want) {
+		t.Fatalf("selected %x (%d bytes), want only %x", selected, size, want)
+	}
+}
+
 func TestCheckBlockSatisfiesInclusionList(t *testing.T) {
 	addr := types.HexToAddress("0xaabbccdd11223344aabbccdd11223344aabbccdd")
 

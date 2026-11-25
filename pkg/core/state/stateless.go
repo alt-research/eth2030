@@ -181,6 +181,9 @@ func NewStatelessStateDB(witness *StatelessWitness) *StatelessStateDB {
 // from the witness if it does not yet exist in the overlay.
 func (s *StatelessStateDB) getOrLoadAccount(addr types.Address) *stateObject {
 	if obj, ok := s.accounts[addr]; ok {
+		if obj.deleted {
+			return newStateObject()
+		}
 		return obj
 	}
 	obj := newStateObject()
@@ -219,15 +222,16 @@ func (s *StatelessStateDB) existsInWitness(addr types.Address) bool {
 
 func (s *StatelessStateDB) CreateAccount(addr types.Address) {
 	s.accounts[addr] = newStateObject()
+	s.accounts[addr].touched = true
 }
 
 func (s *StatelessStateDB) SubBalance(addr types.Address, amount *big.Int) {
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.account.Balance = new(big.Int).Sub(obj.account.Balance, amount)
 }
 
 func (s *StatelessStateDB) AddBalance(addr types.Address, amount *big.Int) {
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.account.Balance = new(big.Int).Add(obj.account.Balance, amount)
 }
 
@@ -242,7 +246,7 @@ func (s *StatelessStateDB) GetNonce(addr types.Address) uint64 {
 }
 
 func (s *StatelessStateDB) SetNonce(addr types.Address, nonce uint64) {
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.account.Nonce = nonce
 }
 
@@ -252,7 +256,7 @@ func (s *StatelessStateDB) GetCode(addr types.Address) []byte {
 }
 
 func (s *StatelessStateDB) SetCode(addr types.Address, code []byte) {
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.code = code
 	obj.account.CodeHash = crypto.Keccak256(code)
 }
@@ -275,7 +279,7 @@ func (s *StatelessStateDB) SelfDestruct(addr types.Address) {
 			return
 		}
 	}
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.selfDestructed = true
 	obj.account.Balance = new(big.Int)
 }
@@ -285,6 +289,20 @@ func (s *StatelessStateDB) HasSelfDestructed(addr types.Address) bool {
 		return obj.selfDestructed
 	}
 	return false
+}
+
+// FinalizeTransaction keeps destruction-marked accounts observable during
+// execution, then hides empty accounts at the same boundary as native state.
+func (s *StatelessStateDB) FinalizeTransaction() { s.Finalise(false) }
+func (s *StatelessStateDB) Finalise(deleteEmpty bool) {
+	for _, obj := range s.accounts {
+		if deleteEmpty && obj.touched && isEmptyAccount(obj) {
+			obj.selfDestructed = true
+		}
+		if obj.selfDestructed {
+			obj.deleted = true
+		}
+	}
 }
 
 // --- Storage operations ---
@@ -298,7 +316,7 @@ func (s *StatelessStateDB) GetState(addr types.Address, key types.Hash) types.Ha
 }
 
 func (s *StatelessStateDB) SetState(addr types.Address, key types.Hash, value types.Hash) {
-	obj := s.getOrLoadAccount(addr)
+	obj := s.getOrLoadAccountForWrite(addr)
 	obj.dirtyStorage[key] = value
 }
 
@@ -311,7 +329,7 @@ func (s *StatelessStateDB) GetCommittedState(addr types.Address, key types.Hash)
 
 func (s *StatelessStateDB) Exist(addr types.Address) bool {
 	if obj, ok := s.accounts[addr]; ok {
-		return !obj.selfDestructed
+		return !obj.deleted
 	}
 	return s.existsInWitness(addr)
 }
@@ -337,27 +355,7 @@ func (s *StatelessStateDB) Snapshot() int {
 	// Deep-copy the overlay accounts.
 	acctsCopy := make(map[types.Address]*stateObject, len(s.accounts))
 	for addr, obj := range s.accounts {
-		cp := &stateObject{
-			account: types.Account{
-				Nonce:    obj.account.Nonce,
-				Balance:  new(big.Int).Set(obj.account.Balance),
-				Root:     obj.account.Root,
-				CodeHash: make([]byte, len(obj.account.CodeHash)),
-			},
-			code:             make([]byte, len(obj.code)),
-			dirtyStorage:     make(map[types.Hash]types.Hash, len(obj.dirtyStorage)),
-			committedStorage: make(map[types.Hash]types.Hash, len(obj.committedStorage)),
-			selfDestructed:   obj.selfDestructed,
-		}
-		copy(cp.account.CodeHash, obj.account.CodeHash)
-		copy(cp.code, obj.code)
-		for k, v := range obj.dirtyStorage {
-			cp.dirtyStorage[k] = v
-		}
-		for k, v := range obj.committedStorage {
-			cp.committedStorage[k] = v
-		}
-		acctsCopy[addr] = cp
+		acctsCopy[addr] = copyMemoryStateObject(obj)
 	}
 
 	logsCopy := make(map[types.Hash][]*types.Log, len(s.logs))
@@ -559,3 +557,19 @@ func (s *StatelessStateDB) Dup() StateDB {
 
 // Verify interface compliance at compile time.
 var _ StateDB = (*StatelessStateDB)(nil)
+
+func (s *StatelessStateDB) FinalizePreState() {
+	for _, obj := range s.accounts {
+		obj.touched = false
+		for key, value := range obj.dirtyStorage {
+			obj.committedStorage[key] = value
+		}
+	}
+}
+
+func (s *StatelessStateDB) getOrLoadAccountForWrite(addr types.Address) *stateObject {
+	obj := s.getOrLoadAccount(addr)
+	obj.touched = true
+	s.accounts[addr] = obj
+	return obj
+}

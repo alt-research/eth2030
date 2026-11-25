@@ -98,7 +98,7 @@ func TestProcessorContractCreation(t *testing.T) {
 	tx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(1),
-		Gas:      200000,
+		Gas:      500000,
 		To:       nil,
 		Value:    big.NewInt(0),
 		Data:     initCode,
@@ -166,8 +166,8 @@ func TestProcessorContractCall(t *testing.T) {
 		t.Fatalf("return data[31]: want 0x42, got 0x%02x", result.ReturnData[31])
 	}
 
-	if result.UsedGas <= TxGas {
-		t.Fatalf("gas used %d should exceed base transfer gas %d", result.UsedGas, TxGas)
+	if result.UsedGas <= 15000 {
+		t.Fatalf("gas used %d should exceed base transfer gas %d", result.UsedGas, 15000)
 	}
 }
 

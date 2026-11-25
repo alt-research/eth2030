@@ -13,6 +13,7 @@ import (
 
 func TestBeaconBlockRootNotCalledPreCancun(t *testing.T) {
 	statedb := state.NewMemoryStateDB()
+	eips.ApplyExecutionSystemGenesis(statedb)
 
 	beaconRoot := types.HexToHash("0xdeadbeef00000000000000000000000000000000000000000000000000000000")
 
@@ -64,7 +65,8 @@ func TestBeaconBlockRootNotCalledPreCancun(t *testing.T) {
 }
 
 func TestBeaconBlockRootCalledPostCancun(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
+	eips.ApplyExecutionSystemGenesis(statedb)
 
 	beaconRoot := types.HexToHash("0xdeadbeef00000000000000000000000000000000000000000000000000000000")
 

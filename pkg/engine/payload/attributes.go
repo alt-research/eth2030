@@ -24,7 +24,6 @@ var (
 	ErrAttrWithdrawalNilEntry = errors.New("payload_attributes: withdrawal entry is nil")
 	ErrAttrWithdrawalBadIndex = errors.New("payload_attributes: withdrawal indices not monotonically increasing")
 	ErrAttrPrevRandaoZero     = errors.New("payload_attributes: prevRandao is zero (unexpected)")
-	ErrAttrSlotZero           = errors.New("payload_attributes: slot number is zero in V4 attributes")
 )
 
 // MaxAllowedTimeDrift is the maximum number of seconds a payload timestamp
@@ -53,17 +52,13 @@ func ValidateAttributesV3(attrs *PayloadAttributesV3, parentTimestamp uint64, no
 }
 
 // ValidateAttributesV4 performs full validation of V4 payload attributes
-// (Amsterdam/FOCIL). It includes all V3 checks and additionally validates
-// the slot number.
+// (Amsterdam/FOCIL). Slot zero is a valid uint64; it is not a missing value.
 func ValidateAttributesV4(attrs *PayloadAttributesV4, parentTimestamp uint64, nowUnix uint64) error {
 	if attrs == nil {
 		return ErrAttrNil
 	}
 	if err := ValidateAttributesV3(&attrs.PayloadAttributesV3, parentTimestamp, nowUnix); err != nil {
 		return err
-	}
-	if attrs.SlotNumber == 0 {
-		return ErrAttrSlotZero
 	}
 	return nil
 }

@@ -1,0 +1,13 @@
+{
+  "passed": false,
+  "operating_status": "bounded_observation_failed",
+  "declared_catchup_seconds": 300,
+  "native_rpc_started_at": "2026-11-23T14:14:31.947Z",
+  "native_process_started_at": "2026-11-23T14:12:34.438042953Z",
+  "native_actual_stopped_slot": 112063,
+  "stored_forkchoice_unique_leaf_slot": 112083,
+  "last_published_head_slot_from_final_slot_log": 112063,
+  "partial_batch_scope": "EL selected head and last published CL head agree at112063; persisted forkchoice includes later partly imported batch through112083. Unique stored leaf is not proof of the selected cached head while syncing. The automatic whole-pair closure correctly remains failed.",
+  "reason": "Input was about2h18m behind. Continuous imports occurred;300s full historical catchup was not achieved. No operating window passed.",
+  "data_reuse": "Only these owned quiescent inputs may be reused after endpoint receipts; original source archives remain unchanged."
+}

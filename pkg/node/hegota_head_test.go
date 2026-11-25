@@ -8,26 +8,26 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/block"
+	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/engine/forkchoice"
 	"github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/eth"
 	"github.com/eth2030/eth2030/p2p"
 	"github.com/eth2030/eth2030/rlp"
 )
 
-// Exercise the installed P2P callback and real reorg listener, rather than only
-// calling TxPool.ResetAtHead directly with an artificial timestamp.
-func TestNativeP2PAndReorgRefreshFrameActivation(t *testing.T) {
+// P2P announcements cannot select a PoS head. Execute forkchoice on the actual
+// native backend and verify both activation and a reorg across the boundary.
+func TestNativeForkchoiceRefreshesFrameActivationAndReorg(t *testing.T) {
 	cfg := makeTestConfig(t)
 	var genesis map[string]any
 	if err := json.Unmarshal(minimalGenesisJSON(1337), &genesis); err != nil {
 		t.Fatal(err)
 	}
-	chain := genesis["config"].(map[string]any)
-	chain["terminalTotalDifficulty"] = 0
-	chain["bogotaTime"] = 1
-	chain["experimentalLegacyFrames"] = true
+	genesisRules := genesis["config"].(map[string]any)
+	genesisRules["terminalTotalDifficulty"] = 0
+	genesisRules["bogotaTime"] = 1
+	genesisRules["experimentalLegacyFrames"] = true
 	sender := types.HexToAddress("0x1111111111111111111111111111111111111111")
 	genesis["alloc"].(map[string]any)[sender.Hex()] = map[string]any{"balance": "1000000000000000000", "code": "0x00", "nonce": "0x0"}
 	raw, err := json.Marshal(genesis)
@@ -39,7 +39,7 @@ func TestNativeP2PAndReorgRefreshFrameActivation(t *testing.T) {
 		t.Fatal(err)
 	}
 	n := newTestNode(t, &cfg)
-	tx := types.NewTransaction(&types.FrameTx{ChainID: big.NewInt(1337), Nonce: big.NewInt(0), Sender: sender, Frames: []types.Frame{{Mode: types.ModeVerify, GasLimit: 50000}}, MaxFeePerGas: big.NewInt(100), MaxPriorityFeePerGas: big.NewInt(1)})
+	tx := types.NewTransaction(&types.FrameTx{ChainID: big.NewInt(1337), Nonce: big.NewInt(0), Sender: sender, Frames: []types.Frame{{Mode: types.ModeVerify, GasLimit: 50000}}, MaxFeePerGas: big.NewInt(2_000_000_000), MaxPriorityFeePerGas: big.NewInt(1)})
 	if err := n.txPool.AddLocal(tx); err == nil {
 		t.Fatal("prototype admitted before canonical activation")
 	}
@@ -64,22 +64,35 @@ func TestNativeP2PAndReorgRefreshFrameActivation(t *testing.T) {
 	if err := n.ethHandler.HandleMsg(peer, p2p.Msg{Code: p2p.NewBlockMsg, Size: uint32(len(encoded)), Payload: encoded}); err != nil {
 		t.Fatal(err)
 	}
-	if n.blockchain.CurrentBlock().Hash() != child.Hash() {
-		t.Fatal("P2P block was not imported")
+	if n.blockchain.CurrentBlock().Hash() != parent.Hash() {
+		t.Fatal("P2P announcement selected an optimistic head")
 	}
+	if err := n.txPool.AddLocal(tx); err == nil {
+		t.Fatal("P2P announcement activated the legacy profile")
+	}
+	if err := n.blockchain.InsertSyncedBlock(child); err != nil {
+		t.Fatal(err)
+	}
+	// Supply the empty CL view required by master's Bogotá forkchoice path.
+	// IL execution semantics are covered by the separate versioned wire tests.
+	if err := n.blockchain.WriteBogotaPayload(child.Hash(), &chain.BogotaPayload{Number: child.NumberU64(), Satisfied: true}); err != nil {
+		t.Fatal(err)
+	}
+	selectHead := func(hash types.Hash) {
+		t.Helper()
+		result, err := n.engBackend.ForkchoiceUpdated(payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
+		if err != nil || result.PayloadStatus.Status != "VALID" {
+			t.Fatalf("forkchoice %s: %+v %v", hash, result, err)
+		}
+		if n.blockchain.CurrentBlock().Hash() != hash {
+			t.Fatal("native FCU did not select the canonical head")
+		}
+	}
+	selectHead(child.Hash())
 	if err := n.txPool.AddLocal(tx); err != nil {
-		t.Fatalf("P2P import failed to activate pool: %v", err)
+		t.Fatalf("FCU failed to activate pool: %v", err)
 	}
-	n.fcStateManager.AddBlock(&forkchoice.BlockInfo{Hash: child.Hash(), ParentHash: parent.Hash(), Number: child.NumberU64(), Slot: 1})
-	if err := n.fcStateManager.ProcessForkchoiceUpdate(payload.ForkchoiceStateV1{HeadBlockHash: child.Hash()}); err != nil {
-		t.Fatal(err)
-	}
-	if err := n.blockchain.SetHead(0); err != nil {
-		t.Fatal(err)
-	}
-	if err := n.fcStateManager.ProcessForkchoiceUpdate(payload.ForkchoiceStateV1{HeadBlockHash: parent.Hash()}); err != nil {
-		t.Fatal(err)
-	}
+	selectHead(parent.Hash())
 	if n.txPool.Get(tx.Hash()) != nil {
 		t.Fatal("reorg listener retained post-fork prototype")
 	}

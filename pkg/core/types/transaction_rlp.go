@@ -71,7 +71,7 @@ type blobTxRLP struct {
 	GasTipCap  *big.Int
 	GasFeeCap  *big.Int
 	Gas        uint64
-	To         Address
+	To         []byte
 	Value      *big.Int
 	Data       []byte
 	AccessList []accessTupleRLP
@@ -109,7 +109,7 @@ type setCodeTxRLP struct {
 	GasTipCap  *big.Int
 	GasFeeCap  *big.Int
 	Gas        uint64
-	To         Address
+	To         []byte
 	Value      *big.Int
 	Data       []byte
 	AccessList []accessTupleRLP
@@ -169,6 +169,8 @@ func (tx *Transaction) EncodeRLP() ([]byte, error) {
 		return encodeTypedTx(AATxType, inner)
 	case *FrameTx:
 		return EncodeFrameTx(inner)
+	case *FrameTx8141:
+		return EncodeFrameTx8141(inner)
 	case *PQTransaction:
 		return inner.EncodePQ()
 	case *LocalTx:
@@ -260,7 +262,7 @@ func encodeTypedTx(txType byte, inner TxData) ([]byte, error) {
 			GasTipCap:  bigOrZero(tx.GasTipCap),
 			GasFeeCap:  bigOrZero(tx.GasFeeCap),
 			Gas:        tx.Gas,
-			To:         tx.To,
+			To:         tx.To[:],
 			Value:      bigOrZero(tx.Value),
 			Data:       tx.Data,
 			AccessList: encodeAccessList(tx.AccessList),
@@ -279,7 +281,7 @@ func encodeTypedTx(txType byte, inner TxData) ([]byte, error) {
 			GasTipCap:  bigOrZero(tx.GasTipCap),
 			GasFeeCap:  bigOrZero(tx.GasFeeCap),
 			Gas:        tx.Gas,
-			To:         tx.To,
+			To:         tx.To[:],
 			Value:      bigOrZero(tx.Value),
 			Data:       tx.Data,
 			AccessList: encodeAccessList(tx.AccessList),
@@ -356,15 +358,7 @@ func DecodeTxRLP(data []byte) (*Transaction, error) {
 	if data[0] >= 0xc0 {
 		return decodeLegacyTx(data)
 	}
-	// If first byte is 0x00, it could be a typed legacy tx (type 0).
-	// Per EIP-2718, type 0 is not formally an envelope type, but we handle
-	// it: strip the 0x00 byte and decode the rest as legacy.
-	if data[0] == 0x00 {
-		if len(data) < 2 {
-			return nil, errShortTypedTx
-		}
-		return decodeLegacyTx(data[1:])
-	}
+
 	return nil, fmt.Errorf("invalid transaction encoding, first byte: 0x%02x", data[0])
 }
 
@@ -373,6 +367,10 @@ func decodeLegacyTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode legacy tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &LegacyTx{
 		Nonce:    dec.Nonce,
 		GasPrice: dec.GasPrice,
@@ -403,11 +401,21 @@ func decodeTypedTx(txType byte, payload []byte) (*Transaction, error) {
 	case AATxType:
 		return decodeAATxTyped(payload)
 	case FrameTxType:
-		return decodeFrameTxWrapped(payload)
+		return decodeFrameEnvelope(payload)
 	case PQTransactionType:
 		return decodePQFromPayload(payload)
 	case MultiDimFeeTxType:
 		return DecodeMultiDimFeeTx(payload)
+	case LocalTxType:
+		var dec localTxRLP
+		if err := rlp.DecodeBytes(payload, &dec); err != nil {
+			return nil, err
+		}
+		if len(dec.To) != 0 && len(dec.To) != AddressLength {
+			return nil, fmt.Errorf("invalid local transaction recipient length %d", len(dec.To))
+		}
+		to := bytesToAddressPtr(dec.To)
+		return NewLocalTx(dec.ChainID, dec.Nonce, to, dec.Value, dec.Gas, dec.GasTipCap, dec.GasFeeCap, dec.Data, dec.ScopeHint), nil
 	default:
 		return nil, fmt.Errorf("unsupported transaction type: 0x%02x", txType)
 	}
@@ -447,6 +455,10 @@ func decodeAccessListTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode access list tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &AccessListTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
@@ -468,6 +480,10 @@ func decodeDynamicFeeTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode dynamic fee tx: %w", err)
 	}
+	if len(dec.To) != 0 && len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
 	inner := &DynamicFeeTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
@@ -514,21 +530,32 @@ func decodeBlobTxFull(data []byte) (*Transaction, *BlobSidecarData, error) {
 			if err1 := rlp.DecodeBytes(data, &v1); err1 != nil {
 				return nil, nil, fmt.Errorf("decode blob tx: %w", err)
 			}
+			if v1.Version != 1 {
+				return nil, nil, fmt.Errorf("unsupported blob wrapper version %d", v1.Version)
+			}
 			dec = v1.Tx
 			sidecar = &BlobSidecarData{
+				Version:     v1.Version,
 				Blobs:       v1.Blobs,
 				Commitments: v1.Commitments,
 				Proofs:      v1.Proofs,
 			}
 		}
 	}
+	if len(dec.To) == 0 {
+		return nil, nil, ErrBlobTxCreate
+	}
+	if len(dec.To) != 20 {
+		return nil, nil, ErrRecipientLength
+	}
+
 	inner := &BlobTx{
 		ChainID:    dec.ChainID,
 		Nonce:      dec.Nonce,
 		GasTipCap:  dec.GasTipCap,
 		GasFeeCap:  dec.GasFeeCap,
 		Gas:        dec.Gas,
-		To:         dec.To,
+		To:         BytesToAddress(dec.To),
 		Value:      dec.Value,
 		Data:       dec.Data,
 		AccessList: decodeAccessList(dec.AccessList),
@@ -550,13 +577,31 @@ func decodeSetCodeTx(data []byte) (*Transaction, error) {
 	if err := rlp.DecodeBytes(data, &dec); err != nil {
 		return nil, fmt.Errorf("decode set code tx: %w", err)
 	}
+	if len(dec.To) == 0 {
+		return nil, ErrSetCodeTxCreate
+	}
+	if len(dec.To) != 20 {
+		return nil, ErrRecipientLength
+	}
+
+	for _, auth := range dec.AuthList {
+		for _, field := range []*big.Int{auth.ChainID, auth.R, auth.S} {
+			if field != nil && field.BitLen() > 256 {
+				return nil, errors.New("authorization field exceeds uint256")
+			}
+		}
+		if auth.V != nil && auth.V.BitLen() > 8 {
+			return nil, errors.New("authorization parity exceeds uint8")
+		}
+	}
+
 	inner := &SetCodeTx{
 		ChainID:           dec.ChainID,
 		Nonce:             dec.Nonce,
 		GasTipCap:         dec.GasTipCap,
 		GasFeeCap:         dec.GasFeeCap,
 		Gas:               dec.Gas,
-		To:                dec.To,
+		To:                BytesToAddress(dec.To),
 		Value:             dec.Value,
 		Data:              dec.Data,
 		AccessList:        decodeAccessList(dec.AccessList),
@@ -690,12 +735,15 @@ func (tx *Transaction) SigningHash() Hash {
 		return signingHashBlob(t)
 	case *SetCodeTx:
 		return signingHashSetCode(t)
+	case *MultiDimFeeTx:
+		return t.signingHash(t.ChainID)
 	case *FrameTx:
 		return ComputeFrameSigHash(t)
+	case *FrameTx8141:
+		hash, _ := t.SigningHash()
+		return hash
 	case *PQTransaction:
-		var h Hash
-		copy(h[:], pqRealSigningHash(t))
-		return h
+		return t.SigningHash()
 	default:
 		return Hash{}
 	}
@@ -722,7 +770,7 @@ func signingHashLegacy(tx *LegacyTx) Hash {
 	enc(tx.Value)
 	enc(tx.Data)
 
-	if chainID != nil && chainID.Sign() > 0 {
+	if tx.V != nil && tx.V.Cmp(big.NewInt(35)) >= 0 {
 		enc(chainID)
 		enc(uint(0))
 		enc(uint(0))
@@ -850,13 +898,4 @@ func encodeAuthListBytes(list []Authorization) []byte {
 		inner = append(inner, rlp.WrapList(item)...)
 	}
 	return rlp.WrapList(inner)
-}
-
-// decodeFrameTxWrapped decodes a FrameTx from RLP payload and wraps it in a Transaction.
-func decodeFrameTxWrapped(data []byte) (*Transaction, error) {
-	inner, err := DecodeFrameTx(data)
-	if err != nil {
-		return nil, err
-	}
-	return NewTransaction(inner), nil
 }

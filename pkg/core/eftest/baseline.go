@@ -75,7 +75,7 @@ func RunBaseline(manifestPath string) (*BaselineReport, error) {
 	if m.Version != 1 || m.ExpectedCases <= 0 || len(m.Fixtures) == 0 {
 		return nil, fmt.Errorf("empty or unsupported baseline manifest")
 	}
-	report := &BaselineReport{Version: 1, NativeBackend: "native/core/execution.ApplyTransaction", ReferenceBackend: "upstream/go-ethereum@v1.17.1/tests.StateTest.RunNoVerify", Expected: m.ExpectedCases}
+	report := &BaselineReport{Version: 1, NativeBackend: "native/core/execution.ApplyTransaction", ReferenceBackend: "upstream/go-ethereum@v1.17.10/tests.StateTest.RunNoVerify", Expected: m.ExpectedCases}
 	seen := map[string]bool{}
 	for _, f := range m.Fixtures {
 		if f.Path == "" || filepath.IsAbs(f.Path) || filepath.Clean(f.Path) != f.Path || f.Path == ".." || len(f.Path) > 2 && f.Path[:3] == "../" || seen[f.Path] || f.Cases <= 0 || f.Source == "" {

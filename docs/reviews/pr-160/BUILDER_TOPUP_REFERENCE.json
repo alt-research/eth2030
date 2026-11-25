@@ -1,0 +1,20 @@
+{
+  "reference": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "amount": 1000000000,
+  "cases": [
+    {
+      "prefix": 176,
+      "before": 57484000000,
+      "after": 58484000000,
+      "credited": 1000000000,
+      "execution_address_unchanged": true
+    },
+    {
+      "prefix": 255,
+      "before": 57484000000,
+      "after": 57484000000,
+      "credited": 0,
+      "execution_address_unchanged": true
+    }
+  ]
+}

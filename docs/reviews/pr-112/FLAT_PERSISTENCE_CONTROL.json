@@ -1,0 +1,26 @@
+{
+  "passed": false,
+  "elapsed_since_process_start_seconds": 651.167981,
+  "deadline_seconds": 600,
+  "source": "d4bdb8d39a4e13928b6548b5049f865f6ce59556",
+  "scope": "Raw account interoperability fixed and authenticated pivot imported. Repeated full flat snapshots make post-pivot canonical execution slower than the live chain.",
+  "geth": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": "0x29b9"
+  },
+  "snap": {
+    "jsonrpc": "2.0",
+    "result": "0x2926",
+    "id": 1
+  },
+  "cl": {
+    "data": {
+      "is_syncing": true,
+      "is_optimistic": false,
+      "el_offline": true,
+      "head_slot": "11598",
+      "sync_distance": "145"
+    }
+  }
+}

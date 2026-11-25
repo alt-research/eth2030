@@ -46,6 +46,23 @@ func (j *journal) revertToSnapshot(id int, s *MemoryStateDB) {
 	}
 	// Revert in reverse order.
 	for i := len(j.entries) - 1; i >= idx; i-- {
+
+		switch change := j.entries[i].(type) {
+		case createAccountChange:
+			s.markHistory(change.addr)
+		case balanceChange:
+			s.markHistory(change.addr)
+		case nonceChange:
+			s.markHistory(change.addr)
+		case codeChange:
+			s.markHistory(change.addr)
+		case selfDestructChange:
+			s.markHistory(change.addr)
+		case touchAccountChange:
+			s.markHistory(change.addr)
+		case storageChange:
+			s.markHistorySlot(change.addr, change.key)
+		}
 		j.entries[i].revert(s)
 	}
 	j.entries = j.entries[:idx]
@@ -130,12 +147,14 @@ func (ch storageChange) revert(s *MemoryStateDB) {
 type selfDestructChange struct {
 	addr           types.Address
 	prevDestructed bool
+	prevDeleted    bool
 	prevBalance    *big.Int
 }
 
 func (ch selfDestructChange) revert(s *MemoryStateDB) {
 	if obj := s.getStateObject(ch.addr); obj != nil {
 		obj.selfDestructed = ch.prevDestructed
+		obj.deleted = ch.prevDeleted
 		obj.account.Balance = ch.prevBalance
 	}
 }
@@ -193,4 +212,14 @@ type refundChange struct {
 
 func (ch refundChange) revert(s *MemoryStateDB) {
 	s.refund = ch.prev
+}
+
+// touchAccountChange ensures reverted CALLs do not delete an earlier empty
+// account at the transaction boundary (EIP-161's 2017 addendum).
+type touchAccountChange struct{ addr types.Address }
+
+func (ch touchAccountChange) revert(s *MemoryStateDB) {
+	if obj := s.getStateObject(ch.addr); obj != nil {
+		obj.touched = false
+	}
 }

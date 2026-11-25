@@ -350,6 +350,7 @@ type executionPayloadV5JSON struct {
 	executionPayloadV3JSON
 	ExecutionRequests []hexBytes      `json:"executionRequests"`
 	BlockAccessList   json.RawMessage `json:"blockAccessList,omitempty"`
+	SlotNumber        string          `json:"slotNumber,omitempty"`
 }
 
 func (p ExecutionPayloadV5) MarshalJSON() ([]byte, error) {
@@ -357,6 +358,7 @@ func (p ExecutionPayloadV5) MarshalJSON() ([]byte, error) {
 		executionPayloadV3JSON: p.ExecutionPayloadV3.ToV3JSON(),
 		ExecutionRequests:      toHexBytesSlice(p.ExecutionRequests),
 		BlockAccessList:        p.BlockAccessList,
+		SlotNumber:             p.SlotNumber,
 	})
 }
 
@@ -368,6 +370,7 @@ func (p *ExecutionPayloadV5) UnmarshalJSON(data []byte) error {
 	p.ExecutionPayloadV3.ApplyV3JSON(j.executionPayloadV3JSON)
 	p.ExecutionRequests = fromHexBytesSlice(j.ExecutionRequests)
 	p.BlockAccessList = j.BlockAccessList
+	p.SlotNumber = j.SlotNumber
 	return nil
 }
 
@@ -383,11 +386,15 @@ type payloadAttributesV3JSON struct {
 
 // ToV3AttrsJSON builds the shadow struct for V3 attributes. Used by V4 too.
 func (p *PayloadAttributesV3) ToV3AttrsJSON() payloadAttributesV3JSON {
+	withdrawals := p.Withdrawals
+	if withdrawals == nil {
+		withdrawals = []*Withdrawal{}
+	}
 	return payloadAttributesV3JSON{
 		Timestamp:             hexUint64(p.Timestamp),
 		PrevRandao:            p.PrevRandao,
 		SuggestedFeeRecipient: p.SuggestedFeeRecipient,
-		Withdrawals:           p.Withdrawals,
+		Withdrawals:           withdrawals,
 		ParentBeaconBlockRoot: p.ParentBeaconBlockRoot,
 	}
 }
@@ -419,6 +426,7 @@ func (p *PayloadAttributesV3) UnmarshalJSON(data []byte) error {
 type payloadAttributesV4JSON struct {
 	payloadAttributesV3JSON
 	SlotNumber                hexUint64  `json:"slotNumber"`
+	TargetGasLimit            hexUint64  `json:"targetGasLimit"`
 	InclusionListTransactions []hexBytes `json:"inclusionListTransactions,omitempty"`
 }
 
@@ -426,6 +434,7 @@ func (p PayloadAttributesV4) MarshalJSON() ([]byte, error) {
 	return json.Marshal(payloadAttributesV4JSON{
 		payloadAttributesV3JSON:   p.PayloadAttributesV3.ToV3AttrsJSON(),
 		SlotNumber:                hexUint64(p.SlotNumber),
+		TargetGasLimit:            hexUint64(p.TargetGasLimit),
 		InclusionListTransactions: toHexBytesSlice(p.InclusionListTransactions),
 	})
 }
@@ -437,6 +446,7 @@ func (p *PayloadAttributesV4) UnmarshalJSON(data []byte) error {
 	}
 	p.PayloadAttributesV3.ApplyV3AttrsJSON(j.payloadAttributesV3JSON)
 	p.SlotNumber = uint64(j.SlotNumber)
+	p.TargetGasLimit = uint64(j.TargetGasLimit)
 	p.InclusionListTransactions = fromHexBytesSlice(j.InclusionListTransactions)
 	return nil
 }
@@ -512,6 +522,8 @@ type getPayloadV6ResponseJSON struct {
 	BlobsBundle       *BlobsBundleV2      `json:"blobsBundle"`
 	Override          bool                `json:"shouldOverrideBuilder"`
 	ExecutionRequests []hexBytes          `json:"executionRequests"`
+	SSZPayload        *hexBytes           `json:"sszPayload,omitempty"`
+	SSZBlockHash      *types.Hash         `json:"sszBlockHash,omitempty"`
 }
 
 func (r GetPayloadV6Response) MarshalJSON() ([]byte, error) {
@@ -519,12 +531,19 @@ func (r GetPayloadV6Response) MarshalJSON() ([]byte, error) {
 	if blobsBundle == nil {
 		blobsBundle = &BlobsBundleV2{}
 	}
+	var sszPayload *hexBytes
+	if r.SSZPayload != nil {
+		h := hexBytes(r.SSZPayload)
+		sszPayload = &h
+	}
 	return json.Marshal(getPayloadV6ResponseJSON{
 		ExecutionPayload:  r.ExecutionPayload,
 		BlockValue:        newHexBig(r.BlockValue),
 		BlobsBundle:       blobsBundle,
 		Override:          r.Override,
 		ExecutionRequests: toHexBytesSlice(r.ExecutionRequests),
+		SSZPayload:        sszPayload,
+		SSZBlockHash:      r.SSZBlockHash,
 	})
 }
 
@@ -538,6 +557,10 @@ func (r *GetPayloadV6Response) UnmarshalJSON(data []byte) error {
 	r.BlobsBundle = j.BlobsBundle
 	r.Override = j.Override
 	r.ExecutionRequests = fromHexBytesSlice(j.ExecutionRequests)
+	if j.SSZPayload != nil {
+		r.SSZPayload = []byte(*j.SSZPayload)
+	}
+	r.SSZBlockHash = j.SSZBlockHash
 	return nil
 }
 
@@ -698,23 +721,23 @@ func (p *PayloadAttributesV7) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ── GetPayloadV5Response ─────────────────────────────────────────────────────
+// ── LegacyGlamsterdamPayloadResponse ─────────────────────────────────────────────────────
 
-type getPayloadV5ResponseJSON struct {
-	ExecutionPayload  *ExecutionPayloadV3 `json:"executionPayload"`
+type legacyGlamsterdamPayloadResponseJSON struct {
+	ExecutionPayload  *ExecutionPayloadV5 `json:"executionPayload"`
 	BlockValue        *hexBig             `json:"blockValue"`
 	BlobsBundle       *BlobsBundleV2      `json:"blobsBundle"`
 	Override          bool                `json:"shouldOverrideBuilder"`
 	ExecutionRequests []hexBytes          `json:"executionRequests"`
 }
 
-// MarshalJSON implements json.Marshaler for GetPayloadV5Response.
-func (r GetPayloadV5Response) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements json.Marshaler for LegacyGlamsterdamPayloadResponse.
+func (r LegacyGlamsterdamPayloadResponse) MarshalJSON() ([]byte, error) {
 	blobsBundle := r.BlobsBundle
 	if blobsBundle == nil {
 		blobsBundle = &BlobsBundleV2{}
 	}
-	return json.Marshal(getPayloadV5ResponseJSON{
+	return json.Marshal(legacyGlamsterdamPayloadResponseJSON{
 		ExecutionPayload:  r.ExecutionPayload,
 		BlockValue:        newHexBig(r.BlockValue),
 		BlobsBundle:       blobsBundle,
@@ -723,9 +746,9 @@ func (r GetPayloadV5Response) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// UnmarshalJSON implements json.Unmarshaler for GetPayloadV5Response.
-func (r *GetPayloadV5Response) UnmarshalJSON(data []byte) error {
-	var j getPayloadV5ResponseJSON
+// UnmarshalJSON implements json.Unmarshaler for LegacyGlamsterdamPayloadResponse.
+func (r *LegacyGlamsterdamPayloadResponse) UnmarshalJSON(data []byte) error {
+	var j legacyGlamsterdamPayloadResponseJSON
 	if err := json.Unmarshal(data, &j); err != nil {
 		return err
 	}
@@ -775,5 +798,73 @@ func (p *GlamsterdamPayloadAttributes) UnmarshalJSON(data []byte) error {
 	p.ParentBeaconBlockRoot = j.ParentBeaconBlockRoot
 	p.TargetBlobCount = uint64(j.TargetBlobCount)
 	p.SlotNumber = uint64(j.SlotNumber)
+	return nil
+}
+
+// BlobAndProofV2 uses Engine DATA encoding rather than Go's base64 []byte JSON.
+func (b BlobAndProofV2) MarshalJSON() ([]byte, error) {
+	type wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	return json.Marshal(wire{Blob: hexBytes(b.Blob), Proofs: toHexBytesSlice(b.Proofs)})
+}
+
+func (b *BlobAndProofV2) UnmarshalJSON(data []byte) error {
+	var wire struct {
+		Blob   hexBytes   `json:"blob"`
+		Proofs []hexBytes `json:"proofs"`
+	}
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Blob = []byte(wire.Blob)
+	b.Proofs = fromHexBytesSlice(wire.Proofs)
+	return nil
+}
+
+type payloadBodyJSON struct {
+	Transactions []hexBytes    `json:"transactions"`
+	Withdrawals  []*Withdrawal `json:"withdrawals"`
+}
+
+func (b ExecutionPayloadBodyV1) MarshalJSON() ([]byte, error) {
+	return json.Marshal(payloadBodyJSON{toHexBytesSlice(b.Transactions), b.Withdrawals})
+}
+
+func (b *ExecutionPayloadBodyV1) UnmarshalJSON(data []byte) error {
+	var wire payloadBodyJSON
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
+	return nil
+}
+
+type payloadBodyV2JSON struct {
+	Transactions    []hexBytes    `json:"transactions"`
+	Withdrawals     []*Withdrawal `json:"withdrawals"`
+	BlockAccessList *hexBytes     `json:"blockAccessList"`
+}
+
+func (b ExecutionPayloadBodyV2) MarshalJSON() ([]byte, error) {
+	var blockAccessList *hexBytes
+	if b.BlockAccessList != nil {
+		value := hexBytes(b.BlockAccessList)
+		blockAccessList = &value
+	}
+	return json.Marshal(payloadBodyV2JSON{toHexBytesSlice(b.Transactions), b.Withdrawals, blockAccessList})
+}
+
+func (b *ExecutionPayloadBodyV2) UnmarshalJSON(data []byte) error {
+	var wire payloadBodyV2JSON
+	if err := json.Unmarshal(data, &wire); err != nil {
+		return err
+	}
+	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
+	b.BlockAccessList = nil
+	if wire.BlockAccessList != nil {
+		b.BlockAccessList = []byte(*wire.BlockAccessList)
+	}
 	return nil
 }

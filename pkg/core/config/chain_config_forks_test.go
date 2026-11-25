@@ -2,16 +2,74 @@ package config
 
 import (
 	"math/big"
+	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestRegisteredOptionalForksAffectCompatibility(t *testing.T) {
+	for _, field := range []string{"MuirGlacierBlock", "ArrowGlacierBlock", "GrayGlacierBlock", "OsakaTime", "BPO1Time", "BPO2Time", "IPlusTime"} {
+		t.Run(field, func(t *testing.T) {
+			local, remote := *TestConfig, *TestConfig
+			left := reflect.ValueOf(&local).Elem().FieldByName(field)
+			right := reflect.ValueOf(&remote).Elem().FieldByName(field)
+			left.Set(reflect.Zero(left.Type()))
+			if strings.HasSuffix(field, "Block") {
+				right.Set(reflect.ValueOf(big.NewInt(0)))
+			} else {
+				right.Set(reflect.ValueOf(newUint64(0)))
+			}
+			if len(ConfigDiff(&local, &remote)) != 1 || CheckConfigCompatible(&local, &remote, 1, 1) == nil || CheckConfigCompatible(&remote, &local, 1, 1) == nil {
+				t.Fatal("active optional fork is absent from symmetric compatibility")
+			}
+		})
+	}
+}
+
+func TestNextForkUsesActualActivationTimeAcrossBPOBranch(t *testing.T) {
+	cfg := *TestConfig
+	cfg.OsakaTime = newUint64(0)
+	cfg.AmsterdamTime = newUint64(100)
+	cfg.BPO1Time = newUint64(200)
+	cfg.BPO2Time = newUint64(300)
+	if next := cfg.NextForkAfter(big.NewInt(1), 1); next.Name != "Amsterdam" {
+		t.Fatalf("registry order displaced earlier activation: %v", next)
+	}
+	cfg.BPO1Time = newUint64(50)
+	if next := cfg.NextForkAfter(big.NewInt(1), 1); next.Name != "BPO1" {
+		t.Fatalf("BPO activation missing: %v", next)
+	}
+}
+
+func TestBPOForkScheduleExtendsPragueWithoutConstrainingAmsterdam(t *testing.T) {
+	for _, test := range []struct {
+		name                          string
+		prague, bpo1, bpo2, amsterdam *uint64
+		invalid                       bool
+	}{
+		{"before Prague", newUint64(10), newUint64(9), nil, nil, true},
+		{"missing Prague", nil, newUint64(10), nil, nil, true},
+		{"reversed BPO", newUint64(0), newUint64(20), newUint64(19), nil, true},
+		{"interleaved", newUint64(0), newUint64(50), newUint64(200), newUint64(100), false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := *TestConfig
+			cfg.PragueTime, cfg.BPO1Time, cfg.BPO2Time, cfg.AmsterdamTime = test.prague, test.bpo1, test.bpo2, test.amsterdam
+			cfg.OsakaTime = test.prague
+			if (cfg.Validate() != nil) != test.invalid {
+				t.Fatalf("wrong BPO schedule acceptance: %v", cfg.Validate())
+			}
+		})
+	}
+}
 
 func TestForkScheduleLength(t *testing.T) {
 	cfg := MainnetConfig
 	schedule := cfg.ForkSchedule()
 
-	// Mainnet should have 17 forks (Homestead through IPlus).
-	if len(schedule) != 17 {
-		t.Fatalf("expected 17 forks in schedule, got %d", len(schedule))
+	// Mainnet should have 24 forks (Homestead through SSZBlocks).
+	if len(schedule) != 24 {
+		t.Fatalf("expected 24 forks in schedule, got %d", len(schedule))
 	}
 
 	// First fork should be Homestead.
@@ -19,9 +77,9 @@ func TestForkScheduleLength(t *testing.T) {
 		t.Fatalf("expected first fork Homestead, got %s", schedule[0].Name)
 	}
 
-	// Last fork should be IPlus.
-	if schedule[len(schedule)-1].Name != "IPlus" {
-		t.Fatalf("expected last fork IPlus, got %s", schedule[len(schedule)-1].Name)
+	// Last fork should be SSZBlocks (EIP-7807 activation, scheduled last).
+	if schedule[len(schedule)-1].Name != "SSZBlocks" {
+		t.Fatalf("expected last fork SSZBlocks, got %s", schedule[len(schedule)-1].Name)
 	}
 }
 
@@ -148,7 +206,7 @@ func TestUnscheduledForks(t *testing.T) {
 
 	unscheduled := cfg.UnscheduledForks()
 
-	// Mainnet has some forks not yet scheduled (Prague, Amsterdam, Glamsterdan, Hogota).
+	// The native roadmap configuration still leaves later forks unscheduled.
 	hasHogota := false
 	for _, f := range unscheduled {
 		if f.Name == "Hogota" {
@@ -304,5 +362,30 @@ func TestNextForkAfter(t *testing.T) {
 	next = cfg.NextForkAfter(big.NewInt(0), 5000)
 	if next.Name != "" {
 		t.Fatalf("expected empty fork after all forks, got %s", next.Name)
+	}
+}
+
+func TestLegacyNativeBLSActivationBoundary(t *testing.T) {
+	cfg := *MainnetConfig
+	cutover := uint64(1_800_000_000)
+	cfg.LegacyNativeBLSUntil = &cutover
+	block := big.NewInt(24_000_000)
+	before := cfg.Rules(block, true, cutover-1)
+	at := cfg.Rules(block, true, cutover)
+	if !before.LegacyNativeBLS || at.LegacyNativeBLS || !at.IsPrague {
+		t.Fatalf("legacy BLS before=%t at=%t Prague=%t", before.LegacyNativeBLS, at.LegacyNativeBLS, at.IsPrague)
+	}
+}
+
+func TestEIP7954UsesAmsterdamWithoutPrivateRepricing(t *testing.T) {
+	cfg := *TestConfig
+	at := uint64(100)
+	cfg.AmsterdamTime = &at
+	cfg.GlamsterdanTime = nil
+	if cfg.Rules(big.NewInt(1), true, 99).IsEIP7954 {
+		t.Fatal("code limit activated before Amsterdam")
+	}
+	if !cfg.Rules(big.NewInt(1), true, 100).IsEIP7954 {
+		t.Fatal("code limit waited for private gas repricing")
 	}
 }

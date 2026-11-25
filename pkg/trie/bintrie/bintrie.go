@@ -14,8 +14,10 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"slices"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 )
 
 // Key encoding constants matching the go-ethereum reference.
@@ -115,6 +117,9 @@ func NewBinaryNode() BinaryNode {
 
 var errInvalidRootType = errors.New("invalid root type")
 
+// ErrDraftStateHashFunction indicates an operation requires a BLAKE3 draft trie.
+var ErrDraftStateHashFunction = errors.New("bintrie: draft state operation requires BLAKE3")
+
 // BinaryTrie is the primary trie structure implementing EIP-7864.
 type BinaryTrie struct {
 	root     BinaryNode
@@ -169,12 +174,26 @@ func (t *BinaryTrie) UpdateLeafMetadata(stem []byte, subindex int, epoch uint64)
 
 // Get retrieves a value by its full 32-byte key.
 func (t *BinaryTrie) Get(key []byte) ([]byte, error) {
-	return t.root.Get(key, nil)
+	if len(key) != HashSize {
+		return nil, ErrInvalidKeyLength
+	}
+	value, err := t.root.Get(key, nil)
+	return slices.Clone(value), err
 }
 
 // Put inserts or updates a key-value pair.
 func (t *BinaryTrie) Put(key, value []byte) error {
-	root, err := t.root.Insert(key, value, nil, 0)
+	if len(key) != HashSize {
+		return ErrInvalidKeyLength
+	}
+	if len(value) != HashSize {
+		return ErrInvalidValueLength
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		t.root = putDraftNode(t.root, key, slices.Clone(value), 0)
+		return nil
+	}
+	root, err := t.root.Insert(key, slices.Clone(value), nil, 0)
 	if err != nil {
 		return err
 	}
@@ -182,8 +201,15 @@ func (t *BinaryTrie) Put(key, value []byte) error {
 	return nil
 }
 
-// Delete removes a key by setting it to zero.
+// Delete removes a draft BLAKE3 leaf; legacy SHA-256 trees store zero.
 func (t *BinaryTrie) Delete(key []byte) error {
+	if len(key) != HashSize {
+		return ErrInvalidKeyLength
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		t.root = deleteDraftNode(t.root, key, 0)
+		return nil
+	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(key, zeroVal[:], nil, 0)
 	if err != nil {
@@ -193,8 +219,14 @@ func (t *BinaryTrie) Delete(key []byte) error {
 	return nil
 }
 
+// IsDraftBlake3 reports whether the tree uses the pinned EIP-7864 encoding.
+func (t *BinaryTrie) IsDraftBlake3() bool { return t.hashFunc == HashFunctionBlake3 }
+
 // Hash returns the root hash of the trie.
 func (t *BinaryTrie) Hash() types.Hash {
+	if t.hashFunc == HashFunctionBlake3 {
+		return draftHash(t.root)
+	}
 	return t.root.Hash()
 }
 
@@ -203,13 +235,13 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 	var (
 		values [][]byte
 		err    error
-		key    = GetBinaryTreeKey(addr, zero[:])
+		key    = t.accountKey(addr)
 	)
 	switch r := t.root.(type) {
 	case *InternalNode:
 		values, err = r.GetValuesAtStem(key[:StemSize], nil)
 	case *StemNode:
-		values = r.Values
+		values, err = r.GetValuesAtStem(key[:StemSize], nil)
 	case Empty:
 		return nil, nil
 	default:
@@ -227,11 +259,15 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 		return nil, nil
 	}
 
-	// Check for deleted accounts (nonce=0, basic data zero, code hash zero)
-	if bytes.Equal(values[BasicDataLeafKey], zero[:]) && len(values) > 10 && len(values[10]) > 0 && bytes.Equal(values[CodeHashLeafKey], zero[:]) {
+	// A pair of zero leaves shadows a deleted account in the binary overlay.
+	if bytes.Equal(values[BasicDataLeafKey], zero[:]) && bytes.Equal(values[CodeHashLeafKey], zero[:]) &&
+		(t.hashFunc == HashFunctionBlake3 || len(values) > 10 && len(values[10]) > 0) {
 		return nil, nil
 	}
 
+	if len(values[BasicDataLeafKey]) != HashSize {
+		return nil, ErrInvalidValueLength
+	}
 	acc := &types.Account{
 		Balance: new(big.Int),
 	}
@@ -239,18 +275,23 @@ func (t *BinaryTrie) GetAccount(addr types.Address) (*types.Account, error) {
 	var balance [16]byte
 	copy(balance[:], values[BasicDataLeafKey][BasicDataBalanceOffset:])
 	acc.Balance.SetBytes(balance[:])
-	acc.CodeHash = values[CodeHashLeafKey]
+	acc.CodeHash = slices.Clone(values[CodeHashLeafKey])
 
 	return acc, nil
 }
 
 // UpdateAccount updates the account information for the given address.
 func (t *BinaryTrie) UpdateAccount(addr types.Address, acc *types.Account, codeLen int) error {
+	if t.hashFunc == HashFunctionBlake3 {
+		if acc == nil || acc.Balance == nil || acc.Balance.Sign() < 0 || acc.Balance.BitLen() > 128 || codeLen < 0 || codeLen > 0xffffff || len(acc.CodeHash) != HashSize {
+			return ErrInvalidValueLength
+		}
+	}
 	var (
 		err       error
 		basicData [HashSize]byte
 		values    = make([][]byte, StemNodeWidth)
-		stem      = GetBinaryTreeKey(addr, zero[:])
+		stem      = t.accountKey(addr)
 	)
 	binary.BigEndian.PutUint32(basicData[BasicDataCodeSizeOffset-1:], uint32(codeLen))
 	binary.BigEndian.PutUint64(basicData[BasicDataNonceOffset:], acc.Nonce)
@@ -263,23 +304,49 @@ func (t *BinaryTrie) UpdateAccount(addr types.Address, acc *types.Account, codeL
 	values[BasicDataLeafKey] = basicData[:]
 	values[CodeHashLeafKey] = acc.CodeHash[:]
 
+	if t.hashFunc == HashFunctionBlake3 {
+		if len(values[CodeHashLeafKey]) != HashSize {
+			return ErrInvalidValueLength
+		}
+		if err := t.Put(stem, values[BasicDataLeafKey]); err != nil {
+			return err
+		}
+		codeKey := GetTreeKeyForCodeHash(addr)
+		return t.Put(codeKey[:], values[CodeHashLeafKey])
+	}
 	t.root, err = t.root.InsertValuesAtStem(stem, values, nil, 0)
 	return err
 }
 
 // GetStorage returns the value for a storage slot.
 func (t *BinaryTrie) GetStorage(addr types.Address, key []byte) ([]byte, error) {
-	return t.root.Get(GetBinaryTreeKeyStorageSlot(addr, key), nil)
+	k, err := t.storageKey(addr, key)
+	if err != nil {
+		return nil, err
+	}
+	return t.Get(k)
 }
 
 // UpdateStorage sets a storage slot value.
 func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) error {
-	k := GetBinaryTreeKeyStorageSlot(address, key)
+	k, err := t.storageKey(address, key)
+	if err != nil {
+		return err
+	}
+	if t.hashFunc == HashFunctionBlake3 && len(value) > HashSize {
+		return ErrInvalidValueLength
+	}
 	var v [HashSize]byte
 	if len(value) >= HashSize {
 		copy(v[:], value[:HashSize])
 	} else {
 		copy(v[HashSize-len(value):], value[:])
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		if v == ([HashSize]byte{}) {
+			return t.Delete(k)
+		}
+		return t.Put(k, v[:])
 	}
 	root, err := t.root.Insert(k, v[:], nil, 0)
 	if err != nil {
@@ -289,9 +356,15 @@ func (t *BinaryTrie) UpdateStorage(address types.Address, key, value []byte) err
 	return nil
 }
 
-// DeleteStorage removes a storage slot value by zeroing it.
+// DeleteStorage removes a draft storage leaf; legacy SHA-256 trees store zero.
 func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
-	k := GetBinaryTreeKeyStorageSlot(addr, key)
+	k, err := t.storageKey(addr, key)
+	if err != nil {
+		return err
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		return t.Delete(k)
+	}
 	var zeroVal [HashSize]byte
 	root, err := t.root.Insert(k, zeroVal[:], nil, 0)
 	if err != nil {
@@ -301,9 +374,19 @@ func (t *BinaryTrie) DeleteStorage(addr types.Address, key []byte) error {
 	return nil
 }
 
-// UpdateContractCode updates the contract code into the trie.
+// UpdateContractCode writes code chunks without updating the account header or removing old chunks.
+// Use ReplaceContractCode for an existing BLAKE3 account.
 func (t *BinaryTrie) UpdateContractCode(addr types.Address, code []byte) error {
 	chunks := ChunkifyCode(code)
+	if t.hashFunc == HashFunctionBlake3 {
+		for i, chunk := range chunks {
+			key := GetTreeKeyForCodeChunk(addr, uint64(i))
+			if err := t.Put(key[:], chunk[:]); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	var (
 		values [][]byte
 		key    []byte
@@ -333,17 +416,154 @@ func (t *BinaryTrie) UpdateContractCode(addr types.Address, code []byte) error {
 
 // UpdateStem updates the values for a given stem key.
 func (t *BinaryTrie) UpdateStem(key []byte, values [][]byte) error {
+	if t.hashFunc == HashFunctionBlake3 {
+		if len(key) < StemSize || len(values) != StemNodeWidth {
+			return ErrInvalidKeyLength
+		}
+		for _, value := range values {
+			if value != nil && len(value) != HashSize {
+				return ErrInvalidValueLength
+			}
+		}
+		var fullKey [HashSize]byte
+		copy(fullKey[:StemSize], key[:StemSize])
+		for index, value := range values {
+			if value == nil {
+				continue
+			}
+			fullKey[StemSize] = byte(index)
+			t.root = putDraftNode(t.root, fullKey[:], slices.Clone(value), 0)
+		}
+		return nil
+	}
 	var err error
 	t.root, err = t.root.InsertValuesAtStem(key, values, nil, 0)
 	return err
 }
 
-// Copy creates a deep copy of the trie.
+// Copy creates an independently mutable trie.
 func (t *BinaryTrie) Copy() *BinaryTrie {
-	return &BinaryTrie{root: t.root.Copy()}
+	if t.hashFunc == HashFunctionBlake3 {
+		return &BinaryTrie{root: t.root, hashFunc: t.hashFunc}
+	}
+	return &BinaryTrie{root: t.root.Copy(), hashFunc: t.hashFunc}
 }
 
 // Root returns the root node (for testing and iteration).
 func (t *BinaryTrie) Root() BinaryNode {
+	if t.hashFunc == HashFunctionBlake3 {
+		return t.root.Copy()
+	}
 	return t.root
+}
+
+func (t *BinaryTrie) accountKey(addr types.Address) []byte {
+	if t.hashFunc == HashFunctionBlake3 {
+		key := GetTreeKeyForBasicData(addr)
+		return key[:]
+	}
+	return GetBinaryTreeKey(addr, zero[:])
+}
+func (t *BinaryTrie) storageKey(addr types.Address, slot []byte) ([]byte, error) {
+	if len(slot) != HashSize {
+		return nil, ErrInvalidKeyLength
+	}
+	if t.hashFunc == HashFunctionBlake3 {
+		key := GetTreeKeyForStorageSlot(addr, new(big.Int).SetBytes(slot))
+		return key[:], nil
+	}
+	return GetBinaryTreeKeyStorageSlot(addr, slot), nil
+}
+
+// ReplaceContractCode atomically updates code, code hash and code size for an
+// existing BLAKE3 account and removes obsolete chunks. It does not publish a root.
+func (t *BinaryTrie) ReplaceContractCode(addr types.Address, code []byte) error {
+	if t.hashFunc != HashFunctionBlake3 {
+		return ErrDraftStateHashFunction
+	}
+	if len(code) > 0xffffff {
+		return ErrInvalidValueLength
+	}
+	account, err := t.GetAccount(addr)
+	if err != nil {
+		return err
+	}
+	if account == nil {
+		return ErrKeyNotFound
+	}
+	basic, err := t.Get(t.accountKey(addr))
+	if err != nil {
+		return err
+	}
+	if len(basic) != HashSize {
+		return ErrInvalidValueLength
+	}
+	oldSize := int(basic[5])<<16 | int(basic[6])<<8 | int(basic[7])
+	oldChunks, newChunks := (oldSize+StemSize-1)/StemSize, (len(code)+StemSize-1)/StemSize
+	next := t.Copy()
+	if err := next.UpdateContractCode(addr, code); err != nil {
+		return err
+	}
+	for i := newChunks; i < oldChunks; i++ {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		if err := next.Delete(key[:]); err != nil {
+			return err
+		}
+	}
+	account.CodeHash = crypto.Keccak256(code)
+	if err := next.UpdateAccount(addr, account, len(code)); err != nil {
+		return err
+	}
+	t.root = next.root
+	return nil
+}
+
+// GetContractCode reconstructs and authenticates an account's code chunks.
+func (t *BinaryTrie) GetContractCode(addr types.Address) ([]byte, error) {
+	if t.hashFunc != HashFunctionBlake3 {
+		return nil, ErrDraftStateHashFunction
+	}
+	account, err := t.GetAccount(addr)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		return nil, ErrKeyNotFound
+	}
+	basic, err := t.Get(t.accountKey(addr))
+	if err != nil {
+		return nil, err
+	}
+	if len(basic) != HashSize || len(account.CodeHash) != HashSize {
+		return nil, ErrInvalidValueLength
+	}
+	size := int(basic[5])<<16 | int(basic[6])<<8 | int(basic[7])
+	result := make([]byte, 0, (size+StemSize-1)/StemSize*StemSize)
+	for i := 0; i < (size+StemSize-1)/StemSize; i++ {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		chunk, err := t.Get(key[:])
+		if err != nil {
+			return nil, err
+		}
+		if len(chunk) != HashSize {
+			return nil, ErrKeyNotFound
+		}
+		result = append(result, chunk[1:]...)
+	}
+	result = result[:size]
+	if !bytes.Equal(crypto.Keccak256(result), account.CodeHash) {
+		return nil, ErrInvalidStoredNode
+	}
+	chunks := ChunkifyCode(result)
+	for i, expected := range chunks {
+		key := GetTreeKeyForCodeChunk(addr, uint64(i))
+		chunk, err := t.Get(key[:])
+		if err != nil {
+			return nil, err
+		}
+		if !bytes.Equal(chunk, expected[:]) {
+			return nil, ErrInvalidStoredNode
+		}
+	}
+	return result, nil
 }

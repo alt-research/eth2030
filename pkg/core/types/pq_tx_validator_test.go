@@ -1,13 +1,12 @@
 package types_test
 
 import (
-	"encoding/binary"
 	"math/big"
+	"sync"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/pqc"
-	"golang.org/x/crypto/sha3"
 )
 
 // newTestPQTx creates a test PQ transaction.
@@ -16,28 +15,9 @@ func newTestPQTx() *types.PQTransaction {
 	return types.NewPQTransaction(big.NewInt(1), 42, &to, big.NewInt(100), 100000, big.NewInt(10), []byte("test payload"))
 }
 
-// pqTestSigningHash reproduces pqRealSigningHash for test-side signing.
 func pqTestSigningHash(tx *types.PQTransaction) []byte {
-	d := sha3.NewLegacyKeccak256()
-	if tx.ChainID != nil {
-		d.Write(tx.ChainID.Bytes())
-	}
-	var buf [8]byte
-	binary.BigEndian.PutUint64(buf[:], tx.Nonce)
-	d.Write(buf[:])
-	if tx.To != nil {
-		d.Write(tx.To[:])
-	}
-	if tx.Value != nil {
-		d.Write(tx.Value.Bytes())
-	}
-	binary.BigEndian.PutUint64(buf[:], tx.Gas)
-	d.Write(buf[:])
-	if tx.GasPrice != nil {
-		d.Write(tx.GasPrice.Bytes())
-	}
-	d.Write(tx.Data)
-	return d.Sum(nil)
+	hash := tx.SigningHash()
+	return hash[:]
 }
 
 // signMLDSATx signs a test tx with ML-DSA and returns a wired-up tx.
@@ -90,12 +70,13 @@ func TestPQTxValidatorRealValidateMLDSA(t *testing.T) {
 func TestPQTxValidatorRealValidateFalcon(t *testing.T) {
 	v := types.NewPQTxValidatorReal()
 	signer := &pqc.FalconSigner{}
-	kp, err := signer.GenerateKeyReal()
+	kp, err := signer.GenerateKey()
 	if err != nil {
 		t.Fatalf("Falcon keygen: %v", err)
 	}
 	tx := newTestPQTx()
-	sig, err := signer.SignReal(kp.SecretKey, pqTestSigningHash(tx))
+	tx.PQSignatureType = types.PQSigTypeFalcon
+	sig, err := signer.Sign(kp.SecretKey, pqTestSigningHash(tx))
 	if err != nil {
 		t.Fatalf("Falcon sign: %v", err)
 	}
@@ -103,7 +84,7 @@ func TestPQTxValidatorRealValidateFalcon(t *testing.T) {
 	tx.PQPublicKey = kp.PublicKey
 	tx.PQSignature = sig
 	v.RegisterSigner(types.PQSigTypeFalcon, func(pk, m, s []byte) bool {
-		return signer.VerifyReal(pk, m, s)
+		return signer.Verify(pk, m, s)
 	})
 	if err := v.ValidatePQSignatureReal(tx); err != nil {
 		t.Fatalf("valid Falcon rejected: %v", err)
@@ -118,6 +99,7 @@ func TestPQTxValidatorRealValidateSPHINCS(t *testing.T) {
 		t.Fatalf("SPHINCS+ keygen: %v", err)
 	}
 	tx := newTestPQTx()
+	tx.PQSignatureType = types.PQSigTypeSPHINCS
 	sig, err := signer.Sign(kp.SecretKey, pqTestSigningHash(tx))
 	if err != nil {
 		t.Fatalf("SPHINCS+ sign: %v", err)
@@ -145,7 +127,7 @@ func TestPQTxValidatorRealValidateSPHINCS(t *testing.T) {
 	tx2 := newTestPQTx()
 	tx2.PQSignatureType = types.PQSigTypeSPHINCS
 	tx2.PQPublicKey = kp.PublicKey
-	tx2.PQSignature = make([]byte, 49216)
+	tx2.PQSignature = make([]byte, types.SPHINCSPlusSigSize)
 	if err := v.ValidatePQSignatureReal(tx2); err == nil {
 		t.Fatal("all-zero SPHINCS+ sig should be rejected")
 	}
@@ -164,12 +146,13 @@ func TestPQTxValidatorRealInvalidSignature(t *testing.T) {
 func TestPQTxValidatorRealWrongAlgorithm(t *testing.T) {
 	v := types.NewPQTxValidatorReal()
 	falconSigner := &pqc.FalconSigner{}
-	kp, err := falconSigner.GenerateKeyReal()
+	kp, err := falconSigner.GenerateKey()
 	if err != nil {
 		t.Fatalf("Falcon keygen: %v", err)
 	}
 	tx := newTestPQTx()
-	sig, err := falconSigner.SignReal(kp.SecretKey, pqTestSigningHash(tx))
+	tx.PQSignatureType = types.PQSigTypeFalcon
+	sig, err := falconSigner.Sign(kp.SecretKey, pqTestSigningHash(tx))
 	if err != nil {
 		t.Fatalf("Falcon sign: %v", err)
 	}
@@ -190,7 +173,7 @@ func TestPQTxValidatorRealEmptySignature(t *testing.T) {
 	v := types.NewPQTxValidatorReal()
 	tx := newTestPQTx()
 	tx.PQSignatureType = types.PQSigTypeMLDSA
-	tx.PQPublicKey = make([]byte, 1568)
+	tx.PQPublicKey = make([]byte, types.DilithiumPubKeySize)
 	tx.PQSignature = nil
 	if err := v.ValidatePQSignatureReal(tx); err == nil {
 		t.Fatal("empty signature should be rejected")
@@ -230,7 +213,7 @@ func TestPQTxValidatorRealRecoverSender(t *testing.T) {
 	}
 	tx := newTestPQTx()
 	tx.PQPublicKey = kp.PublicKey
-	tx.PQSignature = make([]byte, 1376)
+	tx.PQSignature = make([]byte, types.DilithiumSigSize)
 	addr, err := v.RecoverPQSender(tx)
 	if err != nil {
 		t.Fatalf("recover: %v", err)
@@ -248,12 +231,12 @@ func TestPQTxValidatorRealRecoverSenderConsistency(t *testing.T) {
 
 	tx1 := newTestPQTx()
 	tx1.PQPublicKey = kp1.PublicKey
-	tx1.PQSignature = make([]byte, 1376)
+	tx1.PQSignature = make([]byte, types.DilithiumSigSize)
 
 	tx2 := newTestPQTx()
 	tx2.Nonce = 99
 	tx2.PQPublicKey = kp1.PublicKey
-	tx2.PQSignature = make([]byte, 1376)
+	tx2.PQSignature = make([]byte, types.DilithiumSigSize)
 
 	a1, _ := v.RecoverPQSender(tx1)
 	a2, _ := v.RecoverPQSender(tx2)
@@ -263,7 +246,7 @@ func TestPQTxValidatorRealRecoverSenderConsistency(t *testing.T) {
 
 	tx3 := newTestPQTx()
 	tx3.PQPublicKey = kp2.PublicKey
-	tx3.PQSignature = make([]byte, 1376)
+	tx3.PQSignature = make([]byte, types.DilithiumSigSize)
 	a3, _ := v.RecoverPQSender(tx3)
 	if a1 == a3 {
 		t.Fatal("different pubkeys must give different addresses")
@@ -290,7 +273,7 @@ func TestPQTxValidatorRealKeySize(t *testing.T) {
 		st uint8
 		sz int
 	}{
-		{types.PQSigTypeMLDSA, 1568},
+		{types.PQSigTypeMLDSA, types.DilithiumPubKeySize},
 		{types.PQSigTypeFalcon, 897},
 		{types.PQSigTypeSPHINCS, 32},
 	}
@@ -394,11 +377,12 @@ func TestPQTxValidatorRealBatchEmpty(t *testing.T) {
 
 func TestPQTxValidatorRealNoVerifier(t *testing.T) {
 	v := types.NewPQTxValidatorReal()
+	v.RegisterSigner(types.PQSigTypeMLDSA, nil)
 	tx := newTestPQTx()
 	tx.PQSignatureType = types.PQSigTypeMLDSA
-	tx.PQPublicKey = make([]byte, 1568)
+	tx.PQPublicKey = make([]byte, types.DilithiumPubKeySize)
 	tx.PQPublicKey[0] = 1
-	tx.PQSignature = make([]byte, 1376)
+	tx.PQSignature = make([]byte, types.DilithiumSigSize)
 	tx.PQSignature[0] = 1
 	if err := v.ValidatePQSignatureReal(tx); err == nil {
 		t.Fatal("nil verifier should error")
@@ -444,4 +428,42 @@ func TestPQTxValidatorRealGasOrdering(t *testing.T) {
 	if types.PQGasCostFalcon >= types.PQGasCostSPHINCS {
 		t.Fatal("Falcon < SPHINCS expected")
 	}
+}
+
+func TestPQValidatorSignerEntryIsIsolated(t *testing.T) {
+	v := types.NewPQTxValidatorReal()
+	v.RegisterSigner(types.PQSigTypeMLDSA, func(_, _, _ []byte) bool { return true })
+	entry, ok := v.GetSignerEntry(types.PQSigTypeMLDSA)
+	if !ok {
+		t.Fatal("missing signer")
+	}
+	entry.Verify = func(_, _, _ []byte) bool { return false }
+	tx := newTestPQTx()
+	tx.SignWithPQ(types.PQSigTypeMLDSA, make([]byte, types.DilithiumPubKeySize), make([]byte, types.DilithiumSigSize))
+	if err := v.ValidatePQSignatureReal(tx); err != nil {
+		t.Fatalf("mutating returned entry changed verifier: %v", err)
+	}
+	tx.ChainID = big.NewInt(-1)
+	if err := v.ValidatePQSignatureReal(tx); err != types.ErrPQRealVerifyFailed {
+		t.Fatalf("accepted unencodable signing message: %v", err)
+	}
+}
+
+func TestPQValidatorConcurrentRegistrationAndVerification(t *testing.T) {
+	v := types.NewPQTxValidatorReal()
+	tx := newTestPQTx()
+	tx.SignWithPQ(types.PQSigTypeMLDSA, make([]byte, types.DilithiumPubKeySize), make([]byte, types.DilithiumSigSize))
+	var wg sync.WaitGroup
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < 200; j++ {
+				v.RegisterSigner(types.PQSigTypeMLDSA, func(_, _, _ []byte) bool { return true })
+				_ = v.ValidatePQSignatureReal(tx)
+				_, _ = v.GetSignerEntry(types.PQSigTypeMLDSA)
+			}
+		}()
+	}
+	wg.Wait()
 }

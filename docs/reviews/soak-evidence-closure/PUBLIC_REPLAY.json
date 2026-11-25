@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": "Historical cryptographic replay only. The actual operating run failed; this is not48-hour admission.",
+  "actual48h_passed": false,
+  "samples": 763,
+  "independent_account_proofs": 154,
+  "original_signed_windows": 7,
+  "additional_signed_tail": true,
+  "cross_window_anchors": 6,
+  "failed_prefix_first": 64059,
+  "failed_prefix_through": 71906,
+  "original_operating_failure_retained": true
+}

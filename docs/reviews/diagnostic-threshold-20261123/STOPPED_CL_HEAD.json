@@ -1,0 +1,13 @@
+{
+  "source": "3782df1f88095997ffb4c91986a5f1c56bfa5bf2",
+  "compressed_sha256": "5701feade277006e8e4d9ff3bebcccbf4283ad5674790fd2d014871f1eb9513f",
+  "decompressed_sha256": "6aed6192422b8931fda26d0bc3619815028992013143b4655101a419a8b8161c",
+  "leaves": [
+    {
+      "index": 108,
+      "slot": 97868,
+      "root": "0x16f42c89f3dae07bf67b606f62d6379383db59a938cccfd97162320c3d34b04d",
+      "parent": 107
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # 校验、stub 与实验路径调用审计
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 HGT-008。审计覆盖本任务的 native node 初始化、Engine wire、processor/VM、pool、ePBS/FOCIL/PQ/BLS/KZG 校验入口和 unwired state backends。它不是整个仓库所有密码算法或 zkVM 的安全证明。实验模型可以保留，但实际入口不能把“没验证”包装为成功。
 
 | 路径 / 调用者 | 原风险 | 处置、反向证据与剩余职责 |

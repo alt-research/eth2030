@@ -1,0 +1,5 @@
+FROM ubuntu:24.04
+COPY eth2030 /usr/local/bin/eth2030
+COPY engine-capture /usr/local/bin/engine-capture
+COPY native-wrapper.sh /usr/local/bin/geth
+ENTRYPOINT ["eth2030"]

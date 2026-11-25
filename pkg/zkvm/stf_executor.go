@@ -9,12 +9,14 @@ package zkvm
 import (
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"sync"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 )
 
 // RealSTFExecutor errors.
@@ -174,15 +176,19 @@ func (re *RealSTFExecutor) ExecuteSTF(input *STFInput) (*RealSTFOutput, error) {
 		return nil, fmt.Errorf("%w: %v", ErrRealSTFExecFailed, err)
 	}
 
-	// Compute the expected post-state root using the same deterministic
-	// function as the base STF executor for compatibility.
-	computedPost := computePostStateRoot(input.PreStateRoot, input.Transactions, input.Witnesses)
+	// A registered STF program must actually return the claimed post-state
+	// root and gas in its proved output. Host-side hash scaffolds cannot stand
+	// in for an executed state transition. Format: root(32) || gas_used_le(8).
+	if len(guestOutput.Output) != 40 {
+		return nil, fmt.Errorf("%w: STF guest must output a 40-byte root/gas statement", ErrRealSTFExecFailed)
+	}
+	computedPost := types.BytesToHash(guestOutput.Output[:32])
 	valid := computedPost == input.PostStateRoot
 
 	output := &RealSTFOutput{
 		Valid:      valid,
 		PostRoot:   computedPost,
-		GasUsed:    computeGasUsed(input.Transactions),
+		GasUsed:    binary.LittleEndian.Uint64(guestOutput.Output[32:]),
 		CycleCount: guestOutput.Steps,
 	}
 
@@ -207,6 +213,14 @@ func (re *RealSTFExecutor) VerifySTFProof(output *RealSTFOutput) error {
 	}
 	if len(output.ProofData) == 0 {
 		return fmt.Errorf("%w: empty proof data", ErrRealSTFVerifyFailed)
+	}
+	claim, err := canonicalproof.DecodeProof(output.ProofData)
+	if err != nil {
+		return fmt.Errorf("%w: real execution receipt required", ErrRealSTFVerifyFailed)
+	}
+	statementOutput, err := hex.DecodeString(claim.Statement.Output)
+	if err != nil || len(statementOutput) != 40 || types.BytesToHash(statementOutput[:32]) != output.PostRoot || binary.LittleEndian.Uint64(statementOutput[32:]) != output.GasUsed || claim.Statement.Cycles != output.CycleCount || !output.Valid {
+		return ErrRealSTFVerifyFailed
 	}
 
 	re.mu.Lock()

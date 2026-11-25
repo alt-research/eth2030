@@ -121,6 +121,7 @@ func (it *diffStorageIterator) Release() {}
 // --- diskLayer account iterator ---
 
 type diskAccountIterator struct {
+	err    error
 	hashes []types.Hash
 	data   map[types.Hash][]byte
 	pos    int
@@ -153,6 +154,7 @@ func (it *diskAccountIterator) Release() {}
 // --- diskLayer storage iterator ---
 
 type diskStorageIterator struct {
+	err    error
 	hashes []types.Hash
 	data   map[types.Hash][]byte
 	pos    int
@@ -181,3 +183,6 @@ func (it *diskStorageIterator) Slot() []byte {
 }
 
 func (it *diskStorageIterator) Release() {}
+
+func (it *diskAccountIterator) Error() error { return it.err }
+func (it *diskStorageIterator) Error() error { return it.err }

@@ -1,5 +1,7 @@
 # 固定规范与组合
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 HGT-001。所有上游版本与 SHA-256 在 [source-lock.json](../../../specs/hegota/source-lock.json)。`refs/` 正文未修改；尚未合入的 8334/8341/8359/8367/8375/8483/8504 以研究时的 PR head 固定副本保存，不冒充已合并 EIP。本文以 2026-11-25 的证据为准，没有使用次日会议的可能结论。
 
 | 来源 | 固定版本 | 用途与相容性 |

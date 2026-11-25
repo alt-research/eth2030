@@ -1,7 +1,7 @@
 {
   "version": 1,
   "native_backend": "native/core/execution.ApplyTransaction",
-  "reference_backend": "upstream/go-ethereum@v1.17.1/tests.StateTest.RunNoVerify",
+  "reference_backend": "upstream/go-ethereum@v1.17.10/tests.StateTest.RunNoVerify",
   "expected": 12,
   "executed": 12,
   "passed": 12,

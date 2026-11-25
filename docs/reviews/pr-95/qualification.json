@@ -1,0 +1,30 @@
+{
+  "official_release": "ethereum/execution-specs tests@v21.0.2",
+  "official_archive_url": "https://github.com/ethereum/execution-specs/releases/download/tests%40v21.0.2/fixtures.tar.gz",
+  "official_archive_sha256": "e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9",
+  "independent_executor": "official EELS state/root/log oracle; no oracle patches",
+  "results": [
+    {
+      "native_revision": "654fbbd8cb286ac687437473e5fecb3a55df738c",
+      "native_dirty": false,
+      "executor": "eth2030-native-signed-state-transition",
+      "fork": "Osaka",
+      "passed": 14665,
+      "failed": 0,
+      "errors": [],
+      "report_sha256": "c5b62cf6a9d6c1149368021e8b54ea1da5f960a9c20aec183e528cfa21deb7b4",
+      "selected_cases": 14665
+    },
+    {
+      "native_revision": "654fbbd8cb286ac687437473e5fecb3a55df738c",
+      "native_dirty": false,
+      "executor": "eth2030-native-signed-state-transition",
+      "fork": "Amsterdam",
+      "passed": 16908,
+      "failed": 0,
+      "errors": [],
+      "report_sha256": "6a835bec5f925d1c3506059d72fde576e09717f2cd6b9b00cb3c2ea11e57ed69",
+      "selected_cases": 16908
+    }
+  ]
+}

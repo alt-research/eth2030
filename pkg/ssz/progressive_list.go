@@ -1,8 +1,10 @@
 package ssz
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/bits"
 )
 
 // EIP-7916: SSZ ProgressiveList
@@ -114,15 +116,15 @@ func (pl *ProgressiveList) GenerateProof(index int) ([][32]byte, uint64, error) 
 	// Mix in the length: the root is hash(merkle_root, length_chunk), so
 	// append the length chunk as the final sibling (for the length mix-in).
 	var lengthChunk [32]byte
-	lengthChunk[0] = byte(len(pl.chunks))
-	lengthChunk[1] = byte(len(pl.chunks) >> 8)
-	lengthChunk[2] = byte(len(pl.chunks) >> 16)
-	lengthChunk[3] = byte(len(pl.chunks) >> 24)
+	binary.LittleEndian.PutUint64(lengthChunk[:8], uint64(len(pl.chunks)))
+	// Insert the new root edge before the existing path. Multiplication by
+	// two appends an edge at the leaf and only works for an all-left path.
+	var err error
+	gindex, err = progressiveMixinGindex(gindex)
+	if err != nil || len(proof) >= 63 {
+		return nil, 0, ErrProgressiveProofDepth
+	}
 	proof = append(proof, lengthChunk)
-
-	// The gindex for the mix-in level: multiply by 2 (left child of the
-	// mix-in node, since length is the right child).
-	gindex = gindex * 2
 
 	return proof, gindex, nil
 }
@@ -217,6 +219,19 @@ func standardMerkleProof(chunks [][32]byte, limit int, target int, gindex uint64
 
 // --- Convenience functions for typed progressive lists ---
 
+// HashTreeRootProgressiveContainer implements EIP-7495. Field roots are
+// positioned by active-field index; inactive positions are zero chunks.
+// This is an unchecked hashing primitive. Use ProgressiveContainerSchema or
+// HashTreeRootProgressiveContainerChecked to validate a type layout.
+func HashTreeRootProgressiveContainer(fieldRoots [][32]byte, activeFields [32]byte) [32]byte {
+	return hash(merkleizeProgressive(fieldRoots, 1), activeFields)
+}
+
+// HashTreeRootCompatibleUnion mixes the EIP-8016 selector into its value root.
+func HashTreeRootCompatibleUnion(valueRoot [32]byte, selector uint8) [32]byte {
+	return hash(valueRoot, HashTreeRootUint8(selector))
+}
+
 // HashTreeRootProgressiveList computes the hash tree root of a progressive
 // list where each element is provided as its 32-byte hash tree root.
 func HashTreeRootProgressiveList(elementRoots [][32]byte) [32]byte {
@@ -228,7 +243,10 @@ func HashTreeRootProgressiveList(elementRoots [][32]byte) [32]byte {
 // progressive list of basic type elements. The serialized data is packed
 // into chunks, then progressive-Merkleized and mixed with length.
 func HashTreeRootProgressiveBasicList(serialized []byte, count int) [32]byte {
-	chunks := Pack(serialized)
+	var chunks [][32]byte
+	if len(serialized) != 0 {
+		chunks = Pack(serialized)
+	}
 	root := merkleizeProgressive(chunks, 1)
 	return MixInLength(root, uint64(count))
 }
@@ -244,4 +262,13 @@ func HashTreeRootProgressiveBitlist(bits []bool) [32]byte {
 	chunks := Pack(packed)
 	root := merkleizeProgressive(chunks, 1)
 	return MixInLength(root, uint64(len(bits)))
+}
+
+var ErrProgressiveProofDepth = errors.New("ssz: progressive proof gindex exceeds uint64")
+
+func progressiveMixinGindex(index uint64) (uint64, error) {
+	if index == 0 || bits.Len64(index) > 63 {
+		return 0, ErrProgressiveProofDepth
+	}
+	return index + (uint64(1) << uint(bits.Len64(index)-1)), nil
 }

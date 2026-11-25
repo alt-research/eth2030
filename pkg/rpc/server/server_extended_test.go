@@ -138,6 +138,7 @@ func TestExtServer_Handler_NotNil(t *testing.T) {
 func TestExtServer_Handler_ServesRequest(t *testing.T) {
 	cfg := DefaultServerConfig()
 	cfg.AuthSecret = "" // no auth required
+	cfg.AllowedModules = []string{"*"}
 	srv := NewExtServer(newStubHandler(), cfg)
 
 	ts := httptest.NewServer(srv.Handler())

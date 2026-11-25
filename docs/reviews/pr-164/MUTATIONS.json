@@ -1,0 +1,12 @@
+[
+  {
+    "mutation": "ignore-header-commitment",
+    "exit_code": 1,
+    "assertion_caught": true
+  },
+  {
+    "mutation": "stop-after-first-truncated-prefix",
+    "exit_code": 1,
+    "assertion_caught": true
+  }
+]

@@ -21,7 +21,7 @@ func newUint64(v uint64) *uint64 { return &v }
 // testChain creates a blockchain with a genesis block for use in tests.
 func testChain(t *testing.T) (*chain.Blockchain, *state.MemoryStateDB) {
 	t.Helper()
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesis(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -94,6 +94,7 @@ func makeValidParent() *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 
@@ -136,5 +137,6 @@ func makeValidChild(parent *types.Header) *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }

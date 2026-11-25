@@ -1,4 +1,4 @@
-// EIP-7932 Algorithm Registry: maps algorithm type IDs to post-quantum
+// Project PQ algorithm registry: maps local algorithm type IDs to post-quantum
 // verification functions, gas costs, and metadata. Provides a unified
 // dispatch interface for verifying PQ signatures across the Ethereum protocol
 // (transactions, attestations, withdrawals) with algorithm agility.
@@ -7,10 +7,12 @@ package pqc
 import (
 	"errors"
 	"fmt"
+	"github.com/cloudflare/circl/sign/mldsa/mldsa44"
+	"github.com/cloudflare/circl/sign/mldsa/mldsa87"
 	"sync"
 )
 
-// AlgorithmType identifies a post-quantum algorithm in the EIP-7932 registry.
+// AlgorithmType identifies a post-quantum algorithm in the local registry.
 type AlgorithmType uint8
 
 const (
@@ -40,7 +42,7 @@ type AlgorithmDescriptor struct {
 	VerifyFn   VerifyFunc
 }
 
-// PQ algorithm gas costs per EIP-8051.
+// Project-specific gas estimates. EIP-8051 does not specify this table.
 const (
 	GasCostMLDSA44   uint64 = 3500
 	GasCostMLDSA65   uint64 = 4500
@@ -186,7 +188,7 @@ func (r *PQAlgorithmRegistry) Size() int {
 // For PQ schemes this is generally not possible (unlike ECDSA), so this
 // returns the algorithm type and a best-effort extraction from the signature
 // if the scheme supports it, or an error otherwise.
-// Per EIP-7932 SIGRECOVER, lattice-based schemes do not support recovery;
+// These local lattice-based schemes do not support public-key recovery;
 // the public key must be transmitted alongside the signature.
 func (r *PQAlgorithmRegistry) RecoverPublicKey(algType AlgorithmType, msg, sig []byte) ([]byte, error) {
 	r.mu.RLock()
@@ -255,11 +257,10 @@ func ValidatePQSignature(algorithmID uint8, publicKey, message, signature []byte
 func (r *PQAlgorithmRegistry) registerDefaults() {
 	mldsa := NewMLDSASigner()
 
-	// ML-DSA-44 (security level 2) -- uses EnhancedDilithiumSigner with real lattice ops.
-	level2Signer := NewEnhancedDilithiumSigner(DefaultEnhancedDilithiumConfig(2))
-	r.RegisterAlgorithm(MLDSA44, "ML-DSA-44", 2420, 1312, GasCostMLDSA44,
+	r.RegisterAlgorithm(MLDSA44, "ML-DSA-44", mldsa44.SignatureSize, mldsa44.PublicKeySize, GasCostMLDSA44,
 		func(pubkey, msg, sig []byte) bool {
-			return verifyEnhancedDilithium(level2Signer, pubkey, msg, sig, 2420, 1312)
+			var key mldsa44.PublicKey
+			return key.UnmarshalBinary(pubkey) == nil && mldsa44.Verify(&key, msg, nil, sig)
 		},
 	)
 
@@ -270,11 +271,10 @@ func (r *PQAlgorithmRegistry) registerDefaults() {
 		},
 	)
 
-	// ML-DSA-87 (security level 5) -- uses EnhancedDilithiumSigner with real lattice ops.
-	level5Signer := NewEnhancedDilithiumSigner(DefaultEnhancedDilithiumConfig(5))
-	r.RegisterAlgorithm(MLDSA87, "ML-DSA-87", 4627, 2592, GasCostMLDSA87,
+	r.RegisterAlgorithm(MLDSA87, "ML-DSA-87", mldsa87.SignatureSize, mldsa87.PublicKeySize, GasCostMLDSA87,
 		func(pubkey, msg, sig []byte) bool {
-			return verifyEnhancedDilithium(level5Signer, pubkey, msg, sig, 4627, 2592)
+			var key mldsa87.PublicKey
+			return key.UnmarshalBinary(pubkey) == nil && mldsa87.Verify(&key, msg, nil, sig)
 		},
 	)
 
@@ -312,46 +312,4 @@ func (r *PQAlgorithmRegistry) ValidateGasCostsMatch(evmGasLookup EVMGasLookup) e
 		}
 	}
 	return nil
-}
-
-// verifyEnhancedDilithium uses the EnhancedDilithiumSigner for real lattice
-// verification. It generates a key pair, signs the message, and then verifies
-// using the signer's real lattice verification logic. For registry dispatch,
-// we verify by reconstructing the lattice computation from the public key.
-func verifyEnhancedDilithium(signer *EnhancedDilithiumSigner, pubkey, msg, sig []byte, sigSize, pkSize int) bool {
-	if len(sig) != sigSize || len(pubkey) != pkSize || len(msg) == 0 {
-		return false
-	}
-	// Deserialize the signature into an EnhancedDilithiumSig for verification.
-	cfg := signer.config
-	n := cfg.N
-	zLen := cfg.L * n
-	if len(sig) < zLen*4+cfg.K*n+32 {
-		return false
-	}
-	z := make([]int64, zLen)
-	for i := 0; i < zLen && i*4+4 <= len(sig); i++ {
-		z[i] = int64(int32(uint32(sig[i*4]) | uint32(sig[i*4+1])<<8 | uint32(sig[i*4+2])<<16 | uint32(sig[i*4+3])<<24))
-	}
-	zOff := zLen * 4
-	hintEnd := zOff + cfg.K*n
-	if hintEnd+32 > len(sig) {
-		// Signature too short for this level; fall back to size+content check.
-		for _, b := range sig[:32] {
-			if b != 0 {
-				return true
-			}
-		}
-		return false
-	}
-	enhSig := &EnhancedDilithiumSig{
-		Z:             z,
-		Hint:          sig[zOff:hintEnd],
-		ChallengeHash: sig[hintEnd : hintEnd+32],
-	}
-	ok, err := signer.Verify(pubkey, msg, enhSig)
-	if err != nil {
-		return false
-	}
-	return ok
 }

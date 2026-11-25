@@ -6,12 +6,45 @@ import (
 	"io"
 	"math/big"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/golang-jwt/jwt/v4"
 )
+
+func TestEngineJWTAuthentication(t *testing.T) {
+	api := NewEngineAPI(nil)
+	secret := [32]byte{1}
+	api.SetJWTSecret(secret)
+	now := time.Now()
+	for _, tc := range []struct {
+		name   string
+		issued time.Time
+		method jwt.SigningMethod
+		want   int
+	}{
+		{"valid", now, jwt.SigningMethodHS256, http.StatusMethodNotAllowed},
+		{"stale", now.Add(-2 * time.Minute), jwt.SigningMethodHS256, http.StatusUnauthorized},
+		{"other algorithm", now, jwt.SigningMethodHS384, http.StatusUnauthorized},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			token, err := jwt.NewWithClaims(tc.method, jwt.RegisteredClaims{IssuedAt: jwt.NewNumericDate(tc.issued)}).SignedString(secret[:])
+			if err != nil {
+				t.Fatal(err)
+			}
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			res := httptest.NewRecorder()
+			api.httpHandler(res, req)
+			if res.Code != tc.want {
+				t.Fatalf("HTTP %d, want %d", res.Code, tc.want)
+			}
+		})
+	}
+}
 
 // mockBackend is a test implementation of the Backend interface.
 type mockBackend struct {
@@ -24,8 +57,10 @@ type mockBackend struct {
 	getPayloadV4ByIDFn func(id PayloadID) (*GetPayloadV4Response, error)
 	getPayloadV6ByIDFn func(id PayloadID) (*GetPayloadV6Response, error)
 	headTimestamp      uint64
+	blockTimestampFn   func(types.Hash) uint64
 	isCancunFn         func(timestamp uint64) bool
 	isPragueFn         func(timestamp uint64) bool
+	isOsakaFn          func(timestamp uint64) bool
 	isAmsterdamFn      func(timestamp uint64) bool
 }
 
@@ -93,7 +128,10 @@ func (m *mockBackend) GetHeadTimestamp() uint64 {
 	return m.headTimestamp
 }
 
-func (m *mockBackend) GetBlockTimestamp(_ types.Hash) uint64 {
+func (m *mockBackend) GetBlockTimestamp(hash types.Hash) uint64 {
+	if m.blockTimestampFn != nil {
+		return m.blockTimestampFn(hash)
+	}
 	return 0
 }
 
@@ -107,6 +145,13 @@ func (m *mockBackend) IsCancun(timestamp uint64) bool {
 func (m *mockBackend) IsPrague(timestamp uint64) bool {
 	if m.isPragueFn != nil {
 		return m.isPragueFn(timestamp)
+	}
+	return true
+}
+
+func (m *mockBackend) IsOsaka(timestamp uint64) bool {
+	if m.isOsakaFn != nil {
+		return m.isOsakaFn(timestamp)
 	}
 	return true
 }
@@ -126,6 +171,7 @@ func (m *mockBackend) GetFinalizedHash() types.Hash { return types.Hash{} }
 func TestNewPayloadV3_Valid(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			if payload.BlockNumber != 100 {
 				t.Errorf("expected block number 100, got %d", payload.BlockNumber)
@@ -178,6 +224,7 @@ func TestNewPayloadV3_Valid(t *testing.T) {
 func TestNewPayloadV3_InvalidPayload(t *testing.T) {
 	errMsg := "block hash mismatch"
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{
 				Status:          StatusInvalid,
@@ -222,6 +269,7 @@ func TestNewPayloadV3_InvalidPayload(t *testing.T) {
 
 func TestNewPayloadV3_BackendError(t *testing.T) {
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{}, ErrInvalidParams
 		},
@@ -329,6 +377,7 @@ func TestForkchoiceUpdatedV3_WithoutAttributes(t *testing.T) {
 func TestForkchoiceUpdatedV3_WithAttributes(t *testing.T) {
 	expectedID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
 			if attrs == nil {
 				t.Fatal("expected non-nil payload attributes")
@@ -427,6 +476,7 @@ func TestForkchoiceUpdatedV3_InvalidState(t *testing.T) {
 func TestGetPayloadV3_Valid(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		getPayloadByIDFn: func(id PayloadID) (*GetPayloadResponse, error) {
 			if id != payloadID {
 				t.Errorf("unexpected payload ID")
@@ -782,6 +832,7 @@ func TestForkchoiceUpdatedV3_OnlyState(t *testing.T) {
 func TestNewPayloadV4_Valid(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef")
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		processBlockV4Fn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash, requests [][]byte) (PayloadStatusV1, error) {
 			latestValid := payload.BlockHash
 			return PayloadStatusV1{
@@ -798,7 +849,7 @@ func TestNewPayloadV4_Valid(t *testing.T) {
 	hashesJSON, _ := json.Marshal([]types.Hash{})
 	beaconRoot := types.HexToHash("0xbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeac")
 	rootJSON, _ := json.Marshal(beaconRoot)
-	requestsJSON, _ := json.Marshal([][]byte{{0x00, 0x01}, {0x01, 0x02}})
+	requestsJSON, _ := json.Marshal([]string{"0x0001", "0x0102"})
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_newPayloadV4","params":[%s,%s,%s,%s],"id":20}`,
 		payloadJSON, hashesJSON, rootJSON, requestsJSON)
@@ -939,5 +990,36 @@ func makeTestPayloadV3(blockHash types.Hash, blockNumber uint64) ExecutionPayloa
 		},
 		BlobGasUsed:   0,
 		ExcessBlobGas: 0,
+	}
+}
+
+func TestForkchoiceAppliesHeadBeforeRejectingAttributes(t *testing.T) {
+	head := types.Hash{1}
+	state := ForkchoiceStateV1{HeadBlockHash: head}
+	var applied types.Hash
+	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
+		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
+			if attrs != nil {
+				t.Fatal("invalid V3 attributes reached the payload builder")
+			}
+			applied = state.HeadBlockHash
+			return ForkchoiceUpdatedResult{PayloadStatus: PayloadStatusV1{Status: StatusValid}}, nil
+		},
+		forkchoiceUpdV4Fn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV4) (ForkchoiceUpdatedResult, error) {
+			if attrs != nil {
+				t.Fatal("unsupported V4 attributes reached the payload builder")
+			}
+			applied = state.HeadBlockHash
+			return ForkchoiceUpdatedResult{PayloadStatus: PayloadStatusV1{Status: StatusValid}}, nil
+		},
+	}
+	api := NewEngineAPI(backend)
+	if _, err := api.ForkchoiceUpdatedV3(state, new(PayloadAttributesV3)); err != ErrInvalidPayloadAttributes || applied != head {
+		t.Fatalf("V3 head %s, err %v", applied, err)
+	}
+	applied = types.Hash{}
+	if _, err := api.ForkchoiceUpdatedV4(state, new(PayloadAttributesV4)); err != ErrUnsupportedFork || applied != head {
+		t.Fatalf("V4 head %s, err %v", applied, err)
 	}
 }

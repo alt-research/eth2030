@@ -1,0 +1,22 @@
+{
+  "full_go_packages": 219,
+  "race_packages": 3,
+  "entrypoints": [
+    "cmd/eth2030",
+    "cmd/eth2030-geth"
+  ],
+  "old_failure_log": {
+    "path": "bind-address-original-failure.log",
+    "sha256": "f8bb26ee773bcd07937a8d17bf6bfb96e06f28559b127ac6ec9c9172ed6540c8"
+  },
+  "logs": {
+    "bind-address-full-go.log": {
+      "sha256": "42b5789eae905765465ab09208603f0d880b5c966ae258f31872e9a3153cdb93",
+      "successful_packages": 219
+    },
+    "bind-address-race.log": {
+      "sha256": "d3bf4cafafea02843b8b78b2c5799b66c17d4dc977192676910c23b9bf1a76b9",
+      "successful_packages": 3
+    }
+  }
+}

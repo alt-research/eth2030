@@ -15,6 +15,9 @@ import (
 func encodeTransactions(txs []*types.Transaction) (p2p.Msg, error) {
 	var payload []byte
 	for i, tx := range txs {
+		if _, ok := tx.Inner().(*types.FrameTx8141); ok && len(tx.BlobHashes()) > 0 {
+			return p2p.Msg{}, fmt.Errorf("blob-bearing Frame must be announced and requested")
+		}
 		txEnc, err := tx.EncodeRLP()
 		if err != nil {
 			return p2p.Msg{}, fmt.Errorf("encode tx %d: %w", i, err)
@@ -66,6 +69,9 @@ func decodeTransactions(msg p2p.Msg) ([]*types.Transaction, error) {
 		tx, err := types.DecodeTxRLP(txData)
 		if err != nil {
 			return nil, fmt.Errorf("decode tx: %w", err)
+		}
+		if _, ok := tx.Inner().(*types.FrameTx8141); ok && len(tx.BlobHashes()) > 0 {
+			return nil, fmt.Errorf("blob-bearing Frame is not allowed in Transactions messages")
 		}
 		txs = append(txs, tx)
 	}

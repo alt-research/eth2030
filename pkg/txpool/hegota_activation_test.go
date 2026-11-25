@@ -61,3 +61,21 @@ func TestFramePoolGateTracksBlockPrerequisites(t *testing.T) {
 		t.Fatal("retained transaction after prerequisite deactivation")
 	}
 }
+
+// The canonical 8141 envelope must bypass the frozen prototype's admission and
+// eviction gate even when both transaction types share the same type byte.
+func TestCanonicalFramesSurviveLegacyGateReset(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddLocal(tx); err != nil {
+		t.Fatal(err)
+	}
+	chain := *pool.frameConfig
+	for _, legacy := range []bool{false, true, false} {
+		chain.ExperimentalLegacyFrames = legacy
+		pool.ResetAtHead(db, &chain, 100, 1)
+		if pool.Get(tx.Hash()) == nil {
+			t.Fatalf("canonical Frame evicted with legacy opt-in=%t", legacy)
+		}
+	}
+}

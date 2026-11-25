@@ -2,11 +2,13 @@
 package rpctypes
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/big"
 	"strconv"
 
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -57,10 +59,26 @@ func (bn *BlockNumber) UnmarshalJSON(data []byte) error {
 
 // Request is a JSON-RPC 2.0 request.
 type Request struct {
+	ctx     context.Context
 	JSONRPC string            `json:"jsonrpc"`
 	Method  string            `json:"method"`
 	Params  []json.RawMessage `json:"params"`
 	ID      json.RawMessage   `json:"id"`
+}
+
+// Context returns local transport cancellation metadata, never a JSON-RPC field.
+func (r *Request) Context() context.Context {
+	if r.ctx != nil {
+		return r.ctx
+	}
+	return context.Background()
+}
+
+// WithContext returns a request copy with its own immutable transport context.
+func (r *Request) WithContext(ctx context.Context) *Request {
+	clone := *r
+	clone.ctx = ctx
+	return &clone
 }
 
 // Response is a JSON-RPC 2.0 response.
@@ -75,6 +93,7 @@ type Response struct {
 type RPCError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // Error implements the error interface.
@@ -127,6 +146,10 @@ type RPCBlock struct {
 	// that post-Shanghai empty blocks emit "withdrawals": [] instead of
 	// omitting the field entirely (which breaks EIP-4895 clients).
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
+
+	// Amsterdam header commitments.
+	SlotNumber          *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
 }
 
 // RPCAccessTuple is the JSON representation of an EIP-2930 access list entry.
@@ -172,10 +195,40 @@ type RPCTransaction struct {
 	MaxFeePerGas         *string `json:"maxFeePerGas,omitempty"`
 	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas,omitempty"`
 	// AccessList uses a pointer so a non-nil empty slice encodes as [] (not omitted).
-	AccessList          *[]RPCAccessTuple  `json:"accessList,omitempty"`
-	MaxFeePerBlobGas    *string            `json:"maxFeePerBlobGas,omitempty"`
-	BlobVersionedHashes []string           `json:"blobVersionedHashes,omitempty"`
-	AuthorizationList   []RPCAuthorization `json:"authorizationList,omitempty"`
+	AccessList          *[]RPCAccessTuple        `json:"accessList,omitempty"`
+	MaxFeePerBlobGas    *string                  `json:"maxFeePerBlobGas,omitempty"`
+	BlobVersionedHashes []string                 `json:"blobVersionedHashes,omitempty"`
+	AuthorizationList   []RPCAuthorization       `json:"authorizationList,omitempty"`
+	Sender              *string                  `json:"sender,omitempty"`
+	Frames              *[]RPCFrame8141          `json:"frames,omitempty"`
+	Signatures          *[]RPCFrameSignature8141 `json:"signatures,omitempty"`
+	Fees                *RPCFrameFees8141        `json:"fees,omitempty"`
+}
+
+type RPCFrame8141 struct {
+	Mode   string          `json:"mode"`
+	Flags  string          `json:"flags"`
+	Target *string         `json:"target"`
+	Limits RPCFrameGas8141 `json:"limits"`
+	Value  string          `json:"value"`
+	Data   string          `json:"data"`
+}
+
+type RPCFrameGas8141 struct {
+	Execution string `json:"execution"`
+	State     string `json:"state"`
+}
+
+type RPCFrameSignature8141 struct {
+	Scheme    string  `json:"scheme"`
+	Signer    *string `json:"signer"`
+	Message   string  `json:"msg"`
+	Signature string  `json:"signature"`
+}
+
+type RPCFrameFees8141 struct {
+	MaxFee               string `json:"maxFee"`
+	MaxPriorityFeePerGas string `json:"maxPriorityFeePerGas"`
 }
 
 // RPCReceipt is the JSON representation of a transaction receipt.
@@ -207,9 +260,10 @@ type RPCReceipt struct {
 
 // RPCFrameResult represents a single frame's execution result in a FrameTx receipt.
 type RPCFrameResult struct {
-	Status  string    `json:"status"`
-	GasUsed string    `json:"gasUsed"`
-	Logs    []*RPCLog `json:"logs,omitempty"`
+	Status       string    `json:"status"`
+	GasUsed      string    `json:"gasUsed"`
+	StateGasUsed *string   `json:"stateGasUsed,omitempty"`
+	Logs         []*RPCLog `json:"logs,omitempty"`
 }
 
 // RPCLog is the JSON representation of a contract log event.
@@ -229,13 +283,21 @@ type RPCLog struct {
 
 // CallArgs represents the arguments for eth_call and eth_estimateGas.
 type CallArgs struct {
-	From     *string `json:"from"`
-	To       *string `json:"to"`
-	Gas      *string `json:"gas"`
-	GasPrice *string `json:"gasPrice"`
-	Value    *string `json:"value"`
-	Data     *string `json:"data"`
-	Input    *string `json:"input"`
+	Type                 *string            `json:"type,omitempty"`
+	MaxFeePerBlobGas     *string            `json:"maxFeePerBlobGas,omitempty"`
+	BlobVersionedHashes  []string           `json:"blobVersionedHashes,omitempty"`
+	MaxFeePerGas         *string            `json:"maxFeePerGas,omitempty"`
+	MaxPriorityFeePerGas *string            `json:"maxPriorityFeePerGas,omitempty"`
+	AuthorizationList    []RPCAuthorization `json:"authorizationList,omitempty"`
+	AccessList           []RPCAccessTuple   `json:"accessList,omitempty"`
+	Nonce                *string            `json:"nonce,omitempty"`
+	From                 *string            `json:"from"`
+	To                   *string            `json:"to"`
+	Gas                  *string            `json:"gas"`
+	GasPrice             *string            `json:"gasPrice"`
+	Value                *string            `json:"value"`
+	Data                 *string            `json:"data"`
+	Input                *string            `json:"input"`
 }
 
 // GetData returns the call input data, preferring "input" over "data".
@@ -287,6 +349,10 @@ type RPCBlockWithTxs struct {
 	// Withdrawals is nil for pre-Shanghai blocks and a (possibly empty) slice
 	// for post-Shanghai blocks (see RPCBlock.Withdrawals).
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
+
+	// Amsterdam header commitments.
+	SlotNumber          *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
 }
 
 // RPCWithdrawal is the JSON representation of a beacon-chain withdrawal.
@@ -447,7 +513,7 @@ func FormatAuthorizationList(auths []types.Authorization) []RPCAuthorization {
 
 // FormatBlock converts a block to its JSON-RPC representation.
 // If fullTx is true, returns full transaction objects; otherwise returns tx hashes.
-func FormatBlock(block *types.Block, fullTx bool) interface{} {
+func FormatBlock(block *types.Block, fullTx bool, blobFees ...*big.Int) interface{} {
 	header := block.Header()
 	if !fullTx {
 		rb := FormatHeader(header)
@@ -523,6 +589,14 @@ func FormatBlock(block *types.Block, fullTx bool) interface{} {
 		s := EncodeHash(*header.RequestsHash)
 		result.RequestsHash = &s
 	}
+	if header.SlotNumber != nil {
+		slot := EncodeUint64(*header.SlotNumber)
+		result.SlotNumber = &slot
+	}
+	if header.BlockAccessListHash != nil {
+		hash := EncodeHash(*header.BlockAccessListHash)
+		result.BlockAccessListHash = &hash
+	}
 
 	txs := block.Transactions()
 	result.Transactions = make([]*RPCTransaction, len(txs))
@@ -531,7 +605,11 @@ func FormatBlock(block *types.Block, fullTx bool) interface{} {
 	blockTS := header.Time
 	for i, tx := range txs {
 		idx := uint64(i)
-		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee)
+		blobFee := BlobBaseFeeForHeader(header)
+		if len(blobFees) > 0 && blobFees[0] != nil {
+			blobFee = blobFees[0]
+		}
+		result.Transactions[i] = FormatTransaction(tx, &blockHash, &blockNum, &idx, blockTS, header.BaseFee, blobFee)
 	}
 
 	// Withdrawals: always present (even empty) for post-Shanghai blocks.
@@ -603,6 +681,14 @@ func FormatHeader(h *types.Header) *RPCBlock {
 		s := EncodeHash(*h.RequestsHash)
 		block.RequestsHash = &s
 	}
+	if h.SlotNumber != nil {
+		slot := EncodeUint64(*h.SlotNumber)
+		block.SlotNumber = &slot
+	}
+	if h.BlockAccessListHash != nil {
+		hash := EncodeHash(*h.BlockAccessListHash)
+		block.BlockAccessListHash = &hash
+	}
 	return block
 }
 
@@ -610,7 +696,7 @@ func FormatHeader(h *types.Header) *RPCBlock {
 // blockTimestamp is the timestamp of the containing block (0 if unknown/pending).
 // baseFee is the block base fee per gas; used to compute the effective gasPrice
 // for EIP-1559 txs (type ≥ 2). Pass nil for pending txs or pre-London blocks.
-func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber *uint64, index *uint64, blockTimestamp uint64, baseFee *big.Int) *RPCTransaction {
+func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber *uint64, index *uint64, blockTimestamp uint64, baseFee *big.Int, blobFees ...*big.Int) *RPCTransaction {
 	// For EIP-1559+ txs, effective gasPrice = min(feeCap, baseFee + tip).
 	gasPrice := tx.GasPrice()
 	txType := tx.Type()
@@ -720,6 +806,45 @@ func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber
 		}
 	}
 
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		rpcTx.From = EncodeAddress(frame.Sender)
+		sender := rpcTx.From
+		rpcTx.Sender = &sender
+		rpcTx.MaxFeePerGas = nil
+		rpcTx.AccessList = nil
+		frames := make([]RPCFrame8141, len(frame.Frames))
+		for i, f := range frame.Frames {
+			var target *string
+			if f.Target != nil {
+				address := EncodeAddress(*f.Target)
+				target = &address
+			}
+			frames[i] = RPCFrame8141{Mode: EncodeUint64(uint64(f.Mode)), Flags: EncodeUint64(uint64(f.Flags)), Target: target,
+				Limits: RPCFrameGas8141{Execution: EncodeUint64(f.Limits.Execution), State: EncodeUint64(f.Limits.State)}, Value: EncodeBigInt(f.Value), Data: EncodeBytes(f.Data)}
+		}
+		signatures := make([]RPCFrameSignature8141, len(frame.Signatures))
+		for i, sig := range frame.Signatures {
+			var signer *string
+			if sig.Signer != nil {
+				address := EncodeAddress(*sig.Signer)
+				signer = &address
+			}
+			signatures[i] = RPCFrameSignature8141{Scheme: EncodeUint64(uint64(sig.Scheme)), Signer: signer, Message: EncodeBytes(sig.Message), Signature: EncodeBytes(sig.Signature)}
+		}
+		rpcTx.Frames, rpcTx.Signatures = &frames, &signatures
+		rpcTx.Fees = &RPCFrameFees8141{MaxFee: EncodeBigInt(frame.Fees.MaxFee), MaxPriorityFeePerGas: EncodeBigInt(frame.Fees.MaxPriorityFeePerGas)}
+		rpcTx.BlobVersionedHashes = make([]string, len(frame.BlobVersionedHashes))
+		for i, hash := range frame.BlobVersionedHashes {
+			rpcTx.BlobVersionedHashes[i] = EncodeHash(hash)
+		}
+		blobFee := big.NewInt(1)
+		if len(blobFees) > 0 && blobFees[0] != nil {
+			blobFee = blobFees[0]
+		}
+		if payment, err := frame.Payment(baseFee, blobFee); err == nil {
+			rpcTx.GasPrice = EncodeBigInt(payment.GasPrice())
+		}
+	}
 	// EIP-7702: authorization list (type 4).
 	if txType == types.SetCodeTxType {
 		rpcTx.AuthorizationList = FormatAuthorizationList(tx.AuthorizationList())
@@ -793,14 +918,35 @@ func FormatReceipt(receipt *types.Receipt, tx *types.Transaction, blockTimestamp
 		rpcReceipt.BlobGasPrice = &bgp
 	}
 
-	// EIP-8141 Frame transaction fields (type 0x06).
-	// For FrameTx, ContractAddress is repurposed to hold the payer address.
-	if receipt.Type == types.FrameTxType && !receipt.ContractAddress.IsZero() {
-		payer := EncodeAddress(receipt.ContractAddress)
-		rpcReceipt.Payer = &payer
-		// Note: FrameResults are not stored in the standard Receipt.
-		// To populate FrameResults, the caller would need to provide
-		// the original FrameTxReceipt separately.
+	if receipt.Type == types.FrameTxType {
+		switch {
+		case receipt.FrameResults8141 != nil:
+			payer := EncodeAddress(receipt.Payer)
+			rpcReceipt.Payer = &payer
+			frames := make([]RPCFrameResult, 0, len(receipt.FrameResults8141))
+			logIndex := 0
+			for _, result := range receipt.FrameResults8141 {
+				stateGas := EncodeUint64(result.GasUsed.State)
+				frame := RPCFrameResult{
+					Status:       EncodeUint64(result.Status),
+					GasUsed:      EncodeUint64(result.GasUsed.Execution),
+					StateGasUsed: &stateGas,
+				}
+				for _, log := range result.Logs {
+					if logIndex < len(rpcReceipt.Logs) && receipt.Logs[logIndex] == log {
+						frame.Logs = append(frame.Logs, rpcReceipt.Logs[logIndex])
+					} else {
+						frame.Logs = append(frame.Logs, FormatLog(log))
+					}
+					logIndex++
+				}
+				frames = append(frames, frame)
+			}
+			rpcReceipt.FrameResults = &frames
+		case !receipt.ContractAddress.IsZero():
+			payer := EncodeAddress(receipt.ContractAddress)
+			rpcReceipt.Payer = &payer
+		}
 	}
 
 	return rpcReceipt
@@ -851,4 +997,23 @@ func FormatLog(log *types.Log) *RPCLog {
 		rpcLog.BlockTimestamp = &ts
 	}
 	return rpcLog
+}
+
+// BlobBaseFeeForHeader supplies the block context for Frame's total fee budget.
+func BlobBaseFeeForHeader(header *types.Header) *big.Int {
+	if header != nil && header.ExcessBlobGas != nil {
+		return gas.CalcBlobBaseFee(*header.ExcessBlobGas)
+	}
+	return big.NewInt(1)
+}
+
+// StateOverride contains isolated account substitutions for call methods.
+type StateOverride map[string]AccountOverride
+type AccountOverride struct {
+	MovePrecompileToAddress *string           `json:"movePrecompileToAddress,omitempty"`
+	Balance                 *string           `json:"balance,omitempty"`
+	Nonce                   *string           `json:"nonce,omitempty"`
+	Code                    *string           `json:"code,omitempty"`
+	State                   map[string]string `json:"state,omitempty"`
+	StateDiff               map[string]string `json:"stateDiff,omitempty"`
 }

@@ -1,6 +1,7 @@
 package node
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -11,7 +12,7 @@ import (
 	"math/big"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // register pprof handlers on DefaultServeMux
+	"net/http/pprof"
 	"os"
 	"strings"
 	"sync"
@@ -20,6 +21,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
+	"github.com/eth2030/eth2030/consensus"
 	"github.com/eth2030/eth2030/consensus/vdf"
 	"github.com/eth2030/eth2030/core/chain"
 	coreconfig "github.com/eth2030/eth2030/core/config"
@@ -37,6 +39,7 @@ import (
 	dasvalidator "github.com/eth2030/eth2030/das/validator"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/eth"
+	"github.com/eth2030/eth2030/focil"
 	"github.com/eth2030/eth2030/light"
 	"github.com/eth2030/eth2030/metrics"
 	nodebackend "github.com/eth2030/eth2030/node/backend"
@@ -46,7 +49,6 @@ import (
 	"github.com/eth2030/eth2030/rpc"
 	gasrpc "github.com/eth2030/eth2030/rpc/gas"
 	rpcmiddleware "github.com/eth2030/eth2030/rpc/middleware"
-	ethsync "github.com/eth2030/eth2030/sync"
 	syncbeam "github.com/eth2030/eth2030/sync/beam"
 	synccheckpoint "github.com/eth2030/eth2030/sync/checkpoint"
 	syncchecksync "github.com/eth2030/eth2030/sync/checksync"
@@ -57,10 +59,10 @@ import (
 	"github.com/eth2030/eth2030/txpool/encrypted"
 	txjournal "github.com/eth2030/eth2030/txpool/journal"
 	"github.com/eth2030/eth2030/txpool/tracking"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 
 	execpkg "github.com/eth2030/eth2030/core/execution"
 
-	epbsauction "github.com/eth2030/eth2030/epbs/auction"
 	epbsbid "github.com/eth2030/eth2030/epbs/bid"
 	epbsbuilder "github.com/eth2030/eth2030/epbs/builder"
 	epbscommit "github.com/eth2030/eth2030/epbs/commit"
@@ -93,16 +95,22 @@ import (
 	p2preqresp "github.com/eth2030/eth2030/p2p/reqresp"
 	p2psnap "github.com/eth2030/eth2030/p2p/snap"
 	syncbeacon "github.com/eth2030/eth2030/sync/beacon"
-	synchealer "github.com/eth2030/eth2030/sync/healer"
-	syncstatesync "github.com/eth2030/eth2030/sync/statesync"
 	"github.com/eth2030/eth2030/trie/migrate"
 	"github.com/eth2030/eth2030/trie/mpt"
 	"github.com/eth2030/eth2030/txpool/shared"
 )
 
 // Node is the top-level ETH2030 node that manages all subsystems.
+var ErrNodeStopped = errors.New("node is stopped; create a new instance to retry")
+
 type Node struct {
-	config *Config
+	canonicalProver *canonicalproof.Service
+	config          *Config
+	closed          bool
+	listeners       []net.Listener
+	background      sync.WaitGroup
+	lifecycleCtx    context.Context
+	lifecycleCancel context.CancelFunc
 
 	// Subsystems.
 	db            rawdb.Database
@@ -110,6 +118,7 @@ type Node struct {
 	txPool        *txpool.TxPool
 	rpcServer     *rpc.ExtServer
 	rpcHandler    *rpc.Server
+	wsRPCServer   *rpc.Server
 	engineServer  *engine.EngineAPI
 	engBackend    *nodebackend.EngineBackend // processor goroutine owner; closed on Stop
 	p2pServer     *p2p.Server
@@ -120,7 +129,6 @@ type Node struct {
 	ethHandler *eth.Handler
 
 	// Sync engine for downloading blocks from peers.
-	syncer *ethsync.Downloader
 
 	// Gas oracle for EIP-1559-aware gas price suggestions.
 	gasOracle *gasrpc.GasOracle
@@ -177,7 +185,6 @@ type Node struct {
 
 	// ePBS sub-systems (EIP-7732): auction, bid scoring, builder market,
 	// commitment chain, escrow, MEV burn tracker, and slashing.
-	epbsAuction  *epbsauction.AuctionEngine
 	epbsBid      *epbsbid.BidScoreCalculator
 	epbsBuilder  *epbsbuilder.BuilderMarket
 	epbsCommit   *epbscommit.CommitmentChain
@@ -214,10 +221,6 @@ type Node struct {
 	// Tx pool shared mempool abstraction.
 	sharedPool *shared.SharedMempool
 
-	// Snap sync: state healer and state sync scheduler.
-	stateHealer    *synchealer.StateHealer
-	stateSyncSched *syncstatesync.StateSyncScheduler
-
 	// Portal network content DB and DHT router.
 	portalDB     *p2pportal.ContentDB
 	portalRouter *p2pportal.DHTRouter
@@ -230,8 +233,13 @@ type Node struct {
 	discV5 *discv5.DiscV5
 
 	// Beacon sync manager and blob recovery.
-	beaconSyncer *syncbeacon.BeaconSyncer
-	blobSyncMgr  *syncbeacon.BlobSyncManager
+	executionSync   *syncbeacon.ExecutionSyncer
+	historyCancel   context.CancelFunc
+	historyDone     chan struct{}
+	nativeConsensus *consensus.NodeRuntime
+	nativePeers     *nativeConsensusPeers
+	nativeObserveMu sync.Mutex
+	blobSyncMgr     *syncbeacon.BlobSyncManager
 
 	// Engine payload chunker (streaming large payloads to CL).
 	payloadChunker *enginechunking.PayloadChunker
@@ -251,6 +259,8 @@ type Node struct {
 
 	// EP-3: STARK mempool P2P subsystem.
 	topicMgr         *p2p.TopicManager
+	focilILs         *focil.ILStore
+	focilGossip      *focil.GossipValidator
 	starkAgg         *txpool.STARKAggregator
 	starkFrameProver proofs.ValidationFrameProver // non-nil when StarkValidationFrames=true
 	currentSlot      atomic.Uint64                // updated on each FCU; used for peer-tick TTL eviction
@@ -263,12 +273,23 @@ type Node struct {
 // New creates a new Node with the given configuration. It initializes
 // all subsystems but does not start any network services.
 func New(config *Config) (*Node, error) {
+	return newWithDatabase(config, func(directory string) (rawdb.Database, error) {
+		return rawdb.NewFileDB(directory)
+	})
+}
+
+// newWithDatabase keeps diagnostic storage injection local to one constructor.
+// Normal nodes always use New's unchanged FileDB opener.
+func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) (*Node, error) {
 	if config == nil {
 		c := DefaultConfig()
 		config = &c
 	}
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
+	}
+	if config.StarkValidationFrames {
+		return nil, proofs.ErrFrameProofUnavailable
 	}
 
 	// Use canonical hash-to-curve and subgroup-checked pairing in normal builds.
@@ -282,12 +303,11 @@ func New(config *Config) (*Node, error) {
 
 	// Initialize KZG backend for EIP-4844 blobs and EIP-7594 PeerDAS cell proofs.
 	// This is required for computing cell proofs in BlobsBundleV2 (Fulu+).
-	if kzgBackend, err := bls.NewGoEthKZGBackend(); err != nil {
-		return nil, fmt.Errorf("initialize mandatory KZG backend: %w", err)
-	} else {
-		bls.SetKZGBackend(kzgBackend)
-		slog.Info("KZG backend initialized", "backend", kzgBackend.Name())
+	kzgBackend, err := bls.NewGoEthKZGBackend()
+	if err != nil {
+		return nil, fmt.Errorf("initialize Ethereum KZG backend: %w", err)
 	}
+	slog.Info("KZG backend initialized", "backend", kzgBackend.Name())
 
 	// GAP-5.2: log finality mode selection.
 	slog.Info("finality mode", "mode", config.FinalityMode)
@@ -302,12 +322,20 @@ func New(config *Config) (*Node, error) {
 		stop:   make(chan struct{}),
 	}
 
+	n.lifecycleCtx, n.lifecycleCancel = context.WithCancel(context.Background())
+
 	// Initialize persistent database.
-	db, err := rawdb.NewFileDB(config.ResolvePath("chaindata"))
+	db, err := open(config.ResolvePath("chaindata"))
 	if err != nil {
 		return nil, fmt.Errorf("init database: %w", err)
 	}
 	n.db = db
+	initialized := false
+	defer func() {
+		if !initialized {
+			_ = n.Stop()
+		}
+	}()
 
 	// Initialize genesis state before resolving the genesis block so that
 	// SetupGenesisBlock can populate alloc accounts into it.
@@ -332,10 +360,18 @@ func New(config *Config) (*Node, error) {
 			config.NetworkID = genSpec.Config.ChainID.Uint64()
 		}
 	} else {
-		chainConfig = chainConfigForNetwork(config.Network)
+		resolved := *chainConfigForNetwork(config.Network)
+		chainConfig = &resolved
 		// Apply any fork overrides on top of the standard chain config.
 		applyForkOverrides(chainConfig, config)
+		if err := chainConfig.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid network fork schedule: %w", err)
+		}
 		genesis = makeGenesisBlock()
+	}
+	// Check persisted authority before NewBlockchain can replay or adopt history.
+	if err := checkPersistedChainConfig(n.db, chainConfig); err != nil {
+		return nil, fmt.Errorf("chain configuration recovery: %w", err)
 	}
 
 	// Use a TrieStateDB backed by a fast in-memory store when a block DB is
@@ -375,12 +411,22 @@ func New(config *Config) (*Node, error) {
 			return nil, fmt.Errorf("commit genesis state: %w", err)
 		}
 	}
+	if err := bc.RestoreSnapPivot(); err != nil {
+		return nil, fmt.Errorf("restore snap pivot: %w", err)
+	}
 	n.blockchain = bc
+	if err := writePersistedChainConfig(n.db, chainConfig); err != nil {
+		return nil, err
+	}
+	if err := n.initNativeConsensus(); err != nil {
+		return nil, fmt.Errorf("init native consensus: %w", err)
+	}
 
 	// Wire the ancient store (freezer) for finalized block cold storage.
 	// Only opened when a persistent data directory is configured, because the
 	// freezer writes append-only flat files that require a real filesystem.
-	if config.DataDir != "" {
+	// The experimental overlay restores state from live block bodies on startup.
+	if config.DataDir != "" && (chainConfig == nil || chainConfig.BinaryOverlayTime == nil) {
 		as, err := rawdb.NewAncientStore(rawdb.AncientStoreConfig{
 			DataDir: config.ResolvePath("ancient"),
 		})
@@ -462,6 +508,7 @@ func New(config *Config) (*Node, error) {
 			poolCfg.HeadNumber = head.NumberU64()
 			poolCfg.BlockGasLimit = head.Header().GasLimit
 		}
+		poolCfg.IsOsaka = chainCfg.IsOsaka(poolCfg.HeadTime)
 		poolCfg.IsPrague = chainCfg.IsPrague(poolCfg.HeadTime)
 		poolCfg.IsGlamsterdan = chainCfg.IsGlamsterdan(poolCfg.HeadTime)
 	}
@@ -470,6 +517,10 @@ func New(config *Config) (*Node, error) {
 		poolCfg.PriceHistoryBlocks = config.TxpoolPriceHistory
 	}
 	n.txPool = txpool.New(poolCfg, bc.State())
+	n.txPool.RecordBlock(bc.CurrentBlock().Header(), bc.CurrentBlock().Transactions())
+	if bc.Config() != nil {
+		n.txPool.SetForkRules(bc.Config(), bc.CurrentBlock().Time())
+	}
 
 	// Initialize tx journal for pending tx persistence across restarts.
 	// Journal replay must happen after n.txPool is initialized.
@@ -507,8 +558,34 @@ func New(config *Config) (*Node, error) {
 		slog.Warn("stark mempool tick subscribe failed", "err", err)
 	}
 
+	// EIP-7805 FOCIL: subscribe the inclusion_list gossip topic. Received
+	// signed ILs go through the spec CL P2P validation rules before entering
+	// the node's IL store. The EL-side context cannot hold the beacon
+	// committee, so rules 2 and 5 and the public-key lookup are resolved by
+	// the injectable hooks when a committee source is configured; slot and
+	// size caps plus the anti-equivocation store always apply.
+	n.focilILs = focil.NewILStore()
+	n.focilGossip = focil.NewGossipValidator(n.focilILs, &focil.GossipContext{
+		CurrentSlot: func() uint64 { return n.currentSlot.Load() },
+	})
+	if err := n.topicMgr.Subscribe(p2p.InclusionList, func(_ p2p.GossipTopic, _ p2p.MessageID, data []byte) {
+		var signed focil.SignedInclusionList
+		if err := signed.UnmarshalBinary(data); err != nil {
+			slog.Debug("inclusion list gossip decode error", "err", err)
+			return
+		}
+		if _, err := n.focilGossip.Validate(&signed); err != nil {
+			slog.Debug("inclusion list gossip rejected", "err", err)
+			return
+		}
+	}); err != nil {
+		slog.Warn("inclusion list gossip subscribe failed", "err", err)
+	}
+
 	// EP-3 US-PQ-6: compile AA proof circuit on startup (non-fatal; logs result).
+	n.background.Add(1)
 	go func() {
+		defer n.background.Done()
 		// Check for shutdown before expensive compile operation.
 		select {
 		case <-n.stop:
@@ -516,7 +593,7 @@ func New(config *Config) (*Node, error) {
 		default:
 		}
 
-		circuit, err := proofs.CompileAACircuit()
+		circuit, err := proofs.CompileAACircuitGnark()
 		if err != nil {
 			slog.Warn("AA circuit compile failed", "err", err)
 			return
@@ -529,18 +606,13 @@ func New(config *Config) (*Node, error) {
 		default:
 		}
 
-		_, _, err = proofs.SetupKeys(circuit)
+		_, err = proofs.SetupGnarkAAKeys(circuit)
 		if err != nil {
 			slog.Warn("AA circuit key setup failed", "err", err)
 			return
 		}
-		slog.Info("AA proof circuit ready", "name", circuit.Name, "inputs", circuit.PublicInputCount)
+		slog.Info("AA proof circuit ready", "constraints", circuit.ConstraintCount())
 	}()
-
-	// Create STARK validation frame prover when enabled.
-	if config.StarkValidationFrames {
-		n.starkFrameProver = proofs.NewSTARKValidationFrameProver()
-	}
 
 	// Log EP-3 configuration.
 	slog.Info("EP-3 post-quantum config",
@@ -558,35 +630,40 @@ func New(config *Config) (*Node, error) {
 	}
 	if snapDB, ok := n.db.(snapshot.SnapshotDB); ok {
 		n.snapshotTree = snapshot.NewTree(snapDB, genesisRoot)
-		n.snapHandler = p2psnap.NewServerHandler(newSnapStateBackend(n.snapshotTree, n.db))
+		n.snapHandler = p2psnap.NewServerHandler(newSnapStateBackend(bc, n.db))
 	} else {
-		n.snapHandler = p2psnap.NewServerHandler(&stubSnapStateBackend{})
+		n.snapHandler = p2psnap.NewServerHandler(newSnapStateBackend(bc, n.db))
 	}
 
-	// Initialize ETH/68 protocol handler for block and transaction exchange.
+	// Initialize negotiated ETH/68-71 block and transaction exchange.
 	n.ethHandler = eth.NewHandler(bc, n.txPool, config.NetworkID)
+	n.ethHandler.SetForkchoiceControlled(true)
 
-	// Initialize sync downloader and wire it with the eth handler.
-	n.syncer = ethsync.NewDownloader(nil) // nil uses DefaultDownloaderConfig
-	fetcher := eth.NewPeerFetcher(bc)
-	n.syncer.SetFetchers(fetcher, fetcher, bc)
-	// Wire the sync notifier so new block announcements trigger sync.
-	n.ethHandler.SetSyncNotifier(&nodeSyncTrigger{dl: n.syncer})
-	n.ethHandler.SetDownloader(n.syncer)
 	// Reset the tx pool after P2P block insertion to evict confirmed txs.
 	n.ethHandler.SetOnBlockInserted(func() {
-		n.resetTxPoolAtHead()
+		n.ethHandler.NotifyBlockRange()
+		n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
+		n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 	})
 
 	// Initialize P2P server with bootnodes, discovery port, and NAT.
 	// Register the ETH protocol so peers can exchange blocks and transactions.
+	nodeKey, err := loadNodeKey(config.ResolvePath("nodekey"))
+	if err != nil {
+		return nil, fmt.Errorf("node identity: %w", err)
+	}
 	p2pCfg := p2p.Config{
+		EnableRLPx:     true,
+		RLPxPrivateKey: nodeKey,
 		ListenAddr:     config.P2PAddr(),
 		MaxPeers:       config.MaxPeers,
 		BootstrapNodes: config.Bootnodes,
 		DiscoveryPort:  config.EffectiveDiscoveryPort(),
 		NAT:            config.NAT,
-		Protocols:      []p2p.Protocol{n.ethHandler.Protocol(), n.snapHandler.Protocol()},
+		Protocols:      append(n.ethHandler.Protocols(), n.snapHandler.Protocols()...),
+	}
+	if n.nativeConsensus != nil {
+		p2pCfg.Protocols = append(p2pCfg.Protocols, n.nativeProtocol())
 	}
 	// Resolve external IP from --nat=extip:<ip> so NodeInfo enode is reachable.
 	if strings.HasPrefix(config.NAT, "extip:") {
@@ -637,12 +714,23 @@ func New(config *Config) (*Node, error) {
 	}
 
 	// Initialize RPC server with blockchain backend.
+	n.canonicalProver = canonicalproof.NewService(n.lifecycleCtx, canonicalproof.Prover{})
 	rpcBackend := nodebackend.NewRPCBackend(toNodeDeps(n), n.engBackend)
 	adminBackend := nodebackend.NewAdminBackend(toNodeDeps(n))
 	netBackend := nodebackend.NewNetBackend(toNodeDeps(n))
 	n.rpcHandler = rpc.NewServer(rpcBackend)
 	n.rpcHandler.SetAdminBackend(adminBackend)
 	n.rpcHandler.SetNetBackend(netBackend)
+	// This handler backs the Engine API's non-engine_ fallback (JWT-gated on
+	// 8551); scope it to the public HTTP namespaces rather than --ws.api.
+	n.rpcHandler.SetAllowedModules(config.HTTPModules)
+
+	// Dedicated plain handler for the WebSocket path, scoped to --ws.api so
+	// WebSocket cannot serve namespaces that were not explicitly enabled.
+	n.wsRPCServer = rpc.NewServer(rpcBackend)
+	n.wsRPCServer.SetAdminBackend(adminBackend)
+	n.wsRPCServer.SetNetBackend(netBackend)
+	n.wsRPCServer.SetAllowedModules(config.WSModules)
 	n.rpcServer = rpc.NewExtServer(rpcBackend, rpc.ServerConfig{
 		MaxRequestSize:   config.RPCMaxRequestSize,
 		ReadTimeout:      30 * time.Second,
@@ -653,6 +741,8 @@ func New(config *Config) (*Node, error) {
 		AuthSecret:       config.RPCAuthSecret,
 		RateLimitPerSec:  config.RPCRateLimitPerSec,
 		MaxBatchSize:     config.RPCMaxBatchSize,
+		AllowedModules:   config.HTTPModules,
+		AllowedVhosts:    config.HTTPVhosts,
 	})
 	n.rpcServer.SetAdminBackend(adminBackend)
 	n.rpcServer.SetNetBackend(netBackend)
@@ -691,7 +781,6 @@ func New(config *Config) (*Node, error) {
 
 	// Initialize ePBS sub-systems (EIP-7732): auction, bid scoring, builder market,
 	// commitment chain, bid escrow, MEV burn tracker, and slashing engine.
-	n.epbsAuction = epbsauction.NewAuctionEngine(epbsauction.DefaultAuctionEngineConfig())
 	if bsc, bscErr := epbsbid.NewBidScoreCalculator(epbsbid.DefaultBidScoreConfig()); bscErr == nil {
 		n.epbsBid = bsc
 	} else {
@@ -743,7 +832,10 @@ func New(config *Config) (*Node, error) {
 	}
 
 	// Initialize beacon syncer and blob sync manager.
-	n.beaconSyncer = syncbeacon.NewBeaconSyncer(syncbeacon.DefaultBeaconSyncConfig())
+	n.executionSync = syncbeacon.NewExecutionSyncer(bc, n.ethHandler, n.applyExecutionTarget, config.DataDir)
+	if config.SyncMode == "snap" {
+		n.executionSync.SetPivotSync(n.syncFinalizedPivot)
+	}
 	n.blobSyncMgr = syncbeacon.NewBlobSyncManager(syncbeacon.DefaultBlobSyncConfig())
 
 	// Initialize P2P sub-systems: NAT traversal, message dispatch, nonce
@@ -767,12 +859,6 @@ func New(config *Config) (*Node, error) {
 
 	// Initialize shared mempool abstraction (MineableSet interface).
 	n.sharedPool = shared.NewSharedMempool(shared.DefaultSharedMempoolConfig())
-
-	// Initialize snap sync state healer and state sync scheduler (stub writer).
-	// Unwired writers cannot establish successful persistence or healing.
-	// Keep these optional subsystems disabled until real trie writers are supplied.
-	n.stateHealer = nil
-	n.stateSyncSched = nil
 
 	// Initialize engine EL-side builder auction.
 	n.engineAuction = engineauction.NewBuilderAuction(engineauction.DefaultAuctionConfig())
@@ -858,7 +944,8 @@ func New(config *Config) (*Node, error) {
 	n.fcStateManager.OnReorg(func(ev forkchoice.ReorgEvent) {
 		// Reset tx pool state views so pending/queued reflect the new chain tip.
 		if n.txPool != nil && n.blockchain != nil {
-			n.resetTxPoolAtHead()
+			n.txPool.SetForkRules(n.blockchain.Config(), n.blockchain.CurrentBlock().Time())
+			n.txPool.Reset(n.blockchain.State(), n.blockchain.CurrentBlock().Header())
 		}
 	})
 	n.fcStateManager.OnReorg(func(ev forkchoice.ReorgEvent) {
@@ -871,252 +958,265 @@ func New(config *Config) (*Node, error) {
 	// Initialize Engine API server.
 	n.engBackend = nodebackend.NewEngineBackend(toNodeDeps(n))
 	n.engineServer = engine.NewEngineAPI(n.engBackend)
+	// Builder registration, collateral and signed bids belong to the CL's
+	// EIP-7732 registry; deposits/exits use the canonical EIP-8282 requests.
 	// Forward eth_/web3_/net_/admin_ methods on the engine port to the RPC handler.
 	n.engineServer.SetEthHandler(n.rpcHandler.Handler())
+	n.engineServer.SetAuthVhosts(config.AuthVhosts)
 	n.engineServer.SetMaxRequestSize(config.EngineMaxRequestSize)
 	if token, err := resolveEngineAuthToken(config); err != nil {
 		return nil, fmt.Errorf("engine auth: %w", err)
 	} else if token != "" {
 		n.engineServer.SetAuthSecret(token)
+	} else {
+		data, err := os.ReadFile(config.JWTSecretPath())
+		if err != nil {
+			return nil, fmt.Errorf("engine JWT secret: %w", err)
+		}
+		secret, err := hex.DecodeString(strings.TrimPrefix(strings.TrimSpace(string(data)), "0x"))
+		if err != nil || len(secret) != 32 {
+			return nil, errors.New("engine JWT secret must be 32 hex-encoded bytes")
+		}
+		n.engineServer.SetJWTSecret([32]byte(secret))
 	}
 
+	initialized = true
 	return n, nil
 }
 
-// Start starts all node subsystems in order.
-func (n *Node) Start() error {
+// Start reserves required endpoints, starts owned subsystems, and publishes
+// readiness only after all fallible startup steps have succeeded. Failure is
+// terminal for this instance; New can immediately reuse the released datadir.
+func (n *Node) Start() (startErr error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-
+	if n.closed {
+		return ErrNodeStopped
+	}
 	if n.running {
 		return errors.New("node already running")
 	}
-
-	slog.Info("starting ETH2030 node", "network", n.config.Network)
-
-	// Start DAS network manager (PeerDAS EIP-7594).
-	if n.dasNetMgr != nil {
-		n.dasNetMgr.Start()
-		slog.Info("DAS network manager started")
+	defer func() {
+		if startErr != nil {
+			startErr = errors.Join(startErr, n.stopLocked())
+		}
+	}()
+	bind := func(role, address string) (net.Listener, error) {
+		ln, err := net.Listen("tcp", address)
+		if err != nil {
+			return nil, fmt.Errorf("bind %s: %w", role, err)
+		}
+		n.listeners = append(n.listeners, ln)
+		return ln, nil
 	}
-
-	// Start light client subsystem.
-	if n.lightClient != nil {
-		if err := n.lightClient.Start(); err != nil {
-			slog.Warn("light client start failed", "err", err)
-		} else {
-			slog.Info("light client started")
+	rpcLn, err := bind("rpc", n.config.RPCAddr())
+	if err != nil {
+		return err
+	}
+	engineLn, err := bind("engine", n.config.AuthListenAddr())
+	if err != nil {
+		return err
+	}
+	var wsLn, metricsLn net.Listener
+	if n.config.WSEnabled {
+		wsLn, err = bind("ws", n.config.WSListenAddr())
+		if err != nil {
+			return err
+		}
+	}
+	if n.config.Metrics {
+		metricsLn, err = bind("metrics", n.config.MetricsListenAddr())
+		if err != nil {
+			return err
 		}
 	}
 
-	// Start STARK mempool aggregator.
-	if err := n.starkAgg.Start(); err != nil {
-		return fmt.Errorf("start stark aggregator: %w", err)
+	if n.dasNetMgr != nil {
+		n.dasNetMgr.Start()
 	}
-
-	// EP-6 BB-1.x: start all registered anonymous transports.
-	for _, err := range n.transportMgr.StartAll() {
-		slog.Warn("anonymous transport start error", "err", err)
+	if n.lightClient != nil {
+		if err := n.lightClient.Start(); err != nil {
+			return fmt.Errorf("start light client: %w", err)
+		}
 	}
-
-	// Start P2P server.
+	if n.starkAgg != nil {
+		if err := n.starkAgg.Start(); err != nil {
+			return fmt.Errorf("start stark aggregator: %w", err)
+		}
+	}
+	if n.transportMgr != nil {
+		if errs := n.transportMgr.StartAll(); len(errs) > 0 {
+			return fmt.Errorf("start transports: %w", errors.Join(errs...))
+		}
+	}
 	if err := n.p2pServer.Start(); err != nil {
 		return fmt.Errorf("start p2p: %w", err)
 	}
-	slog.Info("P2P server listening", "addr", n.p2pServer.ListenAddr())
-
-	// Start NAT port mapping manager.
-	if err := n.natMgr.Start(); err != nil {
-		slog.Warn("NAT manager start failed", "err", err)
+	if n.natMgr != nil {
+		if err := n.natMgr.Start(); err != nil {
+			return fmt.Errorf("start NAT: %w", err)
+		}
 	}
-
-	// Wire beacon syncer fetcher (marks it active; full fetcher set by sync coordinator).
-	if n.beaconSyncer != nil {
-		n.beaconSyncer.SetFetcher(nil)
+	// Start each worker once, after required socket reservations succeed.
+	n.executionSync.Start()
+	if n.nativeConsensus != nil {
+		n.nativeConsensus.Start()
 	}
-
-	// Bootstrap peers from DNS discovery (EIP-1459) if configured.
+	n.startSnapHistory()
 	if n.config.DNSDiscovery != "" {
-		go n.runDNSDiscovery(n.config.DNSDiscovery)
+		n.background.Add(1)
+		go func() { defer n.background.Done(); n.runDNSDiscovery(n.config.DNSDiscovery) }()
 	}
-
-	// Start standalone DiscV5 DHT and feed discovered peers into the P2P server.
 	n.discV5.Start()
-	go n.runDiscV5PeerFeed()
+	n.background.Add(1)
+	go func() { defer n.background.Done(); n.runDiscV5PeerFeed() }()
 
-	// Start JSON-RPC server (ExtServer handles auth, rate limiting, CORS, body limits).
-	go func() {
-		slog.Info("RPC server listening", "addr", n.config.RPCAddr())
-		if err := n.rpcServer.Start(n.config.RPCAddr()); err != nil && err != http.ErrServerClosed {
-			slog.Error("RPC server error", "err", err)
-		}
-	}()
-
-	// Start Engine API server.
-	go func() {
-		slog.Info("Engine API server listening", "addr", n.config.AuthListenAddr())
-		if err := n.engineServer.Start(n.config.AuthListenAddr()); err != nil {
-			slog.Error("Engine API error", "err", err)
-		}
-	}()
-
-	// Start WebSocket RPC server if enabled.
-	if n.config.WSEnabled {
-		wsHandler := buildWSHandler(n.rpcHandler, n.config.WSOrigins)
-		n.wsServer = &http.Server{
-			Addr:    n.config.WSListenAddr(),
-			Handler: wsHandler,
-		}
+	if err := n.rpcServer.ServeListener(rpcLn); err != nil {
+		return fmt.Errorf("start rpc: %w", err)
+	}
+	if err := n.engineServer.ServeListener(engineLn); err != nil {
+		return fmt.Errorf("start engine: %w", err)
+	}
+	serveHTTP := func(role string, srv *http.Server, ln net.Listener) {
+		n.background.Add(1)
 		go func() {
-			slog.Info("WebSocket RPC server listening", "addr", n.config.WSListenAddr())
-			if err := n.wsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				slog.Error("WebSocket server error", "err", err)
+			defer n.background.Done()
+			if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) && !errors.Is(err, net.ErrClosed) {
+				slog.Error(role+" server error", "err", err)
 			}
 		}()
 	}
-
-	// Start metrics server if enabled.
-	if n.config.Metrics {
+	if wsLn != nil {
+		// WS dispatch goes through the WS-scoped handler (--ws.api allowlist),
+		// not the engine-fallback handler.
+		n.wsServer = newWSServer(n.wsRPCServer.Handler(), wsLn.Addr().String(), n.config.WSOrigins)
+		serveHTTP("WebSocket", n.wsServer, wsLn)
+	}
+	if metricsLn != nil {
 		mux := http.NewServeMux()
+		mux.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
 		mux.Handle("/debug/vars", expvar.Handler())
 		pe := metrics.NewPrometheusExporter(metrics.DefaultRegistry, metrics.DefaultPrometheusConfig())
 		mux.Handle("/metrics", pe.Handler())
-		n.metricsServer = &http.Server{
-			Addr:    n.config.MetricsListenAddr(),
-			Handler: mux,
-		}
-		go func() {
-			slog.Info("Metrics server listening", "addr", n.config.MetricsListenAddr())
-			if err := n.metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				slog.Error("Metrics server error", "err", err)
-			}
-		}()
+		n.metricsServer = &http.Server{Addr: metricsLn.Addr().String(), Handler: mux}
+		serveHTTP("Metrics", n.metricsServer, metricsLn)
 	}
-
 	n.running = true
-	slog.Info("node started successfully")
+	slog.Info("node started successfully", "p2p", n.p2pServer.ListenAddr(), "rpc", n.rpcServer.Addr(), "engine", n.engineServer.Addr())
 	return nil
 }
 
-// Stop gracefully shuts down all subsystems in reverse order.
+// Stop releases every initialized owner, including nodes never successfully
+// started. It is idempotent and always unblocks Wait, even after partial New.
 func (n *Node) Stop() error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
+	return n.stopLocked()
+}
 
-	if !n.running {
-		if n.db != nil {
-			if err := n.db.Close(); err != nil {
-				slog.Warn("database close error", "err", err)
-			}
-			n.db = nil
-		}
-		select {
-		case <-n.stop:
-			// stop channel already closed.
-		default:
-			close(n.stop)
-		}
+func (n *Node) stopLocked() error {
+	if n.closed {
 		return nil
 	}
-
-	slog.Info("stopping ETH2030 node")
-
-	// Stop DAS network manager.
+	n.closed = true
+	n.running = false
+	if n.lifecycleCancel != nil {
+		n.lifecycleCancel()
+	}
+	if n.canonicalProver != nil {
+		n.canonicalProver.Close()
+	}
+	if n.stop != nil {
+		close(n.stop)
+	}
+	var failures []error
+	record := func(role string, err error) {
+		if err != nil {
+			failures = append(failures, fmt.Errorf("stop %s: %w", role, err))
+		}
+	}
+	if n.historyCancel != nil {
+		n.historyCancel()
+		<-n.historyDone
+		n.historyCancel = nil
+	}
+	if n.executionSync != nil {
+		n.executionSync.Stop()
+	}
+	if n.nativeConsensus != nil {
+		n.nativeConsensus.Stop()
+	}
 	if n.dasNetMgr != nil {
 		n.dasNetMgr.Stop()
 	}
-
-	// Stop light client.
 	if n.lightClient != nil {
 		n.lightClient.Stop()
 	}
-
-	// Stop teragas blob scheduler.
 	if n.teragasScheduler != nil {
 		n.teragasScheduler.Stop()
 	}
-
-	// Stop STARK mempool aggregator.
-	n.starkAgg.Stop()
-
-	// EP-6 BB-1.x: stop all anonymous transports.
-	for _, err := range n.transportMgr.StopAll() {
-		slog.Warn("anonymous transport stop error", "err", err)
+	if n.starkAgg != nil {
+		n.starkAgg.Stop()
 	}
-
-	// Stop Engine API.
-	if err := n.engineServer.Stop(); err != nil {
-		slog.Warn("Engine API stop error", "err", err)
+	if n.transportMgr != nil {
+		for _, err := range n.transportMgr.StopAll() {
+			record("transport", err)
+		}
 	}
-
-	// Stop the block processor goroutine.
-	if n.engBackend != nil {
-		n.engBackend.Close()
+	if n.engineServer != nil {
+		record("engine", n.engineServer.Stop())
 	}
-
-	// Stop RPC server.
 	if n.rpcServer != nil {
-		if err := n.rpcServer.Stop(); err != nil {
-			slog.Warn("RPC server stop error", "err", err)
-		}
+		record("rpc", n.rpcServer.Stop())
 	}
-
-	// Stop WebSocket server.
 	if n.wsServer != nil {
-		if err := n.wsServer.Close(); err != nil {
-			slog.Warn("WebSocket server stop error", "err", err)
+		// Shutdown invokes the existing hijacked-connection cancellation hook.
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		err := n.wsServer.Shutdown(ctx)
+		cancel()
+		if err != nil {
+			_ = n.wsServer.Close()
 		}
+		record("ws", err)
 	}
-
-	// Stop metrics server.
 	if n.metricsServer != nil {
-		if err := n.metricsServer.Close(); err != nil {
-			slog.Warn("Metrics server stop error", "err", err)
-		}
+		record("metrics", n.metricsServer.Close())
 	}
-
-	// Signal all node-owned goroutines (peer-feed, etc.) to stop before tearing
-	// down the subsystems they use. Close n.stop first so runDiscV5PeerFeed
-	// exits before discV5.Stop() marks the DHT closed.
-	select {
-	case <-n.stop:
-		// already closed
-	default:
-		close(n.stop)
+	for _, ln := range n.listeners {
+		_ = ln.Close()
 	}
-
-	// Stop standalone DiscV5 DHT.
-	n.discV5.Stop()
-
-	// Stop NAT port mapping and P2P message subsystems.
-	n.natMgr.Stop()
-	n.p2pDispatch.Close()
-	n.reqRespMgr.Close()
+	if n.discV5 != nil {
+		n.discV5.Stop()
+	}
+	if n.natMgr != nil {
+		n.natMgr.Stop()
+	}
+	if n.p2pDispatch != nil {
+		n.p2pDispatch.Close()
+	}
+	if n.reqRespMgr != nil {
+		n.reqRespMgr.Close()
+	}
 	if n.portalDB != nil {
 		n.portalDB.Close()
 	}
-
-	// Stop P2P server.
-	n.p2pServer.Stop()
-
-	// Close ancient store before the live DB.
+	if n.p2pServer != nil {
+		n.p2pServer.Stop()
+	}
+	n.background.Wait()
+	if n.engBackend != nil {
+		n.engBackend.Close()
+	}
 	if n.blockchain != nil {
-		if as := n.blockchain.AncientStore(); as != nil {
-			if err := as.Close(); err != nil {
-				slog.Warn("ancient store close error", "err", err)
-			}
+		if store := n.blockchain.AncientStore(); store != nil {
+			record("ancient store", store.Close())
 		}
 	}
-
-	// Close database.
-	if err := n.db.Close(); err != nil {
-		slog.Warn("database close error", "err", err)
+	if n.db != nil {
+		record("database", n.db.Close())
+		n.db = nil
 	}
-	n.db = nil
-
-	n.running = false
-	slog.Info("node stopped")
-	return nil
+	return errors.Join(failures...)
 }
 
 // Wait blocks until the node is stopped.
@@ -1196,13 +1296,16 @@ func genesisForNetwork(network string) *coreconfig.Genesis {
 // makeGenesisBlock creates a minimal genesis block.
 func makeGenesisBlock() *types.Block {
 	header := &types.Header{
-		Number:     big.NewInt(0),
-		GasLimit:   30_000_000,
-		GasUsed:    0,
-		Time:       0,
-		Difficulty: new(big.Int),
-		BaseFee:    big.NewInt(1_000_000_000), // 1 gwei
-		UncleHash:  types.EmptyUncleHash,
+		Root:        types.EmptyRootHash,
+		TxHash:      types.EmptyRootHash,
+		ReceiptHash: types.EmptyRootHash,
+		Number:      big.NewInt(0),
+		GasLimit:    30_000_000,
+		GasUsed:     0,
+		Time:        0,
+		Difficulty:  new(big.Int),
+		BaseFee:     big.NewInt(1_000_000_000), // 1 gwei
+		UncleHash:   types.EmptyUncleHash,
 	}
 	return types.NewBlock(header, nil)
 }
@@ -1239,11 +1342,24 @@ func ensureJWTSecret(config *Config) error {
 	return nil
 }
 
+// newWSServer owns the parent lifetime for upgraded connections as well as HTTP.
+func newWSServer(handler http.Handler, address string, origins []string) *http.Server {
+	ctx, cancel := context.WithCancel(context.Background())
+	server := &http.Server{
+		Addr:        address,
+		Handler:     buildWSHandler(handler, origins),
+		BaseContext: func(net.Listener) context.Context { return ctx },
+	}
+	// HTTP shutdown does not close hijacked WebSockets by itself.
+	server.RegisterOnShutdown(cancel)
+	return server
+}
+
 // buildWSHandler creates an http.Handler that accepts WebSocket upgrade
 // requests and serves JSON-RPC 2.0 over the persistent connection.
 // The origins list restricts which Origin headers are allowed;
 // an empty list or ["*"] allows all origins.
-func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
+func buildWSHandler(handler http.Handler, origins []string) http.Handler {
 	allowAll := len(origins) == 0 || (len(origins) == 1 && origins[0] == "*")
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  4096,
@@ -1255,7 +1371,7 @@ func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
 			return sliceContains(origins, r.Header.Get("Origin"))
 		},
 	}
-	httpHandler := handler.Handler()
+	httpHandler := handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !websocket.IsWebSocketUpgrade(r) {
 			httpHandler.ServeHTTP(w, r)
@@ -1266,42 +1382,70 @@ func buildWSHandler(handler *rpc.Server, origins []string) http.Handler {
 			slog.Debug("ws upgrade error", "err", err)
 			return
 		}
-		defer conn.Close()
-		serveWSConn(conn, handler)
+		serveWSConn(r.Context(), conn, handler)
 	})
 }
 
-// serveWSConn processes JSON-RPC requests over a WebSocket connection by
-// forwarding each message to the rpc.Server handler via an in-memory HTTP round-trip.
-func serveWSConn(conn *websocket.Conn, handler *rpc.Server) {
-	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			if !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				slog.Debug("ws read error", "err", err)
+// maxPendingWSRequests bounds frames retained while the current request executes.
+const maxPendingWSRequests = 16
+
+// serveWSConn has exactly one reader and one writer. Reading continues while
+// execution runs so a remote close cancels the actual request, including when
+// other frames have already been queued.
+func serveWSConn(parent context.Context, conn *websocket.Conn, handler http.Handler) {
+	ctx, cancel := context.WithCancel(parent)
+	messages := make(chan []byte, maxPendingWSRequests)
+	readerDone := make(chan struct{})
+	stop := func() { cancel(); _ = conn.Close() }
+	defer func() { stop(); <-readerDone }()
+	conn.SetReadLimit(rpc.WSMaxMessageSize)
+	go func() {
+		defer close(readerDone)
+		defer stop()
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				return
 			}
-			return
+			select {
+			case messages <- message:
+			default:
+				_ = conn.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "RPC request queue limit"), time.Now().Add(50*time.Millisecond))
+				return
+			}
 		}
-		// Forward the JSON-RPC request to the handler and capture the response.
-		// We use an in-memory ResponseWriter to collect the output.
-		respBytes := dispatchWSRequest(handler, msg)
-		if err := conn.WriteMessage(websocket.TextMessage, respBytes); err != nil {
-			slog.Debug("ws write error", "err", err)
+	}()
+	for {
+		select {
+		case <-ctx.Done():
 			return
+		case message := <-messages:
+			if ctx.Err() != nil {
+				return
+			}
+			response := dispatchWSRequest(ctx, handler, message)
+			if ctx.Err() != nil {
+				return
+			}
+			if err := conn.SetWriteDeadline(time.Now().Add(rpc.WSWriteTimeout)); err != nil {
+				return
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, response); err != nil {
+				return
+			}
 		}
 	}
 }
 
-// dispatchWSRequest routes a single JSON-RPC payload through the rpc.Server
-// and returns the serialised response.
-func dispatchWSRequest(handler *rpc.Server, body []byte) []byte {
-	req, err := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+// dispatchWSRequest carries connection lifetime through the existing HTTP RPC path.
+func dispatchWSRequest(ctx context.Context, handler http.Handler, body []byte) []byte {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", strings.NewReader(string(body)))
 	if err != nil {
 		return errorResponse("parse error")
 	}
 	req.Header.Set("Content-Type", "application/json")
 	rw := &bufResponseWriter{header: make(http.Header)}
-	handler.Handler().ServeHTTP(rw, req)
+	handler.ServeHTTP(rw, req)
 	return rw.buf
 }
 
@@ -1335,44 +1479,6 @@ func (b *bufResponseWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-// corsMiddleware wraps handler with CORS headers and virtual-host checking.
-// An empty or ["*"] domains list allows all origins.
-// An empty or ["*"] vhosts list allows all hosts.
-func corsMiddleware(handler http.Handler, domains, vhosts []string) http.Handler {
-	allowAllOrigins := len(domains) == 0 || (len(domains) == 1 && domains[0] == "*")
-	allowAllHosts := len(vhosts) == 0 || (len(vhosts) == 1 && vhosts[0] == "*")
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Virtual-host check.
-		if !allowAllHosts {
-			host := r.Host
-			if idx := strings.LastIndex(host, ":"); idx >= 0 {
-				host = host[:idx]
-			}
-			if !sliceContains(vhosts, host) {
-				http.Error(w, "invalid host", http.StatusForbidden)
-				return
-			}
-		}
-
-		// CORS headers.
-		origin := r.Header.Get("Origin")
-		if origin != "" {
-			if allowAllOrigins || sliceContains(domains, origin) {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-			}
-			if r.Method == http.MethodOptions {
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-		}
-
-		handler.ServeHTTP(w, r)
-	})
-}
-
 // sliceContains reports whether s contains elem (case-insensitive).
 func sliceContains(s []string, elem string) bool {
 	lower := strings.ToLower(elem)
@@ -1386,6 +1492,12 @@ func sliceContains(s []string, elem string) bool {
 
 // runDNSDiscovery resolves peers from a DNS EIP-1459 tree URL and connects
 // to them via the P2P server. It runs once at startup and logs results.
+type nodeDNSResolver struct{ ctx context.Context }
+
+func (r nodeDNSResolver) LookupTXT(domain string) ([]string, error) {
+	return net.DefaultResolver.LookupTXT(r.ctx, domain)
+}
+
 func (n *Node) runDNSDiscovery(treeURL string) {
 	// Parse "enrtree://<pubkey>@<domain>" format.
 	domain := treeURL
@@ -1393,9 +1505,7 @@ func (n *Node) runDNSDiscovery(treeURL string) {
 		domain = treeURL[idx+1:]
 	}
 
-	client := dnsdisc.NewDNSClient(dnsdisc.DNSConfig{
-		Domain: domain,
-	})
+	client := dnsdisc.NewDNSClientWithResolver(dnsdisc.DNSConfig{Domain: domain}, nodeDNSResolver{n.lifecycleCtx})
 
 	nodes, err := client.Resolve(domain)
 	if err != nil {
@@ -1433,129 +1543,6 @@ func (s *stubBeamFetcher) FetchAccount(_ types.Address) (*syncbeam.BeamAccountDa
 
 func (s *stubBeamFetcher) FetchStorage(_ types.Address, _ types.Hash) (types.Hash, error) {
 	return types.Hash{}, errors.New("beam: no network fetcher wired")
-}
-
-// snapStateBackend implements p2psnap.StateBackend using the snapshot.Tree
-// for account/storage iteration and rawdb for code lookups.
-type snapStateBackend struct {
-	tree *snapshot.Tree
-	db   rawdb.Database
-}
-
-func newSnapStateBackend(tree *snapshot.Tree, db rawdb.Database) *snapStateBackend {
-	return &snapStateBackend{tree: tree, db: db}
-}
-
-func (b *snapStateBackend) AccountIterator(root, origin types.Hash, fn func(types.Hash, []byte) bool) error {
-	return b.tree.IterateAccounts(root, origin, fn)
-}
-
-func (b *snapStateBackend) StorageIterator(root, account types.Hash, origin []byte, fn func(types.Hash, []byte) bool) error {
-	return b.tree.IterateStorage(root, account, origin, fn)
-}
-
-// Code retrieves contract bytecode from the key-value store by code hash.
-// The code is stored under the "code:" prefix key by SetCode in MemoryStateDB.
-func (b *snapStateBackend) Code(hash types.Hash) ([]byte, error) {
-	key := append([]byte("code:"), hash[:]...)
-	data, err := b.db.Get(key)
-	if err != nil {
-		return nil, nil // not found — return nil without error
-	}
-	return data, nil
-}
-
-// TrieNode returns a trie node by path. Full proof generation requires the
-// underlying MPT; this returns nil until the MPT backend is wired.
-func (b *snapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-
-// AccountProof returns a Merkle proof for an account. Requires the MPT backend.
-func (b *snapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-
-// StorageProof returns a Merkle proof for a storage slot. Requires the MPT backend.
-func (b *snapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-
-var errStateBackendUnsupported = fmt.Errorf("state backend operation unsupported")
-
-// stubSnapStateBackend is a no-op fallback used when the database does not
-// implement snapshot.SnapshotDB (e.g. a minimal read-only adapter).
-type stubSnapStateBackend struct{}
-
-func (s *stubSnapStateBackend) AccountIterator(_ types.Hash, _ types.Hash, _ func(types.Hash, []byte) bool) error {
-	return errStateBackendUnsupported
-}
-func (s *stubSnapStateBackend) StorageIterator(_ types.Hash, _ types.Hash, _ []byte, _ func(types.Hash, []byte) bool) error {
-	return errStateBackendUnsupported
-}
-func (s *stubSnapStateBackend) Code(_ types.Hash) ([]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-func (s *stubSnapStateBackend) TrieNode(_ types.Hash, _ []byte) ([]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-func (s *stubSnapStateBackend) AccountProof(_, _ types.Hash) ([][]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-func (s *stubSnapStateBackend) StorageProof(_, _, _ types.Hash) ([][]byte, error) {
-	return nil, errStateBackendUnsupported
-}
-
-// stubStateWriter is a no-op synchealer.StateWriter used until a real trie
-// database is wired as the state healer write target.
-type stubStateWriter struct{}
-
-func (s *stubStateWriter) WriteAccount(_ types.Hash, _ synchealer.AccountData) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateWriter) WriteStorage(_, _ types.Hash, _ []byte) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateWriter) WriteBytecode(_ types.Hash, _ []byte) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateWriter) WriteTrieNode(_ []byte, _ []byte) error        { return errStateBackendUnsupported }
-func (s *stubStateWriter) HasBytecode(_ types.Hash) bool                 { return false }
-func (s *stubStateWriter) HasTrieNode(_ []byte) bool                     { return false }
-func (s *stubStateWriter) MissingTrieNodes(_ types.Hash, _ int) [][]byte { return nil }
-
-// stubStateSyncWriter is a no-op syncstatesync.StateWriter used until the real
-// snap-sync state write target is wired.
-type stubStateSyncWriter struct{}
-
-func (s *stubStateSyncWriter) WriteAccount(_ types.Hash, _ syncstatesync.AccountData) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateSyncWriter) WriteStorage(_, _ types.Hash, _ []byte) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateSyncWriter) WriteBytecode(_ types.Hash, _ []byte) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateSyncWriter) WriteTrieNode(_ []byte, _ []byte) error {
-	return errStateBackendUnsupported
-}
-func (s *stubStateSyncWriter) HasBytecode(_ types.Hash) bool                 { return false }
-func (s *stubStateSyncWriter) HasTrieNode(_ []byte) bool                     { return false }
-func (s *stubStateSyncWriter) MissingTrieNodes(_ types.Hash, _ int) [][]byte { return nil }
-
-// nodeSyncTrigger adapts the sync.Downloader to the eth.SyncNotifier interface.
-// It starts a sync goroutine when a new block is announced by a peer.
-type nodeSyncTrigger struct {
-	dl *ethsync.Downloader
-}
-
-func (s *nodeSyncTrigger) OnNewBlock(peerID string, blockNum uint64) {
-	go func() {
-		if err := s.dl.Start(blockNum); err != nil {
-			slog.Debug("sync trigger failed", "peer", peerID, "block", blockNum, "err", err)
-		}
-	}()
 }
 
 // slashingEngineAdapter adapts epbsslash.SlashingEngine to the
@@ -1633,16 +1620,5 @@ func (n *Node) runDiscV5PeerFeed() {
 				}
 			}
 		}
-	}
-}
-
-// resetTxPoolAtHead is shared by P2P import and reorg listeners. Both state and
-// activation context must follow the actual canonical blockchain head.
-func (n *Node) resetTxPoolAtHead() {
-	if n.txPool == nil || n.blockchain == nil {
-		return
-	}
-	if head := n.blockchain.CurrentBlock(); head != nil {
-		n.txPool.ResetAtHead(n.blockchain.State(), n.blockchain.Config(), head.Time(), head.NumberU64())
 	}
 }

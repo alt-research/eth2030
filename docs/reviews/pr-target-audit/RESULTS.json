@@ -1,0 +1,826 @@
+{
+  "captured_at": "2026-11-20T03:26:31.961688+00:00",
+  "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+  "all_open_prs_target_master": true,
+  "pull_requests": [
+    {
+      "number": 92,
+      "head": "integration/glamsterdam-conformance-foundation",
+      "head_sha": "4d75b6829928c3dd6a3d2132851bfeba6755af57",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/92",
+      "previous_base": "master"
+    },
+    {
+      "number": 93,
+      "head": "fix/native-vm-metering-boundaries",
+      "head_sha": "00eac65313de2f6f3cde57c84fe7cb431cb79a92",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/93",
+      "previous_base": "integration/glamsterdam-conformance-foundation"
+    },
+    {
+      "number": 94,
+      "head": "fix/native-transaction-validation",
+      "head_sha": "222ec7fc710c3d2cbceef517d2288c9e031a4c5e",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/94",
+      "previous_base": "fix/native-vm-metering-boundaries"
+    },
+    {
+      "number": 95,
+      "head": "test/glamsterdam-native-fixtures",
+      "head_sha": "36a943c4d07d66b270831e6feb2bd9ef9294cede",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/95",
+      "previous_base": "fix/native-transaction-validation"
+    },
+    {
+      "number": 97,
+      "head": "fix/ordinary-transaction-context",
+      "head_sha": "05378fe26fd4a48487e0e65489da5c6c18009a3f",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/97",
+      "previous_base": "test/glamsterdam-native-fixtures"
+    },
+    {
+      "number": 98,
+      "head": "test/glamsterdam-application-compatibility",
+      "head_sha": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/98",
+      "previous_base": "fix/ordinary-transaction-context"
+    },
+    {
+      "number": 100,
+      "head": "integration/glamsterdam-runtime-candidate",
+      "head_sha": "cf787c2ba6d38a25754ae9849fdebeafbd2b0a1a",
+      "base": "master",
+      "draft": true,
+      "url": "https://github.com/alt-research/eth2030/pull/100",
+      "previous_base": "test/glamsterdam-application-compatibility"
+    },
+    {
+      "number": 101,
+      "head": "test/glamsterdam-multiclient-gate",
+      "head_sha": "27d7f0099e9c1f4fd30c67bfc44b6cdb441f7689",
+      "base": "master",
+      "draft": true,
+      "url": "https://github.com/alt-research/eth2030/pull/101",
+      "previous_base": "integration/glamsterdam-runtime-candidate"
+    },
+    {
+      "number": 102,
+      "head": "fix/rpc-block-hash-call-selectors",
+      "head_sha": "041cb8dc1da06b27de20f5d172c6e79e734229db",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/102",
+      "previous_base": "integration/glamsterdam-runtime-candidate"
+    },
+    {
+      "number": 103,
+      "head": "fix/historical-receipt-derived-fields",
+      "head_sha": "5a4e15afa8e5987aad9d626d468241e5ab8e150f",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/103",
+      "previous_base": "integration/glamsterdam-runtime-candidate"
+    },
+    {
+      "number": 104,
+      "head": "fix/engine-stale-canonical-forkchoice",
+      "head_sha": "119ce54c47b16a3bac930175283d03d9284a6efd",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/104",
+      "previous_base": "integration/glamsterdam-runtime-candidate"
+    },
+    {
+      "number": 105,
+      "head": "fix/historical-state-header-readback",
+      "head_sha": "5eeffb84f46a63f84cfa2e0dc64cdae7baea0b50",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/105",
+      "previous_base": "integration/glamsterdam-runtime-candidate"
+    },
+    {
+      "number": 106,
+      "head": "fix/rpc-request-execution-cancellation",
+      "head_sha": "58b988325008205eb797924d1861de97c4a176e7",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/106",
+      "previous_base": "test/glamsterdam-multiclient-gate"
+    },
+    {
+      "number": 107,
+      "head": "fix/websocket-execution-disconnect",
+      "head_sha": "780da97aeabb6bea60a2c6a131faa16dda650ed7",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/107",
+      "previous_base": "fix/rpc-request-execution-cancellation"
+    },
+    {
+      "number": 108,
+      "head": "fix/full-sync-target-progress",
+      "head_sha": "0c7a5a2a5371306072899871f49f9aaffd108fc0",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/108",
+      "previous_base": "fix/websocket-execution-disconnect"
+    },
+    {
+      "number": 109,
+      "head": "fix/merkle-state-history",
+      "head_sha": "c6f95c546c3eee42ae592a1a709aa30208de3559",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/109",
+      "previous_base": "fix/full-sync-target-progress"
+    },
+    {
+      "number": 110,
+      "head": "fix/filedb-wal-recovery",
+      "head_sha": "a6a7b55183ed61d66d07745630eb5b8af356231c",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/110",
+      "previous_base": "fix/merkle-state-history"
+    },
+    {
+      "number": 111,
+      "head": "fix/verified-history-restart",
+      "head_sha": "a6ed926ac2dd04c160b2e9a5b7a5716fd6e5b2fb",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/111",
+      "previous_base": "fix/filedb-wal-recovery"
+    },
+    {
+      "number": 112,
+      "head": "fix/snap-pivot-peer-recovery",
+      "head_sha": "f8bed945bd8808da8276dc45bf5adacd63a56b4e",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/112",
+      "previous_base": "fix/verified-history-restart"
+    },
+    {
+      "number": 113,
+      "head": "integration/glamsterdam-final-acceptance",
+      "head_sha": "e896af6e0ad6474b4248c9a37cdc7c84e5d44d53",
+      "base": "master",
+      "draft": true,
+      "url": "https://github.com/alt-research/eth2030/pull/113",
+      "previous_base": "fix/snap-pivot-peer-recovery"
+    },
+    {
+      "number": 114,
+      "head": "fix/official-rpc-conformance",
+      "head_sha": "8dc8cab45b35172a47d25aa893ef137a01bc386d",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/114",
+      "previous_base": "fix/snap-pivot-peer-recovery"
+    },
+    {
+      "number": 115,
+      "head": "fix/osaka-clz-master",
+      "head_sha": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d",
+      "base": "master",
+      "draft": false,
+      "url": "https://github.com/alt-research/eth2030/pull/115",
+      "previous_base": null
+    }
+  ],
+  "order": [
+    115,
+    92,
+    93,
+    94,
+    95,
+    97,
+    98,
+    100,
+    102,
+    103,
+    104,
+    105,
+    101,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    114,
+    113
+  ],
+  "dependencies": {
+    "92": [
+      115
+    ],
+    "93": [
+      92,
+      115
+    ],
+    "94": [
+      92,
+      93,
+      115
+    ],
+    "95": [
+      92,
+      93,
+      94,
+      115
+    ],
+    "97": [
+      92,
+      93,
+      94,
+      95,
+      115
+    ],
+    "98": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      115
+    ],
+    "100": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      115
+    ],
+    "101": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      102,
+      103,
+      104,
+      105,
+      115
+    ],
+    "102": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      115
+    ],
+    "103": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      115
+    ],
+    "104": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      115
+    ],
+    "105": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      115
+    ],
+    "106": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      115
+    ],
+    "107": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      115
+    ],
+    "108": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      115
+    ],
+    "109": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      115
+    ],
+    "110": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      115
+    ],
+    "111": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      115
+    ],
+    "112": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      115
+    ],
+    "113": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      114,
+      115
+    ],
+    "114": [
+      92,
+      93,
+      94,
+      95,
+      97,
+      98,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      115
+    ],
+    "115": []
+  },
+  "master_checks": [
+    {
+      "number": 92,
+      "clean": true,
+      "tree_or_conflicts": "7ef16329a738788085dfffd5898db39553a93a84"
+    },
+    {
+      "number": 93,
+      "clean": true,
+      "tree_or_conflicts": "4c39c1a98a2ed7df1e113fb32333be05e27059a6"
+    },
+    {
+      "number": 94,
+      "clean": true,
+      "tree_or_conflicts": "87b046e32cd58c4aadefe770d30886818d456483"
+    },
+    {
+      "number": 95,
+      "clean": true,
+      "tree_or_conflicts": "40e5d7681d30d11dd9bb3ce4ce31b0f4d8949a2c"
+    },
+    {
+      "number": 97,
+      "clean": true,
+      "tree_or_conflicts": "46e88f7612cc5f1c3869ee18109c156e5f46c8b2"
+    },
+    {
+      "number": 98,
+      "clean": true,
+      "tree_or_conflicts": "6b2292e5508b57abf8c4e1f9c1de2fa9581275ca"
+    },
+    {
+      "number": 100,
+      "clean": true,
+      "tree_or_conflicts": "c1713777d77ad6a5dd3779605300eb56fd4b1aba"
+    },
+    {
+      "number": 101,
+      "clean": true,
+      "tree_or_conflicts": "f582415fdfa597998ffaaab98f001a462e39a97c"
+    },
+    {
+      "number": 102,
+      "clean": true,
+      "tree_or_conflicts": "74e1ff7b21ef3f827e69a82a7a70ba2e6d57a6a0"
+    },
+    {
+      "number": 103,
+      "clean": true,
+      "tree_or_conflicts": "e0fafad672cbf14263430ead2f6f02c5375f7ce6"
+    },
+    {
+      "number": 104,
+      "clean": true,
+      "tree_or_conflicts": "5426b5dbb4605c967a6943c8726f43b288945ed4"
+    },
+    {
+      "number": 105,
+      "clean": true,
+      "tree_or_conflicts": "6b777794d5608ce4ac917d1ce5be4f7bc08a0fc6"
+    },
+    {
+      "number": 106,
+      "clean": true,
+      "tree_or_conflicts": "0af073ac0c2ba7046b4aaf28e4bd30e26b161e2a"
+    },
+    {
+      "number": 107,
+      "clean": true,
+      "tree_or_conflicts": "4ca5bbceddcfbf1ec99b41a634df3b2f5d8fe47a"
+    },
+    {
+      "number": 108,
+      "clean": true,
+      "tree_or_conflicts": "03ccc46830947ab2f5200308fd922c0268128b3e"
+    },
+    {
+      "number": 109,
+      "clean": true,
+      "tree_or_conflicts": "c113dc26f63b2951f14e635803759bc79495e499"
+    },
+    {
+      "number": 110,
+      "clean": true,
+      "tree_or_conflicts": "8793b5f9e6e216aa8a0dc7543b565b1fcb509d81"
+    },
+    {
+      "number": 111,
+      "clean": true,
+      "tree_or_conflicts": "b32cca6bf81196d827e561b88d08d88bdf3e625d"
+    },
+    {
+      "number": 112,
+      "clean": true,
+      "tree_or_conflicts": "f84d5eec7bc486601d1bbabf75d6d8c5ea53d674"
+    },
+    {
+      "number": 113,
+      "clean": true,
+      "tree_or_conflicts": "d89d6c69f864a2f43b59bf4e75b74c179ac78944"
+    },
+    {
+      "number": 114,
+      "clean": true,
+      "tree_or_conflicts": "1c2c55f4f008a5e0ddde3b89cea3ed122ee4d114"
+    },
+    {
+      "number": 115,
+      "clean": true,
+      "tree_or_conflicts": "0ba36e87cef34fa1ca38d276c200a522e601beb5"
+    }
+  ],
+  "sequential_merge_checks": [
+    {
+      "number": 115,
+      "clean": true,
+      "tree_or_conflicts": "0ba36e87cef34fa1ca38d276c200a522e601beb5"
+    },
+    {
+      "number": 92,
+      "clean": true,
+      "tree_or_conflicts": "7ef16329a738788085dfffd5898db39553a93a84"
+    },
+    {
+      "number": 93,
+      "clean": true,
+      "tree_or_conflicts": "4c39c1a98a2ed7df1e113fb32333be05e27059a6"
+    },
+    {
+      "number": 94,
+      "clean": true,
+      "tree_or_conflicts": "87b046e32cd58c4aadefe770d30886818d456483"
+    },
+    {
+      "number": 95,
+      "clean": true,
+      "tree_or_conflicts": "40e5d7681d30d11dd9bb3ce4ce31b0f4d8949a2c"
+    },
+    {
+      "number": 97,
+      "clean": true,
+      "tree_or_conflicts": "46e88f7612cc5f1c3869ee18109c156e5f46c8b2"
+    },
+    {
+      "number": 98,
+      "clean": true,
+      "tree_or_conflicts": "6b2292e5508b57abf8c4e1f9c1de2fa9581275ca"
+    },
+    {
+      "number": 100,
+      "clean": true,
+      "tree_or_conflicts": "c1713777d77ad6a5dd3779605300eb56fd4b1aba"
+    },
+    {
+      "number": 102,
+      "clean": true,
+      "tree_or_conflicts": "74e1ff7b21ef3f827e69a82a7a70ba2e6d57a6a0"
+    },
+    {
+      "number": 103,
+      "clean": true,
+      "tree_or_conflicts": "f3b99ed505003886f151ebadeb393024936c1d32"
+    },
+    {
+      "number": 104,
+      "clean": true,
+      "tree_or_conflicts": "a459420d69cdd0ed036272ca1b5a26e5935963b5"
+    },
+    {
+      "number": 105,
+      "clean": true,
+      "tree_or_conflicts": "0150f5d6206dddda6281a42a722ba6e61d17cb9d"
+    },
+    {
+      "number": 101,
+      "clean": true,
+      "tree_or_conflicts": "f582415fdfa597998ffaaab98f001a462e39a97c"
+    },
+    {
+      "number": 106,
+      "clean": true,
+      "tree_or_conflicts": "0af073ac0c2ba7046b4aaf28e4bd30e26b161e2a"
+    },
+    {
+      "number": 107,
+      "clean": true,
+      "tree_or_conflicts": "4ca5bbceddcfbf1ec99b41a634df3b2f5d8fe47a"
+    },
+    {
+      "number": 108,
+      "clean": true,
+      "tree_or_conflicts": "03ccc46830947ab2f5200308fd922c0268128b3e"
+    },
+    {
+      "number": 109,
+      "clean": true,
+      "tree_or_conflicts": "c113dc26f63b2951f14e635803759bc79495e499"
+    },
+    {
+      "number": 110,
+      "clean": true,
+      "tree_or_conflicts": "8793b5f9e6e216aa8a0dc7543b565b1fcb509d81"
+    },
+    {
+      "number": 111,
+      "clean": true,
+      "tree_or_conflicts": "b32cca6bf81196d827e561b88d08d88bdf3e625d"
+    },
+    {
+      "number": 112,
+      "clean": true,
+      "tree_or_conflicts": "f84d5eec7bc486601d1bbabf75d6d8c5ea53d674"
+    },
+    {
+      "number": 114,
+      "clean": true,
+      "tree_or_conflicts": "1c2c55f4f008a5e0ddde3b89cea3ed122ee4d114"
+    },
+    {
+      "number": 113,
+      "clean": true,
+      "tree_or_conflicts": "d89d6c69f864a2f43b59bf4e75b74c179ac78944"
+    }
+  ],
+  "final_tree": "d89d6c69f864a2f43b59bf4e75b74c179ac78944",
+  "recent_merged_delivery": [
+    {
+      "number": 96,
+      "head_sha": "129ea5ee0f24df3ce2d264fe96c599cdd02075fd",
+      "original_target": "master",
+      "head_in_master": true,
+      "delivery_followup": null
+    },
+    {
+      "number": 91,
+      "head_sha": "6789a2319f9babf6d926e37a68a95cae53e59d9c",
+      "original_target": "fix/osaka-precompile-activation",
+      "head_in_master": false,
+      "delivery_followup": 115
+    },
+    {
+      "number": 90,
+      "head_sha": "9f7c01918bac215deddee5a2fd902e6b06e1657b",
+      "original_target": "master",
+      "head_in_master": true,
+      "delivery_followup": null
+    },
+    {
+      "number": 89,
+      "head_sha": "c64336a0370798480097e440fb497204b1f17e0c",
+      "original_target": "master",
+      "head_in_master": true,
+      "delivery_followup": null
+    },
+    {
+      "number": 88,
+      "head_sha": "0426c03efae8e9265c9fae5a53f5ae1bb637d20f",
+      "original_target": "master",
+      "head_in_master": true,
+      "delivery_followup": null
+    }
+  ],
+  "already_delivered_review99": {
+    "state": "closed",
+    "historical_base": "fix/simulation-system-timeout",
+    "head_sha": "c4dc26ae3eaee0540ba4005f5048875c23a172ec",
+    "delivered_by": 90,
+    "head_in_master": true
+  },
+  "clz_followup": {
+    "number": 115,
+    "url": "https://github.com/alt-research/eth2030/pull/115",
+    "head_sha": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d",
+    "base": "master",
+    "changed_files": [
+      "docs/reviews/pr-91/CHECK.md",
+      "docs/reviews/pr-91/STATUS.md",
+      "pkg/core/vm/interpreter.go",
+      "pkg/core/vm/jump_table.go",
+      "pkg/core/vm/osaka_clz_test.go"
+    ],
+    "checks": [
+      {
+        "name": "Consensus fixture and control regressions",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056197155"
+      },
+      {
+        "name": "Go tests (blst)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056197148"
+      },
+      {
+        "name": "Go tests (integration)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056197145"
+      },
+      {
+        "name": "Go tests (goethkzg)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056197126"
+      },
+      {
+        "name": "Geth-backed EF state tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056196972"
+      },
+      {
+        "name": "Go tests (race)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056196946"
+      },
+      {
+        "name": "Build, Vet, Lint, Test",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/alt-research/eth2030/actions/runs/44666262733/job/136056196602"
+      }
+    ]
+  },
+  "scope": "Actual fetched heads and master; merge commits preserve original ancestry. Temporary commit objects are never published. Draft status is retained; mergeability is not release acceptance."
+}

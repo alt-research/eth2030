@@ -1,0 +1,14 @@
+[
+  {
+    "name": "published-rust-seal-fake-tests",
+    "exit_code": 0,
+    "elapsed_seconds": 16.599147092958447,
+    "log": "/tmp/eth2030-canonical-proof-20261124/published-rust-seal-fake-tests.log"
+  },
+  {
+    "name": "published-native-proof-binding",
+    "exit_code": 0,
+    "elapsed_seconds": 50.43808440997964,
+    "log": "/tmp/eth2030-canonical-proof-20261124/published-native-proof-binding.log"
+  }
+]

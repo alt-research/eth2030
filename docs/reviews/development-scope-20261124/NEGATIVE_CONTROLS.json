@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-24",
+  "kind": "Executed accounting/rendered-export claim mutations; not a new node runtime qualification",
+  "controls": [
+    {
+      "name": "unfinished_development_todo",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+    },
+    {
+      "name": "unmerged_followup",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:"
+    },
+    {
+      "name": "duration_counted_in_development",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:"
+    },
+    {
+      "name": "approval_counted_in_development",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:"
+    },
+    {
+      "name": "invented_duration_pass",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "invented_upstream_merge",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "invented_original_fault_resolution",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "unrequested_public_activation_change",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "waived_known_code_defects",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "rendered_exclusion_counted",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Missing explicit acceptance exclusion G-03"
+    },
+    {
+      "name": "rendered_active_todo",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /data-active-development-todos=\"0\"/. Input:"
+    },
+    {
+      "name": "homepage_roadmap_divergence",
+      "rejected": true,
+      "exit_code": 1,
+      "failure": "AssertionError [ERR_ASSERTION]: Homepage/detail development snapshots diverged"
+    }
+  ],
+  "all_rejected": true,
+  "original_inputs_restored": true,
+  "restored_export_check_passed": true
+}

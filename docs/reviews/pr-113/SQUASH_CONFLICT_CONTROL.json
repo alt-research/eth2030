@@ -1,0 +1,27 @@
+[
+  {
+    "pr": 88,
+    "clean": true,
+    "conflicts": ""
+  },
+  {
+    "pr": 89,
+    "clean": true,
+    "conflicts": ""
+  },
+  {
+    "pr": 91,
+    "clean": true,
+    "conflicts": ""
+  },
+  {
+    "pr": 92,
+    "clean": true,
+    "conflicts": ""
+  },
+  {
+    "pr": 93,
+    "clean": false,
+    "conflicts": "cf72267be28cd71a883a9be8a924227c7fc20f18\nSTATUS.md\ndocs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md\npkg/core/vm/interpreter.go\n\nAuto-merging STATUS.md\nCONFLICT (content): Merge conflict in STATUS.md\nAuto-merging docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md\nCONFLICT (add/add): Merge conflict in docs/plans/glamsterdam/COMPLETION_PROGRESS_20261119.md\nAuto-merging pkg/core/execution/processor.go\nAuto-merging pkg/core/vm/interpreter.go\nCONFLICT (content): Merge conflict in pkg/core/vm/interpreter.go\nAuto-merging pkg/core/vm/jump_table.go\n"
+  }
+]

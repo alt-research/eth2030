@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "after": 58484000000,
+      "before": 57484000000,
+      "credited": 1000000000,
+      "execution_address_unchanged": true,
+      "prefix": 176
+    },
+    {
+      "after": 57484000000,
+      "before": 57484000000,
+      "credited": 0,
+      "execution_address_unchanged": true,
+      "prefix": 255
+    }
+  ],
+  "client_matches_detailed_consensus_reference": true,
+  "topup_prose_and_prefix_precondition_need_clarification": true
+}

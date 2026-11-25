@@ -7,14 +7,23 @@ import (
 	"sync"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/p2p"
+	"github.com/eth2030/eth2030/p2p/ethproto"
+	"github.com/eth2030/eth2030/rlp"
 	ethsync "github.com/eth2030/eth2030/sync"
 )
 
 var (
-	ErrIncompatibleVersion = errors.New("eth: incompatible protocol version")
-	ErrNetworkIDMismatch   = errors.New("eth: network ID mismatch")
-	ErrGenesisMismatch     = errors.New("eth: genesis block mismatch")
+	ErrIncompatibleVersion   = errors.New("eth: incompatible protocol version")
+	ErrNetworkIDMismatch     = errors.New("eth: network ID mismatch")
+	ErrGenesisMismatch       = errors.New("eth: genesis block mismatch")
+	ErrReceiptsBlockUnknown  = errors.New("eth: receipts block unknown")
+	ErrReceiptsCountMismatch = errors.New("eth: partial receipts count mismatch")
+	ErrReceiptsTooLarge      = errors.New("eth: partial receipt exceeds transaction gas bound")
+	ErrReceiptsTotalTooLarge = errors.New("eth: partial receipts exceed block gas limit")
+	ErrBALHashMismatch       = errors.New("eth: BAL does not match block-access-list-hash")
+	ErrBALUnavailable        = errors.New("eth: block access list unavailable")
 )
 
 // SyncNotifier is an optional callback interface for triggering sync on
@@ -31,8 +40,11 @@ type Handler struct {
 	networkID uint64
 	peers     *p2p.PeerSet
 
-	ethPeersMu sync.RWMutex
-	ethPeers   map[string]*EthPeer // peer ID → EthPeer, for tx broadcast
+	ethPeersMu           sync.RWMutex
+	ethPeers             map[string]*EthPeer // peer ID → EthPeer, for tx broadcast
+	syncMu               sync.Mutex
+	syncRequests         map[syncRequestKey]*syncRequest
+	forkchoiceControlled bool
 
 	// Optional sync notifier triggered by NewBlock messages.
 	syncNotifier SyncNotifier
@@ -48,23 +60,34 @@ type Handler struct {
 	// onBlockInserted is called after a P2P block is successfully inserted.
 	// Used to reset the tx pool so stale confirmed txs are evicted.
 	onBlockInserted func()
+	relay           *sparseRelay
 }
 
 // NewHandler creates a new eth protocol handler.
 func NewHandler(chain Blockchain, txPool TxPool, networkID uint64) *Handler {
-	return &Handler{
+	h := &Handler{
 		chain:     chain,
 		txPool:    txPool,
 		networkID: networkID,
 		peers:     p2p.NewPeerSet(),
 		ethPeers:  make(map[string]*EthPeer),
 	}
+	h.relay = newSparseRelay(txPool)
+	if provider, ok := chain.(ReceiptProvider); ok {
+		h.receiptProvider = provider
+	}
+	if source, ok := chain.(balChainReader); ok {
+		h.accessListProvider = chainBALProvider{source}
+	}
+	return h
 }
 
 // SetSyncNotifier configures an optional callback for new block events.
 func (h *Handler) SetSyncNotifier(sn SyncNotifier) {
 	h.syncNotifier = sn
 }
+
+func (h *Handler) SetForkchoiceControlled(enabled bool) { h.forkchoiceControlled = enabled }
 
 // SetOnBlockInserted registers a callback invoked after a P2P block is
 // successfully inserted. Typically used to reset the tx pool.
@@ -113,7 +136,7 @@ func (h *Handler) announceTransactions(txs []*types.Transaction, excludeID strin
 		if id == excludeID {
 			continue
 		}
-		if err := ep.SendNewPooledTransactionHashes(txs); err != nil {
+		if err := h.sendRelayAnnouncement(ep, txs); err != nil {
 			log.Printf("eth: announce tx hashes to peer %s: %v", ep.ID(), err)
 		}
 	}
@@ -125,34 +148,69 @@ func (h *Handler) Chain() Blockchain {
 }
 
 // Protocol returns a p2p.Protocol that can be registered with the P2P server.
-func (h *Handler) Protocol() p2p.Protocol {
-	return p2p.Protocol{
-		Name:    "eth",
-		Version: ETH68,
-		Length:  13,
-		Run:     h.runPeer,
+func (h *Handler) Protocol() p2p.Protocol { return h.protocol(ETH72) }
+
+// Protocols advertises all compatible wire versions; the P2P server chooses
+// the highest common version before any version-specific status is sent.
+func (h *Handler) Protocols() []p2p.Protocol {
+	return []p2p.Protocol{h.protocol(ETH72), h.protocol(ETH71), h.protocol(ETH70), h.protocol(ETH69), h.protocol(ETH68)}
+}
+func (h *Handler) protocol(version uint32) p2p.Protocol {
+	length := uint64(17)
+	if version >= ETH69 {
+		length = 18
 	}
+	if version >= ETH71 {
+		length = 20
+	}
+	if version >= ETH72 {
+		length = 22
+	}
+	return p2p.Protocol{Name: "eth", Version: uint(version), Length: length, Run: func(peer *p2p.Peer, t p2p.Transport) error { return h.runPeerVersion(peer, t, version) }}
 }
 
 // runPeer is called by the P2P server for each connected peer.
 // It performs the handshake and then enters the message loop.
 func (h *Handler) runPeer(peer *p2p.Peer, t p2p.Transport) error {
+	return h.runPeerVersion(peer, t, ETH68)
+}
+
+func (h *Handler) runPeerVersion(peer *p2p.Peer, t p2p.Transport, version uint32) error {
 	ethPeer := NewEthPeer(peer, t)
+	defer close(ethPeer.done)
 
 	// Build local status.
 	head := h.chain.CurrentBlock()
 	genesis := h.chain.Genesis()
 	status := &p2p.StatusData{
-		ProtocolVersion: ETH68,
+		ProtocolVersion: version,
 		NetworkID:       h.networkID,
 		TD:              head.Difficulty(),
 		Head:            head.Hash(),
 		Genesis:         genesis.Hash(),
 	}
+	blocks, times, checkForks := h.forkSchedule()
+	status.ForkID = ethproto.CalcForkIDWithTime(genesis.Hash(), genesis.Time(), head.NumberU64(), head.Time(), blocks, times)
 
 	// Handshake.
-	if _, err := ethPeer.Handshake(status); err != nil {
+	var remoteStatus *p2p.StatusData
+	var err error
+	if version >= ETH69 {
+		earliest := uint64(0)
+		if history, ok := h.chain.(interface{ HistoryOldestBlock() uint64 }); ok {
+			earliest = history.HistoryOldestBlock()
+		}
+		remoteStatus, err = ethPeer.handshake69(status69{version, h.networkID, genesis.Hash(), status.ForkID, earliest, head.NumberU64(), head.Hash()})
+	} else {
+		remoteStatus, err = ethPeer.Handshake(status)
+	}
+	if err != nil {
 		return err
+	}
+	if checkForks {
+		if err := ethproto.ValidateForkID(remoteStatus.ForkID, genesis.Hash(), genesis.Time(), head.NumberU64(), head.Time(), blocks, times); err != nil {
+			return err
+		}
 	}
 
 	// Register peer.
@@ -164,11 +222,28 @@ func (h *Handler) runPeer(peer *p2p.Peer, t p2p.Transport) error {
 	h.ethPeersMu.Unlock()
 	defer func() {
 		h.peers.Unregister(peer.ID())
+		h.relay.mu.Lock()
+		for key := range h.relay.requests {
+			if key.peer == peer.ID() {
+				delete(h.relay.requests, key)
+			}
+		}
+		for _, record := range h.relay.records {
+			delete(record.peers, peer.ID())
+		}
+		h.relay.mu.Unlock()
 		h.ethPeersMu.Lock()
 		delete(h.ethPeers, peer.ID())
 		h.ethPeersMu.Unlock()
 	}()
 
+	// Keep range notifications off the canonical-head/FCU hot path.
+	if version >= ETH69 {
+		go ethPeer.runRangeUpdates()
+	}
+	if version >= ETH72 {
+		go h.runSparseRelay(ethPeer)
+	}
 	// Message loop.
 	return h.handleMessages(ethPeer)
 }
@@ -193,7 +268,14 @@ func (h *Handler) HandleMsg(ep *EthPeer, msg p2p.Msg) error {
 }
 
 func (h *Handler) handleMsg(ep *EthPeer, msg p2p.Msg) error {
+	if len(msg.Payload) > MaxMessageSize {
+		return ErrMessageTooLarge
+	}
 	switch msg.Code {
+	case GetCellsMsg:
+		return h.handleGetCells(ep, msg)
+	case CellsMsg:
+		return h.handleCells(ep, msg)
 	case p2p.StatusMsg:
 		return fmt.Errorf("eth: unexpected status message after handshake")
 
@@ -227,16 +309,31 @@ func (h *Handler) handleMsg(ep *EthPeer, msg p2p.Msg) error {
 	case p2p.PooledTransactionsMsg:
 		return h.handlePooledTransactions(ep, msg)
 
-	case p2p.GetPartialReceiptsMsg:
-		return h.handleGetPartialReceipts(ep, msg)
+	case p2p.GetReceiptsMsg:
+		if ep.Peer().Version() == ETH68 {
+			return h.handleGetReceipts68(ep, msg)
+		}
+		if ep.Peer().Version() == ETH69 {
+			return h.handleGetReceipts69(ep, msg)
+		}
+		return h.handleGetReceiptsV70(ep, msg)
 
-	case p2p.PartialReceiptsMsg:
-		return h.handlePartialReceipts(ep, msg)
+	case p2p.ReceiptsMsg:
+		return h.consumeReceipts(ep, msg)
+
+	case blockRangeUpdateMsg:
+		return h.handleBlockRange(ep, msg)
 
 	case p2p.GetBlockAccessListsMsg:
+		if ep.Peer().Version() < ETH71 {
+			return fmt.Errorf("BAL message requires eth/71")
+		}
 		return h.handleGetBlockAccessLists(ep, msg)
 
 	case p2p.BlockAccessListsMsg:
+		if ep.Peer().Version() < ETH71 {
+			return fmt.Errorf("BAL message requires eth/71")
+		}
 		return h.handleBlockAccessLists(ep, msg)
 
 	default:
@@ -303,43 +400,66 @@ func (h *Handler) handleGetBlockHeaders(ep *EthPeer, msg p2p.Msg) error {
 
 // collectHeaders gathers headers based on the request parameters.
 func (h *Handler) collectHeaders(req p2p.GetBlockHeadersRequest) []*types.Header {
-	var headers []*types.Header
-
-	// Resolve the starting block.
-	var origin *types.Block
-	if req.Origin.IsHash() {
-		origin = h.chain.GetBlock(req.Origin.Hash)
-	} else {
-		origin = h.chain.GetBlockByNumber(req.Origin.Number)
-	}
-	if origin == nil {
+	byHash := func(hash types.Hash) *types.Header {
+		if source, ok := h.chain.(interface {
+			GetHeaderByHash(types.Hash) *types.Header
+		}); ok {
+			return source.GetHeaderByHash(hash)
+		}
+		if block := h.chain.GetBlock(hash); block != nil {
+			return block.Header()
+		}
 		return nil
 	}
-
-	headers = append(headers, origin.Header())
-
-	// Collect subsequent headers.
+	byNumber := func(number uint64) *types.Header {
+		if source, ok := h.chain.(interface{ GetHeaderByNumber(uint64) *types.Header }); ok {
+			return source.GetHeaderByNumber(number)
+		}
+		if block := h.chain.GetBlockByNumber(number); block != nil {
+			return block.Header()
+		}
+		return nil
+	}
 	amount := req.Amount
 	if amount > MaxHeaders {
 		amount = MaxHeaders
 	}
-
-	num := origin.NumberU64()
-	for i := uint64(1); i < amount; i++ {
-		if req.Reverse {
-			if num < 1+req.Skip {
-				break
-			}
-			num -= 1 + req.Skip
-		} else {
-			num += 1 + req.Skip
-		}
-
-		block := h.chain.GetBlockByNumber(num)
-		if block == nil {
+	var header *types.Header
+	if req.Origin.IsHash() {
+		header = byHash(req.Origin.Hash)
+	} else {
+		header = byNumber(req.Origin.Number)
+	}
+	var headers []*types.Header
+	for uint64(len(headers)) < amount && header != nil {
+		headers = append(headers, header)
+		if req.Skip == ^uint64(0) {
 			break
 		}
-		headers = append(headers, block.Header())
+		step := req.Skip + 1
+		number := header.Number.Uint64()
+		canonical := byNumber(number)
+		onCanonical := canonical != nil && canonical.Hash() == header.Hash()
+		if req.Reverse {
+			if number < step {
+				break
+			}
+			if !req.Origin.IsHash() || onCanonical {
+				header = byNumber(number - step)
+			} else {
+				if step > MaxHeaders {
+					break
+				}
+				for j := uint64(0); j < step && header != nil; j++ {
+					header = byHash(header.ParentHash)
+				}
+			}
+		} else {
+			if number > ^uint64(0)-step || !onCanonical {
+				break
+			}
+			header = byNumber(number + step)
+		}
 	}
 	return headers
 }
@@ -350,7 +470,7 @@ func (h *Handler) handleBlockHeaders(ep *EthPeer, msg p2p.Msg) error {
 	if err := decodeMsg(msg, &pkt); err != nil {
 		return err
 	}
-	// For now, just log receipt. A sync manager would process these.
+	h.deliverSyncResponse(ep, pkt.RequestID, p2p.BlockHeadersMsg, syncResponse{headers: pkt.Headers})
 	log.Printf("eth: received %d headers from %s (req %d)", len(pkt.Headers), ep.ID(), pkt.RequestID)
 	return nil
 }
@@ -389,11 +509,15 @@ func (h *Handler) handleBlockBodies(ep *EthPeer, msg p2p.Msg) error {
 		return err
 	}
 	log.Printf("eth: received %d bodies from %s (req %d)", len(pkt.Bodies), ep.ID(), pkt.RequestID)
+	h.deliverSyncResponse(ep, pkt.RequestID, p2p.BlockBodiesMsg, syncResponse{bodies: pkt.Bodies})
 	return nil
 }
 
 // handleNewBlockHashes processes new block hash announcements.
 func (h *Handler) handleNewBlockHashes(ep *EthPeer, msg p2p.Msg) error {
+	if h.forkchoiceControlled {
+		return nil
+	}
 	var entries []p2p.NewBlockHashesEntry
 	if err := decodeMsg(msg, &entries); err != nil {
 		return err
@@ -410,6 +534,9 @@ func (h *Handler) handleNewBlockHashes(ep *EthPeer, msg p2p.Msg) error {
 
 // handleNewBlock processes a full new block announcement.
 func (h *Handler) handleNewBlock(ep *EthPeer, msg p2p.Msg) error {
+	if h.forkchoiceControlled {
+		return nil
+	}
 	data, err := decodeNewBlock(msg)
 	if err != nil {
 		return err
@@ -466,6 +593,9 @@ func (h *Handler) handleTransactions(ep *EthPeer, msg p2p.Msg) error {
 // announcement from a peer. For any hashes not already in our pool, request
 // the full transaction bodies via GetPooledTransactions (0x09).
 func (h *Handler) handleNewPooledTransactionHashes(ep *EthPeer, msg p2p.Msg) error {
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleSparseAnnouncement(ep, msg)
+	}
 	var ann NewPooledTxHashesMsg68
 	if err := decodeMsg(msg, &ann); err != nil {
 		return err
@@ -488,7 +618,10 @@ func (h *Handler) handleNewPooledTransactionHashes(ep *EthPeer, msg p2p.Msg) err
 // handleGetPooledTransactions responds to a GetPooledTransactions (0x09) request
 // by returning the requested transactions from our pool via PooledTransactions (0x0a).
 func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
-	var req GetPooledTransactionsMessage
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleGetSparsePooled(ep, msg)
+	}
+	var req p2p.GetPooledTransactionsPacket
 	if err := decodeMsg(msg, &req); err != nil {
 		return err
 	}
@@ -498,80 +631,142 @@ func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
 			txs = append(txs, tx)
 		}
 	}
-	return ep.SendPooledTransactions(txs)
+	return ep.SendPooledTransactions(txs, req.RequestID)
 }
 
 // handlePooledTransactions processes a PooledTransactions (0x0a) response from
 // a peer and adds any new transactions to our pool.
 func (h *Handler) handlePooledTransactions(ep *EthPeer, msg p2p.Msg) error {
-	txs, err := decodeTransactions(msg)
-	if err != nil {
+	if ep.Peer().Version() >= ETH72 {
+		return h.handleSparsePooled(ep, msg)
+	}
+	var packet p2p.PooledTransactionsPacket
+	if err := decodeMsg(msg, &packet); err != nil {
 		return err
 	}
-	for _, tx := range txs {
-		if err := h.txPool.AddRemote(tx); err != nil {
-			log.Printf("eth: rejected pooled tx %s from %s: %v", tx.Hash().Hex(), ep.ID(), err)
+	var added []*types.Transaction
+	for _, tx := range packet.Transactions {
+		if err := h.txPool.AddRemote(tx); err == nil {
+			added = append(added, tx)
 		}
 	}
-	// Re-announce to other peers (excluding the sender).
-	if len(txs) > 0 {
-		h.announceTransactions(txs, ep.ID())
+	if len(added) > 0 {
+		h.announceTransactions(added, ep.ID())
 	}
 	return nil
 }
 
-// handleGetPartialReceipts responds to a partial receipt request (eth/70).
-func (h *Handler) handleGetPartialReceipts(ep *EthPeer, msg p2p.Msg) error {
-	var req p2p.GetPartialReceiptsPacket
+// handleGetReceiptsV70 responds to an eth/70 GetReceipts (0x0f) request
+// (EIP-7975). Receipts of the first requested block before
+// firstBlockReceiptIndex are omitted. When the response would exceed the
+// byte budget, the last served block's list is truncated and
+// lastBlockIncomplete is set so the client can page the remainder.
+func (h *Handler) handleGetReceiptsV70(ep *EthPeer, msg p2p.Msg) error {
+	var req p2p.GetReceiptsPacketV70
 	if err := decodeMsg(msg, &req); err != nil {
 		return err
 	}
 
 	if h.receiptProvider == nil {
-		// No receipt provider configured; send empty response.
-		return ep.SendPartialReceipts(req.RequestID, nil, nil)
+		return ep.SendReceiptsV70(req.RequestID, false, nil)
 	}
 
-	allReceipts := h.receiptProvider.GetReceipts(req.BlockHash)
-	if allReceipts == nil {
-		return ep.SendPartialReceipts(req.RequestID, nil, nil)
-	}
-
-	// Collect requested receipts by index, up to MaxPartialReceipts.
-	count := len(req.TxIndices)
-	if count > MaxPartialReceipts {
-		count = MaxPartialReceipts
-	}
-
-	var receipts []*types.Receipt
-	for _, idx := range req.TxIndices[:count] {
-		if int(idx) < len(allReceipts) {
-			receipts = append(receipts, allReceipts[idx])
+	var pages [][]*types.Receipt
+	lastIncomplete := false
+	budget := int64(MaxReceiptsResponseSize)
+	for i, hash := range req.Hashes {
+		if i >= MaxBodies {
+			break
+		}
+		receipts := h.receiptProvider.GetReceipts(hash)
+		if receipts == nil {
+			block := h.chain.GetBlock(hash)
+			if block == nil || len(block.Transactions()) > 0 {
+				break
+			}
+		}
+		if receipts == nil {
+			receipts = []*types.Receipt{}
+		}
+		// Omit receipts of the first block before the requested index.
+		if i == 0 && req.FirstBlockReceiptIndex > 0 {
+			if req.FirstBlockReceiptIndex >= uint64(len(receipts)) {
+				receipts = nil
+			} else {
+				receipts = receipts[req.FirstBlockReceiptIndex:]
+			}
+		}
+		// Serve as many receipts as the byte budget allows.
+		page := make([]*types.Receipt, 0, len(receipts))
+		for _, r := range receipts {
+			enc, err := rlp.EncodeToBytes(r)
+			if err != nil {
+				continue
+			}
+			if int64(len(enc)) > budget {
+				lastIncomplete = true
+				break
+			}
+			budget -= int64(len(enc))
+			page = append(page, r)
+		}
+		pages = append(pages, page)
+		if lastIncomplete {
+			break
 		}
 	}
 
-	return ep.SendPartialReceipts(req.RequestID, receipts, nil)
+	return ep.SendReceiptsV70(req.RequestID, lastIncomplete, pages)
 }
 
-// handlePartialReceipts processes a partial receipts response (eth/70).
-func (h *Handler) handlePartialReceipts(ep *EthPeer, msg p2p.Msg) error {
-	var pkt p2p.PartialReceiptsPacket
-	if err := decodeMsg(msg, &pkt); err != nil {
-		return err
+// ValidatePartialReceipts applies the EIP-7975 sanity checks to a partial
+// (lastBlockIncomplete=1) receipt list for the given block:
+//
+//  1. the delivered count matches the block's transaction count,
+//  2. each receipt's encoded size fits within gasLimit/8 of its
+//     transaction (bounded by the EIP-7825 transaction gas cap),
+//  3. the total downloaded size stays within the block gas limit
+//     allowance (1 byte per gas).
+func ValidatePartialReceipts(block *types.Block, receipts []*types.Receipt) error {
+	if block == nil {
+		return ErrReceiptsBlockUnknown
 	}
-	log.Printf("eth: received %d partial receipts from %s (req %d)", len(pkt.Receipts), ep.ID(), pkt.RequestID)
+	txs := block.Transactions()
+	if len(receipts) != len(txs) {
+		return fmt.Errorf("%w: %d receipts for %d transactions",
+			ErrReceiptsCountMismatch, len(receipts), len(txs))
+	}
+	total := 0
+	for i, r := range receipts {
+		enc, err := rlp.EncodeToBytes(r)
+		if err != nil {
+			return fmt.Errorf("receipt %d encode: %w", i, err)
+		}
+		maxSize := int64(txs[i].Gas()) / 8
+		if maxSize <= 0 {
+			maxSize = 1
+		}
+		if int64(len(enc)) > maxSize {
+			return fmt.Errorf("%w: receipt %d is %d bytes, gas limit allows %d",
+				ErrReceiptsTooLarge, i, len(enc), maxSize)
+		}
+		total += len(enc)
+	}
+	if int64(total) > int64(block.GasLimit()) {
+		return fmt.Errorf("%w: %d bytes exceed the block gas limit %d",
+			ErrReceiptsTotalTooLarge, total, block.GasLimit())
+	}
 	return nil
 }
 
-// handleGetBlockAccessLists responds to a BAL request (eth/71).
+// handleGetBlockAccessLists responds to an eth/71 GetBlockAccessLists
+// (0x12) request (EIP-8159). Each element of the response corresponds to a
+// requested block hash in order; unavailable BALs are served as the RLP
+// empty list (0xc0). The soft response limit is 10 MiB.
 func (h *Handler) handleGetBlockAccessLists(ep *EthPeer, msg p2p.Msg) error {
 	var req p2p.GetBlockAccessListsPacket
 	if err := decodeMsg(msg, &req); err != nil {
 		return err
-	}
-
-	if h.accessListProvider == nil {
-		return ep.SendBlockAccessLists(req.RequestID, nil)
 	}
 
 	count := len(req.BlockHashes)
@@ -579,36 +774,112 @@ func (h *Handler) handleGetBlockAccessLists(ep *EthPeer, msg p2p.Msg) error {
 		count = MaxAccessLists
 	}
 
-	var accessLists []p2p.BlockAccessListData
+	emptyList := []byte{0xc0}
+	accessLists := make([][]byte, 0, count)
+	budget := int64(MaxReceiptsResponseSize)
 	for _, hash := range req.BlockHashes[:count] {
-		entries := h.accessListProvider.GetBlockAccessList(hash)
-		if entries == nil {
-			continue
+		bal, ok := []byte(emptyList), false
+		if h.accessListProvider != nil {
+			bal, ok = h.accessListProvider.GetBlockAccessListRLP(hash)
 		}
-		var wireEntries []p2p.AccessEntryData
-		for _, e := range entries {
-			wireEntries = append(wireEntries, p2p.AccessEntryData{
-				Address:     e.Address,
-				AccessIndex: e.AccessIndex,
-				StorageKeys: e.StorageKeys,
-			})
+		if !ok || len(bal) == 0 {
+			bal = emptyList
+		} else if int64(len(bal)) <= budget {
+			budget -= int64(len(bal))
+		} else {
+			// Soft limit reached: serve empty entries for the remainder.
+			bal = emptyList
 		}
-		accessLists = append(accessLists, p2p.BlockAccessListData{
-			BlockHash: hash,
-			Entries:   wireEntries,
-		})
+		accessLists = append(accessLists, bal)
 	}
 
 	return ep.SendBlockAccessLists(req.RequestID, accessLists)
 }
 
-// handleBlockAccessLists processes a BAL response (eth/71).
+// handleBlockAccessLists processes an eth/71 BlockAccessLists (0x13)
+// response (EIP-8159). Clients MUST validate each BAL by comparing
+// keccak256(rlp(bal)) against the block-access-list-hash in the
+// corresponding block header; mismatching BALs are rejected.
 func (h *Handler) handleBlockAccessLists(ep *EthPeer, msg p2p.Msg) error {
+	if len(msg.Payload) > MaxReceiptsResponseSize {
+		return fmt.Errorf("BAL response too large")
+	}
 	var pkt p2p.BlockAccessListsPacket
 	if err := decodeMsg(msg, &pkt); err != nil {
 		return err
 	}
-	log.Printf("eth: received %d block access lists from %s (req %d)", len(pkt.AccessLists), ep.ID(), pkt.RequestID)
+	hashes, ok := ep.takeBALRequest(pkt.RequestID)
+	if !ok {
+		return fmt.Errorf("unsolicited BAL response %d", pkt.RequestID)
+	}
+	if len(pkt.AccessLists) > len(hashes) {
+		return fmt.Errorf("BAL response exceeds requested count")
+	}
+	type validated struct {
+		hash types.Hash
+		data []byte
+	}
+	ready := make([]validated, 0, len(pkt.AccessLists))
+	for i, encoded := range pkt.AccessLists {
+		block := h.chain.GetBlock(hashes[i])
+		if block == nil {
+			return ErrReceiptsBlockUnknown
+		}
+		header := block.Header()
+		// c0 also means unavailable. It is a valid empty BAL only when its
+		// own hash is the commitment; other unavailable entries are not stored.
+		if len(encoded) == 1 && encoded[0] == 0xc0 && (header.BlockAccessListHash == nil || *header.BlockAccessListHash != crypto.Keccak256Hash(encoded)) {
+			continue
+		}
+		if err := ValidateBlockAccessListForHeader(encoded, header); err != nil {
+			return err
+		}
+		ready = append(ready, validated{hashes[i], encoded})
+	}
+	if consumer, ok := h.chain.(interface {
+		StoreBlockAccessListRLP(types.Hash, []byte) error
+	}); ok {
+		for _, item := range ready {
+			if err := consumer.StoreBlockAccessListRLP(item.hash, item.data); err != nil {
+				return err
+			}
+		}
+	}
+	h.deliverSyncResponse(ep, pkt.RequestID, p2p.BlockAccessListsMsg, syncResponse{bals: pkt.AccessLists})
+	return nil
+}
+
+// isRLPList reports whether the payload starts with an RLP list header
+// (single-byte 0xc0-0xf7 or multi-byte 0xf8+).
+func isRLPList(encoded []byte) bool {
+	return len(encoded) > 0 && encoded[0] >= 0xc0
+}
+
+// ValidateBlockAccessListForHeader validates a received RLP-encoded BAL
+// against a specific block header per EIP-8159: keccak256(rlp(bal)) must
+// equal the header's block-access-list-hash. Empty encodings mark
+// unavailable data and are accepted only for headers without a BAL hash.
+func ValidateBlockAccessListForHeader(encoded []byte, header *types.Header) error {
+	if header == nil {
+		return ErrReceiptsBlockUnknown
+	}
+	isEmpty := len(encoded) == 0 || (len(encoded) == 1 && encoded[0] == 0xc0)
+	if header.BlockAccessListHash == nil {
+		if !isEmpty {
+			return fmt.Errorf("%w: header has no BAL hash but a BAL was delivered", ErrBALHashMismatch)
+		}
+		return nil
+	}
+	if isEmpty && *header.BlockAccessListHash != crypto.Keccak256Hash(encoded) {
+		return fmt.Errorf("%w: header requires a BAL, got empty entry", ErrBALHashMismatch)
+	}
+	if !isRLPList(encoded) {
+		return fmt.Errorf("malformed BAL encoding: not an RLP list")
+	}
+	if got := crypto.Keccak256Hash(encoded); got != *header.BlockAccessListHash {
+		return fmt.Errorf("%w: header=%s computed=%s", ErrBALHashMismatch,
+			header.BlockAccessListHash.Hex(), got.Hex())
+	}
 	return nil
 }
 
@@ -663,4 +934,86 @@ func decodeMsg(msg p2p.Msg, val interface{}) error {
 		Size:    msg.Size,
 		Payload: msg.Payload,
 	}, val)
+}
+
+func (h *Handler) handleGetReceipts68(ep *EthPeer, msg p2p.Msg) error {
+	var request p2p.GetReceiptsPacket
+	if err := decodeMsg(msg, &request); err != nil {
+		return err
+	}
+	response := &p2p.ReceiptsPacket{RequestID: request.RequestID}
+	budget := int64(MaxReceiptsResponseSize)
+	for i, hash := range request.Hashes {
+		if i >= MaxBodies || budget <= 0 {
+			break
+		}
+		block := h.chain.GetBlock(hash)
+		if block == nil {
+			continue
+		}
+		var receipts []*types.Receipt
+		if h.receiptProvider != nil {
+			receipts = h.receiptProvider.GetReceipts(hash)
+		}
+		if len(block.Transactions()) > 0 && receipts == nil {
+			continue
+		}
+		var size int64
+		for _, receipt := range receipts {
+			data, err := receipt.EncodeRLP()
+			if err != nil {
+				return err
+			}
+			size += int64(len(data))
+		}
+		if size > budget && len(response.Receipts) > 0 {
+			break
+		}
+		response.Receipts = append(response.Receipts, receipts)
+		budget -= size
+	}
+	return ep.sendMessage(p2p.ReceiptsMsg, response)
+}
+
+type balChainReader interface {
+	BlockAccessList(types.Hash) ([]byte, error)
+}
+type chainBALProvider struct{ source balChainReader }
+
+func (p chainBALProvider) GetBlockAccessListRLP(hash types.Hash) ([]byte, bool) {
+	data, err := p.source.BlockAccessList(hash)
+	return data, err == nil && len(data) > 0
+}
+
+func (h *Handler) handleGetReceipts69(ep *EthPeer, msg p2p.Msg) error {
+	var req p2p.GetReceiptsPacket
+	if err := decodeMsg(msg, &req); err != nil {
+		return err
+	}
+	response := ethproto.ReceiptsPacketV69{RequestID: req.RequestID}
+	budget := MaxReceiptsResponseSize
+	if h.receiptProvider != nil {
+		for i, hash := range req.Hashes {
+			if i >= MaxBodies {
+				break
+			}
+			receipts := h.receiptProvider.GetReceipts(hash)
+			if receipts == nil {
+				block := h.chain.GetBlock(hash)
+				if block == nil || len(block.Transactions()) > 0 {
+					break
+				}
+			}
+			encoded, err := (ethproto.ReceiptsPacketV69{Receipts: [][]*types.Receipt{receipts}}).EncodeRLP()
+			if err != nil {
+				return err
+			}
+			if len(encoded) > budget {
+				break
+			}
+			budget -= len(encoded)
+			response.Receipts = append(response.Receipts, receipts)
+		}
+	}
+	return ep.sendMessage(p2p.ReceiptsMsg, response)
 }

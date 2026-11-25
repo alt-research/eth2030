@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-25",
+  "timezone": "Asia/Shanghai",
+  "source_base_commit": "f490fe9",
+  "source_fingerprint_sha256": "d7d210e4f28f7917226ae3bb829ed0e57ea7fd09339287befdca855c66931eee",
+  "host": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "architecture": "arm64",
+    "go": "go version go1.26.4 darwin/arm64"
+  },
+  "build": {
+    "command": "cd pkg && env -u GOROOT go build ./...",
+    "exit_code": 0,
+    "container_build": "not_run; HGT-070/091"
+  },
+  "vet": {
+    "command": "cd pkg && env -u GOROOT go vet ./...",
+    "exit_code": 0
+  },
+  "full_suite": {
+    "command": "cd pkg && env -u GOROOT go test -json ./... -timeout=15m -count=1",
+    "named_test_or_subtest_events": {
+      "pass": 22096,
+      "fail": 0,
+      "skip": 131
+    },
+    "package_events": {
+      "pass": 213,
+      "fail": 0,
+      "skip": 16
+    },
+    "exit_code": 0
+  },
+  "race_suite": {
+    "command": "cd pkg && env -u GOROOT go test -race -json ./core/config ./core/eftest ./core/execution ./core/vm ./crypto/bls ./txpool ./node/... ./engine/... ./epbs/... ./focil ./das/streaming",
+    "named_test_or_subtest_events": {
+      "pass": 5120,
+      "fail": 0,
+      "skip": 118
+    },
+    "package_events": {
+      "pass": 37,
+      "fail": 0,
+      "skip": 2
+    },
+    "exit_code": 0
+  },
+  "blst_build_tag": {
+    "command": "cd pkg && env -u GOROOT go test -tags blst ./crypto/bls -count=1",
+    "exit_code": 0,
+    "output": "ok  \tgithub.com/eth2030/eth2030/crypto/bls\t4.433s"
+  },
+  "python_checks": {
+    "admission_and_source_lock": "pass; 72 EIPs, 108 locked files, 99 local source hashes",
+    "independent_codec_goldens": 7,
+    "gas_arithmetic_oracles": 2,
+    "root_domain_oracles": 1,
+    "unexecuted_semantic_trace_seeds": 9,
+    "checker_regression_tests": 12
+  },
+  "baseline": {
+    "command": "cd pkg && env -u GOROOT go run ./cmd/eth2030-baseline",
+    "expected": 12,
+    "executed": 12,
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0,
+    "backends": [
+      "native ApplyTransaction",
+      "direct upstream geth v1.17.1"
+    ],
+    "compared": [
+      "state root",
+      "logs hash",
+      "gas used"
+    ],
+    "not_claimed": [
+      "full historical corpus",
+      "Prague/Glamsterdam/Hegota conformance",
+      "receipt/BAL roots",
+      "Engine/CL interoperability"
+    ]
+  },
+  "scope_counts": {
+    "implement": 3,
+    "conditional": 29,
+    "watch": 3,
+    "excluded": 37
+  },
+  "open_prerequisite_repairs": 16,
+  "decisions": {
+    "count": 9,
+    "combined_release": "blocked; base-only research/prototype profiles isolated"
+  },
+  "not_run": [
+    "Docker/Kurtosis image or official devnet",
+    "sibling CL build",
+    "EELS/EEST full generated corpus",
+    "nine semantic trace seeds in latest native EVM"
+  ],
+  "artifacts": {
+    "specs/hegota/admission.json": "5882fd8a0eadce618522fc96182f7defbc0085de2e9eeff29fcea97c4c37e453",
+    "specs/hegota/bls-vector.json": "e4852c48a48877453b976fb64ec69442d9a49e6046f6ba8504da506d3b782d89",
+    "specs/hegota/codec-goldens.json": "74c6c5122a8909a6fa7e5e0f4153feb8e3de19dff9af79fd3d4022153e872b52",
+    "specs/hegota/conformance.json": "159607fc47c78369dfd87c7f576fccff8af80d3bfd394f4d4dee4aec76263483",
+    "specs/hegota/frame-schema.json": "7727c65dd6109042b1b3b7bf1e8524a6ad3e6efac0cdfedd50792b23f7805427",
+    "specs/hegota/profiles.json": "4f5a1deff64c0d5b6b969c82ea0d9f75b6b6f8138a9c0324872eda49b81b8439",
+    "specs/hegota/proposals/eip-8334.md": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+    "specs/hegota/proposals/eip-8341.md": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+    "specs/hegota/proposals/eip-8359.md": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+    "specs/hegota/proposals/eip-8367.md": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+    "specs/hegota/proposals/eip-8375.md": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+    "specs/hegota/proposals/eip-8483.md": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+    "specs/hegota/proposals/eip-8504.md": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+    "specs/hegota/semantic-goldens.json": "4e185549337a1e9abd3bdea4ea6e931949eb95d6e650709c425bdc1ebfc6a22d",
+    "specs/hegota/source-lock.json": "43616b8a087b55c9626ec292c8e1aee2da330ce7e1044bbb5a58abe077a4f07d",
+    "specs/hegota/tasks.json": "a4a912f817c67ed2e620b81fb97b871b0e5448d5e6009facce113fe2c81c96ee"
+  },
+  "follow_up_audit": {
+    "base_commit": "f490fe9",
+    "report": "docs/plans/hegota-a/follow-up-audit.md",
+    "previous_failed_full_suite": {
+      "exit_code": 1,
+      "failed_tests": [
+        {
+          "package": "github.com/eth2030/eth2030/das/streaming",
+          "test": "TestStreamSessionUniqueIDs",
+          "output": [
+            "=== RUN   TestStreamSessionUniqueIDs",
+            "    streaming_proto_test.go:298: expected unique session IDs, got identical",
+            "--- FAIL: TestStreamSessionUniqueIDs (0.00s)"
+          ]
+        }
+      ],
+      "log_sha256": "ab3d42a47593daa4070560ec63b85050a720e0f083dcefed2ba45db87b45818d"
+    },
+    "collision_reproduction": {
+      "command": "cd pkg && env -u GOROOT go test ./das/streaming -run TestStreamSessionUniqueIDs -count=20",
+      "exit_code": 1,
+      "result": "reproduced time-based session ID collisions"
+    },
+    "collision_regression": {
+      "command": "cd pkg && env -u GOROOT go test -race ./das/streaming -run TestStreamSessionUniqueIDs -count=20",
+      "exit_code": 0,
+      "result": "includes deterministic frozen-clock concurrent test"
+    },
+    "native_head_regression": {
+      "test": "TestNativeP2PAndReorgRefreshFrameActivation",
+      "result": "pass",
+      "covers": "real P2P message import, applied Blockchain.SetHead rewind and installed forkchoice manager listener",
+      "does_not_cover": "automatic native Engine FCU canonical-head switch (HGT-006-R16)"
+    },
+    "source_update_changes": {
+      "added_context_eips": [
+        3675,
+        7594
+      ],
+      "changed_scoped_admission_records": 0
+    }
+  }
+}

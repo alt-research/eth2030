@@ -2,6 +2,7 @@ package rlp
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"math/big"
 	"reflect"
@@ -113,10 +114,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 		// Short string: 0-55 bytes.
 		size := int(prefix - 0x80)
 		start := s.pos + 1
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		if size == 1 && s.data[start] <= 0x7f {
 			return 0, nil, 0, ErrCanonSize
 		}
@@ -140,10 +142,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 			return 0, nil, 0, ErrNonCanonicalSize
 		}
 		start := s.pos + 1 + lenOfLen
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + lenOfLen + size
 		s.pos = end
@@ -153,10 +156,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 		// Short list.
 		size := int(prefix - 0xc0)
 		start := s.pos + 1
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + size
 		s.pos = end
@@ -177,10 +181,11 @@ func (s *Stream) readItem() (kind Kind, payload []byte, totalConsumed int, err e
 			return 0, nil, 0, ErrNonCanonicalSize
 		}
 		start := s.pos + 1 + lenOfLen
-		end := start + size
-		if end > lim {
+		// Validate against remaining bytes before addition can overflow.
+		if size < 0 || size > lim-start {
 			return 0, nil, 0, io.ErrUnexpectedEOF
 		}
+		end := start + size
 		payload = s.data[start:end]
 		total := 1 + lenOfLen + size
 		s.pos = end
@@ -231,6 +236,9 @@ func (s *Stream) List() (uint64, error) {
 			return 0, ErrNonCanonicalSize
 		}
 		payloadStart = s.pos + 1 + lenOfLen
+		if size < 0 || size > s.limit()-payloadStart {
+			return 0, io.ErrUnexpectedEOF
+		}
 		payloadEnd = payloadStart + size
 	default:
 		return 0, ErrExpectedList
@@ -285,7 +293,7 @@ func (s *Stream) Uint64() (uint64, error) {
 	if len(b) > 8 {
 		return 0, ErrUint64Range
 	}
-	if len(b) > 1 && b[0] == 0 {
+	if len(b) > 0 && b[0] == 0 {
 		return 0, ErrCanonInt
 	}
 	var val uint64
@@ -301,7 +309,7 @@ func (s *Stream) BigInt() (*big.Int, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(b) > 1 && b[0] == 0 {
+	if len(b) > 0 && b[0] == 0 {
 		return nil, ErrCanonInt
 	}
 	i := new(big.Int).SetBytes(b)
@@ -407,7 +415,7 @@ func (s *Stream) decodeInto(v reflect.Value) error {
 		// pointer sentinel). Detect this and leave the pointer nil.
 		isList := (elemKind == reflect.Array && elemType.Elem().Kind() != reflect.Uint8) ||
 			(elemKind == reflect.Struct && elemType != reflect.TypeOf(big.Int{}))
-		if isList {
+		if isList || (elemKind == reflect.Array && elemType.Elem().Kind() == reflect.Uint8) {
 			if kind, size, err := s.Kind(); err == nil && kind == String && size == 0 {
 				s.pos++ // consume the 0x80 nil marker
 				return nil
@@ -485,7 +493,10 @@ func (s *Stream) decodeInto(v reflect.Value) error {
 			if err != nil {
 				return err
 			}
-			for i := 0; i < v.Len() && i < len(b); i++ {
+			if len(b) != v.Len() {
+				return fmt.Errorf("rlp: fixed byte array length %d, expected %d", len(b), v.Len())
+			}
+			for i := 0; i < v.Len(); i++ {
 				v.Index(i).SetUint(uint64(b[i]))
 			}
 			return nil

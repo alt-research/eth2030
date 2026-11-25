@@ -1,0 +1,23 @@
+{
+  "passed": false,
+  "actual48h_passed": false,
+  "scope": "Fresh bounded tail ancestry authentication of the failed spontaneous diagnostic; prefix requires a separate bounded ancestry extension. BLS pass cannot erase its actual Engine/storage failures.",
+  "first": 86288,
+  "through": 88288,
+  "reference": {
+    "debug": true,
+    "bls_active": true,
+    "files": {
+      "eth_consensus_specs.gloas.mainnet": "533f62dc20e90272a314365ce900e0bef0a70769dc71a5eba97d2fae262a3cf3",
+      "eth_consensus_specs.fulu.mainnet": "f0c74b75cb302065686673cc582531194f06b1001b991788a0c78ebc3c4560f8",
+      "eth_consensus_specs.utils.bls": "4f16de600dc05f6c9ff917dbbd8c577a1136c5acacc903323715c462c614c904"
+    },
+    "backend_version": "0.5.0",
+    "backend_hashes": [
+      "e70210171261b0e435acaf09dc68d6c9fe35d1bc170aa3dce7fbe3ac65cda3db"
+    ],
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]"
+  },
+  "error": "RuntimeError('reference live failed')",
+  "traceback": "Traceback (most recent call last):\n  File \"/projects/eth2030/qualification/soak-audit-20261122/verify_actual_fcu_io_failed_tail.py\", line 12, in <module>\n    if r.returncode:raise RuntimeError('reference '+name+' failed')\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: reference live failed\n"
+}

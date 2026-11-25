@@ -1,8 +1,11 @@
 package engine
 
 import (
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -136,24 +139,32 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleNewPayloadV4(params)
 	case "engine_newPayloadV5":
 		return api.handleNewPayloadV5(params)
+	case "engine_newPayloadV6":
+		return api.handleNewPayloadV6(params)
 	case "engine_forkchoiceUpdatedV3":
 		return api.handleForkchoiceUpdatedV3(params)
 	case "engine_forkchoiceUpdatedV4":
 		return api.handleForkchoiceUpdatedV4(params)
+	case "engine_forkchoiceUpdatedV5":
+		return api.handleForkchoiceUpdatedV5(params)
 	case "engine_getPayloadV3":
 		return api.handleGetPayloadV3(params)
 	case "engine_getPayloadV4":
 		return api.handleGetPayloadV4(params)
-	case "engine_getPayloadV5", "engine_getPayloadV6":
+	case "engine_getPayloadV5":
+		return api.handleGetPayloadV5(params)
+	case "engine_getPayloadV6":
 		return api.handleGetPayloadV6(params)
+
+	case "engine_getPayloadV7":
+		return api.handleGetPayloadV7(params)
+
+	case "engine_newPayloadV7":
+		return api.handleNewPayloadV7(params)
 	case "engine_exchangeCapabilities":
 		return api.handleExchangeCapabilities(params)
 	case "engine_getClientVersionV1":
 		return api.handleGetClientVersionV1(params)
-	case "engine_submitBuilderBidV1":
-		return api.handleSubmitBuilderBidV1(params)
-	case "engine_getBuilderBidsV1":
-		return api.handleGetBuilderBidsV1(params)
 	case "engine_newInclusionListV1":
 		return api.handleNewInclusionListV1(params)
 	case "engine_getInclusionListV1":
@@ -166,14 +177,12 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleGetPayloadBodiesByHashV2(params)
 	case "engine_getPayloadBodiesByRangeV2":
 		return api.handleGetPayloadBodiesByRangeV2(params)
-	case "engine_getPayloadHeaderV1":
-		return api.handleGetPayloadHeaderV1(params)
-	case "engine_submitBlindedBlockV1":
-		return api.handleSubmitBlindedBlockV1(params)
 	case "engine_getBlobsV1":
 		return api.handleGetBlobsV1(params)
 	case "engine_getBlobsV2":
 		return api.handleGetBlobsV2(params)
+	case "engine_getBlobsV4":
+		return api.handleGetBlobsV4(params)
 	case "engine_getBlobsV3":
 		return api.handleGetBlobsV3(params)
 	default:
@@ -191,6 +200,10 @@ func (api *EngineAPI) handleNewPayloadV3(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 3 params, got %d", len(params)),
 		}
+	}
+
+	if err := validateNewPayloadWire(params, false); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payload ExecutionPayloadV3
@@ -233,6 +246,10 @@ func (api *EngineAPI) handleForkchoiceUpdatedV3(params []json.RawMessage) (any, 
 		}
 	}
 
+	if err := validateForkchoiceWire(params[0]); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var state ForkchoiceStateV1
 	if err := json.Unmarshal(params[0], &state); err != nil {
 		return nil, &jsonrpcError{
@@ -244,7 +261,10 @@ func (api *EngineAPI) handleForkchoiceUpdatedV3(params []json.RawMessage) (any, 
 	var payloadAttributes *PayloadAttributesV3
 	if len(params) == 2 {
 		// Check if the second param is null.
-		if string(params[1]) != "null" {
+		if !isNullWire(params[1]) {
+			if err := validateAttributesWire(params[1], false); err != nil {
+				return api.rejectAttributes(state, false)
+			}
 			payloadAttributes = new(PayloadAttributesV3)
 			if err := json.Unmarshal(params[1], payloadAttributes); err != nil {
 				return nil, &jsonrpcError{
@@ -271,6 +291,10 @@ func (api *EngineAPI) handleGetPayloadV3(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
 	var payloadID PayloadID
 	if err := json.Unmarshal(params[0], &payloadID); err != nil {
 		return nil, &jsonrpcError{
@@ -293,6 +317,10 @@ func (api *EngineAPI) handleNewPayloadV4(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 4 params, got %d", len(params)),
 		}
+	}
+
+	if err := validateNewPayloadWire(params, false); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payload ExecutionPayloadV3
@@ -319,8 +347,8 @@ func (api *EngineAPI) handleNewPayloadV4(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
-	var executionRequests [][]byte
-	if err := json.Unmarshal(params[3], &executionRequests); err != nil {
+	executionRequests, err := parseExecutionRequests(params[3])
+	if err != nil {
 		return nil, &jsonrpcError{
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("invalid executionRequests: %v", err),
@@ -341,6 +369,10 @@ func (api *EngineAPI) handleNewPayloadV5(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 4 params, got %d", len(params)),
 		}
+	}
+
+	if err := validateNewPayloadWire(params, true); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payload ExecutionPayloadV5
@@ -367,8 +399,8 @@ func (api *EngineAPI) handleNewPayloadV5(params []json.RawMessage) (any, *jsonrp
 		}
 	}
 
-	var executionRequests [][]byte
-	if err := json.Unmarshal(params[3], &executionRequests); err != nil {
+	executionRequests, err := parseExecutionRequests(params[3])
+	if err != nil {
 		return nil, &jsonrpcError{
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("invalid executionRequests: %v", err),
@@ -382,6 +414,28 @@ func (api *EngineAPI) handleNewPayloadV5(params []json.RawMessage) (any, *jsonrp
 	return result, nil
 }
 
+func parseExecutionRequests(raw json.RawMessage) ([][]byte, error) {
+	var data []string
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return nil, err
+	}
+	if data == nil {
+		return nil, nil
+	}
+	requests := make([][]byte, len(data))
+	for i, item := range data {
+		if !strings.HasPrefix(item, "0x") {
+			return nil, fmt.Errorf("execution request %d must be hex DATA", i)
+		}
+		request, err := hex.DecodeString(item[2:])
+		if err != nil {
+			return nil, err
+		}
+		requests[i] = request
+	}
+	return requests, nil
+}
+
 // handleGetPayloadV4 processes an engine_getPayloadV4 request (Prague).
 func (api *EngineAPI) handleGetPayloadV4(params []json.RawMessage) (any, *jsonrpcError) {
 	if len(params) != 1 {
@@ -389,6 +443,10 @@ func (api *EngineAPI) handleGetPayloadV4(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
+	}
+
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payloadID PayloadID
@@ -406,6 +464,26 @@ func (api *EngineAPI) handleGetPayloadV4(params []json.RawMessage) (any, *jsonrp
 	return result, nil
 }
 
+// handleGetPayloadV5 processes an engine_getPayloadV5 request (Osaka).
+func (api *EngineAPI) handleGetPayloadV5(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 1 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "expected one payload ID"}
+	}
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+	}
+
+	var id PayloadID
+	if err := json.Unmarshal(params[0], &id); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "invalid payload ID"}
+	}
+	result, err := api.GetPayloadV5(id)
+	if err != nil {
+		return nil, engineErrorToRPC(err)
+	}
+	return result, nil
+}
+
 // handleGetPayloadV6 processes an engine_getPayloadV6 request (Amsterdam).
 func (api *EngineAPI) handleGetPayloadV6(params []json.RawMessage) (any, *jsonrpcError) {
 	if len(params) != 1 {
@@ -413,6 +491,10 @@ func (api *EngineAPI) handleGetPayloadV6(params []json.RawMessage) (any, *jsonrp
 			Code:    InvalidParamsCode,
 			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
+	}
+
+	if err := wireData(params[0], 8); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var payloadID PayloadID
@@ -430,13 +512,68 @@ func (api *EngineAPI) handleGetPayloadV6(params []json.RawMessage) (any, *jsonrp
 	return result, nil
 }
 
-// handleForkchoiceUpdatedV4 processes an engine_forkchoiceUpdatedV4 request (Amsterdam).
-func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, *jsonrpcError) {
-	if len(params) < 1 || len(params) > 2 {
+// handleGetPayloadV7 processes an engine_getPayloadV7 request (EIP-7807 SSZ).
+func (api *EngineAPI) handleGetPayloadV7(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 1 {
 		return nil, &jsonrpcError{
 			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("expected 1-2 params, got %d", len(params)),
+			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
+	}
+	var payloadID PayloadID
+	if err := json.Unmarshal(params[0], &payloadID); err != nil {
+		return nil, &jsonrpcError{
+			Code:    InvalidParamsCode,
+			Message: fmt.Sprintf("invalid payload ID: %v", err),
+		}
+	}
+	result, err := api.GetPayloadV7(payloadID)
+	if err != nil {
+		return nil, engineErrorToRPC(err)
+	}
+	return result, nil
+}
+
+// handleNewPayloadV7 processes an engine_newPayloadV7 request (EIP-7807 SSZ).
+func (api *EngineAPI) handleNewPayloadV7(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 1 {
+		return nil, &jsonrpcError{
+			Code:    InvalidParamsCode,
+			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
+		}
+	}
+	var req NewPayloadV7Request
+	if err := json.Unmarshal(params[0], &req); err != nil {
+		return nil, &jsonrpcError{
+			Code:    InvalidParamsCode,
+			Message: fmt.Sprintf("invalid newPayloadV7 params: %v", err),
+		}
+	}
+	result, err := api.NewPayloadV7(req)
+	if err != nil {
+		return nil, engineErrorToRPC(err)
+	}
+	return result, nil
+}
+
+// handleForkchoiceUpdatedV4 processes an engine_forkchoiceUpdatedV4 request
+// (Amsterdam). Lighthouse >= 8.4 adds an optional third `custodyColumns`
+// bitarray param (Fulu/PeerDAS custody set, may be null) — accepted and
+// validated and consumed by the sparse blob relay.
+func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, *jsonrpcError) {
+	return api.handleAmsterdamForkchoice(params, false)
+}
+
+func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota bool) (any, *jsonrpcError) {
+	if len(params) < 1 || len(params) > 3 {
+		return nil, &jsonrpcError{
+			Code:    InvalidParamsCode,
+			Message: fmt.Sprintf("expected 1-3 params, got %d", len(params)),
+		}
+	}
+
+	if err := validateForkchoiceWire(params[0]); err != nil {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
 	}
 
 	var state ForkchoiceStateV1
@@ -447,24 +584,54 @@ func (api *EngineAPI) handleForkchoiceUpdatedV4(params []json.RawMessage) (any, 
 		}
 	}
 
-	var payloadAttributes *PayloadAttributesV4
-	if len(params) == 2 {
-		if string(params[1]) != "null" {
-			payloadAttributes = new(PayloadAttributesV4)
-			if err := json.Unmarshal(params[1], payloadAttributes); err != nil {
-				return nil, &jsonrpcError{
-					Code:    InvalidParamsCode,
-					Message: fmt.Sprintf("invalid payload attributes: %v", err),
-				}
+	if len(params) == 3 {
+		mask, err := parseCellMask(params[2])
+		if err != nil {
+			return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+		}
+		if mask != nil {
+			if consumer, ok := api.backend.(interface{ SetCustodyColumns(types.CellMask) }); ok {
+				consumer.SetCustodyColumns(*mask)
 			}
 		}
 	}
 
+	var payloadAttributes *PayloadAttributesV4
+	if len(params) >= 2 {
+		if _, native := api.backend.(bogotaBackend); bogota && native && string(params[1]) != "null" {
+			if err := validateBogotaAttributes(params[1]); err != nil {
+				return api.forkchoiceUpdatedBogota(state, nil, ErrInvalidPayloadAttributes)
+			}
+		}
+		if !bogota && !isNullWire(params[1]) {
+			if err := validateAttributesWire(params[1], true); err != nil {
+				return api.rejectAttributes(state, true)
+			}
+		}
+		attrs, err := parsePayloadAttributes(params[1])
+		if err != nil {
+			return nil, &jsonrpcError{
+				Code:    InvalidParamsCode,
+				Message: fmt.Sprintf("invalid payload attributes: %v", err),
+			}
+		}
+		payloadAttributes = attrs
+	}
+
+	if bogota {
+		if _, native := api.backend.(bogotaBackend); native {
+			return api.forkchoiceUpdatedBogota(state, payloadAttributes, nil)
+		}
+	}
 	result, err := api.ForkchoiceUpdatedV4(state, payloadAttributes)
 	if err != nil {
 		return nil, engineErrorToRPC(err)
 	}
 	return result, nil
+}
+
+func (api *EngineAPI) handleForkchoiceUpdatedV5(params []json.RawMessage) (any, *jsonrpcError) {
+	return api.handleAmsterdamForkchoice(params, true)
 }
 
 // handleExchangeCapabilities processes an engine_exchangeCapabilities request.
@@ -545,13 +712,14 @@ func (api *EngineAPI) handleGetBlobsV2(params []json.RawMessage) (any, *jsonrpcE
 			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
 		}
 	}
-	var hashes []types.Hash
-	if err := json.Unmarshal(params[0], &hashes); err != nil {
-		return nil, &jsonrpcError{
-			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("invalid versioned hashes: %v", err),
-		}
+	hashes, parseErr := parseBlobVersionedHashes(params[0])
+	if parseErr != nil {
+		return nil, parseErr
 	}
+	if !api.backend.IsOsaka(api.backend.GetHeadTimestamp()) {
+		return nil, nil
+	}
+
 	if bb, ok := api.backend.(backendapi.BlobsV2Backend); ok {
 		result := bb.GetBlobsV2ByVersionedHashes(hashes)
 		// All-or-nothing: return null if any blob is missing.
@@ -570,22 +738,34 @@ func (api *EngineAPI) handleGetBlobsV2(params []json.RawMessage) (any, *jsonrpcE
 }
 
 // handleGetBlobsV3 processes an engine_getBlobsV3 request (Osaka/Fulu PeerDAS).
+// Lighthouse >= 8.4 sends an optional second param (custody-indicator
+// bitarray over the requested blobs) — accepted and ignored; the EL serves
+// the full sparse set.
 // Returns a sparse array: null at positions where the blob is not in the local
 // pool (partial-response semantics per the Osaka spec).
 func (api *EngineAPI) handleGetBlobsV3(params []json.RawMessage) (any, *jsonrpcError) {
-	if len(params) != 1 {
+	if len(params) < 1 || len(params) > 2 {
 		return nil, &jsonrpcError{
 			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("expected 1 param, got %d", len(params)),
+			Message: fmt.Sprintf("expected 1-2 params, got %d", len(params)),
 		}
 	}
-	var hashes []types.Hash
-	if err := json.Unmarshal(params[0], &hashes); err != nil {
-		return nil, &jsonrpcError{
-			Code:    InvalidParamsCode,
-			Message: fmt.Sprintf("invalid versioned hashes: %v", err),
+	if len(params) == 2 {
+		if err := validateCustodyColumns(params[1]); err != nil {
+			return nil, &jsonrpcError{
+				Code:    InvalidParamsCode,
+				Message: err.Error(),
+			}
 		}
 	}
+	hashes, parseErr := parseBlobVersionedHashes(params[0])
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	if !api.backend.IsOsaka(api.backend.GetHeadTimestamp()) {
+		return nil, nil
+	}
+
 	if bb, ok := api.backend.(backendapi.BlobsV3Backend); ok {
 		result := bb.GetBlobsV3ByVersionedHashes(hashes)
 		found := 0
@@ -598,23 +778,22 @@ func (api *EngineAPI) handleGetBlobsV3(params []json.RawMessage) (any, *jsonrpcE
 			"requested", len(hashes), "found", found)
 		return result, nil
 	}
-	result := make([]*BlobAndProofV2, len(hashes))
-	return result, nil
+	return nil, nil
 }
 
 func engineErrorToRPC(err error) *jsonrpcError {
-	switch err {
-	case ErrUnknownPayload:
+	switch {
+	case errors.Is(err, ErrUnknownPayload):
 		return &jsonrpcError{Code: UnknownPayloadCode, Message: err.Error()}
-	case ErrInvalidForkchoiceState:
+	case errors.Is(err, ErrInvalidForkchoiceState):
 		return &jsonrpcError{Code: InvalidForkchoiceStateCode, Message: err.Error()}
-	case ErrInvalidPayloadAttributes:
+	case errors.Is(err, ErrInvalidPayloadAttributes):
 		return &jsonrpcError{Code: InvalidPayloadAttributeCode, Message: err.Error()}
-	case ErrInvalidParams:
+	case errors.Is(err, ErrInvalidParams):
 		return &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
-	case ErrTooLargeRequest:
+	case errors.Is(err, ErrTooLargeRequest):
 		return &jsonrpcError{Code: TooLargeRequestCode, Message: err.Error()}
-	case ErrUnsupportedFork:
+	case errors.Is(err, ErrUnsupportedFork):
 		return &jsonrpcError{Code: UnsupportedForkCode, Message: err.Error()}
 	default:
 		return &jsonrpcError{Code: internalErrorCode, Message: err.Error()}

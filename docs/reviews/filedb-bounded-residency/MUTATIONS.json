@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "scope": "Only compiling behavioral mutations count. The first code-hash mutator removed a required import and is retained separately as a harness build failure.",
+  "controls": [
+    {
+      "mutation": "drop_snapshot_iterator_error",
+      "detected": true,
+      "log": "mutation-snapshot-rejected.log"
+    },
+    {
+      "mutation": "disable_committed_code_hash_guard",
+      "detected": true,
+      "log": "mutation-codehash-rejected-02.log"
+    }
+  ]
+}

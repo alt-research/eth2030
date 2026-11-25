@@ -1,0 +1,22 @@
+[
+  {
+    "enclave": "eth2030-fcr-proof-20261124",
+    "exit_code": 0,
+    "result": "\u001b[36mINFO\u001b[0m[2026-11-24T15:28:41+08:00] Stopping enclaves...                         \n\u001b[36mINFO\u001b[0m[2026-11-24T15:28:44+08:00] Enclaves stopped successfully                \n"
+  },
+  {
+    "enclave": "eth2030-fcr-proof-20261124-b",
+    "exit_code": 0,
+    "result": "\u001b[36mINFO\u001b[0m[2026-11-24T15:28:44+08:00] Stopping enclaves...                         \n\u001b[36mINFO\u001b[0m[2026-11-24T15:28:59+08:00] Enclaves stopped successfully                \n"
+  },
+  {
+    "enclave": "eth2030-fcr-proof-20261124-c",
+    "exit_code": 0,
+    "result": "\u001b[36mINFO\u001b[0m[2026-11-24T15:28:59+08:00] Stopping enclaves...                         \n\u001b[36mINFO\u001b[0m[2026-11-24T15:29:13+08:00] Enclaves stopped successfully                \n"
+  },
+  {
+    "enclave": "eth2030-fcr-proof-20261124-d",
+    "exit_code": 0,
+    "result": "\u001b[36mINFO\u001b[0m[2026-11-24T15:29:13+08:00] Stopping enclaves...                         \n\u001b[36mINFO\u001b[0m[2026-11-24T15:29:28+08:00] Enclaves stopped successfully                \n"
+  }
+]

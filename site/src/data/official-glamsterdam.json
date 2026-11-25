@@ -1,0 +1,51 @@
+{
+  "reviewed": "November 25, 2026",
+  "source": "https://eips.ethereum.org/EIPS/eip-7773",
+  "sourceRevision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+  "sourceSnapshot": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7773.md",
+  "officialStatus": "Review",
+  "scheduledCore": [
+    2780,
+    7495,
+    7688,
+    7708,
+    7732,
+    7778,
+    7843,
+    7916,
+    7928,
+    7954,
+    7976,
+    7981,
+    7997,
+    8024,
+    8037,
+    8038,
+    8045,
+    8061,
+    8246,
+    8282
+  ],
+  "networking": [
+    7975,
+    8070,
+    8136,
+    8159,
+    8189
+  ],
+  "informational": [
+    {
+      "number": 7904,
+      "title": "Compute Gas Cost Analysis"
+    },
+    {
+      "number": 8261,
+      "title": "Gas Limit Schedule"
+    }
+  ],
+  "laterProofEntries": [
+    "eip-8025",
+    "feature-evm-asm-canonical-quest"
+  ],
+  "policy": "Official inclusion determines the Glamsterdam core denominator. Completion labels describe reviewed ETH2030 implementation; they do not measure global Ethereum rollout or a new latest-spec conformance run. Networking and informational references are separate. Future proof work has no official fork assignment."
+}

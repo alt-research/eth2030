@@ -1,0 +1,40 @@
+{
+  "at": "2026-11-23T09:17:54.243760+00:00",
+  "published_eips": [
+    {
+      "eip": 8037,
+      "repository_commit": "ddd2e93f3555bc413e07d276bafc959775838d38",
+      "blob": "c8bc85b0bf866089f84d0745769fd848733c2958",
+      "path": "EIPS/eip-8037.md",
+      "url": "https://github.com/ethereum/EIPs/blob/ddd2e93f3555bc413e07d276bafc959775838d38/EIPS/eip-8037.md",
+      "lifo_mentions": 7
+    },
+    {
+      "eip": 2780,
+      "repository_commit": "ddd2e93f3555bc413e07d276bafc959775838d38",
+      "blob": "c41fa1eeced3c08914c6d2333102b04b69e80e68",
+      "path": "EIPS/eip-2780.md",
+      "url": "https://github.com/ethereum/EIPs/blob/ddd2e93f3555bc413e07d276bafc959775838d38/EIPS/eip-2780.md",
+      "lifo_mentions": 4
+    }
+  ],
+  "proposals": [
+    {
+      "number": 12581,
+      "state": "closed",
+      "merged": false,
+      "closed_at": "2026-11-21T11:04:00Z",
+      "merged_at": null,
+      "html_url": "https://github.com/ethereum/EIPs/pull/12581"
+    },
+    {
+      "number": 12582,
+      "state": "closed",
+      "merged": false,
+      "closed_at": "2026-11-21T11:04:11Z",
+      "merged_at": null,
+      "html_url": "https://github.com/ethereum/EIPs/pull/12582"
+    }
+  ],
+  "choice": "Continue authorized merged LIFO development; closed/unmerged proposals do not establish a required model migration. No public activation decision inferred."
+}

@@ -39,6 +39,7 @@ type stEnv struct {
 	CurrentGasLimit   string `json:"currentGasLimit"`
 	CurrentNumber     string `json:"currentNumber"`
 	CurrentTimestamp  string `json:"currentTimestamp"`
+	CurrentSlotNumber string `json:"slotNumber"`
 	PreviousHash      string `json:"previousHash"`
 	CurrentBaseFee    string `json:"currentBaseFee"`
 	CurrentRandom     string `json:"currentRandom"`
@@ -143,6 +144,9 @@ func (st *StateTest) Subtests() []StateSubtest {
 
 // Run executes a single subtest and returns the result.
 func (st *StateTest) Run(subtest StateSubtest) *RunResult {
+	if subtest.Fork == "Osaka" || subtest.Fork == "Amsterdam" {
+		return st.RunSigned(subtest)
+	}
 	result := &RunResult{
 		Name:  st.Name,
 		Fork:  subtest.Fork,
@@ -296,6 +300,10 @@ func (st *StateTest) buildHeader(config *coreconfig.ChainConfig) *types.Header {
 		ParentHash: hexToHash(env.PreviousHash),
 	}
 
+	if env.CurrentSlotNumber != "" {
+		slot := hexToUint64(env.CurrentSlotNumber)
+		header.SlotNumber = &slot
+	}
 	if config.IsLondon(header.Number) && env.CurrentBaseFee != "" {
 		header.BaseFee = hexToBigInt(env.CurrentBaseFee)
 	}
@@ -393,7 +401,7 @@ var forkLevel = map[string]int{
 	"Constantinople": 5, "ConstantinopleFix": 5,
 	"Istanbul": 6, "Berlin": 7, "London": 8,
 	"Merge": 9, "Paris": 9,
-	"Shanghai": 10, "Cancun": 11, "Prague": 12,
+	"Shanghai": 10, "Cancun": 11, "Prague": 12, "Osaka": 13, "Amsterdam": 14,
 }
 
 // ForkConfig returns the ChainConfig for a named fork.
@@ -443,6 +451,14 @@ func ForkConfig(fork string) *coreconfig.ChainConfig {
 	if level >= 12 {
 		c.PragueTime = &ts
 	}
+	if level >= 13 {
+		c.OsakaTime = &ts
+	}
+	if level >= 14 {
+		c.BPO1Time = &ts
+		c.BPO2Time = &ts
+		c.AmsterdamTime = &ts
+	}
 	return c
 }
 
@@ -458,7 +474,7 @@ func SupportedForks() []string {
 		"SpuriousDragon", "TangerineWhistle",
 		"Byzantium", "Constantinople", "ConstantinopleFix",
 		"Istanbul", "Berlin", "London",
-		"Merge", "Paris", "Shanghai", "Cancun", "Prague",
+		"Merge", "Paris", "Shanghai", "Cancun", "Prague", "Osaka", "Amsterdam",
 	}
 }
 

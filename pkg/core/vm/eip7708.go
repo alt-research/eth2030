@@ -6,11 +6,11 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
-// EIP-7708: ETH transfers and burns emit a log.
+// EIP-7708: ETH transfers emit a log.
 //
-// All nonzero-value ETH transfers (via CALL, SELFDESTRUCT, or transaction-level)
-// emit a LOG3 identical to an ERC-20 Transfer event. Burns emit a LOG2 with a
-// Burn event. The log address is SYSTEM_ADDRESS (0xff...fe, EIP-4788).
+// Specified nonzero-value transfers (transaction, CALL, CREATE/CREATE2, SELFDESTRUCT)
+// emit a LOG3 identical to an ERC-20 Transfer event. Fees and withdrawals
+// are excluded. The emitter is SYSTEM_ADDRESS (EIP-4788).
 
 var (
 	// SystemAddress is the EIP-4788 system address used as the log emitter.
@@ -26,9 +26,9 @@ var (
 // EmitTransferLog emits an EIP-7708 ETH transfer log (LOG3).
 // It is called whenever nonzero ETH value is transferred between accounts.
 // The log is emitted from SYSTEM_ADDRESS with the ERC-20 Transfer event signature.
-func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
-	if statedb == nil || amount == nil || amount.Sign() <= 0 {
-		return
+func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) *types.Log {
+	if statedb == nil || amount == nil || amount.Sign() <= 0 || from == to {
+		return nil
 	}
 
 	// Encode amount as big-endian uint256 (32 bytes, left-padded).
@@ -36,7 +36,7 @@ func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
 	amountBytes := amount.Bytes()
 	copy(data[32-len(amountBytes):], amountBytes)
 
-	statedb.AddLog(&types.Log{
+	log := &types.Log{
 		Address: SystemAddress,
 		Topics: []types.Hash{
 			TransferEventTopic,
@@ -44,11 +44,13 @@ func EmitTransferLog(statedb StateDB, from, to types.Address, amount *big.Int) {
 			addressToTopic(to),
 		},
 		Data: data,
-	})
+	}
+	statedb.AddLog(log)
+	return log
 }
 
-// EmitBurnLog emits an EIP-7708 ETH burn log (LOG2).
-// It is called when ETH is destroyed (e.g., SELFDESTRUCT to self).
+// EmitBurnLog is a legacy analytics helper, not EIP-7708 consensus emission.
+// Current transfer-log rules do not emit fee or SELFDESTRUCT burn events.
 func EmitBurnLog(statedb StateDB, addr types.Address, amount *big.Int) {
 	if statedb == nil || amount == nil || amount.Sign() <= 0 {
 		return
@@ -73,4 +75,20 @@ func addressToTopic(addr types.Address) types.Hash {
 	var topic types.Hash
 	copy(topic[12:], addr[:])
 	return topic
+}
+
+// recordETHTransfer also notifies an optional request-owned simulation observer.
+// The observer does not change fork activation or add logs to real receipts.
+func (evm *EVM) recordETHTransfer(from, to types.Address, amount *big.Int) {
+	if evm.StateDB == nil || amount == nil || amount.Sign() <= 0 || from == to {
+		return
+	}
+	if observer, ok := evm.StateDB.(interface {
+		RecordETHTransfer(types.Address, types.Address, *big.Int)
+	}); ok {
+		observer.RecordETHTransfer(from, to, amount)
+	}
+	if evm.forkRules.IsEIP7708 {
+		evm.traceLog(EmitTransferLog(evm.StateDB, from, to, amount))
+	}
 }

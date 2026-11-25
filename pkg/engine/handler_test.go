@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -43,6 +44,7 @@ func (m *handlerMockBackend) GetHeadTimestamp() uint64              { return 100
 func (m *handlerMockBackend) GetBlockTimestamp(_ types.Hash) uint64 { return 0 }
 func (m *handlerMockBackend) IsCancun(ts uint64) bool               { return true }
 func (m *handlerMockBackend) IsPrague(ts uint64) bool               { return true }
+func (m *handlerMockBackend) IsOsaka(ts uint64) bool                { return true }
 func (m *handlerMockBackend) IsAmsterdam(ts uint64) bool            { return true }
 func (m *handlerMockBackend) GetHeadHash() types.Hash               { return types.Hash{} }
 func (m *handlerMockBackend) GetSafeHash() types.Hash               { return types.Hash{} }
@@ -265,6 +267,7 @@ func TestHandler_EngineErrorToRPC(t *testing.T) {
 	}{
 		{ErrUnknownPayload, UnknownPayloadCode},
 		{ErrInvalidForkchoiceState, InvalidForkchoiceStateCode},
+		{fmt.Errorf("overlay forkchoice: %w", ErrInvalidForkchoiceState), InvalidForkchoiceStateCode},
 		{ErrInvalidPayloadAttributes, InvalidPayloadAttributeCode},
 		{ErrInvalidParams, InvalidParamsCode},
 		{ErrTooLargeRequest, TooLargeRequestCode},
@@ -308,20 +311,39 @@ func TestHandler_InclusionListV1(t *testing.T) {
 	}
 }
 
-// TestHandler_GetInclusionListV1 tests getting an inclusion list.
-func TestHandler_GetInclusionListV1(t *testing.T) {
-	api := newHandlerTestAPI()
+type inclusionListResponseBackend struct {
+	handlerMockBackend
+	transactions [][]byte
+}
 
-	result, rpcErr := api.handleGetInclusionListV1(nil)
-	if rpcErr != nil {
-		t.Fatalf("error: code=%d msg=%s", rpcErr.Code, rpcErr.Message)
+func (*inclusionListResponseBackend) ProcessInclusionList(*types.InclusionList) error { return nil }
+func (b *inclusionListResponseBackend) GetInclusionList() *types.InclusionList {
+	return &types.InclusionList{Transactions: b.transactions}
+}
+
+func TestHandler_GetInclusionListV1(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		transactions [][]byte
+		want         string
+	}{
+		{name: "empty", want: `[]`},
+		{name: "hex transactions in order", transactions: [][]byte{{2, 0xa1}, {0xc1}}, want: `["0x02a1","0xc1"]`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			api := NewEngineAPI(&inclusionListResponseBackend{transactions: tc.transactions})
+			var response struct {
+				Result json.RawMessage `json:"result"`
+				Error  *jsonrpcError   `json:"error"`
+			}
+			raw := api.HandleRequest([]byte(`{"jsonrpc":"2.0","method":"engine_getInclusionListV1","params":[],"id":1}`))
+			if err := json.Unmarshal(raw, &response); err != nil || response.Error != nil || string(response.Result) != tc.want {
+				t.Fatalf("response %s, want result %s, decode error %v", raw, tc.want, err)
+			}
+		})
 	}
-	resp, ok := result.(*GetInclusionListResponseV1)
-	if !ok {
-		t.Fatalf("result type: %T", result)
-	}
-	if len(resp.Transactions) != 0 {
-		t.Fatalf("want 0 transactions, got %d", len(resp.Transactions))
+	if _, err := newHandlerTestAPI().handleGetInclusionListV1([]json.RawMessage{json.RawMessage("null")}); err == nil || err.Code != InvalidParamsCode {
+		t.Fatalf("expected invalid params, got %v", err)
 	}
 }
 
@@ -397,30 +419,6 @@ func TestHandler_ForkchoiceUpdatedV4_MissingParams(t *testing.T) {
 	}
 	if rpcResp.Error == nil {
 		t.Fatal("expected error for missing params")
-	}
-}
-
-// TestHandler_GetPayloadHeaderV1_MissingParams tests getPayloadHeaderV1 with wrong param count.
-func TestHandler_GetPayloadHeaderV1_MissingParams(t *testing.T) {
-	api := newHandlerTestAPI()
-	_, rpcErr := api.handleGetPayloadHeaderV1(nil)
-	if rpcErr == nil {
-		t.Fatal("expected error for nil params")
-	}
-	if rpcErr.Code != InvalidParamsCode {
-		t.Fatalf("want code %d, got %d", InvalidParamsCode, rpcErr.Code)
-	}
-}
-
-// TestHandler_SubmitBlindedBlockV1_MissingParams tests submitBlindedBlockV1 with wrong param count.
-func TestHandler_SubmitBlindedBlockV1_MissingParams(t *testing.T) {
-	api := newHandlerTestAPI()
-	_, rpcErr := api.handleSubmitBlindedBlockV1(nil)
-	if rpcErr == nil {
-		t.Fatal("expected error for nil params")
-	}
-	if rpcErr.Code != InvalidParamsCode {
-		t.Fatalf("want code %d, got %d", InvalidParamsCode, rpcErr.Code)
 	}
 }
 

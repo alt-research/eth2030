@@ -5,6 +5,7 @@ import (
 
 	blkpkg "github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
@@ -22,6 +23,7 @@ func MakeGenesis(gasLimit uint64, baseFee *big.Int) *types.Block {
 	calldataExcessGas := uint64(0)
 	emptyWithdrawalsHash := types.EmptyRootHash
 	emptyRoot := types.EmptyRootHash
+	emptyRequestsHash := types.EmptyRequestsHash
 	header := &types.Header{
 		Number:            big.NewInt(0),
 		GasLimit:          gasLimit,
@@ -34,9 +36,10 @@ func MakeGenesis(gasLimit uint64, baseFee *big.Int) *types.Block {
 		BlobGasUsed:       &blobGasUsed,
 		ExcessBlobGas:     &excessBlobGas,
 		ParentBeaconRoot:  &emptyRoot,
-		RequestsHash:      &emptyRoot,
+		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 	return types.NewBlock(header, &types.Body{Withdrawals: []*types.Withdrawal{}})
 }
@@ -68,7 +71,7 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 
 	emptyWHash := types.EmptyRootHash
 	emptyBeaconRoot := types.EmptyRootHash
-	emptyRequestsHash := types.EmptyRootHash
+	emptyRequestsHash := types.EmptyRequestsHash
 	header := &types.Header{
 		ParentHash:        parent.Hash(),
 		Number:            new(big.Int).Add(parentHeader.Number, big.NewInt(1)),
@@ -84,6 +87,7 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{
@@ -96,11 +100,7 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 	proc := execution.NewStateProcessor(config.TestConfig)
 	result, err := proc.ProcessWithBAL(blk, statedb)
 	if err == nil {
-		var gasUsed uint64
-		for _, r := range result.Receipts {
-			gasUsed += r.GasUsed
-		}
-		header.GasUsed = gasUsed
+		header.GasUsed = types.BlockGasTotal(result.Receipts, config.TestConfig.IsAmsterdam(header.Time) || config.TestConfig.IsGlamsterdan(header.Time))
 
 		var cdGasUsed uint64
 		for _, tx := range txs {
@@ -123,8 +123,11 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 }
 
 // MakeBlock builds a valid child block of parent with the given transactions.
-// It uses a fresh empty state. Suitable only for the first block after genesis.
+// It uses a fresh state with the Amsterdam request contracts predeployed.
+// Suitable only for the first block after an identically allocated genesis.
 // For chains of blocks use MakeBlockWithState with a shared state.
 func MakeBlock(parent *types.Block, txs []*types.Transaction) *types.Block {
-	return MakeBlockWithState(parent, txs, state.NewMemoryStateDB())
+	db := state.NewMemoryStateDB()
+	eips.ApplyBuilderRequestGenesis(db)
+	return MakeBlockWithState(parent, txs, db)
 }

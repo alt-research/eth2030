@@ -9,21 +9,40 @@ import (
 
 // Protocol version and name.
 const (
-	ProtocolName    = "snap"
-	ProtocolVersion = 1
+	ProtocolName     = "snap"
+	ProtocolVersion  = 1
+	ProtocolVersion2 = 2
 )
 
 // Message codes for the snap/1 protocol.
 const (
-	GetAccountRangeMsg  uint64 = 0x00
-	AccountRangeMsg     uint64 = 0x01
-	GetStorageRangesMsg uint64 = 0x02
-	StorageRangesMsg    uint64 = 0x03
-	GetByteCodesMsg     uint64 = 0x04
-	ByteCodesMsg        uint64 = 0x05
-	GetTrieNodesMsg     uint64 = 0x06
-	TrieNodesMsg        uint64 = 0x07
+	GetAccountRangeMsg     uint64 = 0x00
+	AccountRangeMsg        uint64 = 0x01
+	GetStorageRangesMsg    uint64 = 0x02
+	StorageRangesMsg       uint64 = 0x03
+	GetByteCodesMsg        uint64 = 0x04
+	ByteCodesMsg           uint64 = 0x05
+	GetTrieNodesMsg        uint64 = 0x06
+	TrieNodesMsg           uint64 = 0x07
+	GetBlockAccessListsMsg uint64 = 0x08
+	BlockAccessListsMsg    uint64 = 0x09
 )
+
+const (
+	BALSoftResponseLimit = 2 * 1024 * 1024
+	BALHardResponseLimit = 16 * 1024 * 1024
+	MaxBlockAccessLists  = 64
+)
+
+type GetBlockAccessListsPacket struct {
+	ID     uint64
+	Hashes []types.Hash
+	Bytes  uint64
+}
+type BlockAccessListsPacket struct {
+	ID    uint64
+	Lists [][]byte
+}
 
 // Response size limits.
 const (
@@ -62,7 +81,8 @@ type AccountData struct {
 	Body []byte     // RLP-encoded account (nonce, balance, root, codehash).
 }
 
-// AccountRangePacket is the response to GetAccountRangePacket.
+// AccountRangePacket is the response to GetAccountRangePacket. Its wire encoding
+// uses EncodeRLP/DecodeRLP to preserve raw account lists rather than byte strings.
 type AccountRangePacket struct {
 	ID       uint64        // Echoed request identifier.
 	Accounts []AccountData // Accounts in the requested range.

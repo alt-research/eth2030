@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "merged_master": "c27a5bb09507461bb6e9f2ca72c2456d04072f80",
+  "previous_qualified_composition": "1221d968555db7b3d6769aa185175c0b3e211888",
+  "merged_package_workflow_diff": [],
+  "new_composed_source": "d9201b0cdb8524a28c81ae6b09017efa8a39b6a6",
+  "new_scoped_package_diff": [
+    "pkg/core/chain/history_restart.go",
+    "pkg/core/chain/snap_history.go",
+    "pkg/core/chain/snap_history_retention_test.go",
+    "pkg/core/chain/snap_indexed_restart_test.go",
+    "pkg/core/chain/snap_pivot.go",
+    "pkg/core/rawdb/accessors.go",
+    "pkg/core/rawdb/finality_checked_test.go"
+  ],
+  "scope": "Original merged tree is byte-identical to the previously tested package/workflow tree. Final native composition adds only the two independent snap fixes and checked recovery metadata reader/tests; no gas/VM/wire or fixture expectation changes."
+}

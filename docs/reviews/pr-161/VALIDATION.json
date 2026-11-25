@@ -1,0 +1,21 @@
+{
+  "base": "5fedb7e5733fbef69767a711115ef9925e7bd769",
+  "compatibility": [
+    {
+      "file": "pkg/core/gas/glamsterdam_repricing.go",
+      "non_comment_tokens_unchanged": true
+    },
+    {
+      "file": "pkg/core/gas/eip7623_floor.go",
+      "non_comment_tokens_unchanged": true
+    }
+  ],
+  "affected_full_race_packages": 4,
+  "native_and_wrapper_build_passed": true,
+  "site_static_pages": 157,
+  "tracker_entries": 149,
+  "checked_source_paths": 422,
+  "missing_source_paths": 0,
+  "export_guards_passed": true,
+  "official_progress_labels_changed": false
+}

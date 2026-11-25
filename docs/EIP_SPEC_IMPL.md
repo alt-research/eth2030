@@ -1,50 +1,70 @@
 # EIP Specification & Implementation Traceability
 
-> Last updated: 2026-02-22
+> Current development accounting: November24,2026 at merged master cfd39f3f. Adopted frozen Glamsterdam33-task delivery and5 confirmed follow-ups are complete.48h/larger-scale acceptance and upstream Lodestar approval are deferred outside this progress. Public activation is a separate rollout decision. [Current plan](plans/glamsterdam/NEXT_STEPS_20261124.md). Historical mapped labels below retain their own scope; no whole-public-fork score is promoted.
 
-Complete traceability matrix mapping every EIP to its specification, implementation, tests, and roadmap position. ETH2030 implements **94+ EIPs** across all upgrade phases.
+This index retains the February 22, 2026 inventory outside the explicitly
+refreshed scopes. The November 22 update links frozen Glamsterdam acceptance,
+refreshes eth/70 and eth/71, and adds the missing CL/supporting obligations.
+Frame/FOCIL retain their November 18 paired evidence. Other rows have not
+received a new conformance audit. `Complete` is an implementation label within
+its recorded scope; it does not establish current-draft or cross-client acceptance.
+For current fork placement use the [site tracker](EIP_TRACKER.md); for qualified
+results and remaining work use [development progress](PROGRESS.md) and the
+[active roadmap](ROADMAP.md). Historical aggregate percentages and EF totals are
+not current acceptance scores.
 
----
+Frame execution is qualified against the pinned seven-field, scalar-nonce draft
+and local paymaster candidate. Signed FOCIL, blob history and receiver restart
+passed on the paired ETH2030/Lighthouse profile. The fresh CL used a synchronized
+EL. Independent EL agreement and the Dora consumer migration remain open; see the
+[retained run](verification/frame-8141-20261118-paymaster-history-final.json).
 
-## Quick Summary
-
-| Category | Count |
-|----------|-------|
-| EIPs Complete | 58 |
-| EIPs Substantial | 5 |
-| EIPs Referenced/Partial | 30+ |
-| Total unique EIPs | 94+ |
-| EF State Tests | 36,126/36,126 (100%) |
-
----
-
-## Glamsterdam (2026, ~99% complete)
+## Glamsterdam (historical inventory)
 
 ### Core EIPs
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7928 | Block Access Lists (BALs) | Complete | [EIP-7928](https://eips.ethereum.org/EIPS/eip-7928) | `bal/types.go`, `bal/scheduler_pipeline.go`, `bal/conflict_detector_advanced.go`, `core/state/bals_engine.go` | `core/bal_integration_test.go`, `bal/*_test.go` |
+| 7928 | Block Access Lists (BALs) | Complete | [EIP-7928](https://eips.ethereum.org/EIPS/eip-7928) | `bal/types.go`, `core/chain/block_access_list.go`, `engine/payload_bodies.go` | `core/chain/block_access_list_test.go`, `engine/payload/bodies_json_test.go`, `node/frame_8141_integration_test.go` |
 | 7702 | Set Code Authorization | Complete | [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) | `core/eip7702.go`, `core/types/tx_setcode.go`, `core/vm/precompile_7702.go`, `p2p/setcode_broadcast.go` | `core/eip7702_test.go`, `core/vm/precompile_7702_test.go` |
 | 7701 | Native Account Abstraction | Complete | [EIP-7701](https://eips.ethereum.org/EIPS/eip-7701) | `core/types/tx_aa.go`, `core/vm/eip7701_opcodes.go`, `core/vm/aa_executor.go`, `core/aa_entrypoint.go` | `core/vm/eip7701_opcodes_test.go` |
 | 8070 | Sparse Blob Pool | Complete | [EIP-8070](https://eips.ethereum.org/EIPS/eip-8070) | `txpool/blobpool.go`, `txpool/sparse_blobpool.go`, `das/sparse_blobpool.go` | `txpool/blobpool_test.go`, `txpool/sparse_blobpool_test.go` |
-| 8141 | Frame Transactions | Complete | [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) | `core/types/tx_frame.go`, `core/vm/eip8141_opcodes.go`, `core/frame_execution.go` | `core/vm/eip8141_opcodes_test.go` |
 | 7685 | Execution Layer Requests | Complete | [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) | `core/types/request.go` | `core/withdrawal_test.go` |
 | 7708 | ETH Transfers Emit Log | Complete | [EIP-7708](https://eips.ethereum.org/EIPS/eip-7708) | `core/vm/eip7708.go`, `core/vm/eip7708_deep.go` | `core/vm/eip7708_test.go` |
 | 7918 | Blob Base Fee Floor | Complete | [EIP-7918](https://eips.ethereum.org/EIPS/eip-7918) | `core/blob_gas.go` | `core/blob_gas_test.go` |
 
-### Glamsterdam Repricing (18 EIPs)
+### Additional frozen Glamsterdam obligations (2026-11-22)
+
+These were already included in the accepted 33-task program but absent from the
+older site/index. Empty local implementation cells identify companion-CL rules,
+not missing EL features; their actual source and process consumers are in the
+[frozen reconciliation](reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json).
+They do not invent new positions in the November 2 Strawmap drawing.
+
+| EIP | Title | Status | Spec | Implementation | Tests |
+| --- | --- | --- | --- | --- | --- |
+| 7688 | Progressive SSZ proofs | Complete | [EIP-7688](https://eips.ethereum.org/EIPS/eip-7688) | | `devnet/kurtosis/qualification/reference/reference-progressive-state-proofs.py` |
+| 8045 | Exclude slashed proposers | Complete | [EIP-8045](https://eips.ethereum.org/EIPS/eip-8045) | | Companion CL frozen transition suite |
+| 8061 | Validator churn | Complete | [EIP-8061](https://eips.ethereum.org/EIPS/eip-8061) | | Companion CL frozen transition suite |
+| 8246 | Balance-preserving SELFDESTRUCT | Complete | [EIP-8246](https://eips.ethereum.org/EIPS/eip-8246) | `core/vm/selfdestruct_8246.go` | `core/vm/selfdestruct_8246_test.go`, `core/execution/selfdestruct_8246_test.go` |
+| 8282 | Builder deposits/exits | Complete | [EIP-8282](https://eips.ethereum.org/EIPS/eip-8282) | `core/eips/eip8282.go` | `core/eips/eip8282_test.go`, `core/execution/builder_requests_8282_test.go` |
+| 8189 | snap/2 | Complete | [EIP-8189](https://eips.ethereum.org/EIPS/eip-8189) | `node/snap2_runtime.go`, `core/chain/snap_pivot.go` | `node/snap2_runtime_test.go`, `core/chain/snap_indexed_restart_test.go` |
+| 8136 | Partial data columns | Complete | [EIP-8136](https://eips.ethereum.org/EIPS/eip-8136) | | `devnet/kurtosis/scripts/reference_partial_columns.py` |
+
+### Glamsterdam gas implementation
+
+Current scheduled gas EIPs use the canonical Amsterdam admission, opcode and settlement paths below. The 4500-base exploratory helpers are deprecated compatibility APIs. EIP-7904 is informational; its earlier draft code is not a current gas-schedule requirement.
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7904 | Precompile Gas Repricing | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
-| 7778 | Remove SSTORE Gas Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/vm/instructions.go` (opSstoreGlamst), `core/vm/gas_table.go` | `core/eip7778_test.go` |
-| 2780 | Reduce Intrinsic Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/vm/gas_table.go`, `core/glamsterdam_repricing.go` | `core/eip2780_test.go` |
-| 8037 | State Creation Gas Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8037_test.go` |
-| 8038 | State Access Gas Increase | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/gas_table.go`, `core/vm/repricing.go` | `core/eip8038_test.go` |
+| 7904 | Compute Gas Cost Analysis (informational; earlier draft code retained) | Complete | [EIP-7904](https://eips.ethereum.org/EIPS/eip-7904) | `core/vm/precompiles.go` (lines 582-641), `core/vm/gas.go` (lines 72-79) | `core/vm/glamsterdan_gas_test.go` |
+| 7778 | Block Gas Accounting without Refunds | Complete | [EIP-7778](https://eips.ethereum.org/EIPS/eip-7778) | `core/execution/amsterdam_message.go`, `core/block/builder.go`, `core/chain/blockchain.go` | `core/eip7778_test.go`, `core/execution/amsterdam_fees_test.go`, `core/block/builder_integration_test.go` |
+| 2780 | Resource-Based Intrinsic Transaction Gas | Complete | [EIP-2780](https://eips.ethereum.org/EIPS/eip-2780) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
+| 8037 | State Creation Gas Cost Increase | Complete | [EIP-8037](https://eips.ethereum.org/EIPS/eip-8037) | `core/vm/amsterdam_state_gas.go`, `core/vm/amsterdam_create.go`, `core/execution/amsterdam_message.go`, `core/execution/system_calls.go` | `core/vm/amsterdam_state_gas_test.go`, `core/execution/amsterdam_system_gas_test.go`, `core/eftest/signed_native_test.go` |
+| 8038 | State-Access Gas Cost Update | Complete | [EIP-8038](https://eips.ethereum.org/EIPS/eip-8038) | `core/vm/amsterdam_gas_table.go`, `core/gas/amsterdam_intrinsic.go` | `core/vm/amsterdam_bal_gas_test.go`, `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
 | 7623 | Calldata Floor Pricing | Complete | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) | `core/eip7623_floor.go` | `core/eip7623_test.go` |
-| 7976 | Calldata Floor Revision | Complete | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) | `core/eip7623_floor.go` (CalcFloorGasGlamst) | `core/eip7976_test.go` |
-| 7981 | Access List Floor Cost | Complete | Draft | `core/processor.go`, `core/chain_config.go` | via processor tests |
+| 7976 | Increase Calldata Floor Cost | Complete | [EIP-7976](https://eips.ethereum.org/EIPS/eip-7976) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/execution/amsterdam_fees_test.go`, `core/eftest/signed_native_test.go` |
+| 7981 | Increase Access List Cost | Complete | [EIP-7981](https://eips.ethereum.org/EIPS/eip-7981) | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go`, `txpool/txpool.go` | `core/gas/amsterdam_intrinsic_test.go`, `core/eftest/signed_native_test.go` |
 | 7997 | Deterministic CREATE2 Factory | Complete | [EIP-7997](https://eips.ethereum.org/EIPS/eip-7997) | `core/eip7997.go` | `core/eip7997_test.go` |
 | 7610 | Revert Creation Non-Empty Storage | Complete | [EIP-7610](https://eips.ethereum.org/EIPS/eip-7610) | `core/vm/eip7610.go` | `core/vm/eip7610_test.go` |
 | 7954 | Increased Max Code Size | Complete | [EIP-7954](https://eips.ethereum.org/EIPS/eip-7954) | `core/vm/eip7954.go`, `core/vm/eip7954_deep.go` | `core/vm/eip7954_test.go`, `core/vm/eip7954_deep_test.go` |
@@ -61,34 +81,36 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7975 | Partial Block Receipt Lists (ETH/70) | Referenced | Draft | `p2p/protocol.go` | via protocol tests |
-| 8159 | Block Access List Exchange (ETH/71) | Referenced | Draft | `p2p/protocol.go` | via protocol tests |
+| 7975 | Partial Block Receipt Lists (ETH/70) | Complete | Draft | `eth/protocol.go`, `eth/handler.go`, `p2p/ethproto/protocol.go` | `eiptest/eip7975_test.go`, `eth/handler_test.go` |
+| 8159 | Block Access List Exchange (ETH/71) | Complete | Draft | `eth/protocol_extended.go`, `p2p/ethproto/protocol.go` | `eiptest/eip8159_test.go` |
 
 ---
 
-## Hegotá (2026-2027, ~85% complete)
+## Hegotá (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
+| 8141 | Frame Transactions (pinned draft) | Complete | [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141) | `core/types/frame_8141.go`, `core/execution/frame_8141.go`, `core/vm/frame_8141.go`, `core/framepay/`, `txpool/frame_8141.go` | `core/execution/frame_8141_test.go`, `core/execution/frame_paymaster_test.go`, `txpool/frame_paymaster_test.go`, `node/frame_8141_integration_test.go`, `node/frame_blob_rpc_test.go` |
+| 7805 | FOCIL (Inclusion Lists) | Substantial | [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) | `focil/validation.go`, `engine/bogota.go`, `node/backend/engine_bogota.go` | `focil/il_satisfaction_test.go`, `node/frame_8141_integration_test.go` |
 | 7742 | Uncoupled Blob Count | Complete | [EIP-7742](https://eips.ethereum.org/EIPS/eip-7742) | `core/types/header.go` (TargetBlobsPerBlock), `core/blob_gas.go`, `engine/payload_attributes_v4.go` | `core/blob_schedule_test.go` |
 | 7898 | Uncoupled Execution Payload | Complete | [EIP-7898](https://eips.ethereum.org/EIPS/eip-7898) | `engine/engine_uncoupled.go` | `engine/engine_glamsterdam_test.go` |
 | 7706 | Separate Calldata Gas Dimension | Complete | [EIP-7706](https://eips.ethereum.org/EIPS/eip-7706) | `core/calldata_gas.go`, `core/multidim.go`, `core/multidim_gas.go` | `core/multidim_test.go`, `core/calldata_gas_test.go` |
 | 7999 | Multidimensional Gas Extension | Complete | Draft | `core/multidim.go` | `core/multidim_test.go` |
-| 6404 | SSZ Transactions | Complete | [EIP-6404](https://eips.ethereum.org/EIPS/eip-6404) | `core/types/tx_ssz.go`, `core/types/block_ssz.go` | `core/types/tx_ssz_test.go`, `core/types/block_ssz_test.go` |
-| 7807 | SSZ Blocks | Complete | [EIP-7807](https://eips.ethereum.org/EIPS/eip-7807) | `core/types/block_ssz.go` | `core/types/block_ssz_test.go` |
+| 6404 | SSZ Transactions | Substantial | [EIP-6404](https://eips.ethereum.org/EIPS/eip-6404) | `core/types/tx_ssz.go`, `core/types/block_ssz.go` | `core/types/tx_ssz_test.go`, `core/types/block_ssz_test.go` |
+| 7807 | SSZ Blocks | Substantial | [EIP-7807](https://eips.ethereum.org/EIPS/eip-7807) | `core/types/block_ssz.go` | `core/types/block_ssz_test.go` |
 | 7745 | Log Index | Complete | [EIP-7745](https://eips.ethereum.org/EIPS/eip-7745) | `core/types/log_index.go` | `core/types/log_index_test.go` |
 | 7916 | SSZ ProgressiveList | Complete | [EIP-7916](https://eips.ethereum.org/EIPS/eip-7916) | `ssz/progressive_list.go`, `ssz/progressive_encoder.go` | `ssz/progressive_list_test.go`, `ssz/progressive_encoder_test.go` |
 | 8077 | Announce Nonce (ETH/72) | Complete | [EIP-8077](https://eips.ethereum.org/EIPS/eip-8077) | `eth/announce_nonce.go`, `p2p/announce_nonce.go` | via eth tests |
 | 7691 | Blob Throughput Increase | Complete | [EIP-7691](https://eips.ethereum.org/EIPS/eip-7691) | `core/blob_schedule.go`, `core/blob_gas.go` | `core/eip7691_test.go`, `core/blob_schedule_test.go` |
-| 7495 | SSZ StableContainer | Referenced | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/stable_container.go` | via ssz tests |
+| 7495 | SSZ ProgressiveContainer | Complete | [EIP-7495](https://eips.ethereum.org/EIPS/eip-7495) | `ssz/progressive_container.go`, `ssz/progressive_list.go`, `core/types/execution_ssz_fields.go` | `ssz/progressive_reference_test.go`, `ssz/progressive_captured_test.go` |
 
 ---
 
-## I+ (2027, ~80% complete)
+## I+ (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 8079 | Native Rollups | Complete | [EIP-8079](https://eips.ethereum.org/EIPS/eip-8079) | `rollup/execute.go`, `rollup/anchor.go`, `rollup/native_rollup.go`, `rollup/bridge.go` | `rollup/native_rollup_test.go`, `rollup/execute_test.go` |
+| 8079 | Native Rollups | Substantial | [EIP-8079](https://eips.ethereum.org/EIPS/eip-8079) | `rollup/execute.go`, `rollup/anchor.go`, `rollup/native_rollup.go`, `rollup/bridge.go` | `rollup/native_rollup_test.go`, `rollup/execute_test.go` |
 | 7251 | Max Effective Balance (2048 ETH) | Complete | [EIP-7251](https://eips.ethereum.org/EIPS/eip-7251) | `consensus/validator.go`, `consensus/consolidation.go`, `consensus/consolidation_manager.go` | `consensus/consolidation_test.go`, `consensus/validator_test.go` |
 | 7549 | Attestation Committee Index | Complete | [EIP-7549](https://eips.ethereum.org/EIPS/eip-7549) | `consensus/eip7549.go`, `consensus/attestation.go`, `consensus/attestation_aggregator.go` | via consensus tests |
 | 4762 | Verkle Gas Cost Changes | Complete | [EIP-4762](https://eips.ethereum.org/EIPS/eip-4762) | `core/vm/eip4762_gas.go`, `core/state/access_events.go` | `core/vm/eip4762_gas_test.go` |
@@ -98,17 +120,16 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 
 ---
 
-## J+ (2027-2028, ~75% complete)
+## J+ (historical inventory)
 
 | EIP | Title | Status | Spec | Implementation | Tests |
 |-----|-------|--------|------|----------------|-------|
-| 7732 | Enshrined PBS (ePBS) | Substantial | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/engine_epbs.go` | `epbs/*_test.go` |
-| 7805 | FOCIL (Inclusion Lists) | Substantial | [EIP-7805](https://eips.ethereum.org/EIPS/eip-7805) | `focil/types.go`, `focil/builder.go`, `focil/validation.go`, `focil/compliance_tracker.go` | `focil/*_test.go` |
+| 7732 | Enshrined PBS (ePBS) | Complete | [EIP-7732](https://eips.ethereum.org/EIPS/eip-7732) | `epbs/types.go`, `epbs/bid_escrow.go`, `epbs/commitment_reveal.go`, `engine/server.go`, `engine/legacy_builder_retired_test.go` | `epbs/*_test.go` |
 | 7547 | Inclusion Lists | Complete | [EIP-7547](https://eips.ethereum.org/EIPS/eip-7547) | `core/types/inclusion_list.go`, `core/inclusion_list.go` | via focil tests |
 
 ---
 
-## K+ (2028, ~80% complete)
+## K+ (historical inventory)
 
 | Feature | Related EIPs | Status | Implementation | Tests |
 |---------|-------------|--------|----------------|-------|
@@ -118,7 +139,7 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 | 1-Epoch Finality | Framework-level | Functional | `consensus/finality.go` (singleEpochMode) | `consensus/finality_test.go` |
 | 1M Attestations/Slot | Framework-level | Functional | `consensus/attestation_scaler.go`, `consensus/parallel_bls.go`, `consensus/committee_subnet.go`, `consensus/batch_verifier.go` | `consensus/attestation_scaler_test.go`, `consensus/batch_verifier_test.go` |
 | Mandatory 3-of-5 Proofs | Framework-level | Functional | `proofs/mandatory_proofs.go`, `proofs/mandatory.go` | `proofs/mandatory_test.go` |
-| Canonical Guest | Framework-level | Functional | `zkvm/canonical.go`, `zkvm/canonical_executor.go` | `zkvm/canonical_test.go` |
+| Canonical Guest | Framework-level | Substantial | `zkvm/canonical.go`, `zkvm/canonical_executor.go` | `zkvm/canonical_test.go` |
 | CL Proof Circuits | Framework-level | Functional | `consensus/cl_proof_circuits.go`, `light/cl_proofs.go` | `consensus/cl_proof_circuits_test.go` |
 
 ---
@@ -145,7 +166,7 @@ Complete traceability matrix mapping every EIP to its specification, implementat
 | Feature | Related EIPs | Status | Implementation | Tests |
 |---------|-------------|--------|----------------|-------|
 | Gigagas L1 (1 Ggas/sec) | Framework-level | Functional | `core/gigagas.go`, `core/gigagas_integration.go` | `core/gigagas_test.go` |
-| Canonical zkVM | Framework-level | Functional | `zkvm/riscv_cpu.go`, `zkvm/canonical_executor.go`, `zkvm/proof_backend.go` | `zkvm/riscv_cpu_test.go` |
+| Canonical zkVM | Framework-level | Substantial | `zkvm/riscv_cpu.go`, `zkvm/canonical_executor.go`, `zkvm/proof_backend.go` | `zkvm/riscv_cpu_test.go` |
 | Gas Futures Market | Framework-level | Functional | `core/vm/gas_futures_long.go`, `core/gas_market.go` | `core/gas_market_test.go` |
 | PQ Transactions | 7932, 8051 | Partial | `core/types/pq_transaction.go`, `crypto/pqc/pq_tx_signer.go` | `core/types/pq_transaction_test.go` |
 | Sharded Mempool | Framework-level | Functional | `txpool/sharding.go`, `txpool/shared/` | `txpool/sharding_test.go` |
@@ -272,7 +293,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 | # | Feature | EIP(s) | Status | Key Implementation |
 |---|---------|--------|--------|-------------------|
-| 1 | Fast confirmation | - | Functional | `consensus/fast_confirm.go` |
+| 1 | Fast confirmation | - | **Complete (adopted CL FCR)** | Companion CL signed FCR and native Engine safeBlockHash; `consensus/fastconfirm/fast_confirm.go` is only the legacy utility |
 | 2 | Quick slots (6-sec) | - | Functional | `consensus/quick_slots.go` |
 | 3 | 1-epoch finality | - | Functional | `consensus/finality.go` |
 | 4 | 4-slot epochs | - | Functional | `consensus/quick_slots.go` |
@@ -316,7 +337,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 | # | Feature | EIP(s) | Status | Key Implementation |
 |---|---------|--------|--------|-------------------|
-| 35 | Glamsterdam repricing | 7904,7778,2780,8037,8038,7623,7976 | **Complete** | `core/glamsterdam_repricing.go` |
+| 35 | Glamsterdam repricing | 7778,2780,8037,8038,7623,7976,7981 | **Complete** | `core/gas/amsterdam_intrinsic.go`, `core/execution/amsterdam_message.go`, `core/vm/amsterdam_gas_table.go` |
 | 36 | Optional proofs | 8025 | Functional | `proofs/optional.go` |
 | 37 | Hegotá repricing | - | Functional | `core/hogota_repricing.go` |
 | 38 | 3x/year gas limit | - | Functional | `core/gas_limit.go` |
@@ -325,7 +346,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 | 41 | Block in blobs | - | Functional | `core/block_in_blobs.go` |
 | 42 | Announce nonce | 8077 | Functional | `eth/announce_nonce.go` |
 | 43 | Mandatory proofs | - | Functional | `proofs/mandatory_proofs.go` |
-| 44 | Canonical guest | - | Functional | `zkvm/canonical.go` |
+| 44 | Canonical guest | - | Substantial (real RV32IM receipts; Ethereum STF guest remains) | `zkvm/canonical.go` |
 | 45 | Canonical zkVM | - | Functional | `zkvm/riscv_cpu.go` |
 | 46 | Long-dated gas futures | - | Functional | `core/vm/gas_futures_long.go` |
 | 47 | Sharded mempool | - | Functional | `txpool/sharding.go` |
@@ -350,7 +371,9 @@ All 65 roadmap items mapped to their EIP and implementation status:
 
 ---
 
-## Coverage Summary
+## Historical coverage summary (retained)
+
+The following legacy inventory totals are retained historical data, not current mapped roadmap counts or a new conformance run. Current official-scope Glamsterdam implementation labels are 20/20, including independent current EIP-7495 qualification in PR159. The executable canonical Ethereum STF guest remains later research outside that denominator. The extension record distinguishes exact source and test receipts.
 
 | Metric | Value |
 |--------|-------|
@@ -367,3 +390,7 @@ All 65 roadmap items mapped to their EIP and implementation status:
 | Source files | 986 |
 | Test files | 916 |
 | Total LOC | ~702K |
+
+## November 24 extension scope
+
+EIP-7732 is complete for the adopted signed Gloas development contract; this is not whole-public-fork qualification. EL #155 and Lighthouse #17 connect signed CL FCR to native Engine safeBlockHash and repair crash durability. EL #156 replaces synthetic canonical proof checks with pinned real RV32IM execution receipts and native proof RPC. An executable canonical Ethereum STF guest remains a separate, unfinished broader roadmap item. See [the extension record](reviews/glamsterdam-extensions-20261124/STATUS.md).

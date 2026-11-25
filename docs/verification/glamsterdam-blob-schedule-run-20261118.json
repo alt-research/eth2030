@@ -1,0 +1,40 @@
+{
+  "scenario": "signed native HTTP producer and independent receiver; configured Prague/BPO transitions; synthetic public key",
+  "reference": "unmodified Geth v1.17.10 eip4844 formulas; custom parameters frozen in node regression",
+  "rows": [
+    {
+      "time": "12",
+      "blobs": "7",
+      "excess": "0",
+      "blobFee": "1",
+      "block": "0x555d2423af100872c09da77466b96d0e81f81424ba550bc37a25a9405f19253e",
+      "root": "0x1be590cddd52aa2fe6efa4e6b739519d5a633a6b573ec45edc1551ec491eab24",
+      "senderSpent": "366355500917504"
+    },
+    {
+      "time": "24",
+      "blobs": "10",
+      "excess": "550502",
+      "blobFee": "245",
+      "block": "0x48a0afc25e9e8a398b9f8e468ae9d72f8099c8e3859b13d34244e8d328b6295b",
+      "root": "0x3ec4cf69b34828c03f69531aa54cf878de18244643ce3151ae439f0720dd59f6",
+      "senderSpent": "260534987997568"
+    },
+    {
+      "time": "36",
+      "blobs": "21",
+      "excess": "987408",
+      "blobFee": "139",
+      "block": "0xc0548a6f9583857231d6bbd1e7d31d38ab587cc31514c189932f3d0406a2deb1",
+      "root": "0xe3d8b78f354b42841b1cdf100d8bd633c8d58f7c6110b4dd14b49c45d8a9b02b",
+      "senderSpent": "402982122148608"
+    }
+  ],
+  "full_client_release_qualified": false,
+  "tested_source_ancestor": "a36b8efb6bff63bafe7c4a1f767d458086826657",
+  "sidecar_version": 1,
+  "dependency_prs": [
+    76,
+    79
+  ]
+}

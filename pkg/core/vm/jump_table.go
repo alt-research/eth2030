@@ -80,108 +80,41 @@ func memoryMstore8(stack *Stack) (uint64, bool) {
 }
 
 func memoryReturn(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	size, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, size)
+	return checkedMemoryRange(stack.Back(0), stack.Back(1))
 }
 
 func memoryKeccak256(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	size, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, size)
+	return checkedMemoryRange(stack.Back(0), stack.Back(1))
 }
 
 func memoryCalldataCopy(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	return checkedMemoryRange(stack.Back(0), stack.Back(2))
 }
 
 func memoryCodeCopy(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	return checkedMemoryRange(stack.Back(0), stack.Back(2))
 }
 
 func memoryLog(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	size, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, size)
+	return checkedMemoryRange(stack.Back(0), stack.Back(1))
 }
 
 func memoryReturndataCopy(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(0))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	return checkedMemoryRange(stack.Back(0), stack.Back(2))
 }
 
 // memoryCall returns the required memory size for CALL.
 // Stack: gas, addr, value, argsOffset, argsLength, retOffset, retLength
 func memoryCall(stack *Stack) (uint64, bool) {
-	argsOff, overflow := bigUint64WithOverflow(stack.Back(3))
+	argsEnd, overflow := checkedMemoryRange(stack.Back(3), stack.Back(4))
 	if overflow {
 		return 0, true
 	}
-	argsLen, overflow := bigUint64WithOverflow(stack.Back(4))
+	retEnd, overflow := checkedMemoryRange(stack.Back(5), stack.Back(6))
 	if overflow {
 		return 0, true
 	}
-	retOff, overflow := bigUint64WithOverflow(stack.Back(5))
-	if overflow {
-		return 0, true
-	}
-	retLen, overflow := bigUint64WithOverflow(stack.Back(6))
-	if overflow {
-		return 0, true
-	}
-	argsEnd, overflow := safeAddU_val(argsOff, argsLen)
-	if overflow {
-		return 0, true
-	}
-	retEnd, overflow := safeAddU_val(retOff, retLen)
-	if overflow {
-		return 0, true
-	}
-	if argsEnd > retEnd {
-		return argsEnd, false
-	}
-	return retEnd, false
+	return max(argsEnd, retEnd), false
 }
 
 // memoryCallCode returns the required memory size for CALLCODE.
@@ -192,34 +125,15 @@ func memoryCallCode(stack *Stack) (uint64, bool) {
 // memoryDelegateCall returns the required memory size for DELEGATECALL.
 // Stack: gas, addr, argsOffset, argsLength, retOffset, retLength (no value)
 func memoryDelegateCall(stack *Stack) (uint64, bool) {
-	argsOff, overflow := bigUint64WithOverflow(stack.Back(2))
+	argsEnd, overflow := checkedMemoryRange(stack.Back(2), stack.Back(3))
 	if overflow {
 		return 0, true
 	}
-	argsLen, overflow := bigUint64WithOverflow(stack.Back(3))
+	retEnd, overflow := checkedMemoryRange(stack.Back(4), stack.Back(5))
 	if overflow {
 		return 0, true
 	}
-	retOff, overflow := bigUint64WithOverflow(stack.Back(4))
-	if overflow {
-		return 0, true
-	}
-	retLen, overflow := bigUint64WithOverflow(stack.Back(5))
-	if overflow {
-		return 0, true
-	}
-	argsEnd, overflow := safeAddU_val(argsOff, argsLen)
-	if overflow {
-		return 0, true
-	}
-	retEnd, overflow := safeAddU_val(retOff, retLen)
-	if overflow {
-		return 0, true
-	}
-	if argsEnd > retEnd {
-		return argsEnd, false
-	}
-	return retEnd, false
+	return max(argsEnd, retEnd), false
 }
 
 // memoryStaticCall returns the required memory size for STATICCALL.
@@ -230,75 +144,33 @@ func memoryStaticCall(stack *Stack) (uint64, bool) {
 // memoryExtcodecopy returns the required memory size for EXTCODECOPY.
 // Stack: addr, memOffset, codeOffset, length
 func memoryExtcodecopy(stack *Stack) (uint64, bool) {
-	memOff, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(3))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(memOff, length)
+	return checkedMemoryRange(stack.Back(1), stack.Back(3))
 }
 
 // memoryCreate returns the required memory size for CREATE.
 // Stack: value, offset, length
 func memoryCreate(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	return checkedMemoryRange(stack.Back(1), stack.Back(2))
 }
 
 // memoryCreate2 returns the required memory size for CREATE2.
 // Stack: value, offset, length, salt
 func memoryCreate2(stack *Stack) (uint64, bool) {
-	offset, overflow := bigUint64WithOverflow(stack.Back(1))
-	if overflow {
-		return 0, true
-	}
-	length, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	return safeAddU_val(offset, length)
+	return checkedMemoryRange(stack.Back(1), stack.Back(2))
 }
 
 // memoryMcopy returns the required memory size for MCOPY.
 // Stack: dest, src, size. We need max(dest+size, src+size).
 func memoryMcopy(stack *Stack) (uint64, bool) {
-	dest, overflow := bigUint64WithOverflow(stack.Back(0))
+	destEnd, overflow := checkedMemoryRange(stack.Back(0), stack.Back(2))
 	if overflow {
 		return 0, true
 	}
-	src, overflow := bigUint64WithOverflow(stack.Back(1))
+	srcEnd, overflow := checkedMemoryRange(stack.Back(1), stack.Back(2))
 	if overflow {
 		return 0, true
 	}
-	size, overflow := bigUint64WithOverflow(stack.Back(2))
-	if overflow {
-		return 0, true
-	}
-	if size == 0 {
-		return 0, false
-	}
-	destEnd, overflow := safeAddU_val(dest, size)
-	if overflow {
-		return 0, true
-	}
-	srcEnd, overflow := safeAddU_val(src, size)
-	if overflow {
-		return 0, true
-	}
-	if destEnd > srcEnd {
-		return destEnd, false
-	}
-	return srcEnd, false
+	return max(destEnd, srcEnd), false
 }
 
 // memoryApprove returns the required memory size for APPROVE (EIP-8141).
@@ -391,7 +263,7 @@ func NewFrontierJumpTable() JumpTable {
 	// Arithmetic
 	tbl[STOP] = &operation{execute: opStop, constantGas: GasStop, minStack: 0, maxStack: 1024, halts: true}
 	tbl[ADD] = &operation{execute: opAdd, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
-	tbl[MUL] = &operation{execute: opMul, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
+	tbl[MUL] = &operation{execute: opMul, constantGas: GasLow, minStack: 2, maxStack: 1024}
 	tbl[SUB] = &operation{execute: opSub, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 	tbl[DIV] = &operation{execute: opDiv, constantGas: GasLow, minStack: 2, maxStack: 1024}
 	tbl[SDIV] = &operation{execute: opSdiv, constantGas: GasLow, minStack: 2, maxStack: 1024}
@@ -642,12 +514,30 @@ func NewPragueJumpTable() JumpTable {
 	return tbl
 }
 
+// NewOsakaJumpTable activates EIP-7939's count-leading-zeros opcode.
+func NewOsakaJumpTable() JumpTable {
+	tbl := NewPragueJumpTable()
+	tbl[CLZ] = &operation{execute: opCLZ, constantGas: GasFastStep, minStack: 1, maxStack: 1024}
+	return tbl
+}
+
+// NewAmsterdamJumpTable adds EIP-7843 and EIP-8024 to Osaka.
+func NewAmsterdamJumpTable() JumpTable {
+	tbl := NewOsakaJumpTable()
+	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
+	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
+	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
+	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
+	installAmsterdamGas(&tbl)
+	return tbl
+}
+
 // NewVerkleJumpTable returns the Verkle fork jump table.
 func NewVerkleJumpTable() JumpTable {
 	tbl := NewGlamsterdanJumpTable()
 
 	tbl[SLOAD] = &operation{execute: opSload, constantGas: 0, dynamicGas: gasSloadEIP4762, minStack: 1, maxStack: 1024}
-	tbl[SSTORE] = &operation{execute: opSstore, constantGas: 0, dynamicGas: gasSstoreEIP4762, minStack: 2, maxStack: 1024, writes: true}
+	tbl[SSTORE] = &operation{execute: opSstoreGlamst, constantGas: 0, dynamicGas: gasSstoreEIP4762, minStack: 2, maxStack: 1024, writes: true}
 	tbl[BALANCE] = &operation{execute: opBalance, constantGas: 0, dynamicGas: gasBalanceEIP4762, minStack: 1, maxStack: 1024}
 	tbl[EXTCODESIZE] = &operation{execute: opExtcodesize, constantGas: 0, dynamicGas: gasExtCodeSizeEIP4762, minStack: 1, maxStack: 1024}
 	tbl[EXTCODECOPY] = &operation{execute: opExtcodecopy, constantGas: 0, dynamicGas: gasExtCodeCopyEIP4762, minStack: 4, maxStack: 1024, memorySize: memoryExtcodecopy}
@@ -663,7 +553,7 @@ func NewVerkleJumpTable() JumpTable {
 
 // NewGlamsterdanJumpTable returns the Glamsterdan fork jump table.
 func NewGlamsterdanJumpTable() JumpTable {
-	tbl := NewPragueJumpTable()
+	tbl := NewAmsterdamJumpTable()
 
 	tbl[DIV] = &operation{execute: opDiv, constantGas: GasDivGlamsterdan, minStack: 2, maxStack: 1024}
 	tbl[SDIV] = &operation{execute: opSdiv, constantGas: GasSdivGlamsterdan, minStack: 2, maxStack: 1024}
@@ -685,12 +575,7 @@ func NewGlamsterdanJumpTable() JumpTable {
 	tbl[DELEGATECALL] = &operation{execute: opDelegateCall, constantGas: WarmStorageReadGlamst, dynamicGas: gasDelegateCallGlamst, minStack: 6, maxStack: 1024, memorySize: memoryDelegateCall}
 	tbl[SELFDESTRUCT] = &operation{execute: opSelfdestruct, constantGas: GasSelfdestruct, dynamicGas: gasSelfdestructGlamst, minStack: 1, maxStack: 1024, halts: true, writes: true}
 
-	tbl[SLOTNUM] = &operation{execute: opSlotNum, constantGas: GasBase, minStack: 0, maxStack: 1023}
 	tbl[CLZ] = &operation{execute: opCLZ, constantGas: GasFastStep, minStack: 1, maxStack: 1024}
-
-	tbl[DUPN] = &operation{execute: opDupN, constantGas: GasVerylow, minStack: 1, maxStack: 1023}
-	tbl[SWAPN] = &operation{execute: opSwapN, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
-	tbl[EXCHANGE] = &operation{execute: opExchange, constantGas: GasVerylow, minStack: 2, maxStack: 1024}
 
 	return tbl
 }
@@ -745,4 +630,22 @@ func NewFrameVerifyJumpTable() JumpTable {
 	tbl[LOG4] = nil
 
 	return tbl
+}
+
+// checkedMemoryRange implements the EVM's zero-length region rule before
+// converting offsets. A zero-size copy/call/return must ignore even a full
+// uint256 offset. Nonzero ranges must fit before memory word rounding.
+func checkedMemoryRange(offset, size *big.Int) (uint64, bool) {
+	if size.Sign() == 0 {
+		return 0, false
+	}
+	n, overflow := bigUint64WithOverflow(size)
+	if overflow {
+		return 0, true
+	}
+	start, overflow := bigUint64WithOverflow(offset)
+	if overflow {
+		return 0, true
+	}
+	return safeAddU_val(start, n)
 }

@@ -426,6 +426,10 @@ func makeGasLog(n uint64) dynamicGasFunc {
 func gasCreateDynamic(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	// Stack: value, offset, length
 	size := stack.Back(2).Uint64()
+	if evm.forkRules.IsShanghai && size > uint64(MaxInitCodeSizeForFork(evm.forkRules)) {
+		return 0, ErrMaxInitCodeSizeExceeded
+	}
+
 	words := toWordSize(size)
 	gas := safeMul(InitCodeWordGas, words)
 	memGas, err := gasMemExpansion(evm, contract, stack, mem, memorySize)
@@ -441,6 +445,10 @@ func gasCreateDynamic(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 func gasCreate2Dynamic(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	// Stack: value, offset, length, salt
 	size := stack.Back(2).Uint64()
+	if evm.forkRules.IsShanghai && size > uint64(MaxInitCodeSizeForFork(evm.forkRules)) {
+		return 0, ErrMaxInitCodeSizeExceeded
+	}
+
 	words := toWordSize(size)
 	// CREATE2 hashes the init code, so pay for keccak words + initcode words.
 	gas := safeMul(InitCodeWordGas+GasKeccak256Word, words)
@@ -461,6 +469,9 @@ func gasCreate2Dynamic(evm *EVM, contract *Contract, stack *Stack, mem *Memory, 
 // gas covers WarmStorageReadCost), SSTORE's constant gas is 0, so the full
 // ColdSloadCost is charged here as the cold penalty.
 func gasSstoreEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
+	if contract.Gas <= CallStipend {
+		return 0, ErrOutOfGas
+	}
 	loc := stack.Back(0)
 	slot := bigToHash(loc)
 
@@ -500,11 +511,14 @@ func gasSelfdestructEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Mem
 	addr := types.BytesToAddress(stack.Back(0).Bytes())
 
 	// Cold access cost for the beneficiary address.
-	gas = safeAdd(gas, gasEIP2929AccountCheck(evm, addr))
+	gas = gasEIP2929AccountCheck(evm, addr)
+	if gas > 0 {
+		gas += WarmStorageReadCost
+	}
 
 	// If beneficiary doesn't exist and contract has balance, charge new account gas.
 	if evm.StateDB != nil {
-		if !evm.StateDB.Exist(addr) && evm.StateDB.GetBalance(contract.Address).Sign() != 0 {
+		if evm.StateDB.Empty(addr) && evm.StateDB.GetBalance(contract.Address).Sign() != 0 {
 			gas = safeAdd(gas, CreateBySelfdestructGas)
 		}
 	}
@@ -628,7 +642,7 @@ func gasCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory, mem
 	if transfersValue {
 		gas = safeAdd(gas, CallValueTransferGas)
 		// Sending value to a non-existent account costs extra.
-		if evm.StateDB != nil && !evm.StateDB.Exist(addr) {
+		if evm.StateDB != nil && evm.StateDB.Empty(addr) {
 			gas = safeAdd(gas, CallNewAccountGas)
 		}
 	}
@@ -637,8 +651,12 @@ func gasCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory, mem
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -657,8 +675,12 @@ func gasCallCodeEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memory,
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -673,8 +695,12 @@ func gasDelegateCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Mem
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -689,8 +715,12 @@ func gasStaticCallEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memor
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -848,8 +878,12 @@ func gasCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memo
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -866,8 +900,12 @@ func gasCallCodeGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory, 
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -881,8 +919,12 @@ func gasDelegateCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -896,8 +938,12 @@ func gasStaticCallGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memory
 		return 0, err
 	}
 	gas = safeAdd(gas, memGas)
+	gas, err = gasDelegationResolution(evm, contract, addr, gas)
+	if err != nil {
+		return 0, err
+	}
 	// Compute call gas via 63/64 rule and store in evm.callGasTemp.
-	evm.callGasTemp = callGasEIP150(contract.Gas, gas, stack.Back(0).Uint64())
+	evm.callGasTemp = callGasForWord(contract.Gas, gas, stack.Back(0))
 	gas = safeAdd(gas, evm.callGasTemp)
 	return gas, nil
 }
@@ -917,7 +963,7 @@ func gasSelfdestructGlamst(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 
 // GasPQVerify returns the gas cost for verifying a post-quantum signature
 // of the given algorithm ID. Algorithm IDs match the PQ algorithm registry
-// in pkg/crypto/pqc/ (EIP-7932/EIP-8051).
+// in pkg/crypto/pqc/. This is not the EIP-8051 precompile schedule.
 func GasPQVerify(algorithmID uint8) uint64 {
 	switch algorithmID {
 	case 1: // ML-DSA-44

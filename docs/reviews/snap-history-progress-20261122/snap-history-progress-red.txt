@@ -1,0 +1,9 @@
+--- FAIL: TestSnapHistoryPrefixReadDoesNotBlockTipImportOrForkchoice (2.01s)
+    --- FAIL: TestSnapHistoryPrefixReadDoesNotBlockTipImportOrForkchoice/authenticated (1.01s)
+        snap_history_progress_test.go:111: saved-prefix read held the execution/FCU mutation lock
+    --- FAIL: TestSnapHistoryPrefixReadDoesNotBlockTipImportOrForkchoice/cancelled (1.01s)
+        snap_history_progress_test.go:111: saved-prefix read held the execution/FCU mutation lock
+        snap_history_progress_test.go:75: cancelled prefix: <nil>
+FAIL
+FAIL	github.com/eth2030/eth2030/core/chain	2.717s
+FAIL

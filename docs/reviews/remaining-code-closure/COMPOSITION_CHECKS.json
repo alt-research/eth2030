@@ -1,0 +1,65 @@
+[
+  {
+    "name": "race",
+    "source": "bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "./core/rawdb",
+      "./core/state",
+      "./core/state/snapshot",
+      "./core/state/pruner",
+      "./core/chain",
+      "./engine",
+      "./rpc/server",
+      "./rpc/ethapi",
+      "./node",
+      "./node/backend",
+      "./eiptest"
+    ],
+    "seconds": 75.21890173500287,
+    "exit": 0
+  },
+  {
+    "name": "full",
+    "source": "bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-count=1",
+      "./..."
+    ],
+    "seconds": 48.09861258097226,
+    "exit": 0
+  },
+  {
+    "name": "vet",
+    "source": "bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "seconds": 3.055335793993436,
+    "exit": 0
+  },
+  {
+    "name": "build",
+    "source": "bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394",
+    "command": [
+      "go",
+      "build",
+      "-trimpath",
+      "-ldflags",
+      "-X main.commit=bcf9e13ecdedbd8e59cb05b6590c34ada1c7a394 -X main.version=remaining-code-qualification",
+      "-o",
+      "/projects/eth2030/qualification/remaining-code-20261122/combined-native",
+      "./cmd/eth2030"
+    ],
+    "seconds": 4.371905055013485,
+    "exit": 0
+  }
+]

@@ -13,7 +13,7 @@ func TestFrontierJumpTableArithmetic(t *testing.T) {
 	}{
 		{STOP, "STOP", GasStop, 0},
 		{ADD, "ADD", GasVerylow, 2},
-		{MUL, "MUL", GasVerylow, 2},
+		{MUL, "MUL", GasLow, 2},
 		{SUB, "SUB", GasVerylow, 2},
 		{DIV, "DIV", GasLow, 2},
 		{SDIV, "SDIV", GasLow, 2},

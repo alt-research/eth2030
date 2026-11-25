@@ -1,0 +1,225 @@
+{
+  "captured_at": "2026-11-20T03:18:31.295368+00:00",
+  "pull_requests": [
+    {
+      "number": 92,
+      "head": "integration/glamsterdam-conformance-foundation",
+      "head_sha": "c9bd022a0d813010de40860fa08db2e79ed7a6ea",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    },
+    {
+      "number": 93,
+      "head": "fix/native-vm-metering-boundaries",
+      "head_sha": "3661d79d6c6a69a5b989aefe7cceeda955691fdb",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 94,
+      "head": "fix/native-transaction-validation",
+      "head_sha": "328c8f044fcc1e270c0fbca476580160a281e89b",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 95,
+      "head": "test/glamsterdam-native-fixtures",
+      "head_sha": "7aee734154065de97c08f564da0385d518dcaffb",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 97,
+      "head": "fix/ordinary-transaction-context",
+      "head_sha": "e90baab4eaf1a72d7efceaffbcc298716d89908f",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 98,
+      "head": "test/glamsterdam-application-compatibility",
+      "head_sha": "103dfefae6913cc042015b30b1d7f63af1253f87",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 100,
+      "head": "integration/glamsterdam-runtime-candidate",
+      "head_sha": "9a612c21ddc61bf48c4216ad6e24e4206bcb5ae8",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 101,
+      "head": "test/glamsterdam-multiclient-gate",
+      "head_sha": "f57b582ecb664934db982c4e3f796d9a097c731a",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 102,
+      "head": "fix/rpc-block-hash-call-selectors",
+      "head_sha": "85fb43a0d849b2ea8e97f4b2baaf6b345a58bd43",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 103,
+      "head": "fix/historical-receipt-derived-fields",
+      "head_sha": "53ee0b0106975704635e74b147c351604157c8ff",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 104,
+      "head": "fix/engine-stale-canonical-forkchoice",
+      "head_sha": "aef7f8a1107d70328ba2b78126e8d52721dd6764",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 105,
+      "head": "fix/historical-state-header-readback",
+      "head_sha": "ed8558dee04c52eaff46df7ea1392157b20d7284",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 106,
+      "head": "fix/rpc-request-execution-cancellation",
+      "head_sha": "4918d9738ee7852cb9f29fb2e2de8699129ceefa",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 107,
+      "head": "fix/websocket-execution-disconnect",
+      "head_sha": "8896b32b07d1b0c49a597e509f00345b3c71d2a0",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 108,
+      "head": "fix/full-sync-target-progress",
+      "head_sha": "8d329335e736fed7550144ce8835c11022ac38f2",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 109,
+      "head": "fix/merkle-state-history",
+      "head_sha": "2838fb0b1a87b8f8b9ecb6d513b0aa5d8056d9e7",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 110,
+      "head": "fix/filedb-wal-recovery",
+      "head_sha": "878a799fe55841303b2cf3e706e54ee1121ebe25",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 111,
+      "head": "fix/verified-history-restart",
+      "head_sha": "5ab3c2ce65bc534b86bc768404096756db50579a",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 112,
+      "head": "fix/snap-pivot-peer-recovery",
+      "head_sha": "ad92af00dcd0ab06b416f79c09d6a5fa4908b52e",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 113,
+      "head": "integration/glamsterdam-final-acceptance",
+      "head_sha": "b18ddd6e229ff55becceb1d5a354e33ddc9a2fd2",
+      "base": "master",
+      "draft": true,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 114,
+      "head": "fix/official-rpc-conformance",
+      "head_sha": "ae6e0eb5121f0e3dca036ac0a4c19fec559e6a1a",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": false,
+      "mergeable_state": "dirty"
+    },
+    {
+      "number": 115,
+      "head": "fix/osaka-clz-master",
+      "head_sha": "5dd685790da66a0d6f1ae1ca9f2477c2927b0d9d",
+      "base": "master",
+      "draft": false,
+      "state": "open",
+      "mergeable": true,
+      "mergeable_state": "blocked"
+    }
+  ]
+}

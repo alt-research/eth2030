@@ -1,0 +1,110 @@
+{
+  "passed": false,
+  "status": "failed",
+  "started_at": "2026-11-21T21:10:32.626146+00:00",
+  "profile": {
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "binary_sha256": "4e0f7a54765ce0992d0477d65565fcb41c27a8bac6525bb6f2497721939a9043",
+    "genesis_execution_sha256": "42b742b259788319ea579ad5979976fb3998c69e6fa1a3103653304bb079b3f2",
+    "duration_seconds": 172800,
+    "sampling_seconds": 30,
+    "catchup_budget_seconds": 3600,
+    "memory_each_bytes": 4096000000,
+    "cpus_each": 2,
+    "scope": "Same owned EL/CL databases and binary identities after the failed peer-depleted run. Only own CL boot seeds add the existing full/snap observers, including a measured2-peer provider. Original nodes and limits/scoring/validation/history behavior remain unchanged; original failed run is immutable. New duration starts from zero after catchup.",
+    "cl_source": "d547ba984",
+    "cl_binary_sha256": "56143d366dee843d1a9410752588ce7c8125ae0b6f9984e1fdad7783588ba3f1",
+    "finality_stall_seconds": 600,
+    "max_finalized_lag_blocks": 128,
+    "disk_free_stop_bytes": 21474836480,
+    "log_max_size": "100m",
+    "log_max_files": 3,
+    "seed_correction": "Initial seeds were only the three validator BNs; two trimmed incoming peers (Too many peers), the remaining provider rate-limited backfill and banned the observer. Add available existing observer ENRs; do not disable scores, signature/hash checks or historical sync."
+  },
+  "scope": "48-hour owned observer operating profile only; not public/mainnet capacity or independent BLS finality across the entire span.",
+  "accepted_started_at": "2026-11-21T21:11:33.093597+00:00",
+  "initial": {
+    "ready": true,
+    "sync": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "64059",
+      "sync_distance": "0"
+    },
+    "memory": {
+      "el": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 1246486528,
+        "process_hwm": 889384960
+      },
+      "cl": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 327827456,
+        "process_hwm": 342024192
+      }
+    },
+    "finalized_hash": "0x45d7ada8c2c2eaf11f32c429a2d3e6a5bc3e8262fe9de9b49b0a2079e37a481d",
+    "finalized_root": "0x88bc13959c7480e903ed6e7304ecf95efe02ad6fc70241902a5ae1798db176ac",
+    "finalized_number": 61335,
+    "reference_lag": 0
+  },
+  "samples": 781,
+  "elapsed_seconds": 23545.53568453298,
+  "last": {
+    "ready": true,
+    "sync": {
+      "is_syncing": false,
+      "is_optimistic": false,
+      "el_offline": false,
+      "head_slot": "71906",
+      "sync_distance": "1"
+    },
+    "memory": {
+      "el": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 1703649280,
+        "process_hwm": 885796864
+      },
+      "cl": {
+        "events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "memory_max": 4096000000,
+        "memory_peak": 892518400,
+        "process_hwm": 400478208
+      }
+    },
+    "finalized_hash": "0x6fc98283a159ea4fad5d7ac56a951d746ca48b6365109baa95bcb63dacc01f08",
+    "finalized_root": "0x9511a2f66b80fb3739237aea0fe60b45e46f2a07328598d411ec910922417003",
+    "finalized_number": 69206,
+    "reference_lag": 0
+  },
+  "updated_at": "2026-11-22T03:43:58.512089+00:00",
+  "failure": {
+    "class": "TimeoutError",
+    "message": "timed out"
+  },
+  "finished_at": "2026-11-22T03:44:38.619541+00:00"
+}

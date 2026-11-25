@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "slot": 97047,
+      "block_root": "0xcc4b8ef150bafb8f0c95b88ee4825af83d02d42b003251deeb4a16bec014a7af",
+      "delayed_block": "Nov 23 00:40:58.189 DEBUG Delayed head block                            block_root: 0xcc4b8ef150bafb8f0c95b88ee4825af83d02d42b003251deeb4a16bec014a7af, proposer_index: 106, slot: 97047, total_delay_ms: 2189, observed_delay_ms: \"2183\", blob_delay_ms: \"unknown\", consensus_time_ms: \"4\", execution_time_ms: \"0\", available_delay_ms: \"2188\", attestable_delay_ms: \"2188\", imported_time_ms: \"0\", set_as_head_time_ms: \"1\"",
+      "ban_warning": "Nov 23 00:40:59.001 WARN  Banning builder that failed to reveal its payload  builder_index: 0, pubkey: 0xa55c1285d84ba83a5ad26420cd5ad3091e49c55a813eee651cd467db38a8c8e63192f47955e9376f6b42f6d190571cb5, block_slot: 97047, block_root: 0xcc4b8ef150bafb8f0c95b88ee4825af83d02d42b003251deeb4a16bec014a7af, block_weight: 384000000000, quorum: 230400000000, ban_slots: 32",
+      "rpc_envelope_start": "Nov 23 00:40:59.015 DEBUG Processing RPC payload envelope               block_root: 0xcc4b8ef150bafb8f0c95b88ee4825af83d02d42b003251deeb4a16bec014a7af, slot: 97047, process_type: SinglePayloadEnvelope(893)",
+      "el_newpayload_completed": "Nov 23 00:40:59.083 DEBUG Processed engine_newPayload                   status: \"valid\", parent_hash: 0x9ec13cffcf795313765c8379bdb1dde4db67efae055959d47101e2b75ac352ac, block_hash: 0xd9cf33a52f71da590d187460003c7761346fb67eedc82ad2f7be0413fc68090b, block_number: 93681, response_time_ms: 66",
+      "envelope_imported": "Nov 23 00:40:59.083 INFO  Execution payload envelope imported           block_root: 0xcc4b8ef150bafb8f0c95b88ee4825af83d02d42b003251deeb4a16bec014a7af, slot: 97047, source: lookup, envelope_source: lookup",
+      "el_response_ms": 66,
+      "classification": "Observed block arrived via lookup about2.19s into its3s slot; envelope was not locally observed by the PTC deadline and was recovered by RPC just after next-slot boundary. Configured local circuit-breaker policy records this offence even after later import; no engine timeout or storage convoy is evidenced."
+    },
+    {
+      "slot": 97077,
+      "block_root": "0x03e5dc21b67a4e25016f424054838bba73b379e709bffa336bea09411c31b2b8",
+      "delayed_block": "Nov 23 00:42:28.191 DEBUG Delayed head block                            block_root: 0x03e5dc21b67a4e25016f424054838bba73b379e709bffa336bea09411c31b2b8, proposer_index: 123, slot: 97077, total_delay_ms: 2191, observed_delay_ms: \"2184\", blob_delay_ms: \"unknown\", consensus_time_ms: \"5\", execution_time_ms: \"0\", available_delay_ms: \"2189\", attestable_delay_ms: \"2189\", imported_time_ms: \"0\", set_as_head_time_ms: \"1\"",
+      "ban_warning": "Nov 23 00:42:29.001 WARN  Banning builder that failed to reveal its payload  builder_index: 0, pubkey: 0xa55c1285d84ba83a5ad26420cd5ad3091e49c55a813eee651cd467db38a8c8e63192f47955e9376f6b42f6d190571cb5, block_slot: 97077, block_root: 0x03e5dc21b67a4e25016f424054838bba73b379e709bffa336bea09411c31b2b8, block_weight: 384000000000, quorum: 230400000000, ban_slots: 32",
+      "rpc_envelope_start": "Nov 23 00:42:29.505 DEBUG Processing RPC payload envelope               block_root: 0x03e5dc21b67a4e25016f424054838bba73b379e709bffa336bea09411c31b2b8, slot: 97077, process_type: SinglePayloadEnvelope(898)",
+      "el_newpayload_completed": "Nov 23 00:42:29.571 DEBUG Processed engine_newPayload                   status: \"valid\", parent_hash: 0x8f5ab4036c8b81c3dca8659d615545f436142328db1d33221e742f76dd9e6de0, block_hash: 0x892933bde7379efcd938a5c95eeeb9af52ace7ba8e8f74da80eb2541e27372a5, block_number: 93711, response_time_ms: 64",
+      "envelope_imported": "Nov 23 00:42:29.571 INFO  Execution payload envelope imported           block_root: 0x03e5dc21b67a4e25016f424054838bba73b379e709bffa336bea09411c31b2b8, slot: 97077, source: lookup, envelope_source: lookup",
+      "el_response_ms": 64,
+      "classification": "Observed block arrived via lookup about2.19s into its3s slot; envelope was not locally observed by the PTC deadline and was recovered by RPC just after next-slot boundary. Configured local circuit-breaker policy records this offence even after later import; no engine timeout or storage convoy is evidenced."
+    },
+    {
+      "slot": 97567,
+      "block_root": "0x7a98bcd7c22d0d144dfecac9346edf71d2df018e6df1ac2466ed246f6bb46b08",
+      "delayed_block": "Nov 23 01:06:58.192 DEBUG Delayed head block                            block_root: 0x7a98bcd7c22d0d144dfecac9346edf71d2df018e6df1ac2466ed246f6bb46b08, proposer_index: 45, slot: 97567, total_delay_ms: 2192, observed_delay_ms: \"2185\", blob_delay_ms: \"unknown\", consensus_time_ms: \"5\", execution_time_ms: \"0\", available_delay_ms: \"2190\", attestable_delay_ms: \"2190\", imported_time_ms: \"0\", set_as_head_time_ms: \"1\"",
+      "ban_warning": "Nov 23 01:06:59.001 WARN  Banning builder that failed to reveal its payload  builder_index: 0, pubkey: 0xa55c1285d84ba83a5ad26420cd5ad3091e49c55a813eee651cd467db38a8c8e63192f47955e9376f6b42f6d190571cb5, block_slot: 97567, block_root: 0x7a98bcd7c22d0d144dfecac9346edf71d2df018e6df1ac2466ed246f6bb46b08, block_weight: 384000000000, quorum: 230400000000, ban_slots: 32",
+      "rpc_envelope_start": "Nov 23 01:06:59.500 DEBUG Processing RPC payload envelope               block_root: 0x7a98bcd7c22d0d144dfecac9346edf71d2df018e6df1ac2466ed246f6bb46b08, slot: 97567, process_type: SinglePayloadEnvelope(936)",
+      "el_newpayload_completed": "Nov 23 01:06:59.567 DEBUG Processed engine_newPayload                   status: \"valid\", parent_hash: 0x4df211e499f954f9232d8344e8f34efe27c895c49792ba59fd7569e9280c748c, block_hash: 0x660241f44d0e78170adac61e01d425149771568d0cf754d22d4f20699e3c2895, block_number: 94201, response_time_ms: 66",
+      "envelope_imported": "Nov 23 01:06:59.567 INFO  Execution payload envelope imported           block_root: 0x7a98bcd7c22d0d144dfecac9346edf71d2df018e6df1ac2466ed246f6bb46b08, slot: 97567, source: lookup, envelope_source: lookup",
+      "el_response_ms": 66,
+      "classification": "Observed block arrived via lookup about2.19s into its3s slot; envelope was not locally observed by the PTC deadline and was recovered by RPC just after next-slot boundary. Configured local circuit-breaker policy records this offence even after later import; no engine timeout or storage convoy is evidenced."
+    }
+  ],
+  "source": "3782df1f88095997ffb4c91986a5f1c56bfa5bf2",
+  "source_paths": [
+    "beacon_node/beacon_chain/src/beacon_chain.rs:8095",
+    "beacon_node/beacon_chain/src/circuit_breaker.rs:401"
+  ],
+  "scope": "Three post-threshold CL advisories remain retained. Local late observation is not proof of a globally withheld builder payload. Bans are node-local proposal policy and do not change validity/fork choice. No heuristic/policy or consensus/BLS relaxation is applied.",
+  "original_fault_resolved": false
+}

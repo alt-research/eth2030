@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 )
@@ -27,6 +28,12 @@ const (
 	AttesterSlashing
 	// BlobSidecar propagates blob sidecars (EIP-4844+).
 	BlobSidecar
+	// DataColumnSidecar propagates data column sidecars (EIP-7594/Fulu),
+	// one gossipsub topic per subnet: data_column_sidecar_<subnet_id>.
+	DataColumnSidecar
+	// InclusionList propagates signed inclusion lists (EIP-7805 FOCIL),
+	// one global topic per the spec.
+	InclusionList
 	// SyncCommitteeContribution propagates sync committee contributions.
 	SyncCommitteeContribution
 	// STARKMempoolTick propagates recursive STARK mempool aggregation ticks.
@@ -55,6 +62,8 @@ var gossipTopicNames = map[GossipTopic]string{
 	ProposerSlashing:          "proposer_slashing",
 	AttesterSlashing:          "attester_slashing",
 	BlobSidecar:               "blob_sidecar",
+	DataColumnSidecar:         "data_column_sidecar",
+	InclusionList:             "inclusion_list",
 	SyncCommitteeContribution: "sync_committee_contribution",
 	STARKMempoolTick:          "stark_mempool_tick",
 	PQAggRequest:              "pq_agg_request",
@@ -76,6 +85,50 @@ func (t GossipTopic) TopicString(forkDigest string) string {
 	return fmt.Sprintf("/eth2/%s/%s/ssz_snappy", forkDigest, t.String())
 }
 
+// DataColumnSidecarsSubnetCount is DATA_COLUMN_SIDECARS_SUBNET_COUNT from
+// the Fulu preset (EIP-7594).
+const DataColumnSidecarsSubnetCount = 64
+
+// ComputeSubnetForDataColumnSidecar returns the gossip subnet for a column
+// index, per the Fulu p2p spec: column_index mod DATA_COLUMN_SIDECARS_
+// SUBNET_COUNT.
+func ComputeSubnetForDataColumnSidecar(columnIndex uint64) uint64 {
+	return columnIndex % DataColumnSidecarsSubnetCount
+}
+
+// DataColumnSidecarTopicString builds the canonical Fulu topic for a
+// data column sidecar subnet:
+// /eth2/<fork_digest>/data_column_sidecar_<subnet_id>/ssz_snappy
+func DataColumnSidecarTopicString(forkDigest string, subnetID uint64) string {
+	return fmt.Sprintf("/eth2/%s/data_column_sidecar_%d/ssz_snappy", forkDigest, subnetID)
+}
+
+// ParseDataColumnSidecarTopic parses a data_column_sidecar_<subnet_id>
+// topic string and returns the subnet ID.
+func ParseDataColumnSidecarTopic(topic string) (uint64, error) {
+	// /eth2/<fork_digest>/data_column_sidecar_<subnet_id>/ssz_snappy
+	parts := splitTopicComponents(topic)
+	if len(parts) != 4 || len(parts[2]) <= len("data_column_sidecar_") ||
+		parts[2][:len("data_column_sidecar_")] != "data_column_sidecar_" {
+		return 0, fmt.Errorf("gossip: not a data_column_sidecar topic %q", topic)
+	}
+	subnet := 0
+	for _, c := range parts[2][len("data_column_sidecar_"):] {
+		if c < '0' || c > '9' {
+			return 0, fmt.Errorf("gossip: invalid subnet id in topic %q", topic)
+		}
+		subnet = subnet*10 + int(c-'0')
+	}
+	return uint64(subnet), nil
+}
+
+// splitTopicComponents splits an /eth2/<digest>/<name>/ssz_snappy topic
+// into its three inner components.
+func splitTopicComponents(topic string) []string {
+	trimmed := strings.Trim(topic, "/")
+	return strings.Split(trimmed, "/")
+}
+
 // ParseGossipTopic converts a topic name string to a GossipTopic.
 // Returns an error if the name is not recognized.
 func ParseGossipTopic(name string) (GossipTopic, error) {
@@ -83,6 +136,10 @@ func ParseGossipTopic(name string) (GossipTopic, error) {
 		if n == name {
 			return topic, nil
 		}
+	}
+	// data_column_sidecar_<subnet_id> maps to the DataColumnSidecar topic.
+	if _, err := ParseDataColumnSidecarTopic("/eth2/x/" + name + "/ssz_snappy"); err == nil {
+		return DataColumnSidecar, nil
 	}
 	return 0, fmt.Errorf("gossip: unknown topic name %q", name)
 }
@@ -297,46 +354,7 @@ func (tm *TopicManager) SubscribedTopics() []GossipTopic {
 // the registered handler. Returns an error if the topic is not
 // subscribed, the data is empty/too large, or it is a duplicate.
 func (tm *TopicManager) Publish(topic GossipTopic, data []byte) error {
-	if len(data) == 0 {
-		return ErrTopicEmptyData
-	}
-	if len(data) > MaxPayloadSize {
-		return ErrTopicDataTooLarge
-	}
-	// Per-topic size limit check.
-	if limit, ok := TopicMessageSizeLimit[topic]; ok && len(data) > limit {
-		return ErrTopicMsgTooLarge
-	}
-
-	msgID := ComputeMessageID(data)
-
-	// Check and mark as seen (deduplication).
-	tm.seenMu.Lock()
-	if _, dup := tm.seen[msgID]; dup {
-		tm.seenMu.Unlock()
-		return ErrTopicDuplicateMessage
-	}
-	tm.seen[msgID] = time.Now()
-	tm.seenMu.Unlock()
-
-	tm.mu.RLock()
-	defer tm.mu.RUnlock()
-
-	if tm.closed {
-		return ErrTopicManagerClosed
-	}
-
-	state, exists := tm.topics[topic]
-	if !exists {
-		return ErrTopicNotSubscribed
-	}
-
-	state.score.MessagesReceived++
-	state.score.FirstDeliveries++
-	state.score.MeshDeliveries++
-
-	state.handler(topic, msgID, data)
-	return nil
+	return tm.Deliver(topic, data, true)
 }
 
 // Deliver processes an incoming message from another peer. It validates
@@ -361,37 +379,36 @@ func (tm *TopicManager) Deliver(topic GossipTopic, data []byte, isValid bool) er
 		msgID = ComputeInvalidMessageID(data)
 	}
 
-	// Deduplication.
+	tm.mu.Lock()
+	if tm.closed {
+		tm.mu.Unlock()
+		return ErrTopicManagerClosed
+	}
+	state, exists := tm.topics[topic]
+	if !exists {
+		tm.mu.Unlock()
+		return ErrTopicNotSubscribed
+	}
 	tm.seenMu.Lock()
-	if _, dup := tm.seen[msgID]; dup {
+	if _, duplicate := tm.seen[msgID]; duplicate {
 		tm.seenMu.Unlock()
+		tm.mu.Unlock()
 		return ErrTopicDuplicateMessage
 	}
 	tm.seen[msgID] = time.Now()
 	tm.seenMu.Unlock()
-
-	tm.mu.RLock()
-	defer tm.mu.RUnlock()
-
-	if tm.closed {
-		return ErrTopicManagerClosed
-	}
-
-	state, exists := tm.topics[topic]
-	if !exists {
-		return ErrTopicNotSubscribed
-	}
-
 	state.score.MessagesReceived++
-
 	if !isValid {
 		state.score.InvalidMessages++
+		tm.mu.Unlock()
 		return nil
 	}
-
 	state.score.FirstDeliveries++
 	state.score.MeshDeliveries++
-	state.handler(topic, msgID, data)
+	handler := state.handler
+	tm.mu.Unlock()
+	// Application callbacks may publish, unsubscribe or inspect stats.
+	handler(topic, msgID, data)
 	return nil
 }
 

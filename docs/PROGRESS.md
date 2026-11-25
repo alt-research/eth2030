@@ -1,247 +1,55 @@
-# ETH2030 Progress Report
+# ETH2030 development progress
 
-> Last updated: 2026-02-25
+Updated November24,2026 against master `cfd39f3f4ad05479470466fc14d430c216724347` (PRs142-147 merged) and Lighthouse eth2030 `fa16f70a`. Adopted frozen LIFO/signed Gloas development is complete:33/33 original task IDs and5/5 confirmed software follow-ups; no active confirmed implementation TODO remains. The merged Go package tree equals the actually qualified cumulative code. Per the user's current instruction,48h/larger-scale acceptance and upstream Lodestar approval are excluded from development progress and retained separately.
 
-## Summary
+## Latest actual qualification
 
-| Metric | Value |
-|--------|-------|
-| Packages | 48 |
-| Source files | 991 |
-| Test files | 918 |
-| Source LOC | ~316,000 |
-| Test LOC | ~397,000 |
-| Total LOC | ~713,000 |
-| Passing tests | 18,257 |
-| Test packages | 48/48 passing |
-| EIPs implemented | 58+ (complete), 5 (substantial) |
-| Roadmap coverage | 65 items (65 COMPLETE, 0 FUNCTIONAL, 0 PARTIAL) |
-| EF State Tests | 36,126/36,126 (100%) via go-ethereum backend |
+| Area | Retained result | Evidence / limitation |
+| --- | --- | --- |
+| Combined source checks |219 Go package suites, five related race packages, full vet/native build and 65 Python controls. | [Pre-merge validation](reviews/premerge-20261123/VALIDATION.json); measured composition retains its original source, not a renamed merge measurement. |
+| Merged Lighthouse | Compatible dependency and healthy-producer/faulted-consumer fixture repairs; full repaired baseline27 hosted jobs pass. | [Current CI repairs](reviews/remaining-20261123/CI_REPAIRS.md); final simulator/bootstrap exact-head status is recorded separately. |
+| Completed bounded runtime |6h45m05s startup duration; 6h42m ready observations. After the ready 5.5h threshold: 144 healthy samples, 72 full stack receipts; 1s collector 24244 successful observations, 0 sustained events. | [Completed run](reviews/diagnostic-threshold-20261123/COMPLETED_RUN.json). No new waiting chain is not proof of original-fault resolution or 48h acceptance. |
+| Independent finality |14 unchanged-reference window replays, linked anchors, observed slots 89791–97858 inclusive (8068 slots), 494–512 participants. | [All-window replay](reviews/diagnostic-threshold-20261123/ALL_WINDOWS_REREPLAY.json).73 early missing slots remain; cryptographic authenticity does not erase operating-budget failures. |
+| Actual stopped endpoint | Actual stopped CL slot 97868, 10 slots beyond the last health sample; persisted full beacon body → execution bid/header/state → independently verified account proofs. 160 live + 2 stopped proofs pass. | [Stopped binding](reviews/diagnostic-threshold-20261123/STOPPED_EXECUTION_BINDING.json). Original observation window through 97858 is unchanged. |
 
-## go-ethereum Integration
+The bounded run retains 686 EL memory-limit events (no OOM) and three recovered local late-reveal advisories. It is not warning-free or multi-day capacity acceptance. Full runtime identities, CL/reference/fixture tuple and sources are retained in the linked records.
 
-ETH2030 imports go-ethereum v1.17.0 as a Go module dependency for EVM execution:
+## New follow-up campaign
 
-| Component | Description |
-|-----------|-------------|
-| `pkg/geth/` | Adapter package bridging ETH2030 types to go-ethereum interfaces |
-| `pkg/geth/processor.go` | Block processor using `gethcore.ApplyMessage` for all transactions |
-| `pkg/geth/extensions.go` | Custom precompile injection via `evm.SetPrecompiles()` (13 precompiles) |
-| `pkg/geth/statedb.go` | State creation using go-ethereum's real trie DB |
-| `pkg/geth/config.go` | Chain config mapping (ETH2030 forks → go-ethereum params) |
-| `pkg/cmd/eth2030-geth/` | Production binary embedding go-ethereum as a full node (see below) |
+[Current tuple](reviews/remaining-20261123/CURRENT_TUPLE.json) records the separately declared30-minute ready window, whole-window BLS/offline replay, independent proofs and actual stopped endpoint. It does not extend the historical6h45m or establish48h. Eight finite synthetic KV/WAL reopen/RSS profiles pass declared limits; growth of key/header/canonical metadata and unrestricted capacity qualification are deferred outside development progress. EL142 improves actual recurrence capture;144 repairs the canonical-height gauge observed stuck at0 despite RPC progress;145 bounds large durable batch materialization;146 repairs the confirmed ext4 flat-directory capacity limit with compatible sharded values and protected old-reader rollback. The cumulative recovery passes91s RPC/212s catchup/301s ready,102signed slots and actual stopped113651. The initial300s catchup failed and remains failed. [Post-repair receipt](reviews/remaining-20261123/POST_REPAIR_RECOVERY.json). All five implementation follow-ups are now merged into master.
 
-**Architecture:**
-```
-ETH2030 packages (bal, epbs, focil, das, rollup, zkvm, consensus, ...)
-                     |
-              core/types (ETH2030's public type system — unchanged)
-                     |
-              pkg/geth/ (adapter package — only place that imports go-ethereum)
-                     |
-         go-ethereum v1.17.0 (core/vm, core/state, params — imported as library)
-                     |
-         pkg/cmd/eth2030-geth/ (production binary for mainnet/testnet sync)
-```
+## Current merged acceptance
 
-## eth2030-geth Binary
+| Area | Retained result | Evidence |
+| --- | --- | --- |
+| Execution/RPC |219 fresh packages, 107 official files/108 requests, six affected race suites, full vet/native build, byte-identical second Go1.26.11 executable. | [Post-merge results](reviews/glamsterdam-postmerge-20261121/RESULTS.json) |
+| Snap/BAL recovery | Legal BAL expiry respects actual finalized slots; indexed snap recovery authenticates original checkpoint/head/markers/canonical ancestry; malformed/failed finalized reads remain errors. | PR 123/124; `core/chain/snap_history_retention_test.go`, `snap_indexed_restart_test.go`, `core/rawdb/finality_checked_test.go` under `pkg/` |
+| Original datadirs | Main2/main3/full/snap conservative Docker-start bounds189.038/212.551/219.661/176.953 seconds, all under 300s, with frozen finalized commitments/eight independent proofs. | [Recovery record](reviews/glamsterdam-postmerge-20261121/RECOVERY.json) |
+| Operating windows |400/400 steady and 60/60 pressure slots, original latency budgets, 512-participant independent finality/offline controls and270 account proofs. | [Results](reviews/glamsterdam-postmerge-20261121/RESULTS.json) |
+| Final-source blob | Actual external-builder two-row blobslot59163; 544 KZG proofs, authenticated parent SSZ/signatures/ordered commitments; useful getBlobs-disabled partial cells228/114 columns and observer32/16. | Final-source archive; same original successful transaction, original API404 preserved |
+| Source reproduction |245 public files, complete manifest, fresh extraction and11 independent replay checks; original nine archives/failures unchanged. | [Public replay](reviews/glamsterdam-postmerge-20261121/PUBLIC_REPRODUCTION.json) |
+| Earlier application/CL scope | Signed Uniswap/Safe/7702 sequences, canonical factory, builder payments/registry, progressive SSZ, native official fixtures and independent cold sync retain exact sources. | [Task reconciliation](reviews/glamsterdam-final-campaign/TASK_RECONCILIATION.json) |
 
-The `eth2030-geth` binary at `pkg/cmd/eth2030-geth/` embeds go-ethereum v1.17.0 as a library to provide a production-ready Ethereum node with ETH2030's custom precompiles. This closes the networking, database, and sync gaps that existed when ETH2030 operated only as a standalone implementation.
+These results are retained source-specific measurements, not a new live campaign on the merge metadata. Native EF results remain distinct from Geth-backed runners. The initial failed preparations, over-budget runs and corrected harness inputs remain visible.
 
-**Build:**
-```bash
-cd pkg && go build -o eth2030-geth ./cmd/eth2030-geth/
-```
+## Delivered follow-up repairs
 
-**Source files:**
-| File | Purpose |
-|------|---------|
-| `main.go` | CLI entry point, flag parsing, node lifecycle |
-| `config.go` | Network configuration (mainnet, sepolia, holesky) |
-| `node.go` | go-ethereum node setup, service registration |
-| `precompiles.go` | Custom precompile injection at fork-specific activation levels |
-| `main_test.go` | 8 unit tests covering config, node init, precompile wiring |
+PR 127 retired unsupported local Builder Engine extensions, synthetic stake and the signature-dropping header route; 128 made required startup failure/rollback transactional; 129 bounded FileDB value/WAL residency; 130 fixed restored snap ancestry eligibility. Later PR 135 corrected queued snap-history publication. PR 138 repaired the actual later-diagnostic FCU per-key/WAL fsync read-lock convoy and redundant publication writes while preserving durability and validation. All are merged. Local test/recovery controls and a bounded successful retest are distinct from retrospective attribution.
 
-**Features provided by go-ethereum embedding:**
-| Feature | Details |
-|---------|---------|
-| Sync modes | snap (default), full |
-| Database | Pebble (go-ethereum's default production DB) |
-| Networking | RLPx encrypted P2P, devp2p, peer discovery |
-| Engine API | Port 8551 (for CL client connection) |
-| JSON-RPC | Port 8545 (standard Ethereum JSON-RPC) |
-| Networks | mainnet (default), sepolia, holesky |
-| Custom precompiles | 13 precompiles injected at Glamsterdam, Hegotá, and I+ fork levels |
+Rounds 03/04 remain failed. Original 04 had no contemporaneous waiting stack. Its exact holder and physical storage latency cause remain unconfirmed; shutdown timing does not establish cancellation as the cause. See [separate unknowns](reviews/premerge-20261123/UNCONFIRMED_ORIGINAL_FAILURE.md) and [captured later chain](reviews/fcu-io-liveness-20261123/ROOT_CAUSE.md).
 
-**Tested capabilities:**
-- Binary starts and initializes Pebble DB
-- Writes Sepolia genesis block
-- Begins protocol initialization
-- All 8 unit tests passing
-- Sepolia snap sync verified: CL (Lighthouse v8.1.0) driving EL via Engine API, headers at ~9K/sec
-- Mainnet startup verified: Chain ID 1, genesis block, peer discovery via bootnodes
-- 20+ RPC methods verified on both networks (eth, net, web3, admin, txpool, engine, debug)
+## Completion accounting and separate records
 
-**Custom Precompile Injection:**
+The [current plan](plans/glamsterdam/NEXT_STEPS_20261124.md) and [machine accounting](reviews/development-scope-20261124/CURRENT_STATE.json) distinguish completed code from acceptance and deployment decisions.
 
-| Category | Count | Addresses | Activation Fork |
-|----------|-------|-----------|----------------|
-| Glamsterdam repricing | 4 | 0x06, 0x08, 0x09, 0x0a | Glamsterdam |
-| NTT | 1 | 0x15 | I+ |
-| NII | 4 | 0x0201-0x0204 | I+ |
-| Field arithmetic | 4 | 0x0205-0x0208 | I+ |
+- Development:33/33 original tasks,5/5 confirmed follow-ups and integrated CL CI are complete/merged.
+- Deferred by the user:48h/larger-scale admission and Lodestar maintainer approval do not lower development progress. Neither is recast as passed/merged acceptance.
+- Historical record: original04 exact waiter remains unconfirmed; confirmed independent mechanisms are repaired. No-recurrence cannot reconstruct its missing stack.
+- Public activation: a separate network/epoch/timestamp/client-tuple rollout decision. Timestamp/genesis/override and restart-compatibility support already exists; no new public network parameters are selected here.
+- Extra corpus, research and later-fork consumers: not newly adopted into the current denominator. Skipped/inactive cases retain their actual counts.
 
-**Opcode limitation**: go-ethereum's `operation` struct and `JumpTable` type are unexported, so 26 custom opcodes remain ETH2030-native-EVM-only.
+The [new source audit](reviews/development-scope-20261124/AUDIT.md) follows current TODO consumers. No additional confirmed missing adopted-scope production consumer was established. This is a scoped review, not a whole-client bug-free or whole-public-fork readiness claim.
 
-## EF State Test Validation
+Later-fork independent Frame/Bogotá agreement, Dora production consumers, paymaster services and public binary/PQ/proof/native-rollup work retain separate gates. The paired Frame 66/165 and CL join 256 record is preserved [at its original source](verification/frame-8141-20261118-paymaster-history-final.json); its synchronized-EL boundary is unchanged.
 
-| Metric | Value |
-|--------|-------|
-| **Total tests** | 36,126 |
-| **Passing** | 36,126 (100%) |
-| **Failing** | 0 (0%) |
-| **Test runner** | `pkg/core/eftest/geth_runner.go` |
-| **Backend** | go-ethereum v1.17.0 (imported as Go module) |
-
-All 57 test categories pass at 100%. The go-ethereum backend provides correct gas accounting, state root computation, and EIP-158 empty account cleanup.
-
-## Package Completion
-
-| Package | Status | Description |
-|---------|--------|-------------|
-| `core` | Complete | Blockchain, block builder, validator, state processor (incl. EIP-8141 FrameTx dispatch, nonce semantics, transient storage isolation), gas futures, genesis init |
-| `core/types` | Complete | 7 tx types (legacy, access list, dynamic, blob, set code, frame, AA), header, receipt, block, SSZ |
-| `core/state` | Complete | StateDB interface, in-memory, trie-backed, stateless (witness-backed), prefetcher |
-| `core/state/snapshot` | Complete | Layered diff/disk snapshots, account/storage iterators |
-| `core/state/pruner` | Complete | State pruner with bloom filter reachability |
-| `core/vm` | Complete | 164+ opcodes, 24 precompiles, EOF, gas tables, parallel executor, eWASM optimizer, shielded crypto |
-| `core/rawdb` | Complete | FileDB with WAL, chain DB, block/receipt/tx storage, EIP-4444 history expiry |
-| `core/vops` | Complete | Validity-Only Partial Statelessness: partial executor, validator, witness |
-| `core/eftest` | Complete | EF state test runner: 36,126/36,126 (100%) via go-ethereum backend |
-| `geth` | Complete | go-ethereum adapter: type conversion, block processor, precompile injection, state management |
-| `rlp` | Complete | Full Yellow Paper Appendix B with fuzz testing |
-| `ssz` | Complete | SSZ encode/decode, merkleization, EIP-7916 ProgressiveList |
-| `crypto` | Complete | Keccak-256, secp256k1, BN254, BLS12-381 (incl. aggregate sigs), VDF, threshold, shielded |
-| `crypto/pqc` | Complete | Dilithium3 (real lattice crypto), Falcon512, SPHINCS+ (hash-based), hybrid signer, lattice blob commitments, ValidatePQSignature integration |
-| `consensus` | Complete | 3SF (3-slot finality), quick slots, Casper FFG finality, committee selection, BLS operations, attestations, beacon state, block producer, reward calc, slashing, PQ finality fallback (hash-based signatures alongside BLS) |
-| `engine` | Complete | Engine API V3-V7, forkchoice, payload building, ePBS, distributed builder, Vickrey auctions |
-| `epbs` | Complete | Enshrined PBS: BuilderBid, PayloadEnvelope, builder registry, auctions |
-| `focil` | Complete | FOCIL: inclusion list building, validation, compliance scoring |
-| `bal` | Complete | Block Access Lists (EIP-7928), opcode-level state tracking (15 opcodes), system contract tracking (EIP-4788/2935/4895), engine API integration, SSTORE no-op detection, parallel execution scheduling |
-| `das` | Complete | PeerDAS: sampling, custody, reconstruction, blob streaming, futures, cell gossip, STARK commitment type (PQ DA) |
-| `das/erasure` | Complete | Reed-Solomon erasure coding (Lagrange interpolation) |
-| `witness` | Complete | Execution witness collector, verifier, VOPS integration |
-| `txpool` | Complete | Validation, RBF, eviction, blob gas, EIP-8070 sparse blobpool, FrameTx validation, recursive STARK mempool (tick merging, bitfield, Merkle root, 128KB bandwidth limit) |
-| `txpool/encrypted` | Complete | Encrypted mempool: commit-reveal, threshold decryption ordering |
-| `txpool/shared` | Complete | Sharded mempool with consistent hashing |
-| `rpc` | Complete | 50+ methods, filters, WebSocket subscriptions, Beacon API (16 endpoints) |
-| `trie` | Complete | MPT with proofs, persistence, concurrent healing |
-| `trie/bintrie` | Complete | Binary Merkle trie (EIP-7864): SHA-256, proofs, migration |
-| `rollup` | Complete | Native rollups (EIP-8079): EXECUTE precompile, anchor contract |
-| `zkvm` | Complete | Guest programs, canonical guest (RISC-V), STF framework, Poseidon hash, R1CS circuit builder |
-| `proofs` | Complete | Proof aggregation: ZKSNARK/ZKSTARK/IPA/KZG, mandatory 3-of-5 system, async proof queue, execution proofs |
-| `light` | Complete | Header sync, proof cache (LRU), sync committee, CL proof generator |
-| `p2p` | Complete | TCP transport, devp2p, peer mgmt, gossip (pub/sub, scoring, STARK mempool tick topic), protocol manager |
-| `p2p/discover` | Complete | Peer discovery V4/V5, Kademlia DHT |
-| `p2p/discv5` | Complete | Discovery V5 protocol with WHOAREYOU/handshake |
-| `p2p/dnsdisc` | Complete | DNS-based peer discovery |
-| `p2p/enode` | Complete | Node identity and URL parsing |
-| `p2p/enr` | Complete | Ethereum Node Records (extensible key-value) |
-| `p2p/portal` | Complete | Portal network: content DHT, Kademlia routing, state/history |
-| `p2p/snap` | Complete | Snap sync protocol messages |
-| `sync` | Complete | Full sync + snap sync + beam sync pipeline, trie sync |
-| `eth` | Complete | ETH protocol handler, codec, EIP-8077 announce nonce (ETH/72) |
-| `node` | Complete | Config, lifecycle, subsystem wiring |
-| `cmd/eth2030` | Complete | CLI flags, signal handling, startup |
-| `cmd/eth2030-geth` | Complete | Production binary: go-ethereum embedded node with Pebble DB, RLPx P2P, snap/full sync, Engine API, JSON-RPC, 13 custom precompiles |
-| `log` | Complete | Structured JSON/text logging |
-| `metrics` | Complete | Counters, gauges, histograms, Prometheus, EWMA, CPU tracker |
-
-## EIP Implementation Status
-
-### Complete (58 EIPs)
-
-EIP-150, EIP-152, EIP-196/197, EIP-1153, EIP-1559, EIP-2200, EIP-2537,
-EIP-2718, EIP-2929, EIP-2930, EIP-2935, EIP-3529, EIP-3540, EIP-4444,
-EIP-4762, EIP-4788, EIP-4844 (incl. KZG), EIP-4895, EIP-5656, EIP-6110,
-EIP-6404, EIP-6780, EIP-7002, EIP-7069, EIP-7251, EIP-7480, EIP-7547,
-EIP-7549, EIP-7594, EIP-7620, EIP-7685, EIP-7691, EIP-7698, EIP-7701,
-EIP-7702, EIP-7706, EIP-7742, EIP-7745, EIP-7807, EIP-7825, EIP-7898,
-EIP-7904, EIP-7916, EIP-7918, EIP-7928, EIP-7939, EIP-8024, EIP-8070,
-EIP-8077, EIP-8079, EIP-8141
-
-### Substantial (5)
-
-- **EIP-7732** (ePBS): Builder types, registry, bid management, commitment/reveal, distributed builder API
-- **EIP-7805** (FOCIL): Inclusion lists, validation, compliance scoring
-- **EIP-7864** (Binary Merkle Tree): SHA-256, iterator, proofs, MPT migration
-- **EIP-8025** (Execution Proofs): Witness collector, VOPS validator, stateless execution, beam sync
-- **PQC** (Post-Quantum): Dilithium3/Falcon512/SPHINCS+, hybrid signer, lattice blobs, PQ attestations
-
-## Roadmap Coverage by Phase
-
-| Phase | Year | Coverage | Key Items |
-|-------|------|----------|-----------|
-| Glamsterdam | 2026 | ~99% | ePBS, FOCIL, BALs, native AA, repricing (18 EIPs), sparse blobpool, frame tx |
-| Hegotá | 2026-2027 | ~97% | BPO blob schedules, multidim gas, payload chunking, block-in-blobs, SSZ tx/blocks, encrypted mempool reveal |
-| I+ | 2027 | ~97% | Native rollups, zkVM/STF, VOPS, proof aggregation, PQ crypto, beam sync, rollup anchor |
-| J+ | 2027-2028 | ~95% | Encrypted mempool, light client, variable blobs, BPO3 schedule |
-| K+ | 2028 | ~97% | SSF, quick slots, mandatory proofs, canonical guest, announce nonce, CL proof circuits, proof aggregation round-trip |
-| L+ | 2029 | ~97% | Endgame finality (BLS adapter), PQ attestations, APS, custody proofs, distributed builder, jeanVM aggregation, BPO4 schedule |
-| M+ | 2029+ | ~95% | PQ L1 (ML-DSA-65 signer), gigagas integration, sharded mempool resize, real-time CL proofs, PQ chain security, gas futures settlement |
-| 2030++ | Long term | ~95% | VDF randomness, 51% auto-recovery, AA proof circuits, shielded transfers (BN254 ZK proofs), unified beacon state |
-
-## Remaining Gaps for Production
-
-### 1. Real Cryptographic Backends (MOSTLY CLOSED)
-
-**Status**: All major crypto backends wired with real implementations:
-- BLS: PureGoBLSBackend (Verify, FastAggregateVerify, G2 aggregation) wired into light client, consensus, ePBS
-- Dilithium3: Real lattice-based key generation, signing, verification
-- KZG: PlaceholderKZGBackend with real polynomial evaluation for DAS cells, blobs, engine
-- BN254 Pedersen: Real v*G + r*H commitments for shielded transfers
-- ML-DSA-65: Real FIPS 204 signer wired into PQ algorithm registry
-
-**Remaining for production performance**: Replace pure-Go backends with optimized C libraries (blst for BLS, go-eth-kzg for production SRS, gnark for Groth16 circuits).
-
-### 2. Production Networking -- CLOSED
-
-**Status**: CLOSED via `eth2030-geth` binary.
-**Solution**: The `eth2030-geth` binary embeds go-ethereum v1.17.0, which provides production RLPx encryption, devp2p peer discovery, NAT traversal, and connection management out of the box.
-
-### 3. Database Backend -- CLOSED
-
-**Status**: CLOSED via `eth2030-geth` binary.
-**Solution**: The `eth2030-geth` binary uses Pebble (go-ethereum's default production database), providing LSM-tree storage with production-grade performance. ETH2030's standalone FileDB with WAL remains available for testing and lightweight use.
-
-### 4. Consensus Integration -- PARTIALLY CLOSED
-
-**Current**: SSF, attestations, beacon state, fork choice, epoch processor all implemented. The `eth2030-geth` binary registers the Engine API via `catalyst.Register()`, allowing a CL client (Lighthouse, Prysm, etc.) to connect on port 8551.
-**Remaining**: Wire ETH2030's own consensus components (SSF, quick slots, PQ attestations) into the node lifecycle alongside the CL client connection.
-
-### 5. Roadmap Coverage
-
-All 65 roadmap items are COMPLETE with validation functions and test coverage.
-See `docs/GAP_ANALYSIS.md` for the full audit.
-
-## Test Quality
-
-| Category | Packages | Tests | Quality |
-|----------|----------|-------|---------|
-| Core (blockchain, blocks, genesis) | 6 | 3000+ | Excellent |
-| Types (tx, header, receipt, SSZ) | 1 | 500+ | Excellent |
-| State (statedb, snapshots, pruner) | 3 | 400+ | Very Good |
-| VM (EVM, opcodes, gas, EOF) | 1 | 2000+ | Excellent |
-| Crypto (BN254, BLS12-381, PQC) | 2 | 800+ | Excellent |
-| Consensus (SSF, attestation, beacon) | 2 | 500+ | Very Good |
-| Engine API (V3-V7, forkchoice) | 1 | 300+ | Good |
-| DAS (PeerDAS, erasure, blobs) | 2 | 400+ | Very Good |
-| P2P (transport, discovery, gossip) | 7 | 1000+ | Good |
-| Sync (full, snap, beam) | 1 | 200+ | Good |
-| RPC (JSON-RPC, Beacon API) | 1 | 300+ | Good |
-| Trie (MPT, binary) | 2 | 500+ | Excellent |
-| Transaction pool (base, encrypted, shared) | 3 | 300+ | Good |
-| Proofs/rollup/zkvm/light | 4 | 400+ | Good |
-| Geth adapter (processor, extensions) | 1 | 200+ | Good |
-| EF State Tests (via geth backend) | 1 | 36,126 | 100% pass |
-| Other (RLP, SSZ, BAL, witness, etc.) | 6 | 500+ | Very Good |
+[Roadmap](ROADMAP.md) · [Next-stage plan](next-stage-work-plan.md) · [Immutable original audit](audits/merged-glamsterdam-20261122/README.md)

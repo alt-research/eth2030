@@ -1,0 +1,32 @@
+[
+  {
+    "artifact": "ACTUAL_FCU_IO_RECHECK_CI.json",
+    "bytes": 48332,
+    "sha256": "5ce28684f6fa2d1e7f9bc766979a58bc58f9d7e61ea0ebb6e76ab9310dd6ca93"
+  },
+  {
+    "artifact": "actual-fcu-io-review-window-0-replay.json",
+    "bytes": 1537,
+    "sha256": "a2e753b78e9a6296448893e6debed6c002a6be9e40c5ac01ca1a805e3b28b15c"
+  },
+  {
+    "artifact": "actual-fcu-io-review-window-0-replay.exchanges.jsonl",
+    "bytes": 1606586,
+    "sha256": "c07d14e454979b9239186c738d1e760fd2ed2639ead4f3cccdbe0c9ea8cb954b"
+  },
+  {
+    "artifact": "actual-fcu-io-missing-slots-crosscheck/exchanges.jsonl",
+    "bytes": 34542,
+    "sha256": "fc9965987a3ae2617d8cdbcde974dac68ac2f8bea2effaa405348711370fd41e"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/strict-evidence-guard-02/profile.json",
+    "bytes": 381,
+    "sha256": "bf3b1c251a3790466e5fce9ccd98dd62ec872bff1a0f0e98ced0492315064cfb"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/STRICT_GUARD_DRIVER_02.json",
+    "bytes": 827,
+    "sha256": "8eecf1818eafa2e212c2e6260cef250f001163890f5a839e9be29d5245de1b4d"
+  }
+]

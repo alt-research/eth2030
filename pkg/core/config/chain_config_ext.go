@@ -26,6 +26,7 @@ var ForkOrder = []string{
 	"Shanghai",
 	"Cancun",
 	"Prague",
+	"Osaka",
 	"Amsterdam",
 	"Glamsterdan",
 	"Hogota",
@@ -39,8 +40,14 @@ var ForkOrder = []string{
 //   - Timestamp forks are in ascending order
 //   - Post-merge forks require TerminalTotalDifficulty to be set
 func (c *ChainConfig) Validate() error {
+	if c == nil {
+		return errors.New("chain config is nil")
+	}
 	if c.ChainID == nil || c.ChainID.Sign() <= 0 {
 		return errors.New("invalid chain ID: must be positive")
+	}
+	if err := c.ValidateBlobSchedule(); err != nil {
+		return err
 	}
 
 	// Validate block-number fork ordering.
@@ -84,16 +91,24 @@ func (c *ChainConfig) Validate() error {
 		{"Shanghai", c.ShanghaiTime},
 		{"Cancun", c.CancunTime},
 		{"Prague", c.PragueTime},
+		{"Osaka", c.OsakaTime},
 		{"Amsterdam", c.AmsterdamTime},
 		{"Glamsterdan", c.GlamsterdanTime},
 		{"Hogota", c.HogotaTime},
 		{"IPlus", c.IPlusTime},
+		{"SSZBlocks", c.SSZBlockTime},
 	}
 	var lastTime *uint64
 	var lastTimeName string
-	for _, f := range timeForks {
+	for i, f := range timeForks {
 		if f.time == nil {
 			continue
+		}
+		// Canonical forks extend the preceding fork; missing predecessors
+		// cannot silently suppress inherited execution/request validation.
+		canonical := f.name == "Cancun" || f.name == "Prague" || f.name == "Osaka" || f.name == "Amsterdam"
+		if canonical && timeForks[i-1].time == nil {
+			return fmt.Errorf("%s requires %s to be scheduled", f.name, timeForks[i-1].name)
 		}
 		if lastTime != nil && *f.time < *lastTime {
 			return fmt.Errorf("fork ordering: %s (time %d) must be >= %s (time %d)",
@@ -103,6 +118,18 @@ func (c *ChainConfig) Validate() error {
 		lastTimeName = f.name
 	}
 
+	// EIP-7892 BPO schedules extend Prague and may interleave with later forks.
+	for _, bpo := range []struct {
+		name string
+		time *uint64
+	}{{"BPO1", c.BPO1Time}, {"BPO2", c.BPO2Time}} {
+		if bpo.time != nil && (c.PragueTime == nil || *bpo.time < *c.PragueTime) {
+			return fmt.Errorf("%s requires prior or simultaneous Prague activation", bpo.name)
+		}
+	}
+	if c.BPO1Time != nil && c.BPO2Time != nil && *c.BPO2Time < *c.BPO1Time {
+		return errors.New("BPO2 must not precede BPO1")
+	}
 	// Post-merge timestamp forks require TerminalTotalDifficulty.
 	if c.ShanghaiTime != nil && c.TerminalTotalDifficulty == nil {
 		return errors.New("Shanghai requires TerminalTotalDifficulty to be set")
@@ -127,6 +154,9 @@ func (c *ChainConfig) ActiveFork(time uint64) string {
 	}
 	if c.IsAmsterdam(time) {
 		return "Amsterdam"
+	}
+	if c.IsOsaka(time) {
+		return "Osaka"
 	}
 	if c.IsPrague(time) {
 		return "Prague"
@@ -170,6 +200,7 @@ func TestnetConfig() *ChainConfig {
 	shanghaiTime := uint64(0)
 	cancunTime := uint64(0)
 	pragueTime := uint64(1000)
+	osakaTime := uint64(1500)
 	amsterdamTime := uint64(2000)
 	glamsterdanTime := uint64(3000)
 	hogotaTime := uint64(4000)
@@ -192,6 +223,7 @@ func TestnetConfig() *ChainConfig {
 		ShanghaiTime:            &shanghaiTime,
 		CancunTime:              &cancunTime,
 		PragueTime:              &pragueTime,
+		OsakaTime:               &osakaTime,
 		AmsterdamTime:           &amsterdamTime,
 		GlamsterdanTime:         &glamsterdanTime,
 		HogotaTime:              &hogotaTime,
@@ -220,6 +252,7 @@ func DevConfig() *ChainConfig {
 		ShanghaiTime:            &zero,
 		CancunTime:              &zero,
 		PragueTime:              &zero,
+		OsakaTime:               &zero,
 		AmsterdamTime:           &zero,
 		GlamsterdanTime:         &zero,
 		HogotaTime:              &zero,

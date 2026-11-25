@@ -1,0 +1,34 @@
+{
+  "native_revision": "a73dc6a6225dfdc7e370f01bfba931b94f20feb4",
+  "native_dirty": false,
+  "archive_sha256": "e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9",
+  "forks": {
+    "osaka": {
+      "passed": 17441,
+      "failed": 0,
+      "blocks": 19875,
+      "accepted_blocks": 18183,
+      "expected_rejections": 1692,
+      "independently_verified_multi_fault_alternative_rejections": 8,
+      "all_final_heads_and_full_state_roots_match": true,
+      "full_report_sha256": "8603a665215b4285b6addf6607d696f55aebe505a1bd40f13d37ec928f66109a"
+    },
+    "amsterdam": {
+      "passed": 26349,
+      "failed": 0,
+      "blocks": 32745,
+      "accepted_blocks": 27038,
+      "expected_rejections": 5707,
+      "independently_verified_multi_fault_alternative_rejections": 8,
+      "all_final_heads_and_full_state_roots_match": true,
+      "full_report_sha256": "b788ea604fcfd70aee6262de93ce5ee32cb54a79874bda448768ddb2674e756d"
+    }
+  },
+  "validation": {
+    "full_go_suite": "passed",
+    "six_complete_affected_race_suites": "passed",
+    "full_go_vet": "passed",
+    "both_node_builds": "passed",
+    "executed_behavioral_mutations_caught": 6
+  }
+}

@@ -56,7 +56,7 @@ func decodeRawTransaction(rawHex string) (*types.Transaction, []byte, error) {
 		return nil, nil, fmt.Errorf("empty transaction data")
 	}
 
-	tx, err := types.DecodeTxRLP(rawBytes)
+	tx, err := types.DecodePooledTransaction(rawBytes)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -145,9 +145,10 @@ func (api *TxPoolAPI) GetTransactionByHash(req *Request) *Response {
 	tx, blockNum, index := api.backend.GetTransaction(hash)
 	if tx != nil {
 		var (
-			blockHash *types.Hash
-			blockTS   uint64
-			baseFee   *big.Int
+			blockHash   *types.Hash
+			blockTS     uint64
+			baseFee     *big.Int
+			blobBaseFee *big.Int
 		)
 		if blockNum > 0 {
 			header := api.backend.HeaderByNumber(BlockNumber(blockNum))
@@ -156,9 +157,10 @@ func (api *TxPoolAPI) GetTransactionByHash(req *Request) *Response {
 				blockHash = &h
 				blockTS = header.Time
 				baseFee = header.BaseFee
+				blobBaseFee = blobPriceForHeader(api.backend, header)
 			}
 		}
-		return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee))
+		return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
 	}
 
 	// Check pending pool.

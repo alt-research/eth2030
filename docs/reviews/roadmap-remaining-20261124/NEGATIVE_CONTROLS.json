@@ -1,0 +1,47 @@
+{
+  "controls": [
+    {
+      "name": "missing_completion_criteria",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Incomplete work criteria frame-independent"
+    },
+    {
+      "name": "missing_planned_entry",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+    },
+    {
+      "name": "missing_evidence_source",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Missing remaining-work source pkg/nonexistent-roadmap-consumer.go"
+    },
+    {
+      "name": "contradictory_frozen_todo_count",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "name": "deferred_acceptance_recounted",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+    },
+    {
+      "name": "omitted_pending_inventory_entry",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: Remaining view omits or duplicates historical non-complete entries"
+    },
+    {
+      "name": "stale_open_ci_wording",
+      "rejected": true,
+      "failure": "AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /integrated CI and operational acceptance remain open/. Input:"
+    },
+    {
+      "name": "deployment_runtime_drift_to_node20",
+      "rejected": true,
+      "failure": "AssertionError: deployment workflow must use the same Node 22 source-check runtime"
+    }
+  ],
+  "all_rejected": true,
+  "restored_baseline_passed": true,
+  "inputs_restored": true
+}

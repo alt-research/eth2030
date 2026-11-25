@@ -1,0 +1,41 @@
+{
+  "base": "d743925e3c4e7deb3fdc00648cb2296372910b28",
+  "heads": {
+    "142": "8f7c983cd15f95cbaf7f360ed7af2e991ce04c4c",
+    "143": "b972184a679687ff15effa26eda535bf47fe5177",
+    "144": "aad5f0b483722609f3c08b66bb933bae860681eb",
+    "145": "32f3af237c84382f1ae71fe28c5dc4a2e3e8ede3"
+  },
+  "all_clean": true,
+  "subset_extensions_checked": 32,
+  "subset_trees_confluent": true,
+  "validation_commit": "ef8c68e725c724566c5c34619d71b8a0fd1acba0",
+  "final_tree": "dfa8f1e53be8e9578421e740c903245e21b8e628",
+  "actual_merge": false,
+  "scope": "All subset extensions with representative parent ancestry and matching subset trees. No master ref updated.",
+  "validation": {
+    "final-code-prs-full-go.log": {
+      "exit": 0,
+      "packages_passed": 219,
+      "sha256": "f25fe42b830d534bd33fe45e1e98dca8a86d84cee068fbe510e88c8dae99a3ac"
+    },
+    "final-code-prs-race.log": {
+      "exit": 0,
+      "packages_passed": 6,
+      "sha256": "a99901a43c163b84e1c95d0e64e1306099f4fb71fe0f5d265544c37ec12b59f7"
+    },
+    "native_build": "passed",
+    "integration": {
+      "exit": 0,
+      "packages_passed": 219,
+      "sha256": "af4e66f67a43c80095b9f472650218b322676c7a24097d6e94abc66ed96ea59c"
+    },
+    "explicit_entrypoints": [
+      "go build ./cmd/eth2030 (native EL)",
+      "go build ./cmd/eth2030-geth (Geth-backed wrapper)"
+    ]
+  },
+  "public_validation_branch": "qualification/remaining-final-code-20261123",
+  "public_validation_source": "https://github.com/alt-research/eth2030/commit/ef8c68e725c724566c5c34619d71b8a0fd1acba0",
+  "publication_boundary": "Retained cumulative source only; no master merge and no aggregate feature PR."
+}

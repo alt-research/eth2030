@@ -62,8 +62,9 @@ type ProtocolCapability struct {
 	MessageIDs []uint64
 }
 
-// AllCapabilities returns the full set of supported ETH protocol capabilities,
-// from ETH/68 through ETH/72.
+// AllCapabilities is the historical experimental capability inventory.
+// Production negotiation uses Handler.Protocols; the legacy witness entry
+// is not EIP-8070 eth/72 and is not advertised by the node.
 func AllCapabilities() []ProtocolCapability {
 	return []ProtocolCapability{
 		{
@@ -254,10 +255,11 @@ type GetBlockAccessListsMessage struct {
 	Hashes []types.Hash
 }
 
-// BlockAccessListsMessage contains block access lists.
+// BlockAccessListsMessage contains RLP-encoded block access lists
+// (EIP-8159); empty entries mark unavailable BALs.
 type BlockAccessListsMessage struct {
-	BlockHash   types.Hash
-	AccessLists []AccessListEntry
+	Hashes      []types.Hash
+	AccessLists [][]byte
 }
 
 // GetExecutionWitnessMessage requests an execution witness for a block.

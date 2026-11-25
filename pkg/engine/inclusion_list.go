@@ -139,9 +139,7 @@ type InclusionListStatusV1 struct {
 
 // GetInclusionListResponseV1 is the response to engine_getInclusionListV1.
 // Transactions are hex-encoded strings with 0x prefix (JSON-RPC convention).
-type GetInclusionListResponseV1 struct {
-	Transactions []string `json:"transactions"`
-}
+type GetInclusionListResponseV1 []string
 
 // Inclusion list status values.
 const (
@@ -196,21 +194,19 @@ func (api *EngineAPI) NewInclusionListV1(il InclusionListV1) (InclusionListStatu
 
 // GetInclusionListV1 returns an inclusion list generated from the EL's mempool.
 // Called by CL validators who are inclusion list committee members.
-func (api *EngineAPI) GetInclusionListV1() (*GetInclusionListResponseV1, error) {
+func (api *EngineAPI) GetInclusionListV1() (GetInclusionListResponseV1, error) {
 	ilBackend, ok := api.backend.(InclusionListBackend)
 	if !ok {
-		return &GetInclusionListResponseV1{Transactions: []string{}}, nil
+		return GetInclusionListResponseV1{}, nil
 	}
 
 	il := ilBackend.GetInclusionList()
 	// Convert transactions to hex-encoded strings with 0x prefix
-	txs := make([]string, len(il.Transactions))
+	txs := make(GetInclusionListResponseV1, len(il.Transactions))
 	for i, tx := range il.Transactions {
 		txs[i] = fmt.Sprintf("0x%x", tx)
 	}
-	return &GetInclusionListResponseV1{
-		Transactions: txs,
-	}, nil
+	return txs, nil
 }
 
 // InclusionListBackend is a type alias — canonical definition in engine/backendapi.
@@ -242,6 +238,9 @@ func (api *EngineAPI) handleNewInclusionListV1(params []json.RawMessage) (any, *
 
 // handleGetInclusionListV1 processes an engine_getInclusionListV1 request.
 func (api *EngineAPI) handleGetInclusionListV1(params []json.RawMessage) (any, *jsonrpcError) {
+	if len(params) != 0 {
+		return nil, &jsonrpcError{Code: InvalidParamsCode, Message: "engine_getInclusionListV1 takes no parameters"}
+	}
 	result, err := api.GetInclusionListV1()
 	if err != nil {
 		return nil, engineErrorToRPC(err)

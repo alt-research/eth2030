@@ -1,0 +1,6 @@
+{
+  "passed": false,
+  "scope": "The selected old slot-9465 parent post-state became unavailable before the ledger was captured. No supply assertion was executed.",
+  "failure": "HTTP 404 during old parent state retrieval",
+  "retry_rule": "Use a fresh eligible pair and retain original capture/failure separately."
+}

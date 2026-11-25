@@ -8,6 +8,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -72,6 +73,13 @@ type ServerConfig struct {
 	RateLimitPerSec  int
 	MaxBatchSize     int
 	ShutdownTimeout  time.Duration
+	// AllowedModules is the namespace allowlist (e.g. eth, net, web3).
+	// nil denies every namespace; the "*" entry allows all. This is the
+	// enforcement point for --http.api.
+	AllowedModules []string
+	// AllowedVhosts restricts the Host header (DNS-rebinding defense).
+	// Empty or ["*"] allows all hosts; this enforces --http.vhosts.
+	AllowedVhosts []string
 }
 
 // DefaultServerConfig returns sensible server defaults.
@@ -148,11 +156,12 @@ type MiddlewareFunc func(http.Handler) http.Handler
 // Server is a simple JSON-RPC HTTP server that dispatches requests to a
 // RequestHandler, with optional admin_, net_, and beacon_ namespace support.
 type Server struct {
-	api       RequestHandler
-	adminAPI  AdminRequestHandler
-	netAPI    NetRequestHandler
-	beaconAPI BeaconRequestHandler
-	mux       *http.ServeMux
+	api            RequestHandler
+	adminAPI       AdminRequestHandler
+	netAPI         NetRequestHandler
+	beaconAPI      BeaconRequestHandler
+	allowedModules []string
+	mux            *http.ServeMux
 }
 
 // NewServer creates a new Server for the given RequestHandler.
@@ -180,6 +189,12 @@ func (s *Server) SetBeaconHandler(h BeaconRequestHandler) {
 	s.beaconAPI = h
 }
 
+// SetAllowedModules sets the namespace allowlist applied to every request.
+// nil denies all namespaces; the "*" entry allows all.
+func (s *Server) SetAllowedModules(modules []string) {
+	s.allowedModules = modules
+}
+
 // Handler returns the HTTP handler for the server.
 func (s *Server) Handler() http.Handler {
 	return s.mux
@@ -200,6 +215,12 @@ func (s *Server) handleRPC(w http.ResponseWriter, r *http.Request) {
 	var req rpctypes.Request
 	if err := json.Unmarshal(body, &req); err != nil {
 		writeError(w, nil, rpctypes.ErrCodeParse, "invalid JSON")
+		return
+	}
+
+	req = *req.WithContext(r.Context())
+	if !methodAllowed(req.Method, s.allowedModules) {
+		writeJSON(w, methodUnavailableResponse(req.Method))
 		return
 	}
 
@@ -232,6 +253,66 @@ func isBeaconMethod(method string) bool {
 	return len(method) > 7 && method[:7] == "beacon_"
 }
 
+// methodNamespace returns the JSON-RPC namespace of a method, i.e. the part
+// before the first underscore. Methods without an underscore form their own
+// namespace.
+func methodNamespace(method string) string {
+	if idx := strings.Index(method, "_"); idx >= 0 {
+		return method[:idx]
+	}
+	return method
+}
+
+// methodAllowed reports whether method passes the namespace allowlist.
+// A nil modules list denies everything; the "*" entry allows everything.
+// Matching is case-insensitive.
+func methodAllowed(method string, modules []string) bool {
+	ns := strings.ToLower(methodNamespace(method))
+	for _, m := range modules {
+		if m == "*" || strings.EqualFold(m, ns) {
+			return true
+		}
+	}
+	return false
+}
+
+// hostAllowed reports whether the request Host header passes the vhost
+// allowlist. An empty or ["*"] list allows all hosts; otherwise the Host
+// must match an entry case-insensitively, ignoring a trailing ":port".
+func hostAllowed(r *http.Request, vhosts []string) bool {
+	allowAll := len(vhosts) == 0 || (len(vhosts) == 1 && vhosts[0] == "*")
+	if allowAll {
+		return true
+	}
+	host := r.Host
+	// Strip the port, handling bracketed IPv6 literals like "[::1]:8545".
+	if strings.HasPrefix(host, "[") {
+		if idx := strings.LastIndex(host, "]"); idx >= 0 {
+			host = host[1:idx]
+		}
+	} else if idx := strings.LastIndex(host, ":"); idx >= 0 {
+		host = host[:idx]
+	}
+	for _, v := range vhosts {
+		if strings.EqualFold(v, host) {
+			return true
+		}
+	}
+	return false
+}
+
+// methodUnavailableResponse builds the geth-style denial used when a method
+// is not served under the configured module allowlist.
+func methodUnavailableResponse(method string) *rpctypes.Response {
+	return &rpctypes.Response{
+		JSONRPC: "2.0",
+		Error: &rpctypes.RPCError{
+			Code:    rpctypes.ErrCodeMethodNotFound,
+			Message: fmt.Sprintf("the method %s does not exist/is not available", method),
+		},
+	}
+}
+
 func writeJSON(w http.ResponseWriter, v interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(v) //nolint:errcheck
@@ -262,6 +343,9 @@ type ExtServer struct {
 	started      atomic.Bool
 	middlewares  []MiddlewareFunc
 	requestCount atomic.Int64
+	serveDone    chan struct{}
+	serveErr     error
+	stopped      bool
 }
 
 // NewExtServer creates a new ExtServer for the given RequestHandler.
@@ -279,6 +363,7 @@ func NewExtServer(api RequestHandler, config ServerConfig) *ExtServer {
 		rateLimiter: NewRateLimiter(config.RateLimitPerSec),
 	}
 	s.batch.SetMaxBatchSize(config.MaxBatchSize)
+	s.batch.SetAllowedModules(config.AllowedModules)
 	return s
 }
 
@@ -329,41 +414,61 @@ func (s *ExtServer) buildHandler() http.Handler {
 	return handler
 }
 
-// Start starts the HTTP server on the given address.
+// Start binds and serves until Stop, preserving the blocking standalone API.
 func (s *ExtServer) Start(addr string) error {
-	if s.started.Load() {
-		return ErrServerStarted
-	}
-
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
-
-	handler := s.buildHandler()
-	mux := http.NewServeMux()
-	mux.Handle("/", handler)
-
-	srv := &http.Server{
-		Handler:      mux,
-		ReadTimeout:  s.config.ReadTimeout,
-		WriteTimeout: s.config.WriteTimeout,
-		IdleTimeout:  s.config.IdleTimeout,
-	}
-
-	s.mu.Lock()
-	s.httpServer = srv
-	s.listener = ln
-	s.mu.Unlock()
-	s.started.Store(true)
-
-	if err := srv.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err := s.ServeListener(ln); err != nil {
+		ln.Close()
 		return err
 	}
+	s.mu.Lock()
+	done := s.serveDone
+	s.mu.Unlock()
+	<-done
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.serveErr
+}
+
+// ServeListener takes ownership of an already bound listener after successful
+// initialization. The address and shutdown owner are published before return.
+func (s *ExtServer) ServeListener(ln net.Listener) error {
+	if ln == nil {
+		return fmt.Errorf("nil HTTP listener")
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.stopped {
+		return http.ErrServerClosed
+	}
+	if s.started.Load() || s.httpServer != nil {
+		return ErrServerStarted
+	}
+	srv := &http.Server{Handler: s.buildHandler(),
+		ReadTimeout: s.config.ReadTimeout, WriteTimeout: s.config.WriteTimeout, IdleTimeout: s.config.IdleTimeout,
+	}
+	s.httpServer = srv
+	s.listener = ln
+	done := make(chan struct{})
+	s.serveDone = done
+	s.started.Store(true)
+	go func() {
+		err := srv.Serve(ln)
+		if errors.Is(err, http.ErrServerClosed) || errors.Is(err, net.ErrClosed) {
+			err = nil
+		}
+		s.mu.Lock()
+		s.serveErr = err
+		s.mu.Unlock()
+		close(done)
+	}()
 	return nil
 }
 
-// Addr returns the listener address.
+// Addr returns the actual owned listener address, including port-zero binds.
 func (s *ExtServer) Addr() net.Addr {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -373,17 +478,29 @@ func (s *ExtServer) Addr() net.Addr {
 	return s.listener.Addr()
 }
 
-// Stop gracefully shuts down the server.
+// Stop has a bounded graceful period, then forcibly releases listeners and
+// connections. It also joins the serving goroutine if Stop wins the startup race.
 func (s *ExtServer) Stop() error {
 	s.mu.Lock()
-	srv := s.httpServer
+	s.stopped = true
+	srv, ln, done := s.httpServer, s.listener, s.serveDone
 	s.mu.Unlock()
 	if srv == nil {
 		return nil
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), s.config.ShutdownTimeout)
 	defer cancel()
-	return srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		_ = srv.Close()
+	}
+	if ln != nil {
+		_ = ln.Close()
+	}
+	if done != nil {
+		<-done
+	}
+	return err
 }
 
 // RequestCount returns the total number of requests served.
@@ -401,6 +518,18 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	metrics.RPCRequests.Inc()
 	s.requestCount.Add(1)
+
+	// Virtual-host check (DNS-rebinding defense, --http.vhosts).
+	if !hostAllowed(r, s.config.AllowedVhosts) {
+		rpcLog.Warn("rpc_vhost_rejected",
+			"event", "rpc_vhost_rejected",
+			"remote", r.RemoteAddr,
+			"host", r.Host,
+		)
+		http.Error(w, "invalid host", http.StatusForbidden)
+		return
+	}
+
 	s.setCORSHeaders(w, r)
 
 	if r.Method == http.MethodOptions {
@@ -462,7 +591,7 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if rpcbatch.IsBatchRequest(body) {
-		s.handleBatch(w, body)
+		s.handleBatch(w, r.Context(), body)
 		return
 	}
 
@@ -485,6 +614,14 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 		"method", req.Method,
 		"remote", r.RemoteAddr,
 	)
+
+	req = *req.WithContext(r.Context())
+	// Namespace allowlist (--http.api). Denied methods report the same
+	// geth-style "not available" error as unknown methods.
+	if !methodAllowed(req.Method, s.config.AllowedModules) {
+		writeJSON(w, methodUnavailableResponse(req.Method))
+		return
+	}
 
 	var resp *rpctypes.Response
 	switch {
@@ -534,10 +671,10 @@ func (s *ExtServer) handleRPC(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, resp)
 }
 
-func (s *ExtServer) handleBatch(w http.ResponseWriter, body []byte) {
+func (s *ExtServer) handleBatch(w http.ResponseWriter, ctx context.Context, body []byte) {
 	seq := s.requestCount.Load()
 	batchStart := time.Now()
-	responses, err := s.batch.HandleBatch(body)
+	responses, err := s.batch.HandleBatchContext(ctx, body)
 	if err != nil {
 		writeError(w, nil, rpctypes.ErrCodeInvalidRequest, err.Error())
 		return

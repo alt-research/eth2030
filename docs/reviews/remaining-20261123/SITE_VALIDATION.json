@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "mutations": [
+    {
+      "mutation": "invented48h",
+      "rejected": true
+    },
+    {
+      "mutation": "invented-original-resolution",
+      "rejected": true
+    },
+    {
+      "mutation": "short-observation",
+      "rejected": true
+    },
+    {
+      "mutation": "erased-first-failure",
+      "rejected": true
+    },
+    {
+      "mutation": "pending-cl-ci",
+      "rejected": true
+    },
+    {
+      "mutation": "wrong-pr-base",
+      "rejected": true
+    },
+    {
+      "mutation": "altered-historical-duration",
+      "rejected": true
+    },
+    {
+      "mutation": "fake-upstream-approval",
+      "rejected": true
+    },
+    {
+      "mutation": "divergent-home-roadmap",
+      "rejected": true
+    }
+  ],
+  "restored_export_passed": true,
+  "build": "npm run build passed;157 static pages",
+  "eip_entries": 149,
+  "code_paths": 398,
+  "missing_paths": 0,
+  "home_roadmap_shared_progress_equal": true,
+  "pinned_evidence_revision": "1317a6624e6246a8e0937f56d2758b300ccbcfcb",
+  "deployment": "Not deployed; EL master remains unmerged",
+  "visual_scope": "Rendered/export checks for current content; no new browser screenshot claim"
+}

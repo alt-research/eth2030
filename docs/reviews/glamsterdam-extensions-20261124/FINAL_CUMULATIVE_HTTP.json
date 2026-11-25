@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "source": "7901a25767a8ad3f53d99b3f1821b30bd9d28d75",
+  "required_passed": [
+    "TestFastConfirmationEngineSafeCheckpointConsumer",
+    "TestRealCanonicalProofThroughNativeNode"
+  ],
+  "required_skipped": [],
+  "scope": "Actual cumulative native Node HTTP: real proof generation, verification, altered input/state rejection and restart; standard Engine safe checkpoint/retraction/invalid/reannouncement consumers."
+}

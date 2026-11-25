@@ -1,0 +1,43 @@
+name: Site progress and evidence
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'site/**'
+      - 'docs/EIP_SPEC_IMPL.md'
+      - 'CLAUDE.md'
+      - 'docs/reviews/glamsterdam-*/**'
+      - 'docs/reviews/progress-*/**'
+      - 'docs/reviews/remaining-*/**'
+      - 'docs/reviews/development-scope-*/**'
+      - 'docs/reviews/roadmap-remaining-*/**'
+      - 'docs/plans/ROADMAP_REMAINING_*.md'
+      - 'docs/reviews/diagnostic-threshold-*/**'
+      - 'docs/plans/glamsterdam/**'
+      - 'docs/audits/merged-glamsterdam-*/**'
+      - '.github/workflows/site-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  site:
+    name: Site build and evidence checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: node --experimental-strip-types scripts/verify-eips.ts --files
+      - run: npm run build
+      - run: node --experimental-strip-types scripts/check-export.mjs

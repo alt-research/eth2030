@@ -111,7 +111,7 @@ func TestParallelProcessIndependentTransactions(t *testing.T) {
 
 	transferAmt := new(big.Int).SetUint64(1e18)
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(50000)
+	gasLimit := uint64(300000) // Fund current new-account state gas as well.
 
 	txs := make([]*types.Transaction, 3)
 	for i := range senders {
@@ -163,7 +163,7 @@ func TestParallelProcessFallbackSequential(t *testing.T) {
 
 	transferAmt := new(big.Int).SetUint64(1e18)
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(50000)
+	gasLimit := uint64(300000) // Fund current new-account state gas as well.
 
 	tx := makeTransferTx(0, recipient, transferAmt, gasLimit, gasPrice)
 	tx.SetSender(sender)
@@ -277,7 +277,7 @@ func TestParallelProcessReceiptOrdering(t *testing.T) {
 	statedb := setupState(accounts)
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(50000)
+	gasLimit := uint64(300000) // Fund current new-account state gas as well.
 
 	txs := make([]*types.Transaction, n)
 	for i := 0; i < n; i++ {
@@ -338,7 +338,7 @@ func TestParallelProcessConflictingTransactions(t *testing.T) {
 	statedb := setupState(accounts)
 
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(50000)
+	gasLimit := uint64(300000) // Fund current new-account state gas as well.
 	transferAmt := new(big.Int).SetUint64(1e18)
 
 	txs := make([]*types.Transaction, n)
@@ -387,7 +387,7 @@ func TestParallelProcessWithEmptyBAL(t *testing.T) {
 
 	transferAmt := new(big.Int).SetUint64(1e18)
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(50000)
+	gasLimit := uint64(300000) // Fund current new-account state gas as well.
 
 	tx := makeTransferTx(0, recipient, transferAmt, gasLimit, gasPrice)
 	tx.SetSender(sender)

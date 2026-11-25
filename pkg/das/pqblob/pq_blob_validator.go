@@ -1,15 +1,9 @@
-// PQ blob validator wires post-quantum blob commitments into the DAS
-// sampling and validation pipeline. It integrates:
-//   - PQBlobCommitment/PQBlobProof from pq_blobs.go (lattice Merkle commitments)
-//   - LatticeCommitScheme from crypto/pqc (MLWE binding commitments)
-//   - PQ signers (Falcon, SPHINCS+, ML-DSA) for commitment authentication
-//
-// This bridges Gap #31 (PQ Blobs) by providing a unified validation entry
-// point that DAS samplers can call to verify PQ-secured blob data.
+// The PQ blob validator checks the experimental Merkle commitment and its signature.
 package pqblob
 
 import (
-	"crypto/sha256"
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"sync"
@@ -78,14 +72,13 @@ type PQBlobProofV2 struct {
 }
 
 // PQBlobValidator validates PQ blob commitments within the DAS sampling
-// pipeline. It combines lattice-based commitment verification from pq_blobs.go
+// pipeline. It combines Merkle commitment verification from pq_blobs.go
 // with PQ signature verification to authenticate blob data.
 type PQBlobValidator struct {
 	mu        sync.RWMutex
 	algorithm string
 	signer    pqc.PQSigner
 	algID     uint8
-	lattice   *pqc.LatticeCommitScheme
 }
 
 // NewPQBlobValidator creates a validator for the specified PQ algorithm.
@@ -102,22 +95,16 @@ func NewPQBlobValidator(algorithm string) *PQBlobValidator {
 		signer = &pqc.FalconSigner{}
 		algID = PQBlobAlgFalcon
 	case PQAlgSPHINCS:
-		// SPHINCS+ does not implement PQSigner (different Sign API); use
-		// the stub DilithiumSigner for the signer interface but tag as SPHINCS.
-		signer = &pqc.DilithiumSigner{}
+		signer = pqc.NewSPHINCSSigner()
 		algID = PQBlobAlgSPHINCS
 	default:
 		return nil
 	}
 
-	// Derive a seed from the algorithm name for the lattice commitment scheme.
-	seed := sha256.Sum256([]byte("pq-blob-validator-" + algorithm))
-
 	return &PQBlobValidator{
 		algorithm: algorithm,
 		signer:    signer,
 		algID:     algID,
-		lattice:   pqc.NewLatticeCommitScheme(seed),
 	}
 }
 
@@ -127,8 +114,7 @@ func (v *PQBlobValidator) Algorithm() string {
 }
 
 // ValidateBlobCommitment verifies that a PQ blob commitment matches the
-// given blob data. It recomputes the lattice Merkle commitment from
-// pq_blobs.go and checks equality with the provided commitment digest.
+// given blob data and requires the complete versioned-format digest.
 func (v *PQBlobValidator) ValidateBlobCommitment(blob []byte, commitment []byte) error {
 	if blob == nil {
 		return ErrPQValidatorNilBlob
@@ -143,36 +129,13 @@ func (v *PQBlobValidator) ValidateBlobCommitment(blob []byte, commitment []byte)
 		return ErrPQValidatorNilCommit
 	}
 
-	// Recompute the PQ blob commitment using the lattice Merkle tree.
 	recomputed, err := CommitBlob(blob)
 	if err != nil {
-		return fmt.Errorf("pq_validator: commit failed: %w", err)
+		return err
 	}
-
-	// Compare the recomputed digest with the provided commitment.
-	if len(commitment) < PQCommitmentSize {
-		// For shorter commitments, compare prefix.
-		for i := 0; i < len(commitment); i++ {
-			if commitment[i] != recomputed.Digest[i] {
-				return ErrPQValidatorMismatch
-			}
-		}
-		return nil
+	if !bytes.Equal(commitment, recomputed.Digest[:]) {
+		return ErrPQValidatorMismatch
 	}
-
-	for i := 0; i < PQCommitmentSize; i++ {
-		if commitment[i] != recomputed.Digest[i] {
-			return ErrPQValidatorMismatch
-		}
-	}
-
-	// Also verify through the MLWE lattice commitment scheme for double binding.
-	latticeCommit, _, latticeErr := v.lattice.Commit(blob)
-	if latticeErr != nil {
-		return fmt.Errorf("pq_validator: lattice commit failed: %w", latticeErr)
-	}
-	_ = latticeCommit // Lattice commit is valid; primary check passed.
-
 	return nil
 }
 
@@ -200,15 +163,12 @@ func (v *PQBlobValidator) ValidateBlobProof(blob []byte, proof *PQBlobProofV2, c
 		return fmt.Errorf("pq_validator: blob-commitment check failed: %w", err)
 	}
 
-	// Step 2: Verify the Merkle root in the proof matches the commitment.
-	commitLen := PQCommitmentSize
-	if len(commitment) < commitLen {
-		commitLen = len(commitment)
+	if proof.Algorithm != v.algorithm || !bytes.Equal(proof.MerkleRoot[:], commitment) {
+		return ErrPQValidatorProofInvalid
 	}
-	for i := 0; i < commitLen; i++ {
-		if proof.MerkleRoot[i] != commitment[i] {
-			return ErrPQValidatorProofInvalid
-		}
+	chunkProof, err := GenerateBlobProof(blob, 0)
+	if err != nil || !bytes.Equal(proof.MerkleProof, serializeChunkProof(chunkProof)) {
+		return ErrPQValidatorProofInvalid
 	}
 
 	// Step 3: Verify the PQ signature over the Merkle root.
@@ -242,7 +202,7 @@ func (v *PQBlobValidator) GenerateCommitmentProof(blob []byte) (*PQBlobProofV2, 
 		return nil, ErrPQValidatorBlobTooLarge
 	}
 
-	// Compute the lattice Merkle commitment.
+	// Compute the ordered Merkle commitment.
 	commitment, err := CommitBlob(blob)
 	if err != nil {
 		return nil, fmt.Errorf("pq_validator: commit failed: %w", err)
@@ -396,15 +356,15 @@ func serializeChunkProof(proof *PQBlobProof) []byte {
 	if proof == nil {
 		return nil
 	}
-	// Format: chunkIndex(4) || chunkHash(32) || latticeWitness(96) || commitDigest(64)
-	buf := make([]byte, 4+32+PQProofSize+PQCommitmentSize)
-	buf[0] = byte(proof.ChunkIndex >> 24)
-	buf[1] = byte(proof.ChunkIndex >> 16)
-	buf[2] = byte(proof.ChunkIndex >> 8)
-	buf[3] = byte(proof.ChunkIndex)
-	copy(buf[4:36], proof.ChunkHash[:])
-	copy(buf[36:36+PQProofSize], proof.LatticeWitness[:])
-	copy(buf[36+PQProofSize:], proof.CommitmentDigest[:])
+	// version || index || chunk hash || commitment digest || siblings.
+	buf := make([]byte, 1+4+32+PQCommitmentSize, 1+4+32+PQCommitmentSize+len(proof.Siblings)*32)
+	buf[0] = 1
+	binary.BigEndian.PutUint32(buf[1:5], proof.ChunkIndex)
+	copy(buf[5:37], proof.ChunkHash[:])
+	copy(buf[37:], proof.CommitmentDigest[:])
+	for _, sibling := range proof.Siblings {
+		buf = append(buf, sibling[:]...)
+	}
 	return buf
 }
 

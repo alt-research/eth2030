@@ -1,5 +1,7 @@
 # 历史基线、前置协议与修复清单
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 HGT-006。验收入口是 `pkg/cmd/eth2030-baseline`，固定输入在 `pkg/core/eftest/testdata/hegota/manifest.json`。两份原始 legacytests 官方文件的 SHA、来源和 12 个 subtest 数均固定。每个用例在 native processor 和直接 upstream geth 各执行一次，对 pinned oracle 与彼此的 state root、logs hash、gas 做比较。没有使用 ETH2030 geth wrapper，也没有复用 native 结果生成 oracle。
 
 实际覆盖：7 个旧文件用例（Frontier、Homestead、EIP150、EIP158、Byzantium、Constantinople、ConstantinopleFix）和 5 个新文件用例（Berlin、London、Paris、Shanghai、Cancun）。准确 fork 名以 [baseline.json](../../../evidence/hegota-a/baseline.json) 为准，防止用“支持的 fork 列表”冒充执行数量。这是最小历史基线，不能推导为完整历史回归，更不包含 Prague/Glamsterdam/Hegotá。

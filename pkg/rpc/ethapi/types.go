@@ -47,11 +47,12 @@ const (
 
 // Re-export formatting functions.
 var (
-	FormatBlock       = rpctypes.FormatBlock
-	FormatHeader      = rpctypes.FormatHeader
-	FormatTransaction = rpctypes.FormatTransaction
-	FormatReceipt     = rpctypes.FormatReceipt
-	FormatLog         = rpctypes.FormatLog
+	FormatBlock          = rpctypes.FormatBlock
+	FormatHeader         = rpctypes.FormatHeader
+	FormatTransaction    = rpctypes.FormatTransaction
+	BlobBaseFeeForHeader = rpctypes.BlobBaseFeeForHeader
+	FormatReceipt        = rpctypes.FormatReceipt
+	FormatLog            = rpctypes.FormatLog
 )
 
 // Unexported helpers delegating to rpctypes.
@@ -128,13 +129,5 @@ type PendingTxInfo struct {
 }
 
 // StateOverride maps addresses to account overrides for eth_call.
-type StateOverride map[string]AccountOverride
-
-// AccountOverride specifies replacement state for a single account.
-type AccountOverride struct {
-	Balance   *string           `json:"balance,omitempty"`
-	Nonce     *string           `json:"nonce,omitempty"`
-	Code      *string           `json:"code,omitempty"`
-	State     map[string]string `json:"state,omitempty"`
-	StateDiff map[string]string `json:"stateDiff,omitempty"`
-}
+type StateOverride = rpctypes.StateOverride
+type AccountOverride = rpctypes.AccountOverride

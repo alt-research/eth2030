@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/types"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"github.com/eth2030/eth2030/rpc/debugapi"
 )
 
@@ -27,6 +28,21 @@ func (api *EthAPI) debugTraceTransaction(req *Request) *Response {
 		_ = json.Unmarshal(req.Params[1], &cfg)
 	}
 
+	if backend, ok := api.backend.(rpcbackend.ExecutionTraceBackend); ok {
+		options, err := executionTraceOptions(cfg)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+		}
+		logger, err := backend.TraceTransactionDetailed(txHash, options)
+		if err != nil {
+			return traceResponseError(req.ID, err)
+		}
+		result, err := executionTraceResult(logger)
+		if err != nil {
+			return traceResponseError(req.ID, err)
+		}
+		return successResponse(req.ID, result)
+	}
 	if cfg.Tracer == "callTracer" {
 		return api.debugTraceTransactionCallTracer(req, txHash)
 	}
@@ -179,6 +195,29 @@ type callTracerEntry struct {
 
 // traceBlock produces a trace result for each transaction in the block.
 func (api *EthAPI) traceBlock(req *Request, block *types.Block, cfg debugapi.DbgTraceConfig) *Response {
+	if backend, ok := api.backend.(rpcbackend.ExecutionTraceBackend); ok {
+		options, err := executionTraceOptions(cfg)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+		}
+		traces, err := backend.TraceBlockDetailed(block.Hash(), options)
+		if err != nil {
+			return traceResponseError(req.ID, err)
+		}
+		if len(traces) != len(block.Transactions()) {
+			return errorResponse(req.ID, ErrCodeInternal, "incomplete block trace")
+		}
+		results := make([]map[string]any, len(traces))
+		for i, tracer := range traces {
+			result, err := executionTraceResult(tracer)
+			if err != nil {
+				return traceResponseError(req.ID, err)
+			}
+			results[i] = map[string]any{"txHash": encodeHash(block.Transactions()[i].Hash()), "result": result}
+		}
+		return successResponse(req.ID, results)
+	}
+
 	txs := block.Transactions()
 	blockHash := block.Hash()
 	receipts := api.backend.GetReceipts(blockHash)
@@ -225,6 +264,28 @@ func (api *EthAPI) traceBlock(req *Request, block *types.Block, cfg debugapi.Dbg
 		return successResponse(req.ID, results)
 	}
 
+	if backend, ok := api.backend.(rpcbackend.BlockTraceBackend); ok {
+		traces, err := backend.TraceBlock(blockHash)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, err.Error())
+		}
+		if len(traces) != len(txs) {
+			return errorResponse(req.ID, ErrCodeInternal, "incomplete block trace")
+		}
+		results := make([]*BlockTraceResult, len(txs))
+		for i, tracer := range traces {
+			logs := make([]StructLog, len(tracer.Logs))
+			for j, entry := range tracer.Logs {
+				stack := make([]string, len(entry.Stack))
+				for k, v := range entry.Stack {
+					stack[k] = "0x" + v.Text(16)
+				}
+				logs[j] = StructLog{PC: entry.Pc, Op: entry.Op.String(), Gas: entry.Gas, GasCost: entry.GasCost, Depth: entry.Depth, Stack: stack}
+			}
+			results[i] = &BlockTraceResult{TxHash: encodeHash(txs[i].Hash()), Result: &TraceResult{Gas: tracer.GasUsed(), Failed: tracer.Error() != nil, ReturnValue: encodeBytes(tracer.Output()), StructLogs: logs}}
+		}
+		return successResponse(req.ID, results)
+	}
 	results := make([]*BlockTraceResult, len(txs))
 	for i, tx := range txs {
 		trace := &TraceResult{
@@ -251,6 +312,9 @@ func (api *EthAPI) traceBlock(req *Request, block *types.Block, cfg debugapi.Dbg
 
 // debugTraceCall implements debug_traceCall.
 func (api *EthAPI) debugTraceCall(req *Request) *Response {
+	if backend, ok := api.backend.(rpcbackend.ExecutionTraceBackend); ok {
+		return api.detailedTraceCall(req, backend)
+	}
 	if len(req.Params) < 1 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "missing call arguments")
 	}
@@ -265,6 +329,30 @@ func (api *EthAPI) debugTraceCall(req *Request) *Response {
 		if err := json.Unmarshal(req.Params[1], &bn); err != nil {
 			return errorResponse(req.ID, ErrCodeInvalidParams, "invalid block number: "+err.Error())
 		}
+	}
+
+	if backend, ok := api.backend.(rpcbackend.CallBackend); ok {
+		var callConfig struct {
+			StateOverrides StateOverride `json:"stateOverrides"`
+		}
+		if len(req.Params) > 2 {
+			if err := json.Unmarshal(req.Params[2], &callConfig); err != nil {
+				return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+			}
+		}
+		tracer, err := backend.TraceCall(args, bn, callConfig.StateOverrides)
+		if err != nil {
+			return errorResponse(req.ID, ErrCodeExecution, err.Error())
+		}
+		logs := make([]StructLog, len(tracer.Logs))
+		for i, entry := range tracer.Logs {
+			stack := make([]string, len(entry.Stack))
+			for j, v := range entry.Stack {
+				stack[j] = "0x" + v.Text(16)
+			}
+			logs[i] = StructLog{PC: entry.Pc, Op: entry.Op.String(), Gas: entry.Gas, GasCost: entry.GasCost, Depth: entry.Depth, Stack: stack}
+		}
+		return successResponse(req.ID, &TraceResult{Gas: tracer.GasUsed(), Failed: tracer.Error() != nil, ReturnValue: encodeBytes(tracer.Output()), StructLogs: logs})
 	}
 
 	from := types.Address{}

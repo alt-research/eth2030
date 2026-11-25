@@ -1409,3 +1409,5 @@ func TestFormatReceipt_NilLogs(t *testing.T) {
 		t.Fatalf("want 0 logs, got %d", len(rpcReceipt.Logs))
 	}
 }
+
+func (m *testMockBackend) IsOsaka(uint64) bool { return false }

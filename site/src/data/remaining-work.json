@@ -1,0 +1,250 @@
+{
+  "date": "November 25, 2026",
+  "reviewedMaster": "5fedb7e5733fbef69767a711115ef9925e7bd769",
+  "mergedProgressPr": 148,
+  "adoptedDevelopmentTodos": 0,
+  "policy": "Glamsterdam progress follows the twenty officially scheduled core EIPs in EIP-7773. All twenty project entries now have Complete implementation labels, with current EIP-7495 qualification in PR159. The frozen development ledger remains separate. EIP-8025 and canonical Ethereum guest research remain later proposals without an official fork assignment.",
+  "items": [
+    {
+      "id": "frame-independent",
+      "phase": "hegota",
+      "kind": "Qualification",
+      "title": "Independent Frame / FOCIL agreement",
+      "current": "Native paired signed Frame and inclusion-list controls are delivered. The fresh CL used a synchronized EL.",
+      "remaining": "Qualify an independent client using the same seven-field Frame/Bogota contract, plus alternate-peer recovery and redundant BN / remote-signer paths.",
+      "doneWhen": "Independent state and receipt roots, signed verdicts, late join and restart agree under the adopted contract.",
+      "evidence": [
+        "docs/verification/frame-8141-20261118-paymaster-history-final.json",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7805",
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "dora-consumers",
+      "phase": "hegota",
+      "kind": "Integration",
+      "title": "Dora production consumers",
+      "current": "Decoder and inclusion-list display work do not establish the full production consumer migration.",
+      "remaining": "Finish and qualify epoch, receipt and statistics consumers, schema migration, missed-event recovery, pruning and persisted rebuild.",
+      "doneWhen": "Real consumer reads survive competing roots, Req/Resp recovery and restart before retained-view adapters are retired.",
+      "evidence": [
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7805",
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "workload-services",
+      "phase": "hegota",
+      "kind": "Integration",
+      "title": "Workload and paymaster service cutover",
+      "current": "The pinned local paymaster ABI and paired sponsored/blob controls are delivered.",
+      "remaining": "Qualify ordinary, delegated and sponsored services against the selected protocol and actual deployment consumers.",
+      "doneWhen": "Real service settlement, fees, receipts, retry and restart agree at declared source pins.",
+      "evidence": [
+        "docs/verification/frame-8141-20261118-paymaster-history-final.json",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-8141"
+      ]
+    },
+    {
+      "id": "canonical-proofs",
+      "phase": "longer",
+      "kind": "Research",
+      "title": "Later optional execution proofs and canonical Ethereum STF guest",
+      "current": "EL #156 delivers real RV32IM program-execution receipts, complete statement binding and native asynchronous prove/verify consumers. The fixed-output STF adapter fixture is not an Ethereum STF implementation.",
+      "remaining": "Complete the Ethereum STF guest, authenticated execution witnesses and payload-bound optional-proof lifecycle in later rounds; this work is outside official Glamsterdam scope.",
+      "doneWhen": "Authenticated witness-backed Ethereum execution matches independent roots, and payload-bound optional proof production, verification, signed propagation and recovery pass at pinned schemas. Normal payload validation remains authoritative.",
+      "evidence": [
+        "pkg/zkvm/canonical.go",
+        "pkg/zkvm/canonical_executor.go"
+      ],
+      "entries": [
+        "eip-8025",
+        "feature-evm-asm-canonical-quest",
+        "feature-leanvm-pq-proofs",
+        "feature-mandatory-proofs"
+      ]
+    },
+    {
+      "id": "public-binary-state",
+      "phase": "i",
+      "kind": "Research",
+      "title": "Public binary-state contract and recovery",
+      "current": "Private binary overlay/conversion controls do not define a public compatible layout.",
+      "remaining": "Agree layout, addressing and witness rules; qualify authenticated recovery and resource bounds.",
+      "doneWhen": "Independent clients agree on roots, witnesses and persisted recovery under the chosen public contract.",
+      "evidence": [
+        "docs/ROADMAP.md",
+        "docs/next-stage-work-plan.md"
+      ],
+      "entries": [
+        "eip-7864"
+      ]
+    },
+    {
+      "id": "pq-lifecycle",
+      "phase": "j",
+      "kind": "Research",
+      "title": "PQ validator keys, transactions and sampling",
+      "current": "PQ primitives and private provider/transaction controls are narrower than a public protocol.",
+      "remaining": "Define validator-key lifecycle, public signing/sampling contracts and independent implementation vectors.",
+      "doneWhen": "Key registration, rotation, revocation, replay rejection and live consumers agree across independent implementations.",
+      "evidence": [
+        "docs/ROADMAP.md",
+        "pkg/crypto/pqc/pq_tx_signer.go"
+      ],
+      "entries": [
+        "feature-lean-sphincs-pq-transactions",
+        "feature-leanxmss-pq-attestations",
+        "feature-leanda-pq-sampling"
+      ]
+    },
+    {
+      "id": "proof-rollup-finality",
+      "phase": "l",
+      "kind": "Research",
+      "title": "Proof, native-rollup and finality consumers",
+      "current": "Native rollup transition/withdrawal helpers use simulated hash conditions; these are not real rollup proof acceptance.",
+      "remaining": "Adopt compatible execution, proof and consensus contracts; connect independent verifiers and actual deciding consumers.",
+      "doneWhen": "State transitions, withdrawals, fees and finality pass independent end-to-end positive and rejection controls.",
+      "evidence": [
+        "pkg/rollup/native_rollup.go",
+        "docs/ROADMAP.md"
+      ],
+      "entries": [
+        "eip-8079",
+        "feature-mandatory-proofs",
+        "feature-1-round-finality"
+      ]
+    }
+  ],
+  "plannedOnly": [
+    "feature-tapered-issuance-burn",
+    "feature-decentralized-state",
+    "feature-ethp2p-unification",
+    "feature-remove-blob-transactions"
+  ],
+  "excludedAcceptance": [
+    "G-03",
+    "G-04"
+  ],
+  "specificationRepairs": [
+    {
+      "id": "fast-confirmation-native",
+      "title": "Signed FCR and native safe-block consumers",
+      "target": "master",
+      "label": "EL review #155",
+      "url": "https://github.com/alt-research/eth2030/pull/155"
+    },
+    {
+      "id": "real-execution-proofs",
+      "title": "Real execution receipts and native proof RPC",
+      "target": "master",
+      "label": "EL review #156",
+      "url": "https://github.com/alt-research/eth2030/pull/156"
+    },
+    {
+      "id": "fcr-crash-durability",
+      "title": "Durable FCR announcements before publication",
+      "target": "eth2030",
+      "label": "Lighthouse review #17",
+      "url": "https://github.com/jiayaoqijia/lighthouse/pull/17"
+    }
+  ],
+  "specificationAuditUrl": "https://github.com/alt-research/eth2030/pull/152",
+  "currentConformanceReview": {
+    "state": "qualified",
+    "title": "Current conformance review",
+    "summary": "The 20/20 count describes retained implementation labels. Current-spec corrections now pass pinned-source qualification; the linked reviews record their delivery and merge state.",
+    "detail": "All 43,790 native EL cases pass, covering 52,620 block checks: 45,221 accepted and 7,399 expected rejections. All 12,195 selected CL full-node and compatibility cases pass with crypto modes separately recorded. Real BLS/KZG wire consumers and the combined native node build pass. Lighthouse corrections are merged into eth2030; EL delivery is preserved in the master-targeted reviews.",
+    "originalFaultStatus": "unconfirmed",
+    "boundary": "Original-04 attribution remains unconfirmed. 48h/scale and Lodestar upstream approval remain excluded, not passed. EIP-8025 and a full Ethereum STF guest remain later work.",
+    "reviews": [
+      {
+        "id": "engine-quantity",
+        "title": "Engine slot quantity parsing",
+        "target": "master",
+        "state": "Qualified review",
+        "url": "https://github.com/alt-research/eth2030/pull/160"
+      },
+      {
+        "id": "gas-authority",
+        "title": "Gas specification authority",
+        "target": "master",
+        "state": "Qualified review",
+        "url": "https://github.com/alt-research/eth2030/pull/161"
+      },
+      {
+        "id": "native-rlp",
+        "title": "Native block framing",
+        "target": "master",
+        "state": "Qualified review",
+        "url": "https://github.com/alt-research/eth2030/pull/162"
+      },
+      {
+        "id": "native-blockchain",
+        "title": "Complete native block conformance",
+        "target": "master",
+        "state": "Qualified review",
+        "url": "https://github.com/alt-research/eth2030/pull/163"
+      },
+      {
+        "id": "independent-bal",
+        "title": "Independent BAL recovery",
+        "target": "master",
+        "state": "Qualified review",
+        "url": "https://github.com/alt-research/eth2030/pull/164"
+      },
+      {
+        "id": "cl-admission",
+        "title": "Consensus message admission",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/18"
+      },
+      {
+        "id": "cl-fcr",
+        "title": "Fast confirmation vote accounting",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/19"
+      },
+      {
+        "id": "cl-cell-bitmap",
+        "title": "Progressive cell bitmap schemas",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/20"
+      },
+      {
+        "id": "cl-independent-peer",
+        "title": "Independent peer interoperability",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/21"
+      },
+      {
+        "id": "cl-light-client",
+        "title": "Canonical light-client serving",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/22"
+      },
+      {
+        "id": "cl-current-reference",
+        "title": "Complete current consensus reference",
+        "target": "eth2030",
+        "state": "Merged",
+        "url": "https://github.com/jiayaoqijia/lighthouse/pull/23"
+      }
+    ]
+  }
+}

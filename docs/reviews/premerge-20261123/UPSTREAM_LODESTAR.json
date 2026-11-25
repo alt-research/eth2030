@@ -1,0 +1,24 @@
+{
+  "url": "https://github.com/ChainSafe/lodestar/pull/10693",
+  "head": "4e224659179dc8050344b48a397f1791450bf24c",
+  "target": "unstable",
+  "api_base_sha": "3d90162721dfcd809c48538e8abf77d2db4a6be0",
+  "current_target_sha": "97ba67c17ea8323b8e69d94fbaba76412611217a",
+  "current_merge_returncode": 0,
+  "checks": [
+    {
+      "name": "Validate PR title",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/ChainSafe/lodestar/actions/runs/44928781117/job/136920611092"
+    },
+    {
+      "name": "Validate PR title",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/ChainSafe/lodestar/actions/runs/44928753440/job/136920526039"
+    }
+  ],
+  "combined_commit_status": "pending",
+  "scope": "Only title checks are present; this is not full hosted unit/spec/e2e/browser qualification. Unchanged external-PR lockfile policy and maintainer review remain open."
+}

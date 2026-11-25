@@ -1,7 +1,10 @@
 package vm
 
 import (
+	"encoding/binary"
+
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
 
 // WitnessGasTracker maintains the four sets specified by EIP-4762 for tracking
@@ -13,16 +16,48 @@ type WitnessGasTracker struct {
 	accessedLeaves   map[witnessLeafKey]bool
 	editedSubtrees   map[witnessSubtreeKey]bool
 	editedLeaves     map[witnessLeafKey]bool
+	pending          []witnessEvent
+	staging          bool
+}
+
+type witnessEvent struct {
+	key    witnessLeafKey
+	branch bool
+	edit   bool
+}
+
+// Dynamic gas calculation can discover accesses before the EVM knows
+// whether the instruction can pay for them.
+func (t *WitnessGasTracker) finishGasCalculation(paid bool) {
+	if !paid {
+		for _, event := range t.pending {
+			key := event.key
+			if event.branch {
+				branch := witnessSubtreeKey{key.addr, key.subKey}
+				if event.edit {
+					delete(t.editedSubtrees, branch)
+				} else {
+					delete(t.accessedSubtrees, branch)
+				}
+			} else if event.edit {
+				delete(t.editedLeaves, key)
+			} else {
+				delete(t.accessedLeaves, key)
+			}
+		}
+	}
+	t.pending = t.pending[:0]
+	t.staging = false
 }
 
 type witnessSubtreeKey struct {
 	addr   types.Address
-	subKey uint64
+	subKey types.Hash
 }
 
 type witnessLeafKey struct {
 	addr    types.Address
-	subKey  uint64
+	subKey  types.Hash
 	leafKey uint8
 }
 
@@ -40,17 +75,29 @@ func NewWitnessGasTracker() *WitnessGasTracker {
 // (address, subKey, leafKey). It returns the gas to charge. If the subtree
 // or leaf has already been accessed, no gas is charged for that component.
 func (t *WitnessGasTracker) TouchAccessEvent(addr types.Address, subKey uint64, leafKey uint8) uint64 {
+	var index types.Hash
+	binary.BigEndian.PutUint64(index[24:], subKey)
+	return t.touchAccess(addr, index, leafKey)
+}
+
+func (t *WitnessGasTracker) touchAccess(addr types.Address, subKey types.Hash, leafKey uint8) uint64 {
 	var gas uint64
 
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
 	if !t.accessedSubtrees[sk] {
 		t.accessedSubtrees[sk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: witnessLeafKey{addr: addr, subKey: subKey}, branch: true})
+		}
 		gas = safeAdd(gas, WitnessBranchCost)
 	}
 
 	lk := witnessLeafKey{addr: addr, subKey: subKey, leafKey: leafKey}
 	if !t.accessedLeaves[lk] {
 		t.accessedLeaves[lk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: lk})
+		}
 		gas = safeAdd(gas, WitnessChunkCost)
 	}
 
@@ -62,17 +109,29 @@ func (t *WitnessGasTracker) TouchAccessEvent(addr types.Address, subKey uint64, 
 // event gas. The fill parameter indicates whether the slot was previously
 // empty (None), triggering the extra CHUNK_FILL_COST.
 func (t *WitnessGasTracker) TouchWriteEvent(addr types.Address, subKey uint64, leafKey uint8, fill bool) uint64 {
+	var index types.Hash
+	binary.BigEndian.PutUint64(index[24:], subKey)
+	return t.touchWrite(addr, index, leafKey, fill)
+}
+
+func (t *WitnessGasTracker) touchWrite(addr types.Address, subKey types.Hash, leafKey uint8, fill bool) uint64 {
 	var gas uint64
 
 	sk := witnessSubtreeKey{addr: addr, subKey: subKey}
 	if !t.editedSubtrees[sk] {
 		t.editedSubtrees[sk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: witnessLeafKey{addr: addr, subKey: subKey}, branch: true, edit: true})
+		}
 		gas = safeAdd(gas, SubtreeEditCost)
 	}
 
 	lk := witnessLeafKey{addr: addr, subKey: subKey, leafKey: leafKey}
 	if !t.editedLeaves[lk] {
 		t.editedLeaves[lk] = true
+		if t.staging {
+			t.pending = append(t.pending, witnessEvent{key: lk, edit: true})
+		}
 		gas = safeAdd(gas, ChunkEditCost)
 		if fill {
 			gas = safeAdd(gas, ChunkFillCost)
@@ -154,10 +213,9 @@ func gasSloadEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, me
 	if evm.witnessGas == nil {
 		return 0, nil
 	}
-	loc := stack.Back(0)
-	storageKey := loc.Uint64()
-	treeKey, subKey := GetStorageSlotTreeKeys(storageKey)
-	return evm.witnessGas.TouchAccessEvent(contract.Address, treeKey, subKey), nil
+	key := bigToHash(stack.Back(0))
+	treeIndex, leaf := bintrie.StorageIndex(key[:])
+	return evm.witnessGas.touchAccess(contract.Address, types.BytesToHash(treeIndex.Bytes()), leaf), nil
 }
 
 // gasSstoreEIP4762 calculates witness-based gas for SSTORE under EIP-4762.
@@ -170,23 +228,25 @@ func gasSstoreEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 		return gas, nil
 	}
 
-	loc := stack.Back(0)
-	storageKey := loc.Uint64()
-	treeKey, subKey := GetStorageSlotTreeKeys(storageKey)
+	key := bigToHash(stack.Back(0))
+	treeIndex, leaf := bintrie.StorageIndex(key[:])
+	stem := types.BytesToHash(treeIndex.Bytes())
 
 	// Access event.
-	gas = safeAdd(gas, evm.witnessGas.TouchAccessEvent(contract.Address, treeKey, subKey))
+	gas = safeAdd(gas, evm.witnessGas.touchAccess(contract.Address, stem, leaf))
 
 	// Determine if this is a fill (writing to a previously-empty slot).
-	key := bigToHash(loc)
 	fill := false
-	if evm.StateDB != nil {
-		committed := evm.StateDB.GetCommittedState(contract.Address, key)
-		fill = isZeroHash(committed)
+	if slots, ok := evm.StateDB.(interface {
+		HasStorageLeaf(types.Address, types.Hash) bool
+	}); ok {
+		fill = !slots.HasStorageLeaf(contract.Address, key)
+	} else if evm.StateDB != nil {
+		fill = evm.StateDB.GetCommittedState(contract.Address, key).IsZero()
 	}
 
 	// Write event.
-	gas = safeAdd(gas, evm.witnessGas.TouchWriteEvent(contract.Address, treeKey, subKey, fill))
+	gas = safeAdd(gas, evm.witnessGas.touchWrite(contract.Address, stem, leaf, fill))
 	return gas, nil
 }
 
@@ -227,6 +287,9 @@ func gasExtCodeCopyEIP4762(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 
 	// Charge per code chunk accessed.
 	if evm.witnessGas != nil && size > 0 {
+		if !stack.Back(2).IsUint64() {
+			return gas, nil
+		}
 		codeOffset := stack.Back(2).Uint64()
 		var codeSize uint64
 		if evm.StateDB != nil {
@@ -351,13 +414,10 @@ func gasCodeChunksAccess(evm *EVM, addr types.Address, codeOffset, readSize, cod
 	}
 
 	// Clamp the range to codeSize.
-	endByte := codeOffset + readSize
-	if endByte > codeSize {
-		endByte = codeSize
-	}
 	if codeOffset >= codeSize {
 		return 0
 	}
+	endByte := codeOffset + min(readSize, codeSize-codeOffset)
 
 	firstChunk := codeOffset / CodeChunkSize
 	lastChunk := (endByte - 1) / CodeChunkSize
@@ -368,14 +428,4 @@ func gasCodeChunksAccess(evm *EVM, addr types.Address, codeOffset, readSize, cod
 		gas = safeAdd(gas, evm.witnessGas.TouchAccessEvent(addr, treeKey, subKey))
 	}
 	return gas
-}
-
-// isZeroHash returns true if all bytes in h are zero.
-func isZeroHash(h types.Hash) bool {
-	for _, b := range h {
-		if b != 0 {
-			return false
-		}
-	}
-	return true
 }

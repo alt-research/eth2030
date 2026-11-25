@@ -67,7 +67,7 @@ func TestCalcBlockValue_NilBaseFee(t *testing.T) {
 	}, nil)
 	receipts := []*types.Receipt{}
 
-	value := calcBlockValue(block, receipts, nil)
+	value := calcBlockValue(nil, block, receipts, nil)
 	if value.Sign() != 0 {
 		t.Fatalf("expected zero value with nil baseFee, got %s", value.String())
 	}
@@ -81,7 +81,7 @@ func TestCalcBlockValue_EmptyBlock(t *testing.T) {
 	receipts := []*types.Receipt{}
 	baseFee := big.NewInt(1000000000) // 1 Gwei
 
-	value := calcBlockValue(block, receipts, baseFee)
+	value := calcBlockValue(nil, block, receipts, baseFee)
 	if value.Sign() != 0 {
 		t.Fatalf("expected zero value for empty block, got %s", value.String())
 	}
@@ -155,7 +155,7 @@ func TestBlockToPayloadV5_Conversion(t *testing.T) {
 	block := types.NewBlock(header, nil)
 	prevRandao := types.HexToHash("0x1111111111111111111111111111111111111111111111111111111111111111")
 
-	ep := BlockToPayloadV5(block, prevRandao, nil, nil)
+	ep := BlockToPayloadV5(block, prevRandao, nil, nil, 0)
 	if ep == nil {
 		t.Fatal("BlockToPayloadV5 returned nil")
 	}

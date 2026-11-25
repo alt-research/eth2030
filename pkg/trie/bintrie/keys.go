@@ -67,9 +67,10 @@ func GetTreeKeyForCodeHash(addr types.Address) [32]byte {
 // tree_index = (CODE_OFFSET + chunkID) / StemNodeWidth
 // sub_index  = (CODE_OFFSET + chunkID) % StemNodeWidth
 func GetTreeKeyForCodeChunk(addr types.Address, chunkID uint64) [32]byte {
-	pos := uint64(CodeOffset) + chunkID
-	treeIndex := new(big.Int).SetUint64(pos / StemNodeWidth)
-	subIndex := uint8(pos % StemNodeWidth)
+	pos := new(big.Int).Add(new(big.Int).SetUint64(chunkID), big.NewInt(CodeOffset))
+	treeIndex, remainder := new(big.Int), new(big.Int)
+	treeIndex.QuoRem(pos, big.NewInt(StemNodeWidth), remainder)
+	subIndex := uint8(remainder.Uint64())
 	return GetTreeKey(addrTo32(addr), treeIndex, subIndex)
 }
 

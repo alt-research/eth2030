@@ -62,13 +62,13 @@ Three layers, each with sub-tracks:
 - **Tests**: 1,090 files, ~444K LOC, 20,281 tests
 - **Total**: 2,274 files, ~794K LOC
 - **EIPs**: 58 complete, 5 substantial
-- **EF State Tests**: 36,126/36,126 passing (100%) via go-ethereum v1.17.0 backend in `pkg/core/eftest/`
+- **EF State Tests**: 36,126/36,126 passing (100%) via go-ethereum v1.17.10 backend in `pkg/core/eftest/`
 - **go-ethereum integration**: `pkg/geth/` adapter with 13 custom precompile injection + `eth2030-geth` binary for mainnet/testnet sync (verified: Sepolia snap sync via Lighthouse CL, mainnet startup, 20+ RPC methods tested)
 - **Security audits**: leanVM audit (18 findings across 4 leanEthereum repos, 9 PRs submitted: 2 merged, 4 open, 3 closed)
 
 ### EIP Implementation Status
-- **Complete** (58): EIP-150, EIP-152, EIP-196/197, EIP-1153, EIP-1559, EIP-2200, EIP-2537, EIP-2718, EIP-2929, EIP-2930, EIP-2935, EIP-3529, EIP-3540, EIP-4444, EIP-4762, EIP-4788, EIP-4844 (incl. KZG), EIP-4895, EIP-5656, EIP-6110, EIP-6404, EIP-6780, EIP-7002, EIP-7069, EIP-7251, EIP-7480, EIP-7547, EIP-7549, EIP-7594, EIP-7620, EIP-7685, EIP-7691, EIP-7698, EIP-7701, EIP-7702, EIP-7706, EIP-7742, EIP-7745, EIP-7807, EIP-7825, EIP-7898, EIP-7904, EIP-7916, EIP-7918, EIP-7928, EIP-7939, EIP-8024, EIP-8070, EIP-8077, EIP-8079, EIP-8141
-- **Substantial** (5): EIP-7732 (ePBS), EIP-7864 (binary tree), EIP-7805 (FOCIL, incl. Dora explorer support + EIP-8141 frame tx IL satisfaction), EIP-8025 (execution proofs), PQC (Dilithium3/Falcon512/SPHINCS+)
+- **Complete** (53): EIP-150, EIP-152, EIP-196/197, EIP-1153, EIP-1559, EIP-2200, EIP-2537, EIP-2718, EIP-2929, EIP-2930, EIP-2935, EIP-3529, EIP-3540, EIP-4444, EIP-4762, EIP-4788, EIP-4844 (incl. KZG), EIP-4895, EIP-5656, EIP-6110, EIP-6780, EIP-7002, EIP-7069, EIP-7251, EIP-7480, EIP-7547, EIP-7549, EIP-7594, EIP-7620, EIP-7685, EIP-7691, EIP-7698, EIP-7701, EIP-7702, EIP-7706, EIP-7732 (adopted signed Gloas contract), EIP-7742, EIP-7745, EIP-7825, EIP-7898, EIP-7904, EIP-7916, EIP-7918, EIP-7928, EIP-7975, EIP-8159, EIP-7934, EIP-7939, EIP-8024, EIP-8070, EIP-8077, EIP-8141
+- **Substantial** (7): EIP-7864 (binary tree), EIP-7805 (FOCIL, incl. Dora explorer support + EIP-8141 frame tx IL satisfaction), EIP-8025 (execution proofs), EIP-6404 and EIP-7807 (draft codecs and reference vectors; fork activation pending), EIP-8079 (rollup execution component; precompile address and ABI pending), PQC (Dilithium3/Falcon512/SPHINCS+)
 
 ## Project Structure & Module Organization
 
@@ -82,7 +82,7 @@ Three layers, each with sub-tracks:
   - `core/state/pruner/` - State pruner with bloom filter reachability
   - `core/vops/` - Validity-Only Partial Statelessness: partial executor, validator, witness integration, complete VOPS validator (access lists, storage proofs)
   - `core/eftest/` - EF state test runner: JSON parser, fixture loader, go-ethereum-backed execution (36,126/36,126 = 100%)
-  - `geth/` - go-ethereum adapter: type conversion, chain config mapping, pre-state creation, state transition, block processor, custom precompile injection (13 precompiles: 4 Glamsterdam repriced, 1 NTT, 4 NII, 4 field), ETH2030 fork-level detection (imports go-ethereum v1.17.0 as library)
+  - `geth/` - go-ethereum adapter: type conversion, chain config mapping, pre-state creation, state transition, block processor, custom precompile injection (13 precompiles: 4 Glamsterdam repriced, 1 NTT, 4 NII, 4 field), ETH2030 fork-level detection (imports go-ethereum v1.17.10 as library)
   - `rlp/` - RLP encoding/decoding
   - `consensus/` - Consensus layer: 3SF (3-slot finality), quick slots (6s, 4-slot epochs), 1-epoch finality, EIP-7251 validator balance (2048 ETH max EB), consolidation, APS (committee selection), EIP-7549 attestations, PQ attestations (Dilithium), attester stake cap, endgame finality, UnifiedBeaconState (merged v1/v2/modern), finality BLS adapter, CL proof circuits (SHA-256 Merkle), jeanVM aggregation (Groth16 ZK-circuit BLS), PQ chain security (SHA-3 fork choice)
   - `ssz/` - SSZ encoding/decoding, merkleization, EIP-7916 ProgressiveList
@@ -112,7 +112,7 @@ Three layers, each with sub-tracks:
   - `metrics/` - Counters, gauges, histograms, Prometheus export, EWMA, meter, CPU tracker
   - `devnet/kurtosis/` - Kurtosis devnet configs (30 features + 6 general), scripts (consensus check, assertoor, precompile smoke test, EIP-8141 frame tx test, feature verify), ethpandaops tools integration (assertoor, spamoor, rakoon, dora, blockscout, blobscan, forky, tracoor, forkmon, prometheus, grafana). Public endpoints: devnet.eth2030.com (RPC), devnet-dora.eth2030.com (Dora), devnet-blockscout.eth2030.com (Blockscout)
 - `cmd/eth2030/` - CLI binary with flags, signal handling
-  - `cmd/eth2030-geth/` - Production binary embedding go-ethereum v1.17.0 as a library for real mainnet/testnet sync (Pebble DB, RLPx P2P, snap/full sync, Engine API on port 8551, JSON-RPC on port 8545, 13 custom precompiles injected at Glamsterdam/Hegotá/I+ fork levels; supports mainnet, sepolia, holesky)
+  - `cmd/eth2030-geth/` - Production binary embedding go-ethereum v1.17.10 as a library for real mainnet/testnet sync (Pebble DB, RLPx P2P, snap/full sync, Engine API on port 8551, JSON-RPC on port 8545, 13 custom precompiles injected at Glamsterdam/Hegotá/I+ fork levels; supports mainnet, sepolia, hoodi (holesky mapped to hoodi since geth v1.17.10 removed it))
 - `internal/testutil/` - Shared test utilities
 - `refs/` - Reference submodules (47 total, read-only, do NOT modify). See **[`refs/REFERENCES.md`](refs/REFERENCES.md)** for the full catalog: per-submodule details, ETH2030 relevance, and a priority matrix mapping each North Star goal to the relevant refs. Main upstream: https://github.com/orgs/ethereum/repositories
   - **Ethereum specs**: consensus-specs, execution-specs, consensus-spec-tests, execution-spec-tests, execution-apis, beacon-APIs, builder-specs, EIPs, ERCs

@@ -1,0 +1,10 @@
+[
+  {
+    "mutation": "refund-lifetime",
+    "detected": true
+  },
+  {
+    "mutation": "transient-lifetime",
+    "detected": true
+  }
+]

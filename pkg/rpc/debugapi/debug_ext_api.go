@@ -88,7 +88,7 @@ func (d *DebugExtAPI) debugStorageRangeAt(req *rpctypes.Request) *rpctypes.Respo
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := d.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(d.backend, header)
 	if err != nil {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "state unavailable: "+err.Error())
 	}
@@ -168,7 +168,7 @@ func (d *DebugExtAPI) debugAccountRange(req *rpctypes.Request) *rpctypes.Respons
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := d.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(d.backend, header)
 	if err != nil {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "state unavailable: "+err.Error())
 	}
@@ -272,7 +272,7 @@ func (d *DebugExtAPI) debugDumpBlock(req *rpctypes.Request) *rpctypes.Response {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "block not found")
 	}
 
-	statedb, err := d.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(d.backend, header)
 	if err != nil {
 		return rpctypes.NewErrorResponse(req.ID, rpctypes.ErrCodeInternal, "state unavailable: "+err.Error())
 	}

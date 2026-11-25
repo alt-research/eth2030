@@ -1,0 +1,11 @@
+{
+  "master": "209607b9ba1ce81c63b6bb1d1e2a45a6144f14c2",
+  "example_pr": 93,
+  "head": "3661d79d6c6a69a5b989aefe7cceeda955691fdb",
+  "common_ancestors": [
+    "5951de994a20fd9e0a091508ec82568aee35327d",
+    "c64336a0370798480097e440fb497204b1f17e0c",
+    "0426c03efae8e9265c9fae5a53f5ae1bb637d20f"
+  ],
+  "observed": "Local merge-tree succeeds; GitHub reports mergeable=false/dirty after retarget. No claim about GitHub internal implementation. Correct by normally merging master and updated prerequisites, retaining ancestry."
+}

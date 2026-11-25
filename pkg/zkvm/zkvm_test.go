@@ -9,7 +9,7 @@ import (
 
 // --- Verifier tests ---
 
-func TestVerifyProofValid(t *testing.T) {
+func TestVerifyProofRejectsStructuralFixture(t *testing.T) {
 	vk := &VerificationKey{
 		Data:        []byte("test-vk"),
 		ProgramHash: types.Hash{0x01},
@@ -23,8 +23,8 @@ func TestVerifyProofValid(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !valid {
-		t.Error("expected valid proof")
+	if valid {
+		t.Error("accepted a structural fixture as a real proof")
 	}
 }
 

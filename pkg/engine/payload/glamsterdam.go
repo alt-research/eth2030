@@ -32,9 +32,10 @@ type BlobsBundleV2 struct {
 	Blobs       [][]byte
 }
 
-// GetPayloadV5Response is the response for engine_getPayloadV5 (Osaka spec).
-type GetPayloadV5Response struct {
-	ExecutionPayload  *ExecutionPayloadV3 `json:"executionPayload"`
+// LegacyGlamsterdamPayloadResponse belongs to the historical standalone adapter.
+// The production Engine V5 response is the canonical Osaka GetPayloadV5Response.
+type LegacyGlamsterdamPayloadResponse struct {
+	ExecutionPayload  *ExecutionPayloadV5 `json:"executionPayload"`
 	BlockValue        *big.Int            `json:"blockValue"`
 	BlobsBundle       *BlobsBundleV2      `json:"blobsBundle"`
 	Override          bool                `json:"shouldOverrideBuilder"`

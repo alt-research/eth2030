@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -12,6 +13,7 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -78,12 +80,13 @@ type Blockchain struct {
 	// briefly for cache reads/writes, not during expensive state execution.
 	// This allows concurrent Engine API reads (HasBlock, GetBlock, etc.)
 	// to proceed without blocking while a block is being processed.
-	insertMu  sync.Mutex
-	config    *config.ChainConfig
-	db        rawdb.Database
-	hc        *HeaderChain
-	processor *execution.StateProcessor
-	validator block.Validator
+	insertMu         sync.Mutex
+	canonicalVersion uint64 // protected by mu; validates multi-key fallback reads
+	config           *config.ChainConfig
+	db               rawdb.Database
+	hc               *HeaderChain
+	processor        *execution.StateProcessor
+	validator        block.Validator
 
 	opts BlockchainOpts // cache size limits, set at construction
 
@@ -154,7 +157,8 @@ type Blockchain struct {
 	// sfGroup deduplicates concurrent StateAtBlock re-executions: when N
 	// goroutines all request state for the same block hash, only one does the
 	// work and the rest wait for and share the result.
-	sfGroup singleflight.Group
+	sfGroup         singleflight.Group
+	queryStateSlots chan struct{}
 }
 
 // NewBlockchain creates a new blockchain initialized with the given genesis block.
@@ -164,6 +168,25 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 	if genesis == nil {
 		return nil, ErrNoGenesis
 	}
+	if err := execution.ValidatePQDraftSchedule(config); err != nil {
+		return nil, err
+	}
+	overlayConfigured := config != nil && config.BinaryOverlayTime != nil
+	if overlayConfigured && db == nil {
+		return nil, errors.New("binary overlay requires a block database")
+	}
+	if overlayConfigured && *config.BinaryOverlayTime <= genesis.Time() {
+		return nil, errors.New("binary overlay activation must follow genesis")
+	}
+	if config != nil && config.BinaryConversionTime != nil {
+		if !overlayConfigured || *config.BinaryConversionTime < *config.BinaryOverlayTime {
+			return nil, errors.New("binary conversion requires prior or simultaneous overlay activation")
+		}
+		if config.BinaryConversionStride <= 0 {
+			return nil, state.ErrBinaryConversionStride
+		}
+	}
+
 	var opts BlockchainOpts
 	if len(optArgs) > 0 {
 		opts = optArgs[0]
@@ -197,6 +220,20 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		execGenesis = state.NewMemoryStateDB()
 	}
 
+	if overlayConfigured {
+		switch statedb.(type) {
+		case *state.TrieStateDB, *state.MemoryStateDB:
+			if execGenesis.GetRoot() != genesis.Root() {
+				return nil, fmt.Errorf("binary overlay genesis: %w", block.ErrInvalidStateRoot)
+			}
+			statedb = execGenesis
+			// Keep the complete state available at the activation boundary.
+			gcMode, stateDB = "", nil
+		default:
+			return nil, state.ErrBinaryOverlayState
+		}
+	}
+
 	bc := &Blockchain{
 		config:           config,
 		db:               db,
@@ -210,6 +247,7 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		txLookup:         make(map[types.Hash]TxLookupEntry),
 		sc:               newStateCache(opts.StateCacheSize),
 		memSC:            newStateCache(opts.StateCacheSize),
+		queryStateSlots:  make(chan struct{}, 2),
 		genesisState:     statedb,
 		execGenesisState: execGenesis,
 		gcMode:           gcMode,
@@ -227,16 +265,106 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 	// Store genesis in caches.
 	hash := genesis.Hash()
 	bc.blockCache[hash] = genesis
+	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
 	bc.canonCache[genesis.NumberU64()] = hash
 
 	// Check if chain already exists in rawdb (e.g. after restart).
 	existing, err := rawdb.ReadCanonicalHash(db, 0)
-	if err != nil || existing != hash {
+	if err != nil && !errors.Is(err, rawdb.ErrNotFound) {
+		return nil, fmt.Errorf("read genesis: %w", err)
+	}
+	if err == nil && existing != hash {
+		return nil, fmt.Errorf("%w: genesis mismatch: database=%x configured=%s", ErrInvalidChain, existing, hash)
+	}
+	if errors.Is(err, rawdb.ErrNotFound) {
 		// Fresh start: persist genesis and set head pointers.
-		bc.writeBlock(genesis)
-		rawdb.WriteCanonicalHash(db, genesis.NumberU64(), hash)
-		rawdb.WriteHeadBlockHash(db, hash)
-		rawdb.WriteHeadHeaderHash(db, hash)
+		if overlayConfigured {
+			batch := db.NewBatch()
+			if err := writeValidatedBlock(batch, genesis, nil); err != nil {
+				return nil, err
+			}
+			if err := rawdb.WriteCanonicalHash(batch, 0, hash); err != nil {
+				return nil, err
+			}
+			if err := rawdb.WriteHeadBlockHash(batch, hash); err != nil {
+				return nil, err
+			}
+			if err := rawdb.WriteHeadHeaderHash(batch, hash); err != nil {
+				return nil, err
+			}
+			if err := batch.Write(); err != nil {
+				return nil, fmt.Errorf("persist binary overlay genesis: %w", err)
+			}
+		} else {
+			bc.writeBlock(genesis)
+			rawdb.WriteCanonicalHash(db, genesis.NumberU64(), hash)
+			rawdb.WriteHeadBlockHash(db, hash)
+			rawdb.WriteHeadHeaderHash(db, hash)
+		}
+	}
+
+	if overlayConfigured && err == nil && existing == hash {
+		storedHead, readErr := rawdb.ReadHeadBlockHash(db)
+		if readErr != nil {
+			return nil, fmt.Errorf("read overlay chain head: %w", readErr)
+		}
+		if storedHead != hash {
+			head := bc.readBlock(storedHead)
+			if head == nil || head.Hash() != storedHead || head.NumberU64() <= genesis.NumberU64() {
+				return nil, fmt.Errorf("restore overlay chain head %x: %w", storedHead, ErrBlockNotFound)
+			}
+			var legacy []types.Hash
+			for cursor := head; cursor.NumberU64() > genesis.NumberU64(); {
+				num := cursor.NumberU64()
+				canonical, err := rawdb.ReadCanonicalHash(db, num)
+				if err != nil || canonical != cursor.Hash() {
+					return nil, fmt.Errorf("restore overlay canonical block %d: %w", num, ErrBlockNotFound)
+				}
+				bc.canonCache[num] = canonical
+				header := cursor.Header()
+				bc.hc.headers[num] = header
+				bc.hc.headersByHash[canonical] = header
+				parent := bc.readBlock(cursor.ParentHash())
+				if parent == nil || parent.NumberU64() != num-1 || parent.Hash() != cursor.ParentHash() {
+					return nil, fmt.Errorf("restore overlay ancestor of block %d: %w", num, ErrBlockNotFound)
+				}
+				if !bc.HasValidatedBlock(canonical) {
+					if err := bc.validator.ValidateHeader(header, parent.Header()); err != nil {
+						return nil, fmt.Errorf("verify legacy overlay header %d: %w", num, err)
+					}
+					legacy = append(legacy, canonical)
+				}
+				cursor = parent
+				if num == 1 && cursor.Hash() != hash {
+					return nil, fmt.Errorf("restore overlay genesis: %w", ErrBlockNotFound)
+				}
+			}
+			replayed, replayErr := bc.replayStateAtBlock(head, true)
+			if replayErr != nil {
+				return nil, fmt.Errorf("restore overlay chain state: %w", replayErr)
+			}
+			if replayed.GetRoot() != head.Root() {
+				return nil, block.ErrInvalidStateRoot
+			}
+			if err := bc.verifyOverlayCheckpoint(head, replayed); err != nil {
+				return nil, fmt.Errorf("verify overlay head checkpoint: %w", err)
+			}
+			if len(legacy) > 0 {
+				batch := db.NewBatch()
+				for _, blockHash := range legacy {
+					if err := batch.Put(validatedKey(blockHash), []byte{1}); err != nil {
+						return nil, storageFailure(err)
+					}
+				}
+				if err := batch.Write(); err != nil {
+					return nil, storageFailure(err)
+				}
+			}
+			bc.currentState, bc.currentBlock = replayed, head
+			bc.hc.currentHeader = head.Header()
+			bc.sc.protect(head.Hash())
+			bc.memSC.protect(head.Hash())
+		}
 	}
 
 	// Restore finalized and safe block pointers from the database.
@@ -249,7 +377,27 @@ func NewBlockchain(config *config.ChainConfig, genesis *types.Block, statedb sta
 		}
 	}
 
+	metrics.ChainHeight.Set(int64(bc.currentBlock.NumberU64()))
 	return bc, nil
+}
+
+// cacheBlockLocked keeps the body map and eviction queue consistent, including
+// cold parent reads and reorg ancestry. The caller holds bc.mu for writing.
+func (bc *Blockchain) cacheBlockLocked(blk *types.Block) {
+	hash := blk.Hash()
+	if _, exists := bc.blockCache[hash]; exists {
+		bc.blockCache[hash] = blk
+		return
+	}
+	capacity := bc.opts.BlockCacheSize
+	if capacity <= 0 {
+		capacity = defaultBlockCacheSize
+	}
+	for len(bc.blockCache) >= capacity {
+		bc.evictOldestBlock()
+	}
+	bc.blockCache[hash] = blk
+	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
 }
 
 // evictOldestBlock removes the oldest block from blockCache (LRU eviction).
@@ -269,6 +417,52 @@ func (bc *Blockchain) evictOldestBlock() {
 	}
 }
 
+var ErrBinaryOverlayRoot = fmt.Errorf("binary overlay: %w", block.ErrInvalidStateRoot)
+
+// executeState prepares and finalizes the overlay for validation and replay.
+func (bc *Blockchain) executeState(blk *types.Block, current state.StateDB, getHash func(uint64) types.Hash) (state.StateDB, *execution.ProcessResult, error) {
+	return bc.executeStateContext(context.Background(), blk, current, getHash)
+}
+func (bc *Blockchain) executeStateContext(ctx context.Context, blk *types.Block, current state.StateDB, getHash func(uint64) types.Hash) (state.StateDB, *execution.ProcessResult, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
+
+	next, err := execution.PrepareBlockState(bc.config, blk.Time(), current)
+	if err != nil {
+		return nil, nil, err
+	}
+	processorCopy := bc.processor.WithContext(ctx)
+	processor := &processorCopy
+	if getHash != nil {
+		branchProcessor := processor.WithGetHash(getHash)
+		processor = &branchProcessor
+	}
+	overlayConfigured := bc.config != nil && bc.config.BinaryOverlayTime != nil
+	if overlayConfigured && blk.NumberU64() > 0 {
+		if err := bc.validator.ValidateBody(blk); err != nil {
+			return nil, nil, err
+		}
+	}
+	result, err := processor.ProcessWithBAL(blk, next)
+	if readErr := state.ReadError(next); readErr != nil {
+		return nil, nil, storageFailure(readErr)
+	}
+	if err != nil {
+		return nil, nil, err
+	}
+	if overlayConfigured {
+		root, err := next.Commit()
+		if err != nil {
+			return nil, nil, err
+		}
+		if root != blk.Root() {
+			return nil, nil, fmt.Errorf("%w: header=%s computed=%s", ErrBinaryOverlayRoot, blk.Root(), root)
+		}
+	}
+	return next, result, nil
+}
+
 // InsertBlock validates, executes, and inserts a single block.
 //
 // To prevent long lock-holds from blocking concurrent Engine API reads,
@@ -283,9 +477,18 @@ func (bc *Blockchain) evictOldestBlock() {
 // During Phase 2 all Engine API reads (HasBlock, GetBlock, CurrentBlock, etc.)
 // can proceed without waiting, eliminating HTTP timeouts under heavy load.
 func (bc *Blockchain) InsertBlock(blk *types.Block) error {
+	_, err := bc.InsertBlockWithResult(blk)
+	return err
+}
+
+// InsertBlockWithResult returns the execution result of a newly validated block.
+// A block already present in the chain returns a nil result.
+func (bc *Blockchain) InsertBlockWithResult(blk *types.Block) (*execution.ProcessResult, error) {
 	bc.insertMu.Lock()
 	defer bc.insertMu.Unlock()
-	return bc.insertBlock(blk)
+	var result *execution.ProcessResult
+	err := bc.insertBlock(blk, &result, false)
+	return result, err
 }
 
 // collectAncestorsLocked builds the chain of blocks that must be re-executed
@@ -351,7 +554,7 @@ func (bc *Blockchain) collectAncestorsLocked(target *types.Block) ([]*types.Bloc
 }
 
 // insertBlock is the internal three-phase insert. Caller must hold bc.insertMu.
-func (bc *Blockchain) insertBlock(blk *types.Block) error {
+func (bc *Blockchain) insertBlock(blk *types.Block, inserted **execution.ProcessResult, staged bool) error {
 	hash := blk.Hash()
 	num := blk.NumberU64()
 	header := blk.Header()
@@ -368,15 +571,14 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 	// ── Phase 1: validate and snapshot (brief bc.mu.Lock) ──────────────────
 	// Hold bc.mu only for in-memory reads — no expensive computation here.
 	var parent *types.Block
-	var ancestorChain []*types.Block
-	var baseState state.StateDB
 	var headNum uint64 // captured under bc.mu; used to determine canonicality in Phase 2
+	var headHash types.Hash
 
 	{
 		bc.mu.Lock()
 
 		// Skip if already known.
-		if _, ok := bc.blockCache[hash]; ok {
+		if _, ok := bc.blockCache[hash]; ok && bc.HasValidatedBlock(hash) {
 			bc.mu.Unlock()
 			blockchainLog.Debug("block_known",
 				"event", "block_known",
@@ -391,7 +593,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 		if parent == nil {
 			parent = bc.readBlock(header.ParentHash)
 			if parent != nil {
-				bc.blockCache[header.ParentHash] = parent
+				bc.cacheBlockLocked(parent)
 			}
 		}
 		if parent == nil {
@@ -438,11 +640,11 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 
 		// Collect the ancestor chain needed to build the parent's state.
 		// This reads blockCache (under bc.mu) and the state cache (own lock).
-		ancestorChain, baseState = bc.collectAncestorsLocked(parent)
 
 		// Capture current head number so Phase 2 can determine canonicality
 		// without holding bc.mu during expensive state commit and DB writes.
 		headNum = bc.currentBlock.NumberU64()
+		headHash = bc.currentBlock.Hash()
 
 		bc.mu.Unlock() // ← release lock; Phase 2 runs without it
 	}
@@ -451,16 +653,13 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 	// Re-execute ancestors from the cached base state. bc.insertMu ensures
 	// only one goroutine runs this phase at a time, so the computed state
 	// is always consistent. All concurrent readers can proceed freely.
-	statedb := baseState
-	for _, ancestor := range ancestorChain {
-		if _, err := bc.processor.Process(ancestor, statedb); err != nil {
-			return fmt.Errorf("re-execute block %d: %w", ancestor.NumberU64(), err)
-		}
+	statedb, stateErr := bc.StateAtBlock(parent)
+	if stateErr != nil {
+		return stateErr
 	}
-
 	// Execute the target block.
 	blockStart := time.Now()
-	result, err := bc.processor.ProcessWithBAL(blk, statedb)
+	statedb, result, err := bc.executeState(blk, statedb, bc.BranchHashFn(parent.Header()))
 	metrics.BlockProcessTime.Observe(float64(time.Since(blockStart).Milliseconds()))
 	if err != nil {
 		blockchainLog.Error("block_exec_fail",
@@ -483,12 +682,8 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 	isAmsterdam := bc.config != nil && bc.config.IsAmsterdam(header.Time)
 	for _, r := range receipts {
 		totalBlockGasUsed += r.BlockGasUsed
-		if isGlamsterdan && r.BlockGasUsed > 0 {
-			totalGasUsed += r.BlockGasUsed
-		} else {
-			totalGasUsed += r.GasUsed
-		}
 	}
+	totalGasUsed = types.BlockGasTotal(receipts, isGlamsterdan || isAmsterdam)
 	if header.GasUsed != totalGasUsed {
 		err := fmt.Errorf("%w: header=%d computed=%d", block.ErrInvalidGasUsedTotal, header.GasUsed, totalGasUsed)
 		blockchainLog.Warn("block_gas_mismatch",
@@ -561,21 +756,16 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 		return err
 	}
 
-	// EIP-7685: process requests before state root (may modify state).
-	if bc.config != nil && bc.config.IsPrague(header.Time) {
-		if _, err := execution.ProcessRequests(bc.config, statedb, header); err != nil {
-			blockchainLog.Error("block_requests_fail",
-				"event", "block_requests_fail",
-				"hash", hash.Hex(),
-				"num", num,
-				"error", err,
-			)
-			return fmt.Errorf("process requests block %d: %w", num, err)
-		}
+	// EIP-7685: commit only the requests reproduced by execution.
+	if err := bc.validator.ValidateRequests(header, result.Requests); err != nil {
+		return fmt.Errorf("block %d requests: %w", num, err)
 	}
 
 	// Validate state root.
 	computedRoot := statedb.GetRoot()
+	if err := state.ReadError(statedb); err != nil {
+		return storageFailure(err)
+	}
 	if header.Root != computedRoot {
 		err := fmt.Errorf("%w: header=%s computed=%s", block.ErrInvalidStateRoot,
 			header.Root.Hex(), computedRoot.Hex())
@@ -634,43 +824,88 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 	// ── Phase 2b: persist results outside bc.mu to minimise lock hold time ─
 	// insertMu guarantees only one goroutine is here at a time, so headNum
 	// captured in Phase 1 is still valid for the canonical check below.
-	isCanonical := num > headNum
+	overlayConfigured := bc.config != nil && bc.config.BinaryOverlayTime != nil
+	isCanonical := !staged && num > headNum
+	if overlayConfigured {
+		isCanonical = !staged && header.ParentHash == headHash
+	}
 	if isCanonical {
 		// Commit state to backing store: flushes dirty accounts/storage to DB
 		// and clears the in-memory dirty layer. Expensive with many dirty
 		// accounts (e.g. storagespam) — must run outside bc.mu.Lock().
-		if _, err := statedb.Commit(); err != nil {
-			return fmt.Errorf("commit state block %d: %w", num, err)
+		if !overlayConfigured {
+			if _, err := statedb.Commit(); err != nil {
+				return fmt.Errorf("commit state block %d: %w", num, storageFailure(err))
+			}
 		}
 
-		// Cache post-commit state in both caches.
-		// After Commit() the dirty layer is empty so Dup() is O(1).
-		// memSC is permanent (never cleared on reorg) so collectAncestorsLocked
-		// always finds a nearby ancestor, avoiding full genesis re-execution.
-		bc.sc.put(hash, num, statedb)
-		bc.memSC.put(hash, num, statedb)
-		// Protect this canonical head state from eviction.
-		// This ensures StateAtBlock can always find the current head state
-		// quickly, preventing expensive re-execution during payload building.
+	}
+	batch := bc.db.NewBatch()
+	if err := writeValidatedBlock(batch, blk, receipts); err != nil {
+		return storageFailure(err)
+	}
+	if header.BlockAccessListHash != nil && result.BlockAccessList != nil {
+		encoded, err := result.BlockAccessList.EncodeRLP()
+		if err != nil {
+			return err
+		}
+		if err := batch.Put(blockAccessListKey(hash), encoded); err != nil {
+			return storageFailure(err)
+		}
+	}
+	if overlay, ok := statedb.(*state.BinaryOverlayState); ok {
+		if err := writeOverlayCheckpoint(bc.db, batch, blk, overlay); err != nil {
+			return storageFailure(err)
+		}
+	}
+	// Immutable MPT history is committed with the execution-validation marker,
+	// including side branches, without selecting a canonical head.
+	if !overlayConfigured {
+		switch statedb.(type) {
+		case *state.MemoryStateDB, *state.TrieStateDB, *state.SnapStateDB, *state.TrieBackedStateDB:
+			if err := state.StoreTrieHistory(bc.db, batch, header.Root, statedb); err != nil {
+				return storageFailure(err)
+			}
+		}
+	}
+	if isCanonical {
+		if err := rawdb.WriteCanonicalHash(batch, num, hash); err != nil {
+			return storageFailure(err)
+		}
+		if err := rawdb.WriteHeadBlockHash(batch, hash); err != nil {
+			return storageFailure(err)
+		}
+		if err := rawdb.WriteHeadHeaderHash(batch, hash); err != nil {
+			return storageFailure(err)
+		}
+		for _, tx := range txs {
+			if err := rawdb.WriteTxLookup(batch, tx.Hash(), num); err != nil {
+				return storageFailure(err)
+			}
+		}
+	}
+	if err := batch.Write(); err != nil {
+		return storageFailure(err)
+	}
+	// Published history becomes the immutable base for the next working set;
+	// do not retain a full legacy state copy per block or per cache entry.
+	if !overlayConfigured {
+		// Preserve explicitly complete in-memory simulator backends (and
+		// their storage preimages). Persistent native nodes use lazy roots.
+		switch bc.genesisState.(type) {
+		case *state.TrieStateDB, *state.SnapStateDB:
+			view, err := state.OpenTrieHistory(context.Background(), bc.db, header.Root)
+			if err != nil {
+				return storageFailure(err)
+			}
+			statedb = view
+		}
+	}
+	bc.sc.put(hash, num, statedb)
+	bc.memSC.put(hash, num, statedb)
+	if isCanonical {
 		bc.sc.protect(hash)
 		bc.memSC.protect(hash)
-
-		// Persist block, receipts, and chain indices to rawdb.
-		bc.writeBlock(blk)
-		bc.writeReceipts(num, hash, receipts)
-		bc.writeTxLookups(txs, num)
-		rawdb.WriteCanonicalHash(bc.db, num, hash)
-		rawdb.WriteHeadBlockHash(bc.db, hash)
-		rawdb.WriteHeadHeaderHash(bc.db, hash)
-	} else {
-		// Side block: cache state and persist block body only; no DB commit.
-		// Populate both sc and memSC so that if this block later becomes
-		// canonical (via reorg), collectAncestorsLocked finds it in O(1).
-		// For TrieStateDB side blocks the dirty layer holds block state and
-		// is small enough for Dup() to be fast in typical reorg scenarios.
-		bc.sc.put(hash, num, statedb)
-		bc.memSC.put(hash, num, statedb)
-		bc.writeBlock(blk)
 	}
 
 	// Cache receipts under rcMu (independent of bc.mu; fast operation).
@@ -694,14 +929,13 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 	defer bc.mu.Unlock()
 
 	// Store in block cache (evict oldest when at capacity).
-	for len(bc.blockCache) >= bc.opts.BlockCacheSize {
-		bc.evictOldestBlock()
-	}
-	bc.blockCache[hash] = blk
-	bc.blockCacheOrder = append(bc.blockCacheOrder, hash)
+	bc.cacheBlockLocked(blk)
 
 	// Build tx lookup index.
 	for i, tx := range txs {
+		if !isCanonical {
+			break
+		}
 		bc.txLookup[tx.Hash()] = TxLookupEntry{
 			BlockHash:   hash,
 			BlockNumber: num,
@@ -711,6 +945,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 
 	if isCanonical {
 		bc.canonCache[num] = hash
+		bc.canonicalVersion++
 		bc.currentBlock = blk
 		bc.currentState = statedb
 
@@ -735,6 +970,7 @@ func (bc *Blockchain) insertBlock(blk *types.Block) error {
 		)
 	}
 
+	*inserted = result
 	return nil
 }
 
@@ -754,31 +990,34 @@ func (bc *Blockchain) InsertChain(blocks []*types.Block) (int, error) {
 // It checks the in-memory cache first, then falls back to rawdb.
 func (bc *Blockchain) GetBlock(hash types.Hash) *types.Block {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	if b, ok := bc.blockCache[hash]; ok {
-		return b
+	block := bc.blockCache[hash]
+	ancient := bc.ancientStore
+	bc.mu.RUnlock()
+	if block != nil {
+		return block
 	}
-	// Fallback: try reading from rawdb.
-	return bc.readBlock(hash)
+	return bc.readBlockWithAncient(hash, ancient)
 }
 
-// GetBlockByNumber retrieves the canonical block for a given number.
+// GetBlockByNumber reads cached selection briefly, then performs cold I/O
+// without retaining the publication lock. A cold lookup may wait for a writer.
 func (bc *Blockchain) GetBlockByNumber(number uint64) *types.Block {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	hash, ok := bc.canonCache[number]
-	if !ok {
-		// Fallback: try rawdb canonical hash.
-		h, err := rawdb.ReadCanonicalHash(bc.db, number)
+	hash, known := bc.canonCache[number]
+	block := bc.blockCache[hash]
+	ancient := bc.ancientStore
+	bc.mu.RUnlock()
+	if known && block != nil {
+		return block
+	}
+	if !known {
+		var err error
+		hash, err = rawdb.ReadCanonicalHash(bc.db, number)
 		if err != nil {
 			return nil
 		}
-		hash = h
 	}
-	if b, ok2 := bc.blockCache[hash]; ok2 {
-		return b
-	}
-	return bc.readBlock(hash)
+	return bc.readBlockWithAncient(hash, ancient)
 }
 
 // CurrentBlock returns the head of the canonical chain.
@@ -825,6 +1064,8 @@ func (bc *Blockchain) AncientStore() *rawdb.AncientStore {
 // that the value survives a node restart. If an AncientStore is wired, it
 // triggers a background migration of all blocks up to the finalized number.
 func (bc *Blockchain) SetFinalized(blk *types.Block) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	bc.currentFinalBlock = blk
 	as := bc.ancientStore
@@ -860,6 +1101,8 @@ func (bc *Blockchain) migrateToAncient(as *rawdb.AncientStore, finalNum uint64) 
 // The safe block is not persisted to disk (it is reconstructed from the
 // finalized block on startup, following go-ethereum convention).
 func (bc *Blockchain) SetSafe(blk *types.Block) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	bc.currentSafeBlock = blk
 	bc.mu.Unlock()
@@ -873,10 +1116,11 @@ func (bc *Blockchain) SetSafe(blk *types.Block) {
 // HasBlock checks if a block with the given hash exists in cache or rawdb.
 func (bc *Blockchain) HasBlock(hash types.Hash) bool {
 	bc.mu.RLock()
-	defer bc.mu.RUnlock()
 	if _, ok := bc.blockCache[hash]; ok {
+		bc.mu.RUnlock()
 		return true
 	}
+	bc.mu.RUnlock()
 	// Fall back to rawdb: if the header number mapping exists, the block was
 	// persisted (written by writeBlock which calls WriteHeader).
 	_, err := rawdb.ReadHeaderNumber(bc.db, hash)
@@ -897,6 +1141,15 @@ func (bc *Blockchain) HasStateCached(blockHash types.Hash) bool {
 // SetHead rewinds the canonical chain to the given block number.
 // Blocks above the target number are removed from the canonical index.
 func (bc *Blockchain) SetHead(number uint64) error {
+	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+		target := bc.GetBlockByNumber(number)
+		if target == nil {
+			return fmt.Errorf("%w: no canonical block at %d", ErrBlockNotFound, number)
+		}
+		return bc.ApplyForkchoice(target.Hash(), types.Hash{}, types.Hash{})
+	}
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 
@@ -923,6 +1176,7 @@ func (bc *Blockchain) SetHead(number uint64) error {
 	}
 
 	// Set new head.
+	bc.canonicalVersion++
 	bc.currentBlock = bc.blockCache[target]
 
 	// Re-derive state by re-executing from genesis.
@@ -939,6 +1193,7 @@ func (bc *Blockchain) SetHead(number uint64) error {
 
 	// Rewind header chain.
 	bc.hc.SetHead(number)
+	metrics.ChainHeight.Set(int64(number))
 
 	return nil
 }
@@ -1074,7 +1329,7 @@ func (bc *Blockchain) CanQuicklyGetState(blk *types.Block, threshold int) bool {
 		parent := bc.blockCache[current.ParentHash()]
 		bc.mu.RUnlock()
 		if parent == nil {
-			parent = bc.readBlock(current.ParentHash())
+			parent = bc.GetBlock(current.ParentHash())
 		}
 		if parent == nil {
 			return false // Parent unknown, would need full sync
@@ -1089,93 +1344,165 @@ func (bc *Blockchain) CanQuicklyGetState(blk *types.Block, threshold int) bool {
 // releases the lock before any expensive re-execution so that concurrent RPC
 // reads and insertBlock Phase 3 are not blocked.
 func (bc *Blockchain) StateAtBlock(blk *types.Block) (state.StateDB, error) {
-	// Fast path: genesis state.
+	return bc.replayStateAtBlock(blk, false)
+}
+
+// Startup has already walked the canonical headers before replaying a legacy
+// overlay database. Only that path can replay blocks without validation markers.
+func (bc *Blockchain) replayStateAtBlock(blk *types.Block, startup bool) (state.StateDB, error) {
+	return bc.replayStateContext(context.Background(), blk, startup, true)
+}
+
+// StateAtBlockContext prepares request-owned state without coupling cancellation
+// to another caller's replay. At most two such preparations run concurrently.
+func (bc *Blockchain) StateAtBlockContext(ctx context.Context, blk *types.Block) (state.StateDB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if blk == nil {
+		return nil, ErrStateNotFound
+	}
 	if blk.Hash() == bc.genesis.Hash() {
-		return bc.genesisState.Dup(), nil
+		return bc.execGenesisState.Copy(), nil
 	}
-
-	// Fast path: exact cache hit in sc (hot TrieStateDB cache, no bc.mu).
+	if !bc.HasValidatedBlock(blk.Hash()) {
+		return nil, fmt.Errorf("%w: block is not execution validated", ErrStateNotFound)
+	}
 	if cached, ok := bc.sc.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
-	// Fast path: permanent MemoryStateDB cache — valid across reorgs.
 	if cached, ok := bc.memSC.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
 		return cached, nil
 	}
+	select {
+	case bc.queryStateSlots <- struct{}{}:
+		defer func() { <-bc.queryStateSlots }()
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	return bc.replayStateContext(ctx, blk, false, false)
+}
 
-	// Slow path: deduplicate via singleflight so that N concurrent requests
-	// for the same block hash result in only one re-execution.
-	blockchainLog.Warn("state_at_block_cache_miss",
-		"event", "state_at_block_cache_miss",
-		"block_num", blk.NumberU64(),
-		"block_hash", blk.Hash().Hex()[:16],
-	)
-	key := blk.Hash().Hex()
-	v, err, _ := bc.sfGroup.Do(key, func() (interface{}, error) {
-		// Collect ancestor chain under bc.mu (fast map reads only).
-		chain, baseState := func() ([]*types.Block, state.StateDB) {
-			bc.mu.RLock()
-			defer bc.mu.RUnlock()
+func (bc *Blockchain) replayStateContext(ctx context.Context, blk *types.Block, startup, shared bool) (state.StateDB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 
-			var ancestors []*types.Block
-			current := blk
-			for current.Hash() != bc.genesis.Hash() {
-				if cached, ok := bc.sc.get(current.ParentHash()); ok {
-					ancestors = append(ancestors, current)
-					for i, j := 0, len(ancestors)-1; i < j; i, j = i+1, j-1 {
-						ancestors[i], ancestors[j] = ancestors[j], ancestors[i]
-					}
-					return ancestors, cached.Dup()
+	if blk == nil {
+		return nil, ErrStateNotFound
+	}
+	if blk.Hash() == bc.genesis.Hash() {
+		return bc.execGenesisState.Copy(), nil
+	}
+	if !startup && !bc.HasValidatedBlock(blk.Hash()) {
+		return nil, fmt.Errorf("%w: block is not execution validated", ErrStateNotFound)
+	}
+	if cached, ok := bc.sc.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
+		return cached, nil
+	}
+	if cached, ok := bc.memSC.get(blk.Hash()); ok {
+		state.SetReadContext(cached, ctx)
+		return cached, nil
+	}
+	replay := func() (interface{}, error) {
+		var pending []*types.Block
+		current := blk
+		var base state.StateDB
+		for {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+			if current.Hash() == bc.genesis.Hash() {
+				base = bc.execGenesisState.Copy()
+				break
+			}
+			if cached, ok := bc.sc.get(current.Hash()); ok {
+				base = cached
+				break
+			}
+			if cached, ok := bc.memSC.get(current.Hash()); ok {
+				base = cached
+				break
+			}
+			if bc.config == nil || bc.config.BinaryOverlayTime == nil {
+				if snapshot, err := state.OpenTrieHistory(ctx, bc.db, current.Header().Root); err == nil {
+					base = snapshot
+					break
+				} else if !errors.Is(err, rawdb.ErrNotFound) {
+					return nil, storageFailure(err)
 				}
-				if cached, ok := bc.memSC.get(current.ParentHash()); ok {
-					ancestors = append(ancestors, current)
-					for i, j := 0, len(ancestors)-1; i < j; i, j = i+1, j-1 {
-						ancestors[i], ancestors[j] = ancestors[j], ancestors[i]
-					}
-					return ancestors, cached.Dup()
-				}
-				ancestors = append(ancestors, current)
-				parent := bc.blockCache[current.ParentHash()]
-				if parent == nil {
-					parent = bc.readBlock(current.ParentHash())
-				}
-				if parent == nil {
+				if snapshot, err := state.OpenSnapState(bc.db, current.Header().Root); err == nil {
+					base = snapshot
 					break
 				}
-				current = parent
 			}
-			for i, j := 0, len(ancestors)-1; i < j; i, j = i+1, j-1 {
-				ancestors[i], ancestors[j] = ancestors[j], ancestors[i]
+			if !startup && !bc.HasValidatedBlock(current.Hash()) {
+				return nil, fmt.Errorf("%w: unvalidated ancestor", ErrStateNotFound)
 			}
-			return ancestors, nil
-		}()
-
-		if baseState == nil {
-			baseState = bc.execGenesisState.Copy()
-		}
-
-		// Re-execute outside bc.mu — this may take 100ms+ for long chains.
-		// Cache each intermediate state in both sc (hot) and memSC (permanent,
-		// never cleared on reorg) so future requests avoid re-execution even
-		// after sc is wiped by a reorg.
-		for _, b := range chain {
-			if _, err := bc.processor.Process(b, baseState); err != nil {
-				return nil, fmt.Errorf("re-execute block %d: %w", b.NumberU64(), err)
+			pending = append(pending, current)
+			current = bc.GetBlock(current.ParentHash())
+			if current == nil {
+				return nil, fmt.Errorf("%w: missing ancestor before state checkpoint", ErrStateNotFound)
 			}
-			bc.sc.put(b.Hash(), b.NumberU64(), baseState)
-			bc.memSC.put(b.Hash(), b.NumberU64(), baseState)
 		}
-		if len(chain) == 0 {
-			return nil, fmt.Errorf("%w: no ancestor chain for %v", ErrStateNotFound, blk.Hash())
+		for i := len(pending) - 1; i >= 0; i-- {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+			block := pending[i]
+			parent := bc.GetBlock(block.ParentHash())
+			if parent == nil {
+				return nil, ErrStateNotFound
+			}
+			next, _, err := bc.executeStateContext(ctx, block, base, bc.BranchHashFn(parent.Header()))
+			if err != nil {
+				return nil, err
+			}
+			base = next
+			root := base.GetRoot()
+			if err := state.ReadError(base); err != nil {
+				return nil, storageFailure(err)
+			}
+			if root != block.Header().Root {
+				return nil, fmt.Errorf("state readback root mismatch at block %d", block.NumberU64())
+			}
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+			if bc.config == nil || bc.config.BinaryOverlayTime == nil {
+				batch := bc.db.NewBatch()
+				if err := state.StoreTrieHistory(bc.db, batch, block.Root(), base); err != nil {
+					return nil, storageFailure(err)
+				}
+				if err := ctx.Err(); err != nil {
+					return nil, err
+				}
+				if err := batch.Write(); err != nil {
+					return nil, storageFailure(err)
+				}
+			}
+			bc.sc.put(block.Hash(), block.NumberU64(), base)
+			bc.memSC.put(block.Hash(), block.NumberU64(), base)
 		}
-		return baseState, nil
-	})
+		return base, nil
+	}
+	var value interface{}
+	var err error
+	if shared {
+		value, err, _ = bc.sfGroup.Do(blk.Hash().Hex(), replay)
+	} else {
+		value, err = replay()
+	}
 	if err != nil {
 		return nil, err
 	}
-	// singleflight shares the result across waiters; each caller needs its own
-	// copy so they don't corrupt each other's state during block execution.
-	return v.(state.StateDB).Dup(), nil
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return value.(state.StateDB).Dup(), nil
 }
 
 // stateAt returns the state after executing up to (and including) the given block.
@@ -1239,9 +1566,11 @@ func (bc *Blockchain) stateAt(blk *types.Block) (state.StateDB, error) {
 	// memSC is never cleared on reorg so post-reorg recovery is cheap.
 	for i := len(chain) - 1; i >= 0; i-- {
 		b := chain[i]
-		if _, err := bc.processor.Process(b, baseState); err != nil {
+		next, _, err := bc.executeState(b, baseState, nil)
+		if err != nil {
 			return nil, fmt.Errorf("re-execute block %d: %w", b.NumberU64(), err)
 		}
+		baseState = next
 		bc.sc.put(b.Hash(), b.NumberU64(), baseState)
 		bc.memSC.put(b.Hash(), b.NumberU64(), baseState)
 	}
@@ -1274,6 +1603,10 @@ func (bc *Blockchain) writeBlock(blk *types.Block) {
 // Caller must hold bc.mu (at least RLock) — ancientStore is read without its
 // own lock because bc.mu guards the pointer and AncientStore methods are safe.
 func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
+	return bc.readBlockWithAncient(hash, bc.ancientStore)
+}
+
+func (bc *Blockchain) readBlockWithAncient(hash types.Hash, ancient *rawdb.AncientStore) *types.Block {
 	// Look up block number from hash.
 	// DeleteHeaderData preserves this mapping after AncientStore migration.
 	num, err := rawdb.ReadHeaderNumber(bc.db, hash)
@@ -1285,35 +1618,41 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 	headerData, _ := rawdb.ReadHeader(bc.db, num, hash)
 	if len(headerData) == 0 {
 		// Header may have been migrated to AncientStore; try there.
-		if bc.ancientStore != nil {
-			return bc.readBlockFromAncient(num)
+		if ancient != nil {
+			block := readAncientBlock(ancient, num)
+			if block != nil && block.Hash() == hash {
+				return block
+			}
 		}
 		return nil
 	}
 	header, err := types.DecodeHeaderRLP(headerData)
-	if err != nil {
+	if err != nil || header.Hash() != hash || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != num {
 		return nil
 	}
 
 	// Read body.
 	bodyData, err := rawdb.ReadBody(bc.db, num, hash)
 	if err != nil || len(bodyData) == 0 {
+		if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+			return nil
+		}
 		// Body may have been migrated to AncientStore; try there.
-		if bc.ancientStore != nil {
-			bodyData, err = bc.ancientStore.ReadBody(num)
-			if err != nil || len(bodyData) == 0 {
-				// Body may be empty for blocks with no transactions.
-				return types.NewBlock(header, nil)
+		if ancient != nil {
+			block := readAncientBlock(ancient, num)
+			if block != nil && block.Hash() == hash {
+				return block
 			}
+			return nil
 		} else {
-			// No AncientStore; create block with header only.
-			return types.NewBlock(header, nil)
+			// A missing body is not an empty execution block.
+			return nil
 		}
 	}
 	body, err := decodeBlockBody(bodyData)
 	if err != nil {
-		// If body decode fails, return header-only block.
-		return types.NewBlock(header, nil)
+		// Corrupt bodies must not masquerade as available blocks.
+		return nil
 	}
 	return types.NewBlock(header, body)
 }
@@ -1321,7 +1660,9 @@ func (bc *Blockchain) readBlock(hash types.Hash) *types.Block {
 // readBlockFromAncient reads a block by number from the AncientStore.
 // Caller must hold bc.mu (at least RLock).
 func (bc *Blockchain) readBlockFromAncient(num uint64) *types.Block {
-	as := bc.ancientStore
+	return readAncientBlock(bc.ancientStore, num)
+}
+func readAncientBlock(as *rawdb.AncientStore, num uint64) *types.Block {
 	headerData, err := as.ReadHeader(num)
 	if err != nil || len(headerData) == 0 {
 		return nil
@@ -1332,11 +1673,11 @@ func (bc *Blockchain) readBlockFromAncient(num uint64) *types.Block {
 	}
 	bodyData, _ := as.ReadBody(num)
 	if len(bodyData) == 0 {
-		return types.NewBlock(header, nil)
+		return nil
 	}
 	body, err := decodeBlockBody(bodyData)
 	if err != nil {
-		return types.NewBlock(header, nil)
+		return nil
 	}
 	return types.NewBlock(header, body)
 }
@@ -1431,6 +1772,7 @@ func decodeBlockBody(data []byte) (*types.Body, error) {
 		if err != nil {
 			return nil, fmt.Errorf("decoding tx: %w", err)
 		}
+		restoreStoredSender(tx)
 		txs = append(txs, tx)
 	}
 	if err := s.ListEnd(); err != nil {
@@ -1537,6 +1879,12 @@ func decodeWithdrawal(data []byte) (*types.Withdrawal, error) {
 // API calls (newPayload, getPayload) are not blocked for tens of seconds
 // during deep reorgs.
 func (bc *Blockchain) Reorg(newHead *types.Block) error {
+	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+		if newHead == nil || !bc.HasValidatedBlock(newHead.Hash()) {
+			return ErrBlockNotFound
+		}
+		return bc.ApplyForkchoice(newHead.Hash(), types.Hash{}, types.Hash{})
+	}
 	bc.mu.Lock()
 	chain, baseState, err := bc.reorg(newHead)
 	bc.mu.Unlock()
@@ -1550,7 +1898,8 @@ func (bc *Blockchain) Reorg(newHead *types.Block) error {
 	statedb := baseState
 	for i := len(chain) - 1; i >= 0; i-- {
 		b := chain[i]
-		if _, execErr := bc.processor.Process(b, statedb); execErr != nil {
+		next, _, execErr := bc.executeState(b, statedb, nil)
+		if execErr != nil {
 			blockchainLog.Error("reorg_state_fail",
 				"event", "reorg_state_fail",
 				"hash", b.Hash().Hex(),
@@ -1559,6 +1908,7 @@ func (bc *Blockchain) Reorg(newHead *types.Block) error {
 			)
 			return fmt.Errorf("re-derive state after reorg at %d: %w", b.NumberU64(), execErr)
 		}
+		statedb = next
 		bc.sc.put(b.Hash(), b.NumberU64(), statedb)
 		bc.memSC.put(b.Hash(), b.NumberU64(), statedb)
 	}
@@ -1614,7 +1964,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 	current := newHead
 	for {
 		if _, ok := bc.blockCache[current.Hash()]; !ok {
-			bc.blockCache[current.Hash()] = current
+			bc.cacheBlockLocked(current)
 		}
 		if current.NumberU64() == 0 {
 			break
@@ -1627,7 +1977,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 			if parent == nil {
 				return nil, nil, fmt.Errorf("%w: missing ancestor %v during reorg", ErrBlockNotFound, current.ParentHash())
 			}
-			bc.blockCache[current.ParentHash()] = parent
+			bc.cacheBlockLocked(parent)
 		}
 		current = parent
 	}
@@ -1657,7 +2007,11 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 
 			// Remove in-memory txLookup entries and rawdb txLookup entries
 			// for the orphaned block so stale lookups cannot be returned.
-			if orphan, ok := bc.blockCache[hash]; ok {
+			orphan := bc.blockCache[hash]
+			if orphan == nil {
+				orphan = bc.readBlock(hash)
+			}
+			if orphan != nil {
 				for _, tx := range orphan.Transactions() {
 					delete(bc.txLookup, tx.Hash())
 					rawdb.DeleteTxLookup(bc.db, tx.Hash())
@@ -1673,7 +2027,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 		hash := blk.Hash()
 		num := blk.NumberU64()
 
-		bc.blockCache[hash] = blk
+		bc.cacheBlockLocked(blk)
 		bc.canonCache[num] = hash
 		bc.writeBlock(blk)
 		rawdb.WriteCanonicalHash(bc.db, num, hash)
@@ -1695,6 +2049,7 @@ func (bc *Blockchain) reorg(newHead *types.Block) ([]*types.Block, state.StateDB
 
 	// Update current block.
 	bc.currentBlock = newHead
+	metrics.ChainHeight.Set(int64(newHead.NumberU64()))
 	rawdb.WriteHeadBlockHash(bc.db, newHead.Hash())
 	rawdb.WriteHeadHeaderHash(bc.db, newHead.Hash())
 
@@ -1743,7 +2098,7 @@ func (bc *Blockchain) GetReceipts(blockHash types.Hash) []*types.Receipt {
 	if err != nil {
 		return nil
 	}
-	blk := bc.readBlock(blockHash)
+	blk := bc.GetBlock(blockHash)
 	var txs []*types.Transaction
 	if blk != nil {
 		txs = blk.Transactions()
@@ -1775,7 +2130,7 @@ func (bc *Blockchain) GetBlockReceipts(number uint64) []*types.Receipt {
 		return r
 	}
 	// Fallback: read from rawdb (thread-safe).
-	blk := bc.readBlock(hash)
+	blk := bc.GetBlock(hash)
 	var txs []*types.Transaction
 	if blk != nil {
 		txs = blk.Transactions()
@@ -1792,7 +2147,7 @@ func (bc *Blockchain) GetLogs(blockHash types.Hash) []*types.Log {
 		// Fallback: read from rawdb (thread-safe, no bc.mu needed).
 		num, err := rawdb.ReadHeaderNumber(bc.db, blockHash)
 		if err == nil {
-			blk := bc.readBlock(blockHash)
+			blk := bc.GetBlock(blockHash)
 			var txs []*types.Transaction
 			if blk != nil {
 				txs = blk.Transactions()
@@ -1820,31 +2175,41 @@ func (bc *Blockchain) GetTxLookupEntry(txHash types.Hash) (TxLookupEntry, bool) 
 
 // GetTransactionLookup returns the block location for a transaction hash.
 func (bc *Blockchain) GetTransactionLookup(txHash types.Hash) (blockHash types.Hash, blockNumber uint64, txIndex uint64, found bool) {
-	bc.mu.RLock()
-	defer bc.mu.RUnlock()
-	if entry, ok := bc.txLookup[txHash]; ok {
-		return entry.BlockHash, entry.BlockNumber, entry.TxIndex, true
-	}
-	// Fallback: try rawdb tx lookup index.
-	num, err := rawdb.ReadTxLookup(bc.db, txHash)
-	if err != nil {
-		return types.Hash{}, 0, 0, false
-	}
-	hash, err := rawdb.ReadCanonicalHash(bc.db, num)
-	if err != nil {
-		return types.Hash{}, 0, 0, false
-	}
-	// Find the transaction index within the block.
-	blk := bc.readBlock(hash)
-	if blk == nil {
-		return types.Hash{}, 0, 0, false
-	}
-	for i, tx := range blk.Transactions() {
-		if tx.Hash() == txHash {
-			return hash, num, uint64(i), true
+	for {
+		bc.mu.RLock()
+		if entry, ok := bc.txLookup[txHash]; ok {
+			bc.mu.RUnlock()
+			return entry.BlockHash, entry.BlockNumber, entry.TxIndex, true
+		}
+		version, ancient := bc.canonicalVersion, bc.ancientStore
+		bc.mu.RUnlock()
+		blockHash, blockNumber, txIndex, found = func() (types.Hash, uint64, uint64, bool) {
+			num, err := rawdb.ReadTxLookup(bc.db, txHash)
+			if err != nil {
+				return types.Hash{}, 0, 0, false
+			}
+			hash, err := rawdb.ReadCanonicalHash(bc.db, num)
+			if err != nil {
+				return types.Hash{}, 0, 0, false
+			}
+			block := bc.readBlockWithAncient(hash, ancient)
+			if block == nil {
+				return types.Hash{}, 0, 0, false
+			}
+			for i, tx := range block.Transactions() {
+				if tx.Hash() == txHash {
+					return hash, num, uint64(i), true
+				}
+			}
+			return types.Hash{}, 0, 0, false
+		}()
+		bc.mu.RLock()
+		same := bc.canonicalVersion == version
+		bc.mu.RUnlock()
+		if same {
+			return
 		}
 	}
-	return types.Hash{}, 0, 0, false
 }
 
 // HistoryOldestBlock returns the oldest block number for which block bodies
@@ -1859,10 +2224,16 @@ func (bc *Blockchain) HistoryOldestBlock() uint64 {
 // (head - retention) blocks. Headers are preserved. Returns the number
 // of blocks pruned.
 func (bc *Blockchain) PruneHistory(retention uint64) (uint64, error) {
+	bc.insertMu.Lock()
+	defer bc.insertMu.Unlock()
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 
 	if bc.currentBlock == nil {
+		return 0, nil
+	}
+	if bc.config != nil && bc.config.BinaryOverlayTime != nil {
+		// This profile replays from genesis on startup and needs every body.
 		return 0, nil
 	}
 	head := bc.currentBlock.NumberU64()
@@ -1969,25 +2340,46 @@ func (bc *Blockchain) readReceiptsFromDB(num uint64, hash types.Hash, txs []*typ
 	if len(receipts) == 0 {
 		return nil
 	}
+	headerBytes, err := rawdb.ReadHeader(bc.db, num, hash)
+	if err != nil {
+		return nil
+	}
+	header, err := types.DecodeHeaderRLP(headerBytes)
+	if err != nil || header.Hash() != hash || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != num {
+		return nil
+	}
 	// Restore derived fields not persisted in the consensus RLP encoding.
+	var logIndex uint
 	for i, r := range receipts {
 		r.BlockHash = hash
 		r.BlockNumber = new(big.Int).SetUint64(num)
 		r.TransactionIndex = uint(i)
 		if i < len(txs) {
-			r.TxHash = txs[i].Hash()
+			tx := txs[i]
+			r.TxHash = tx.Hash()
+			if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+				blobFee := big.NewInt(1)
+				if header.ExcessBlobGas != nil {
+					blobFee = gas.BlobBaseFeeForHeader(bc.config, header)
+				}
+				if err := r.DeriveFrameFields8141(frame, header.BaseFee, blobFee); err != nil {
+					return nil
+				}
+			}
+			bc.deriveStoredReceipt(r, tx, header)
 		}
 		if i == 0 {
 			r.GasUsed = r.CumulativeGasUsed
 		} else {
 			r.GasUsed = r.CumulativeGasUsed - receipts[i-1].CumulativeGasUsed
 		}
-		for j, log := range r.Logs {
+		for _, log := range r.Logs {
 			log.BlockHash = hash
 			log.BlockNumber = num
 			log.TxHash = r.TxHash
 			log.TxIndex = uint(i)
-			log.Index = uint(j)
+			log.Index = logIndex
+			logIndex++
 		}
 	}
 	return receipts
@@ -2006,5 +2398,5 @@ func (bc *Blockchain) EvictBlockFromCache(hash types.Hash) {
 func (bc *Blockchain) StoreBlockInCache(block *types.Block) {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
-	bc.blockCache[block.Hash()] = block
+	bc.cacheBlockLocked(block)
 }

@@ -1,5 +1,7 @@
 # A 组提交前复核
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 日期：2026-11-25；复核起点：`f490fe9`。按主计划 A 组全部 7 项验收条件重新检查，发现遗漏后补齐代码、测试和证据；未将发现的后续功能缺口改成已完成。
 
 | 任务 | 复核结果与补齐 |

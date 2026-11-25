@@ -1,84 +1,156 @@
 {
-  "note": "Existing full-suite skip events are excluded from baseline acceptance. The required 12-case corpus has zero skips. Names/counts include subtests; package-level no-test events are separate.",
+  "note": "Host full-suite and race skip events are separate from the mandatory 12-case zero-skip baseline. Case-sensitive alias fixture is unsupported on this host filesystem; Linux runs it.",
   "full_suite": [
     {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestFinalityBLSAdapterAggregateVotes",
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFDiscoverFixtures",
       "reason": [
-        "finality_bls_adapter_test.go:96: requires real blst backend for pairing correctness",
-        "--- SKIP: TestFinalityBLSAdapterAggregateVotes (0.00s)"
+        "fixture_loader_test.go:29: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "--- SKIP: TestEFDiscoverFixtures (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestFinalityBLSAdapterSignAndAttachVote",
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunSingleFixture",
       "reason": [
-        "finality_bls_adapter_test.go:282: requires real blst backend for pairing correctness",
-        "--- SKIP: TestFinalityBLSAdapterSignAndAttachVote (0.00s)"
+        "fixture_loader_test.go:63: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFRunSingleFixture (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestFinalityBLSAdapterSignAndVerifyVote",
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFSkipUnsupportedForks",
       "reason": [
-        "finality_bls_adapter_test.go:48: requires real blst backend for pairing correctness",
-        "--- SKIP: TestFinalityBLSAdapterSignAndVerifyVote (0.00s)"
+        "fixture_loader_test.go:120: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFSkipUnsupportedForks (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestFinalityBLSAdapterVerifyFinalityProof",
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFStateRootMismatchReporting",
       "reason": [
-        "finality_bls_adapter_test.go:228: requires real blst backend for pairing correctness",
-        "--- SKIP: TestFinalityBLSAdapterVerifyFinalityProof (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestVerifyAttestationSignature",
-      "reason": [
-        "bls_operations_test.go:225: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifyAttestationSignature (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestVerifyProposerSignature",
-      "reason": [
-        "bls_operations_test.go:172: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifyProposerSignature (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/consensus",
-      "test": "TestVerifySyncCommitteeBLSSignature",
-      "reason": [
-        "bls_operations_test.go:302: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifySyncCommitteeBLSSignature (0.00s)"
+        "fixture_loader_test.go:170: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFStateRootMismatchReporting (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFBatchRunConcurrency",
       "reason": [
-        "fixture_loader_test.go:201: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "fixture_loader_test.go:199: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
         "--- SKIP: TestEFBatchRunConcurrency (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFDiscoverFixtures",
+      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json",
       "reason": [
-        "fixture_loader_test.go:31: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
-        "--- SKIP: TestEFDiscoverFixtures (0.00s)"
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_1.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_shanghai_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_paris_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_Example_Add11",
+      "reason": [
+        "fixture_loader_test.go:371: fixture not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExample/add11.json",
+        "--- SKIP: TestEF_Example_Add11 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_Example_SelfBalance",
+      "reason": [
+        "fixture_loader_test.go:397: directory not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSelfBalance",
+        "--- SKIP: TestEF_Example_SelfBalance (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_DiscoverGeneralStateTests",
+      "reason": [
+        "fixture_loader_test.go:426: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
+        "--- SKIP: TestEF_DiscoverGeneralStateTests (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunGoEthereumStateTest",
+      "reason": [
+        "fixture_loader_test.go:459: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFRunGoEthereumStateTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFIntegrationGoEthereumFixtures",
       "reason": [
-        "fixture_loader_test.go:580: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "fixture_loader_test.go:489: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
         "--- SKIP: TestEFIntegrationGoEthereumFixtures (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunStaticStateTests",
+      "reason": [
+        "fixture_loader_test.go:523: execution-spec-tests state tests not found: ../../../refs/execution-spec-tests/tests/static/state_tests",
+        "--- SKIP: TestEFRunStaticStateTests (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_RegressionGates",
+      "reason": [
+        "fixture_loader_test.go:550: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
+        "--- SKIP: TestEF_RegressionGates (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethRunnerSmoke",
+      "reason": [
+        "geth_runner_test.go:26: go-ethereum test fixtures not available",
+        "--- SKIP: TestGethRunnerSmoke (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethCategorySummary",
+      "reason": [
+        "geth_runner_test.go:95: go-ethereum test fixtures not available",
+        "--- SKIP: TestGethCategorySummary (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethRunnerSingleCategory",
+      "reason": [
+        "geth_runner_test.go:240: test fixtures not available",
+        "--- SKIP: TestGethRunnerSingleCategory (0.00s)"
       ]
     },
     {
@@ -91,10 +163,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFMultipleDataVariants",
+      "test": "TestEFSubtests",
       "reason": [
-        "state_test_runner_test.go:308: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFMultipleDataVariants (0.00s)"
+        "state_test_runner_test.go:51: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFSubtests (0.00s)"
       ]
     },
     {
@@ -107,6 +179,14 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFMultipleDataVariants",
+      "reason": [
+        "state_test_runner_test.go:308: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFMultipleDataVariants (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFRunAgainstGoEthereumFixture",
       "reason": [
         "state_test_runner_test.go:361: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
@@ -115,266 +195,114 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunGoEthereumStateTest",
+      "test": "TestEF_stExpectSection",
       "reason": [
-        "fixture_loader_test.go:550: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFRunGoEthereumStateTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunSingleFixture",
-      "reason": [
-        "fixture_loader_test.go:65: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFRunSingleFixture (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunStaticStateTests",
-      "reason": [
-        "fixture_loader_test.go:614: execution-spec-tests state tests not found: ../../../refs/execution-spec-tests/tests/static/state_tests",
-        "--- SKIP: TestEFRunStaticStateTests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFSkipUnsupportedForks",
-      "reason": [
-        "fixture_loader_test.go:122: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFSkipUnsupportedForks (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFStateRootMismatchReporting",
-      "reason": [
-        "fixture_loader_test.go:172: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFStateRootMismatchReporting (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFSubtests",
-      "reason": [
-        "state_test_runner_test.go:51: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFSubtests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_CategorySummary",
-      "reason": [
-        "fixture_loader_test.go:698: use TestGethCategorySummary for authoritative EF test results via go-ethereum backend",
-        "--- SKIP: TestEF_CategorySummary (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_DiscoverGeneralStateTests",
-      "reason": [
-        "fixture_loader_test.go:510: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
-        "--- SKIP: TestEF_DiscoverGeneralStateTests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_Example_Add11",
-      "reason": [
-        "fixture_loader_test.go:455: fixture not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExample/add11.json",
-        "--- SKIP: TestEF_Example_Add11 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_Example_SelfBalance",
-      "reason": [
-        "fixture_loader_test.go:481: directory not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSelfBalance",
-        "--- SKIP: TestEF_Example_SelfBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_FullSuiteReport",
-      "reason": [
-        "fixture_loader_test.go:371: use TestGethCategorySummary for authoritative EF test results via go-ethereum backend",
-        "--- SKIP: TestEF_FullSuiteReport (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_RegressionGates",
-      "reason": [
-        "fixture_loader_test.go:641: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
-        "--- SKIP: TestEF_RegressionGates (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_1.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_paris_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_shanghai_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stArgsZeroOneBalance",
-      "reason": [
-        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
-        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCallCodes",
-      "reason": [
-        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
-        "--- SKIP: TestEF_stCallCodes (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCodeCopyTest",
-      "reason": [
-        "fixture_loader_test.go:307: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
-        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP150Specific",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
-        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
+        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
+        "--- SKIP: TestEF_stExpectSection (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stEIP1559",
       "reason": [
-        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
         "--- SKIP: TestEF_stEIP1559 (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stExpectSection",
+      "test": "TestEF_stArgsZeroOneBalance",
       "reason": [
-        "fixture_loader_test.go:310: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
-        "--- SKIP: TestEF_stExpectSection (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryStressTest",
-      "reason": [
-        "fixture_loader_test.go:313: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
-        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryTest",
-      "reason": [
-        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
-        "--- SKIP: TestEF_stMemoryTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stQuadraticComplexityTest",
-      "reason": [
-        "fixture_loader_test.go:316: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
-        "--- SKIP: TestEF_stQuadraticComplexityTest (0.00s)"
+        "fixture_loader_test.go:312: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
+        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stRevertTest",
       "reason": [
-        "fixture_loader_test.go:325: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
+        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
         "--- SKIP: TestEF_stRevertTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stSLoadTest",
+      "test": "TestEF_stMemoryStressTest",
       "reason": [
-        "fixture_loader_test.go:309: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSLoadTest",
-        "--- SKIP: TestEF_stSLoadTest (0.00s)"
+        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
+        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stCodeCopyTest",
+      "reason": [
+        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
+        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stQuadraticComplexityTest",
+      "reason": [
+        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
+        "--- SKIP: TestEF_stQuadraticComplexityTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stCallCodes",
+      "reason": [
+        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
+        "--- SKIP: TestEF_stCallCodes (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stStaticCall",
       "reason": [
-        "fixture_loader_test.go:324: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
+        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
         "--- SKIP: TestEF_stStaticCall (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stEIP150Specific",
+      "reason": [
+        "fixture_loader_test.go:319: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
+        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stZeroCallsRevert",
       "reason": [
-        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
+        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
         "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethCategorySummary",
+      "test": "TestEF_stMemoryTest",
       "reason": [
-        "geth_runner_test.go:65: go-ethereum test fixtures not available",
-        "--- SKIP: TestGethCategorySummary (0.00s)"
+        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
+        "--- SKIP: TestEF_stMemoryTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethRunnerSingleCategory",
+      "test": "TestEF_stSLoadTest",
       "reason": [
-        "geth_runner_test.go:195: test fixtures not available",
-        "--- SKIP: TestGethRunnerSingleCategory (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethRunnerSmoke",
-      "reason": [
-        "geth_runner_test.go:26: go-ethereum test fixtures not available",
-        "--- SKIP: TestGethRunnerSmoke (0.00s)"
+        "fixture_loader_test.go:307: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSLoadTest",
+        "--- SKIP: TestEF_stSLoadTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/rawdb",
-      "test": "TestAncientStore_Compact_ReadOnly",
+      "test": "TestNewAncientStore_ReadOnlyFlag",
       "reason": [
-        "ancient_store_test.go:323: read-only store creation failed",
-        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
+        "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.00s)"
       ]
     },
     {
@@ -387,10 +315,18 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/rawdb",
-      "test": "TestNewAncientStore_ReadOnlyFlag",
+      "test": "TestAncientStore_Compact_ReadOnly",
       "reason": [
-        "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
-        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.00s)"
+        "ancient_store_test.go:323: read-only store creation failed",
+        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
+      "reason": [
+        "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.04s)"
       ]
     },
     {
@@ -403,442 +339,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/ADD",
+      "test": "TestJsonSub",
       "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/ADD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/AND",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/AND (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/BYTE",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/BYTE (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/DIV",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/DIV (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/EQ",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/EQ (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/EXP",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/EXP (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/GT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/GT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/LT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/LT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/MOD",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/MOD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/MUL",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/MUL (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/OR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/OR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SAR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SAR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SDIV",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SDIV (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SGT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SGT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SHL",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SHL (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SHR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SHR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SIGNEXTEND",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SIGNEXTEND (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SLT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SLT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SMOD",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SMOD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SUB",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SUB (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/XOR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/XOR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAnd",
-      "reason": [
-        "json_vectors_test.go:116: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
-        "--- SKIP: TestJsonAnd (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG1Add",
-      "reason": [
-        "precompiles_json_test.go:249: skipping precompile fixture test: blsG1Add.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG1Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG1Mul",
-      "reason": [
-        "precompiles_json_test.go:260: skipping precompile fixture test: blsG1Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG1Mul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG1MultiExp",
-      "reason": [
-        "precompiles_json_test.go:271: skipping precompile fixture test: blsG1MultiExp.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG1MultiExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG2Add",
-      "reason": [
-        "precompiles_json_test.go:284: skipping precompile fixture test: blsG2Add.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG2Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG2Mul",
-      "reason": [
-        "precompiles_json_test.go:307: skipping precompile fixture test: blsG2Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG2Mul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSG2MultiExp",
-      "reason": [
-        "precompiles_json_test.go:329: skipping precompile fixture test: blsG2MultiExp.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSG2MultiExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSMapG1",
-      "reason": [
-        "precompiles_json_test.go:373: skipping precompile fixture test: blsMapG1.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSMapG1 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSMapG2",
-      "reason": [
-        "precompiles_json_test.go:395: skipping precompile fixture test: blsMapG2.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSMapG2 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSPairing",
-      "reason": [
-        "precompiles_json_test.go:351: skipping precompile fixture test: blsPairing.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSPairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256Add",
-      "reason": [
-        "precompiles_json_test.go:148: skipping precompile fixture test: bn256Add.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256Pairing",
-      "reason": [
-        "precompiles_json_test.go:170: skipping precompile fixture test: bn256Pairing.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256Pairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256ScalarMul",
-      "reason": [
-        "precompiles_json_test.go:159: skipping precompile fixture test: bn256ScalarMul.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256ScalarMul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBlake2F",
-      "reason": [
-        "precompiles_json_test.go:183: skipping precompile fixture test: blake2F.json is not present in this checkout",
-        "--- SKIP: TestJsonBlake2F (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonByte",
-      "reason": [
-        "json_vectors_test.go:128: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
-        "--- SKIP: TestJsonByte (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonDiv",
-      "reason": [
-        "json_vectors_test.go:96: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
-        "--- SKIP: TestJsonDiv (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonEcRecover",
-      "reason": [
-        "precompiles_json_test.go:129: skipping precompile fixture test: ecRecover.json is not present in this checkout",
-        "--- SKIP: TestJsonEcRecover (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonEq",
-      "reason": [
-        "json_vectors_test.go:160: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
-        "--- SKIP: TestJsonEq (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonExp",
-      "reason": [
-        "json_vectors_test.go:112: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
-        "--- SKIP: TestJsonExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG1Add",
-      "reason": [
-        "precompiles_json_test.go:428: skipping precompile failure fixture test: fail-blsG1Add.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG1Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG1Mul",
-      "reason": [
-        "precompiles_json_test.go:438: skipping precompile failure fixture test: fail-blsG1Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG1Mul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG1MultiExp",
-      "reason": [
-        "precompiles_json_test.go:452: skipping precompile failure fixture test: fail-blsG1MultiExp.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG1MultiExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG2Add",
-      "reason": [
-        "precompiles_json_test.go:466: skipping precompile failure fixture test: fail-blsG2Add.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG2Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG2Mul",
-      "reason": [
-        "precompiles_json_test.go:476: skipping precompile failure fixture test: fail-blsG2Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG2Mul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG2MultiExp",
-      "reason": [
-        "precompiles_json_test.go:486: skipping precompile failure fixture test: fail-blsG2MultiExp.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG2MultiExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSMapG1",
-      "reason": [
-        "precompiles_json_test.go:506: skipping precompile failure fixture test: fail-blsMapG1.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSMapG1 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSMapG2",
-      "reason": [
-        "precompiles_json_test.go:516: skipping precompile failure fixture test: fail-blsMapG2.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSMapG2 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSPairing",
-      "reason": [
-        "precompiles_json_test.go:496: skipping precompile failure fixture test: fail-blsPairing.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSPairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBlake2F",
-      "reason": [
-        "precompiles_json_test.go:418: skipping precompile failure fixture test: fail-blake2f.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBlake2F (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonGt",
-      "reason": [
-        "json_vectors_test.go:148: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
-        "--- SKIP: TestJsonGt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonLt",
-      "reason": [
-        "json_vectors_test.go:144: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
-        "--- SKIP: TestJsonLt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonMod",
-      "reason": [
-        "json_vectors_test.go:104: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
-        "--- SKIP: TestJsonMod (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonModExp",
-      "reason": [
-        "precompiles_json_test.go:198: skipping precompile fixture test: modexp.json is not present in this checkout",
-        "--- SKIP: TestJsonModExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonModExpEIP2565",
-      "reason": [
-        "precompiles_json_test.go:210: skipping precompile fixture test: modexp_eip2565.json is not present in this checkout",
-        "--- SKIP: TestJsonModExpEIP2565 (0.00s)"
+        "json_vectors_test.go:88: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
+        "--- SKIP: TestJsonSub (0.00s)"
       ]
     },
     {
@@ -851,6 +355,54 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonDiv",
+      "reason": [
+        "json_vectors_test.go:96: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
+        "--- SKIP: TestJsonDiv (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSdiv",
+      "reason": [
+        "json_vectors_test.go:100: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
+        "--- SKIP: TestJsonSdiv (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonMod",
+      "reason": [
+        "json_vectors_test.go:104: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
+        "--- SKIP: TestJsonMod (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSmod",
+      "reason": [
+        "json_vectors_test.go:108: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
+        "--- SKIP: TestJsonSmod (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonExp",
+      "reason": [
+        "json_vectors_test.go:112: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
+        "--- SKIP: TestJsonExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAnd",
+      "reason": [
+        "json_vectors_test.go:116: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
+        "--- SKIP: TestJsonAnd (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonOr",
       "reason": [
         "json_vectors_test.go:120: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
@@ -859,26 +411,18 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonP256Verify",
+      "test": "TestJsonXor",
       "reason": [
-        "precompiles_json_test.go:223: skipping precompile fixture test: p256Verify.json is not present in this checkout",
-        "--- SKIP: TestJsonP256Verify (0.00s)"
+        "json_vectors_test.go:124: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
+        "--- SKIP: TestJsonXor (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonPointEvaluation",
+      "test": "TestJsonByte",
       "reason": [
-        "precompiles_json_test.go:239: point evaluation fixture requires production trusted setup; our impl uses test setup (s=42)",
-        "--- SKIP: TestJsonPointEvaluation (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSAR",
-      "reason": [
-        "json_vectors_test.go:140: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
-        "--- SKIP: TestJsonSAR (0.00s)"
+        "json_vectors_test.go:128: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
+        "--- SKIP: TestJsonByte (0.00s)"
       ]
     },
     {
@@ -899,26 +443,26 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSdiv",
+      "test": "TestJsonSAR",
       "reason": [
-        "json_vectors_test.go:100: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
-        "--- SKIP: TestJsonSdiv (0.00s)"
+        "json_vectors_test.go:140: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
+        "--- SKIP: TestJsonSAR (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSgt",
+      "test": "TestJsonLt",
       "reason": [
-        "json_vectors_test.go:156: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
-        "--- SKIP: TestJsonSgt (0.00s)"
+        "json_vectors_test.go:144: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
+        "--- SKIP: TestJsonLt (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSignExtend",
+      "test": "TestJsonGt",
       "reason": [
-        "json_vectors_test.go:164: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
-        "--- SKIP: TestJsonSignExtend (0.00s)"
+        "json_vectors_test.go:148: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
+        "--- SKIP: TestJsonGt (0.00s)"
       ]
     },
     {
@@ -931,18 +475,194 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSmod",
+      "test": "TestJsonSgt",
       "reason": [
-        "json_vectors_test.go:108: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
-        "--- SKIP: TestJsonSmod (0.00s)"
+        "json_vectors_test.go:156: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
+        "--- SKIP: TestJsonSgt (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSub",
+      "test": "TestJsonEq",
       "reason": [
-        "json_vectors_test.go:88: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
-        "--- SKIP: TestJsonSub (0.00s)"
+        "json_vectors_test.go:160: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
+        "--- SKIP: TestJsonEq (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSignExtend",
+      "reason": [
+        "json_vectors_test.go:164: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
+        "--- SKIP: TestJsonSignExtend (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/ADD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/ADD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SUB",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SUB (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/MUL",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/MUL (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/DIV",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/DIV (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SDIV",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SDIV (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/MOD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/MOD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SMOD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SMOD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/EXP",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/EXP (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/AND",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/AND (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/OR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/OR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/XOR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/XOR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/BYTE",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/BYTE (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SHL",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SHL (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SHR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SHR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SAR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SAR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/LT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/LT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/GT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/GT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SLT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SLT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SGT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SGT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/EQ",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/EQ (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SIGNEXTEND",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SIGNEXTEND (0.00s)"
       ]
     },
     {
@@ -955,81 +675,209 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonXor",
+      "test": "TestJsonEcRecover",
       "reason": [
-        "json_vectors_test.go:124: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
-        "--- SKIP: TestJsonXor (0.00s)"
+        "precompiles_json_test.go:130: skipping precompile fixture test: ecRecover.json is not present in this checkout",
+        "--- SKIP: TestJsonEcRecover (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestAggregateVerifyDistinct",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256Add",
       "reason": [
-        "bls_aggregate_extended_test.go:369: requires real blst backend for pairing correctness",
-        "--- SKIP: TestAggregateVerifyDistinct (0.00s)"
+        "precompiles_json_test.go:149: skipping precompile fixture test: bn256Add.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256Add (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSAggGenerateAndVerifyPoP",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256ScalarMul",
       "reason": [
-        "bls_aggregate_extended_test.go:82: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSAggGenerateAndVerifyPoP (0.00s)"
+        "precompiles_json_test.go:160: skipping precompile fixture test: bn256ScalarMul.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256ScalarMul (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSAggSignAndVerifyWithDST",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256Pairing",
       "reason": [
-        "bls_aggregate_extended_test.go:192: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSAggSignAndVerifyWithDST (0.00s)"
+        "precompiles_json_test.go:171: skipping precompile fixture test: bn256Pairing.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256Pairing (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSSignatureSetMultiple",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBlake2F",
       "reason": [
-        "bls_aggregate_extended_test.go:250: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSSignatureSetMultiple (0.00s)"
+        "precompiles_json_test.go:184: skipping precompile fixture test: blake2F.json is not present in this checkout",
+        "--- SKIP: TestJsonBlake2F (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSSignatureSetSingle",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonModExp",
       "reason": [
-        "bls_aggregate_extended_test.go:232: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSSignatureSetSingle (0.00s)"
+        "precompiles_json_test.go:199: skipping precompile fixture test: modexp.json is not present in this checkout",
+        "--- SKIP: TestJsonModExp (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/light/bls",
-      "test": "TestVerifierCounters",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonModExpEIP2565",
       "reason": [
-        "bls_verifier_test.go:250: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifierCounters (0.00s)"
+        "precompiles_json_test.go:211: skipping precompile fixture test: modexp_eip2565.json is not present in this checkout",
+        "--- SKIP: TestJsonModExpEIP2565 (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/light/bls",
-      "test": "TestVerifySyncCommitteeSignature_SupermajoritySubset",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonP256Verify",
       "reason": [
-        "bls_verifier_test.go:230: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifySyncCommitteeSignature_SupermajoritySubset (0.00s)"
+        "precompiles_json_test.go:224: skipping precompile fixture test: p256Verify.json is not present in this checkout",
+        "--- SKIP: TestJsonP256Verify (0.00s)"
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/light/bls",
-      "test": "TestVerifySyncCommitteeSignature_Valid",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG1Add",
       "reason": [
-        "bls_verifier_test.go:151: requires real blst backend for pairing correctness",
-        "--- SKIP: TestVerifySyncCommitteeSignature_Valid (0.00s)"
+        "precompiles_json_test.go:276: skipping precompile fixture test: blsG1Add.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG1Add (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG1Mul",
+      "reason": [
+        "precompiles_json_test.go:277: skipping precompile fixture test: blsG1Mul.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG1Mul (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG1MultiExp",
+      "reason": [
+        "precompiles_json_test.go:278: skipping precompile fixture test: blsG1MultiExp.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG1MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG2Add",
+      "reason": [
+        "precompiles_json_test.go:279: skipping precompile fixture test: blsG2Add.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG2Add (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG2Mul",
+      "reason": [
+        "precompiles_json_test.go:280: skipping precompile fixture test: blsG2Mul.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG2Mul (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSG2MultiExp",
+      "reason": [
+        "precompiles_json_test.go:281: skipping precompile fixture test: blsG2MultiExp.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSG2MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSPairing",
+      "reason": [
+        "precompiles_json_test.go:282: skipping precompile fixture test: blsPairing.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSPairing (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSMapG1",
+      "reason": [
+        "precompiles_json_test.go:283: skipping precompile fixture test: blsMapG1.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSMapG1 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSMapG2",
+      "reason": [
+        "precompiles_json_test.go:284: skipping precompile fixture test: blsMapG2.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSMapG2 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBlake2F",
+      "reason": [
+        "precompiles_json_test.go:289: skipping precompile failure fixture test: fail-blake2f.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBlake2F (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSG1Add",
+      "reason": [
+        "precompiles_json_test.go:308: skipping precompile failure fixture test: fail-blsG1Add.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSG1Add (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSG1MultiExp",
+      "reason": [
+        "precompiles_json_test.go:310: skipping precompile failure fixture test: fail-blsG1MultiExp.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSG1MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSG2Add",
+      "reason": [
+        "precompiles_json_test.go:312: skipping precompile failure fixture test: fail-blsG2Add.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSG2Add (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSG2MultiExp",
+      "reason": [
+        "precompiles_json_test.go:314: skipping precompile failure fixture test: fail-blsG2MultiExp.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSG2MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSPairing",
+      "reason": [
+        "precompiles_json_test.go:317: skipping precompile failure fixture test: fail-blsPairing.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSPairing (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSMapG1",
+      "reason": [
+        "precompiles_json_test.go:319: skipping precompile failure fixture test: fail-blsMapG1.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSMapG1 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSMapG2",
+      "reason": [
+        "precompiles_json_test.go:320: skipping precompile failure fixture test: fail-blsMapG2.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSMapG2 (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestLoadGenesisFile_Kurtosis",
       "reason": [
-        "genesis_loader_test.go:254: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:310: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestLoadGenesisFile_Kurtosis (0.00s)"
       ]
     },
@@ -1037,7 +885,7 @@
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestLoadGenesisFile_Kurtosis_AllocDetails",
       "reason": [
-        "genesis_loader_test.go:301: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:357: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestLoadGenesisFile_Kurtosis_AllocDetails (0.00s)"
       ]
     },
@@ -1045,34 +893,666 @@
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestNodeWithGenesisFile_Kurtosis",
       "reason": [
-        "genesis_loader_test.go:345: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:401: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestNodeWithGenesisFile_Kurtosis (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestNativeCommitStallDiagnostic",
+      "reason": [
+        "native_commit_stall_test.go:268: explicit owned commit-stall diagnostic not requested; not liveness coverage",
+        "--- SKIP: TestNativeCommitStallDiagnostic (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestNativeMatureImportReplay",
+      "reason": [
+        "native_import_replay_test.go:216: external mature snapshot not supplied; this is not a pass for the incident replay",
+        "--- SKIP: TestNativeMatureImportReplay (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ExecuteAndProve",
+      "reason": [
+        "canonical_executor_test.go:178: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_ExecuteAndProve (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProof",
+      "reason": [
+        "canonical_executor_test.go:211: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_VerifyGuestProof (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProofTampered",
+      "reason": [
+        "canonical_executor_test.go:236: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_VerifyGuestProofTampered (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ProofStatementConsistency",
+      "reason": [
+        "canonical_executor_test.go:337: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_ProofStatementConsistency (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTF",
+      "reason": [
+        "stf_executor_test.go:103: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_ExecuteSTF (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTFMismatch",
+      "reason": [
+        "stf_executor_test.go:145: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_ExecuteSTFMismatch (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_VerifySTFProof",
+      "reason": [
+        "stf_executor_test.go:212: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_VerifySTFProof (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_FullRoundTrip",
+      "reason": [
+        "stf_executor_test.go:354: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_FullRoundTrip (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestZKISABridge_ExecuteZKISA",
+      "reason": [
+        "zkisa_bridge_test.go:104: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestZKISABridge_ExecuteZKISA (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestTrack4LiveDevnet",
+      "reason": [
+        "track4_integration_test.go:472: set ETH2030_TRACK4_RPC to the two Track 4 devnet RPC URLs",
+        "--- SKIP: TestTrack4LiveDevnet (0.00s)"
       ]
     }
   ],
   "race_suite": [
     {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFBatchRunConcurrency",
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAdd",
       "reason": [
-        "fixture_loader_test.go:201: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
-        "--- SKIP: TestEFBatchRunConcurrency (0.00s)"
+        "json_vectors_test.go:84: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
+        "--- SKIP: TestJsonAdd (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSub",
+      "reason": [
+        "json_vectors_test.go:88: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
+        "--- SKIP: TestJsonSub (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonMul",
+      "reason": [
+        "json_vectors_test.go:92: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
+        "--- SKIP: TestJsonMul (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonDiv",
+      "reason": [
+        "json_vectors_test.go:96: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
+        "--- SKIP: TestJsonDiv (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSdiv",
+      "reason": [
+        "json_vectors_test.go:100: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
+        "--- SKIP: TestJsonSdiv (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonMod",
+      "reason": [
+        "json_vectors_test.go:104: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
+        "--- SKIP: TestJsonMod (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSmod",
+      "reason": [
+        "json_vectors_test.go:108: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
+        "--- SKIP: TestJsonSmod (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonExp",
+      "reason": [
+        "json_vectors_test.go:112: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
+        "--- SKIP: TestJsonExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAnd",
+      "reason": [
+        "json_vectors_test.go:116: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
+        "--- SKIP: TestJsonAnd (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonOr",
+      "reason": [
+        "json_vectors_test.go:120: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
+        "--- SKIP: TestJsonOr (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonXor",
+      "reason": [
+        "json_vectors_test.go:124: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
+        "--- SKIP: TestJsonXor (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonByte",
+      "reason": [
+        "json_vectors_test.go:128: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
+        "--- SKIP: TestJsonByte (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSHL",
+      "reason": [
+        "json_vectors_test.go:132: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
+        "--- SKIP: TestJsonSHL (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSHR",
+      "reason": [
+        "json_vectors_test.go:136: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
+        "--- SKIP: TestJsonSHR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSAR",
+      "reason": [
+        "json_vectors_test.go:140: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
+        "--- SKIP: TestJsonSAR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonLt",
+      "reason": [
+        "json_vectors_test.go:144: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
+        "--- SKIP: TestJsonLt (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonGt",
+      "reason": [
+        "json_vectors_test.go:148: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
+        "--- SKIP: TestJsonGt (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSlt",
+      "reason": [
+        "json_vectors_test.go:152: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
+        "--- SKIP: TestJsonSlt (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSgt",
+      "reason": [
+        "json_vectors_test.go:156: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
+        "--- SKIP: TestJsonSgt (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonEq",
+      "reason": [
+        "json_vectors_test.go:160: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
+        "--- SKIP: TestJsonEq (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonSignExtend",
+      "reason": [
+        "json_vectors_test.go:164: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
+        "--- SKIP: TestJsonSignExtend (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/ADD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/ADD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SUB",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SUB (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/MUL",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/MUL (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/DIV",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/DIV (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SDIV",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SDIV (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/MOD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/MOD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SMOD",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SMOD (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/EXP",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/EXP (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/AND",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/AND (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/OR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/OR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/XOR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/XOR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/BYTE",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/BYTE (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SHL",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SHL (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SHR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SHR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SAR",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SAR (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/LT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/LT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/GT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/GT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SLT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SLT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SGT",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SGT (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/EQ",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/EQ (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonAllOpcodes/SIGNEXTEND",
+      "reason": [
+        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
+        "--- SKIP: TestJsonAllOpcodes/SIGNEXTEND (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonVectorCounts",
+      "reason": [
+        "json_vectors_test.go:254: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
+        "--- SKIP: TestJsonVectorCounts (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonEcRecover",
+      "reason": [
+        "precompiles_json_test.go:130: skipping precompile fixture test: ecRecover.json is not present in this checkout",
+        "--- SKIP: TestJsonEcRecover (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256Add",
+      "reason": [
+        "precompiles_json_test.go:149: skipping precompile fixture test: bn256Add.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256Add (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256ScalarMul",
+      "reason": [
+        "precompiles_json_test.go:160: skipping precompile fixture test: bn256ScalarMul.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256ScalarMul (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBN256Pairing",
+      "reason": [
+        "precompiles_json_test.go:171: skipping precompile fixture test: bn256Pairing.json is not present in this checkout",
+        "--- SKIP: TestJsonBN256Pairing (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBlake2F",
+      "reason": [
+        "precompiles_json_test.go:184: skipping precompile fixture test: blake2F.json is not present in this checkout",
+        "--- SKIP: TestJsonBlake2F (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonModExp",
+      "reason": [
+        "precompiles_json_test.go:199: skipping precompile fixture test: modexp.json is not present in this checkout",
+        "--- SKIP: TestJsonModExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonModExpEIP2565",
+      "reason": [
+        "precompiles_json_test.go:211: skipping precompile fixture test: modexp_eip2565.json is not present in this checkout",
+        "--- SKIP: TestJsonModExpEIP2565 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonP256Verify",
+      "reason": [
+        "precompiles_json_test.go:224: skipping precompile fixture test: p256Verify.json is not present in this checkout",
+        "--- SKIP: TestJsonP256Verify (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFDiscoverFixtures",
       "reason": [
-        "fixture_loader_test.go:31: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "fixture_loader_test.go:29: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
         "--- SKIP: TestEFDiscoverFixtures (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunSingleFixture",
+      "reason": [
+        "fixture_loader_test.go:63: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFRunSingleFixture (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFSkipUnsupportedForks",
+      "reason": [
+        "fixture_loader_test.go:120: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFSkipUnsupportedForks (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFStateRootMismatchReporting",
+      "reason": [
+        "fixture_loader_test.go:170: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFStateRootMismatchReporting (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFBatchRunConcurrency",
+      "reason": [
+        "fixture_loader_test.go:199: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "--- SKIP: TestEFBatchRunConcurrency (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_1.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_shanghai_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json",
+      "reason": [
+        "fixture_loader_test.go:343: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_paris_state_test_tx_type_0.json",
+        "--- SKIP: TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_Example_Add11",
+      "reason": [
+        "fixture_loader_test.go:371: fixture not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExample/add11.json",
+        "--- SKIP: TestEF_Example_Add11 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_Example_SelfBalance",
+      "reason": [
+        "fixture_loader_test.go:397: directory not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSelfBalance",
+        "--- SKIP: TestEF_Example_SelfBalance (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_DiscoverGeneralStateTests",
+      "reason": [
+        "fixture_loader_test.go:426: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
+        "--- SKIP: TestEF_DiscoverGeneralStateTests (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunGoEthereumStateTest",
+      "reason": [
+        "fixture_loader_test.go:459: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFRunGoEthereumStateTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFIntegrationGoEthereumFixtures",
       "reason": [
-        "fixture_loader_test.go:580: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
+        "fixture_loader_test.go:489: testdata not found: ../../../refs/go-ethereum/cmd/evm/testdata",
         "--- SKIP: TestEFIntegrationGoEthereumFixtures (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFRunStaticStateTests",
+      "reason": [
+        "fixture_loader_test.go:523: execution-spec-tests state tests not found: ../../../refs/execution-spec-tests/tests/static/state_tests",
+        "--- SKIP: TestEFRunStaticStateTests (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_RegressionGates",
+      "reason": [
+        "fixture_loader_test.go:550: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
+        "--- SKIP: TestEF_RegressionGates (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethRunnerSmoke",
+      "reason": [
+        "geth_runner_test.go:26: go-ethereum test fixtures not available",
+        "--- SKIP: TestGethRunnerSmoke (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethCategorySummary",
+      "reason": [
+        "geth_runner_test.go:95: go-ethereum test fixtures not available",
+        "--- SKIP: TestGethCategorySummary (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestGethRunnerSingleCategory",
+      "reason": [
+        "geth_runner_test.go:240: test fixtures not available",
+        "--- SKIP: TestGethRunnerSingleCategory (0.00s)"
       ]
     },
     {
@@ -1085,10 +1565,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFMultipleDataVariants",
+      "test": "TestEFSubtests",
       "reason": [
-        "state_test_runner_test.go:308: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFMultipleDataVariants (0.00s)"
+        "state_test_runner_test.go:51: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFSubtests (0.00s)"
       ]
     },
     {
@@ -1101,6 +1581,14 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEFMultipleDataVariants",
+      "reason": [
+        "state_test_runner_test.go:308: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
+        "--- SKIP: TestEFMultipleDataVariants (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEFRunAgainstGoEthereumFixture",
       "reason": [
         "state_test_runner_test.go:361: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
@@ -1109,209 +1597,81 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunGoEthereumStateTest",
-      "reason": [
-        "fixture_loader_test.go:550: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFRunGoEthereumStateTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunSingleFixture",
-      "reason": [
-        "fixture_loader_test.go:65: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFRunSingleFixture (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFRunStaticStateTests",
-      "reason": [
-        "fixture_loader_test.go:614: execution-spec-tests state tests not found: ../../../refs/execution-spec-tests/tests/static/state_tests",
-        "--- SKIP: TestEFRunStaticStateTests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFSkipUnsupportedForks",
-      "reason": [
-        "fixture_loader_test.go:122: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFSkipUnsupportedForks (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFStateRootMismatchReporting",
-      "reason": [
-        "fixture_loader_test.go:172: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFStateRootMismatchReporting (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEFSubtests",
-      "reason": [
-        "state_test_runner_test.go:51: fixture not found: ../../../refs/go-ethereum/cmd/evm/testdata/statetest.json",
-        "--- SKIP: TestEFSubtests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_CategorySummary",
-      "reason": [
-        "fixture_loader_test.go:698: use TestGethCategorySummary for authoritative EF test results via go-ethereum backend",
-        "--- SKIP: TestEF_CategorySummary (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_DiscoverGeneralStateTests",
-      "reason": [
-        "fixture_loader_test.go:510: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
-        "--- SKIP: TestEF_DiscoverGeneralStateTests (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_Example_Add11",
-      "reason": [
-        "fixture_loader_test.go:455: fixture not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExample/add11.json",
-        "--- SKIP: TestEF_Example_Add11 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_Example_SelfBalance",
-      "reason": [
-        "fixture_loader_test.go:481: directory not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSelfBalance",
-        "--- SKIP: TestEF_Example_SelfBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_FullSuiteReport",
-      "reason": [
-        "fixture_loader_test.go:371: use TestGethCategorySummary for authoritative EF test results via go-ethereum backend",
-        "--- SKIP: TestEF_FullSuiteReport (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_RegressionGates",
-      "reason": [
-        "fixture_loader_test.go:641: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests",
-        "--- SKIP: TestEF_RegressionGates (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_cancun_state_test_tx_type_1.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_cancun_state_test_tx_type_1.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_paris_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_paris_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json",
-      "reason": [
-        "fixture_loader_test.go:345: fixture not found: ../../../refs/execution-spec-tests/src/ethereum_test_specs/tests/fixtures/chainid_shanghai_state_test_tx_type_0.json",
-        "--- SKIP: TestEF_SpecFixtures/chainid_shanghai_state_test_tx_type_0.json (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stArgsZeroOneBalance",
-      "reason": [
-        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
-        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCallCodes",
-      "reason": [
-        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
-        "--- SKIP: TestEF_stCallCodes (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stCodeCopyTest",
       "reason": [
-        "fixture_loader_test.go:307: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
+        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
         "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP150Specific",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
-        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stEIP1559",
       "reason": [
-        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
         "--- SKIP: TestEF_stEIP1559 (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stExpectSection",
+      "test": "TestEF_stEIP150Specific",
       "reason": [
-        "fixture_loader_test.go:310: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
-        "--- SKIP: TestEF_stExpectSection (0.00s)"
+        "fixture_loader_test.go:319: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
+        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryStressTest",
+      "test": "TestEF_stZeroCallsRevert",
       "reason": [
-        "fixture_loader_test.go:313: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
-        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
+        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
+        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryTest",
+      "test": "TestEF_stStaticCall",
       "reason": [
-        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
-        "--- SKIP: TestEF_stMemoryTest (0.00s)"
+        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
+        "--- SKIP: TestEF_stStaticCall (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stQuadraticComplexityTest",
       "reason": [
-        "fixture_loader_test.go:316: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
+        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
         "--- SKIP: TestEF_stQuadraticComplexityTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stExpectSection",
+      "reason": [
+        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
+        "--- SKIP: TestEF_stExpectSection (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stMemoryTest",
+      "reason": [
+        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
+        "--- SKIP: TestEF_stMemoryTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stCallCodes",
+      "reason": [
+        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
+        "--- SKIP: TestEF_stCallCodes (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stRevertTest",
       "reason": [
-        "fixture_loader_test.go:325: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
+        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
         "--- SKIP: TestEF_stRevertTest (0.00s)"
       ]
     },
@@ -1319,239 +1679,31 @@
       "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stSLoadTest",
       "reason": [
-        "fixture_loader_test.go:309: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSLoadTest",
+        "fixture_loader_test.go:307: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSLoadTest",
         "--- SKIP: TestEF_stSLoadTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stStaticCall",
+      "test": "TestEF_stArgsZeroOneBalance",
       "reason": [
-        "fixture_loader_test.go:324: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
-        "--- SKIP: TestEF_stStaticCall (0.00s)"
+        "fixture_loader_test.go:312: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
+        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stZeroCallsRevert",
+      "test": "TestEF_stMemoryStressTest",
       "reason": [
-        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
-        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethCategorySummary",
-      "reason": [
-        "geth_runner_test.go:65: go-ethereum test fixtures not available",
-        "--- SKIP: TestGethCategorySummary (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethRunnerSingleCategory",
-      "reason": [
-        "geth_runner_test.go:195: test fixtures not available",
-        "--- SKIP: TestGethRunnerSingleCategory (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestGethRunnerSmoke",
-      "reason": [
-        "geth_runner_test.go:26: go-ethereum test fixtures not available",
-        "--- SKIP: TestGethRunnerSmoke (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAdd",
-      "reason": [
-        "json_vectors_test.go:84: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
-        "--- SKIP: TestJsonAdd (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/ADD",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/ADD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/AND",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/AND (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/BYTE",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/BYTE (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/DIV",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/DIV (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/EQ",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/EQ (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/EXP",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/EXP (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/GT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/GT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/LT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/LT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/MOD",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/MOD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/MUL",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/MUL (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/OR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/OR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SAR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SAR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SDIV",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SDIV (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SGT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SGT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SHL",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SHL (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SHR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SHR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SIGNEXTEND",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SIGNEXTEND (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SLT",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SLT (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SMOD",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SMOD (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/SUB",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SUB (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAllOpcodes/XOR",
-      "reason": [
-        "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/XOR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonAnd",
-      "reason": [
-        "json_vectors_test.go:116: skipping JSON vector test: fixture testdata/testcases_and.json is not present in this checkout",
-        "--- SKIP: TestJsonAnd (0.00s)"
+        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
+        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG1Add",
       "reason": [
-        "precompiles_json_test.go:249: skipping precompile fixture test: blsG1Add.json is not present in this checkout",
+        "precompiles_json_test.go:276: skipping precompile fixture test: blsG1Add.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG1Add (0.00s)"
       ]
     },
@@ -1559,7 +1711,7 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG1Mul",
       "reason": [
-        "precompiles_json_test.go:260: skipping precompile fixture test: blsG1Mul.json is not present in this checkout",
+        "precompiles_json_test.go:277: skipping precompile fixture test: blsG1Mul.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG1Mul (0.00s)"
       ]
     },
@@ -1567,7 +1719,7 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG1MultiExp",
       "reason": [
-        "precompiles_json_test.go:271: skipping precompile fixture test: blsG1MultiExp.json is not present in this checkout",
+        "precompiles_json_test.go:278: skipping precompile fixture test: blsG1MultiExp.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG1MultiExp (0.00s)"
       ]
     },
@@ -1575,7 +1727,7 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG2Add",
       "reason": [
-        "precompiles_json_test.go:284: skipping precompile fixture test: blsG2Add.json is not present in this checkout",
+        "precompiles_json_test.go:279: skipping precompile fixture test: blsG2Add.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG2Add (0.00s)"
       ]
     },
@@ -1583,7 +1735,7 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG2Mul",
       "reason": [
-        "precompiles_json_test.go:307: skipping precompile fixture test: blsG2Mul.json is not present in this checkout",
+        "precompiles_json_test.go:280: skipping precompile fixture test: blsG2Mul.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG2Mul (0.00s)"
       ]
     },
@@ -1591,15 +1743,23 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSG2MultiExp",
       "reason": [
-        "precompiles_json_test.go:329: skipping precompile fixture test: blsG2MultiExp.json is not present in this checkout",
+        "precompiles_json_test.go:281: skipping precompile fixture test: blsG2MultiExp.json is not present in this checkout",
         "--- SKIP: TestJsonBLSG2MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonBLSPairing",
+      "reason": [
+        "precompiles_json_test.go:282: skipping precompile fixture test: blsPairing.json is not present in this checkout",
+        "--- SKIP: TestJsonBLSPairing (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSMapG1",
       "reason": [
-        "precompiles_json_test.go:373: skipping precompile fixture test: blsMapG1.json is not present in this checkout",
+        "precompiles_json_test.go:283: skipping precompile fixture test: blsMapG1.json is not present in this checkout",
         "--- SKIP: TestJsonBLSMapG1 (0.00s)"
       ]
     },
@@ -1607,111 +1767,31 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonBLSMapG2",
       "reason": [
-        "precompiles_json_test.go:395: skipping precompile fixture test: blsMapG2.json is not present in this checkout",
+        "precompiles_json_test.go:284: skipping precompile fixture test: blsMapG2.json is not present in this checkout",
         "--- SKIP: TestJsonBLSMapG2 (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBLSPairing",
+      "test": "TestJsonFailBlake2F",
       "reason": [
-        "precompiles_json_test.go:351: skipping precompile fixture test: blsPairing.json is not present in this checkout",
-        "--- SKIP: TestJsonBLSPairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256Add",
-      "reason": [
-        "precompiles_json_test.go:148: skipping precompile fixture test: bn256Add.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256Pairing",
-      "reason": [
-        "precompiles_json_test.go:170: skipping precompile fixture test: bn256Pairing.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256Pairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBN256ScalarMul",
-      "reason": [
-        "precompiles_json_test.go:159: skipping precompile fixture test: bn256ScalarMul.json is not present in this checkout",
-        "--- SKIP: TestJsonBN256ScalarMul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonBlake2F",
-      "reason": [
-        "precompiles_json_test.go:183: skipping precompile fixture test: blake2F.json is not present in this checkout",
-        "--- SKIP: TestJsonBlake2F (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonByte",
-      "reason": [
-        "json_vectors_test.go:128: skipping JSON vector test: fixture testdata/testcases_byte.json is not present in this checkout",
-        "--- SKIP: TestJsonByte (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonDiv",
-      "reason": [
-        "json_vectors_test.go:96: skipping JSON vector test: fixture testdata/testcases_div.json is not present in this checkout",
-        "--- SKIP: TestJsonDiv (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonEcRecover",
-      "reason": [
-        "precompiles_json_test.go:129: skipping precompile fixture test: ecRecover.json is not present in this checkout",
-        "--- SKIP: TestJsonEcRecover (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonEq",
-      "reason": [
-        "json_vectors_test.go:160: skipping JSON vector test: fixture testdata/testcases_eq.json is not present in this checkout",
-        "--- SKIP: TestJsonEq (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonExp",
-      "reason": [
-        "json_vectors_test.go:112: skipping JSON vector test: fixture testdata/testcases_exp.json is not present in this checkout",
-        "--- SKIP: TestJsonExp (0.00s)"
+        "precompiles_json_test.go:289: skipping precompile failure fixture test: fail-blake2f.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBlake2F (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSG1Add",
       "reason": [
-        "precompiles_json_test.go:428: skipping precompile failure fixture test: fail-blsG1Add.json is not present in this checkout",
+        "precompiles_json_test.go:308: skipping precompile failure fixture test: fail-blsG1Add.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSG1Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG1Mul",
-      "reason": [
-        "precompiles_json_test.go:438: skipping precompile failure fixture test: fail-blsG1Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG1Mul (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSG1MultiExp",
       "reason": [
-        "precompiles_json_test.go:452: skipping precompile failure fixture test: fail-blsG1MultiExp.json is not present in this checkout",
+        "precompiles_json_test.go:310: skipping precompile failure fixture test: fail-blsG1MultiExp.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSG1MultiExp (0.00s)"
       ]
     },
@@ -1719,31 +1799,31 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSG2Add",
       "reason": [
-        "precompiles_json_test.go:466: skipping precompile failure fixture test: fail-blsG2Add.json is not present in this checkout",
+        "precompiles_json_test.go:312: skipping precompile failure fixture test: fail-blsG2Add.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSG2Add (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSG2Mul",
-      "reason": [
-        "precompiles_json_test.go:476: skipping precompile failure fixture test: fail-blsG2Mul.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSG2Mul (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSG2MultiExp",
       "reason": [
-        "precompiles_json_test.go:486: skipping precompile failure fixture test: fail-blsG2MultiExp.json is not present in this checkout",
+        "precompiles_json_test.go:314: skipping precompile failure fixture test: fail-blsG2MultiExp.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSG2MultiExp (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/vm",
+      "test": "TestJsonFailBLSPairing",
+      "reason": [
+        "precompiles_json_test.go:317: skipping precompile failure fixture test: fail-blsPairing.json is not present in this checkout",
+        "--- SKIP: TestJsonFailBLSPairing (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSMapG1",
       "reason": [
-        "precompiles_json_test.go:506: skipping precompile failure fixture test: fail-blsMapG1.json is not present in this checkout",
+        "precompiles_json_test.go:319: skipping precompile failure fixture test: fail-blsMapG1.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSMapG1 (0.00s)"
       ]
     },
@@ -1751,231 +1831,15 @@
       "package": "github.com/eth2030/eth2030/core/vm",
       "test": "TestJsonFailBLSMapG2",
       "reason": [
-        "precompiles_json_test.go:516: skipping precompile failure fixture test: fail-blsMapG2.json is not present in this checkout",
+        "precompiles_json_test.go:320: skipping precompile failure fixture test: fail-blsMapG2.json is not present in this checkout",
         "--- SKIP: TestJsonFailBLSMapG2 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBLSPairing",
-      "reason": [
-        "precompiles_json_test.go:496: skipping precompile failure fixture test: fail-blsPairing.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBLSPairing (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonFailBlake2F",
-      "reason": [
-        "precompiles_json_test.go:418: skipping precompile failure fixture test: fail-blake2f.json is not present in this checkout",
-        "--- SKIP: TestJsonFailBlake2F (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonGt",
-      "reason": [
-        "json_vectors_test.go:148: skipping JSON vector test: fixture testdata/testcases_gt.json is not present in this checkout",
-        "--- SKIP: TestJsonGt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonLt",
-      "reason": [
-        "json_vectors_test.go:144: skipping JSON vector test: fixture testdata/testcases_lt.json is not present in this checkout",
-        "--- SKIP: TestJsonLt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonMod",
-      "reason": [
-        "json_vectors_test.go:104: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
-        "--- SKIP: TestJsonMod (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonModExp",
-      "reason": [
-        "precompiles_json_test.go:198: skipping precompile fixture test: modexp.json is not present in this checkout",
-        "--- SKIP: TestJsonModExp (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonModExpEIP2565",
-      "reason": [
-        "precompiles_json_test.go:210: skipping precompile fixture test: modexp_eip2565.json is not present in this checkout",
-        "--- SKIP: TestJsonModExpEIP2565 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonMul",
-      "reason": [
-        "json_vectors_test.go:92: skipping JSON vector test: fixture testdata/testcases_mul.json is not present in this checkout",
-        "--- SKIP: TestJsonMul (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonOr",
-      "reason": [
-        "json_vectors_test.go:120: skipping JSON vector test: fixture testdata/testcases_or.json is not present in this checkout",
-        "--- SKIP: TestJsonOr (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonP256Verify",
-      "reason": [
-        "precompiles_json_test.go:223: skipping precompile fixture test: p256Verify.json is not present in this checkout",
-        "--- SKIP: TestJsonP256Verify (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonPointEvaluation",
-      "reason": [
-        "precompiles_json_test.go:239: point evaluation fixture requires production trusted setup; our impl uses test setup (s=42)",
-        "--- SKIP: TestJsonPointEvaluation (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSAR",
-      "reason": [
-        "json_vectors_test.go:140: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
-        "--- SKIP: TestJsonSAR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSHL",
-      "reason": [
-        "json_vectors_test.go:132: skipping JSON vector test: fixture testdata/testcases_shl.json is not present in this checkout",
-        "--- SKIP: TestJsonSHL (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSHR",
-      "reason": [
-        "json_vectors_test.go:136: skipping JSON vector test: fixture testdata/testcases_shr.json is not present in this checkout",
-        "--- SKIP: TestJsonSHR (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSdiv",
-      "reason": [
-        "json_vectors_test.go:100: skipping JSON vector test: fixture testdata/testcases_sdiv.json is not present in this checkout",
-        "--- SKIP: TestJsonSdiv (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSgt",
-      "reason": [
-        "json_vectors_test.go:156: skipping JSON vector test: fixture testdata/testcases_sgt.json is not present in this checkout",
-        "--- SKIP: TestJsonSgt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSignExtend",
-      "reason": [
-        "json_vectors_test.go:164: skipping JSON vector test: fixture testdata/testcases_signext.json is not present in this checkout",
-        "--- SKIP: TestJsonSignExtend (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSlt",
-      "reason": [
-        "json_vectors_test.go:152: skipping JSON vector test: fixture testdata/testcases_slt.json is not present in this checkout",
-        "--- SKIP: TestJsonSlt (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSmod",
-      "reason": [
-        "json_vectors_test.go:108: skipping JSON vector test: fixture testdata/testcases_smod.json is not present in this checkout",
-        "--- SKIP: TestJsonSmod (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonSub",
-      "reason": [
-        "json_vectors_test.go:88: skipping JSON vector test: fixture testdata/testcases_sub.json is not present in this checkout",
-        "--- SKIP: TestJsonSub (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonVectorCounts",
-      "reason": [
-        "json_vectors_test.go:254: skipping JSON vector test: fixture testdata/testcases_add.json is not present in this checkout",
-        "--- SKIP: TestJsonVectorCounts (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/vm",
-      "test": "TestJsonXor",
-      "reason": [
-        "json_vectors_test.go:124: skipping JSON vector test: fixture testdata/testcases_xor.json is not present in this checkout",
-        "--- SKIP: TestJsonXor (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestAggregateVerifyDistinct",
-      "reason": [
-        "bls_aggregate_extended_test.go:369: requires real blst backend for pairing correctness",
-        "--- SKIP: TestAggregateVerifyDistinct (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSAggGenerateAndVerifyPoP",
-      "reason": [
-        "bls_aggregate_extended_test.go:82: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSAggGenerateAndVerifyPoP (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSAggSignAndVerifyWithDST",
-      "reason": [
-        "bls_aggregate_extended_test.go:192: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSAggSignAndVerifyWithDST (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSSignatureSetMultiple",
-      "reason": [
-        "bls_aggregate_extended_test.go:250: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSSignatureSetMultiple (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/crypto/bls",
-      "test": "TestBLSSignatureSetSingle",
-      "reason": [
-        "bls_aggregate_extended_test.go:232: requires real blst backend for pairing correctness",
-        "--- SKIP: TestBLSSignatureSetSingle (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestLoadGenesisFile_Kurtosis",
       "reason": [
-        "genesis_loader_test.go:254: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:310: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestLoadGenesisFile_Kurtosis (0.00s)"
       ]
     },
@@ -1983,7 +1847,7 @@
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestLoadGenesisFile_Kurtosis_AllocDetails",
       "reason": [
-        "genesis_loader_test.go:301: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:357: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestLoadGenesisFile_Kurtosis_AllocDetails (0.00s)"
       ]
     },
@@ -1991,8 +1855,66 @@
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestNodeWithGenesisFile_Kurtosis",
       "reason": [
-        "genesis_loader_test.go:345: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "genesis_loader_test.go:401: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestNodeWithGenesisFile_Kurtosis (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestNativeCommitStallDiagnostic",
+      "reason": [
+        "native_commit_stall_test.go:268: explicit owned commit-stall diagnostic not requested; not liveness coverage",
+        "--- SKIP: TestNativeCommitStallDiagnostic (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestNativeMatureImportReplay",
+      "reason": [
+        "native_import_replay_test.go:216: external mature snapshot not supplied; this is not a pass for the incident replay",
+        "--- SKIP: TestNativeMatureImportReplay (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestTrack4LiveDevnet",
+      "reason": [
+        "track4_integration_test.go:472: set ETH2030_TRACK4_RPC to the two Track 4 devnet RPC URLs",
+        "--- SKIP: TestTrack4LiveDevnet (0.00s)"
+      ]
+    }
+  ],
+  "ci_race_suite": [
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestNewAncientStore_ReadOnlyFlag",
+      "reason": [
+        "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestAncientStore_PruneTail_ReadOnly",
+      "reason": [
+        "ancient_store_test.go:307: read-only store creation failed",
+        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestAncientStore_Compact_ReadOnly",
+      "reason": [
+        "ancient_store_test.go:323: read-only store creation failed",
+        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
+      "reason": [
+        "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.01s)"
       ]
     }
   ]

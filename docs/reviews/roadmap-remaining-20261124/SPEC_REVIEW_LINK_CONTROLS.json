@@ -1,0 +1,14 @@
+{
+  "checks": [
+    {
+      "name": "cl_target_changed_to_master",
+      "rejected": true
+    },
+    {
+      "name": "audit_link_changed_to_wrong_review",
+      "rejected": true
+    }
+  ],
+  "inputs_restored": true,
+  "baseline_passed": true
+}

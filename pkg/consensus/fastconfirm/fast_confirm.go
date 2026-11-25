@@ -1,14 +1,12 @@
-// Package consensus - fast confirmation protocol for the CL latency track.
-//
-// Fast confirmation provides optimistic confirmation of blocks before finality
-// is reached. Validators attest to blocks, and once a quorum threshold is met,
-// the block is considered "fast confirmed" -- not finalized, but highly likely
-// to be included in the canonical chain. This reduces perceived latency for
-// users and applications without weakening finality guarantees.
+// Package fastconfirm provides a legacy single-candidate vote counter.
+// Callers must authenticate observations before adding them. This utility is
+// not Ethereum's balance- and fork-choice-aware Fast Confirmation Rule (FCR).
+// Production FCR runs in the CL and reaches the EL through Engine safeBlockHash.
 package fastconfirm
 
 import (
 	"errors"
+	"math"
 	"sync"
 	"time"
 
@@ -29,6 +27,8 @@ var (
 	ErrFCDuplicateAttester = errors.New("fast confirm: duplicate attester for slot")
 	ErrFCSlotExpired       = errors.New("fast confirm: slot has expired")
 	ErrFCNotFound          = errors.New("fast confirm: no confirmation for slot")
+	ErrFCBlockRootMismatch = errors.New("fast confirm: conflicting candidate root")
+	ErrFCUnknownValidator  = errors.New("fast confirm: validator outside configured set")
 )
 
 // FastConfirmConfig configures the fast confirmation protocol.
@@ -98,8 +98,9 @@ func NewFastConfirmTracker(cfg *FastConfirmConfig) *FastConfirmTracker {
 	if cfg == nil {
 		cfg = DefaultFastConfirmConfig()
 	}
+	owned := *cfg
 	return &FastConfirmTracker{
-		config: cfg,
+		config: &owned,
 		slots:  make(map[Slot]*slotAttestation),
 	}
 }
@@ -116,6 +117,12 @@ func (ft *FastConfirmTracker) AddAttestation(slot Slot, blockRoot types.Hash, at
 	if blockRoot == emptyHash {
 		return ErrFCBlockRootEmpty
 	}
+	if err := ValidateFastConfirmConfig(ft.config); err != nil {
+		return err
+	}
+	if uint64(attesterIndex) >= uint64(ft.config.TotalValidators) {
+		return ErrFCUnknownValidator
+	}
 
 	ft.mu.Lock()
 	defer ft.mu.Unlock()
@@ -131,6 +138,11 @@ func (ft *FastConfirmTracker) AddAttestation(slot Slot, blockRoot types.Hash, at
 		ft.slots[slot] = sa
 		ft.slotOrder = append(ft.slotOrder, slot)
 		ft.pruneOldestLocked()
+	}
+	// The public API exposes one candidate per slot. A foreign observation must
+	// not add support to that candidate or consume one of its validator votes.
+	if sa.blockRoot != blockRoot {
+		return ErrFCBlockRootMismatch
 	}
 
 	// Check for duplicate attester.
@@ -261,7 +273,16 @@ func ValidateConfirmation(fc *FastConfirmation, cfg *FastConfirmConfig) error {
 	if fc.BlockRoot == emptyHash {
 		return ErrFCBlockRootEmpty
 	}
+	if fc.AttestationCount < 0 {
+		return errors.New("fast confirm: negative attestation count")
+	}
 	if cfg != nil {
+		if err := ValidateFastConfirmConfig(cfg); err != nil {
+			return err
+		}
+		if fc.Confirmed && (cfg.TotalValidators == 0 || fc.AttestationCount < cfg.MinAttesters) {
+			return errors.New("fast confirm: confirmed without the required validator support")
+		}
 		if cfg.TotalValidators > 0 && fc.AttestationCount > cfg.TotalValidators {
 			return errors.New("fast confirm: attestation count exceeds total validators")
 		}
@@ -280,7 +301,7 @@ func ValidateFastConfirmConfig(cfg *FastConfirmConfig) error {
 	if cfg == nil {
 		return errors.New("fast confirm: nil config")
 	}
-	if cfg.QuorumThreshold < 0 || cfg.QuorumThreshold > 1.0 {
+	if math.IsNaN(cfg.QuorumThreshold) || cfg.QuorumThreshold < 0 || cfg.QuorumThreshold > 1.0 {
 		return errors.New("fast confirm: quorum threshold must be in [0, 1]")
 	}
 	if cfg.MinAttesters < 0 {

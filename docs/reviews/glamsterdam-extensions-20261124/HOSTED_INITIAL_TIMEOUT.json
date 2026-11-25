@@ -1,0 +1,83 @@
+{
+  "run_id": 45336500029,
+  "source_revision": "d492fe98aa73722acbaae3fcc0211023fe297466",
+  "failures": [
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ExecuteAndProve",
+      "elapsed_seconds": 300.77
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProof",
+      "elapsed_seconds": 300.69
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProofTampered",
+      "elapsed_seconds": 300.72
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ProofStatementConsistency",
+      "elapsed_seconds": 300.1
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealExplicitBackendAndProductionVerifier",
+      "elapsed_seconds": 300.42
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTF",
+      "elapsed_seconds": 300.7
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTFMismatch",
+      "elapsed_seconds": 300.73
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_VerifySTFProof",
+      "elapsed_seconds": 300.71
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_FullRoundTrip/basic_round-trip",
+      "elapsed_seconds": 300.73
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_FullRoundTrip/tampered_proof_fails_verification",
+      "elapsed_seconds": 300.69
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_FullRoundTrip",
+      "elapsed_seconds": 601.43
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestZKISABridge_ExecuteZKISA",
+      "elapsed_seconds": 300.72
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": null,
+      "elapsed_seconds": 3308.044
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestRealCanonicalProofThroughNativeNode",
+      "elapsed_seconds": 240.39
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": null,
+      "elapsed_seconds": 269.848
+    }
+  ],
+  "actual_cause": "All real producer calls reached the inherited 300s proof deadline; native Node waited only 240s. Retained receipt verification, fake/modified seal rejection and independent RV32IM vectors passed. No cryptographic rejection mismatch was reported.",
+  "artifact_sha256": "b329ec1456e423baf6b6aecfe19a78e0e4705b5f5431fb8f65f3088a8574ca9d"
+}

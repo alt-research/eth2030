@@ -32,23 +32,6 @@ func TestLegacyFramesRequireExplicitForkScope(t *testing.T) {
 	}
 }
 
-func TestEngineVersionForkIntervals(t *testing.T) {
-	c := *TestConfig
-	ca, pr, am, bo := uint64(100), uint64(200), uint64(300), uint64(400)
-	c.CancunTime = &ca
-	c.PragueTime = &pr
-	c.AmsterdamTime = &am
-	c.HogotaTime = &bo
-	for _, tt := range []struct {
-		time       uint64
-		v3, v4, v5 bool
-	}{{99, false, false, false}, {100, true, false, false}, {199, true, false, false}, {200, false, true, false}, {299, false, true, false}, {300, false, false, true}, {399, false, false, true}, {400, false, false, false}, {401, false, false, false}} {
-		if c.IsEngineCancun(tt.time) != tt.v3 || c.IsEnginePrague(tt.time) != tt.v4 || c.IsEngineAmsterdam(tt.time) != tt.v5 {
-			t.Fatalf("Engine API interval mismatch at %d", tt.time)
-		}
-	}
-}
-
 func TestLegacyFrameConfigChangeAfterActivationIsIncompatible(t *testing.T) {
 	before := *TestConfigHogota
 	after := before

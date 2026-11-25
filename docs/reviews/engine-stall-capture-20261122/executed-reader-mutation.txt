@@ -1,0 +1,5 @@
+FAIL
+FAIL: test_quiet_after_burst_delivers_timeout_without_another_write (test_capture_engine_stall.PipeCaptureTests.test_quiet_after_burst_delivers_timeout_without_another_write)
+AssertionError: False is not true : timeout stayed hidden until a new write/EOF
+Ran 1 test in 3.004s
+FAILED (failures=1)

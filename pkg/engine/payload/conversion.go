@@ -1,12 +1,35 @@
 package payload
 
 import (
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 )
+
+// DecodeBlockAccessList validates the Engine API DATA field and returns its
+// EIP-7928 commitment to the canonical RLP bytes.
+func DecodeBlockAccessList(raw json.RawMessage) (types.Hash, error) {
+	var value string
+	if err := json.Unmarshal(raw, &value); err != nil || !strings.HasPrefix(value, "0x") {
+		return types.Hash{}, fmt.Errorf("blockAccessList must be 0x-prefixed hex DATA")
+	}
+	encoded, err := hex.DecodeString(value[2:])
+	if err != nil {
+		return types.Hash{}, fmt.Errorf("blockAccessList: %w", err)
+	}
+	if len(encoded) == 0 {
+		return types.Hash{}, fmt.Errorf("blockAccessList RLP is empty")
+	}
+	// The processor validates canonical RLP by matching this commitment
+	// against the BAL reconstructed from execution.
+	return crypto.Keccak256Hash(encoded), nil
+}
 
 // PayloadToHeader converts an ExecutionPayloadV4 to a block Header.
 func PayloadToHeader(p *ExecutionPayloadV4) *types.Header {
@@ -133,22 +156,25 @@ func BlockToPayload(block *types.Block, prevRandao types.Hash, withdrawals []*Wi
 }
 
 // BlockToPayloadV5 converts a built block to an ExecutionPayloadV5 with BAL.
-func BlockToPayloadV5(block *types.Block, prevRandao types.Hash, withdrawals []*Withdrawal, blockBAL *bal.BlockAccessList) *ExecutionPayloadV5 {
+func BlockToPayloadV5(block *types.Block, prevRandao types.Hash, withdrawals []*Withdrawal, blockBAL *bal.BlockAccessList, slotNumber uint64) *ExecutionPayloadV5 {
 	ep4 := BlockToPayload(block, prevRandao, withdrawals)
 
-	var balData json.RawMessage
+	// lighthouse >= 8.4 deserializes the Gloas payload's blockAccessList as a
+	// 0x-prefixed hex string (hex_prog_var_list); contents are passed through
+	// unvalidated to the payload envelope. Encode the RLP BAL bytes as hex;
+	// an absent BAL serializes as the empty string "0x".
+	balData := json.RawMessage(`"0x"`)
 	if blockBAL != nil {
-		encoded, err := blockBAL.EncodeRLP()
-		if err == nil {
-			balData, _ = json.Marshal(encoded)
+		if encoded, err := blockBAL.EncodeRLP(); err == nil {
+			if quoted, err := json.Marshal("0x" + hex.EncodeToString(encoded)); err == nil {
+				balData = json.RawMessage(quoted)
+			}
 		}
-	}
-	if balData == nil {
-		balData = json.RawMessage("null")
 	}
 
 	return &ExecutionPayloadV5{
 		ExecutionPayloadV4: *ep4,
 		BlockAccessList:    balData,
+		SlotNumber:         fmt.Sprintf("0x%x", slotNumber),
 	}
 }

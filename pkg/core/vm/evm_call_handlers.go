@@ -97,9 +97,7 @@ func (ch *CallHandler) HandleCall(params *CallHandlerParams) *CallHandlerResult 
 			ch.evm.StateDB.SubBalance(params.Caller, params.Value)
 			ch.evm.StateDB.AddBalance(params.Target, params.Value)
 
-			if ch.evm.forkRules.IsEIP7708 && params.Caller != params.Target {
-				EmitTransferLog(ch.evm.StateDB, params.Caller, params.Target, params.Value)
-			}
+			ch.evm.recordETHTransfer(params.Caller, params.Target, params.Value)
 		}
 	}
 
@@ -119,6 +117,16 @@ func (ch *CallHandler) HandleCall(params *CallHandlerParams) *CallHandlerResult 
 	}
 
 	code := ch.evm.StateDB.GetCode(codeAddr)
+	// EIP-7702: a delegated EOA's "code" is the 0xef0100 || delegate
+	// designator. Calls into the EOA must execute the delegate's code in the
+	// EOA's execution context (storage/balance stay with the EOA). The
+	// delegation is followed exactly once — the resolved code is executed
+	// as-is and never re-resolved, per the EIP.
+	if types.HasDelegationPrefix(code) {
+		if delegate, ok := types.ParseDelegation(code); ok {
+			code = ch.evm.StateDB.GetCode(delegate)
+		}
+	}
 	if len(code) == 0 {
 		result.Success = true
 		return result
@@ -178,17 +186,10 @@ func (ch *CallHandler) HandleCall(params *CallHandlerParams) *CallHandlerResult 
 func (ch *CallHandler) runPrecompile(p PrecompiledContract, params *CallHandlerParams) *CallHandlerResult {
 	result := &CallHandlerResult{GasLeft: params.Gas}
 
-	gasCost := p.RequiredGas(params.Input)
-	if params.Gas < gasCost {
-		result.Err = ErrOutOfGas
-		result.GasLeft = 0
-		return result
-	}
-
-	output, err := p.Run(params.Input)
+	output, gasLeft, err := runPrecompile(p, params.Input, params.Gas)
 	result.ReturnData = output
-	result.GasLeft = params.Gas - gasCost
-	result.GasUsed = gasCost
+	result.GasLeft = gasLeft
+	result.GasUsed = params.Gas - gasLeft
 	result.Success = err == nil
 	result.Err = err
 	return result

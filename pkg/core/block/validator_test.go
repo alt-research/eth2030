@@ -29,6 +29,7 @@ func makeValidParent() *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 
@@ -72,6 +73,7 @@ func makeValidChild(parent *types.Header) *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 
@@ -245,6 +247,8 @@ func TestValidateBody_NoUncles(t *testing.T) {
 	v := NewBlockValidator(config.TestConfig)
 	header := makeValidParent()
 	header.TxHash = types.EmptyRootHash // correct root for empty tx list
+	withdrawalsRoot := types.EmptyRootHash
+	header.WithdrawalsHash = &withdrawalsRoot
 	blk := types.NewBlock(header, &types.Body{
 		Withdrawals: []*types.Withdrawal{}, // Post-Shanghai requires withdrawals.
 	})

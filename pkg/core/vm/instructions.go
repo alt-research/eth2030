@@ -303,7 +303,7 @@ func opCalldataLoad(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	x := stack.Peek()
 	offset := x.Uint64()
 	data := make([]byte, 32)
-	if offset < uint64(len(contract.Input)) {
+	if x.IsUint64() && offset < uint64(len(contract.Input)) {
 		copy(data, contract.Input[offset:])
 	}
 	x.SetBytes(data)
@@ -323,7 +323,7 @@ func opCalldataCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	}
 	dOff := dataOffset.Uint64()
 	data := make([]byte, l)
-	if dOff < uint64(len(contract.Input)) {
+	if dataOffset.IsUint64() && dOff < uint64(len(contract.Input)) {
 		copy(data, contract.Input[dOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -343,7 +343,7 @@ func opCodeCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 	}
 	cOff := codeOffset.Uint64()
 	data := make([]byte, l)
-	if cOff < uint64(len(contract.Code)) {
+	if codeOffset.IsUint64() && cOff < uint64(len(contract.Code)) {
 		copy(data, contract.Code[cOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -419,7 +419,11 @@ func opGasLimit(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 }
 
 func opChainID(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	stack.Push(new(big.Int).SetUint64(evm.chainID))
+	value := new(big.Int)
+	if evm.Context.ChainID != nil {
+		value.Set(evm.Context.ChainID)
+	}
+	stack.Push(value)
 	return nil, nil
 }
 
@@ -675,8 +679,8 @@ func opReturndataSize(pc *uint64, evm *EVM, contract *Contract, memory *Memory, 
 func opReturndataCopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	memOffset, dataOffset, length := stack.Pop(), stack.Pop(), stack.Pop()
 	l := length.Uint64()
-	if l == 0 {
-		return nil, nil
+	if !dataOffset.IsUint64() || !length.IsUint64() {
+		return nil, ErrReturnDataOutOfBounds
 	}
 	dOff := dataOffset.Uint64()
 	end := dOff + l
@@ -740,11 +744,9 @@ func makeLog(n int) executionFunc {
 		}
 		data := memory.Get(int64(offset.Uint64()), int64(size.Uint64()))
 		if evm.StateDB != nil {
-			evm.StateDB.AddLog(&types.Log{
-				Address: contract.Address,
-				Topics:  topics,
-				Data:    data,
-			})
+			entry := &types.Log{Address: contract.Address, Topics: topics, Data: data}
+			evm.StateDB.AddLog(entry)
+			evm.traceLog(entry)
 		}
 		return nil, nil
 	}
@@ -787,17 +789,26 @@ func opCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Sta
 	}
 
 	// GAP-1.2: forward the entire state-creation reservoir to the sub-call.
-	evm.callReservoirForward = contract.StateGasReservoir
-	contract.StateGasReservoir = 0
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	} else {
+		evm.callReservoirForward = contract.StateGasReservoir
+		contract.StateGasReservoir = 0
+	}
 
 	ret, returnGas, err := evm.Call(contract.Address, addr, args, callGas, value)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
 	// GAP-1.2: restore parent reservoir with whatever the child did not consume.
-	contract.StateGasReservoir += evm.callReservoirReturn
-	evm.callReservoirReturn = 0
-
-	// Refund unused gas to caller (matching go-ethereum: no stipend subtraction).
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.StateGasReservoir += evm.callReservoirReturn
+		evm.callReservoirReturn = 0
+		contract.Gas += returnGas
+	}
 
 	// Push success/failure
 	if err != nil {
@@ -847,10 +858,17 @@ func opCallCode(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 		callGas += CallStipend
 	}
 
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
 	ret, returnGas, err := evm.CallCode(contract.Address, addr, args, callGas, value)
 
 	// Refund unused gas to caller (matching go-ethereum: no stipend subtraction).
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -891,9 +909,16 @@ func opDelegateCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 	// The Run loop already deducted callGasTemp from contract.Gas (as part of dynamic gas).
 	callGas := evm.callGasTemp
 
-	ret, returnGas, err := evm.DelegateCall(contract.CallerAddress, addr, args, callGas)
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
+	ret, returnGas, err := evm.delegateCall(contract.CallerAddress, contract.Address, contract.Value, addr, args, callGas)
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -934,9 +959,16 @@ func opStaticCall(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stac
 	// The Run loop already deducted callGasTemp from contract.Gas (as part of dynamic gas).
 	callGas := evm.callGasTemp
 
+	if evm.amsterdamStateGasActive() {
+		evm.forwardStateGas(contract)
+	}
 	ret, returnGas, err := evm.StaticCall(contract.Address, addr, args, callGas)
 
-	contract.Gas += returnGas
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -976,11 +1008,26 @@ func opCreate(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *S
 	// rule and base gas deductions internally.
 	gas := contract.Gas
 	contract.Gas = 0
+	if evm.amsterdamStateGasActive() {
+		contract.pendingAccountStateGas = 0
+		evm.returnedStateGas = &Contract{StateGasReservoir: contract.StateGasReservoir, StateGasBaseline: contract.StateGasReservoir}
+	}
 
 	ret, addr, returnGas, err := evm.Create(contract.Address, initCode, gas, value)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
-	contract.Gas += returnGas
-	evm.returnData = ret
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
+	if errors.Is(err, ErrExecutionReverted) {
+		evm.returnData = ret
+	} else {
+		evm.returnData = nil
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -1012,11 +1059,26 @@ func opCreate2(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *
 	// rule and base gas deductions internally.
 	gas := contract.Gas
 	contract.Gas = 0
+	if evm.amsterdamStateGasActive() {
+		contract.pendingAccountStateGas = 0
+		evm.returnedStateGas = &Contract{StateGasReservoir: contract.StateGasReservoir, StateGasBaseline: contract.StateGasReservoir}
+	}
 
 	ret, addr, returnGas, err := evm.Create2(contract.Address, initCode, gas, value, salt)
+	if errors.Is(err, ErrFrameStateGas) {
+		return nil, ErrOutOfGas
+	}
 
-	contract.Gas += returnGas
-	evm.returnData = ret
+	if evm.amsterdamStateGasActive() {
+		evm.absorbStateGas(contract, returnGas, err)
+	} else {
+		contract.Gas += returnGas
+	}
+	if errors.Is(err, ErrExecutionReverted) {
+		evm.returnData = ret
+	} else {
+		evm.returnData = nil
+	}
 
 	if err != nil {
 		stack.Push(new(big.Int))
@@ -1056,9 +1118,6 @@ func opExtcodecopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 	length := stack.Pop()
 
 	l := length.Uint64()
-	if l == 0 {
-		return nil, nil
-	}
 
 	var code []byte
 	if evm.StateDB != nil {
@@ -1070,9 +1129,15 @@ func opExtcodecopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 		}
 	}
 
+	// The account is accessed once pre-state gas is paid, even when no
+	// bytes are copied. Zero length still ignores memory/code offsets.
+	if l == 0 {
+		return nil, nil
+	}
+
 	cOff := codeOffset.Uint64()
 	data := make([]byte, l)
-	if cOff < uint64(len(code)) {
+	if codeOffset.IsUint64() && cOff < uint64(len(code)) {
 		copy(data, code[cOff:])
 	}
 	memory.Set(memOffset.Uint64(), l, data)
@@ -1088,7 +1153,7 @@ func opExtcodehash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 		if evm.balTracker != nil {
 			evm.balTracker.RecordAddressTouch(addr)
 		}
-		if !evm.StateDB.Exist(addr) {
+		if evm.StateDB.Empty(addr) {
 			slot.SetUint64(0)
 		} else {
 			hash := evm.StateDB.GetCodeHash(addr)
@@ -1180,6 +1245,12 @@ func opBlobBaseFee(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 // Returns the hash of one of the 256 most recent complete blocks.
 func opBlockhash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	num := stack.Peek()
+	// BLOCKHASH consumes a uint256. Truncating an overflowing future number
+	// could turn 2**64 into block zero and disclose the wrong historical hash.
+	if !num.IsUint64() {
+		num.SetUint64(0)
+		return nil, nil
+	}
 	num64 := num.Uint64()
 
 	var upper uint64
@@ -1200,11 +1271,8 @@ func opBlockhash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack
 	return nil, nil
 }
 
-// opSelfdestruct implements the SELFDESTRUCT opcode.
-// Post-EIP-6780 (Cancun): sends remaining balance to the beneficiary but does
-// NOT destroy the account. Account destruction only occurs if the contract was
-// created in the same transaction, which is tracked externally by the state
-// processor. The opcode effectively becomes "send all balance".
+// opSelfdestruct transfers the balance and halts. Same-transaction creation
+// markers are journaled by the EVM; EIP-8246 clears their state at transaction end.
 func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	if evm.readOnly {
 		return nil, ErrWriteProtection
@@ -1214,15 +1282,15 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 
 	if evm.StateDB != nil {
 		balance := evm.StateDB.GetBalance(contract.Address)
+		// The implicit transfer log belongs to the executing frame, before the
+		// synthetic zero-gas SELFDESTRUCT child is recorded (SDK hook ordering).
+		evm.recordETHTransfer(contract.Address, beneficiary, balance)
+		if finish := evm.traceFrame(SELFDESTRUCT, contract.Address, beneficiary, nil, 0, balance); finish != nil {
+			defer finish(nil, 0, nil)
+		}
 		if balance.Sign() > 0 {
-			// EIP-7708: emit transfer or burn log for SELFDESTRUCT.
-			if evm.forkRules.IsEIP7708 {
-				if beneficiary != contract.Address {
-					EmitTransferLog(evm.StateDB, contract.Address, beneficiary, balance)
-				} else {
-					EmitBurnLog(evm.StateDB, contract.Address, balance)
-				}
-			}
+			// EIP-7708: only a transfer to a different beneficiary is logged.
+
 			// EIP-7928: capture pre-transfer balances for BAL tracking.
 			var preSelfBal, preBenBal *big.Int
 			if evm.balTracker != nil {
@@ -1239,9 +1307,19 @@ func opSelfdestruct(pc *uint64, evm *EVM, contract *Contract, memory *Memory, st
 				}
 			}
 		}
-		// Post-EIP-6780: do NOT call SelfDestruct. The account persists.
-		// The state processor may still mark it for destruction if the
-		// contract was created in the same transaction.
+		if balance.Sign() == 0 {
+			evm.StateDB.AddBalance(beneficiary, new(big.Int))
+		}
+
+		if evm.createdInTransaction(contract.Address) {
+			// The StateDB marker clears the balance as a legacy side effect.
+			// Restore it so repeated destruction and later credits never burn ETH.
+			remaining := new(big.Int).Set(evm.StateDB.GetBalance(contract.Address))
+			evm.StateDB.SelfDestruct(contract.Address)
+			if evm.isEIP8246() {
+				evm.StateDB.AddBalance(contract.Address, remaining)
+			}
+		}
 	}
 
 	return nil, nil
@@ -1264,25 +1342,15 @@ func opCLZ(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stac
 	return nil, nil
 }
 
-// decodeSingle decodes a single immediate byte for DUPN/SWAPN per EIP-8024.
-// Maps the full byte range [0..255] (excluding 91..127) onto stack depths [17..236].
+// decodeSingle maps valid EIP-8024 immediates to depths 17 through 235.
 func decodeSingle(x byte) int {
-	if x <= 90 {
-		return int(x) + 17
-	}
-	// x >= 128
-	return int(x) - 20
+	return (int(x) + 145) % 256
 }
 
-// decodePair decodes a pair immediate byte for EXCHANGE per EIP-8024.
-// Maps the full byte range [0..255] (excluding 80..127) onto two stack depths.
+// decodePair implements the EIP-8024 XOR permutation for EXCHANGE.
+// Callers reject the reserved range 82 through 127 before decoding.
 func decodePair(x byte) (int, int) {
-	var k int
-	if x <= 79 {
-		k = int(x)
-	} else {
-		k = int(x) - 48
-	}
+	k := int(x ^ 143)
 	q, r := k/16, k%16
 	if q < r {
 		return q + 1, r + 1
@@ -1349,8 +1417,8 @@ func opExchange(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack 
 		x = contract.Code[*pc+1]
 	}
 
-	// Range 80..127 is excluded per spec.
-	if x > 79 && x < 128 {
+	// Range 82..127 is excluded per spec.
+	if x > 81 && x < 128 {
 		return nil, ErrInvalidOpCode
 	}
 	n, m := decodePair(x)

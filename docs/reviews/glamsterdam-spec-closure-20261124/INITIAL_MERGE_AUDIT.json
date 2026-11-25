@@ -1,0 +1,110 @@
+{
+  "base": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+  "heads": [
+    {
+      "number": 149,
+      "head": "0cf24c4e3af76f8a8ec05c6404e46348170cca9c",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "mergeable": true,
+      "merged": false
+    },
+    {
+      "number": 150,
+      "head": "005ef47389470a67a1f8368cb8a9d87e0300a6a8",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "mergeable": true,
+      "merged": false
+    },
+    {
+      "number": 151,
+      "head": "07f6e3645310637184ee0b5445b53253d64a155b",
+      "base": "master",
+      "base_sha": "b4b88ed0e410e5b735a9c6bf0f033180c89dc8c0",
+      "mergeable": true,
+      "merged": false
+    }
+  ],
+  "all_clean": true,
+  "subset_transitions": 12,
+  "merge_orders_covered": 6,
+  "all_orders_converge": true,
+  "package_equal_to_qualified_source": true,
+  "pkg_tree": "0206fabc89395694d02b0bf63d069d8c825b5192",
+  "qualified_source": "264adba468069377fb50b487bd2dec77c089b28d",
+  "checks": [
+    {
+      "prefix": 0,
+      "next_pr": 149,
+      "tree": "86337931da5152e2b20a2a470c4081e6d25c6396",
+      "clean": true
+    },
+    {
+      "prefix": 0,
+      "next_pr": 150,
+      "tree": "932f9481f62c151fc8e80be33a1f7ae220e23423",
+      "clean": true
+    },
+    {
+      "prefix": 0,
+      "next_pr": 151,
+      "tree": "0285d79a43675c6bbf8deb122a981b1dc050937d",
+      "clean": true
+    },
+    {
+      "prefix": 1,
+      "next_pr": 150,
+      "tree": "bb81d79011dc3af6b3522ec5fd76dd5054086028",
+      "clean": true
+    },
+    {
+      "prefix": 1,
+      "next_pr": 151,
+      "tree": "fba7045b512dfa19afdd55112177360f54ead333",
+      "clean": true
+    },
+    {
+      "prefix": 2,
+      "next_pr": 149,
+      "tree": "bb81d79011dc3af6b3522ec5fd76dd5054086028",
+      "clean": true
+    },
+    {
+      "prefix": 2,
+      "next_pr": 151,
+      "tree": "84d1c2242b60d5ccb094736dc8aacdd5c44f4e7b",
+      "clean": true
+    },
+    {
+      "prefix": 3,
+      "next_pr": 151,
+      "tree": "328bfc1352987358d8ec2a4435d2d4d79b8d42a3",
+      "clean": true
+    },
+    {
+      "prefix": 4,
+      "next_pr": 149,
+      "tree": "fba7045b512dfa19afdd55112177360f54ead333",
+      "clean": true
+    },
+    {
+      "prefix": 4,
+      "next_pr": 150,
+      "tree": "84d1c2242b60d5ccb094736dc8aacdd5c44f4e7b",
+      "clean": true
+    },
+    {
+      "prefix": 5,
+      "next_pr": 150,
+      "tree": "328bfc1352987358d8ec2a4435d2d4d79b8d42a3",
+      "clean": true
+    },
+    {
+      "prefix": 6,
+      "next_pr": 149,
+      "tree": "328bfc1352987358d8ec2a4435d2d4d79b8d42a3",
+      "clean": true
+    }
+  ]
+}

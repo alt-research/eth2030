@@ -1,0 +1,22 @@
+# Published application sequence qualification
+
+At clean source 3dc08a931d804c58efa5a6c25c40d2d75eb25e7c, both selected forks pass: 31 real signed application transactions and 17 actual getter queries each. All complete roots, paid gas, status, log contents and return bytes match unchanged Geth v1.17.10; Amsterdam block execution/state dimensions also match. See qualification.json and the source/license/integrity inventory in pkg/core/applicationtest/testdata.
+
+Actual published Uniswap V2 artifacts deploy, create a pair using independently reconstructed CREATE2 commitments, mint liquidity, swap and burn, and reject duplicate pairs and insufficient balances. Actual Safe/proxy/MultiSend artifacts initialize ownership, refund execution fees, execute direct/delegate batches, handle low-gas and reverting children, preserve atomic effects and conserve payer/wallet balances. A 30k child succeeds with 97,920 state gas funded beyond its forwarded execution budget on Amsterdam; a 15k child fails on both forks. The real cold-access costs invalidated initial guessed 15k/20k/25k successes; these failed assumptions remain diagnostic logs, not passing evidence.
+
+Temporary allowance allocation/clearing across sibling token calls and nested rollback run at a 1M top-level gas limit, so no initial reservoir hides LIFO spill/refill behavior. An actual Safe runtime is authorized to an EOA using a real signed EIP-7702 tuple, initialized, funded and used to transfer tokens, then revoked while preserving its nonce lifecycle. Wallet emitted refunds equal actual ETH debits/credits after transaction fees.
+
+The first DEX sequence discovered a separate transaction-boundary refund/transient defect; PR 97 owns the production correction. This review composes it and retains the application fixture and consumer checks independently. Default tests verify verbatim artifact checksums; CI additionally retains complete reassembled signed transactions, roots/logs and getter outputs with exact per-fork counts. Full Go tests, core integration, application race checking, full vet and build pass locally.
+
+This closes the selected R03 component sequence campaign, not external application-wide compatibility clearance or R10 full-process acceptance. These isolated transition contexts fix base fee at one and do not claim pool/Engine/header/system/forkchoice execution. The selected merged LIFO model remains unchanged, including its documented GAS-attribution limitations. Remaining historical/override APIs and full-process/storage/operating campaigns stay tracked separately.
+
+
+## CI correction: preserve Engine cells during pool promotion (2026-11-20)
+
+CI run 44667682959 failed only the Build, Vet, Lint, Test job: the real native-node reconnect test observed a missing cell 127 from engine_getBlobsV4. Full-pool admission occurs before sparse staging cleanup. GetBlobCells snapshots full transactions first, then staged metadata; reinitializing a result row for the staged copy erased already authenticated full cells/proofs. Distinct signed transactions referencing the same versioned blob hash could also erase one another's available cells.
+
+Allocate each requested result row once and merge only present authenticated cells/proofs. The actual peer/restart test and its original deadlines are unchanged. No cryptographic check, sparse admission requirement, mask/order rule or expected output is weakened. The selected EIP-8070 Engine API's missing-cell null semantics are retained.
+
+The new deterministic real-signed/KZG regression holds metadata-only and reconstructed staging alongside full-pool data, covers a different transaction with the same blob hash, and unions disjoint authenticated sparse copies. Four scenarios fail on the original code, while missing-data controls pass. All five pass after correction, including duplicate request positions, unknown hashes, absent cells remaining null, exact cell/proof bytes and real KZG verification.
+
+On the same Go 1.26.11 toolchain used by CI, all 214 full package suites pass with the exact CI test command and -p=4; affected eth/node/backend race suites, ten repetitions of the unchanged original network/restart test, full vet and native executable build pass. The first deterministic red run used host Go 1.27.3; all final qualification uses Go 1.26.11. See CI_REPAIR_20261120.json. Publish only the existing PR 98 branch, retain master as the target, and check the resulting remote-head CI separately before reporting completion. No EL master merge or unrelated branch update is performed.

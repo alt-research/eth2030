@@ -1,0 +1,38 @@
+{
+  "original_head": "af7e96c7a5b97819d9313d6780f1df5d30edb2ea",
+  "original_ci_run": 44667682959,
+  "failed_job_url": "https://github.com/alt-research/eth2030/actions/runs/44667682959/job/136060881424",
+  "failed_test": "TestEth72ActualNodeFullPromotionAndEngineCells",
+  "failed_assertion": "fresh receiver Engine projection changed",
+  "root_cause": "Full-pool and staged transactions can overlap during promotion. Reallocating a result row for sparse metadata overwrote previously authenticated full cells/proofs; different signed transactions sharing a versioned blob hash had the same issue.",
+  "specification": "Selected EIP-8070 engine_getBlobsV4: requested available cells/proofs are returned in mask order and missing cells remain null.",
+  "deterministic_regression": {
+    "name": "TestGetBlobCellsPreservesAvailableData",
+    "scenarios": 5,
+    "original_failures": [
+      "full-and-metadata",
+      "full-and-reconstructed-staging",
+      "full-and-other-transaction",
+      "sparse-union"
+    ],
+    "missing_data_control": "sparse-missing",
+    "crypto": "real signed blob transactions, real computed cells/proofs and VerifyCellProof on returned available cells",
+    "red_toolchain": "go1.27.3"
+  },
+  "validation": {
+    "toolchain": "go1.26.11",
+    "full_command": "GOFLAGS=-p=4 go test ./... -timeout=15m -count=1",
+    "full_packages_passed": 214,
+    "affected_race_packages": [
+      "eth",
+      "node",
+      "node/backend"
+    ],
+    "original_native_test_repetitions": 10,
+    "original_native_test_unchanged": true,
+    "original_deadlines_unchanged": true,
+    "vet": "go vet ./...",
+    "build": "go build ./cmd/eth2030"
+  },
+  "publication": "Existing PR 98 only; target master. Final remote-head CI is verified after push and reported in the PR description."
+}

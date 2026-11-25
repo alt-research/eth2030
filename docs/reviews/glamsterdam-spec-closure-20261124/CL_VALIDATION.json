@@ -1,0 +1,100 @@
+{
+  "base_eth2030": "fa16f70abee7d31c9817ab8d782af73bce241484",
+  "commands": [
+    {
+      "source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "lighthouse"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.764497504977044,
+      "log": "/tmp/eth2030-spec-closure-validation-20261124/cl-lifecycle-final-0.log"
+    },
+    {
+      "source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "beacon_chain",
+        "--features",
+        "fork_from_env",
+        "--lib",
+        "payload_bid_verification",
+        "--",
+        "--test-threads=8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 323.7609365420067,
+      "log": "/tmp/eth2030-spec-closure-validation-20261124/cl-lifecycle-final-1.log"
+    }
+  ],
+  "gloas_bid_tests_passed": 59,
+  "gloas_bid_tests_failed": 0,
+  "repo_policy_clippy_passed": true,
+  "clippy_policy_source": "Lighthouse Makefile lint target, including its existing enum_variant_names allowlist",
+  "ad_hoc_stricter_clippy_result": "Failed on pre-existing execution_layer Error::SszError because the project allowlist was omitted; rerun under the actual project policy passed without changing that baseline enum.",
+  "prior_failures_retained": true,
+  "actual48h_passed": false,
+  "original_fault_resolved": false,
+  "hosted_ci_pending": false,
+  "full_gloas_source_before_timer_patch": "87169d6ab7f0336f4448d6d54a23fed848426022",
+  "feature_source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+  "timer_inclusive_targeted_test_passed": true,
+  "timer_inclusive_full_suite_pending": false,
+  "bls_features": {
+    "features": [
+      "arbitrary",
+      "blst",
+      "default",
+      "supranational"
+    ],
+    "fake_crypto_enabled": false
+  },
+  "timer_inclusive_full_suite_passed": true,
+  "project_policy_clippy": {
+    "source": "3d6ea012c44d5318524c5875aa3d80a17e4c3a17",
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "beacon_chain",
+      "--features",
+      "fork_from_env",
+      "--lib",
+      "--",
+      "-D",
+      "clippy::fn_to_numeric_cast_any",
+      "-D",
+      "clippy::manual_let_else",
+      "-D",
+      "clippy::large_stack_frames",
+      "-D",
+      "clippy::disallowed_methods",
+      "-D",
+      "warnings",
+      "-A",
+      "clippy::derive_partial_eq_without_eq",
+      "-A",
+      "clippy::upper-case-acronyms",
+      "-A",
+      "clippy::vec-init-then-push",
+      "-A",
+      "clippy::question-mark",
+      "-A",
+      "clippy::uninlined-format-args",
+      "-A",
+      "clippy::enum_variant_names"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 8.629143366997596,
+    "log": "/tmp/eth2030-spec-closure-validation-20261124/cl-final-policy-clippy.log"
+  },
+  "hosted_and_merge_receipt": "CL_HOSTED_AND_MERGE.json",
+  "merged_target": "eth2030",
+  "merge_commit": "dc6547450c19b7b7605b4c7b4abd1466c5addb43",
+  "merge_tree_equal_to_qualified_source": true
+}

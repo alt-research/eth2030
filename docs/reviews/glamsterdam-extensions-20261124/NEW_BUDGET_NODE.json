@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "source": "40a78da6f0aa02024607ce848eff3d4a1af767da",
+  "cpu_affinity": "0,1,2,3",
+  "proving_budget_seconds": 900,
+  "node_test_elapsed_seconds": 170.01,
+  "real_proof_generated": true,
+  "async_http_responsive": true,
+  "changed_input_and_state_rejected": true,
+  "proof_verified_after_node_restart": true,
+  "old_job_id_rejected_after_restart": true
+}

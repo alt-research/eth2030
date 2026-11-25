@@ -1,0 +1,12 @@
+[
+  {
+    "changed_expectation": "proposer",
+    "exit_code": 101,
+    "rejected_by_assertion": true
+  },
+  {
+    "changed_expectation": "churn",
+    "exit_code": 101,
+    "rejected_by_assertion": true
+  }
+]

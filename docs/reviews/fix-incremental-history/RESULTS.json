@@ -1,0 +1,71 @@
+{
+  "baseline": "7068cd97394570bb7b459eb88a5bbdc613911db4",
+  "finding": "F3",
+  "toolchain": "go1.26.11",
+  "full_packages": 218,
+  "race_packages": [
+    "core/state",
+    "core/chain",
+    "core/execution",
+    "core/block",
+    "core/applicationtest",
+    "node",
+    "node/backend",
+    "rpc/ethapi",
+    "txpool",
+    "eiptest"
+  ],
+  "full_vet": true,
+  "native_build": true,
+  "scale": {
+    "accounts": 8192,
+    "changed_accounts": 1,
+    "baseline_store_gets": 11445,
+    "corrected_store_gets": 14,
+    "baseline_open_gets": 11445,
+    "corrected_open_gets": 7,
+    "storage_slots": 8192,
+    "corrected_storage_proof_gets": 13,
+    "scope": "logical MemoryDB Get calls; no physical IOPS/mainnet extrapolation"
+  },
+  "application_lanes": {
+    "ordinary": {
+      "Osaka": {
+        "signed_transactions": 31,
+        "queries": 17
+      },
+      "Amsterdam": {
+        "signed_transactions": 31,
+        "queries": 17
+      }
+    },
+    "lazy_history": {
+      "Osaka": {
+        "signed_transactions": 31,
+        "queries": 17
+      },
+      "Amsterdam": {
+        "signed_transactions": 31,
+        "queries": 17
+      }
+    }
+  },
+  "root_controls": "pinned generic-trie path updates agree with native full-state roots; native verifier checks generated proofs",
+  "error_controls": [
+    "accessed missing/corrupt content does not return successful zero",
+    "storage failure is not consensus-invalid nonce",
+    "cancelled caller does not poison cached view",
+    "zero-fee admission cannot use unreadable nonce/balance",
+    "metadata readers serialize lazy cache mutation",
+    "discarded publication batch retries safely",
+    "full export cannot mutate prepared source code"
+  ],
+  "full_operations_retained": [
+    "initial import",
+    "explicit full audit",
+    "checkpoint export/range serving",
+    "unindexed legacy replay"
+  ],
+  "plan_review": 118,
+  "publication": "master-targeted state correction; current-head CI and composed source checked separately"
+}

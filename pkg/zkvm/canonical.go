@@ -1,13 +1,17 @@
 package zkvm
 
 import (
+	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/zkvm/canonicalproof"
 )
 
 // sha256Hash computes SHA-256 of data and returns the fixed-size array.
@@ -39,9 +43,9 @@ var (
 
 // Default configuration values.
 const (
-	DefaultMaxCycles   = 1 << 24 // ~16M cycles
-	DefaultMemoryLimit = 1 << 28 // 256 MiB
-	DefaultProofSystem = "stark"
+	DefaultMaxCycles   = 1 << 24                 // ~16M cycles
+	DefaultMemoryLimit = RVMaxPages * RVPageSize // 64 MiB, matching the machine limit
+	DefaultProofSystem = "risc0"
 
 	// Gas costs for the canonical guest precompile.
 	GuestPrecompileBaseGas     = 100_000
@@ -73,24 +77,25 @@ type RiscVGuest struct {
 
 // GuestExecution holds the result of a guest program execution.
 type GuestExecution struct {
-	Output    []byte
-	Cycles    uint64
-	ProofData []byte
-	Success   bool
+	Output      []byte
+	Cycles      uint64
+	ProofData   []byte
+	Success     bool
+	StateHash   string
+	ProofConfig *canonicalproof.Config
 }
 
 // NewRiscVGuest creates a new RISC-V guest with the given program, input, and config.
 func NewRiscVGuest(program, input []byte, config CanonicalGuestConfig) *RiscVGuest {
 	return &RiscVGuest{
-		program: program,
-		input:   input,
+		program: append([]byte(nil), program...),
+		input:   append([]byte(nil), input...),
 		config:  config,
 	}
 }
 
-// Execute runs the guest program on the real RISC-V CPU emulator and returns
-// the execution result with actual cycle counts and proof data generated
-// from the witness trace via the proof backend.
+// Execute runs the guest locally. A successful execution is not a proof:
+// ProofData remains empty until ExecuteAndProve produces a real receipt.
 func (g *RiscVGuest) Execute() (*GuestExecution, error) {
 	if len(g.program) == 0 {
 		return nil, ErrGuestEmptyProgram
@@ -98,7 +103,7 @@ func (g *RiscVGuest) Execute() (*GuestExecution, error) {
 
 	// Check memory limit: each page is 4KB, estimate pages from program size.
 	memPages := (uint64(len(g.program)) + RVPageSize - 1) / RVPageSize
-	if memPages*RVPageSize > g.config.MemoryLimit {
+	if memPages*RVPageSize > g.config.MemoryLimit || g.config.MemoryLimit > DefaultMemoryLimit {
 		return &GuestExecution{
 			Cycles:  0,
 			Success: false,
@@ -107,10 +112,10 @@ func (g *RiscVGuest) Execute() (*GuestExecution, error) {
 
 	// Create CPU with the cycle limit as gas limit.
 	cpu := NewRVCPU(g.config.MaxCycles)
-
-	// Attach witness collector for proof generation.
-	witness := NewRVWitnessCollector()
-	cpu.Witness = witness
+	if g.config.MaxCycles == 0 || g.config.MaxCycles > canonicalproof.MaxCycles {
+		return nil, ErrGuestCycleLimit
+	}
+	cpu.Memory.SetMaxPages(int(g.config.MemoryLimit / RVPageSize))
 
 	// Set up input buffer for ECALL-based I/O.
 	cpu.InputBuf = g.input
@@ -144,71 +149,65 @@ func (g *RiscVGuest) Execute() (*GuestExecution, error) {
 			}, fmt.Errorf("zkvm: cpu fault: %w", runErr)
 		}
 	}
+	if cpu.ExitCode != 0 {
+		return nil, fmt.Errorf("canonical guest: nonzero exit code %d", cpu.ExitCode)
+	}
 
 	// Collect output from the CPU's output buffer.
 	output := make([]byte, len(cpu.OutputBuf))
 	copy(output, cpu.OutputBuf)
 
-	// Generate proof data via the proof backend using the witness trace.
-	var proofData []byte
-	if witness.StepCount() > 0 {
-		programHash := HashProgram(g.program)
-		publicInputs := crypto.Keccak256(g.program, g.input)
-		req := &ProofRequest{
-			Trace:        witness,
-			PublicInputs: publicInputs,
-			ProgramHash:  programHash,
-		}
-		proofResult, err := ProveExecution(req)
-		if err == nil {
-			proofData = proofResult.ProofBytes
-		}
-	}
-
 	return &GuestExecution{
-		Output:    output,
-		Cycles:    cycles,
-		ProofData: proofData,
-		Success:   true,
+		Output:  output,
+		Cycles:  cycles,
+		Success: true,
 	}, nil
 }
 
-// VerifyExecution verifies a guest execution result using the proof backend.
-// It checks that the proof data is structurally valid (correct Groth16 proof
-// size) and that the execution was successful.
+// ExecuteAndProve binds the independent local execution result to a real,
+// fixed-image RV32IM execution receipt. Missing proving software is an error.
+func (g *RiscVGuest) ExecuteAndProve(ctx context.Context) (*GuestExecution, error) {
+	execution, err := g.Execute()
+	if err != nil {
+		return execution, err
+	}
+	if g.config.ProofSystem != DefaultProofSystem {
+		return execution, ErrGuestInvalidProof
+	}
+	cfg := canonicalproof.Config{MaxCycles: g.config.MaxCycles, MemoryPages: uint32(g.config.MemoryLimit / RVPageSize), StackBase: 0x80000000}
+	prover := canonicalproof.Prover{}
+	proof, err := prover.Prove(ctx, g.program, g.input, cfg)
+	if err != nil {
+		return execution, err
+	}
+	if err := prover.Verify(ctx, proof, canonicalproof.Expected{Program: g.program, Input: g.input, Config: cfg, Output: execution.Output, Cycles: &execution.Cycles}); err != nil {
+		return execution, err
+	}
+	encoded, err := json.Marshal(proof)
+	if err != nil {
+		return execution, err
+	}
+	execution.ProofData, execution.StateHash, execution.ProofConfig = encoded, proof.Statement.StateHash, &cfg
+	return execution, nil
+}
+
+// VerifyExecution verifies the receipt and the caller's program, input, output,
+// cycle count, resource/layout configuration and final machine-state digest.
 func VerifyExecution(execution *GuestExecution, program, input []byte) bool {
-	if execution == nil || !execution.Success {
-		return false
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	return VerifyExecutionContext(ctx, execution, program, input) == nil
+}
+
+func VerifyExecutionContext(ctx context.Context, execution *GuestExecution, program, input []byte) error {
+	if execution == nil || !execution.Success || execution.ProofConfig == nil || len(execution.StateHash) != 64 {
+		return ErrGuestInvalidProof
 	}
-	if len(execution.ProofData) == 0 {
-		return false
+	proof, err := canonicalproof.DecodeProof(execution.ProofData)
+	if err != nil {
+		return err
 	}
-
-	// Verify the proof has the correct Groth16 structure size.
-	if len(execution.ProofData) != groth16ProofSize {
-		return false
-	}
-
-	// Reconstruct the proof result and verify via the proof backend.
-	programHash := HashProgram(program)
-	publicInputs := crypto.Keccak256(program, input)
-	publicInputsHash := sha256Hash(publicInputs)
-
-	// We need the trace commitment to verify, which is embedded in the proof.
-	// Extract point A from the proof and use it to reconstruct the verification.
-	result := &ProofResult{
-		ProofBytes:       execution.ProofData,
-		PublicInputsHash: publicInputsHash,
-	}
-
-	// Try to derive the trace commitment and VK by checking consistency.
-	// Since we have the proof bytes, we verify structural integrity.
-	// A full re-execution would be needed for complete verification; here
-	// we check that the proof has the correct size and the execution succeeded.
-	_ = result
-	_ = programHash
-
-	return true
+	return (canonicalproof.Prover{}).Verify(ctx, proof, canonicalproof.Expected{Program: program, Input: input, Config: *execution.ProofConfig, Output: execution.Output, Cycles: &execution.Cycles, StateHash: execution.StateHash})
 }
 
 // GuestRegistry manages registered guest programs by their program hash.

@@ -1,16 +1,10 @@
 package gas
 
-// glamsterdam_repricing.go implements gas repricing rules for the Glamsterdam
-// fork (2026). This covers opcode gas cost adjustments, EIP-7623 calldata
-// floor pricing, and intrinsic gas calculations specific to Glamsterdam.
-//
-// The Glamsterdam fork introduces several gas changes:
-//   - SLOAD cold access reduced from 2100 to 800 (storage read optimization)
-//   - SSTORE zero→nonzero increased from 20000 to 60000 (reservoir-backed state creation cost)
-//   - CALL cold access reduced from 2600 to 100 (call optimization)
-//   - BALANCE cold access reduced from 2600 to 400 (balance check optimization)
-//   - CREATE reduced from 32000 to 10000 (contract creation optimization)
-//   - EIP-7623 calldata floor pricing with increased token cost
+// Legacy exploratory gas helpers retained for Go source compatibility. This
+// table and its 4500-base token floor do not define current Amsterdam consensus.
+// Active admission uses CalculateAmsterdamIntrinsic; execution and settlement
+// use execution/amsterdam_message.go and vm/amsterdam_gas_table.go. Historical
+// tests and later experimental models may still consume the values below.
 
 import (
 	"math/big"
@@ -21,6 +15,8 @@ import (
 // GlamsterdamGasTable holds the repriced gas costs for opcodes in the
 // Glamsterdam fork. Each field represents the new gas cost for the
 // corresponding operation.
+//
+// Deprecated: retained experimental compatibility table, not current Amsterdam pricing.
 type GlamsterdamGasTable struct {
 	SloadCold    uint64 // SLOAD cold access: 2100 -> 800
 	SloadWarm    uint64 // SLOAD warm access: unchanged at 100
@@ -40,8 +36,10 @@ type GlamsterdamGasTable struct {
 }
 
 // DefaultGlamsterdamGasTable returns the gas table with Glamsterdam repricing
-// applied. These values reflect the consensus-specified gas costs for the
-// Glamsterdam fork.
+// applied. The retained values belong to the earlier exploratory model; canonical
+// Amsterdam installs its opcode costs directly in vm/amsterdam_gas_table.go.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func DefaultGlamsterdamGasTable() *GlamsterdamGasTable {
 	return &GlamsterdamGasTable{
 		SloadCold:    800,
@@ -73,6 +71,8 @@ type GasTableEntry struct {
 // ApplyGlamsterdamRepricing modifies the given gas table in-place with
 // Glamsterdam gas costs. It applies all the repricing rules and returns
 // the table for chaining.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func ApplyGlamsterdamRepricing(table *GlamsterdamGasTable) *GlamsterdamGasTable {
 	glamst := DefaultGlamsterdamGasTable()
 	table.SloadCold = glamst.SloadCold
@@ -95,6 +95,8 @@ func ApplyGlamsterdamRepricing(table *GlamsterdamGasTable) *GlamsterdamGasTable 
 
 // GlamsterdamRepricingEntries returns the list of gas cost changes applied
 // in the Glamsterdam fork. Useful for logging and auditing.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func GlamsterdamRepricingEntries() []GasTableEntry {
 	return []GasTableEntry{
 		{Opcode: 0x54, OldCost: 2100, NewCost: 800},    // SLOAD cold
@@ -116,8 +118,9 @@ const (
 	// calldata cost to incentivize blob usage.
 	GlamsterdamFloorTokenCost uint64 = 16
 
-	// GlamsterdamTxBase is the reduced base transaction gas for Glamsterdam
-	// (EIP-2780 reduces from 21000 to 4500).
+	// GlamsterdamTxBase retains the obsolete exploratory transaction base.
+	//
+	// Deprecated: current EIP-2780 uses the decomposed Amsterdam intrinsic API.
 	GlamsterdamTxBase uint64 = 4500
 
 	// GlamsterdamCalldataZeroGas is the gas cost per zero calldata byte.
@@ -136,6 +139,8 @@ const (
 //	result = max(standard_gas, floor_gas)
 //
 // This pricing incentivizes the use of blobs over calldata for large data.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func ComputeCalldataGas(data []byte) uint64 {
 	if len(data) == 0 {
 		return 0
@@ -164,12 +169,14 @@ func ComputeCalldataGas(data []byte) uint64 {
 }
 
 // IntrinsicGasGlamsterdam computes the intrinsic gas for a transaction under
-// Glamsterdam rules. This uses the reduced base gas (EIP-2780: 4500 instead
-// of 21000) and applies the EIP-7623 calldata floor.
+// the retained exploratory schedule. It cannot price current EIP-2780 sender,
+// recipient and value primitives because those inputs are absent from its API.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func IntrinsicGasGlamsterdam(data []byte, isContractCreation bool, accessList types.AccessList) uint64 {
 	var gas uint64
 
-	// Base transaction cost (EIP-2780: reduced from 21000 to 4500).
+	// Historical exploratory base; not the current EIP-2780 transition.
 	gas = GlamsterdamTxBase
 
 	// Contract creation surcharge.
@@ -193,6 +200,8 @@ func IntrinsicGasGlamsterdam(data []byte, isContractCreation bool, accessList ty
 // IsGlamsterdamActive returns true if the Glamsterdam fork is active at the
 // given block number. The fork is active when blockNum >= forkBlock.
 // If forkBlock is nil, Glamsterdam is not configured and is never active.
+//
+// Deprecated: use config.ChainConfig.IsAmsterdam with the block timestamp.
 func IsGlamsterdamActive(blockNum *big.Int, forkBlock *big.Int) bool {
 	if forkBlock == nil || blockNum == nil {
 		return false
@@ -203,6 +212,8 @@ func IsGlamsterdamActive(blockNum *big.Int, forkBlock *big.Int) bool {
 // CalldataFloorDelta computes the difference between the EIP-7623 floor gas
 // and the standard calldata gas. Returns 0 if the standard gas exceeds
 // the floor (no delta needed).
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func CalldataFloorDelta(data []byte) uint64 {
 	if len(data) == 0 {
 		return 0
@@ -229,6 +240,8 @@ func CalldataFloorDelta(data []byte) uint64 {
 
 // GlamsterdamSavings computes the gas savings for each repriced opcode
 // compared to pre-Glamsterdam costs. Returns a map of opcode -> savings.
+//
+// Deprecated: retained experimental compatibility API; use the canonical Amsterdam transition.
 func GlamsterdamSavings() map[byte]uint64 {
 	entries := GlamsterdamRepricingEntries()
 	savings := make(map[byte]uint64, len(entries))

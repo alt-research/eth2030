@@ -1,0 +1,57 @@
+{
+  "at": "2026-11-21T17:16:37.976264+00:00",
+  "scope": "Final readonly original-network health; no further scenario or configuration mutation.",
+  "roles": [
+    {
+      "service": "cl-2-lodestar-geth",
+      "health": {
+        "started": "2026-11-21T17:16:37.647103+00:00",
+        "url": "http://127.0.0.1:33236/eth/v1/node/health",
+        "request": null,
+        "http_status": 200,
+        "response": "",
+        "elapsed_ms": 1.177529979031533
+      }
+    },
+    {
+      "service": "cl-3-lighthouse-geth",
+      "health": {
+        "started": "2026-11-21T17:16:37.648308+00:00",
+        "url": "http://127.0.0.1:33268/eth/v1/node/health",
+        "request": null,
+        "http_status": 200,
+        "response": "",
+        "elapsed_ms": 0.6756859947927296
+      }
+    },
+    {
+      "service": "cl-1-lighthouse-geth",
+      "health": {
+        "started": "2026-11-21T17:16:37.649008+00:00",
+        "url": "http://127.0.0.1:33075/eth/v1/node/health",
+        "request": null,
+        "http_status": 200,
+        "response": "",
+        "elapsed_ms": 0.6835850072093308
+      }
+    },
+    {
+      "service": "el-3-geth-lighthouse",
+      "latest": "0x6a8c4a6bef7ba8ce81979eddc41088c8e26a38be387209cbd456848ef0e0d166",
+      "finalized": "0x695e20f773b81903f3a90164fa1274a208c455b7bd0e4585711f4b7582b228cb",
+      "actual_executable_sha256": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/8/exe\n"
+    },
+    {
+      "service": "el-2-geth-lodestar",
+      "latest": "0x6a8c4a6bef7ba8ce81979eddc41088c8e26a38be387209cbd456848ef0e0d166",
+      "finalized": "0x695e20f773b81903f3a90164fa1274a208c455b7bd0e4585711f4b7582b228cb",
+      "actual_executable_sha256": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/8/exe\n"
+    },
+    {
+      "service": "el-1-geth-lighthouse",
+      "latest": "0x6a8c4a6bef7ba8ce81979eddc41088c8e26a38be387209cbd456848ef0e0d166",
+      "finalized": "0x695e20f773b81903f3a90164fa1274a208c455b7bd0e4585711f4b7582b228cb",
+      "actual_executable_sha256": "/proc/15/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/15/exe\n/proc/8/exe /usr/local/bin/geth-real 487d2b950b9ba0e9d1e31e4762d03c08e4b7abd6709a16e90c08b52c33ff5e57  /proc/8/exe\n"
+    }
+  ]
+}

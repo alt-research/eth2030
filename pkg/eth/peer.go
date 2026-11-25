@@ -3,6 +3,7 @@ package eth
 import (
 	"fmt"
 	"math/big"
+	"sync"
 	"sync/atomic"
 
 	"github.com/eth2030/eth2030/core/types"
@@ -11,16 +12,29 @@ import (
 
 // EthPeer wraps a p2p.Peer with eth protocol-specific send/request methods.
 type EthPeer struct {
-	peer      *p2p.Peer
-	transport p2p.Transport
-	reqID     atomic.Uint64
+	peer         *p2p.Peer
+	transport    p2p.Transport
+	reqID        atomic.Uint64
+	done         chan struct{}
+	writeMu      sync.Mutex
+	requestMu    sync.Mutex
+	balRequests  map[uint64][]types.Hash
+	blockRange   blockRange
+	localRange   blockRange
+	rangeUpdates chan blockRange
 }
 
 // NewEthPeer creates a new EthPeer wrapping the given p2p peer and transport.
 func NewEthPeer(peer *p2p.Peer, t p2p.Transport) *EthPeer {
+	if peer.Version() == 0 {
+		peer.SetVersion(ETH68)
+	}
 	return &EthPeer{
-		peer:      peer,
-		transport: t,
+		peer:         peer,
+		transport:    t,
+		done:         make(chan struct{}),
+		balRequests:  make(map[uint64][]types.Hash),
+		rangeUpdates: make(chan blockRange, 1),
 	}
 }
 
@@ -41,7 +55,7 @@ func (ep *EthPeer) sendMessage(code uint64, val interface{}) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode %s: %w", p2p.MessageName(code), err)
 	}
-	return ep.transport.WriteMsg(p2p.Msg{
+	return ep.writeMsg(p2p.Msg{
 		Code:    msg.Code,
 		Size:    msg.Size,
 		Payload: msg.Payload,
@@ -100,7 +114,7 @@ func (ep *EthPeer) SendTransactions(txs []*types.Transaction) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode transactions: %w", err)
 	}
-	return ep.transport.WriteMsg(msg)
+	return ep.writeMsg(msg)
 }
 
 // SendNewPooledTransactionHashes announces transaction hashes to the peer via
@@ -127,17 +141,17 @@ func (ep *EthPeer) SendNewPooledTransactionHashes(txs []*types.Transaction) erro
 // SendGetPooledTransactions requests the full bodies of the given transaction
 // hashes from the peer via the eth/68 GetPooledTransactions message (0x09).
 func (ep *EthPeer) SendGetPooledTransactions(hashes []types.Hash) error {
-	return ep.sendMessage(MsgGetPooledTransactions, &GetPooledTransactionsMessage{Hashes: hashes})
+	return ep.sendMessage(MsgGetPooledTransactions, &p2p.GetPooledTransactionsPacket{RequestID: ep.nextRequestID(), Hashes: hashes})
 }
 
 // SendPooledTransactions responds to a GetPooledTransactions request by sending
 // the full transaction bodies via the eth/68 PooledTransactions message (0x0a).
-func (ep *EthPeer) SendPooledTransactions(txs []*types.Transaction) error {
-	msg, err := encodePooledTransactions(txs)
-	if err != nil {
-		return fmt.Errorf("eth: encode pooled transactions: %w", err)
+func (ep *EthPeer) SendPooledTransactions(txs []*types.Transaction, requestIDs ...uint64) error {
+	var id uint64
+	if len(requestIDs) > 0 {
+		id = requestIDs[0]
 	}
-	return ep.transport.WriteMsg(msg)
+	return ep.sendMessage(p2p.PooledTransactionsMsg, &p2p.PooledTransactionsPacket{RequestID: id, Transactions: txs})
 }
 
 // SendNewBlockHashes announces new block hashes to the peer.
@@ -151,41 +165,63 @@ func (ep *EthPeer) SendNewBlock(block *types.Block, td *big.Int) error {
 	if err != nil {
 		return fmt.Errorf("eth: encode new block: %w", err)
 	}
-	return ep.transport.WriteMsg(msg)
+	return ep.writeMsg(msg)
 }
 
-// RequestPartialReceipts sends a request for specific transaction receipts (eth/70).
-func (ep *EthPeer) RequestPartialReceipts(blockHash types.Hash, txIndices []uint64) (uint64, error) {
+// RequestReceiptsV70 sends an eth/70 GetReceipts (0x0f) request (EIP-7975).
+// Receipts of the first requested block before firstIndex are omitted by
+// the server, enabling paginated receipt download.
+func (ep *EthPeer) RequestReceiptsV70(hashes []types.Hash, firstIndex uint64) (uint64, error) {
 	reqID := ep.nextRequestID()
-	err := ep.sendMessage(p2p.GetPartialReceiptsMsg, &p2p.GetPartialReceiptsPacket{
-		RequestID: reqID,
-		BlockHash: blockHash,
-		TxIndices: txIndices,
+	err := ep.sendMessage(p2p.GetReceiptsMsg, &p2p.GetReceiptsPacketV70{
+		RequestID:              reqID,
+		FirstBlockReceiptIndex: firstIndex,
+		Hashes:                 hashes,
 	})
 	return reqID, err
 }
 
-// SendPartialReceipts sends a partial receipts response (eth/70).
-func (ep *EthPeer) SendPartialReceipts(requestID uint64, receipts []*types.Receipt, proofs [][]byte) error {
-	return ep.sendMessage(p2p.PartialReceiptsMsg, &p2p.PartialReceiptsPacket{
-		RequestID: requestID,
-		Receipts:  receipts,
-		Proofs:    proofs,
+// SendReceiptsV70 sends an eth/70 Receipts (0x10) response (EIP-7975).
+// lastBlockIncomplete marks the last receipt list as partial.
+func (ep *EthPeer) SendReceiptsV70(requestID uint64, lastBlockIncomplete bool, pages [][]*types.Receipt) error {
+	return ep.sendMessage(p2p.ReceiptsMsg, &p2p.ReceiptsPacketV70{
+		RequestID:           requestID,
+		LastBlockIncomplete: lastBlockIncomplete,
+		Receipts:            pages,
 	})
 }
 
 // RequestBlockAccessLists sends a request for block access lists (eth/71).
 func (ep *EthPeer) RequestBlockAccessLists(hashes []types.Hash) (uint64, error) {
+	if ep.peer.Version() < ETH71 {
+		return 0, fmt.Errorf("BAL requests require eth/71")
+	}
+	if len(hashes) == 0 || len(hashes) > MaxAccessLists {
+		return 0, fmt.Errorf("invalid BAL request count")
+	}
 	reqID := ep.nextRequestID()
-	err := ep.sendMessage(p2p.GetBlockAccessListsMsg, &p2p.GetBlockAccessListsPacket{
-		RequestID:   reqID,
-		BlockHashes: hashes,
-	})
+	if err := ep.trackBALRequest(reqID, hashes); err != nil {
+		return 0, err
+	}
+	err := ep.sendMessage(p2p.GetBlockAccessListsMsg, &p2p.GetBlockAccessListsPacket{RequestID: reqID, BlockHashes: hashes})
+	if err != nil {
+		ep.takeBALRequest(reqID)
+	}
 	return reqID, err
 }
 
-// SendBlockAccessLists sends a block access lists response (eth/71).
-func (ep *EthPeer) SendBlockAccessLists(requestID uint64, accessLists []p2p.BlockAccessListData) error {
+func (ep *EthPeer) takeBALRequest(id uint64) ([]types.Hash, bool) {
+	ep.requestMu.Lock()
+	defer ep.requestMu.Unlock()
+	hashes, ok := ep.balRequests[id]
+	delete(ep.balRequests, id)
+	return hashes, ok
+}
+
+// SendBlockAccessLists sends an eth/71 BlockAccessLists (0x13) response
+// (EIP-8159). Each element is the RLP-encoded BAL per EIP-7928, in request
+// order; the RLP empty list (0xc0) marks an unavailable BAL.
+func (ep *EthPeer) SendBlockAccessLists(requestID uint64, accessLists [][]byte) error {
 	return ep.sendMessage(p2p.BlockAccessListsMsg, &p2p.BlockAccessListsPacket{
 		RequestID:   requestID,
 		AccessLists: accessLists,
@@ -215,6 +251,9 @@ func (ep *EthPeer) Handshake(local *p2p.StatusData) (*p2p.StatusData, error) {
 	}
 
 	// Validate compatibility.
+	if remote.ProtocolVersion != local.ProtocolVersion {
+		return nil, ErrIncompatibleVersion
+	}
 	if remote.NetworkID != local.NetworkID {
 		return nil, fmt.Errorf("eth: network ID mismatch: local %d, remote %d", local.NetworkID, remote.NetworkID)
 	}
@@ -227,4 +266,25 @@ func (ep *EthPeer) Handshake(local *p2p.StatusData) (*p2p.StatusData, error) {
 	ep.peer.SetVersion(remote.ProtocolVersion)
 
 	return &remote, nil
+}
+
+// writeMsg serializes all protocol writes, including range announcements and
+// request/response traffic, for transports that permit only one writer.
+func (ep *EthPeer) writeMsg(msg p2p.Msg) error {
+	ep.writeMu.Lock()
+	defer ep.writeMu.Unlock()
+	return ep.transport.WriteMsg(msg)
+}
+
+func (ep *EthPeer) trackBALRequest(id uint64, hashes []types.Hash) error {
+	ep.requestMu.Lock()
+	defer ep.requestMu.Unlock()
+	if len(hashes) == 0 || len(hashes) > MaxAccessLists {
+		return fmt.Errorf("invalid BAL request count")
+	}
+	if len(ep.balRequests) >= MaxAccessLists {
+		return fmt.Errorf("too many outstanding BAL requests")
+	}
+	ep.balRequests[id] = append([]types.Hash(nil), hashes...)
+	return nil
 }

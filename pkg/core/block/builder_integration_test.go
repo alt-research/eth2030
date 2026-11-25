@@ -36,6 +36,7 @@ func makeGenesisInteg(gasLimit uint64, baseFee *big.Int) *types.Block {
 	calldataExcessGas := uint64(0)
 	emptyWithdrawalsHash := types.EmptyRootHash
 	emptyRoot := types.EmptyRootHash
+	emptyRequestsHash := types.EmptyRequestsHash
 	header := &types.Header{
 		Number:            big.NewInt(0),
 		GasLimit:          gasLimit,
@@ -48,9 +49,10 @@ func makeGenesisInteg(gasLimit uint64, baseFee *big.Int) *types.Block {
 		BlobGasUsed:       &blobGasUsed,
 		ExcessBlobGas:     &excessBlobGas,
 		ParentBeaconRoot:  &emptyRoot,
-		RequestsHash:      &emptyRoot,
+		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 	return types.NewBlock(header, &types.Body{Withdrawals: []*types.Withdrawal{}})
 }
@@ -92,7 +94,7 @@ func makeBlockWithStateInteg(parent *types.Block, txs []*types.Transaction, stat
 
 	emptyWHash := types.EmptyRootHash
 	emptyBeaconRoot := types.EmptyRootHash
-	emptyRequestsHash := types.EmptyRootHash
+	emptyRequestsHash := types.EmptyRequestsHash
 	header := &types.Header{
 		ParentHash:        parent.Hash(),
 		Number:            new(big.Int).Add(parentHeader.Number, big.NewInt(1)),
@@ -108,6 +110,7 @@ func makeBlockWithStateInteg(parent *types.Block, txs []*types.Transaction, stat
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{
@@ -120,11 +123,7 @@ func makeBlockWithStateInteg(parent *types.Block, txs []*types.Transaction, stat
 	proc := execution.NewStateProcessor(config.TestConfig)
 	result, err := proc.ProcessWithBAL(blk, statedb)
 	if err == nil {
-		var gasUsed uint64
-		for _, r := range result.Receipts {
-			gasUsed += r.GasUsed
-		}
-		header.GasUsed = gasUsed
+		header.GasUsed = types.BlockGasTotal(result.Receipts, config.TestConfig.IsAmsterdam(header.Time) || config.TestConfig.IsGlamsterdan(header.Time))
 
 		var cdGasUsed uint64
 		for _, tx := range txs {
@@ -157,7 +156,7 @@ func (p *mockTxPoolInteg) Pending() []*types.Transaction {
 
 // TestBuildBlock_Empty tests building an empty block via the new API.
 func TestBuildBlock_Empty(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -198,7 +197,7 @@ func TestBuildBlock_Empty(t *testing.T) {
 
 // TestBuildBlock_WithTransactions tests building a block with transactions from pool.
 func TestBuildBlock_WithTransactions(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(10_000_000))
@@ -216,7 +215,7 @@ func TestBuildBlock_WithTransactions(t *testing.T) {
 		tx := types.NewTransaction(&types.LegacyTx{
 			Nonce:    i,
 			GasPrice: big.NewInt(10),
-			Gas:      21000,
+			Gas:      300_000,
 			To:       &receiver,
 			Value:    big.NewInt(100),
 		})
@@ -256,7 +255,7 @@ func TestBuildBlock_WithTransactions(t *testing.T) {
 
 // TestBuildBlock_GasLimitEnforcement tests that the block builder respects gas limits.
 func TestBuildBlock_GasLimitEnforcement(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xaa})
 	receiver := types.BytesToAddress([]byte{0xab})
 	statedb.AddBalance(sender, big.NewInt(100_000_000))
@@ -309,8 +308,8 @@ func TestBuildBlock_GasLimitEnforcement(t *testing.T) {
 }
 
 func TestBuildBlock_AATxReplayMatchesBuiltStateRoot(t *testing.T) {
-	builderState := state.NewMemoryStateDB()
-	replayState := state.NewMemoryStateDB()
+	builderState := newBuilderRequestTestState()
+	replayState := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 	funds := new(big.Int).Mul(big.NewInt(10), big.NewInt(1e18))
 	builderState.AddBalance(sender, funds)
@@ -421,10 +420,10 @@ func TestBuildBlock_AATxReplayMatchesBuiltStateRoot_PreAmsterdam(t *testing.T) {
 	}
 }
 
-func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T) {
+func TestBuildBlock_AmsterdamWithoutLegacyFlagUsesGrossExecutionForHeader(t *testing.T) {
 	cfg := testConfigAmsterdamWithoutGlamsterdam()
-	builderState := state.NewMemoryStateDB()
-	replayState := state.NewMemoryStateDB()
+	builderState := newBuilderRequestTestState()
+	replayState := newBuilderRequestTestState()
 	sender := types.HexToAddress("0xdddddddddddddddddddddddddddddddddddddddd")
 	contractAddr := types.HexToAddress("0x000000000000000000000000000000000000c1ea")
 	funds := new(big.Int).Mul(big.NewInt(10), big.NewInt(1e18))
@@ -474,8 +473,8 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 	if receipts[0].BlockGasUsed <= receipts[0].GasUsed {
 		t.Fatalf("expected refund-driven gas split, got blockGasUsed=%d gasUsed=%d", receipts[0].BlockGasUsed, receipts[0].GasUsed)
 	}
-	if blk.GasUsed() != receipts[0].GasUsed {
-		t.Fatalf("header gas used = %d, want post-refund gas %d before Glamsterdam", blk.GasUsed(), receipts[0].GasUsed)
+	if blk.GasUsed() != receipts[0].BlockGasUsed {
+		t.Fatalf("header gas used = %d, want gross execution %d under Amsterdam", blk.GasUsed(), receipts[0].BlockGasUsed)
 	}
 
 	proc := execution.NewStateProcessor(cfg)
@@ -486,7 +485,7 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 	if len(result.Receipts) != 1 {
 		t.Fatalf("replay receipt count = %d, want 1", len(result.Receipts))
 	}
-	if result.Receipts[0].GasUsed != blk.GasUsed() {
+	if result.Receipts[0].BlockGasUsed != blk.GasUsed() {
 		t.Fatalf("replay gas used = %d, want header gas %d", result.Receipts[0].GasUsed, blk.GasUsed())
 	}
 	if result.Receipts[0].BlockGasUsed != receipts[0].BlockGasUsed {
@@ -497,7 +496,7 @@ func TestBuildBlock_AmsterdamWithoutGlamsterdamUsesUserGasForHeader(t *testing.T
 // TestBuildBlock_WithdrawalProcessing tests that withdrawals are applied
 // correctly during block building.
 func TestBuildBlock_WithdrawalProcessing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -565,7 +564,7 @@ func TestBuildBlock_WithdrawalProcessing(t *testing.T) {
 // TestBuildBlock_RequestsHash tests that the block builder sets the requests
 // hash in the header when Prague is active (EIP-7685).
 func TestBuildBlock_RequestsHash(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1000))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -599,7 +598,7 @@ func TestBuildBlock_RequestsHash(t *testing.T) {
 
 // TestReorg_Simple tests a basic chain reorganization.
 func TestReorg_Simple(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	genesis := makeGenesisInteg(30_000_000, big.NewInt(1))
 	db := rawdb.NewMemoryDB()
 	bc, err := chain.NewBlockchain(config.TestConfig, genesis, statedb, db)
@@ -633,6 +632,7 @@ func TestReorg_Simple(t *testing.T) {
 		UncleHash:  block.EmptyUncleHash,
 	}
 	emptyWHash := types.EmptyRootHash
+	b1Header.SlotNumber = new(uint64)
 	b1Header.WithdrawalsHash = &emptyWHash
 	zeroBlobGas := uint64(0)
 	var pExcess, pUsed uint64
@@ -647,7 +647,7 @@ func TestReorg_Simple(t *testing.T) {
 	b1Header.ExcessBlobGas = &b1ExcessBlobGas
 	b1BeaconRoot := types.EmptyRootHash
 	b1Header.ParentBeaconRoot = &b1BeaconRoot
-	b1RequestsHash := types.EmptyRootHash
+	b1RequestsHash := types.EmptyRequestsHash
 	b1Header.RequestsHash = &b1RequestsHash
 	b1CalldataGasUsed := uint64(0)
 	var pCalldataExcess, pCalldataUsed uint64

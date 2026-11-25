@@ -48,6 +48,9 @@ type Backend interface {
 	// IsPrague returns true if the given timestamp falls within the Prague fork.
 	IsPrague(timestamp uint64) bool
 
+	// IsOsaka reports activation of the Osaka payload/proof rules.
+	IsOsaka(timestamp uint64) bool
+
 	// IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 	IsAmsterdam(timestamp uint64) bool
 
@@ -90,7 +93,7 @@ type GlamsterdamBackend interface {
 	ForkchoiceUpdatedV4G(state *payload.ForkchoiceStateV1, attrs *payload.GlamsterdamPayloadAttributes) (*payload.ForkchoiceUpdatedResult, error)
 
 	// GetPayloadV5 retrieves a previously built payload by ID.
-	GetPayloadV5(id payload.PayloadID) (*payload.GetPayloadV5Response, error)
+	GetPayloadV5(id payload.PayloadID) (*payload.LegacyGlamsterdamPayloadResponse, error)
 
 	// GetBlobsV2 retrieves blobs by versioned hashes from the blob pool.
 	GetBlobsV2(versionedHashes []types.Hash) ([]*payload.BlobAndProofV2, error)

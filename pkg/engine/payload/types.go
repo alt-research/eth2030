@@ -92,6 +92,9 @@ type ExecutionPayloadV4 struct {
 type ExecutionPayloadV5 struct {
 	ExecutionPayloadV4
 	BlockAccessList json.RawMessage `json:"blockAccessList,omitempty"`
+	// SlotNumber is the beacon slot (hex-encoded) that requested this payload
+	// (Gloas payload field; lighthouse >= 8.4 expects it on Gloas payloads).
+	SlotNumber string `json:"slotNumber,omitempty"`
 }
 
 // PayloadAttributesV1 contains attributes for building a new payload.
@@ -117,6 +120,7 @@ type PayloadAttributesV3 struct {
 type PayloadAttributesV4 struct {
 	PayloadAttributesV3
 	SlotNumber                uint64   `json:"slotNumber"`
+	TargetGasLimit            uint64   `json:"targetGasLimit,omitempty"`
 	InclusionListTransactions [][]byte `json:"inclusionListTransactions,omitempty"` // EIP-7805 FOCIL
 }
 
@@ -145,6 +149,12 @@ type GetPayloadV6Response struct {
 	BlobsBundle       *BlobsBundleV2      `json:"blobsBundle"`
 	Override          bool                `json:"shouldOverrideBuilder"`
 	ExecutionRequests [][]byte            `json:"executionRequests"`
+
+	// EIP-7807 SSZ activation fields (set when SSZ blocks are active):
+	// SSZPayload is the 0x-hex EIP-7807 payload encoding of the block and
+	// SSZBlockHash its hash tree root, the SSZ execution block hash.
+	SSZPayload   json.RawMessage `json:"sszPayload,omitempty"`
+	SSZBlockHash *types.Hash     `json:"sszBlockHash,omitempty"`
 }
 
 // BlobsBundleV1 is the blobs bundle returned by engine_getPayload.

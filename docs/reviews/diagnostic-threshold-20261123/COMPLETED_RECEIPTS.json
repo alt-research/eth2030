@@ -1,0 +1,82 @@
+[
+  {
+    "artifact": "actual-fcu-io-postfix/result.json",
+    "bytes": 2430,
+    "sha256": "89b087fe94c266f2e5c8fe55c207e4d24a5f32e018b50375cd1938923483d99c"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/observations/samples.jsonl",
+    "bytes": 584025,
+    "sha256": "74c68c863eda5bb80714aefe8b74aed84827458b5d6233c5ce8b8e46f0f3fc6a"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/actual-native-wait-sampling/result.json",
+    "bytes": 1094,
+    "sha256": "2bc35250b7b53ea0cc54adc19d985e4a14c9c1e849a4889e0d73104bf67446be"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/strict-evidence-guard-04/result.json",
+    "bytes": 2041,
+    "sha256": "a0ee48f8a8d10022b9446e94531f0d23f1f542f4fe58be008fc994b7e207c2dd"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/strict-evidence-guard-04/THRESHOLD_5_5H.json",
+    "bytes": 2210,
+    "sha256": "1e51debb4286c1ccb0ccb0d00e10c6b9aad29359d16c0fcadb051ea4620b01ef"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/bounded-bls-windows/result.json",
+    "bytes": 10451,
+    "sha256": "8233da7b6154c4f9e0a2465d8be2ddf4acf42c654e25873fd74be1f08c4b15eb"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/STOPPED_EXECUTION_BINDING.json",
+    "bytes": 1712,
+    "sha256": "34ea889574b930c6af4b9d4d7b5547e000b5618bda535a83a37e802229edc22e"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/stopped-cl-forkchoice.zst",
+    "bytes": 16196,
+    "sha256": "5701feade277006e8e4d9ff3bebcccbf4283ad5674790fd2d014871f1eb9513f"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/stopped-cl-beacon-block.ssz",
+    "bytes": 1368,
+    "sha256": "04f8a3ddbf0ac296a0009ddbc74163e6e1755cf633ea77b94558a9fc1bcea6fd"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/stopped-cl-protoarray-nodes.json",
+    "bytes": 17439,
+    "sha256": "f178322e3b3732556a5b8346b417f4ae2695593f4895073da7d60c8a22af067d"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/cl-post-threshold.log",
+    "bytes": 14445101,
+    "sha256": "96ddeefe05e942a224ccdaf8048024df14dffc96d76a094ac1611152bd51571c"
+  },
+  {
+    "artifact": "actual-fcu-io-postfix/el-post-threshold.log",
+    "bytes": 280985,
+    "sha256": "5554cfa94fd32cfb49c5725a57d0491ae8f80cd34ab79a5f8ccb3c98cd52a23c"
+  },
+  {
+    "artifact": "actual-fcu-io-all-windows-rereplay/RESULT.json",
+    "bytes": 5861,
+    "sha256": "6f6c55e0c35cc3dfc20990a48c030c201bc8430d6c44ace0cda4f4f40e9e72b2"
+  },
+  {
+    "artifact": "diagnostic-closing-window-red.log",
+    "bytes": 1145,
+    "sha256": "d7b7b2f395a2caa69638902e6db48c4019f1e2011509dd8fb6d033411ec7941d"
+  },
+  {
+    "artifact": "stopped_cl_leveldb.go",
+    "bytes": 857,
+    "sha256": "3e461e485baa16800c35530cbb0eed173cbf2ef162f083c57109d460921bebf5"
+  },
+  {
+    "artifact": "read_stopped_native.go",
+    "bytes": 4336,
+    "sha256": "9525aa9acef50043234903bf74069912e02f12fece37a9b02c797506d7bdbb41"
+  }
+]

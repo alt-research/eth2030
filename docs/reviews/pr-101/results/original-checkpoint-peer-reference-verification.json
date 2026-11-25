@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checkpoint": "0xe4638e451320db9fa8e6528c415551cb329e2e80c9b8d5f162faaf75f0032fd3",
+  "slot": 1215,
+  "applied_network_inputs": [
+    "GENESIS_FORK_VERSION",
+    "SLOT_DURATION_MS",
+    "ALTAIR_FORK_VERSION",
+    "ALTAIR_FORK_EPOCH",
+    "BELLATRIX_FORK_VERSION",
+    "BELLATRIX_FORK_EPOCH",
+    "CAPELLA_FORK_VERSION",
+    "CAPELLA_FORK_EPOCH",
+    "DENEB_FORK_VERSION",
+    "DENEB_FORK_EPOCH",
+    "ELECTRA_FORK_VERSION",
+    "ELECTRA_FORK_EPOCH",
+    "FULU_FORK_VERSION",
+    "FULU_FORK_EPOCH",
+    "GLOAS_FORK_VERSION",
+    "GLOAS_FORK_EPOCH"
+  ],
+  "scope": "Peer proof verified by unmodified selected reference under the actual private-network fork inputs, before local cache recovery."
+}

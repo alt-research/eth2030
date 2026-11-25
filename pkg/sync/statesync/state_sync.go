@@ -4,6 +4,7 @@
 package statesync
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -115,6 +116,7 @@ type accountRangeTask struct {
 
 type storageTask struct {
 	accountHash types.Hash
+	origin      types.Hash
 	done        bool
 	retries     int
 }
@@ -130,20 +132,25 @@ type ProgressCallback func(progress StateSyncProgress)
 
 // StateSyncScheduler orchestrates the full state sync pipeline.
 type StateSyncScheduler struct {
-	mu           sync.Mutex
-	phase        atomic.Uint32
-	running      atomic.Bool
-	cancel       chan struct{}
-	pivotBlock   uint64
-	pivotRoot    types.Hash
-	pivotHeader  *types.Header
-	accountTasks []*accountRangeTask
-	nextTaskID   atomic.Uint64
-	storageTasks []*storageTask
-	codeTasks    map[types.Hash]*codeTask
-	progress     StateSyncProgress
-	onProgress   ProgressCallback
-	writer       StateWriter
+	mu            sync.Mutex
+	phase         atomic.Uint32
+	running       atomic.Bool
+	cancel        chan struct{}
+	pivotBlock    uint64
+	pivotRoot     types.Hash
+	pivotHeader   *types.Header
+	accountTasks  []*accountRangeTask
+	nextTaskID    atomic.Uint64
+	storageTasks  []*storageTask
+	storageIndex  map[types.Hash]*storageTask
+	codeTasks     map[types.Hash]*codeTask
+	progress      StateSyncProgress
+	onProgress    ProgressCallback
+	writer        StateWriter
+	pivotResolver PivotResolver
+	runContext    context.Context
+	activePeer    SnapPeer
+	generation    uint64
 }
 
 // NewStateSyncScheduler creates a new state sync scheduler.
@@ -154,7 +161,13 @@ func NewStateSyncScheduler(writer StateWriter, callback ProgressCallback) *State
 	}
 }
 
-func (s *StateSyncScheduler) Phase() uint32   { return s.phase.Load() }
+func (s *StateSyncScheduler) Phase() uint32 { return s.phase.Load() }
+
+func (s *StateSyncScheduler) PivotHeader() *types.Header {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.pivotHeader
+}
 func (s *StateSyncScheduler) IsRunning() bool { return s.running.Load() }
 
 // Progress returns a snapshot of current progress.
@@ -167,18 +180,27 @@ func (s *StateSyncScheduler) Progress() StateSyncProgress {
 }
 
 // SetPivot configures the pivot block for the state sync.
-func (s *StateSyncScheduler) SetPivot(header *types.Header) {
+func (s *StateSyncScheduler) SetPivot(header *types.Header) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.running.Load() {
+		return ErrStateSyncRunning
+	}
+	if header == nil || header.Number == nil || !header.Number.IsUint64() {
+		return fmt.Errorf("state sync: invalid pivot")
+	}
 	s.pivotBlock = header.Number.Uint64()
 	s.pivotRoot = header.Root
 	s.pivotHeader = header
 	s.progress.PivotBlock = s.pivotBlock
 	s.progress.PivotRoot = s.pivotRoot
+	return nil
 }
 
 // Stop cancels the scheduler.
 func (s *StateSyncScheduler) Stop() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	select {
 	case <-s.cancel:
 	default:
@@ -235,17 +257,42 @@ func (s *StateSyncScheduler) allAccountTasksDone() bool {
 
 // Run executes the full state sync pipeline. Blocks until done or cancelled.
 func (s *StateSyncScheduler) Run(peer SnapPeer) error {
+	return s.RunContext(context.Background(), peer)
+}
+
+func (s *StateSyncScheduler) RunContext(ctx context.Context, peer SnapPeer) error {
 	if !s.running.CompareAndSwap(false, true) {
 		return ErrStateSyncRunning
 	}
 	defer s.running.Store(false)
 
 	s.mu.Lock()
+	if s.pivotHeader == nil || s.writer == nil || peer == nil {
+		s.mu.Unlock()
+		s.phase.Store(SyncPhaseFailed)
+		return fmt.Errorf("state sync: missing pivot, writer or peer")
+	}
 	s.cancel = make(chan struct{})
+	s.runContext, s.activePeer = ctx, peer
+	s.storageTasks = nil
+	s.storageIndex = make(map[types.Hash]*storageTask)
+	s.codeTasks = make(map[types.Hash]*codeTask)
+	s.progress = StateSyncProgress{PivotBlock: s.pivotBlock, PivotRoot: s.pivotRoot}
 	s.progress.StartTime = time.Now()
 	s.initAccountTasks(AccountTaskSize)
 	s.phase.Store(SyncPhaseAccounts)
 	s.mu.Unlock()
+	cancelChannel := s.cancel
+	stop := context.AfterFunc(ctx, func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		select {
+		case <-cancelChannel:
+		default:
+			close(cancelChannel)
+		}
+	})
+	defer stop()
 
 	phases := []struct {
 		phase uint32
@@ -256,12 +303,36 @@ func (s *StateSyncScheduler) Run(peer SnapPeer) error {
 		{SyncPhaseCodes, s.runCodeDownload},
 		{SyncPhaseHeal, s.runHealing},
 	}
-	for _, p := range phases {
-		s.phase.Store(p.phase)
-		if err := p.fn(peer); err != nil {
+	for {
+		generation := s.generation
+		for _, p := range phases {
+			if err := s.updatePivot(); err != nil {
+				s.phase.Store(SyncPhaseFailed)
+				return err
+			}
+			s.phase.Store(p.phase)
+			if err := p.fn(s.activePeer); err != nil {
+				s.phase.Store(SyncPhaseFailed)
+				return err
+			}
+		}
+		if err := s.updatePivot(); err != nil {
 			s.phase.Store(SyncPhaseFailed)
 			return err
 		}
+		if generation == s.generation {
+			break
+		}
+	}
+	if finalizer, ok := s.writer.(interface{ Finalize(types.Hash) error }); ok {
+		if err := finalizer.Finalize(s.pivotRoot); err != nil {
+			s.phase.Store(SyncPhaseFailed)
+			return err
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		s.phase.Store(SyncPhaseFailed)
+		return err
 	}
 	s.phase.Store(SyncPhaseDone)
 	s.reportProgress()
@@ -270,6 +341,12 @@ func (s *StateSyncScheduler) Run(peer SnapPeer) error {
 
 func (s *StateSyncScheduler) runAccountDownload(peer SnapPeer) error {
 	for {
+		if err := s.updatePivot(); err != nil {
+			return err
+		}
+		if s.activePeer != nil {
+			peer = s.activePeer
+		}
 		select {
 		case <-s.cancel:
 			return ErrStateSyncStopped
@@ -298,10 +375,13 @@ func (s *StateSyncScheduler) runAccountDownload(peer SnapPeer) error {
 			task.peerID = ""
 			task.retries++
 			if task.retries >= TaskRetryLimit {
-				task.done = true
+				s.mu.Unlock()
+				return fmt.Errorf("%w: account range: %v", ErrTaskFailed, err)
 			}
 			s.mu.Unlock()
-			time.Sleep(TaskRetryBackoff)
+			if err := s.retryWait(); err != nil {
+				return err
+			}
 			continue
 		}
 		for _, acct := range resp.Accounts {
@@ -312,7 +392,17 @@ func (s *StateSyncScheduler) runAccountDownload(peer SnapPeer) error {
 			s.progress.AccountsDownloaded++
 			s.progress.AccountBytes += estimateAccountSize(acct)
 			if acct.Root != types.EmptyRootHash {
-				s.storageTasks = append(s.storageTasks, &storageTask{accountHash: acct.Hash})
+				if s.storageIndex == nil {
+					s.storageIndex = make(map[types.Hash]*storageTask)
+					for _, task := range s.storageTasks {
+						s.storageIndex[task.accountHash] = task
+					}
+				}
+				if s.storageIndex[acct.Hash] == nil {
+					task := &storageTask{accountHash: acct.Hash}
+					s.storageTasks = append(s.storageTasks, task)
+					s.storageIndex[acct.Hash] = task
+				}
 			}
 			if acct.CodeHash != types.EmptyCodeHash {
 				if _, ok := s.codeTasks[acct.CodeHash]; !ok {
@@ -337,6 +427,12 @@ func (s *StateSyncScheduler) runAccountDownload(peer SnapPeer) error {
 
 func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 	for {
+		if err := s.updatePivot(); err != nil {
+			return err
+		}
+		if s.activePeer != nil {
+			peer = s.activePeer
+		}
 		select {
 		case <-s.cancel:
 			return ErrStateSyncStopped
@@ -344,9 +440,9 @@ func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 		}
 		s.mu.Lock()
 		var task *storageTask
-		for _, t := range s.storageTasks {
-			if !t.done {
-				task = t
+		for _, candidate := range s.storageTasks {
+			if !candidate.done {
+				task = candidate
 				break
 			}
 		}
@@ -358,8 +454,30 @@ func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 		root := s.pivotRoot
 		s.mu.Unlock()
 
-		origin := types.Hash{}
 		for {
+			generation := s.generation
+			if err := s.updatePivot(); err != nil {
+				return err
+			}
+			if generation != s.generation {
+				replacement := s.storageIndex[task.accountHash]
+				if replacement == nil {
+					break
+				}
+				task = replacement
+			}
+			if s.activePeer != nil {
+				peer = s.activePeer
+			}
+			if writer, ok := s.writer.(*SnapshotWriter); ok {
+				if _, exists := writer.snapshot.Accounts[task.accountHash]; !exists {
+					task.done = true
+				}
+			}
+			if task.done {
+				break
+			}
+			root = s.pivotRoot
 			select {
 			case <-s.cancel:
 				return ErrStateSyncStopped
@@ -372,15 +490,19 @@ func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 			resp, err := peer.RequestStorageRange(StorageRangeRequest{
 				ID: s.nextTaskID.Add(1), Root: root,
 				Accounts: []types.Hash{task.accountHash},
-				Origin:   origin, Limit: limit, Bytes: 512 * 1024,
+				Origin:   task.origin, Limit: limit, Bytes: 512 * 1024,
 			})
 			if err != nil {
 				task.retries++
 				if task.retries >= TaskRetryLimit {
-					task.done = true
+					return fmt.Errorf("%w: storage range: %v", ErrTaskFailed, err)
 				}
-				break
+				if err := s.retryWait(); err != nil {
+					return err
+				}
+				continue
 			}
+			task.retries = 0
 			for _, slot := range resp.Slots {
 				if e := s.writer.WriteStorage(slot.AccountHash, slot.SlotHash, slot.Value); e != nil {
 					return fmt.Errorf("state sync: write storage: %w", e)
@@ -398,14 +520,21 @@ func (s *StateSyncScheduler) runStorageDownload(peer SnapPeer) error {
 				s.mu.Unlock()
 				break
 			}
-			origin = incrementHash(resp.Slots[len(resp.Slots)-1].SlotHash)
+			task.origin = incrementHash(resp.Slots[len(resp.Slots)-1].SlotHash)
 		}
 		s.reportProgress()
 	}
 }
 
 func (s *StateSyncScheduler) runCodeDownload(peer SnapPeer) error {
+	failures := 0
 	for {
+		if err := s.updatePivot(); err != nil {
+			return err
+		}
+		if s.activePeer != nil {
+			peer = s.activePeer
+		}
 		select {
 		case <-s.cancel:
 			return ErrStateSyncStopped
@@ -436,13 +565,38 @@ func (s *StateSyncScheduler) runCodeDownload(peer SnapPeer) error {
 
 		resp, err := peer.RequestBytecodes(BytecodeRequest{ID: s.nextTaskID.Add(1), Hashes: batch})
 		if err != nil {
-			time.Sleep(TaskRetryBackoff)
+			failures++
+			if failures >= TaskRetryLimit {
+				return fmt.Errorf("%w: bytecode: %v", ErrTaskFailed, err)
+			}
+			if err := s.retryWait(); err != nil {
+				return err
+			}
 			continue
 		}
-		for _, code := range resp.Codes {
-			if e := s.writer.WriteBytecode(code.Hash, code.Code); e != nil {
-				return fmt.Errorf("state sync: write bytecode: %w", e)
+		if resp == nil || len(resp.Codes) == 0 {
+			failures++
+			if failures >= TaskRetryLimit {
+				return fmt.Errorf("%w: no bytecode progress", ErrTaskFailed)
 			}
+			if err := s.retryWait(); err != nil {
+				return err
+			}
+			continue
+		}
+		failures = 0
+		if writer, ok := s.writer.(interface{ WriteBytecodes([]BytecodeData) error }); ok {
+			if err := writer.WriteBytecodes(resp.Codes); err != nil {
+				return fmt.Errorf("state sync: write bytecode: %w", err)
+			}
+		} else {
+			for _, code := range resp.Codes {
+				if err := s.writer.WriteBytecode(code.Hash, code.Code); err != nil {
+					return fmt.Errorf("state sync: write bytecode: %w", err)
+				}
+			}
+		}
+		for _, code := range resp.Codes {
 			s.mu.Lock()
 			if ct, ok := s.codeTasks[code.Hash]; ok {
 				ct.done = true
@@ -458,6 +612,7 @@ func (s *StateSyncScheduler) runCodeDownload(peer SnapPeer) error {
 
 func (s *StateSyncScheduler) runHealing(peer SnapPeer) error {
 	root := s.pivotRoot
+	stalled := 0
 	for {
 		select {
 		case <-s.cancel:
@@ -476,6 +631,7 @@ func (s *StateSyncScheduler) runHealing(peer SnapPeer) error {
 		if err != nil {
 			return fmt.Errorf("state sync: heal request failed: %w", err)
 		}
+		progress := false
 		for i, data := range nodes {
 			if len(data) == 0 || i >= len(missing) {
 				continue
@@ -483,13 +639,33 @@ func (s *StateSyncScheduler) runHealing(peer SnapPeer) error {
 			if e := s.writer.WriteTrieNode(missing[i], data); e != nil {
 				return fmt.Errorf("state sync: write trie node: %w", e)
 			}
+			progress = true
 			s.mu.Lock()
 			s.progress.HealNodesDone++
 			s.progress.HealBytes += uint64(len(data))
 			s.progress.LastUpdate = time.Now()
 			s.mu.Unlock()
 		}
+		if !progress {
+			stalled++
+			if stalled >= TaskRetryLimit {
+				return fmt.Errorf("%w: no healing progress", ErrTaskFailed)
+			}
+		} else {
+			stalled = 0
+		}
 		s.reportProgress()
+	}
+}
+
+func (s *StateSyncScheduler) retryWait() error {
+	timer := time.NewTimer(TaskRetryBackoff)
+	defer timer.Stop()
+	select {
+	case <-s.cancel:
+		return ErrStateSyncStopped
+	case <-timer.C:
+		return nil
 	}
 }
 

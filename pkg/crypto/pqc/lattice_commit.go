@@ -169,49 +169,49 @@ func (lcs *LatticeCommitScheme) Open(data []byte, commitment *LatticeCommitment)
 		return nil, ErrLatticeNilCommit
 	}
 
-	// Recompute the commitment and return the opening.
-	_, opening, err := lcs.Commit(data)
+	canonical, opening, err := lcs.Commit(data)
 	if err != nil {
 		return nil, err
+	}
+	if !matchesLatticeCommitment(commitment, canonical) {
+		return nil, ErrLatticeVerifyFail
 	}
 	return opening, nil
 }
 
-// Verify checks that a commitment is valid given the opening and original data.
-// It recomputes c = A*s + e + m and checks equality with the commitment.
+// Verify checks the complete deterministic opening and commitment for data.
 func (lcs *LatticeCommitScheme) Verify(commitment *LatticeCommitment, opening *LatticeOpening, data []byte) bool {
-	if commitment == nil || opening == nil || data == nil || len(data) == 0 {
+	if lcs == nil || commitment == nil || opening == nil || len(data) == 0 {
 		return false
 	}
-	if commitment.Scheme != SchemeMLWECommit {
+	canonical, expected, err := lcs.Commit(data)
+	if err != nil || !matchesLatticeCommitment(commitment, canonical) {
 		return false
 	}
-
-	// Recompute c = A*s + e + m.
-	for i := 0; i < LatticeK; i++ {
-		acc := NewPoly()
-		for j := 0; j < LatticeK; j++ {
-			product := lcs.matrixA[i][j].MulNTT(opening.Secret[j])
-			acc = acc.Add(product)
-		}
-		acc = acc.Add(opening.Error[i])
-		acc = acc.Add(opening.MessagePoly[i])
-
-		// Check equality with the committed vector.
-		if !acc.Equal(commitment.CommitVec[i]) {
+	for i := range LatticeK {
+		if !sameLatticePoly(opening.Secret[i], expected.Secret[i]) ||
+			!sameLatticePoly(opening.Error[i], expected.Error[i]) ||
+			!sameLatticePoly(opening.MessagePoly[i], expected.MessagePoly[i]) {
 			return false
 		}
 	}
-
-	// Also verify the message encoding matches the data.
-	expectedMsg := encodeBlob(data)
-	for i := 0; i < LatticeK; i++ {
-		if !opening.MessagePoly[i].Equal(expectedMsg[i]) {
-			return false
-		}
-	}
-
 	return true
+}
+
+func matchesLatticeCommitment(candidate, canonical *LatticeCommitment) bool {
+	if candidate.Scheme != canonical.Scheme || candidate.Hash != canonical.Hash {
+		return false
+	}
+	for i := range LatticeK {
+		if !sameLatticePoly(candidate.CommitVec[i], canonical.CommitVec[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func sameLatticePoly(candidate, canonical *Poly) bool {
+	return candidate != nil && candidate.Coeffs == canonical.Coeffs
 }
 
 // CommitToBlob is a convenience wrapper that implements PQCommitScheme-like
@@ -242,7 +242,8 @@ func (lcs *LatticeCommitScheme) VerifyBlob(pqCommit *PQBlobCommitment, data []by
 	if err != nil {
 		return false
 	}
-	return bytes.Equal(pqCommit.Commitment, commitment.Hash[:])
+	return bytes.Equal(pqCommit.Commitment, commitment.Hash[:]) &&
+		bytes.Equal(pqCommit.Proof, serializeCommitVec(commitment.CommitVec))
 }
 
 // --- Internal helpers ---

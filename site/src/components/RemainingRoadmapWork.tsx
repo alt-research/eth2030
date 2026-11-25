@@ -1,0 +1,51 @@
+import Link from 'next/link';
+import remaining from '@/data/remaining-work.json';
+import { EIPS } from '@/data/eips';
+import { GITHUB_URL } from '@/lib/constants';
+import { roadmapStages, roadmapProgress, roadmapStatusNames, laterProofEntries } from '@/lib/roadmap';
+
+export default function RemainingRoadmapWork() {
+  const inventory = [...roadmapStages.map(stage => ({ stage, pending: roadmapProgress(stage.id).entries.filter(entry => entry.status !== 'complete') })), { stage: { id: 'longer', name: 'Later proof proposals' }, pending: laterProofEntries.filter(entry => entry.status !== 'complete') }];
+  const labelledPending = inventory.reduce((total, phase) => total + phase.pending.length, 0);
+  return <section aria-labelledby="remaining-work-heading" className="mb-8 rounded-xl border border-eth-teal/30 bg-eth-surface/80 p-5 md:p-6">
+    <p className="text-xs uppercase tracking-wider text-eth-teal">Remaining work · {remaining.date}</p>
+    <h2 id="remaining-work-heading" className="mt-2 text-xl font-bold text-eth-text">What still needs work</h2>
+    <p data-remaining-adopted-todos={remaining.adoptedDevelopmentTodos} className="mt-3 text-sm leading-7 text-eth-text/80">Earlier frozen development ledger: {remaining.adoptedDevelopmentTodos} confirmed open implementation TODOs in that retained scope. PR #{remaining.mergedProgressPr} is merged into master.</p>
+    <p className="mt-2 text-xs leading-6 text-eth-dim">{remaining.policy}</p>
+    <div data-current-conformance={remaining.currentConformanceReview.state} className="mt-5 border-t border-eth-teal/20 pt-4">
+      <h3 className="text-sm font-bold text-eth-text">{remaining.currentConformanceReview.title}</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">{remaining.currentConformanceReview.detail}</p>
+      <ul className="mt-3 grid gap-3 md:grid-cols-3">{remaining.currentConformanceReview.reviews.map(item => <li key={item.id} data-conformance-review={item.id} data-state={item.state} className="text-xs leading-6"><a className="text-eth-teal underline" href={item.url}>{item.title} ↗</a><p className="text-eth-dim">{item.state} · target {item.target}</p></li>)}</ul>
+      <p className="mt-3 text-xs leading-6 text-eth-dim">{remaining.currentConformanceReview.boundary}</p>
+    </div>
+    <div className="mt-5 border-t border-eth-teal/20 pt-4" aria-label="Current specification repair reviews">
+      <h3 className="text-sm font-bold text-eth-text">Current specification repairs</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">These repairs and proof extensions are merged. Their retained reviews preserve source-specific CI and runtime evidence; broader proof research remains later work.</p>
+      <ul className="mt-3 grid gap-3 md:grid-cols-3">{remaining.specificationRepairs.map(item => <li key={item.id} data-spec-repair={item.id} data-target={item.target} className="min-w-0 rounded-lg border border-eth-teal/20 p-3 text-xs leading-6"><p className="font-bold text-eth-text">{item.title}</p><p className="mt-1 text-eth-dim">Target: {item.target}</p><a className="text-eth-teal underline" href={item.url}>{item.label} ↗</a></li>)}</ul>
+      <a className="mt-3 inline-block text-xs text-eth-teal underline" href={remaining.specificationAuditUrl}>Current EIP scope and source-specific validation ↗</a>
+    </div>
+    <div className="mt-5 grid gap-3 md:grid-cols-2" aria-label="Later-scope workstreams">
+      {remaining.items.map(item => <details key={item.id} data-remaining-work={item.id} className="min-w-0 rounded-lg border border-eth-teal/20 p-4">
+        <summary className="cursor-pointer text-sm font-bold leading-6 text-eth-text"><span className="text-xs font-normal text-eth-teal">{item.kind} · </span>{item.title}<span className="mt-2 block text-xs font-normal leading-6 text-eth-dim">{item.remaining}</span></summary>
+        <p className="mt-3 text-xs leading-6 text-eth-text/80"><strong>Current evidence:</strong> {item.current}</p>
+        <p className="mt-2 text-xs leading-6 text-eth-text/80"><strong>Done when:</strong> {item.doneWhen}</p>
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-xs text-eth-teal">{item.entries.map(id => <Link className="underline" key={id} href={`/eips/${id}/`}>{EIPS.find(entry => entry.id === id)?.title ?? id} ↗</Link>)}</div>
+        <ul className="mt-3 text-xs leading-6 text-eth-teal">{item.evidence.map(path => <li key={path}><a className="break-all underline" href={`${GITHUB_URL}/blob/${remaining.reviewedMaster}/${path}`}>{path} ↗</a></li>)}</ul>
+      </details>)}
+    </div>
+    <div className="mt-5 border-t border-eth-teal/20 pt-4">
+      <h3 className="text-sm font-bold text-eth-text">Planned-only tracker entries</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">These four retained roadmap entries list no implementation or test paths. Their protocol scope must be adopted before implementation; they are outside the completed Glamsterdam task ledger.</p>
+      <ul className="mt-2 grid gap-2 text-xs leading-6 text-eth-teal sm:grid-cols-2">{remaining.plannedOnly.map(id => <li key={id} data-planned-work={id}><Link className="underline" href={`/eips/${id}/`}>{EIPS.find(entry => entry.id === id)?.title ?? id} ↗</Link></li>)}</ul>
+    </div>
+    <div className="mt-5 border-t border-eth-teal/20 pt-4">
+      <h3 className="text-sm font-bold text-eth-text">Current non-complete tracker labels: {labelledPending} entries</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">This inventory contains {labelledPending} non-complete entries across the displayed official and project-planning scopes. The official Glamsterdam core list has no non-complete implementation label in this snapshot; EIP-7495 has independent qualification evidence. EIP-8025 and canonical Ethereum STF research belong to later rounds; the adopted signed Gloas and FCR routes retain scoped completion evidence. Expand a phase to inspect every non-complete entry.</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{inventory.map(({ stage, pending }) => <details key={stage.id} data-pending-phase={stage.id} data-pending-count={pending.length} className="min-w-0 rounded-lg border border-eth-teal/20 p-3 text-xs leading-6">
+        <summary className="cursor-pointer font-bold text-eth-text">{stage.name} · {pending.length} entries</summary>
+        <ul className="mt-2 space-y-2">{pending.map(entry => <li key={entry.id} data-pending-entry={entry.id}><Link className="text-eth-teal underline" href={`/eips/${entry.id}/`}>{entry.title}</Link><span className="ml-2 text-eth-dim">{roadmapStatusNames[entry.status]}</span></li>)}</ul>
+      </details>)}</div>
+    </div>
+    <p className="mt-5 text-xs leading-6 text-eth-dim">48h/larger-scale admission and upstream Lodestar approval remain excluded from development progress. Original 04 attribution remains unconfirmed. Public activation is a separate network rollout decision; no activation parameter is changed here.</p>
+  </section>;
+}

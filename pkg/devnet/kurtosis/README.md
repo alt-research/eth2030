@@ -8,11 +8,14 @@ Local multi-client Ethereum devnets using [Kurtosis](https://www.kurtosis.com/) 
 - **Kurtosis CLI**: Install from https://docs.kurtosis.com/install/
 
 ```bash
+# From the repository root, initialize the pinned devnet package
+git submodule update --init refs/ethereum-package
+
 # Start the Kurtosis engine (first time only)
 kurtosis engine start
 
 # Build the eth2030-geth Docker image
-cd pkg && docker build -t eth2030:local .
+(cd pkg && docker build -t eth2030:local .)
 ```
 
 ## Quick Start
@@ -139,6 +142,9 @@ Each feature has a `scripts/features/verify-<feature>.sh` script that performs f
 
 ## ethpandaops Tools
 
+See the [devnet service inventory](../../../docs/devnet-third-party-inventory.md)
+for maintained fork revisions, profile selections, and verified uses.
+
 | Tool | Description |
 |------|-------------|
 | **Assertoor** | Automated test runner — stability, block proposals, transactions, blobs |
@@ -174,6 +180,20 @@ Key flags supported by eth2030-geth for Kurtosis compatibility:
 - `--metrics`, `--metrics.addr`, `--metrics.port` — Prometheus metrics (port 9001)
 - `--nat`, `--bootnodes`, `--discovery.port` — P2P networking
 
+### eth2030 image RPC exposure
+
+The `eth2030` binary (the image entrypoint for `el_image: eth2030:local`) defaults to
+**loopback-only RPC**: `127.0.0.1` binds on ports 8545/8551/8546/9001, `--http.api`
+defaults to `eth,net,web3`, and CORS is deny-by-default. The module allowlist,
+vhost check, and Engine `--authrpc.vhosts` are enforced on the request path.
+
+Kurtosis devnets override these via the ethereum-package launcher
+(`--http.addr=0.0.0.0 --http.api=admin,... --http.vhosts=*`), and every config
+yaml in `configs/` additionally passes `--rpc.allow-insecure` so admin/debug stay
+reachable inside the enclave without `--rpc.auth_secret`. Never use
+`--rpc.allow-insecure` outside container devnets; prefer `--rpc.auth_secret` or
+keeping admin/debug off.
+
 ## Troubleshooting
 
 **Kurtosis engine not running**: `kurtosis engine start`
@@ -196,3 +216,91 @@ Key flags supported by eth2030-geth for Kurtosis compatibility:
 
 - **Prysm container**: `gcr.io/prysmaticlabs/prysm/beacon-chain:latest` may have exec issues in some environments. Use Lighthouse as the primary CL.
 - **Assertoor quick timeout**: 30s is not enough for full stability checks — extend to 120s+ for thorough validation.
+
+## Pinned Fulu control
+
+From the Kurtosis directory, run the dedicated controller with the
+initialized ethereum-package checkout at `c4a8e15d`:
+
+```sh
+./scripts/run-track4-control.py --output /tmp/eth2030-fulu-control
+```
+
+Pass `--package` when the pinned package is in a different worktree. The
+control uses Lighthouse v8.3.3 and genesis generator 5.3.5 by digest,
+verifies the memory limits on the two EL/BN/VC pairs, and waits for both ELs
+and Beacon APIs to agree on the finalized execution block. It then stops
+and starts one EL using its existing data, resolves its current RPC address
+and reads the same PQ receipt and historical storage. The output directory
+holds `evidence.json` and the launch and transaction verifier logs.
+The controller removes its own enclave on exit and stops the Kurtosis
+engine when it started that engine and the host has no other enclaves.
+
+`gloas-genesis.yaml` and `gloas-transition.yaml` are capped setup fixtures
+for the Gloas-at-genesis and scheduled transition scenarios. They use
+genesis generator 6.2.8. Build the paired ETH2030 EL and Lighthouse CL
+images from the recorded revisions before launching them. Use
+`./scripts/verify-gloas-control.py <enclave>` to verify the same envelope,
+execution header slot and BAL commitment on both pairs. This check covers
+self-build. The external builder, payment and data-availability acceptance
+cases are separate.
+
+## Track 4 private devnet
+
+Build the Track 4 image and start two ETH2030/Lighthouse pairs. Use a fresh
+enclave name. The prerequisites are Docker, Kurtosis, Go, jq, gzip, the pinned
+`refs/ethereum-package` checkout, and a local `eth2030cl:local` Lighthouse image.
+
+```bash
+KURTOSIS_PACKAGE=/absolute/path/to/refs/ethereum-package \
+  ./scripts/run-track4.sh eth2030-track4
+./scripts/verify-track4.sh eth2030-track4
+```
+
+The launcher adds the same test allocation to the generated EL and CL
+genesis. The EL wrapper keeps that genesis state and sets private fork times
+for EIP-7932/8051 recovery and the pinned EIP-7864 BLAKE3 overlay at genesis
+plus 12 seconds. EIP-7748 conversion starts 12 seconds later and advances one
+unit per block. I+ runs from genesis in this profile. The prefunded ML-DSA key
+is a public test fixture.
+
+The verifier checks known-answer and negative signature cases over
+`eth_call`, submits a signed PQ transaction, and compares the canonical
+receipt, storage value and state root from both ELs. It fetches the
+corresponding block from both Beacon APIs and checks the execution payload,
+raw transaction bytes and non-optimistic status. Each missing result or
+mismatch fails verification.
+
+```bash
+go -C ../.. test ./node -run '^TestTrack4IndependentEngineAndRPC$' -count=1
+```
+
+The local integration test runs the same EIP vectors across the activation
+boundary. It also drives independent authenticated Engine HTTP handlers,
+imports the three supported PQ transaction formats, switches competing
+branches and reopens a verifier's FileDB to check persisted receipts and
+storage. The live profile has no production STARK, lattice, PQ committee or
+witness-gas provider configuration.
+
+## Heze compulsory inclusion devnet
+
+Build the paired EL and Lighthouse development revisions with Bogotá Engine
+V6 support and tag them `eth2030:local` and `eth2030cl:local`. Use the pinned
+Ethereum Kurtosis package with a genesis generator that supports the Heze
+schedule and emits `bogotaTime` in the execution genesis.
+
+Run this from `pkg/devnet/kurtosis` with Docker, Kurtosis, Python 3 and Foundry
+`cast` installed.
+
+```bash
+kurtosis run ../../../refs/ethereum-package --enclave eth2030-heze-focil \
+  --args-file configs/heze-focil.yaml
+./scripts/verify-heze-focil.py eth2030-heze-focil
+```
+
+The pairs share a chain ID, disable EL bootstrapping and use distinct EL peer-network IDs. The verifier
+selects adjacent slots whose proposer belongs to one pair and captures a
+signed list from the other pair's committee. It submits the transaction
+with the public fixture key, verifies the proposing EL did not receive it
+through its mempool, and matches the signed list, bid hash and receipt.
+Both Beacon APIs must finalize the block and the EL receipts must agree.

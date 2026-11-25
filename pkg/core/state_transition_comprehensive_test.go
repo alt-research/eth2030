@@ -32,7 +32,7 @@ func TestETHTransferFullCycle(t *testing.T) {
 
 	transferValue := new(big.Int).SetUint64(1e18) // 1 ETH
 	gasPrice := big.NewInt(1)
-	gasLimit := uint64(21000)
+	gasLimit := uint64(300_000)
 
 	msg := &config.Message{
 		From:     sender,
@@ -61,8 +61,8 @@ func TestETHTransferFullCycle(t *testing.T) {
 	}
 
 	// Verify gas used.
-	if result.UsedGas != execution.TxGas {
-		t.Errorf("UsedGas = %d, want %d", result.UsedGas, execution.TxGas)
+	if result.UsedGas != 204600 {
+		t.Errorf("UsedGas = %d, want %d", result.UsedGas, uint64(204600))
 	}
 
 	// Verify recipient balance.
@@ -235,12 +235,12 @@ func TestGasRefundMechanics(t *testing.T) {
 	statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18)))
 	statedb.CreateAccount(recipient)
 
-	// Simple transfer to verify refund cap. A plain transfer has no refund
-	// (refund counter stays zero), so we verify that UsedGas == execution.TxGas.
+	// A newly live receiver costs 21000 intrinsic plus 120*1530 state gas.
+	// A plain transfer has no storage refund.
 	msg := &config.Message{
 		From:     sender,
 		To:       &recipient,
-		GasLimit: 100000, // much more than needed
+		GasLimit: 300_000, // much more than needed
 		GasPrice: big.NewInt(1),
 		Value:    big.NewInt(1),
 		Nonce:    0,
@@ -264,8 +264,8 @@ func TestGasRefundMechanics(t *testing.T) {
 
 	// No refund counter was incremented for a simple transfer, so
 	// gasUsed should equal intrinsic gas exactly.
-	if result.UsedGas != execution.TxGas {
-		t.Errorf("UsedGas = %d, want %d (no refund expected)", result.UsedGas, execution.TxGas)
+	if result.UsedGas != 204600 {
+		t.Errorf("UsedGas = %d, want %d (no refund expected)", result.UsedGas, uint64(204600))
 	}
 
 	// Verify the MaxRefundQuotient constant is 5 (EIP-3529).
@@ -274,9 +274,7 @@ func TestGasRefundMechanics(t *testing.T) {
 	}
 
 	// Remaining gas should be refunded to sender.
-	// gasCost deducted = gasLimit * gasPrice = 100000
-	// gasRefunded = (gasLimit - gasUsed) * gasPrice = (100000 - 21000) = 79000
-	// So net gasCost = 21000
+	// Upfront gasLimit is 300000; net paid gas is 204600.
 	netGasCost := new(big.Int).Mul(big.NewInt(1), new(big.Int).SetUint64(result.UsedGas))
 	expectedBal := new(big.Int).Sub(senderBalBefore, msg.Value)
 	expectedBal.Sub(expectedBal, netGasCost)
@@ -304,7 +302,7 @@ func TestValueTransferToNewAccount(t *testing.T) {
 	msg := &config.Message{
 		From:     sender,
 		To:       &newAddr,
-		GasLimit: 100000,
+		GasLimit: 300_000,
 		GasPrice: big.NewInt(1),
 		Value:    big.NewInt(1000),
 		Nonce:    0,
@@ -451,7 +449,7 @@ func TestGlamsterdamReducedIntrinsicGas(t *testing.T) {
 		To:       &recipient,
 		GasLimit: 100000,
 		GasPrice: big.NewInt(1),
-		Value:    big.NewInt(1),
+		Value:    big.NewInt(0),
 		Nonce:    0,
 	}
 
@@ -471,14 +469,12 @@ func TestGlamsterdamReducedIntrinsicGas(t *testing.T) {
 		t.Fatalf("transfer should succeed: %v", result.Err)
 	}
 
-	// Under EIP-2780, TxBaseGlamsterdam = 4500 (vs legacy 21000).
-	// The total gas should be well under 21000 for a simple transfer
-	// to an existing account.
-	if result.UsedGas >= execution.TxGas {
-		t.Errorf("UsedGas = %d, expected < %d under Glamsterdam (EIP-2780)", result.UsedGas, execution.TxGas)
+	// A zero-value call charges 12000 sender + 3000 distinct recipient.
+	if result.UsedGas != 15000 {
+		t.Errorf("UsedGas = %d, expected %d under current EIP-2780", result.UsedGas, uint64(15000))
 	}
 
-	// Verify the reduced base cost constant.
+	// The historical draft helper remains available only for its explicit lane.
 	if vm.TxBaseGlamsterdam != 4500 {
 		t.Errorf("TxBaseGlamsterdam = %d, want 4500", vm.TxBaseGlamsterdam)
 	}
@@ -693,7 +689,7 @@ func TestBlockGasLimitBounds(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := verifyGasLimit(tt.parentGL, tt.childGL)
+			err := coreblock.VerifyGasLimit(tt.parentGL, tt.childGL)
 			if tt.expectErr && err == nil {
 				t.Error("expected error, got nil")
 			}
@@ -780,7 +776,7 @@ func TestSequentialTransactions(t *testing.T) {
 		msg := &config.Message{
 			From:     sender,
 			To:       &recipient,
-			GasLimit: 21000,
+			GasLimit: 300_000,
 			GasPrice: big.NewInt(1),
 			Value:    big.NewInt(100),
 			Nonce:    i,
@@ -822,13 +818,13 @@ func TestGlamsterdamNewAccountSurchargeComprehensive(t *testing.T) {
 			name:      "value to existing account (no surcharge)",
 			toExists:  true,
 			value:     big.NewInt(1),
-			wantBelow: 21000, // should be less than legacy 21000
+			wantBelow: 21001, // current existing-account value transfer is 21000
 		},
 		{
 			name:      "value to new account (with surcharge)",
 			toExists:  false,
 			value:     big.NewInt(1),
-			wantAbove: 29500, // TxBaseGlamsterdam + GAS_NEW_ACCOUNT = 4500+25000
+			wantAbove: 204600, // 21000 intrinsic + 120*1530 new account state gas
 		},
 		{
 			name:      "zero value to new account (no surcharge)",
@@ -848,13 +844,13 @@ func TestGlamsterdamNewAccountSurchargeComprehensive(t *testing.T) {
 			statedb.CreateAccount(sender)
 			statedb.AddBalance(sender, new(big.Int).Mul(big.NewInt(100), new(big.Int).SetUint64(1e18)))
 			if tt.toExists {
-				statedb.CreateAccount(recipient)
+				statedb.SetNonce(recipient, 1)
 			}
 
 			msg := &config.Message{
 				From:     sender,
 				To:       &recipient,
-				GasLimit: 200000,
+				GasLimit: 300_000,
 				GasPrice: big.NewInt(1),
 				Value:    tt.value,
 				Nonce:    0,

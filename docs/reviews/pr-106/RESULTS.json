@@ -1,0 +1,28 @@
+{
+  "full_package_suites_passed": 215,
+  "packages_without_tests": 18,
+  "race_package_suites_passed": 20,
+  "tagged_integration_package_suites_passed": 44,
+  "full_vet": true,
+  "native_build": true,
+  "executed_mutation_controls": [
+    {
+      "mutation": "request_backend_context",
+      "detected_by_executed_assertion": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "actual_call_evm_context",
+      "detected_by_executed_assertion": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "http_batch_context",
+      "detected_by_executed_assertion": true,
+      "exit_code": 1
+    }
+  ],
+  "production_sources_restored": true,
+  "wire_context_fields_added": false,
+  "scope": "Native HTTP single/batch request execution cancellation; WebSocket close detection and historical replay context remain separate."
+}

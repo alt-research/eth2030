@@ -1,0 +1,37 @@
+{
+  "base": "d743925e3c4e7deb3fdc00648cb2296372910b28",
+  "heads": {
+    "142": "8f7c983cd15f95cbaf7f360ed7af2e991ce04c4c",
+    "143": "3b5fbeb55ddfdcab07c3d5d8639988922a95bd75",
+    "144": "f3da9c131940db25de6863e0636155ab43ca9943",
+    "145": "b1c95a5aae905dd564e65c7f9bc9679212d57ebe",
+    "146": "d5ef77a63088b10597d407fd1f3f6ad65e626501"
+  },
+  "all_clean": true,
+  "subset_extensions_checked": 80,
+  "subset_trees_confluent": true,
+  "actual_master_merge": false,
+  "final_tree": "db3f63e74b633fe6956eb4e4e73a7ee72fd30c26",
+  "pkg_tree": "48afbc345e9418d562be901c13e2e54eaae500b9",
+  "measured_runtime_source": "50514bf32353aaf98484747ffc7b86823af85bed",
+  "current_package_equal_to_measured_runtime": true,
+  "scope": "All subset extensions with representative ancestry; matching resulting trees. Final branch updates after runtime are documentation-only.",
+  "cumulative_validation": {
+    "combined-layout-full-go.log": {
+      "exit": 0,
+      "successful_packages": 219,
+      "sha256": "a8ec19dec874a23aff455b6ed536752673324797e95894739ded44c65cee8fc6"
+    },
+    "combined-layout-race.log": {
+      "exit": 0,
+      "successful_packages": 7,
+      "sha256": "b4159e967ac24f97452cf43ca23083f0041c8bb8a8a7498bfc40ca02af83ec56"
+    },
+    "combined-layout-integration.log": {
+      "exit": 0,
+      "successful_packages": 219,
+      "sha256": "dd730ea26e22d6856b5eac4190b25ae2ea0d472138d75f37b5c06164b0df0c45"
+    },
+    "native_entrypoint": "cmd/eth2030 built and actually run"
+  }
+}

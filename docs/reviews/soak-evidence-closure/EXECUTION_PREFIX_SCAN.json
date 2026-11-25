@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "profile": {
+    "declared_at": "2026-11-22T04:13:48.186341+00:00",
+    "first": 61335,
+    "last": 69206,
+    "source": "2c0df12ff4c89d6407c5f27c8de8ea56517d7a4e",
+    "scope": "Every execution block in the frozen prefix, native/Geth RPC hash/root and parent-link agreement; sampled EIP1186 and signed BLS remain independent gates. Read-only, no workload injection and no all-header RLP rehash claim."
+  },
+  "blocks": 7872,
+  "transactions": 5,
+  "nonempty_blocks": 5,
+  "gas_used": 979200,
+  "distinct_state_roots": 7872
+}

@@ -24,6 +24,7 @@ func keyToPath(depth int, key []byte) ([]byte, error) {
 type InternalNode struct {
 	left, right BinaryNode
 	depth       int
+	draft       *draftNodeHash
 }
 
 // GetValuesAtStem retrieves the group of values located at the given stem key.
@@ -91,11 +92,14 @@ func (bt *InternalNode) Insert(key []byte, value []byte, resolver NodeResolverFn
 
 // Copy creates a deep copy of the node.
 func (bt *InternalNode) Copy() BinaryNode {
-	return &InternalNode{
-		left:  bt.left.Copy(),
-		right: bt.right.Copy(),
-		depth: bt.depth,
+	copy := &InternalNode{depth: bt.depth}
+	if bt.left != nil {
+		copy.left = bt.left.Copy()
 	}
+	if bt.right != nil {
+		copy.right = bt.right.Copy()
+	}
+	return copy
 }
 
 // Hash returns the SHA-256 hash of the node (H(left || right)).

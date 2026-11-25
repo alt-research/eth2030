@@ -1,12 +1,14 @@
 package engine
 
 import (
-	"bytes"
 	"context"
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -17,10 +19,8 @@ import (
 	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
-	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/crypto/bls"
 	"github.com/eth2030/eth2030/engine/actor"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
 	"github.com/eth2030/eth2030/focil"
@@ -42,6 +42,7 @@ const (
 type pendingPayload struct {
 	block        *types.Block
 	receipts     []*types.Receipt
+	requests     types.Requests
 	bal          *bal.BlockAccessList // EIP-7928
 	blockValue   *big.Int
 	parentHash   types.Hash
@@ -49,6 +50,9 @@ type pendingPayload struct {
 	feeRecipient types.Address
 	prevRandao   types.Hash
 	withdrawals  []*Withdrawal
+	// slotNumber is the beacon slot from payload attributes (Gloas payloads
+	// expose it as a payload field for CL-side envelope bookkeeping).
+	slotNumber uint64
 }
 
 // EngineBackendConfig holds tunable memory limits for EngineBackend.
@@ -129,7 +133,8 @@ type EngineBackend struct {
 	cleanupWg     sync.WaitGroup
 
 	// txPool provides access to pending transactions for inclusion list generation.
-	txPool block.TxPoolReader
+	txPoolMu sync.RWMutex
+	txPool   block.TxPoolReader
 }
 
 // NewEngineBackend creates a new Engine API backend with default memory limits.
@@ -273,6 +278,14 @@ func (b *EngineBackend) getHeadHash() types.Hash {
 	b.stateMu.RLock()
 	defer b.stateMu.RUnlock()
 	return b.headHash
+}
+
+// GetBlockByHash returns a block stored by the backend, or nil if unknown.
+func (b *EngineBackend) GetBlockByHash(hash types.Hash) *types.Block {
+	if blk, ok := b.getBlock(hash); ok {
+		return blk
+	}
+	return nil
 }
 
 func (b *EngineBackend) getForkchoiceState() (headHash, safeHash, finalHash types.Hash) {
@@ -419,22 +432,16 @@ func (b *EngineBackend) loadPayloadBodiesByHash(hashes []types.Hash) []*enginepa
 	b.blocksMu.RLock()
 	defer b.blocksMu.RUnlock()
 
-	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
-	}
+	headBlock := b.blocks[headHash]
 
 	results := make([]*enginepayload.ExecutionPayloadBodyV2, len(hashes))
 	for i, h := range hashes {
 		block, found := b.blocks[h]
-		if !found || !rawdb.IsBALRetained(headNum, block.NumberU64()) {
+		if !found {
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[h]; ok {
-			balBytes, _ := json.Marshal(blockBAL)
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[h])
 		results[i] = body
 	}
 	return results
@@ -447,8 +454,16 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 	defer b.blocksMu.RUnlock()
 
 	headNum := uint64(0)
-	if head, ok := b.blocks[headHash]; ok {
-		headNum = head.NumberU64()
+	headBlock := b.blocks[headHash]
+	if headBlock != nil {
+		headNum = headBlock.NumberU64()
+	}
+
+	if start > headNum {
+		return []*enginepayload.ExecutionPayloadBodyV2{}
+	}
+	if remaining := headNum - start; count > remaining && count-remaining > 1 {
+		count = remaining + 1
 	}
 
 	canonical := make(map[uint64]types.Hash, count)
@@ -456,7 +471,7 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 		minNum := start
 		for cur := head; cur != nil && cur.NumberU64() >= minNum; {
 			num := cur.NumberU64()
-			if num >= start && num < start+count {
+			if num >= start && num-start < count {
 				canonical[num] = cur.Hash()
 				if len(canonical) == int(count) {
 					break
@@ -499,14 +514,11 @@ func (b *EngineBackend) loadPayloadBodiesByRange(start, count uint64) []*enginep
 			)
 		}
 		block, ok := b.blocks[hash]
-		if !ok || !rawdb.IsBALRetained(headNum, num) {
+		if !ok {
 			continue
 		}
 		body := enginepayload.BlockToPayloadBodyV2(block)
-		if blockBAL, ok := b.bals[hash]; ok {
-			balBytes, _ := json.Marshal(blockBAL)
-			body.BlockAccessList = balBytes
-		}
+		body.BlockAccessList = historicalBALBytes(headBlock, block, b.bals[hash])
 		results[i] = body
 	}
 	if len(canonical) != int(count) {
@@ -691,9 +703,9 @@ func (b *EngineBackend) ProcessBlockV4(
 	parentBeaconBlockRoot types.Hash,
 	executionRequests [][]byte,
 ) (PayloadStatusV1, error) {
-	// Delegate to ProcessBlock for core validation; execution requests are
-	// stored alongside the block but validated at a higher level.
-	return b.ProcessBlock(payload, expectedBlobVersionedHashes, parentBeaconBlockRoot)
+	var extended ExecutionPayloadV5
+	extended.ExecutionPayloadV3 = *payload
+	return b.processRequestPayload(&extended, parentBeaconBlockRoot, executionRequests, false)
 }
 
 // GetHeadTimestamp returns the timestamp of the current head block.
@@ -718,7 +730,7 @@ func (b *EngineBackend) GetBlockTimestamp(hash types.Hash) uint64 {
 
 // IsCancun returns true if the given timestamp falls within the Cancun fork.
 func (b *EngineBackend) IsCancun(timestamp uint64) bool {
-	return b.config.IsEngineCancun(timestamp)
+	return b.config.IsCancun(timestamp)
 }
 
 // ForkchoiceUpdated processes a forkchoice state update from the CL.
@@ -899,10 +911,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 			"source", "async",
 		)
 
+		bundle, err := enginepayload.BuildBlobsBundleV1(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadResponse{
 			ExecutionPayload: ep,
 			BlockValue:       result.BlockValue,
-			BlobsBundle:      collectBlobsBundleV1(result.Block.Transactions()),
+			BlobsBundle:      bundle,
 		}, nil
 	}
 
@@ -930,10 +946,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 			"source", "actor",
 		)
 
+		bundle, err := enginepayload.BuildBlobsBundleV1(actorPayload.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadResponse{
 			ExecutionPayload: ep,
 			BlockValue:       new(big.Int).Set(actorPayload.BlockValue),
-			BlobsBundle:      collectBlobsBundleV1(actorPayload.Block.Transactions()),
+			BlobsBundle:      bundle,
 		}, nil
 	}
 
@@ -959,10 +979,14 @@ func (b *EngineBackend) GetPayloadByID(id PayloadID) (*GetPayloadResponse, error
 		"source", "mutex",
 	)
 
+	bundle, err := enginepayload.BuildBlobsBundleV1(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadResponse{
 		ExecutionPayload: ep,
 		BlockValue:       new(big.Int).Set(pending.blockValue),
-		BlobsBundle:      collectBlobsBundleV1(pending.block.Transactions()),
+		BlobsBundle:      bundle,
 	}, nil
 }
 
@@ -982,7 +1006,7 @@ func payloadToBlock(payload *ExecutionPayloadV3, parentBeaconBlockRoot types.Has
 	// Decode transactions.
 	txs := make([]*types.Transaction, len(payload.Transactions))
 	for i, enc := range payload.Transactions {
-		tx, err := types.DecodeTxRLP(enc)
+		tx, err := types.DecodeBlockTransaction(enc)
 		if err != nil {
 			return nil, fmt.Errorf("invalid transaction %d: %w", i, err)
 		}
@@ -1002,7 +1026,7 @@ func payloadToBlock(payload *ExecutionPayloadV3, parentBeaconBlockRoot types.Has
 	// Compute withdrawals root.
 	// This matches the CL's ordered_trie_root computation for withdrawals.
 	var withdrawalsHash *types.Hash
-	if len(withdrawals) > 0 {
+	if payload.Withdrawals != nil {
 		wr := block.DeriveWithdrawalsRoot(withdrawals)
 		withdrawalsHash = &wr
 	}
@@ -1095,10 +1119,23 @@ func (b *EngineBackend) ProcessBlockV5(
 	parentBeaconBlockRoot types.Hash,
 	executionRequests [][]byte,
 ) (PayloadStatusV1, error) {
+	return b.processRequestPayload(payload, parentBeaconBlockRoot, executionRequests, true)
+}
+
+func (b *EngineBackend) processRequestPayload(
+	payload *ExecutionPayloadV5, parentBeaconBlockRoot types.Hash, executionRequests [][]byte, withBAL bool,
+) (PayloadStatusV1, error) {
+	if err := types.ValidateExecutionRequestsWire(executionRequests); err != nil {
+		return PayloadStatusV1{}, ErrInvalidParams
+	}
+	version := "V4"
+	if withBAL {
+		version = "V5"
+	}
 	metrics.EngineNewPayload.Inc()
 	backendLog.Debug("payload_received",
 		"event", "payload_received",
-		"version", "V5",
+		"version", version,
 		"blockHash", payload.BlockHash.Hex(),
 		"blockNum", payload.BlockNumber,
 		"parentHash", payload.ParentHash.Hex(),
@@ -1113,7 +1150,7 @@ func (b *EngineBackend) ProcessBlockV5(
 		errMsg := err.Error()
 		backendLog.Warn("payload_invalid",
 			"event", "payload_invalid",
-			"version", "V5",
+			"version", version,
 			"blockHash", payload.BlockHash.Hex(),
 			"reason", "payload decode failed",
 			"error", errMsg,
@@ -1132,12 +1169,37 @@ func (b *EngineBackend) ProcessBlockV5(
 	if !parentOk {
 		backendLog.Debug("payload_syncing",
 			"event", "payload_syncing",
-			"version", "V5",
+			"version", version,
 			"blockHash", payload.BlockHash.Hex(),
 			"parentHash", parentHash.Hex(),
 		)
 		return PayloadStatusV1{Status: StatusSyncing}, nil
 	}
+
+	header := blk.Header()
+	if b.config.IsCancun(header.Time) {
+		header.ParentBeaconRoot = &parentBeaconBlockRoot
+	}
+	if b.config.IsPrague(header.Time) {
+		hash := types.ComputeWireRequestsHash(executionRequests)
+		header.RequestsHash = &hash
+	}
+	if withBAL && b.config.IsAmsterdam(header.Time) {
+		hash, err := enginepayload.DecodeBlockAccessList(payload.BlockAccessList)
+		if err != nil {
+			message := err.Error()
+			return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
+		}
+		header.BlockAccessListHash = &hash
+		if payload.SlotNumber != "" {
+			slot, err := strconv.ParseUint(strings.TrimPrefix(payload.SlotNumber, "0x"), 16, 64)
+			if !strings.HasPrefix(payload.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != strings.ToLower(payload.SlotNumber) {
+				return PayloadStatusV1{}, ErrInvalidParams
+			}
+			header.SlotNumber = &slot
+		}
+	}
+	blk = types.NewBlock(header, blk.Body())
 
 	// SPEC-6.4: restore CalldataGasUsed/CalldataExcessGas stripped by the
 	// engine API wire format. These fields are part of the header hash
@@ -1147,6 +1209,20 @@ func (b *EngineBackend) ProcessBlockV5(
 		blk = restoreCalldataGasFields(blk, parentBlock, payload.BlockHash)
 	}
 
+	if blk.Hash() != payload.BlockHash {
+		message := "payload block hash does not match reconstructed header"
+		return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
+	}
+	if _, known := b.getBlock(blk.Hash()); known {
+		hash := blk.Hash()
+		return PayloadStatusV1{Status: StatusValid, LatestValidHash: &hash}, nil
+	}
+
+	if payload.Timestamp <= parentBlock.Time() {
+		message := fmt.Sprintf("invalid timestamp: block %d <= parent %d", payload.Timestamp, parentBlock.Time())
+		return PayloadStatusV1{Status: StatusInvalid, LatestValidHash: &parentHash, ValidationError: &message}, nil
+	}
+
 	// Run through the state processor with BAL computation.
 	stateCopy := b.statedb.Dup()
 	result, err := b.processor.ProcessWithBAL(blk, stateCopy)
@@ -1154,7 +1230,7 @@ func (b *EngineBackend) ProcessBlockV5(
 		errMsg := fmt.Sprintf("state processing failed: %v", err)
 		backendLog.Error("payload_exec_fail",
 			"event", "payload_exec_fail",
-			"version", "V5",
+			"version", version,
 			"blockHash", payload.BlockHash.Hex(),
 			"blockNum", payload.BlockNumber,
 			"error", err,
@@ -1165,41 +1241,15 @@ func (b *EngineBackend) ProcessBlockV5(
 		}, nil
 	}
 
-	// Validate the BAL by comparing the computed BAL with the provided one.
-	if payload.BlockAccessList != nil {
-		computedBAL := result.BlockAccessList
-		if computedBAL == nil {
-			computedBAL = bal.NewBlockAccessList()
+	if expected := blk.Header().BlockAccessListHash; expected != nil {
+		if result.BlockAccessList == nil || result.BlockAccessList.Hash() != *expected {
+			message := "block access list does not match execution"
+			return PayloadStatusV1{Status: StatusInvalid, ValidationError: &message}, nil
 		}
-		computedEncoded, _ := computedBAL.EncodeRLP()
-
-		var providedBALBytes []byte
-		if err := json.Unmarshal(payload.BlockAccessList, &providedBALBytes); err != nil {
-			// If the blockAccessList isn't valid JSON bytes, it may be null.
-			if string(payload.BlockAccessList) != "null" {
-				errMsg := fmt.Sprintf("invalid blockAccessList encoding: %v", err)
-				backendLog.Warn("payload_bal_invalid",
-					"event", "payload_bal_invalid",
-					"blockHash", payload.BlockHash.Hex(),
-					"reason", "BAL JSON decode failed",
-					"error", errMsg,
-				)
-				return PayloadStatusV1{
-					Status:          StatusInvalid,
-					ValidationError: &errMsg,
-				}, nil
-			}
-		} else if !bytes.Equal(computedEncoded, providedBALBytes) {
-			// BAL mismatch is logged but does not invalidate the block.
-			// EIP-7928 BALs are advisory for parallel execution hints;
-			// a mismatch may occur due to serialization differences or
-			// state divergence between build and validation paths.
-			backendLog.Debug("payload_bal_mismatch",
-				"event", "payload_bal_mismatch",
-				"blockHash", payload.BlockHash.Hex(),
-				"blockNum", payload.BlockNumber,
-			)
-		}
+	}
+	if err := types.ValidateRequestsHash(blk.Header(), result.Requests); err != nil {
+		message := err.Error()
+		return PayloadStatusV1{Status: StatusInvalid, LatestValidHash: &parentHash, ValidationError: &message}, nil
 	}
 
 	// EIP-7805: check IL satisfaction against block and stored ILs.
@@ -1246,7 +1296,7 @@ func (b *EngineBackend) ProcessBlockV5(
 
 	backendLog.Info("payload_valid",
 		"event", "payload_valid",
-		"version", "V5",
+		"version", version,
 		"blockHash", blockHash.Hex(),
 		"blockNum", payload.BlockNumber,
 		"txCount", len(payload.Transactions),
@@ -1311,11 +1361,11 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			return ForkchoiceUpdatedResult{}, ErrInvalidPayloadAttributes
 		}
 
-		builder := block.NewBlockBuilder(b.config, nil, nil)
+		builder := block.NewBlockBuilder(b.config, nil, b.payloadTxPool())
 		builder.SetState(b.statedb.Dup())
 		parentHeader := parentBlock.Header()
 
-		blk, receipts, err := builder.BuildBlock(parentHeader, &block.BuildBlockAttributes{
+		blk, built, err := builder.BuildBlockWithResult(parentHeader, &block.BuildBlockAttributes{
 			Timestamp:        attrs.Timestamp,
 			FeeRecipient:     attrs.SuggestedFeeRecipient,
 			Random:           attrs.PrevRandao,
@@ -1323,24 +1373,18 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			Withdrawals:      WithdrawalsToCore(attrs.Withdrawals),
 			BeaconRoot:       &attrs.ParentBeaconBlockRoot,
 			InclusionListTxs: attrs.InclusionListTransactions,
+			SlotNumber:       &attrs.SlotNumber,
 		})
 		if err != nil {
 			return ForkchoiceUpdatedResult{}, fmt.Errorf("payload build failed: %w", err)
 		}
 
-		// Compute BAL for the built block (EIP-7928).
-		var blockBAL *bal.BlockAccessList
-		if b.config.IsAmsterdam(attrs.Timestamp) {
-			stateCopy2 := b.statedb.Dup()
-			balResult, err := b.processor.ProcessWithBAL(blk, stateCopy2)
-			if err == nil && balResult != nil {
-				blockBAL = balResult.BlockAccessList
-			}
-		}
+		receipts, blockBAL := built.Receipts, built.BlockAccessList
 
 		b.storePayload(id, &pendingPayload{
 			block:        blk,
 			receipts:     receipts,
+			requests:     built.Requests,
 			bal:          blockBAL,
 			blockValue:   new(big.Int),
 			parentHash:   fcState.HeadBlockHash,
@@ -1348,6 +1392,7 @@ func (b *EngineBackend) ForkchoiceUpdatedV4(
 			feeRecipient: attrs.SuggestedFeeRecipient,
 			prevRandao:   attrs.PrevRandao,
 			withdrawals:  attrs.Withdrawals,
+			slotNumber:   attrs.SlotNumber,
 		})
 
 		// Dual-write to actors for migration.
@@ -1381,11 +1426,15 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
 		ep4 := enginepayload.BlockToPayload(result.Block, asyncPending.PrevRandao, engineWithdrawals)
+		bundle, err := enginepayload.BuildBlobsBundleV1(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadV4Response{
 			ExecutionPayload:  &ep4.ExecutionPayloadV3,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundleV1(result.Block.Transactions()),
-			ExecutionRequests: [][]byte{},
+			BlobsBundle:       bundle,
+			ExecutionRequests: result.Requests.Encode(),
 		}, nil
 	}
 
@@ -1396,30 +1445,38 @@ func (b *EngineBackend) GetPayloadV4ByID(id PayloadID) (*GetPayloadV4Response, e
 
 	ep4 := enginepayload.BlockToPayload(pending.block, pending.prevRandao, pending.withdrawals)
 
+	bundle, err := enginepayload.BuildBlobsBundleV1(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadV4Response{
 		ExecutionPayload:  &ep4.ExecutionPayloadV3,
 		BlockValue:        new(big.Int).Set(pending.blockValue),
-		BlobsBundle:       collectBlobsBundleV1(pending.block.Transactions()),
-		ExecutionRequests: [][]byte{},
+		BlobsBundle:       bundle,
+		ExecutionRequests: pending.requests.Encode(),
 	}, nil
 }
 
-// GetPayloadV5 retrieves a previously built payload for getPayloadV5 (Gloas/Heze).
-// Implements GlamsterdamBackend interface.
-func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error) {
+// GetPayloadV5 serves the historical standalone GlamsterdamBackend adapter.
+// Production HTTP dispatch uses EngineAPI.GetPayloadV5 for the Osaka shape.
+func (b *EngineBackend) GetPayloadV5(id PayloadID) (*LegacyGlamsterdamPayloadResponse, error) {
 	asyncPending, result, _, err := b.waitAsyncPayload(id, false)
 	if err != nil {
 		return nil, err
 	}
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
-		ep4 := enginepayload.BlockToPayload(result.Block, asyncPending.PrevRandao, engineWithdrawals)
-		return &GetPayloadV5Response{
-			ExecutionPayload:  &ep4.ExecutionPayloadV3,
+		ep5 := enginepayload.BlockToPayloadV5(result.Block, asyncPending.PrevRandao, engineWithdrawals, result.BAL, asyncPending.SlotNumber)
+		bundle, err := enginepayload.BuildBlobsBundleV2(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
+		return &LegacyGlamsterdamPayloadResponse{
+			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundleV2(result.Block.Transactions()),
+			BlobsBundle:       bundle,
 			Override:          false,
-			ExecutionRequests: [][]byte{},
+			ExecutionRequests: result.Requests.Encode(),
 		}, nil
 	}
 
@@ -1428,14 +1485,18 @@ func (b *EngineBackend) GetPayloadV5(id PayloadID) (*GetPayloadV5Response, error
 		return nil, err
 	}
 
-	ep4 := enginepayload.BlockToPayload(pending.block, pending.prevRandao, pending.withdrawals)
+	ep5 := enginepayload.BlockToPayloadV5(pending.block, pending.prevRandao, pending.withdrawals, pending.bal, pending.slotNumber)
 
-	return &GetPayloadV5Response{
-		ExecutionPayload:  &ep4.ExecutionPayloadV3,
+	bundle, err := enginepayload.BuildBlobsBundleV2(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
+	return &LegacyGlamsterdamPayloadResponse{
+		ExecutionPayload:  ep5,
 		BlockValue:        pending.blockValue,
-		BlobsBundle:       collectBlobsBundleV2(pending.block.Transactions()),
+		BlobsBundle:       bundle,
 		Override:          false,
-		ExecutionRequests: [][]byte{},
+		ExecutionRequests: pending.requests.Encode(),
 	}, nil
 }
 
@@ -1450,12 +1511,16 @@ func (b *EngineBackend) GetPayloadV6ByID(id PayloadID) (*GetPayloadV6Response, e
 	}
 	if asyncPending != nil && result != nil {
 		engineWithdrawals := enginepayload.WithdrawalsToEngine(asyncPending.Withdrawals)
-		ep5 := enginepayload.BlockToPayloadV5(result.Block, asyncPending.PrevRandao, engineWithdrawals, result.BAL)
+		ep5 := enginepayload.BlockToPayloadV5(result.Block, asyncPending.PrevRandao, engineWithdrawals, result.BAL, asyncPending.SlotNumber)
+		bundle, err := enginepayload.BuildBlobsBundleV2(result.Block.Transactions())
+		if err != nil {
+			return nil, err
+		}
 		return &GetPayloadV6Response{
 			ExecutionPayload:  ep5,
 			BlockValue:        result.BlockValue,
-			BlobsBundle:       collectBlobsBundle(result.Block.Transactions()),
-			ExecutionRequests: [][]byte{},
+			BlobsBundle:       bundle,
+			ExecutionRequests: result.Requests.Encode(),
 		}, nil
 	}
 
@@ -1464,127 +1529,101 @@ func (b *EngineBackend) GetPayloadV6ByID(id PayloadID) (*GetPayloadV6Response, e
 		return nil, err
 	}
 
-	ep5 := enginepayload.BlockToPayloadV5(pending.block, pending.prevRandao, pending.withdrawals, pending.bal)
+	ep5 := enginepayload.BlockToPayloadV5(pending.block, pending.prevRandao, pending.withdrawals, pending.bal, pending.slotNumber)
 
+	bundle, err := enginepayload.BuildBlobsBundleV2(pending.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
 	return &GetPayloadV6Response{
 		ExecutionPayload:  ep5,
 		BlockValue:        new(big.Int).Set(pending.blockValue),
-		BlobsBundle:       collectBlobsBundle(pending.block.Transactions()),
-		ExecutionRequests: [][]byte{},
+		BlobsBundle:       bundle,
+		ExecutionRequests: pending.requests.Encode(),
 	}, nil
 }
 
-func collectBlobSidecars(txs []*types.Transaction) (blobs, commitments [][]byte, sidecarBlobs [][]byte) {
-	for _, tx := range txs {
-		sc := tx.BlobSidecar()
-		if sc == nil {
-			continue
-		}
-		blobs = append(blobs, sc.Blobs...)
-		commitments = append(commitments, sc.Commitments...)
-		sidecarBlobs = append(sidecarBlobs, sc.Blobs...)
+// GetPayloadV7ByID retrieves a previously built payload for getPayloadV7.
+// When EIP-7807 SSZ blocks are active at the payload timestamp, the response
+// additionally carries the SSZ payload encoding and its hash tree root — the
+// SSZ execution block hash the CL commits to.
+func (b *EngineBackend) GetPayloadV7ByID(id PayloadID) (*GetPayloadV6Response, error) {
+	resp, err := b.GetPayloadV6ByID(id)
+	if err != nil {
+		return nil, err
 	}
-	return blobs, commitments, sidecarBlobs
-}
-
-func expandBlobCellProofs(blobs [][]byte, warnLabel string) ([][]byte, int) {
-	if len(blobs) == 0 {
-		return nil, 0
+	ep5 := resp.ExecutionPayload
+	if ep5 == nil || !b.config.IsSSZBlock(ep5.Timestamp) {
+		return resp, nil
 	}
-
-	kzg := bls.DefaultKZGBackend()
-	proofs := make([][]byte, 0, len(blobs)*bls.KZGCellsPerExtBlob)
-	totalProofs := 0
-	for _, blob := range blobs {
-		_, cellProofs, err := kzg.ComputeCellsAndProofs(blob)
-		if err != nil {
-			backendLog.Warn(warnLabel,
-				"err", err)
-			for range bls.KZGCellsPerExtBlob {
-				proofs = append(proofs, make([]byte, bls.KZGBytesPerProof))
-				totalProofs++
-			}
-			continue
+	asyncPending, result, release, err := b.waitAsyncPayload(id, false)
+	if err != nil {
+		return resp, nil // hash unavailable without the built block; hash fields stay unset
+	}
+	if release != nil {
+		defer release()
+	}
+	var block *types.Block
+	var receipts []*types.Receipt
+	var requests types.Requests
+	var balRLP []byte
+	var slot uint64
+	if asyncPending != nil && result != nil {
+		block, receipts, requests, slot = result.Block, result.Receipts, result.Requests, asyncPending.SlotNumber
+		if result.BAL != nil {
+			balRLP, _ = result.BAL.EncodeRLP()
 		}
-		for _, p := range cellProofs {
-			cp := p
-			proofs = append(proofs, cp[:])
-			totalProofs++
+	} else if pending, perr := b.getStoredPayload(id); perr == nil {
+		block, receipts, requests, slot = pending.block, pending.receipts, pending.requests, pending.slotNumber
+		if pending.bal != nil {
+			balRLP, _ = pending.bal.EncodeRLP()
 		}
 	}
-	return proofs, totalProofs
-}
-
-// collectBlobsBundle builds a BlobsBundleV2 from the blob sidecar data attached
-// to the given transactions. Each blob's 48-byte KZG proof is expanded to 128
-// per-cell KZG proofs using ComputeCellsAndProofs, as required by the Fulu/PeerDAS
-// spec (engine_getPayloadV6 blobsBundle.proofs must have 128*N entries).
-func collectBlobsBundle(txs []*types.Transaction) *BlobsBundleV2 {
-	bundle := &BlobsBundleV2{}
-	blobTxCount := 0
-	totalProofs := 0
-	for _, tx := range txs {
-		if tx.BlobSidecar() != nil {
-			blobTxCount++
-		}
+	if block == nil || block.Header().BaseFee == nil {
+		return resp, nil
 	}
-	blobs, commitments, sidecarBlobs := collectBlobSidecars(txs)
-	bundle.Blobs = blobs
-	bundle.Commitments = commitments
-	totalBlobs := len(sidecarBlobs)
-	bundle.Proofs, totalProofs = expandBlobCellProofs(sidecarBlobs, "collectBlobsBundle: ComputeCellsAndProofs failed, using zero proofs")
-	backendLog.Debug("collectBlobsBundle: result",
-		"blobTxCount", blobTxCount,
-		"totalBlobs", totalBlobs,
-		"totalProofs", totalProofs,
-		"expectedProofs", totalBlobs*bls.KZGCellsPerExtBlob,
-	)
-	return bundle
-}
-
-// collectBlobsBundleV1 collects blob sidecars with one proof per blob (V1 format).
-// Used for engine_getPayloadV3 and engine_getPayloadV4 responses.
-func collectBlobsBundleV1(txs []*types.Transaction) *BlobsBundleV1 {
-	bundle := &BlobsBundleV1{}
-	for _, tx := range txs {
-		sc := tx.BlobSidecar()
-		if sc == nil {
-			continue
-		}
-		bundle.Blobs = append(bundle.Blobs, sc.Blobs...)
-		bundle.Commitments = append(bundle.Commitments, sc.Commitments...)
-		bundle.Proofs = append(bundle.Proofs, sc.Proofs...)
+	excessRegular := uint64(0)
+	if block.Header().CalldataExcessGas != nil {
+		excessRegular = *block.Header().CalldataExcessGas
 	}
-	return bundle
-}
-
-// collectBlobsBundleV2 collects blob sidecars with cell proofs (V2 format).
-// Used for engine_getPayloadV5 responses (Gloas/Heze fork).
-// Each blob's 48-byte KZG proof is expanded to 128 per-cell KZG proofs
-// using ComputeCellsAndProofs, as required by the Fulu/PeerDAS spec.
-func collectBlobsBundleV2(txs []*types.Transaction) *enginepayload.BlobsBundleV2 {
-	bundle := &enginepayload.BlobsBundleV2{}
-	blobs, commitments, sidecarBlobs := collectBlobSidecars(txs)
-	bundle.Blobs = blobs
-	bundle.Commitments = commitments
-	bundle.Proofs, _ = expandBlobCellProofs(sidecarBlobs, "collectBlobsBundleV2: ComputeCellsAndProofs failed, using zero proofs")
-	backendLog.Debug("collectBlobsBundleV2: result",
-		"blobCount", len(blobs),
-		"commitmentCount", len(commitments),
-		"proofCount", len(bundle.Proofs),
-		"expectedProofs", len(sidecarBlobs)*bls.KZGCellsPerExtBlob,
-	)
-	return bundle
+	ctx := types.ExecutionSSZContext{
+		BlobGasLimit:     gas.FusakaMaxBlobGasPerBlock,
+		BlobBaseFee:      gas.BlobBaseFeeForHeader(b.config, block.Header()),
+		ExcessRegularGas: excessRegular,
+		Requests:         requests,
+		BlockAccessList:  balRLP,
+		SlotNumber:       slot,
+	}
+	payloadSSZ, err := types.NewExecutionPayloadSSZ(block, receipts, ctx)
+	if err != nil {
+		return resp, nil
+	}
+	enc, err := payloadSSZ.MarshalSSZ()
+	if err != nil {
+		return resp, nil
+	}
+	root, err := payloadSSZ.HashTreeRoot()
+	if err != nil {
+		return resp, nil
+	}
+	resp.SSZPayload = json.RawMessage(`"` + "0x" + hex.EncodeToString(enc) + `"`)
+	resp.SSZBlockHash = &root
+	return resp, nil
 }
 
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
-	return b.config.IsEnginePrague(timestamp)
+	return b.config.IsPrague(timestamp)
+}
+
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.config.IsOsaka(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
-	return b.config.IsEngineAmsterdam(timestamp)
+	return b.config.IsAmsterdam(timestamp)
 }
 
 // ProcessInclusionList validates and stores a new inclusion list from the CL.
@@ -1606,20 +1645,33 @@ func (b *EngineBackend) ProcessInclusionList(il *types.InclusionList) error {
 // EIP-7805: Select transactions up to MAX_BYTES_PER_INCLUSION_LIST (8 KiB).
 func (b *EngineBackend) GetInclusionList() *types.InclusionList {
 	// If no txpool is wired, return empty IL.
-	if b.txPool == nil {
+	pool := b.payloadTxPool()
+	if pool == nil {
 		return &types.InclusionList{Transactions: [][]byte{}}
 	}
 
-	selected, totalSize := eips.SelectTransactionsForInclusionList(b.txPool.Pending(), eips.MaxBytesPerInclusionList)
+	selected, totalSize := eips.SelectTransactionsForInclusionList(pool.Pending(), eips.MaxBytesPerInclusionList)
 
 	backendLog.Debug("getInclusionList", "tx_count", len(selected), "total_bytes", totalSize)
 
 	return &types.InclusionList{Transactions: selected}
 }
 
-// SetTxPool wires a transaction pool reader for inclusion list generation.
+// SetTxPool wires a transaction pool reader for inclusion list generation
+// AND payload building (the async builder consumes pending txs per build).
 func (b *EngineBackend) SetTxPool(pool block.TxPoolReader) {
+	b.txPoolMu.Lock()
+	defer b.txPoolMu.Unlock()
 	b.txPool = pool
+	if b.asyncBuilder != nil {
+		b.asyncBuilder.SetTxPool(pool)
+	}
+}
+
+func (b *EngineBackend) payloadTxPool() block.TxPoolReader {
+	b.txPoolMu.RLock()
+	defer b.txPoolMu.RUnlock()
+	return b.txPool
 }
 
 // ilsAsFocil converts stored types.InclusionList entries to focil.InclusionList format.

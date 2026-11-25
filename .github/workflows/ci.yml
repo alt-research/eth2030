@@ -5,6 +5,13 @@ on:
     branches: [master]
     paths:
       - 'pkg/**'
+      - 'tools/consensus-replay/**'
+      - 'tools/capture_engine_stall.py'
+      - 'tools/engine_storage_snapshot.py'
+      - 'tools/test_capture_engine_stall.py'
+      - 'tools/test_engine_storage_snapshot.py'
+      - 'IFLOW.md'
+      - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
       - 'specs/hegota/**'
       - 'tools/hegota/**'
@@ -13,6 +20,13 @@ on:
     branches: [master]
     paths:
       - 'pkg/**'
+      - 'tools/consensus-replay/**'
+      - 'tools/capture_engine_stall.py'
+      - 'tools/engine_storage_snapshot.py'
+      - 'tools/test_capture_engine_stall.py'
+      - 'tools/test_engine_storage_snapshot.py'
+      - 'IFLOW.md'
+      - 'CLAUDE.md'
       - '.github/workflows/ci.yml'
       - 'specs/hegota/**'
       - 'tools/hegota/**'
@@ -27,6 +41,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  consensus-replay:
+    name: Consensus fixture and control regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: tools/consensus-replay/go.sum
+      - name: Replay the finalized consensus fixture
+        working-directory: tools/consensus-replay
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+          go test -race -count=1 ./...
+          go run . testdata/heze-a05a56de
+      - name: Verify devnet control assertions
+        run: python3 -m unittest discover -s pkg/devnet/kurtosis/scripts -p 'test_*.py'
+      - name: Verify quiet-pipe Engine timeout evidence capture
+        run: python3 -m unittest discover -s tools -p 'test_capture_engine_stall.py'
+      - name: Verify live storage-wait evidence capture
+        run: python3 -m unittest discover -s tools -p 'test_engine_storage_snapshot.py'
+      - name: Rebuild the frozen paymaster runtime
+        run: |
+          curl --fail --location --retry 3 https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/linux-amd64/solc-linux-amd64-v0.8.38+commit.1835d247 -o "$RUNNER_TEMP/frame-solc"
+          printf '%s  %s\n' '65c3180a336eabb6bdc4bbd49cc405aeb233976964ae6c11fba2a6c8be8f3243' "$RUNNER_TEMP/frame-solc" | sha256sum -c -
+          sudo install -m 755 "$RUNNER_TEMP/frame-solc" /usr/local/bin/solc
+          python3 pkg/core/framepay/contracts/generate.py --check
+
   ci:
     name: Build, Vet, Lint, Test
     runs-on: ubuntu-latest
@@ -70,3 +117,180 @@ jobs:
         run: go test ./... -timeout=15m -count=1
         env:
           GOFLAGS: '-p=4'
+
+  application-sequences:
+    name: Published wallet and DEX application sequences
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Execute native and independent signed application workflows
+        working-directory: pkg
+        run: go test -json -count=1 ./core/applicationtest > application-sequence-results.jsonl
+      - name: Collect complete application evidence
+        if: always()
+        run: |
+          python3 - <<'PYTHON'
+          import collections, json, os
+          from pathlib import Path
+          outputs = collections.defaultdict(str)
+          passed = set()
+          for line in Path('pkg/application-sequence-results.jsonl').read_text().splitlines():
+              event = json.loads(line)
+              test = event.get('Test', '')
+              outputs[test] += event.get('Output', '')
+              if event['Action'] == 'pass':
+                  passed.add(test)
+          result = {'native_revision': os.environ['GITHUB_SHA'], 'oracle': 'unchanged Geth v1.17.10', 'eips_revision': '3db38a3725105cb67b8804ac3e147967113bc3ca', 'forks': {}}
+          assert '' in passed and 'TestPublishedApplicationArtifactIntegrity' in passed
+          for lane, test_root in [('forks', 'TestPublishedWalletAndDEXSignedSequences'), ('lazy_history_forks', 'TestPublishedWalletAndDEXLazyHistorySequences')]:
+              result[lane] = {}
+              for fork in ['Osaka', 'Amsterdam']:
+                  test = test_root + '/' + fork
+                  assert test in passed, test
+                  records = []
+                  # go test splits long signed deployment logs across Output events.
+                  # Reassemble each test's output before decoding its JSON records.
+                  for line in outputs[test].splitlines():
+                      start = line.find('{')
+                      if start < 0:
+                          continue
+                      record = json.loads(line[start:])
+                      records.append(record)
+                  transactions = [r for r in records if 'transaction' in r]
+                  queries = [r for r in records if r.get('kind') == 'application_query']
+                  assert len(transactions) == 31 and len(queries) == 17, (fork, len(transactions), len(queries))
+                  assert all(r['native_root'] == r['independent_root'] for r in transactions)
+                  assert all(r['native_output'] == r['independent_output'] for r in queries)
+                  result[lane][fork] = {'transactions': transactions, 'queries': queries}
+          Path('pkg/application-sequences.json').write_text(json.dumps(result, indent=2) + '\n')
+          PYTHON
+      - name: Retain signed inputs, roots, logs and actual getter outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-sequence-results-${{ github.sha }}
+          path: |
+            pkg/application-sequence-results.jsonl
+            pkg/application-sequences.json
+          if-no-files-found: error
+          retention-days: 90
+
+  native-state-tests:
+    name: Native signed Osaka and Amsterdam state tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Download and verify independent official fixtures
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors https://github.com/ethereum/execution-specs/releases/download/tests%40v21.0.2/fixtures.tar.gz -o "$RUNNER_TEMP/eels-fixtures.tar.gz"
+          printf '%s  %s\n' 'e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9' "$RUNNER_TEMP/eels-fixtures.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/eels-native"
+          tar -xzf "$RUNNER_TEMP/eels-fixtures.tar.gz" -C "$RUNNER_TEMP/eels-native" fixtures/state_tests/for_osaka fixtures/state_tests/for_amsterdam fixtures/blockchain_tests/for_osaka fixtures/blockchain_tests/for_amsterdam
+      - name: Build the native executor
+        working-directory: pkg
+        run: |
+          go build -o "$RUNNER_TEMP/native-state-tests" ./cmd/native-state-tests
+          go build -buildvcs=true -ldflags "-X main.sourceRevision=$GITHUB_SHA -X main.sourceModified=false" -o "$RUNNER_TEMP/native-blockchain-tests" ./cmd/native-blockchain-tests
+      - name: Execute both complete selected fork corpora
+        run: |
+          mkdir -p native-state-results
+          failed=0
+          "$RUNNER_TEMP/native-state-tests" -fork Osaka "$RUNNER_TEMP/eels-native/fixtures/state_tests/for_osaka" > native-state-results/osaka.json 2> native-state-results/osaka.log || failed=1
+          "$RUNNER_TEMP/native-state-tests" -fork Amsterdam "$RUNNER_TEMP/eels-native/fixtures/state_tests/for_amsterdam" > native-state-results/amsterdam.json 2> native-state-results/amsterdam.log || failed=1
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          for fork, expected in [('Osaka', 14665), ('Amsterdam', 16908)]:
+              report = json.loads(Path(f'native-state-results/{fork.lower()}.json').read_text())
+              assert report['native_revision'] == os.environ['GITHUB_SHA'], report['native_revision']
+              assert report['executor'] == 'eth2030-native-signed-state-transition'
+              assert report['fork'] == fork and not report['errors'], report['errors']
+              assert report['passed'] == expected and report['failed'] == 0, (fork, report['passed'], report['failed'])
+              assert len(report['cases']) == expected
+              assert len({(c['file'], c['name'], c['index']) for c in report['cases']}) == expected
+              assert all(c['passed'] and c['expected_root'] == c['got_root'] for c in report['cases'])
+          PYTHON
+          "$RUNNER_TEMP/native-blockchain-tests" -fork Osaka "$RUNNER_TEMP/eels-native/fixtures/blockchain_tests/for_osaka" > native-state-results/osaka-blockchain.json 2> native-state-results/osaka-blockchain.log || failed=1
+          "$RUNNER_TEMP/native-blockchain-tests" -fork Amsterdam "$RUNNER_TEMP/eels-native/fixtures/blockchain_tests/for_amsterdam" > native-state-results/amsterdam-blockchain.json 2> native-state-results/amsterdam-blockchain.log || failed=1
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          for fork, cases, blocks in [('Osaka', 17441, 19875), ('Amsterdam', 26349, 32745)]:
+              report = json.loads(Path(f'native-state-results/{fork.lower()}-blockchain.json').read_text())
+              assert report['native_revision'] == os.environ['GITHUB_SHA']
+              assert report['executor'] == 'eth2030-native-blockchain-import'
+              assert report['fork'] == fork and not report['errors'], report['errors']
+              assert report['passed'] == cases and report['failed'] == 0
+              assert len(report['cases']) == cases
+              assert len({(case['file'], case['name']) for case in report['cases']}) == cases
+              assert sum(len(case['blocks']) for case in report['cases']) == blocks
+              assert all(case['passed'] and case['expected_head'] == case['got_head'] and case['expected_root'] == case['got_root'] for case in report['cases'])
+          PYTHON
+          exit "$failed"
+      - name: Retain native case results and failure diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-state-results-${{ github.sha }}
+          path: native-state-results/
+          if-no-files-found: error
+          retention-days: 90
+
+  ef-state-tests:
+    name: Geth-backed EF state tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ethereum/tests
+          # refs/go-ethereum at 0cba803f pins this tests/testdata revision.
+          ref: 81862e4848585a438d64f911a19b3825f0f4cd95
+          path: refs/go-ethereum/tests/testdata
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Verify pinned EF vectors
+        working-directory: pkg
+        run: go test -v -count=1 -timeout=15m -run '^TestGethCategorySummary$' ./core/eftest
+        env:
+          ETH2030_REQUIRE_EF_FIXTURES: '1'
+
+  test-variants:
+    name: Go tests (${{ matrix.variant }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: integration
+            args: -tags integration ./core ./p2p/...
+          - variant: blst
+            args: -tags blst ./crypto/bls ./consensus ./light/bls
+          - variant: goethkzg
+            args: -tags goethkzg ./crypto/bls ./core/vm
+          - variant: race
+            args: -race ./consensus ./focil ./das/custody ./ssz ./core/types ./eiptest/... ./core/rawdb ./core/chain ./sync/beacon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Run test variant
+        working-directory: pkg
+        run: go test -count=1 -timeout=15m ${{ matrix.args }}

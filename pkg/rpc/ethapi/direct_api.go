@@ -7,6 +7,7 @@ package ethapi
 import (
 	"errors"
 	"fmt"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math"
 	"math/big"
 
@@ -63,7 +64,7 @@ func (api *EthDirectAPI) GetBalance(address string, block string) (string, error
 		return "", ErrBlockNotFound
 	}
 
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrStateUnavailable, err)
 	}
@@ -82,7 +83,7 @@ func (api *EthDirectAPI) GetTransactionCount(address string, block string) (stri
 		return "", ErrBlockNotFound
 	}
 
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrStateUnavailable, err)
 	}
@@ -240,11 +241,10 @@ func (api *EthDirectAPI) SendRawTransaction(data string) (string, error) {
 		return "", ErrEmptyTxData
 	}
 
-	// Wrap raw bytes as a legacy transaction. A full implementation would
-	// RLP-decode the transaction to determine its type.
-	tx := types.NewTransaction(&types.LegacyTx{
-		Data: rawBytes,
-	})
+	tx, err := types.DecodePooledTransaction(rawBytes)
+	if err != nil {
+		return "", err
+	}
 
 	if err := api.backend.SendTransaction(tx); err != nil {
 		return "", err
@@ -278,7 +278,7 @@ func (api *EthDirectAPI) GetCode(address, block string) (string, error) {
 		return "", ErrBlockNotFound
 	}
 
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrStateUnavailable, err)
 	}
@@ -297,7 +297,7 @@ func (api *EthDirectAPI) GetStorageAt(address, key, block string) (string, error
 		return "", ErrBlockNotFound
 	}
 
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", ErrStateUnavailable, err)
 	}

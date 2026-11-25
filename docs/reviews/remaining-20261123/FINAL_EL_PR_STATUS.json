@@ -1,0 +1,51 @@
+{
+  "at": "2026-11-23T14:41:03.648696+00:00",
+  "all_current_code_heads_ci_passed": true,
+  "prs": [
+    {
+      "number": 146,
+      "head": "d5ef77a63088b10597d407fd1f3f6ad65e626501",
+      "base": "master",
+      "draft": false,
+      "ci_id": 45196161584,
+      "ci_conclusion": "success",
+      "ci_url": "https://github.com/alt-research/eth2030/actions/runs/45196161584"
+    },
+    {
+      "number": 145,
+      "head": "b1c95a5aae905dd564e65c7f9bc9679212d57ebe",
+      "base": "master",
+      "draft": false,
+      "ci_id": 45189158581,
+      "ci_conclusion": "success",
+      "ci_url": "https://github.com/alt-research/eth2030/actions/runs/45189158581"
+    },
+    {
+      "number": 144,
+      "head": "f3da9c131940db25de6863e0636155ab43ca9943",
+      "base": "master",
+      "draft": false,
+      "ci_id": 45189157445,
+      "ci_conclusion": "success",
+      "ci_url": "https://github.com/alt-research/eth2030/actions/runs/45189157445"
+    },
+    {
+      "number": 143,
+      "head": "3b5fbeb55ddfdcab07c3d5d8639988922a95bd75",
+      "base": "master",
+      "draft": false,
+      "ci_id": 45176044660,
+      "ci_conclusion": "success",
+      "ci_url": "https://github.com/alt-research/eth2030/actions/runs/45176044660"
+    },
+    {
+      "number": 142,
+      "head": "8f7c983cd15f95cbaf7f360ed7af2e991ce04c4c",
+      "base": "master",
+      "draft": false,
+      "ci_id": 45154932805,
+      "ci_conclusion": "success",
+      "ci_url": "https://github.com/alt-research/eth2030/actions/runs/45154932805"
+    }
+  ]
+}

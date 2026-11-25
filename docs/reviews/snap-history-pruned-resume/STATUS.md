@@ -1,0 +1,5 @@
+# Snap historical resume after BAL expiry
+
+A legal EIP-7928 pruning of a completed historical BAL prevented both in-memory cursor recovery and real FileDB reopen on master c27a5bb0. Preserve canonical header/body/prefix authentication, verify every present BAL hash, and permit missing BAL bytes only when both actual beacon slot fields establish expiry relative to the finalized block. Exact-boundary/in-window bytes remain required; unfinalized head movement and missing slot metadata cannot expire data.
+
+Two original red controls pass after correction. Retained exact-boundary, within-window, unfinalized-head, corrupt-byte and unknown-slot controls reject as required. Ordinary executed sparse-slot fixtures and FileDB recovery retain exact state/head/finality and do not grant pre-pivot execution authority or manufacture pruned bytes. Full 219 packages and 107 files/108 unchanged official requests, five affected race suites, full vet and native/tool builds pass on Go 1.26.11. Results retain exact source and command scope. The live retained chain is below the long retention horizon, so these boundary fixtures are not a claimed live two-week expiry campaign.

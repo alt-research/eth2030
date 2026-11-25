@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/eth2030/eth2030/rlp"
@@ -101,14 +102,17 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 	hasExcessBlobGas := h.ExcessBlobGas != nil
 	hasBeaconRoot := h.ParentBeaconRoot != nil
 	hasRequestsHash := h.RequestsHash != nil
+	hasBALHash := h.BlockAccessListHash != nil
 	hasCalldataUsed := EIP7706HashFields && h.CalldataGasUsed != nil
 	hasCalldataExcess := EIP7706HashFields && h.CalldataExcessGas != nil
 
 	// anyFrom[i] is true when any optional field at or after position i is set.
 	// This mirrors go-ethereum's generated encoder logic.
-	anyFromCalldataExcess := hasCalldataExcess
+	anyFromSlot := h.SlotNumber != nil
+	anyFromCalldataExcess := hasCalldataExcess || (EIP7706HashFields && anyFromSlot)
 	anyFromCalldataUsed := hasCalldataUsed || anyFromCalldataExcess
-	anyFromRequests := hasRequestsHash || anyFromCalldataUsed
+	anyFromBAL := hasBALHash || anyFromCalldataUsed || anyFromSlot
+	anyFromRequests := hasRequestsHash || anyFromBAL
 	anyFromBeacon := hasBeaconRoot || anyFromRequests
 	anyFromExcessBlob := hasExcessBlobGas || anyFromBeacon
 	anyFromBlobUsed := hasBlobGasUsed || anyFromExcessBlob
@@ -187,29 +191,41 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 	} else {
 		appendEmpty()
 	}
-	if !anyFromCalldataUsed {
+	if !anyFromBAL {
 		return rlp.WrapList(payload), nil
 	}
-
-	// EIP-7706: CalldataGasUsed (only when EIP7706HashFields is enabled)
-	if hasCalldataUsed {
-		if err := appendItem(*h.CalldataGasUsed); err != nil {
+	// EIP-7928: block_access_list_hash follows requests_hash.
+	if hasBALHash {
+		if err := appendItem(*h.BlockAccessListHash); err != nil {
 			return nil, err
 		}
 	} else {
 		appendEmpty()
 	}
-	if !anyFromCalldataExcess {
-		return rlp.WrapList(payload), nil
+	// EIP-7706 experimental fields retain their layout when enabled.
+	if anyFromCalldataUsed {
+		if hasCalldataUsed {
+			if err := appendItem(*h.CalldataGasUsed); err != nil {
+				return nil, err
+			}
+		} else {
+			appendEmpty()
+		}
 	}
-
-	// EIP-7706: CalldataExcessGas (only when EIP7706HashFields is enabled)
-	if hasCalldataExcess {
-		if err := appendItem(*h.CalldataExcessGas); err != nil {
+	if anyFromCalldataExcess {
+		if hasCalldataExcess {
+			if err := appendItem(*h.CalldataExcessGas); err != nil {
+				return nil, err
+			}
+		} else {
+			appendEmpty()
+		}
+	}
+	// EIP-7843: append the slot even when its value is zero.
+	if anyFromSlot {
+		if err := appendItem(*h.SlotNumber); err != nil {
 			return nil, err
 		}
-	} else {
-		appendEmpty()
 	}
 	return rlp.WrapList(payload), nil
 }
@@ -362,25 +378,44 @@ func DecodeHeaderRLP(data []byte) (*Header, error) {
 		h.RequestsHash = &rh
 	}
 
-	// EIP-7706: CalldataGasUsed / CalldataExcessGas — only decoded when the
-	// EIP7706HashFields flag is enabled (off by default for Lighthouse compat).
-	if !EIP7706HashFields || s.AtListEnd() {
-		return finishHeader(s, h)
-	}
-	cgu, err := s.Uint64()
-	if err != nil {
-		return nil, err
-	}
-	h.CalldataGasUsed = &cgu
-
 	if s.AtListEnd() {
 		return finishHeader(s, h)
 	}
-	ceg, err := s.Uint64()
+	balBytes, err := s.Bytes()
 	if err != nil {
 		return nil, err
 	}
-	h.CalldataExcessGas = &ceg
+	if len(balBytes) == HashLength {
+		hash := BytesToHash(balBytes)
+		h.BlockAccessListHash = &hash
+	} else if len(balBytes) != 0 {
+		return nil, fmt.Errorf("header: invalid BAL hash length %d", len(balBytes))
+	}
+
+	// EIP-7706: CalldataGasUsed / CalldataExcessGas — only decoded when the
+	// EIP7706HashFields flag is enabled (off by default for Lighthouse compat).
+	if EIP7706HashFields && !s.AtListEnd() {
+		cgu, err := s.Uint64()
+		if err != nil {
+			return nil, err
+		}
+		h.CalldataGasUsed = &cgu
+
+		if !s.AtListEnd() {
+			ceg, err := s.Uint64()
+			if err != nil {
+				return nil, err
+			}
+			h.CalldataExcessGas = &ceg
+		}
+	}
+	if !s.AtListEnd() {
+		slot, err := s.Uint64()
+		if err != nil {
+			return nil, err
+		}
+		h.SlotNumber = &slot
+	}
 
 	return finishHeader(s, h)
 }

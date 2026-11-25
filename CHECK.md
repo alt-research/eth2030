@@ -1,12 +1,197 @@
+## Current Glamsterdam conformance closure (2026-11-25)
+
+- [x] Preserve the original checkout and publish independent master-targeted EL corrections.
+- [x] Complete the native official block corpus, independent BAL recovery and current strict CL reference campaign.
+- [x] Repair actual canonical light-client serving/notification defects with real red/green consumers.
+- [x] Verify all eight combined release stages, real independent wire consumers and the native node build.
+- [x] Integrate every qualified Lighthouse correction into eth2030 after latest CI passes.
+- [x] Reconcile source-specific progress and residual boundaries on the homepage/roadmap and in PR165 evidence.
+
+Publication gate: recheck the final documentation CI, all EL targets/heads and cumulative merge orders after publication; retain the immutable result in PR165 metadata. EL merge remains the separate user action. Original-04 remains unconfirmed; excluded/later work is not marked passed.
+
+## Remaining-code closure (2026-11-22)
+
+- [x] Preserve the original checkout and freeze shared source at PR126 head43002a5d; all new PRs target master with explicit ancestry.
+- [x] Close legacy Builder Engine authority/signature/header gaps under the selected Gloas/Engine contract; retain red and independent signed controls.
+- [x] Make node startup transactional: synchronous required binds, failure propagation, complete rollback, truthful health and retry.
+- [x] Recheck scale/coverage/upstream boundaries, publish separate source reviews and verify exact-head CI plus all120 cumulative source merge orders.
+
+- [x] Bound FileDB resident values and stream WAL recovery without weakening known-key IO, root or commit-marker checks.
+- [ ] Diagnose and repair the repeated native Engine import stall before fresh operating admission; retain failed03/04 and the independently signed observed spans.
+- [ ] Complete actual 48-hour operation on the final combined runtime; synthetic profiles and short restarts do not close this gate.
+
+Each feature owns its detailed CHECK.md and STATUS.md under docs/reviews; shared root tracking is inherited rather than edited independently.
+
+## Merged roadmap refresh and gap audit (2026-11-22)
+
+- [x] Verify EL reviews123/124/125 merged in master9a094830 and preserve the original dirty checkout.
+- [x] Reconcile homepage, roadmap and EIP tracker with merged source, all core/supporting obligations and retained qualification evidence.
+- [x] Reproduce legacy builder-extension gaps and document scaling, upstream/public and later-fork boundaries.
+- [x] Build and inspect157 exported pages, verify desktop/mobile layouts and reject mutated claims/status.
+- [x] Correct the CI-observed metrics/P2P port collision using a synchronously reserved ephemeral listener.
+- [x] Publish master-targeted PR126; require final exact remote-head CI/merge verification after the documentation suffix.
+
+## Final post-merge closure (2026-11-22)
+
+- [x] Fix and separately publish BAL-expiry resume and authenticated indexed snap/finality IO recovery.
+- [x] Complete four original-datadir restarts, fifteen dependency controls, three automatic provider recoveries and final steady/pressure acceptance.
+- [x] Verify final-source two-row external-builder blob/partials, historical state/BAL and independent finality/SDK consumers.
+- [x] Publish complete public captures and fresh offline replays; preserve original failures and unchanged protocol authority.
+- [x] Publish master-targeted documentation PR125, verify exact source-head CI/targets and all six cumulative merge orders; final post-push metadata verification is retained separately.
+
+Earlier checklists are retained dated observations. Current completion is reconciled in docs/plans/glamsterdam/POST_MERGE_CLOSURE_20261122.md.
+
+## Authorized post-merge corrections and next-step plan (2026-11-20)
+
+- [x] Isolate F1/F2/F3 corrections from the original dirty checkout and retain their red controls/specification authority.
+- [x] Publish cells handoff PR 116 and full-range sync PR 117 directly to master; both pass all nine CI jobs.
+- [x] Publish separate remaining-work/acceptance plan PR 118 without starting new live campaigns.
+- [x] Qualify incremental state/history and exact point consumers with roots/proofs/application/error/scale controls; prepare its separate master-targeted PR.
+- [x] Require final current-head CI and cumulative composition/merge verification before reporting completion; do not merge EL master.
+
+## Direct-master delivery correction and stop (2026-11-20)
+
+- [x] Prepare and publish independent PR 115 for original PR 91 against current master; retain exact source/test bytes and original ancestry.
+- [x] Verify affected tests/race/vet/build and audit every open/recently merged review for stranded delivery.
+- [x] Retarget all remaining open reviews to master, retain Draft status and clarify code prerequisites; close already-delivered PR 99.
+- [x] Verify clean current-master and cumulative dependency-ordered merges, preserve exact target evidence and publish the updated handoff.
+- [x] Require final post-push remote-head verification and stop without merging EL master or resuming feature work.
+
+## User stop and PR merge handoff (2026-11-20)
+
+- [x] Finish and separately publish the current official RPC conformance correction as PR 114.
+- [x] Check every open EL PR against its fetched current target and simulate dependency-ordered merge commits; preserve the squash-conflict control.
+- [x] Publish frozen heads, merge procedure, actual runtime health and explicit deferred acceptance work.
+- [x] Restore the in-flight original pair 2 maintenance and stop completed auxiliary qualification roles while retaining their data.
+- [x] Verify the frozen remote PR refs and documentation-only handoff; require the final post-push check and stop all further development as requested.
+
+## Authorized complete Glamsterdam continuation (2026-11-19)
+
+- [x] Preserve the original dirty checkout and freeze the merged master/audit baseline.
+- [x] Compose separately reviewed prerequisite corrections and retain all task/source ancestry.
+- [ ] Close R02/R03/R04 native fixture, application and entrypoint obligations with actual independent consumers.
+- [ ] Close R06/R07/R08/R09 CL adversarial, payment, proof and peer obligations; retain explicit-fork evidence.
+- [ ] Complete R10/R11/R12 independent process, recovery and operating-budget campaigns.
+- [ ] Close R13 compatible artifacts/runbooks and publish every major EL change as a separate PR.
+
+## Glamsterdam post-merge completion audit (2026-11-19)
+
+- [x] Fetch latest master and verify all EL reviews 64–87 are merged; preserve original dirty worktree.
+- [x] Reconcile the 33-task plan against merged implementations and actual evidence rather than historic pending labels.
+- [x] Revalidate concrete defects, native fixture infrastructure, CL/client boundaries and open qualification gates.
+- [x] Produce a deduplicated remaining-work inventory with exact sources, priorities and completion conditions; update integration status without business changes.
+
+## Shared PR tracking conflict cleanup (2026-11-19)
+
+- [x] Inventory open feature reviews and classify tracking versus source/evidence conflicts.
+- [x] Preserve feature tracking under `docs/reviews/pr-<number>/` and align shared root trackers.
+- [x] Reconcile current master without dropping either side of functional changes; verify builds and affected tests.
+- [x] Prepare non-forced updates to all existing PR branches; require exact remote-head and live conflict-state verification before reporting completion.
+
+## PR 65 conflict resolution (2026-11-19)
+
+- [x] Fetch and verify the exact PR head and current master without changing the original checkout.
+- [x] Merge current master while preserving the EIP-7954 review and latest program documentation.
+- [x] Run affected tests, race/vet and local build; update STATUS.md.
+- [x] Push only the updated PR 65 branch and confirm GitHub mergeability (mergeable=true; CI pending).
+
+## Glamsterdam EIP-7954 contract limits
+
+- [x] Read local draft and pinned current EIP-7954; record the 64/128 KiB revision difference.
+- [x] Add failing CREATE/CREATE2 and transaction admission boundary tests.
+- [x] Correct fork-gated limits and reject oversized creation transactions before mutation.
+- [x] Verify affected packages, build and prepare the separate feature review.
+
+## Tracing review and merge handoff (2026-11-19)
+
+- [x] Record PR 87, exact local/SDK/mutation qualification and immutable heads.
+- [x] Fetch master and inspect PR states, Draft status, dependency ancestry and observed CI evidence.
+- [x] Prepare MERGE_REVIEW.md; leave upstream merge decisions for review.
+- [x] Stop further implementation after the current task as requested.
+
+## Stateful simulation review tracking (2026-11-19)
+
+- [x] Record PR 86, its independent complete-block evidence, scope and fifteen detected mutations.
+- [x] Keep qualified feature branches distinct from stable integration and final release acceptance.
+- [x] Continue nested tracing separately with explicit unmerged-schema boundaries.
+
+## Explicit LIFO development selection (2026-11-19)
+
+- [x] Record the user's implementation decision and exact merged source.
+- [x] Keep unmerged alternatives excluded and final design review open.
+- [x] Continue remaining consumer/CL/validation work under this selected baseline.
+
+## Qualified gas development tracking (2026-11-19)
+
+- [x] Archive the clean 42-case checkpoint, actual HTTP/system/accounting consumers and detected mutations.
+- [x] Record full/tagged/race/vet/build without converting final protocol choices into development defaults.
+- [x] Keep separate RPC branch and broader acceptance outside the stable qualified integration.
+
+## Canonical system review tracking (2026-11-19)
+
+- [x] Record separate PR 84, canonical independent roots, actual Node consumers and mutations.
+- [x] Verify composed full/tagged/affected race/vet/build and published integration head.
+- [x] Retain Gas draft full-suite/API/application and full-client/release gates.
+
+## Glamsterdam completion implementation (2026-11-18)
+
+## Pivot proof and gas draft tracking (2026-11-19)
+
+- [x] Record PR 81 unchanged-account consumer repair, seven scenarios and nine detected mutations.
+- [x] Preserve the qualified 212-package aggregate and changed-consumer race/build evidence.
+- [x] Track separate Draft PR 83 and signed/block checkpoints without claiming full-suite or release completion.
+
+## Sparse relay review tracking (2026-11-19)
+
+- [x] Record separate PR 82, source/foundation/remote heads and current merged wire decisions.
+- [x] Import actual native/SDK/Engine/recovery/mutation evidence and snap/2 socket follow-up.
+- [x] Verify the 212-package aggregate, tagged suites, 97-package race, vet/build and published integration head.
+- [x] Preserve final gas, CL/multiclient/resource and release gates.
+
+## Snap version 2 review tracking (2026-11-19)
+
+- [x] Record separate PR 81, exact source, dependencies and qualified consumers.
+- [x] Preserve full program gates and import verification/results/composition evidence.
+- [x] Verify aggregate tests, tagged suites, affected race/vet and build.
+
+## Configured blob schedule review (2026-11-18)
+
+- [x] Publish PR 80 with explicit dependencies and isolated review delta.
+- [x] Qualify real 7/10/21-blob version-1 HTTP and restart consumers, independent formulas and six mutations.
+- [x] Retain the failed legacy race observation and pass current proofs without timeout changes.
+- [x] Qualify full/tagged/54-package race/vet/build composition.
+- [ ] Complete sparse relay, snap/2, final gas and remaining release gates.
+
+## Canonical startup and Engine review (2026-11-18)
+
+- [x] Publish isolated PR 78 and pin complete Engine specifications.
+- [x] Qualify actual HTTP and four behavioral mutations, preserving valid zero fields and forkchoice adoption.
+- [x] Run full/tagged/affected race/vet/build on the feature composition.
+- [x] Qualify actual persisted configuration recovery in PR 79.
+- [ ] Complete remaining release gates.
+
+## Builder execution requests review batch (2026-11-18)
+
+- [x] Publish isolated EL PR 77 and Lighthouse PR 3 with exact spec and wire evidence.
+- [x] Compose the feature sets without altering the original checkouts.
+- [x] Qualify 211 aggregate Go packages, tagged Core/EIP, vet/build and 25 paired CL library tests/check/full lint.
+- [x] Retain final gas, full live network/deployment/recovery and release gates.
+
+- [x] Isolate the current-mainline program worktree and preserve the original dirty checkout.
+- [ ] Revalidate the 33-task plan against origin/master and freeze specification/decision inputs.
+- [ ] Publish the baseline/acceptance program in its own review branch.
+- [ ] Deliver each major feature in a separate scoped branch and PR, retaining test evidence.
+- [ ] Close native, consumer, independent-client, recovery and release gates with observed evidence.
+
 # Lean4 Verification Check-list
 
 ## PR #167 master integration and CI (2026-11-25)
 
-- [ ] Record the merge base, upstream divergence and each conflict resolution.
-- [ ] Integrate current master without restoring retired interfaces or losing native execution fixes.
-- [ ] Reconcile specification locks, runtime evidence, regression tests and CI workflows.
-- [ ] Run local build, required checks and regression suites; repair failures.
-- [ ] Commit, push, verify hosted CI and update the PR description in English.
+- [x] Record the merge base, upstream divergence and each conflict resolution.
+- [x] Integrate current master without restoring retired interfaces or losing native execution fixes.
+- [x] Reconcile specification locks, runtime evidence, regression tests and CI workflows.
+- [x] Run local build, required checks and regression suites; repair failures.
+- [x] Prepare the verified integration commit and English PR update; track publication and hosted outcomes directly on PR #167.
 
 ## Hegotá A follow-up audit and push (2026-11-25)
 
@@ -44,6 +229,414 @@
 - [x] Write a sourced Chinese macro development plan and EIP review register.
 - [x] Verify document links and counts, run a local Go build, and update STATUS.md.
 - [x] Commit only this task's documentation changes.
+## Glamsterdam implementation checkpoint (2026-11-18)
+
+- [x] Publish separate branches and reviews for scoped major changes.
+- [x] Qualify their combined production sources with full Go, tagged, build and affected vet/race checks.
+- [x] Record exact reviewed/source heads and distinguish development evidence from open release gates.
+- [ ] Complete the remaining 33-task program acceptance matrix.
+
+## Merged Frame roadmap and homepage progress (2026-11-18)
+
+- [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+- [x] Share the qualified development snapshot between the homepage and roadmap.
+- [x] Refresh Frame, FOCIL and historical BAL references; retain independent-client and service gates.
+- [x] Replace obsolete active plans and progress totals with current evidence and next acceptance work.
+- [x] Verify the static export, progress consistency, source paths, local build and responsive rendering.
+- [x] Commit and publish only the scoped changes for review.
+
+## Frame paymaster and history follow-up (2026-11-18)
+
+- [x] Freeze a reproducible ETH2030 paymaster runtime with an acyclic protocol-signature witness convention and explicit upstream-reference differences.
+- [x] Qualify exact-code recognition, prefix execution, aggregate exposure, delayed-withdrawal reservations and head/reorg revalidation.
+- [x] Test actual authorization, timelock enforcement, storage changes and value transfers, including negative and mutation cases.
+- [x] Repair historical Engine body DATA encoding and validated BAL persistence, including both wire versions and restart readback.
+- [x] Exercise coded sponsorship and fresh CL Frame history with bounded live resources, then remove all owned runtime resources.
+- [x] Retain a root-checked replay of the real Heze state using the released Go client and a minimal profile-specific compatibility type.
+- [x] Reconcile service-consumer and independent-client gates against current sources; keep unsupported boundaries explicit.
+
+## Canonical Frame execution
+
+- [x] Implement the pinned execution, state gas, approval and atomic rollback paths.
+- [x] Wire activation, generic public admission, payload import and receipt persistence.
+- [x] Pin the canonical-paymaster runtime and witness convention and qualify withdrawal reservations.
+- [x] Verify signatures, sponsorship, native blob order and EL restart.
+- [x] Qualify fresh CL Frame backfill against the paired native EL.
+- [ ] Qualify independent-client Frame history.
+- [ ] Qualify updated services and independent-client and state-sync gates.
+
+## Next-stage promotion (2026-11-17)
+
+See the [next-stage work plan](docs/next-stage-work-plan.md) for verified branch
+state, review scope and independent-client gates.
+
+- [x] Prepare and merge the native Bogotá, scoped devnet controls, Lighthouse and documentation reviews.
+- [x] Integrate Lighthouse upstream `3777cfd7` and preserve the local FCU verdict and list recovery regressions.
+- [x] Rebuild and qualify the patched EL/CL pair on finalized sponsored Frame traffic.
+- [x] Finish the pinned Frame transition and run its live receipt and history gates.
+- [ ] Run the Track 3 independent late-join control and continue authenticated moving-pivot recovery.
+
+## Consensus Client Follow-up (2026-11-16)
+
+See the [Lighthouse and Hegotá implementation plan](docs/lighthouse-hegota-implementation-plan.md)
+for work ownership, dependencies and acceptance criteria. The
+[consensus client roadmap](docs/cl-iteration-roadmap.md) covers later milestones.
+The [CL gap audit](docs/lighthouse-cl-gap-audit.md) records the audited revisions,
+implementation gaps and acceptance criteria.
+
+- [x] Record the published Lighthouse development baseline, initial Frame and FOCIL draft references, and cross-repository implementation and acceptance plan.
+- [x] Inventory the explorer, workload, assertion and monitoring services with fork revisions, profile coverage and historical run evidence.
+- [x] Compare the maintained forks with their upstream release, default and devnet branches in the [upstream adoption audit](docs/devnet-fork-upstream-audit.md).
+- [x] Assign duplicate mainline features and experimental ETH2030 features to their implementation owners in the [feature-level dispositions](docs/devnet-fork-upstream-audit.md#feature-level-disposition).
+- [x] Record the [implementation PR sequence](docs/devnet-upstream-implementation-plan.md#pr-sequence), control pins, verification gates and per-profile promotion.
+- [x] Freeze the capped Fulu control and verify finality, EL restart and enclave removal in [PR 1](docs/devnet-upstream-implementation-plan.md#1-freeze-the-control-and-make-failures-observable).
+- [x] Verify Gloas-at-genesis self-build and ordinary Heze compulsory inclusion on the merged clients, then remove both enclaves.
+- [ ] Run the scheduled Gloas, external builder, PTC and blob cases and the independent-client gates.
+- [ ] Qualify upstream Spamoor for ordinary traffic and verify receipt failover and the pinned Frame vectors before retiring the workload fork.
+- [ ] Replay the Heze Dora retention and epoch-data scenarios with an upstream Dora and Go client pair on a compatible CL schema.
+- [ ] Qualify the newer ethereum-package pin with generated genesis checks and a combined Heze/Bogotá activation run.
+- [x] Verify the historical CL and EL branches against the live code paths and assign all 68 unmatched Lighthouse commits to the [legacy branch integration plan](docs/lighthouse-legacy-branch-merge-plan.md).
+- [x] Audit the merged EL, Lighthouse branch delta, and upstream fork scope.
+- [x] Merge the current Lighthouse unstable revision in an isolated integration worktree and review the source delta.
+- [x] Verify official Lighthouse v8.3.3 against two ETH2030 ELs on the private Fulu profile.
+- [x] Verify the pinned upstream Lighthouse unstable image against two ETH2030 ELs on the private Fulu profile.
+- [x] Audit the March Lighthouse patches against current source, specifications, and Dora consumers.
+- [x] Verify a self-built Gloas envelope and its matching execution block on both node pairs after a live fork transition.
+- [x] Publish the Lighthouse `eth2030` branch and test the Heze self-build inclusion-list snapshot.
+- [x] Integrate the upstream update at `8104a2467` and port Heze proposer-side gossip checks and local Frame hash verification.
+- [x] Verify validator-driven Heze inclusion-list production against the native EL's Bogotá list response in the two-pair devnet.
+- [x] Implement native Bogotá V6 validation and persist the execution-valid inclusion-unsatisfied decision in Lighthouse fork choice.
+- [x] Implement Heze inclusion-list peer recovery and test request/response framing, authenticated previous-slot import, and stream termination.
+- [x] Prove ordinary transaction inclusion on two unpeered ELs and verify the same-parent Engine build with and without list delivery.
+- [x] Commit EIP-7843 slot numbers to Amsterdam execution headers and match Geth genesis hashing, native payload import, and restart readback.
+- [x] Merge upstream Lighthouse `7a9d14115`, run its Gloas database-invariants test, and verify the published fork ref.
+- [x] Verify finalized Fulu Track 4 history and the same PQ transaction receipt after restarting one live EL.
+- [x] Add the repeatable Heze devnet profile and verifier for a finalized ordinary transaction delivered through FOCIL.
+- [x] Reproduce a finalized Fulu checkpoint and the Gloas transition with a published Lighthouse source, the current receiver fixture, and a pinned ETH2030 image.
+- [ ] Freeze cross-client Frame and Bogotá wire fixtures.
+- [x] Align Amsterdam-at-genesis execution header hashing and confirm block production with Gloas at genesis.
+- [ ] Pin a reproducible Lighthouse and ETH2030 reference pair and verify the Gloas/Amsterdam builder, BAL and blob scenarios.
+- [ ] Align the EL Frame implementation with the pinned draft and verify Frame payload import, blob commitments and historical backfill in the CL.
+- [x] Verify the V5 to V6 fork boundary on both ELs, the same-payload inclusion verdicts, and finalized compulsory inclusion on the published Lighthouse runtime with isolated mempools.
+- [x] Force live inclusion-list gossip loss and recover the original signed list through Req/Resp following an embedded self-build bid.
+- [x] Implement and test pending Bogotá inclusion-list retention and deferred FCU validation through the native EL HTTP API.
+- [ ] Verify deferred inclusion satisfaction through forkchoice against an independent execution client.
+- [x] Finalize a sponsored Frame transaction delivered through FOCIL, reconcile payer balances and receipts on both ELs, and verify EL restart.
+- [x] Verify the same sponsored Frame through fresh CL late join with a synchronized EL.
+- [ ] Verify the same Frame through independent EL late join.
+- [x] Verify Dora inclusion-list positions and historical display after Lighthouse pruning and Dora restart on a memory-bounded Heze devnet.
+- [ ] Update Dora epoch statistics to decode current Gloas and Heze BeaconState SSZ.
+- [ ] Verify full and snap late join and restart against independent source clients.
+- [ ] Exercise scheduled Quick Slots and optional execution proofs on separate profiles with independent evidence.
+- [ ] Run decoupled-consensus differential tests and PQ validator interop against a pinned Lean specification.
+
+## Heze CL follow-up
+
+- [x] Merge upstream Lighthouse `ca9dff457` and verify both database restart regressions and the local release build.
+- [x] Bind deferred Bogotá Engine verdicts to the executed beacon ancestor, including an empty head and fork-choice reload.
+- [x] Recover signed lists advertised by embedded self-build bids with gossip delivery deliberately dropped in a capped devnet.
+- [x] Read the imported Heze block and its prior finalized checkpoint after restarting the receiver.
+- [x] Check Frame blob commitment ordering through the CL historical payload verification path.
+- [x] Run historical backfill with Frame transactions executed by a compatible EL, including sponsored Frame settlement.
+- [x] Integrate upstream Lighthouse `1bcdcbfa0` on the staging branch and pass the Gloas light-client fork-boundary regression.
+- [ ] Pin Heze SSZ and proof vectors and implement Heze light-client headers, bootstrap and updates.
+- [ ] Verify VC restart, remote signing and redundant BN publication without signing conflicting lists for a duty.
+- [ ] Verify Req/Resp recovery through alternate peers, partial responses and competing dependent roots.
+
+## Pinned EIP-8141 Migration
+
+- [x] Match the seven-field transaction and signing encodings and validate protocol signatures against independent fixtures.
+- [x] Match canonical receipt encoding, split gas readback after a FileDB reopen, and the fee-budget arithmetic.
+- [x] Implement frame execution, state-gas ownership and refills, atomic rollback, and escrow and settlement on live state.
+- [x] Wire Bogotá activation, generic public-mempool policy, blob sidecars, Engine validation, and historical replay.
+- [x] Freeze the canonical-paymaster exception and delayed-withdrawal reservation rules against a deployable runtime.
+- [x] Run finalized sponsored FOCIL and EL restart scenarios with reconciled receipts and balances.
+- [x] Run native blob-bearing build/import, reorg and disk replay with real KZG data.
+- [x] Run live blob-bearing Frame history and receiver restart scenarios.
+- [ ] Run independent EL late-join scenarios.
+
+## Roadmap Homepage Integration (2026-11-13)
+
+- [x] Promote the approved prototype to a detailed roadmap page and share its progress model with the homepage.
+- [x] Replace the homepage roadmap with six compact cards showing progress and only non-complete tracker entries.
+- [x] Verify homepage filtering, matching percentages, links, responsive layout, and the site build.
+- [x] Update status and commit the integration without publishing.
+
+## Native Bogotá deferred validation
+
+- [x] Retain the exact V6 list and off-canonical block before returning ACCEPTED.
+- [x] Complete staged validation on FCU and keep the verdict across FileDB reopen.
+- [x] Check missing ancestry, hash validation, list replacement and unresolved synced views through Engine HTTP.
+- [ ] Verify the native path with Lighthouse and a compatible independent EL.
+
+## Roadmap Prototype Card Alignment (2026-11-13)
+
+- [x] Keep the six roadmap phases in chronological reading order and equalize card dimensions without clipping content.
+- [x] Verify all card sizes, order, visible content, and responsive layouts in the browser.
+- [x] Build, record the result, and commit the local prototype without publishing.
+
+## Roadmap Prototype Density and Percentage (2026-11-13)
+
+- [x] Make all six cards denser and emphasize tracker progress with clearly defined percentages and animation.
+- [x] Check percentage math against displayed entries, zero-complete cases, responsive layouts and reduced motion.
+- [x] Build, update status, and commit the local prototype without publishing.
+
+## Roadmap Prototype Visual Revision (2026-11-12)
+
+- [x] Match the existing site's dark visual language and add accessible animation.
+- [x] Put all mapped roadmap nodes and tracker progress directly inside six cards without detail-page navigation.
+- [x] Verify every mapped entry, status counts, animations, responsive layout, and the production build.
+- [x] Record the prototype revision and commit without publishing.
+
+## EF Roadmap Six-Card Prototype (2026-11-12)
+
+- [x] Check the current EF Strawmap and map its six fork columns to the existing repository tracker.
+- [x] Build a responsive, interactive prototype with source attribution and clear evidence limitations.
+- [x] Build locally, inspect desktop and mobile, and verify card navigation and source links.
+- [x] Record the prototype scope and commit the prototype without publishing it.
+
+## Website Account and Content Refresh (2026-11-12)
+
+- [x] Compare the deployed site and GitHub Pages configuration with current repository ownership and source.
+- [x] Update repository links, clone instructions, canonical domain, dependency version, and verified outdated feature claims.
+- [x] Distinguish historical roadmap/tracker data from current verification and document remaining sync limitations.
+- [x] Build the site and local Go module, verify exported links and evidence paths, update status, and commit task-owned changes.
+
+## Track 3 Completion Follow-Up (2026-11-12)
+
+- [x] Trace bounded-memory snapshot download, execution and serving against the snap protocol and database implementations; the active FileDB also retains all values in memory.
+- [x] Preserve storage pagination on transient failure and avoid quadratic scans of completed storage tasks.
+- [x] Verify finalized ancestry before reusing a completed snapshot after a CL finality advance.
+- [x] Continue a fixed-pivot download across peer failures, sharing only account roots authenticated against that pivot.
+- [x] Audit the candidate stack-trie builder: propagate node-writer failures and correct its bounded-memory claim.
+- [x] Stream snapshot validation and trie-node generation; write trie nodes and snapshot leaves in bounded batches with failure-before-publication tests.
+- [x] Revalidate and recover a completely downloaded, not-yet-adopted snapshot after restart, including offline recovery and corruption/missing-node rejection.
+- [x] Persist downloaded bytecode by verified content hash and reuse it across attempts and restarts without publishing an incomplete state.
+- [x] Specify observable restart, moving-pivot, resource, independent-client, and mutation-test acceptance gates in `docs/track3-remaining-acceptance.md`.
+- [ ] Implement authenticated moving-pivot continuation and safe restart behavior with regression coverage.
+- [ ] Remove remaining sync scalability bottlenecks without weakening ancestry validation.
+- [ ] Validate real-client interoperability and record the actual scope and resource limits.
+- [ ] Run affected tests, race checks and builds; update status and commit task-owned changes.
+
+## Track 3 Adversarial Review (2026-11-12)
+
+- [x] Re-read specification and design contracts; audit every Track 3 production change and its callers.
+- [x] Reproduce and fix forkchoice authority, ancestry, durable publication, restart and reorg defects.
+- [x] Reproduce and fix native/snap state execution, rollback, storage, and proof-validation defects.
+- [x] Audit protocol encodings, peer cancellation, pagination, lifecycle shutdown and native consensus invariants.
+- [x] Add behavioral regressions and targeted mutation checks; run affected race, full, integration, tag, vet and build checks.
+- [x] Correct completion claims and document remaining scope accurately; commit and push scoped fixes.
+
+## Track 3 Implementation (2026-11-12)
+
+Base: `origin/master` at `9fde8aa` (PR #50 merged), branch `feat/track3-node`.
+
+- [x] Trace current snap serving, download, proof verification, persistence, pivot adoption, and restart paths against the pinned specifications.
+- [x] Replace node snap-sync no-op writers with verified persistent state and trie healing; test sync from an empty database and execution after pivot adoption.
+- [x] Connect unknown Engine forkchoice heads to a cancellable CL-driven beacon sync loop with peer download, validated ancestry, retries, and shutdown coverage.
+- [x] Connect 3SF, quick-slot scheduling, and PQ attestation components to an explicitly configured node lifecycle and verify their event consumers and shutdown.
+- [x] Run meaningful negative-path tests, affected race tests, integration tests, full Go tests, vet, formatting, and local builds.
+- [x] Update `STATUS.md` and the Track 3 completion record with implementation and verification evidence; commit scoped changes.
+
+Functional scope and evidence: [Track 3 node integration](docs/track3-node.md).
+Track 3 is **not fully complete**. Production snap synchronization still requires
+moving-pivot range reuse and bounded-memory assembly. Snap/2 and standalone CL
+validator/proposer tooling are additional work; the native observer has no
+execution forkchoice authority.
+
+## Next Phase Planning (2026-11-11)
+
+Baseline: `master` at `137006e` (PR #48, `feat/eiptest-framework` merged). Re-verify each
+gap against current code before starting — parts of the 2026-03 gap analysis are stale
+(BAL header hash and `engine_getInclusionListV1` already exist).
+
+### Track 0 — Housekeeping
+
+- [x] Fast-forward local `master` to `origin/master`.
+- [x] Delete merged local branch `feat/eiptest-framework` (remote already deleted).
+
+### Track 1 — Glamsterdam / ePBS closure (P0)
+
+- [x] EIP-7732 ePBS (85%): PTC election/voting wiring into fork-choice (types exist in `pkg/epbs/types.go`); BuilderPendingPayment/Withdrawal payment mechanism; builder registry (balance/deposit/withdrawable epoch); CL integration (payload → SignedBuilderBid in BeaconBlockBody); wire `epbs/bid SubmitBid` to a real builder entry point.
+- [x] EIP-7975 (ETH/70 partial block receipts) and EIP-8159 (ETH/71 BAL exchange): move from referenced-only (`pkg/eth/protocol.go`, `pkg/p2p/ethproto`) to implemented and tested.
+- [x] EIP-7928 BAL residual gaps: Engine BAL mismatch must reject (probe currently only logs); verify remaining 10% gap items against the 2026-03 analysis. (Rejection already enforced; nil BAL hash now rejected post-Amsterdam.)
+- [x] EIP-7594 PeerDAS (80%): column subnet gossip, custody, <50% column reconstruction, txpool `cell_proofs`. (Canonical `data_column_sidecar_<subnet>` topics + SignedBlockHeader added; custody/reconstruction/cell_proofs were already in place.)
+
+### Track 2 — Hegotá closure (P1)
+
+- [x] EIP-7805 FOCIL (85%): CL P2P inclusion-list gossip validation rules; equivocation (duplicate IL per committee member) evidence handling.
+- [x] EIP-8141 FrameTx residual: re-verify APPROVE scope semantics (0x0/0x1/0x2) against the current draft; payer gas approval path; frame receipt format. (Payer charging was missing entirely — now collected on APPROVE(1)/(2); receipts carry the payer.)
+- [x] EIP-7495 SSZ StableContainer: add tests (currently referenced-only). (HTR aligned with the EIP-7495 ProgressiveContainer spec form; conformance tests added.)
+- [x] EIP-8025 Execution Proofs: close out to complete. (Proofs now anchored to the real EIP-7928 BAL with header-commitment verification.)
+- [x] SSZ fork activation (EIP-6404/7807/7916): consensus activation, Engine API versioning, RPC migration (explicitly deferred fork work). (SSZBlockTime fork switch; engine_getPayloadV7/newPayloadV7 with SSZ hash binding; transitional header-form block hash.)
+
+### Track 3 — Node fundamentals (cross-cutting)
+
+- [ ] Real snap sync: fixed-pivot proof-verified bootstrap, persistent hashed state, authenticated healing and recovery are implemented and tested. Moving-pivot continuation and bounded-memory assembly remain open; do not equate the small-chain end-to-end test with production snap-sync completion.
+- [x] CL-driven beacon sync loop (`pkg/sync/beacon`): authenticated Engine request → hash-bound `eth` download → staged execution → atomic forkchoice publication; retries, target replacement, cancellation and `eth_syncing` are wired.
+- [x] Wire own consensus components (3SF, quick slots, PQ attestations) into node lifecycle as an explicit research observer: configuration-bound signatures, source-target quorums, RLPx vote delivery, CL reorg re-anchoring and joined shutdown. The external CL retains execution forkchoice authority; this is not a standalone consensus client.
+
+### Track 4 — I* / PQ direction
+
+- [x] PQC suite: real implementations for Dilithium3, padded Falcon-512, and SPHINCS+-SHA2-128f-simple, alongside ML-DSA-65. Historical Falcon and SPHINCS+ require CGO.
+- [x] EIP-7932 draft PQ registry and EIP-8051 draft gas and expanded-key validation tests through explicit EVM registration.
+- [ ] EIP-7864 Binary Merkle Trie: continue toward complete.
+- [ ] Remaining STARK / lattice / aggregation protocol migrations (CODEBASE_AUDIT §VII).
+
+#### Track 4 implementation checklist (2026-11-13)
+
+- [x] Expose the historical signature formats explicitly and test interoperability, malformed inputs, and the no-CGO boundary.
+- [x] Test the pinned EIP-7932 registry and both expanded-key EIP-8051 precompile variants through explicitly registered EVM calls.
+- [x] Correct binary trie proof authentication and test multi-value stems and exclusion.
+- [x] Match EIP-7864 Python reference roots for basic insertion and a state embedding with storage and code boundaries.
+- [x] Expose resumable offline migration through the client command and read its output back from a reopened FileDB.
+- [x] Exercise EIP-7932/8051 through an opt-in private-chain fork with distinct addresses, state-backed public keys, and account access charging.
+- [ ] Confirm canonical fork addresses and key registry rules for EIP-7932/8051. The pinned drafts both assign 0x12, which the pinned EIP-7997 factory uses.
+- [x] Implement the EIP-7748 ordered conversion step, zero-override protection, and resumable cursor for the pinned BLAKE3 overlay.
+- [x] Exercise the pinned BLAKE3 overlay on an opt-in chain through block construction, import, Engine API payload construction, reorg, rewind, and restart by replay. Apply ordered conversion before transactions and preserve explicit zero overrides.
+- [x] Preserve all 256 bits of EVM storage keys when tracking EIP-4762 storage access and edit events. Test branch and leaf gas for repeated, adjacent, and high-bit-distinct slots.
+- [ ] Implement the production EIP-7864 path with the agreed key layout and complete EIP-4762 witness gas. Add a scalable frozen-state reader and restore the execution state directly from durable checkpoints. See the completion audit in docs/CODEBASE_AUDIT.md §VII.
+- [ ] Connect the PQ attestation verifier to the node's authenticated committee and key source.
+- [x] Replace unauthenticated experimental blob witnesses with ordered openings and verify complete deterministic lattice commitments in batches.
+- [x] Verify every PQ attestation in the consensus batch, bind publication and classic fallback to authorized keys, and reject XMSS relabeling.
+- [ ] Specify and migrate application-specific STARK, lattice and aggregation protocols with real providers and consumer verification. (STARK aggregate and block-bound frame provider boundaries are fail-closed; no production STARK provider is configured.)
+- [x] Run affected suites and local build; record completed work and remaining gaps in STATUS.md.
+
+#### Track 4 overlay checkpoint follow-up
+
+- [x] Persist the binary root and conversion cursor with each imported overlay block.
+- [x] Validate checkpoints across forkchoice, restart, write failure, and older replay-only databases.
+- [x] Share immutable BLAKE3 nodes across branches and write only changed paths.
+- [x] Distinguish zero storage leaves from absent leaves for witness gas and discard events for unpaid opcodes.
+- [x] Reject private PQ address collisions across scheduled precompile forks before opening a chain.
+- [x] Cross-check the public drafts and record outstanding protocol and adoption requirements.
+
+#### Track 4 integration and devnet verification
+
+- [x] Exercise signed PQ transactions through JSON-RPC, block construction, independent Engine import, and persisted state readback.
+- [x] Check both EIP-8051 variants and the EIP-7932 registry through the activated private profile.
+- [x] Run a fresh Kurtosis devnet with the Track 4 image and compare execution and beacon-chain observations.
+
+#### Track 4 bug review
+
+- [x] Verify overlay state copying, canonical lookup, replay retention, and database error handling.
+- [x] Verify Engine payload identity and forkchoice behavior with the binary overlay.
+- [x] Verify both binary trie proof APIs bind the complete key and leaf.
+- [x] Verify PQ attestation authorization and aggregation inputs.
+- [x] Enforce execution proof batch ownership, size limits, and verification deadlines.
+- [x] Run regressions, affected race tests, and the local build.
+
+### Track 5 — eiptest framework (incremental)
+
+- [ ] T5.1: opportunistic migration of `pkg/`-root E2E scenarios as files are touched.
+- [ ] T4.3: post-first-feature ergonomics notes in the framework README.
+
+### Track 6 — Devnet and site
+
+- [x] Gloas devnet dependency (recorded at `a75a67a`); full-feature devnet run validating ePBS + FOCIL + BAL together. (full-feature-eth2030: fulu@32, gloas@64+Amsterdam BAL enforcement, heze@96 all clean; newPayloadV5 with BAL accepted from lighthouse 8.4.0-rc.0; follow-up: expose blockAccessListHash in the eth_getBlockByNumber serializer.)
+- [ ] Site publishing: deployment workflow names `eth2030.com` while GitHub Pages binds `eth2030.altllm.ai`.
+
+Recommended start order: Track 1 (ePBS PTC + fork-choice is the largest single P0), Track 3 snap-sync in parallel, Track 6 devnet as the integration gate.
+
+## Native Execution Requests and SSZ Integration
+
+- [x] Trace native request collection, block commitment, replay, and Engine API handling against the EIPs.
+- [x] Collect canonical deposit, withdrawal, and consolidation requests through the native execution paths.
+- [x] Verify nonempty requests through block building, validation, Engine API, and the SSZ projection.
+- [x] Run affected and default suites and record the results.
+
+## Execution SSZ and Framework Test Effectiveness Review
+
+- [x] Verify the branch and run the default, tagged, and race suites.
+- [x] Measure whether targeted behavior changes fail their intended tests.
+- [x] Close demonstrated assertion gaps and repeat the targeted checks.
+- [x] Record the results in `STATUS.md`.
+
+## Execution SSZ Specification Review
+
+- [x] Compare transaction and block encodings with the pinned and published EIP drafts.
+- [x] Normalize EIP-6404 transaction bytes, signatures, and Merkle roots.
+- [x] Implement the published EIP-7807 payload and header summary codecs.
+- [x] Verify independent vectors and affected suites.
+
+## EIP Test Framework Completion
+
+- [x] Repair simulator results, fork timing, transaction signing, and failure assertions.
+- [x] Complete STF, pool, encoding, RPC, Engine, and differential probes with regression tests.
+- [x] Enforce the coverage gate and verify generated scaffolds and the README walkthrough.
+- [x] Develop and verify a new EIP test-first through the scaffold.
+- [x] Complete scenario contracts and run Amsterdam fixture generation and consumption.
+- [x] Run the default and variant suites, verify the build, and reconcile the plan and status.
+
+## EIP Test Framework Acceptance Review (2026-11-11)
+
+- [x] Compare the implementation and examples with the plan's acceptance criteria.
+- [x] Run the framework suite, default Go suite, and local CI checks.
+- [x] Verify failure detection and exercise the documented tooling entry points.
+- [x] Record verified results and remaining gaps in `STATUS.md`.
+## PR #47 Merge Resolution
+
+- [x] Confirm the pull request head and fetch the current upstream base.
+- [x] Create an isolated worktree for the merge.
+- [x] Reconcile the status entries and preserve the roadmap and tracker navigation.
+- [x] Build the site and Go module, and verify the static export and selected Go packages.
+- [x] Scope all merge and staging operations to the isolated worktree.
+
+## Cryptography Regression Fixes
+
+- [x] Wire PQ signature verification through transaction admission and native execution.
+- [x] Activate canonical BLS precompiles at Prague and preserve historical native execution rules.
+- [x] Correct RLPx identity, PeerDAS cell validation, and ECIES empty messages.
+- [x] Repair proof batch deadlines and STARK gossip round-tripping.
+- [x] Verify the regression probes, upstream vectors, and the full Go suite.
+
+## Public Cryptography Library Migration (2026-11-10)
+
+- [x] Replace secp256k1 signing and recovery, BN254 precompile arithmetic, and BLAKE2b compression.
+- [x] Replace BLS12-381 precompile arithmetic, mappings and compression, and consolidate KZG providers.
+- [x] Replace ECIES, keystore, RLPx, and Engine JWT implementations and document protocol migration boundaries.
+- [x] Integrate public PQ signature and KEM providers with explicit encoding compatibility.
+- [x] Move Groth16 verification, AA circuit startup, Banderwagon group arithmetic, and EVM transforms to gnark.
+- [x] Remove superseded implementations and standalone placeholder backends after checking callers.
+- [x] Verify a clean snapshot with Go builds, vet, fixture-backed tests, and the tagged suites.
+- [ ] Complete experimental proof protocols in the follow-up below.
+
+## Ethereum Client Cryptography Follow-Up (2026-11-10)
+
+- [x] Trace the libraries used by the pinned Geth and consensus references to their actual callers.
+- [x] Migrate experimental IPA openings, Poseidon, VDF and VRF to public providers.
+- [x] Migrate encrypted-mempool share reconstruction and retire unused standalone schemes.
+- [x] Verify actual IPA and KZG openings in batch and require configured SNARK and STARK providers.
+- [x] Carry complete ML-DSA keys and signatures through the gossip codec.
+- [x] Verify the full source snapshot with pinned EF fixtures, build, vet, tagged, Go-only, and targeted race checks.
+- [ ] Migrate the remaining application-specific STARK, lattice commitment and aggregation protocols.
+
+## Unused Package Cleanup (2026-11-10)
+
+- [x] Remove the six packages selected in the first cleanup batch and update package indexes.
+- [x] Verify builds, tests, and the executable dependency graphs from a clean snapshot.
+
+## Codebase Audit Follow-Up (2026-11-10)
+
+- [x] Verify native EIP-4844 point evaluation with the Ethereum ceremony setup and align binary build tags.
+- [x] Provision pinned EF fixtures in CI and enforce the geth-backed vector results.
+- [x] Upgrade gnark and exercise BN254 circuit compilation, setup, proving, and verification.
+- [x] Resolve permanent skips, placeholders, weak checks, tagged suites, and race coverage.
+- [x] Verify dead-code candidates and clean ignored local audit artifacts.
+- [x] Run the supported build and test matrix and record each outcome.
+
+## Codebase Audit Evidence Review (2026-11-10)
+
+- [x] Reconcile reachability findings with production, test, and tagged builds.
+- [x] Record the fixture, test coverage, and dependency scan results with their limits.
+- [x] Revise the proposed follow-up and verify the documentation and local builds.
+
+## English Documentation Review (2026-11-10)
+
+- [x] Scan project-owned documentation for Chinese text.
+- [x] Manually translate `docs/CODEBASE_AUDIT.md` and any other Chinese documentation.
+- [x] Record the English documentation requirement in `AGENTS.md`.
+- [x] Verify the translation, repeat the language scan, and run local builds.
 
 ## Inclusion List JSON Refactor (2026-03-21)
 - [x] Extract small inclusion-list JSON parsing helpers in `pkg/engine/inclusion_list.go`.
@@ -120,3 +713,55 @@
 - [x] Verify site build, evidence paths and responsive presentation; update STATUS.md.
 - [x] Commit only files changed for this task.
 - [ ] Complete a full current-spec conformance and cross-client audit before claiming broader coverage.
+
+## Scoped devnet control review
+
+- [x] Prepare the controller and fixtures independently from the Frame codec.
+- [x] Verify the process lifecycle and evidence assertions on this review branch.
+
+## Glamsterdam final engineering campaign (2026-11-20)
+
+- [x] Reconcile all 33 original GL IDs and R01-R13 against the frozen LIFO/signed-envelope target.
+- [x] Publish separate storage-fence and snap historical-BAL fixes with regression, build and real-process evidence.
+- [x] Complete actual lifecycle/registry/payment/reorg/invalid-state, peer/custody/gossip, sync/storage and operating gates.
+- [x] Retain original failures, exact source/runtime/license inventories, complete byte archives and independent offline consumers.
+- [x] Publish independent master-targeted PRs and verify CI/ordinary cumulative merge orders at handoff.
+- [ ] Record the user's reserved final public protocol/model decision and subsequent EL merge/release approval.
+
+See [the final handoff](docs/plans/glamsterdam/COMPLETION_HANDOFF_20261120.md) for exact scope and finite support boundaries. Unrelated later-fork/formal tasks above are not closed by this campaign.
+
+## Glamsterdam post-merge closure (2026-11-21)
+
+- [ ] Verify PR120/121/122 reach current master and compare the merged source with the qualified composition.
+- [ ] Re-run fresh merged-source full Go, exact official RPC fixtures, affected race/vet/build and Python controls.
+- [ ] Recheck the actual retained network and original registry cleanup without changing protocol clocks or validation.
+- [ ] Reconcile external-client workflow coverage and remaining adoption/model review boundaries.
+- [ ] Publish exact post-merge evidence and updated tracking in a master-targeted PR; verify current CI and conflicts.
+## RPC exposure hardening — unauthenticated admin/debug on wildcard bind (2026-11-23)
+
+External report (0xpack, severity High, CWE-862) confirmed against commit 55f7fd8:
+the `eth2030` binary defaults to `--http.addr 0.0.0.0` with `admin`/`debug`
+modules served and no auth; `HTTPModules`, vhosts and CORS checks are never
+enforced by the dispatcher (`corsMiddleware` is dead code).
+
+Decision: geth-compatible secure defaults + explicit devnet opt-in
+(kurtosis `ethereum-package` already passes `--http.addr=0.0.0.0`,
+`--http.api=admin,...`, `--http.vhosts=*` itself); remote admin/debug without
+an auth secret requires the explicit `--rpc.allow-insecure` flag.
+
+- [x] Verify every report claim against the code (defaults, dispatcher, dead vhost check, stubs, JWT on 8551, geth-leg local bind).
+- [x] Switch node defaults to loopback bind + `[eth net web3]` modules (config.go).
+- [x] Enforce the module allowlist in the RPC dispatcher (ExtServer, plain Server, batch single + extended paths).
+- [x] Enforce HTTP vhosts and Engine `AuthVhosts` on the live request path.
+- [x] Add `--rpc.allow-insecure` gate: refuse remote admin/debug without `--rpc.auth_secret` unless explicitly allowed.
+- [x] Wire `WSModules` into the WebSocket handler (was decorative).
+- [x] Remove dead `corsMiddleware`; add live-path tests for modules/vhosts.
+- [x] Add `--rpc.allow-insecure` to all 49 devnet yamls using `eth2030:local` (validated with a YAML parser).
+- [x] Unit tests for defaults, guardrail, dispatcher allowlist, vhost, engine vhost, WS modules.
+- [x] Build `eth2030` and run the focused test suites.
+- [x] Update devnet README flag docs and STATUS.md; commit.
+
+Known limits: devnet yamls are config-checked but not re-run end to end in this
+session; `eth2030-geth` needs no change (real go-ethereum stack enforces its own
+module allowlist); `debug_setHead`/`debug_dumpBlock` remain unwired dead code
+(report overstated their reachability).

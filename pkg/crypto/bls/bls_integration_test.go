@@ -166,6 +166,7 @@ func TestBLSIntegrationBackendSwitching(t *testing.T) {
 	if original.Name() != "gnark-consensus" && original.Name() != "blst-real" {
 		t.Errorf("default backend must use a consensus verifier, got %q", original.Name())
 	}
+	t.Cleanup(func() { SetBLSBackend(original) })
 
 	// Switch to blst.
 	SetBLSBackend(&BlstBLSBackend{})

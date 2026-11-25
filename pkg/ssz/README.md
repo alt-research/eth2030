@@ -8,7 +8,7 @@ The `ssz` package implements the SSZ specification used by the Ethereum consensu
 
 The package covers the full SSZ encoding surface: basic types (bool, uint8–uint256), fixed and variable-length containers, vectors, lists, bitvectors, and bitlists. The Merkleization functions compute SHA-256-based hash tree roots compatible with the consensus specification, including the `mix_in_length` operation for lists.
 
-Beyond the base spec, the package implements two consensus-layer EIPs. EIP-7916 defines `ProgressiveList`, a Merkle tree structure that grows progressively with list size rather than padding to the next power of two; this enables efficient incremental appends. EIP-7495 defines `StableContainer`, a fixed-capacity container where fields can be optional, enabling forward-compatible schema evolution without changing the Merkle tree shape.
+Beyond the base spec, the package implements two consensus-layer EIPs. EIP-7916 defines `ProgressiveList`, a Merkle tree structure that grows progressively with list size rather than padding to the next power of two; this enables efficient incremental appends. EIP-7495 defines `ProgressiveContainer(active_fields)`: an immutable type layout with up to 256 positions. Inactive positions are zero Merkle leaves and consume no wire bytes; active fields encode exactly as an ordinary Container.
 
 ## Table of Contents
 
@@ -99,20 +99,45 @@ Convenience functions for typed lists:
 - `HashTreeRootProgressiveBasicList(serialized []byte, count int) [32]byte`
 - `HashTreeRootProgressiveBitlist(bits []bool) [32]byte`
 
-### EIP-7495: StableContainer
-
-`StableContainer` provides a fixed-capacity container with optional fields for forward-compatible schema evolution:
+### EIP-7495: ProgressiveContainer
 
 ```go
-sc := ssz.NewStableContainer(64)           // capacity of 64 fields
-sc.AddField("slot", slotRoot, false)       // required field
-sc.AddField("blob_root", zeroRoot, true)   // optional field (starts inactive)
-sc.SetActive(1, true)                      // activate optional field
-root := sc.HashTreeRoot()
-// hash(Merkleize(chunks, capacity), Merkleize(Pack(activeBitvector), 0))
+schema, err := ssz.NewProgressiveContainerSchema(
+    []bool{true, false, true}, // Stable field positions 0 and 2.
+    []int{2, 1},              // uint16 and uint8; 0 denotes a variable field.
+)
+if err != nil { return err }
+wire, err := schema.MarshalSSZ([][]byte{ssz.MarshalUint16(42), ssz.MarshalUint8(255)})
+// wire is 2a00ff: neither an inactive value nor active_fields is transmitted.
+fields, err := schema.UnmarshalSSZ(wire)
+fieldRoots := [][32]byte{ssz.HashTreeRootUint16(42), ssz.HashTreeRootUint8(255)}
+root, err := schema.HashTreeRoot(fieldRoots)
+proof, gindex, err := schema.GenerateProof(fieldRoots, 2)
+valid := schema.VerifyProof(root, fieldRoots[1], 2, proof)
 ```
 
-`Profile` pins a specific subset of fields as active on top of a `StableContainer`, enabling concrete message types with stable Merkle compatibility.
+A schema owns its layout and field sizes. Empty layouts, widths above 256,
+trailing inactive positions and declared/active count mismatches are errors.
+There is no requirement for a field named `more` at position 255. Field values,
+defaults and JSON use their ordinary typed Container codecs; the schema composes
+already encoded active-field values and their roots, without defining another
+SSZ value/type system. Variable-field offsets are uint32 and must be canonical.
+
+`HashTreeRootProgressiveContainerChecked` accepts position-indexed root slots,
+requires inactive slots to be zero and rejects undeclared mask bits. Existing
+execution SSZ consumers use this checked form. The unchecked root primitive is
+available only for callers that have already validated a schema.
+
+`StableContainer` and `Profile` are deprecated compatibility root utilities.
+Their historical capacity/optional-field behavior is not an EIP-7495 type
+system or codec. New code should use `ProgressiveContainerSchema`.
+
+Independent `ethereum/remerkleable` fixtures cover bytes, roots, complete
+branches, growth boundaries and illegal layouts. A separately decoded captured
+384-validator Gloas state verifies byte identity, all 46 field roots/proofs and
+original CL current/next/finalized branches. See `testdata/eip7495/` and the
+feature review for reproduction commands and the reference library's extra
+256-position naming restriction.
 
 ### Union Codec
 
@@ -157,6 +182,6 @@ root = pl.HashTreeRoot()
 - [Roadmap](../../docs/ROADMAP.md)
 - [SSZ Specification](https://github.com/ethereum/consensus-specs/blob/dev/ssz/simple-serialize.md)
 - EIP-7916: SSZ ProgressiveList
-- EIP-7495: SSZ StableContainer
+- EIP-7495: SSZ ProgressiveContainer
 - EIP-6404: SSZ transactions (uses this package for serialization)
 - EIP-7807: SSZ blocks

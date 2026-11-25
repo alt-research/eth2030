@@ -14,6 +14,7 @@ import (
 func TestNewPayloadInvalidParentHash(t *testing.T) {
 	// Backend returns SYNCING for unknown parent.
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{Status: StatusSyncing}, nil
 		},
@@ -57,6 +58,7 @@ func TestNewPayloadInvalidBlockHash(t *testing.T) {
 	// Backend returns INVALID_BLOCK_HASH when block hash doesn't match.
 	errMsg := "block hash mismatch"
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{
 				Status:          StatusInvalidBlockHash,
@@ -105,6 +107,7 @@ func TestNewPayloadInvalidTimestamp(t *testing.T) {
 	// Backend returns INVALID for a payload with timestamp <= parent.
 	errMsg := "timestamp not progressing"
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			return PayloadStatusV1{
 				Status:          StatusInvalid,
@@ -150,6 +153,7 @@ func TestNewPayloadInvalidTimestamp(t *testing.T) {
 func TestNewPayloadValidEmpty(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		processBlockFn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash) (PayloadStatusV1, error) {
 			if len(payload.Transactions) != 0 {
 				t.Errorf("expected 0 transactions, got %d", len(payload.Transactions))
@@ -413,7 +417,6 @@ func TestExchangeCapabilities_ReturnsSupportedMethods(t *testing.T) {
 		"engine_getPayloadV3",
 		"engine_getPayloadV4",
 		"engine_getPayloadV6",
-		"engine_exchangeCapabilities",
 		"engine_getClientVersionV1",
 	}
 
@@ -454,6 +457,7 @@ func TestExchangeCapabilities_EmptyRequest(t *testing.T) {
 func TestNewPayloadV4_ValidWithRequests(t *testing.T) {
 	blockHash := types.HexToHash("0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		processBlockV4Fn: func(payload *ExecutionPayloadV3, hashes []types.Hash, root types.Hash, requests [][]byte) (PayloadStatusV1, error) {
 			if len(requests) != 2 {
 				t.Errorf("expected 2 execution requests, got %d", len(requests))
@@ -473,7 +477,7 @@ func TestNewPayloadV4_ValidWithRequests(t *testing.T) {
 	hashesJSON, _ := json.Marshal([]types.Hash{})
 	beaconRoot := types.HexToHash("0xbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeac")
 	rootJSON, _ := json.Marshal(beaconRoot)
-	requestsJSON, _ := json.Marshal([][]byte{{0x00, 0x01, 0x02}, {0x01, 0x03, 0x04}})
+	requestsJSON, _ := json.Marshal([]string{"0x000102", "0x010304"})
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_newPayloadV4","params":[%s,%s,%s,%s],"id":1}`,
 		payloadJSON, hashesJSON, rootJSON, requestsJSON)
@@ -503,6 +507,7 @@ func TestNewPayloadV4_ValidWithRequests(t *testing.T) {
 func TestForkchoiceUpdatedV3_ValidWithAttributes(t *testing.T) {
 	expectedID := PayloadID{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11}
 	backend := &mockBackend{
+		isAmsterdamFn: func(uint64) bool { return false },
 		forkchoiceUpdFn: func(state ForkchoiceStateV1, attrs *PayloadAttributesV3) (ForkchoiceUpdatedResult, error) {
 			if attrs == nil {
 				t.Fatal("expected non-nil payload attributes")
@@ -639,8 +644,9 @@ func TestNewPayloadV5_Valid(t *testing.T) {
 
 	api := NewEngineAPI(backend)
 
-	bal := json.RawMessage(`[{"address":"0xaaaa","storageKeys":["0x01"]}]`)
+	bal := json.RawMessage(`"0xc0"`)
 	payload := ExecutionPayloadV5{
+		SlotNumber: "0x0",
 		ExecutionPayloadV4: ExecutionPayloadV4{
 			ExecutionPayloadV3: makeTestPayloadV3(blockHash, 300),
 		},
@@ -650,7 +656,7 @@ func TestNewPayloadV5_Valid(t *testing.T) {
 	hashesJSON, _ := json.Marshal([]types.Hash{})
 	beaconRoot := types.HexToHash("0xbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeaconbeac")
 	rootJSON, _ := json.Marshal(beaconRoot)
-	requestsJSON, _ := json.Marshal([][]byte{{0x00}})
+	requestsJSON, _ := json.Marshal([]string{})
 
 	req := fmt.Sprintf(`{"jsonrpc":"2.0","method":"engine_newPayloadV5","params":[%s,%s,%s,%s],"id":1}`,
 		payloadJSON, hashesJSON, rootJSON, requestsJSON)
@@ -713,6 +719,7 @@ func TestNewPayloadV5_MissingBAL_Comprehensive(t *testing.T) {
 func TestGetPayloadV3_ValidRetrieval(t *testing.T) {
 	payloadID := PayloadID{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	backend := &mockBackend{
+		isPragueFn: func(uint64) bool { return false },
 		getPayloadByIDFn: func(id PayloadID) (*GetPayloadResponse, error) {
 			if id != payloadID {
 				t.Errorf("unexpected payload ID")
@@ -844,8 +851,9 @@ func TestNewPayloadV5_UnsupportedFork_Comprehensive(t *testing.T) {
 	}
 	api := NewEngineAPI(backend)
 
-	bal := json.RawMessage(`[]`)
+	bal := json.RawMessage(`"0xc0"`)
 	payload := ExecutionPayloadV5{
+		SlotNumber: "0x0",
 		ExecutionPayloadV4: ExecutionPayloadV4{
 			ExecutionPayloadV3: makeTestPayloadV3(types.Hash{}, 100),
 		},

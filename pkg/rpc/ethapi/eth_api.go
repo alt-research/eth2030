@@ -2,7 +2,10 @@ package ethapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/eth2030/eth2030/core/state"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	"math/big"
 	"sync"
 
@@ -39,9 +42,20 @@ func NewEthAPI(backend Backend, subs SubscriptionService) *EthAPI {
 // This is primarily used by tests in dependent packages.
 func (api *EthAPI) Subs() SubscriptionService { return api.subs }
 
+// executionAPI creates a stateless view only for execution handlers. Shared API
+// maps, subscription services and locks stay with their original owner.
+func (api *EthAPI) executionAPI(req *Request) *EthAPI {
+	if backend, ok := api.backend.(rpcbackend.ContextBackend); ok {
+		return &EthAPI{backend: backend.WithContext(req.Context())}
+	}
+	return api
+}
+
 // HandleRequest dispatches a JSON-RPC request to the appropriate method.
 func (api *EthAPI) HandleRequest(req *Request) *Response {
 	switch req.Method {
+	case "zkvm_proveExecution", "zkvm_getProof", "zkvm_cancelProof", "zkvm_verifyExecution":
+		return api.canonicalProofRequest(req)
 	case "eth_chainId":
 		return api.chainID(req)
 	case "eth_blockNumber":
@@ -64,10 +78,12 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 		return api.getTransactionByHash(req)
 	case "eth_getTransactionReceipt":
 		return api.getTransactionReceipt(req)
+	case "eth_simulateV1":
+		return api.executionAPI(req).simulateV1(req)
 	case "eth_call":
-		return api.ethCall(req)
+		return api.executionAPI(req).ethCall(req)
 	case "eth_estimateGas":
-		return api.estimateGas(req)
+		return api.executionAPI(req).estimateGas(req)
 	case "eth_sendRawTransaction":
 		return api.sendRawTransaction(req)
 	case "eth_sendUserOperation":
@@ -85,7 +101,7 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 	case "eth_syncing":
 		return api.syncing(req)
 	case "eth_createAccessList":
-		return api.createAccessList(req)
+		return api.executionAPI(req).createAccessList(req)
 	case "eth_subscribe":
 		return api.ethSubscribe(req)
 	case "eth_unsubscribe":
@@ -137,13 +153,13 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 	case "eth_blobBaseFee":
 		return api.getBlobBaseFee(req)
 	case "debug_traceTransaction":
-		return api.debugTraceTransaction(req)
+		return api.executionAPI(req).debugTraceTransaction(req)
 	case "debug_traceCall":
-		return api.debugTraceCall(req)
+		return api.executionAPI(req).debugTraceCall(req)
 	case "debug_traceBlockByNumber":
-		return api.debugTraceBlockByNumber(req)
+		return api.executionAPI(req).debugTraceBlockByNumber(req)
 	case "debug_traceBlockByHash":
-		return api.debugTraceBlockByHash(req)
+		return api.executionAPI(req).debugTraceBlockByHash(req)
 	case "web3_clientVersion":
 		return api.clientVersion(req)
 	case "web3_sha3":
@@ -219,7 +235,7 @@ func (api *EthAPI) getBlockByNumber(req *Request) *Response {
 	// are always populated per the Ethereum JSON-RPC spec.
 	block := api.backend.BlockByNumber(bn)
 	if block != nil {
-		return successResponse(req.ID, FormatBlock(block, fullTx))
+		return successResponse(req.ID, FormatBlock(block, fullTx, blobPriceForHeader(api.backend, block.Header())))
 	}
 	return successResponse(req.ID, FormatHeader(header))
 }
@@ -259,7 +275,7 @@ func (api *EthAPI) getBlockByHash(req *Request) *Response {
 	// are always populated per the Ethereum JSON-RPC spec.
 	block := api.backend.BlockByHash(hash)
 	if block != nil {
-		return successResponse(req.ID, FormatBlock(block, fullTx))
+		return successResponse(req.ID, FormatBlock(block, fullTx, blobPriceForHeader(api.backend, block.Header())))
 	}
 	return successResponse(req.ID, FormatHeader(header))
 }
@@ -274,23 +290,21 @@ func (api *EthAPI) getBalance(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
-	}
-
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}
 
 	addr := types.HexToAddress(addrHex)
 	balance := statedb.GetBalance(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeBigInt(balance))
 }
 
@@ -304,23 +318,21 @@ func (api *EthAPI) getTransactionCount(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
-	}
-
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}
 
 	addr := types.HexToAddress(addrHex)
 	nonce := statedb.GetNonce(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeUint64(nonce))
 }
 
@@ -334,23 +346,21 @@ func (api *EthAPI) getCode(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[1])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
-	}
-
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}
 
 	addr := types.HexToAddress(addrHex)
 	code := statedb.GetCode(addr)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeBytes(code))
 }
 
@@ -367,17 +377,12 @@ func (api *EthAPI) getStorageAt(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	var bn BlockNumber
-	if err := json.Unmarshal(req.Params[2], &bn); err != nil {
-		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+	header, selectorErr := resolveRawBlockHeader(api.backend, req.Params[2])
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 	}
 
-	header := api.backend.HeaderByNumber(bn)
-	if header == nil {
-		return errorResponse(req.ID, ErrCodeInternal, "block not found")
-	}
-
-	statedb, err := api.backend.StateAt(header.Root)
+	statedb, err := rpcbackend.StateAtHeader(api.backend, header)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}
@@ -385,6 +390,9 @@ func (api *EthAPI) getStorageAt(req *Request) *Response {
 	addr := types.HexToAddress(addrHex)
 	slot := types.HexToHash(slotHex)
 	value := statedb.GetState(addr, slot)
+	if err := state.ReadError(statedb); err != nil {
+		return errorResponse(req.ID, ErrCodeInternal, err.Error())
+	}
 	return successResponse(req.ID, encodeHash(value))
 }
 
@@ -502,6 +510,22 @@ func (api *EthAPI) feeHistory(req *Request) *Response {
 	// plus the next block's base fees (N+1 entries for baseFeePerGas / baseFeePerBlobGas).
 	for i := oldest; i <= newestNum+1; i++ {
 		header := api.backend.HeaderByNumber(BlockNumber(i))
+		if header == nil && i == newestNum+1 {
+			// Match the reference oracle: forecast with the latest known fork,
+			// not an invented timestamp for a future CL proposal.
+			result.BaseFeePerGas = append(result.BaseFeePerGas, encodeBigInt(gas.CalcBaseFee(newestHeader)))
+			if newestHeader.ExcessBlobGas != nil {
+				target, max, fraction := api.backend.BlobSchedule(newestHeader.Time)
+				excess, err := gas.CalcExcessBlobGasWithRules(newestHeader, gas.BlobSchedule{Target: target, Max: max, UpdateFraction: fraction}, api.backend.IsOsaka(newestHeader.Time))
+				if err != nil {
+					return errorResponse(req.ID, ErrCodeInternal, err.Error())
+				}
+				result.BaseFeePerBlobGas = append(result.BaseFeePerBlobGas, encodeBigInt(api.calcBlobBaseFee(excess, newestHeader.Time)))
+			} else {
+				result.BaseFeePerBlobGas = append(result.BaseFeePerBlobGas, "0x0")
+			}
+			continue
+		}
 		if header != nil && header.BaseFee != nil {
 			result.BaseFeePerGas = append(result.BaseFeePerGas, encodeBigInt(header.BaseFee))
 		} else {
@@ -568,7 +592,14 @@ type SyncStatus struct {
 
 // syncing returns the sync status. Returns false when fully synced.
 func (api *EthAPI) syncing(req *Request) *Response {
-	// For now, we report as fully synced.
+	if backend, ok := api.backend.(interface {
+		SyncProgress() (bool, uint64, uint64, uint64)
+	}); ok {
+		active, start, current, highest := backend.SyncProgress()
+		if active {
+			return successResponse(req.ID, SyncStatus{StartingBlock: fmt.Sprintf("0x%x", start), CurrentBlock: fmt.Sprintf("0x%x", current), HighestBlock: fmt.Sprintf("0x%x", highest)})
+		}
+	}
 	return successResponse(req.ID, false)
 }
 
@@ -576,6 +607,7 @@ func (api *EthAPI) syncing(req *Request) *Response {
 type AccessListResult struct {
 	AccessList []AccessListEntry `json:"accessList"`
 	GasUsed    string            `json:"gasUsed"`
+	Error      string            `json:"error,omitempty"`
 }
 
 // AccessListEntry is a single entry in an access list result.
@@ -595,26 +627,49 @@ func (api *EthAPI) createAccessList(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	bn := LatestBlockNumber
+	var raw json.RawMessage
 	if len(req.Params) > 1 {
-		if err := json.Unmarshal(req.Params[1], &bn); err != nil {
-			return errorResponse(req.ID, ErrCodeInvalidParams, "invalid block number: "+err.Error())
+		raw = req.Params[1]
+	}
+	selection, selectorErr := parseBlockSelection(raw)
+	if selectorErr != nil {
+		return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+	}
+
+	discovery, ok := api.backend.(rpcbackend.AccessListBackend)
+	if !ok {
+		return errorResponse(req.ID, ErrCodeInternal, "access-list discovery is not supported by this backend")
+	}
+	var observed *rpcbackend.AccessListResult
+	var err error
+	if byHeader, ok := api.backend.(rpcbackend.HeaderAccessListBackend); ok {
+		header, selectorErr := resolveBlockSelection(api.backend, selection)
+		if selectorErr != nil {
+			return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
 		}
+		observed, err = byHeader.CreateAccessListAtHeader(args, header)
+	} else {
+		if selection.hash != nil {
+			if _, selectorErr := resolveBlockSelection(api.backend, selection); selectorErr != nil {
+				return &Response{JSONRPC: "2.0", ID: req.ID, Error: selectorErr}
+			}
+			return errorResponse(req.ID, ErrCodeMethodNotFound, "hash-selected access-list discovery unavailable")
+		}
+		observed, err = discovery.CreateAccessList(args, selection.number)
 	}
-
-	from, to, gas, value, data := parseCallArgs(&args)
-
-	// Execute the call to determine gas usage.
-	_, gasUsed, err := api.backend.EVMCall(from, to, data, gas, value, bn)
 	if err != nil {
-		return errorResponse(req.ID, ErrCodeInternal, "execution error: "+err.Error())
+		if errors.Is(err, rpcbackend.ErrInvalidCallArgs) {
+			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
+		}
+		return errorResponse(req.ID, ErrCodeInternal, "access-list generation: "+err.Error())
 	}
-
-	// A full implementation would trace storage accesses during execution.
-	// For now, return an empty access list with the gas used.
-	result := &AccessListResult{
-		AccessList: []AccessListEntry{},
-		GasUsed:    encodeUint64(gasUsed),
+	result := &AccessListResult{AccessList: make([]AccessListEntry, 0, len(observed.AccessList)), GasUsed: encodeUint64(observed.GasUsed), Error: observed.ExecutionError}
+	for _, tuple := range observed.AccessList {
+		entry := AccessListEntry{Address: encodeAddress(tuple.Address), StorageKeys: make([]string, 0, len(tuple.StorageKeys))}
+		for _, key := range tuple.StorageKeys {
+			entry.StorageKeys = append(entry.StorageKeys, encodeHash(key))
+		}
+		result.AccessList = append(result.AccessList, entry)
 	}
 
 	return successResponse(req.ID, result)
@@ -1051,6 +1106,9 @@ func (api *EthAPI) getBlockReceipts(req *Request) *Response {
 
 // ethCall executes a read-only EVM call without creating a transaction.
 func (api *EthAPI) ethCall(req *Request) *Response {
+	if _, ok := api.backend.(rpcbackend.CallBackend); ok {
+		return api.ethCallFull(req)
+	}
 	if len(req.Params) < 1 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "missing call arguments")
 	}
@@ -1079,6 +1137,9 @@ func (api *EthAPI) ethCall(req *Request) *Response {
 
 // estimateGas estimates the gas needed to execute a transaction.
 func (api *EthAPI) estimateGas(req *Request) *Response {
+	if _, ok := api.backend.(rpcbackend.CallBackend); ok {
+		return api.estimateGasFull(req)
+	}
 	if len(req.Params) < 1 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "missing call arguments")
 	}
@@ -1176,9 +1237,10 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 	}
 
 	var (
-		blockHash *types.Hash
-		blockTS   uint64
-		baseFee   *big.Int
+		blockHash   *types.Hash
+		blockTS     uint64
+		baseFee     *big.Int
+		blobBaseFee *big.Int
 	)
 	if blockNum > 0 {
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
@@ -1187,10 +1249,11 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 			blockHash = &h
 			blockTS = header.Time
 			baseFee = header.BaseFee
+			blobBaseFee = blobPriceForHeader(api.backend, header)
 		}
 	}
 
-	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee))
+	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
 }
 
 // getTransactionReceipt returns a receipt for a transaction hash.
@@ -1251,7 +1314,7 @@ func (api *EthAPI) sendRawTransaction(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "empty transaction data")
 	}
 
-	tx, err := types.DecodeTxRLP(rawBytes)
+	tx, err := types.DecodePooledTransaction(rawBytes)
 	if err != nil {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
@@ -1330,7 +1393,7 @@ func (api *EthAPI) getTransactionByBlockHashAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, blobPriceForHeader(api.backend, block.Header())))
 }
 
 // getTransactionByBlockNumberAndIndex implements eth_getTransactionByBlockNumberAndIndex.
@@ -1363,7 +1426,7 @@ func (api *EthAPI) getTransactionByBlockNumberAndIndex(req *Request) *Response {
 	blockNum := block.NumberU64()
 	bh := block.Hash()
 	blockTS := block.Header().Time
-	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee))
+	return successResponse(req.ID, FormatTransaction(txs[index], &bh, &blockNum, &index, blockTS, block.Header().BaseFee, blobPriceForHeader(api.backend, block.Header())))
 }
 
 // getBlockTransactionCountByHash implements eth_getBlockTransactionCountByHash.
@@ -1477,6 +1540,14 @@ func (api *EthAPI) calcBlobBaseFee(excessBlobGas, blockTime uint64) *big.Int {
 	_, _, fraction := api.backend.BlobSchedule(blockTime)
 	sched := gas.BlobScheduleEntry{BaseFeeUpdateFraction: fraction}
 	return gas.CalcBlobBaseFeeWithSchedule(excessBlobGas, sched)
+}
+
+func blobPriceForHeader(backend Backend, header *types.Header) *big.Int {
+	if header == nil || header.ExcessBlobGas == nil {
+		return new(big.Int)
+	}
+	_, _, fraction := backend.BlobSchedule(header.Time)
+	return gas.CalcBlobBaseFeeWithSchedule(*header.ExcessBlobGas, gas.BlobScheduleEntry{BaseFeeUpdateFraction: fraction})
 }
 
 // UnsubscribeID removes a subscription by ID. Used by WebSocket connection

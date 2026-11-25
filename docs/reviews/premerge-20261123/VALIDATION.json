@@ -1,0 +1,68 @@
+{
+  "at": "2026-11-23T03:06:58.471201+00:00",
+  "el_source": "5e6c2faaa78a748c3445603260021a03a2b39f32",
+  "go_toolchain": "go1.26.11",
+  "full_go_package_suites": 219,
+  "related_race_packages": [
+    "core/rawdb",
+    "core/chain",
+    "sync/beacon",
+    "node",
+    "node/backend"
+  ],
+  "go_vet_passed": true,
+  "native_build_passed": true,
+  "composed_python_control_tests": 65,
+  "tool_control_tests_passed": true,
+  "site_build_export_passed": true,
+  "cl_source": "69392d84582420b66c1699822f274a4d83448354",
+  "cl_qualified_functional_source": "3782df1f88095997ffb4c91986a5f1c56bfa5bf2",
+  "cl_current_all_pr_production_tree_equals_qualified_source": true,
+  "cl_locked_workspace_all_targets_check_passed": true,
+  "cl_full_hosted_composed_ci_passed": false,
+  "original_fault_resolved": false,
+  "actual_master_merge": false,
+  "actual_cl_target_merge": false,
+  "receipts": [
+    {
+      "artifact": "el-composed-full-tests.log",
+      "bytes": 12576,
+      "sha256": "4c2b5050c48eb3a3c928d75c3ae26217c2884dea068c68274bf6ce34195a2732"
+    },
+    {
+      "artifact": "el-composed-race-vet-build.log",
+      "bytes": 249,
+      "sha256": "0a05f86e1dfa3a39ce018edbece35fdf3cc956a6f89639e9763d0bf6bf8b7199"
+    },
+    {
+      "artifact": "el-composed-python-final.log",
+      "bytes": 10660,
+      "sha256": "2bd443de4aeb106631de0e6524fd9a0500032479cc21c309005f5d44e924df17"
+    },
+    {
+      "artifact": "el-composed-python-tests.log",
+      "bytes": 269,
+      "sha256": "a22f0fdc58c4927d03ce72de9beb316fd6bd308c0df96d9118127fa45d47e7d9"
+    },
+    {
+      "artifact": "site-copy-check.log",
+      "bytes": 1083,
+      "sha256": "b647e6e24325160caefe66a08b2a8de917a2f63c0c3ef1987ea34bc83548fa44"
+    },
+    {
+      "artifact": "cl-qualified-all-targets.log",
+      "bytes": 9853,
+      "sha256": "98452768ddc17c8840416cd0bbe3211a8a1cb37b35aa03d25eab203ceaeed6c9"
+    },
+    {
+      "artifact": "closing-report-deadline-red.log",
+      "bytes": 1634,
+      "sha256": "36b2b125760158579bff126cf1f637c3c345c56297d1e8a1963978f8e22d95fa"
+    }
+  ],
+  "go_full_race_vet_build_source": "fb187212adb7961f3ffeafbfcd950aee16155ed6",
+  "composed_python_test_source": "5e6c2faaa78a748c3445603260021a03a2b39f32",
+  "site_source": "720566e8",
+  "site_source_note": "Built/export-checked the same edited content immediately before committing it.",
+  "go_source_and_tests_equal_to_full_test_source": true
+}

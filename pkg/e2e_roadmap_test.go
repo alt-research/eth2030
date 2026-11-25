@@ -4,17 +4,19 @@
 package e2e_test
 
 import (
+	"bytes"
 	"math/big"
 	"testing"
 	"time"
 
+	"github.com/consensys/gnark-crypto/ecc"
+	"github.com/consensys/gnark/backend/groth16"
 	e2e "github.com/eth2030/eth2030"
 	"github.com/eth2030/eth2030/consensus"
 	"github.com/eth2030/eth2030/core/block"
 	coreconfig "github.com/eth2030/eth2030/core/config"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/crypto"
+	"github.com/eth2030/eth2030/crypto/vdf"
 	"github.com/eth2030/eth2030/das"
 	"github.com/eth2030/eth2030/epbs"
 	epbsauction "github.com/eth2030/eth2030/epbs/auction"
@@ -31,7 +33,7 @@ import (
 // TestE2E_Roadmap_GlamsterdamRepricing verifies that 18-EIP repricing is
 // applied during block building and processing.
 func TestE2E_Roadmap_GlamsterdamRepricing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -101,7 +103,7 @@ func TestE2E_Roadmap_FOCILInclusionCompliance(t *testing.T) {
 // TestE2E_Roadmap_NativeAAExecution tests EIP-7701 account abstraction
 // transaction creation and basic processing.
 func TestE2E_Roadmap_NativeAAExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0xAA})
 	receiver := types.BytesToAddress([]byte{0xBB})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -127,7 +129,7 @@ func TestE2E_Roadmap_NativeAAExecution(t *testing.T) {
 // TestE2E_Roadmap_BALParallelExecution tests that Block Access Lists track
 // state correctly for parallel execution validation.
 func TestE2E_Roadmap_BALParallelExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver1 := types.BytesToAddress([]byte{0x20})
 	receiver2 := types.BytesToAddress([]byte{0x30})
@@ -359,12 +361,11 @@ func TestE2E_Roadmap_QuickSlotsTiming(t *testing.T) {
 		t.Fatalf("slots per epoch: got %d, want 4", cfg.SlotsPerEpoch)
 	}
 
-	genesis := time.Now().Add(-48 * time.Second) // 8 slots ago
+	genesis := time.Unix(1_700_000_000, 0)
 	sched := consensus.NewQuickSlotScheduler(cfg, genesis)
 
-	slot := sched.CurrentSlot()
-	if slot < 7 || slot > 9 {
-		t.Errorf("current slot: got %d, want ~8", slot)
+	if slot := sched.SlotAt(genesis.Add(48 * time.Second)); slot != 8 {
+		t.Errorf("slot after 48 seconds: got %d, want 8", slot)
 	}
 
 	epoch := sched.SlotToEpoch(8)
@@ -441,11 +442,11 @@ func TestE2E_Roadmap_AttestationScaling(t *testing.T) {
 // TestE2E_Roadmap_VDFRandomness tests VDF evaluation and proof verification
 // using the Wesolowski scheme.
 func TestE2E_Roadmap_VDFRandomness(t *testing.T) {
-	params := &crypto.VDFParams{T: 100, Lambda: 128}
-	vdf := crypto.NewWesolowskiVDF(params)
+	const iterations = 100
+	evaluator := vdf.NewVDFv2(vdf.DefaultVDFv2Config())
 
 	input := []byte("slot-randomness-seed-42")
-	proof, err := vdf.Evaluate(input, params.T)
+	proof, err := evaluator.Evaluate(input, iterations)
 	if err != nil {
 		t.Fatalf("Evaluate: %v", err)
 	}
@@ -455,7 +456,7 @@ func TestE2E_Roadmap_VDFRandomness(t *testing.T) {
 	if len(proof.Proof) == 0 {
 		t.Fatal("empty VDF proof")
 	}
-	if !vdf.Verify(proof) {
+	if !evaluator.Verify(proof) {
 		t.Error("VDF proof did not verify")
 	}
 
@@ -463,7 +464,7 @@ func TestE2E_Roadmap_VDFRandomness(t *testing.T) {
 	tampered := *proof
 	tampered.Output = append([]byte{}, proof.Output...)
 	tampered.Output[0] ^= 0xff
-	if vdf.Verify(&tampered) {
+	if evaluator.Verify(&tampered) {
 		t.Error("tampered proof should not verify")
 	}
 }
@@ -484,6 +485,7 @@ func TestE2E_Roadmap_MandatoryProofSystem(t *testing.T) {
 	}
 
 	blockHash := e2e.DeterministicHash(42)
+	proof := mandatoryProofFixture(t, sys, blockHash)
 	assigned, err := sys.AssignProvers(blockHash)
 	if err != nil {
 		t.Fatalf("AssignProvers: %v", err)
@@ -494,7 +496,7 @@ func TestE2E_Roadmap_MandatoryProofSystem(t *testing.T) {
 
 	// Submit and verify 3 proofs.
 	for i := 0; i < 3; i++ {
-		sub := e2e.MakeProofSubmission(assigned[i], blockHash)
+		sub := &proofs.ProofSubmission{ProverID: assigned[i], BlockHash: blockHash, ProofType: "zksnark", ProofData: proof}
 		if err := sys.SubmitProof(sub); err != nil {
 			t.Fatalf("SubmitProof[%d]: %v", i, err)
 		}
@@ -538,7 +540,7 @@ func TestE2E_Roadmap_ZkVMExecution(t *testing.T) {
 // TestE2E_Roadmap_MultidimGasPricing tests separate gas accounting for
 // calldata, execution, and blob gas dimensions.
 func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -551,7 +553,7 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 	tx := types.NewTransaction(&types.LegacyTx{
 		Nonce:    0,
 		GasPrice: big.NewInt(2000),
-		Gas:      100000,
+		Gas:      300000,
 		To:       &to,
 		Value:    big.NewInt(1000),
 		Data:     make([]byte, 256), // 256 bytes of calldata
@@ -568,9 +570,9 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 	if len(receipts) == 0 {
 		t.Fatal("no receipts returned; tx may have been rejected")
 	}
-	if receipts[0].GasUsed <= e2e.RoadmapTestTxGas {
+	if receipts[0].Status != types.ReceiptStatusSuccessful || receipts[0].GasUsed <= 21000 {
 		t.Errorf("gas used %d should exceed base tx gas %d due to calldata",
-			receipts[0].GasUsed, e2e.RoadmapTestTxGas)
+			receipts[0].GasUsed, uint64(21000))
 	}
 	if block.GasUsed() == 0 {
 		t.Error("block gas used is zero")
@@ -580,7 +582,7 @@ func TestE2E_Roadmap_MultidimGasPricing(t *testing.T) {
 // TestE2E_Roadmap_GigagasParallelProcessing exercises parallel tx batch
 // execution: multiple independent transfers that can run concurrently.
 func TestE2E_Roadmap_GigagasParallelProcessing(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	senders := make([]types.Address, 5)
 	receivers := make([]types.Address, 5)
 	for i := range senders {
@@ -633,7 +635,7 @@ func TestE2E_Roadmap_GigagasParallelProcessing(t *testing.T) {
 // TestE2E_Roadmap_FullBlockLifecycleWithConsensus tests the complete flow:
 // tx -> pool -> build -> execute -> attest -> finalize.
 func TestE2E_Roadmap_FullBlockLifecycleWithConsensus(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -686,7 +688,7 @@ func TestE2E_Roadmap_FullBlockLifecycleWithConsensus(t *testing.T) {
 // TestE2E_Roadmap_StatelessExecution tests building and verifying a block
 // where the state changes are tracked independently.
 func TestE2E_Roadmap_StatelessExecution(t *testing.T) {
-	statedb := state.NewMemoryStateDB()
+	statedb := newBuilderRequestTestState()
 	sender := types.BytesToAddress([]byte{0x10})
 	receiver := types.BytesToAddress([]byte{0x20})
 	statedb.AddBalance(sender, big.NewInt(1e18))
@@ -783,4 +785,38 @@ func TestE2E_Roadmap_ProofAggregation(t *testing.T) {
 	if !verified {
 		t.Error("aggregate proof verification failed")
 	}
+}
+
+// mandatoryProofFixture supplies an actual Groth16 statement for the quorum tests.
+func mandatoryProofFixture(t *testing.T, sys *proofs.MandatoryProofSystem, blockHash types.Hash) []byte {
+	t.Helper()
+	circuit, err := proofs.CompileAACircuitGnark()
+	if err != nil {
+		t.Fatal(err)
+	}
+	keys, err := proofs.SetupGnarkAAKeys(circuit)
+	if err != nil {
+		t.Fatal(err)
+	}
+	proof, err := proofs.ProveGnarkAA(circuit, keys, 2, 21000, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wire bytes.Buffer
+	if _, err := proof.WriteTo(&wire); err != nil {
+		t.Fatal(err)
+	}
+	sys.RegisterVerifier("zksnark", func(sub *proofs.ProofSubmission) bool {
+		if sub.BlockHash != blockHash {
+			return false
+		}
+		reader := bytes.NewReader(sub.ProofData)
+		decoded := groth16.NewProof(ecc.BN254)
+		if _, err := decoded.ReadFrom(reader); err != nil || reader.Len() != 0 {
+			return false
+		}
+		ok, err := proofs.VerifyGnarkAAProof(keys, decoded, 2, 21000)
+		return ok && err == nil
+	})
+	return wire.Bytes()
 }

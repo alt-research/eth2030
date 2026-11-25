@@ -16,11 +16,11 @@ import (
 type PQSignatureType uint8
 
 const (
-	// SigDilithium3 is CRYSTALS-Dilithium at NIST level 3.
+	// SigDilithium3 is the historical identifier for ML-DSA-65.
 	SigDilithium3 PQSignatureType = 0
-	// SigFalcon512 is Falcon at NIST level 1.
+	// SigFalcon512 is the historical identifier for the selected FN-DSA-512 provider.
 	SigFalcon512 PQSignatureType = 1
-	// SigSPHINCS128 is SPHINCS+-128 (stateless hash-based, NIST level 1).
+	// SigSPHINCS128 is the historical identifier for SLH-DSA-SHA2-128f.
 	SigSPHINCS128 PQSignatureType = 2
 )
 
@@ -47,12 +47,13 @@ func SignatureSizeForType(st PQSignatureType) (int, error) {
 
 // Errors returned by PQTxSigner operations.
 var (
-	ErrUnsupportedScheme = errors.New("pq_tx_signer: unsupported PQ scheme")
-	ErrNilTransaction    = errors.New("pq_tx_signer: nil transaction")
-	ErrNilKey            = errors.New("pq_tx_signer: nil key")
-	ErrSchemeMismatch    = errors.New("pq_tx_signer: key scheme does not match signer")
-	ErrInvalidSignature  = errors.New("pq_tx_signer: invalid signature")
-	ErrBatchLenMismatch  = errors.New("pq_tx_signer: batch length mismatch")
+	ErrUnsupportedScheme     = errors.New("pq_tx_signer: unsupported PQ scheme")
+	ErrNilTransaction        = errors.New("pq_tx_signer: nil transaction")
+	ErrNilKey                = errors.New("pq_tx_signer: nil key")
+	ErrSchemeMismatch        = errors.New("pq_tx_signer: key scheme does not match signer")
+	ErrInvalidSignature      = errors.New("pq_tx_signer: invalid signature")
+	ErrInvalidSigningPayload = errors.New("pq_tx_signer: invalid signing payload")
+	ErrBatchLenMismatch      = errors.New("pq_tx_signer: batch length mismatch")
 )
 
 // PQPrivateKey holds a post-quantum private key with its scheme identifier.
@@ -91,7 +92,7 @@ func (s *PQTxSigner) Scheme() PQSignatureType {
 
 // GenerateKey generates a new PQ key pair for the signer's scheme.
 // For Falcon-512 and SPHINCS+, uses the real lattice/hash-based key generation.
-// For Dilithium3, uses the DilithiumSigner (stub with matching Sign/Verify).
+// The historical Dilithium3 identifier uses the ML-DSA-65 provider.
 func (s *PQTxSigner) GenerateKey() (*PQPrivateKey, *PQPublicKey, error) {
 	s.mu.RLock()
 	scheme := s.scheme
@@ -147,8 +148,21 @@ func (s *PQTxSigner) SignTransaction(tx *types.Transaction, key *PQPrivateKey) (
 		return nil, ErrSchemeMismatch
 	}
 
-	// Hash-then-sign: Keccak256(RLP(tx)) -> sign the hash.
+	// The PQ envelope authenticates the algorithm. Set it on the signing
+	// copy so callers can still attach the signature after signing.
+	if pq, ok := tx.Inner().(*types.PQTransaction); ok {
+		unsigned := *pq
+		unsigned.PQSignatureType = uint8(scheme)
+		digest := unsigned.SigningHash()
+		if digest == (types.Hash{}) {
+			return nil, ErrInvalidSigningPayload
+		}
+		return signHash(scheme, key.Raw, digest[:])
+	}
 	txHash := hashTransaction(tx)
+	if txHash == (types.Hash{}) {
+		return nil, ErrInvalidSigningPayload
+	}
 	return signHash(scheme, key.Raw, txHash[:])
 }
 
@@ -165,7 +179,7 @@ func (s *PQTxSigner) VerifyTransaction(tx *types.Transaction, sig []byte, pubkey
 	scheme := s.scheme
 	s.mu.RUnlock()
 
-	if pubkey.Scheme != scheme {
+	if pubkey.Scheme != scheme || tx.Type() == types.PQTransactionType && tx.PQSigType() != uint8(scheme) {
 		return false, ErrSchemeMismatch
 	}
 
@@ -175,6 +189,9 @@ func (s *PQTxSigner) VerifyTransaction(tx *types.Transaction, sig []byte, pubkey
 	}
 
 	txHash := hashTransaction(tx)
+	if txHash == (types.Hash{}) {
+		return false, ErrInvalidSigningPayload
+	}
 	return verifyHash(scheme, pubkey.Raw, txHash[:], sig), nil
 }
 
@@ -214,6 +231,9 @@ func (s *PQTxSigner) VerifyBatch(
 
 // hashTransaction computes Keccak256(RLP(tx)) for the hash-then-sign pattern.
 func hashTransaction(tx *types.Transaction) types.Hash {
+	if tx.Type() == types.PQTransactionType {
+		return tx.SigningHash()
+	}
 	encoded, err := tx.EncodeRLP()
 	if err != nil {
 		return types.Hash{}

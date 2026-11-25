@@ -1,0 +1,191 @@
+{
+  "audit_date": "2026-11-19",
+  "audited_pr_head": "a339283acb74c71377da7a50ce734d3bcaa1ba71",
+  "audit_checkpoint_commit": "23d127c99d08c302dd1149c63e2c9a7a2526ea09",
+  "audit_checkpoint_dirty": false,
+  "qualified_source_tree": "50ca5e493720bff909fb9e0c36b5d61209bf4223",
+  "current_master_observed": "d31bd7202742fb260a881e6a6217e119532e419d",
+  "selected_eips_commit": "3db38a3725105cb67b8804ac3e147967113bc3ca",
+  "live_eips_master": "b055feec322fbc37e9d77a393a50b3ff56b31c92",
+  "live_2780_8037_8038_text_identical_to_pin": true,
+  "upstream_12581_12582": "open and unmerged at audit",
+  "reference_module": "github.com/ethereum/go-ethereum",
+  "reference_version": "v1.17.10",
+  "scope": "signed transaction transitions; pool and outer block validation are not invoked",
+  "amsterdam": {
+    "total": 42,
+    "matches": 42,
+    "signed_envelopes": {
+      "0x02": 32,
+      "0x04": 10
+    }
+  },
+  "osaka_controls": {
+    "total": 42,
+    "matches": 35,
+    "mismatches": [
+      {
+        "name": "above_execution_cap",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "receipt_status",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 21000,
+        "reference_paid_gas": 0,
+        "native_root": "0x50f6a372a0facac1d95cdeb1713ba40e39c168f4d45f12471585100f6b96f2b1",
+        "reference_root": "0x79d0ae2eda47e4059fc21ea60e2da3293e10821ef6338e5fd9ff78b82806840e",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      },
+      {
+        "name": "authorization_bad_nonce_warms",
+        "fork": "osaka_control",
+        "differences": [
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": true,
+        "native_paid_gas": 48605,
+        "reference_paid_gas": 46105,
+        "native_root": "0xdb4df8da8d4288bbf1b9ca9742432f07bc6fc02ceb28c5213df68c9c87599a73",
+        "reference_root": "0xaed3e36354d02bad2cb75f8b7840aa2638c50cd856908c6cd1e3e23439f41a79",
+        "classification": "confirmed skipped-authorization warming mismatch; not a declared-cap case"
+      },
+      {
+        "name": "create_maximum_code_7954",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 110000000,
+        "reference_paid_gas": 0,
+        "native_root": "0xc9c52e26633cc15dee90aebe8c207ddaba73549a83704462912bcdd6af236cf1",
+        "reference_root": "0x5c7d57da9696f56c72c9081456537e6b325e1facf7f1adb200fd8d008f10c8ac",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      },
+      {
+        "name": "funded_reservoir_allocate",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "receipt_status",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 43106,
+        "reference_paid_gas": 0,
+        "native_root": "0x6cebf12147e2283be1f0e17992cc0002f5613ac459c18440a2f799b5c37285b6",
+        "reference_root": "0xcbc13ed9b6be1638d9c74321af22037b8c25a454144df66c4ae592a1333b7171",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      },
+      {
+        "name": "funded_reservoir_exception",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 16977216,
+        "reference_paid_gas": 0,
+        "native_root": "0x147002b086d54211693dd4872f2140e675980ed805c421eb0eb47a8bfaa28590",
+        "reference_root": "0x7d7d851ca0e1557d80ad4f3847733c8e74aeb486fc82094dc2ec01c9e2bdfe92",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      },
+      {
+        "name": "funded_reservoir_nested_refill",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "receipt_status",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 36665,
+        "reference_paid_gas": 0,
+        "native_root": "0xef153f924019980266a804efa7a9d3b4164c924460f0f21d197edb57e4d990bb",
+        "reference_root": "0xae66c98a43e630813f65bf140f44fc99fc42b4e7320b2d0f7b335f761c433c71",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      },
+      {
+        "name": "partial_reservoir_allocate_clear",
+        "fork": "osaka_control",
+        "differences": [
+          "validity",
+          "receipt_status",
+          "user_gas_used",
+          "block_gas_used",
+          "block_execution_gas",
+          "post_state_root",
+          "accounts"
+        ],
+        "native_valid": true,
+        "reference_valid": false,
+        "native_paid_gas": 34570,
+        "reference_paid_gas": 0,
+        "native_root": "0x4187ad3031e57fd069e05562549be7099f05cbe546ebc890e9c651aeaea58401",
+        "reference_root": "0x70cb969c9aa00fc991d1c1a3c24539205fe0f85cba1d878281c5ee2be3fe15e4",
+        "classification": "direct-transition declared-cap control; outer consumer qualification required"
+      }
+    ]
+  },
+  "historical_warming_case_also_in_clean_archive": {
+    "revision": "2cde17ad4eae361e384ee36e8d41fa5523730db9",
+    "same_signed_input": true,
+    "native_paid_gas": 48605,
+    "reference_paid_gas": 46105,
+    "meaning": "not introduced by the recent merge/CI repairs; introduction before the PR83 checkpoint was not established"
+  },
+  "native_fixture_adapter": {
+    "supports_osaka": false,
+    "supports_amsterdam": false,
+    "source": "pkg/core/eftest/state_test_runner.go:395-458",
+    "geth_ci_executes": "gethcore.ApplyMessage in pkg/core/eftest/geth_runner.go:247"
+  },
+  "current_verification": {
+    "signed_comparison": "executed; JSON command exits zero even for differences, which are reported above",
+    "targeted_gas_vm_execution_node": "passed; gaspool package matched no tests under the filter and is not counted as a fresh test pass",
+    "go_build_all": "passed",
+    "audited_head_ci": "7/7 successful; separate from native Amsterdam fixture qualification"
+  },
+  "memory_engine_cap_probe": {
+    "status": "inconclusive fixture; producer included zero transactions",
+    "not_a_confirmed_acceptance_bug": true,
+    "log": "/tmp/eth2030-audit83-memory-cap.log"
+  },
+  "raw_current_comparison": "/tmp/eth2030-audit83-current-corpus.json",
+  "business_code_changes": false
+}

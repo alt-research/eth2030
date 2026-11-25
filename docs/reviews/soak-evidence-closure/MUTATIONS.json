@@ -1,0 +1,30 @@
+[
+  {
+    "mutation": "sample-gap",
+    "compiled": true,
+    "detected": true,
+    "test": "SamplingTests.test_suspended_sampler_cannot_fill_elapsed_duration",
+    "exit": 1
+  },
+  {
+    "mutation": "cross-anchor",
+    "compiled": true,
+    "detected": true,
+    "test": "FinalityTests.test_matching_slot_boundary_does_not_excuse_conflicting_finality",
+    "exit": 1
+  },
+  {
+    "mutation": "cleanup",
+    "compiled": true,
+    "detected": true,
+    "test": "RuntimeTests.test_passed_time_cannot_hide_failed_cleanup",
+    "exit": 1
+  },
+  {
+    "mutation": "actual-geth",
+    "compiled": true,
+    "detected": true,
+    "test": "WireTests.test_metadata_passed_cannot_hide_wrong_geth_bytes",
+    "exit": 1
+  }
+]

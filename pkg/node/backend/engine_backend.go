@@ -2,12 +2,17 @@ package backend
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"math/big"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/eth2030/eth2030/core/block"
+	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/eips"
+	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/mev"
 	"github.com/eth2030/eth2030/core/types"
@@ -22,48 +27,16 @@ import (
 type pendingPayload struct {
 	block    *types.Block
 	receipts []*types.Receipt
+	result   *execution.ProcessResult
+	slot     uint64
 	err      error
 	done     chan struct{}
 }
 
-// blockProcReq is a work item for the block processor goroutine.
-type blockProcReq struct {
-	payload               *payload.ExecutionPayloadV3
-	parentBeaconBlockRoot types.Hash
-	requestsHash          *types.Hash
-	replyCh               chan blockProcResp
-}
-
-// blockProcResp carries the result of a processed block.
-type blockProcResp struct {
-	status payload.PayloadStatusV1
-	err    error
-}
+const defaultMaxPayloads = 32
+const blobCacheMaxSize = 256
 
 var errInclusionListStorageUnsupported = errors.New("inclusion list storage not wired in node backend")
-
-const (
-	fcuCacheSize       = 8   // Number of FCU entries to cache
-	defaultMaxPayloads = 32  // Default number of payloads to cache
-	processChSize      = 8   // Buffer size for block processing channel
-	blobCacheMaxSize   = 256 // Maximum number of blobs to cache for getBlobsV2
-)
-
-// fcuCacheEntry records a (head,safe,finalized) triple from a processed FCU.
-type fcuCacheEntry struct {
-	head      types.Hash
-	safe      types.Hash
-	finalized types.Hash
-}
-
-// postFCUWork carries slow state-update work deferred from ForkchoiceUpdated.
-type postFCUWork struct {
-	fcState    payload.ForkchoiceStateV1
-	headBlock  *types.Block
-	finalBlock *types.Block
-	safeBlock  *types.Block
-	hasAttrs   bool
-}
 
 // EngineBackend adapts NodeDeps to the engine.Backend interface.
 type EngineBackend struct {
@@ -76,20 +49,20 @@ type EngineBackend struct {
 	builder      *block.BlockBuilder
 	buildMu      sync.Mutex
 
-	fcMu          sync.RWMutex
-	safeHash      types.Hash
-	finalizedHash types.Hash
+	fcMu             sync.RWMutex
+	safeHash         types.Hash
+	finalizedHash    types.Hash
+	inclusionResults map[types.Hash]bool
+	inclusionOrder   []types.Hash
 
-	processCh chan blockProcReq
-	stopCh    chan struct{}
+	workMu          sync.Mutex
+	closed          bool
+	workers         sync.WaitGroup
+	fcuMu           sync.Mutex
+	bogotaMu        sync.Mutex
+	bogotaFinalized uint64
 
-	fcuCache   [fcuCacheSize]fcuCacheEntry
-	fcuCacheWr int
-	fcuCacheMu sync.Mutex
-
-	postFCUCh chan postFCUWork
-
-	blobCache   map[types.Hash][]byte
+	blobCache   map[types.Hash]*payload.BlobAndProofV2
 	blobCacheMu sync.RWMutex
 }
 
@@ -112,36 +85,37 @@ func NewEngineBackend(node NodeDeps) *EngineBackend {
 		maxPayloads = defaultMaxPayloads
 	}
 	b := &EngineBackend{
-		node:        node,
-		payloads:    make(map[payload.PayloadID]*pendingPayload),
-		maxPayloads: maxPayloads,
-		builder:     builder,
-		processCh:   make(chan blockProcReq, processChSize),
-		stopCh:      make(chan struct{}),
-		postFCUCh:   make(chan postFCUWork, 1),
-		blobCache:   make(map[types.Hash][]byte),
+		node:             node,
+		payloads:         make(map[payload.PayloadID]*pendingPayload),
+		maxPayloads:      maxPayloads,
+		builder:          builder,
+		blobCache:        make(map[types.Hash]*payload.BlobAndProofV2),
+		inclusionResults: make(map[types.Hash]bool),
 	}
-	go b.processLoop()
-	go b.postFCULoop()
 	return b
 }
 
-// processLoop is the dedicated block processor goroutine.
-func (b *EngineBackend) processLoop() {
-	for {
-		select {
-		case <-b.stopCh:
-			return
-		case req := <-b.processCh:
-			status, err := b.processBlockInternal(req.payload, req.parentBeaconBlockRoot, req.requestsHash)
-			req.replyCh <- blockProcResp{status: status, err: err}
-		}
+func (b *EngineBackend) beginWork() error {
+	b.workMu.Lock()
+	defer b.workMu.Unlock()
+	if b.closed {
+		return fmt.Errorf("engine backend closed")
 	}
+	b.workers.Add(1)
+	return nil
 }
-
-// Close stops the backend.
+func (b *EngineBackend) launch(fn func()) bool {
+	if b.beginWork() != nil {
+		return false
+	}
+	go func() { defer b.workers.Done(); fn() }()
+	return true
+}
 func (b *EngineBackend) Close() {
-	close(b.stopCh)
+	b.workMu.Lock()
+	b.closed = true
+	b.workMu.Unlock()
+	b.workers.Wait()
 }
 
 // GetHeadHash returns the current head block hash.
@@ -209,17 +183,22 @@ func (b *EngineBackend) GetBlockTimestamp(hash types.Hash) uint64 {
 
 // IsCancun returns true if the given timestamp falls within the Cancun fork.
 func (b *EngineBackend) IsCancun(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsEngineCancun(timestamp)
+	return b.node.Blockchain().Config().IsCancun(timestamp)
 }
 
 // IsPrague returns true if the given timestamp falls within the Prague fork.
 func (b *EngineBackend) IsPrague(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsEnginePrague(timestamp)
+	return b.node.Blockchain().Config().IsPrague(timestamp)
+}
+
+// IsOsaka reports whether Osaka rules are active at the payload timestamp.
+func (b *EngineBackend) IsOsaka(timestamp uint64) bool {
+	return b.node.Blockchain().Config().IsOsaka(timestamp)
 }
 
 // IsAmsterdam returns true if the given timestamp falls within the Amsterdam fork.
 func (b *EngineBackend) IsAmsterdam(timestamp uint64) bool {
-	return b.node.Blockchain().Config().IsEngineAmsterdam(timestamp)
+	return b.node.Blockchain().Config().IsAmsterdam(timestamp)
 }
 
 // ProcessBlock validates and executes a new payload from the consensus layer.
@@ -230,15 +209,14 @@ func (b *EngineBackend) ProcessBlock(
 ) (payload.PayloadStatusV1, error) {
 	if len(expectedBlobVersionedHashes) > 0 {
 		if err := vhash.VerifyAllBlobVersionBytes(expectedBlobVersionedHashes); err != nil {
-			latestValid := p.ParentHash
 			slog.Warn("engine_newPayload: invalid blob versioned hash version byte", "err", err)
 			return payload.PayloadStatusV1{
 				Status:          engine.StatusInvalid,
-				LatestValidHash: &latestValid,
+				ValidationError: ptrString(err.Error()),
 			}, nil
 		}
 	}
-	return b.processBlockInternal(p, parentBeaconBlockRoot, nil)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, nil, nil, nil, nil)
 }
 
 // ProcessBlockV4 validates and executes a Prague payload with execution requests.
@@ -248,15 +226,11 @@ func (b *EngineBackend) ProcessBlockV4(
 	parentBeaconBlockRoot types.Hash,
 	executionRequests [][]byte,
 ) (payload.PayloadStatusV1, error) {
-	var reqs types.Requests
-	for _, reqBytes := range executionRequests {
-		if len(reqBytes) == 0 {
-			continue
-		}
-		reqs = append(reqs, &types.Request{Type: reqBytes[0], Data: reqBytes[1:]})
+	if err := types.ValidateExecutionRequestsWire(executionRequests); err != nil {
+		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 	}
-	rHash := types.ComputeRequestsHash(reqs)
-	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash)
+	rHash := types.ComputeWireRequestsHash(executionRequests)
+	return b.processBlockInternal(p, parentBeaconBlockRoot, &rHash, nil, nil, nil)
 }
 
 // ProcessBlockV5 validates and executes a new Amsterdam payload with BAL.
@@ -266,23 +240,54 @@ func (b *EngineBackend) ProcessBlockV5(
 	parentBeaconBlockRoot types.Hash,
 	executionRequests [][]byte,
 ) (payload.PayloadStatusV1, error) {
-	var reqs types.Requests
-	for _, reqBytes := range executionRequests {
-		if len(reqBytes) == 0 {
-			continue
-		}
-		reqs = append(reqs, &types.Request{Type: reqBytes[0], Data: reqBytes[1:]})
+	return b.processBlockV5(p, parentBeaconBlockRoot, executionRequests, nil)
+}
+
+func (b *EngineBackend) processBlockV5(
+	p *payload.ExecutionPayloadV5,
+	parentBeaconBlockRoot types.Hash,
+	executionRequests [][]byte,
+	stage func(*types.Block) (bool, error),
+) (payload.PayloadStatusV1, error) {
+	if err := types.ValidateExecutionRequestsWire(executionRequests); err != nil {
+		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 	}
-	rHash := types.ComputeRequestsHash(reqs)
-	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash)
+	rHash := types.ComputeWireRequestsHash(executionRequests)
+	balHash, err := payload.DecodeBlockAccessList(p.BlockAccessList)
+	if err != nil {
+		message := err.Error()
+		return payload.PayloadStatusV1{Status: engine.StatusInvalid, ValidationError: &message}, nil
+	}
+	var slotNumber *uint64
+	if p.SlotNumber != "" {
+		slot, err := strconv.ParseUint(strings.TrimPrefix(p.SlotNumber, "0x"), 16, 64)
+		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != strings.ToLower(p.SlotNumber) {
+			return payload.PayloadStatusV1{}, engine.ErrInvalidParams
+		}
+		slotNumber = &slot
+	}
+	return b.processBlockInternal(&p.ExecutionPayloadV3, parentBeaconBlockRoot, &rHash, &balHash, slotNumber, stage)
 }
 
 func (b *EngineBackend) processBlockInternal(
 	p *payload.ExecutionPayloadV3,
 	parentBeaconBlockRoot types.Hash,
 	requestsHash *types.Hash,
+	balHash *types.Hash,
+	slotNumber *uint64,
+	stage func(*types.Block) (bool, error),
 ) (payload.PayloadStatusV1, error) {
+	if err := b.beginWork(); err != nil {
+		return payload.PayloadStatusV1{}, err
+	}
+	defer b.workers.Done()
 	bc := b.node.Blockchain()
+	if p == nil {
+		return payload.PayloadStatusV1{}, engine.ErrInvalidParams
+	}
+	if err := bc.CheckStorage(); err != nil {
+		return payload.PayloadStatusV1{}, err
+	}
 
 	slog.Debug("engine_newPayload",
 		"blockNumber", p.BlockNumber,
@@ -292,28 +297,14 @@ func (b *EngineBackend) processBlockInternal(
 		"txCount", len(p.Transactions),
 	)
 
-	// Short-circuit for already-known blocks.
-	if bc.HasBlock(p.BlockHash) {
-		h := p.BlockHash
-		slog.Debug("engine_newPayload: already known, returning VALID",
-			"blockNumber", p.BlockNumber,
-			"blockHash", p.BlockHash,
-		)
-		b.registerBlockInFCState(p)
-		head := bc.CurrentBlock()
-		b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), head.Time(), head.NumberU64())
-		return payload.PayloadStatusV1{Status: engine.StatusValid, LatestValidHash: &h}, nil
-	}
-
 	// Decode transactions from raw bytes.
 	var txs []*types.Transaction
 	for _, raw := range p.Transactions {
-		tx, err := types.DecodeTxRLP(raw)
+		tx, err := types.DecodeBlockTransaction(raw)
 		if err != nil {
-			latestValid := p.ParentHash
 			return payload.PayloadStatusV1{
 				Status:          engine.StatusInvalid,
-				LatestValidHash: &latestValid,
+				ValidationError: ptrString(err.Error()),
 			}, nil
 		}
 		txs = append(txs, tx)
@@ -337,27 +328,27 @@ func (b *EngineBackend) processBlockInternal(
 	blobGasUsed := p.BlobGasUsed
 	excessBlobGas := p.ExcessBlobGas
 	header := &types.Header{
-		ParentHash:    p.ParentHash,
-		UncleHash:     types.EmptyUncleHash,
-		Coinbase:      p.FeeRecipient,
-		Root:          p.StateRoot,
-		ReceiptHash:   p.ReceiptsRoot,
-		Bloom:         p.LogsBloom,
-		Difficulty:    new(big.Int),
-		Number:        new(big.Int).SetUint64(p.BlockNumber),
-		GasLimit:      p.GasLimit,
-		GasUsed:       p.GasUsed,
-		Time:          p.Timestamp,
-		Extra:         p.ExtraData,
-		BaseFee:       p.BaseFeePerGas,
-		MixDigest:     p.PrevRandao,
-		TxHash:        block.DeriveTxsRoot(txs),
-		BlobGasUsed:   &blobGasUsed,
-		ExcessBlobGas: &excessBlobGas,
+		ParentHash:  p.ParentHash,
+		UncleHash:   types.EmptyUncleHash,
+		Coinbase:    p.FeeRecipient,
+		Root:        p.StateRoot,
+		ReceiptHash: p.ReceiptsRoot,
+		Bloom:       p.LogsBloom,
+		Difficulty:  new(big.Int),
+		Number:      new(big.Int).SetUint64(p.BlockNumber),
+		GasLimit:    p.GasLimit,
+		GasUsed:     p.GasUsed,
+		Time:        p.Timestamp,
+		Extra:       p.ExtraData,
+		BaseFee:     p.BaseFeePerGas,
+		MixDigest:   p.PrevRandao,
+		TxHash:      block.DeriveTxsRoot(txs),
 	}
 
 	// EIP-4788: set ParentBeaconRoot when provided (Cancun+).
-	if parentBeaconBlockRoot != (types.Hash{}) {
+	if bc.Config().IsCancun(p.Timestamp) {
+		header.BlobGasUsed = &blobGasUsed
+		header.ExcessBlobGas = &excessBlobGas
 		header.ParentBeaconRoot = &parentBeaconBlockRoot
 	}
 
@@ -377,44 +368,58 @@ func (b *EngineBackend) processBlockInternal(
 	}
 
 	// EIP-7706: reconstruct CalldataExcessGas/CalldataGasUsed.
-	if types.EIP7706HashFields && bc.Config().IsGlamsterdan(p.Timestamp) {
+	if bc.Config().IsGlamsterdan(p.Timestamp) {
 		parentBlock := bc.GetBlock(p.ParentHash)
-		if parentBlock == nil {
-			slog.Warn("engine_newPayload: parent block unavailable for EIP-7706, returning SYNCING",
-				"blockNumber", p.BlockNumber,
-				"parentHash", p.ParentHash,
-			)
+		if parentBlock == nil && types.EIP7706HashFields {
 			return payload.PayloadStatusV1{Status: engine.StatusSyncing}, nil
 		}
-		ph := parentBlock.Header()
-		var pCalldataExcess, pCalldataUsed uint64
-		if ph.CalldataExcessGas != nil {
-			pCalldataExcess = *ph.CalldataExcessGas
+		if parentBlock != nil {
+			ph := parentBlock.Header()
+			var pCalldataExcess, pCalldataUsed uint64
+			if ph.CalldataExcessGas != nil {
+				pCalldataExcess = *ph.CalldataExcessGas
+			}
+			if ph.CalldataGasUsed != nil {
+				pCalldataUsed = *ph.CalldataGasUsed
+			}
+			calldataExcessGas := gas.CalcCalldataExcessGas(pCalldataExcess, pCalldataUsed, ph.GasLimit)
+			header.CalldataExcessGas = &calldataExcessGas
+			var calldataGasUsed uint64
+			for _, tx := range txs {
+				calldataGasUsed += tx.CalldataGas()
+			}
+			header.CalldataGasUsed = &calldataGasUsed
 		}
-		if ph.CalldataGasUsed != nil {
-			pCalldataUsed = *ph.CalldataGasUsed
-		}
-		calldataExcessGas := gas.CalcCalldataExcessGas(pCalldataExcess, pCalldataUsed, ph.GasLimit)
-		header.CalldataExcessGas = &calldataExcessGas
-		var calldataGasUsed uint64
-		for _, tx := range txs {
-			calldataGasUsed += tx.CalldataGas()
-		}
-		header.CalldataGasUsed = &calldataGasUsed
 	}
 
+	header.BlockAccessListHash = balHash
+	header.SlotNumber = slotNumber
 	block := types.NewBlock(header, &types.Body{Transactions: txs, Withdrawals: withdrawals})
+	if block.Hash() != p.BlockHash {
+		message := "payload block hash does not match reconstructed header"
+		return payload.PayloadStatusV1{Status: engine.StatusInvalid, ValidationError: &message}, nil
+	}
 
 	// Check if parent is known.
 	slog.Debug("engine_newPayload: step2 checking parent",
 		"blockNumber", p.BlockNumber,
 		"parentHash", p.ParentHash,
 	)
-	if !bc.HasBlock(p.ParentHash) {
+	if !bc.HasValidatedBlock(p.ParentHash) {
 		slog.Debug("engine_newPayload: parent unknown, returning SYNCING",
 			"parentHash", p.ParentHash,
 		)
 		return payload.PayloadStatusV1{Status: engine.StatusSyncing}, nil
+	}
+
+	if stage != nil && !bc.HasValidatedBlock(block.Hash()) && p.ParentHash != b.GetHeadHash() {
+		deferred, err := stage(block)
+		if err != nil {
+			return payload.PayloadStatusV1{}, err
+		}
+		if deferred {
+			return payload.PayloadStatusV1{Status: engine.StatusAccepted}, nil
+		}
 	}
 
 	// Insert the block.
@@ -422,30 +427,25 @@ func (b *EngineBackend) processBlockInternal(
 		"blockNumber", p.BlockNumber,
 		"blockHash", p.BlockHash,
 	)
-	if err := bc.InsertBlock(block); err != nil {
+	if err := bc.InsertSyncedBlock(block); err != nil {
+		if errors.Is(err, chain.ErrStateNotFound) {
+			return payload.PayloadStatusV1{Status: engine.StatusSyncing}, nil
+		}
+		if errors.Is(err, chain.ErrStorageFailure) {
+			return payload.PayloadStatusV1{}, err
+		}
 		slog.Warn("engine_newPayload: insert failed", "err", err)
 		latestValid := p.ParentHash
+		message := err.Error()
 		return payload.PayloadStatusV1{
 			Status:          engine.StatusInvalid,
 			LatestValidHash: &latestValid,
+			ValidationError: &message,
 		}, nil
 	}
 
 	// Cache blobs for engine_getBlobsV2.
 	b.cacheBlobsFromBlock(block)
-
-	// Sync txpool state.
-	head := bc.CurrentBlock()
-	b.node.TxPool().ResetAtHead(bc.State(), bc.Config(), head.Time(), head.NumberU64())
-
-	// Notify gas oracle.
-	if oracle := b.node.GasOracle(); oracle != nil {
-		tips := ExtractBlockTips(txs, p.BaseFeePerGas)
-		oracle.RecordBlock(p.BlockNumber, p.BaseFeePerGas, tips)
-	}
-
-	// Feed txpool gas-price suggestor.
-	b.node.TxPool().RecordBlock(header, txs)
 
 	// Register in forkchoice state manager.
 	b.registerBlockInFCState(p)
@@ -491,7 +491,9 @@ func (b *EngineBackend) cacheBlobsFromBlock(blk *types.Block) {
 	// Count new blobs to be added.
 	newBlobs := 0
 	for _, tx := range txs {
-		if tx.BlobSidecar() != nil {
+		sidecar := tx.BlobSidecar()
+		_, frame := tx.Inner().(*types.FrameTx8141)
+		if sidecar != nil && (sidecar.Version == 1 || frame) {
 			newBlobs += len(tx.BlobHashes())
 		}
 	}
@@ -516,13 +518,17 @@ func (b *EngineBackend) cacheBlobsFromBlock(blk *types.Block) {
 
 	for _, tx := range txs {
 		sidecar := tx.BlobSidecar()
-		if sidecar == nil {
+		_, frame := tx.Inner().(*types.FrameTx8141)
+		if sidecar == nil || (sidecar.Version != 1 && !frame) {
 			continue
 		}
 		blobHashes := tx.BlobHashes()
 		for i, hash := range blobHashes {
 			if i < len(sidecar.Blobs) && len(sidecar.Blobs[i]) > 0 {
-				b.blobCache[hash] = sidecar.Blobs[i]
+				if len(sidecar.Proofs) < (i+1)*128 {
+					continue
+				}
+				b.blobCache[hash] = copyBlobCellProofs(sidecar.Blobs[i], sidecar.Proofs[i*128:(i+1)*128])
 			}
 		}
 	}
@@ -560,3 +566,5 @@ func (b *EngineBackend) ProcessInclusionList(il *types.InclusionList) error {
 	// acknowledging successful processing.
 	return errInclusionListStorageUnsupported
 }
+
+func ptrString(s string) *string { return &s }

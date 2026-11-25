@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "source_revision": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "bls_active": true,
+  "first_slot": 1,
+  "through_slot": 115,
+  "counts": {
+    "proposer_slashings": 0,
+    "attester_slashings": 0,
+    "voluntary_exits": 0,
+    "bls_to_execution_changes": 0,
+    "deposits": 0,
+    "deposit_requests": 0,
+    "proposer_signatures": 114,
+    "state_root_bindings": 114,
+    "randao_signatures": 114,
+    "empty_sync_aggregates": 2,
+    "self_build_bids_without_separate_signature": 114,
+    "execution_envelope_signatures": 114,
+    "blocks": 114,
+    "attestation_aggregates": 118,
+    "payload_attestation_aggregates": 111,
+    "sync_aggregates": 112,
+    "missed_slots": 1
+  },
+  "mutation_controls": {
+    "proposer": true,
+    "randao": true,
+    "execution_envelope": true,
+    "attestation": true,
+    "payload_attestation": true,
+    "sync_aggregate": true
+  },
+  "network_configuration": {
+    "GENESIS_FORK_VERSION": "0x10000038",
+    "SLOT_DURATION_MS": "6000",
+    "ALTAIR_FORK_VERSION": "0x20000038",
+    "ALTAIR_FORK_EPOCH": "0",
+    "BELLATRIX_FORK_VERSION": "0x30000038",
+    "BELLATRIX_FORK_EPOCH": "0",
+    "CAPELLA_FORK_VERSION": "0x40000038",
+    "CAPELLA_FORK_EPOCH": "0",
+    "DENEB_FORK_VERSION": "0x50000038",
+    "DENEB_FORK_EPOCH": "0",
+    "ELECTRA_FORK_VERSION": "0x60000038",
+    "ELECTRA_FORK_EPOCH": "0",
+    "FULU_FORK_VERSION": "0x70000038",
+    "FULU_FORK_EPOCH": "0",
+    "GLOAS_FORK_VERSION": "0x80000038",
+    "GLOAS_FORK_EPOCH": "0"
+  },
+  "canonical_tip": "0x3c783dce392dceacd155bc0d15ce71573a45dc2cbe54b0b87a7e8113a748bc0c",
+  "canonical_blocks": 113,
+  "canonical_skipped_slots": 2,
+  "verified_orphan_roots": [
+    "0x0ab72fb4e51013b2724c3be34b4490da7e502292a88f2dc940849fdb9ba21d32"
+  ],
+  "orphan_blocks": 1,
+  "offline_retained_window": true,
+  "scope": "Every captured signed block in the declared private window, including retained orphan blocks, with the final canonical ancestry checked independently: proposer, RANDAO, included attestation/PTC aggregates, sync aggregates and execution envelopes, with authenticated state-root/roster bindings. Self-build bids are not counted as separate BLS signatures. This is not a new 48h, scale or complete Ethereum STF acceptance."
+}

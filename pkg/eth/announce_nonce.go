@@ -15,8 +15,8 @@ import (
 	"github.com/eth2030/eth2030/rlp"
 )
 
-// Protocol version for EIP-8077 announce nonce extension.
-const ETH72 = 72 // EIP-8077: Announce Nonce
+// This standalone nonce-announcement helper is not the negotiated eth/72
+// schema. EIP-8070 defines eth/72 sparse blob relay.
 
 // MaxAnnouncements is the maximum number of transaction announcements in a
 // single NewPooledTransactionHashesWithNonce message.

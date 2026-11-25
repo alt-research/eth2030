@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "route": "/roadmap/",
+      "both_default_closed": true,
+      "bottom_order": true,
+      "click_and_keyboard": true,
+      "nested_disclosure": true,
+      "reload_closed": true
+    },
+    {
+      "width": 1440,
+      "route": "/roadmap/#remaining-work",
+      "target_is_collapsed_disclosure": true
+    },
+    {
+      "width": 1440,
+      "route": "homepage remaining-work link",
+      "navigation_passed": true,
+      "closed_after_navigation": true,
+      "page_errors": []
+    },
+    {
+      "width": 375,
+      "route": "/roadmap/",
+      "both_default_closed": true,
+      "bottom_order": true,
+      "click_and_keyboard": true,
+      "nested_disclosure": true,
+      "reload_closed": true
+    },
+    {
+      "width": 375,
+      "route": "/roadmap/#remaining-work",
+      "target_is_collapsed_disclosure": true
+    },
+    {
+      "width": 375,
+      "route": "homepage remaining-work link",
+      "navigation_passed": true,
+      "closed_after_navigation": true,
+      "page_errors": []
+    }
+  ],
+  "screenshots": [
+    "/tmp/eth2030-remaining-disclosure/roadmap-375.png",
+    "/tmp/eth2030-remaining-disclosure/roadmap-1440.png"
+  ]
+}

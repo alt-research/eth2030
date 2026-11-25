@@ -10,6 +10,9 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/cloudflare/circl/sign/mldsa/mldsa65"
+	"github.com/cloudflare/circl/sign/slhdsa"
+
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 )
@@ -21,13 +24,14 @@ const (
 	PipelineAlgSPHINCS   uint8 = 22
 )
 
-// Signing modes.
+// Signing modes. Direct mode is an experimental legacy format and is not
+// accepted by native transaction validation.
 const (
 	SignModeHashThenSign uint8 = 0
 	SignModeDirect       uint8 = 1
 )
 
-// Gas costs per EIP-7932.
+// Project-specific gas estimates; these are not EIP-8051 precompile costs.
 const (
 	PipelineGasMLDSA65   uint64 = 4500
 	PipelineGasFalcon512 uint64 = 3200
@@ -97,12 +101,16 @@ func (p *PQSigningPipeline) RegisterSigner(entry *PipelineSignerEntry) error {
 	if _, exists := p.signers[entry.AlgID]; exists {
 		return fmt.Errorf("%w: %d", ErrPipelineAlgExists, entry.AlgID)
 	}
-	p.signers[entry.AlgID] = entry
+	copyEntry := *entry
+	p.signers[entry.AlgID] = &copyEntry
 	return nil
 }
 
 // SignTransaction signs a PQ transaction. Returns (signature, publicKey, error).
-func (p *PQSigningPipeline) SignTransaction(tx *types.PQTransaction, algID uint8, privateKey []byte) ([]byte, []byte, error) {
+// FN-DSA callers must supply the corresponding public key because the provider
+// does not expose its derivation from a serialized private key. A supplied key
+// is checked against the generated signature before it is returned.
+func (p *PQSigningPipeline) SignTransaction(tx *types.PQTransaction, algID uint8, privateKey []byte, publicKey ...[]byte) ([]byte, []byte, error) {
 	if tx == nil {
 		return nil, nil, ErrPipelineNilTx
 	}
@@ -116,7 +124,18 @@ func (p *PQSigningPipeline) SignTransaction(tx *types.PQTransaction, algID uint8
 	if !exists {
 		return nil, nil, fmt.Errorf("%w: %d", ErrPipelineAlgNotFound, algID)
 	}
-	msg := pipelineTxMessage(tx, mode)
+	signingTx := *tx
+	switch algID {
+	case PipelineAlgMLDSA65:
+		signingTx.PQSignatureType = types.PQSigDilithium
+	case PipelineAlgFalcon512:
+		signingTx.PQSignatureType = types.PQSigFalcon
+	case PipelineAlgSPHINCS:
+		signingTx.PQSignatureType = types.PQSigSPHINCS
+	default:
+		return nil, nil, ErrPipelineUnknownAlg
+	}
+	msg := pipelineTxMessage(&signingTx, mode)
 	if len(msg) == 0 {
 		return nil, nil, ErrPipelineEmptyTxData
 	}
@@ -124,7 +143,21 @@ func (p *PQSigningPipeline) SignTransaction(tx *types.PQTransaction, algID uint8
 	if err != nil {
 		return nil, nil, fmt.Errorf("pq_pipeline: sign: %w", err)
 	}
-	pk := pipelineDerivePublicKey(algID, privateKey, entry.PubKeySize)
+	var pk []byte
+	if len(publicKey) > 1 {
+		return nil, nil, ErrPipelineInvalidSig
+	}
+	if len(publicKey) == 1 {
+		pk = append([]byte(nil), publicKey[0]...)
+	} else {
+		pk, err = pipelinePublicKey(algID, privateKey)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	if len(pk) != entry.PubKeySize || !entry.VerifyFn(pk, msg, sig) {
+		return nil, nil, ErrPipelineInvalidSig
+	}
 	return sig, pk, nil
 }
 
@@ -148,15 +181,23 @@ func (p *PQSigningPipeline) VerifyTransaction(tx *types.PQTransaction) (bool, ty
 	if !entry.VerifyFn(tx.PQPublicKey, msg, tx.PQSignature) {
 		return false, types.Address{}, ErrPipelineVerifyFailed
 	}
-	return true, PipelineDeriveAddress(algID, tx.PQPublicKey), nil
+	return true, types.PQPubKeyToAddress(tx.PQPublicKey), nil
 }
 
 // PipelineDeriveAddress derives an Ethereum address from a PQ public key
-// per EIP-7932: address = Keccak256(algorithm_id || public_key)[12:32].
+// using the pinned EIP-7932 draft, including the 0xff secp256k1 compatibility case.
+// The project-specific type-0x07 sender uses types.PQPubKeyToAddress instead.
 func PipelineDeriveAddress(algID uint8, pubkey []byte) types.Address {
-	input := make([]byte, 1+len(pubkey))
-	input[0] = algID
-	copy(input[1:], pubkey)
+	var input []byte
+	if algID == 0xff {
+		if len(pubkey) > 0 {
+			input = pubkey[1:]
+		}
+	} else {
+		input = make([]byte, 1+len(pubkey))
+		input[0] = algID
+		copy(input[1:], pubkey)
+	}
 	hash := crypto.Keccak256(input)
 	var addr types.Address
 	copy(addr[:], hash[12:32])
@@ -193,7 +234,8 @@ func (p *PQSigningPipeline) GetSigner(algID uint8) (*PipelineSignerEntry, error)
 	if !exists {
 		return nil, fmt.Errorf("%w: %d", ErrPipelineAlgNotFound, algID)
 	}
-	return entry, nil
+	copyEntry := *entry
+	return &copyEntry, nil
 }
 
 func (p *PQSigningPipeline) RegisteredAlgorithms() []uint8 {
@@ -275,10 +317,10 @@ func (p *PQSigningPipeline) registerDefaults() {
 	p.signers[PipelineAlgFalcon512] = &PipelineSignerEntry{
 		AlgID: PipelineAlgFalcon512, Name: "Falcon-512", GasCost: PipelineGasFalcon512,
 		SigSize: Falcon512SigSize, PubKeySize: Falcon512PubKeySize, SecKeySize: Falcon512SecKeySize,
-		SignFn:   func(sk, msg []byte) ([]byte, error) { return falcon.SignReal(sk, msg) },
-		VerifyFn: func(pk, msg, sig []byte) bool { return falcon.VerifyReal(pk, msg, sig) },
+		SignFn:   func(sk, msg []byte) ([]byte, error) { return falcon.Sign(sk, msg) },
+		VerifyFn: func(pk, msg, sig []byte) bool { return falcon.Verify(pk, msg, sig) },
 		KeyGenFn: func() ([]byte, []byte, error) {
-			kp, err := falcon.GenerateKeyReal()
+			kp, err := falcon.GenerateKey()
 			if err != nil {
 				return nil, nil, err
 			}
@@ -304,6 +346,13 @@ func (p *PQSigningPipeline) registerDefaults() {
 func pipelineTxMessage(tx *types.PQTransaction, mode uint8) []byte {
 	if tx == nil {
 		return nil
+	}
+	if mode == SignModeHashThenSign {
+		hash := tx.SigningHash()
+		if hash == (types.Hash{}) {
+			return nil
+		}
+		return hash[:]
 	}
 	var payload []byte
 	payload = append(payload, []byte(pipelineDomainTag)...)
@@ -333,64 +382,32 @@ func pipelineTxMessage(tx *types.PQTransaction, mode uint8) []byte {
 	return h[:]
 }
 
-func pipelineDerivePublicKey(algID uint8, sk []byte, pkSize int) []byte {
-	input := make([]byte, 1+len(sk))
-	input[0] = algID
-	copy(input[1:], sk)
-	seed := crypto.Keccak256(input)
-	pk := make([]byte, pkSize)
-	offset, current := 0, seed
-	for offset < len(pk) {
-		n := copy(pk[offset:], current)
-		offset += n
-		current = crypto.Keccak256(current)
+// The FN-DSA provider does not expose public-key derivation from private
+// bytes. Callers must supply the public key for that algorithm.
+func pipelinePublicKey(algID uint8, sk []byte) ([]byte, error) {
+	switch algID {
+	case PipelineAlgMLDSA65:
+		var key mldsa65.PrivateKey
+		if err := key.UnmarshalBinary(sk); err != nil {
+			return nil, err
+		}
+		return key.Public().(*mldsa65.PublicKey).Bytes(), nil
+	case PipelineAlgSPHINCS:
+		key := slhdsa.PrivateKey{ID: slhdsa.SHA2_128f}
+		if err := key.UnmarshalBinary(sk); err != nil {
+			return nil, err
+		}
+		return key.PublicKey().MarshalBinary()
+	default:
+		return nil, fmt.Errorf("%w: public key required for algorithm %d", ErrPipelineInvalidSig, algID)
 	}
-	return pk
 }
 
-// pipelineMLDSAKeyFromSK reconstructs an MLDSAKeyPair from serialized sk.
 func pipelineMLDSAKeyFromSK(sk []byte) (*MLDSAKeyPair, error) {
-	if len(sk) < MLDSAPrivateKeySize {
-		return nil, fmt.Errorf("pq_pipeline: mldsa sk too short: %d", len(sk))
+	if len(sk) != MLDSAPrivateKeySize {
+		return nil, ErrInvalidKeySize
 	}
-	rho, kSeed, tr := sk[:32], sk[32:64], sk[64:128]
-	polySize := mldsaN * 4
-	s1 := make([]mldsaPoly, mldsaL)
-	off := 128
-	for j := 0; j < mldsaL; j++ {
-		if off+polySize <= len(sk) {
-			s1[j] = mldsaUnpackPoly(sk[off : off+polySize])
-		}
-		off += polySize
-	}
-	s2 := make([]mldsaPoly, mldsaK)
-	for i := 0; i < mldsaK; i++ {
-		if off+polySize <= len(sk) {
-			s2[i] = mldsaUnpackPoly(sk[off : off+polySize])
-		}
-		off += polySize
-	}
-	t0 := make([]mldsaPoly, mldsaK)
-	for i := 0; i < mldsaK; i++ {
-		if off+polySize <= len(sk) {
-			t0[i] = mldsaUnpackPoly(sk[off : off+polySize])
-		}
-		off += polySize
-	}
-	aMatrix := mldsaExpandA(rho)
-	t := mldsaMatVecMul(aMatrix, s1)
-	for i := 0; i < mldsaK; i++ {
-		t[i] = mldsaPolyAdd(t[i], s2[i])
-	}
-	t1 := make([]mldsaPoly, mldsaK)
-	for i := 0; i < mldsaK; i++ {
-		t1[i], _ = mldsaPower2Round(t[i])
-	}
-	return &MLDSAKeyPair{
-		PublicKey: mldsaSerializePK(rho, t1), SecretKey: sk[:MLDSAPrivateKeySize],
-		rho: copySlice(rho), kSeed: copySlice(kSeed), tr: copySlice(tr),
-		s1: s1, s2: s2, t0: t0, t1: t1, aMatrix: aMatrix,
-	}, nil
+	return &MLDSAKeyPair{SecretKey: sk}, nil
 }
 
 func pqSigTypeToPipelineAlg(sigType uint8) uint8 {

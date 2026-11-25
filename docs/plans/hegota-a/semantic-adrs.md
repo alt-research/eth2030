@@ -1,5 +1,7 @@
 # 组合 schema 与语义 ADR
 
+> Historical A-branch audit through `6a17479`. Current master integration changes several runtime conclusions; see the [PR #167 integration audit](master-integration-167.md) and current evidence.
+
 HGT-007。所有正文精确到 [source-lock.json](../../../specs/hegota/source-lock.json)；ADR 是后续实现的约束和未决边界，不是对旧代码的符合性背书。`8141-base-research-v1` 只采用单独 8141；8250、8272、8369、8504 不会因列在同一目录而自动合入。
 
 ## ADR-A01：编码、哈希与签名承诺

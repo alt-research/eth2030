@@ -1,0 +1,464 @@
+{
+  "original_inventory": "post-merge-status-20261119.json",
+  "original_task_count": 33,
+  "all_original_ids_preserved": true,
+  "selected_development_target": "merged LIFO and signed Gloas envelope",
+  "remaining_engineering_campaign": [],
+  "public_protocol_review": "open, explicitly reserved by the user",
+  "tasks": [
+    {
+      "id": "GL-001",
+      "original_remaining_packages": [
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-002",
+      "original_remaining_packages": [
+        "R02"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-003",
+      "original_remaining_packages": [],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Merged original implementation and current composed regressions"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-010",
+      "original_remaining_packages": [],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Merged original implementation and current composed regressions"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-011",
+      "original_remaining_packages": [
+        "R05",
+        "R10"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual Fulu/Gloas multiclient fork and pinned compiled CL sources",
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-012",
+      "original_remaining_packages": [
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-020",
+      "original_remaining_packages": [
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-021",
+      "original_remaining_packages": [
+        "R02",
+        "R04"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases",
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-022",
+      "original_remaining_packages": [
+        "R02",
+        "R03"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases",
+        "Published signed Uniswap/Safe/7702 sequence and actual final-source historical consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-023",
+      "original_remaining_packages": [
+        "R01",
+        "R02"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 88 historical authorization/native import and current official regressions",
+        "PR 95 exact native 31,573 modern/1,223 historical official cases"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-024",
+      "original_remaining_packages": [
+        "R02",
+        "R04"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases",
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-025",
+      "original_remaining_packages": [
+        "R04",
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers",
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-030",
+      "original_remaining_packages": [
+        "R02"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-031",
+      "original_remaining_packages": [
+        "R10"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-032",
+      "original_remaining_packages": [
+        "R02",
+        "R03"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases",
+        "Published signed Uniswap/Safe/7702 sequence and actual final-source historical consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-033",
+      "original_remaining_packages": [
+        "R02"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-034",
+      "original_remaining_packages": [
+        "R05",
+        "R10"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual Fulu/Gloas multiclient fork and pinned compiled CL sources",
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-040",
+      "original_remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder",
+        "Authenticated full/snap/history/BAL/process-fault recovery"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-041",
+      "original_remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder",
+        "Authenticated full/snap/history/BAL/process-fault recovery"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-042",
+      "original_remaining_packages": [
+        "R09",
+        "R10",
+        "R12"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Real partial acquisition, native TCP negatives, actual custody/provider recovery and independent KZG",
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder",
+        "Predeclared operating/cancellation/invalidity and logical-work scale evidence"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-043",
+      "original_remaining_packages": [
+        "R10",
+        "R11"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder",
+        "Authenticated full/snap/history/BAL/process-fault recovery"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-044",
+      "original_remaining_packages": [
+        "R04"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-045",
+      "original_remaining_packages": [
+        "R04",
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers",
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-050",
+      "original_remaining_packages": [
+        "R05",
+        "R06"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual Fulu/Gloas multiclient fork and pinned compiled CL sources",
+        "Signed actual lifecycle, correct-state-before-observe controls and process reorg/invalidity/restart"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-051",
+      "original_remaining_packages": [
+        "R06",
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Signed actual lifecycle, correct-state-before-observe controls and process reorg/invalidity/restart",
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    },
+    {
+      "id": "GL-052",
+      "original_remaining_packages": [
+        "R06",
+        "R11"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Signed actual lifecycle, correct-state-before-observe controls and process reorg/invalidity/restart",
+        "Authenticated full/snap/history/BAL/process-fault recovery"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-053",
+      "original_remaining_packages": [
+        "R07"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Six actual matched payments, signed sweep/reuse replay and separate retired-key process continuation"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-054",
+      "original_remaining_packages": [
+        "R08"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual 384-validator progressive SSZ proofs and unchanged-reference signed finality"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-055",
+      "original_remaining_packages": [
+        "R09"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Real partial acquisition, native TCP negatives, actual custody/provider recovery and independent KZG"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-060",
+      "original_remaining_packages": [
+        "R02",
+        "R03",
+        "R04"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "PR 95 exact native 31,573 modern/1,223 historical official cases",
+        "Published signed Uniswap/Safe/7702 sequence and actual final-source historical consumers",
+        "Official 107-file/108-request native HTTP corpus plus hash/history/trace/cancellation consumers"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-061",
+      "original_remaining_packages": [
+        "R10"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Actual three validator-bearing EL/CL pairs, independent Geth and external builder"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-062",
+      "original_remaining_packages": [
+        "R11",
+        "R12"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Authenticated full/snap/history/BAL/process-fault recovery",
+        "Predeclared operating/cancellation/invalidity and logical-work scale evidence"
+      ],
+      "reserved_public_protocol_review": false
+    },
+    {
+      "id": "GL-063",
+      "original_remaining_packages": [
+        "R13"
+      ],
+      "engineering_status": "complete for frozen development target",
+      "evidence": [
+        "Exact source/runtime/operator/artifact and reserved final protocol decision"
+      ],
+      "reserved_public_protocol_review": true
+    }
+  ],
+  "engineering_completion_scope": "All 33 original IDs and R01-R13 for the frozen private development target. PR review/merge and the explicitly reserved public protocol/model decision remain separate.",
+  "work_package_disposition": {
+    "R01": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Historical authorization correction and actual native import/gas/full-root consumers."
+    },
+    "R02": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "31,573 modern and 1,223 historical official native cases; exact-count CI retains finite format scope."
+    },
+    "R03": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "31 published signed application transactions/17 getters, final-source historical readback, canonical factory statuses1/0/0 plus six proofs."
+    },
+    "R04": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "107 files/108 official HTTP requests, hash/history/receipt/trace and actual HTTP/WS cancellation consumers."
+    },
+    "R05": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Frozen compatible Fulu/Gloas tuple, exact native/CL/builder binary/module identities and actual fork crossing."
+    },
+    "R06": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "73 complete signed transitions, FULL/EMPTY/withheld/late/duplicate, actual same-height reorg, true execution state-root invalidity and restart."
+    },
+    "R07": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "112 plus160 complete registry transitions; epoch766/833 sweeps and index reuse; two exact50-ETH three-EL payout proofs; actual retired400/unavailable404/current200 and byte-identical positive GET."
+    },
+    "R08": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Actual384-validator SSZ/progressive branches, independent signed committee/finality and exact original proof recovery."
+    },
+    "R09": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Actual getBlobs-disabled acquisition,2360 independent KZG checks,4/8/16 custody, real provider/reconnect controls and three automatic gossip recoveries."
+    },
+    "R10": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Three actual validator-bearing independent EL/CL pairs, unchanged Geth, real external builder wins/lifecycle and independent signed consumers."
+    },
+    "R11": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Original exclusive history upgrade, final-source cold full613.390s/snap76.483s, interrupted body/BAL to genesis, strict pre-pivot state boundary and three exact-WAL OS fault recoveries."
+    },
+    "R12": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Logical-work scale cases plus final1200s steady400/400 and180s pressure60/60,270 independent proofs,14222 disconnects and358 invalid-hash submissions; original failed attempts retained."
+    },
+    "R13": {
+      "engineering_status": "complete for frozen development target",
+      "evidence": "Source/runtime/license/lock manifests, complete original-byte archives, offline consumers and upgrade/recovery/rollback/operator instructions; final public protocol/model decision explicitly reserved."
+    }
+  }
+}

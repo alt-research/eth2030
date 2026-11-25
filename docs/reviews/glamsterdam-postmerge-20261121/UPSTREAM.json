@@ -1,0 +1,96 @@
+{
+  "observed_day_utc": "2026-11-21",
+  "selected_merged_lifo_and_signed_envelope_target_unchanged": true,
+  "pull_requests": [
+    {
+      "repository": "ethereum/EIPs",
+      "number": 12581,
+      "state": "closed",
+      "merged": false,
+      "head": "2ba9176f360c3c95641c6c1b5428ac3113335c4b",
+      "base": "master",
+      "url": "https://github.com/ethereum/EIPs/pull/12581",
+      "updated_at": "2026-11-21T11:04:00Z"
+    },
+    {
+      "repository": "ethereum/EIPs",
+      "number": 12582,
+      "state": "closed",
+      "merged": false,
+      "head": "19d788c896ad35fc53dc5721dbe70ed91cb40069",
+      "base": "master",
+      "url": "https://github.com/ethereum/EIPs/pull/12582",
+      "updated_at": "2026-11-21T11:04:11Z"
+    },
+    {
+      "repository": "ethereum/consensus-specs",
+      "number": 5770,
+      "state": "open",
+      "merged": false,
+      "head": "dc75cee42b4b12edee8a56ff81da7b7f8f93de8d",
+      "base": "master",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5770",
+      "updated_at": "2026-11-12T17:36:45Z"
+    },
+    {
+      "repository": "ethereum/consensus-specs",
+      "number": 5820,
+      "state": "open",
+      "merged": false,
+      "head": "78ea271e7c0d84748ab6086e17f468898939afbc",
+      "base": "master",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5820",
+      "updated_at": "2026-11-20T13:44:09Z"
+    },
+    {
+      "repository": "ethereum/consensus-specs",
+      "number": 5781,
+      "state": "open",
+      "merged": false,
+      "head": "16e71e2acdcff7dd726d3d337a840201b94745fd",
+      "base": "master",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5781",
+      "updated_at": "2026-11-20T17:42:19Z"
+    },
+    {
+      "repository": "ethereum/consensus-specs",
+      "number": 5818,
+      "state": "open",
+      "merged": false,
+      "head": "18eae232e57f46d4168fbf44192147dc4d1f0d19",
+      "base": "nflaig/gloas-optimistic-sync",
+      "url": "https://github.com/ethereum/consensus-specs/pull/5818",
+      "updated_at": "2026-11-12T09:12:19Z"
+    },
+    {
+      "repository": "ethereum/execution-apis",
+      "number": 852,
+      "state": "open",
+      "merged": false,
+      "head": "79709ed3b9d76b210e02424aa73b9096ce6b8d3b",
+      "base": "main",
+      "url": "https://github.com/ethereum/execution-apis/pull/852",
+      "updated_at": "2026-11-19T10:45:40Z"
+    },
+    {
+      "repository": "ethereum/execution-apis",
+      "number": 855,
+      "state": "open",
+      "merged": false,
+      "head": "d8409a1d01d394033b0785de18ee112b46e644d3",
+      "base": "main",
+      "url": "https://github.com/ethereum/execution-apis/pull/855",
+      "updated_at": "2026-11-19T01:18:05Z"
+    },
+    {
+      "repository": "sigp/rust-libp2p",
+      "number": 579,
+      "state": "open",
+      "merged": false,
+      "head": "12b1ee829d7a109d85ed8d543265c2a36b33bbc3",
+      "base": "fix-handle-idontwants-controller",
+      "url": "https://github.com/sigp/rust-libp2p/pull/579",
+      "updated_at": "2026-11-19T22:27:29Z"
+    }
+  ]
+}

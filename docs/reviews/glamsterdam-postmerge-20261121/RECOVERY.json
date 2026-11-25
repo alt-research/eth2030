@@ -1,0 +1,113 @@
+{
+  "passed": true,
+  "at": "2026-11-21T16:33:15.947368+00:00",
+  "scope": "Read-only exact running identities and conservative Docker-start reconciliation; original reports unchanged.",
+  "roles": {
+    "el-2-geth-lodestar": {
+      "container": "b7ca3b40e3527cb493d4635572f30e181097732e3fae50f52744e002e76b6d02",
+      "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+      "command": [
+        "geth  --override.genesis=/network-configs/genesis.json --verbosity=4 --datadir=/data/geth/execution-data --http --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug,txpool --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug,txpool --ws.origins=* --nat=extip:172.16.0.11 --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0 --metrics.port=9001 --discovery.port=30303 --port=30303 --miner.gasprice=1 --miner.gaslimit=150000000 --bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303 --networkid=1337 --rpc.rate_limit=0"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "docker_started_at": "2026-11-21T16:19:43.962983137Z",
+      "start_ack_offset_seconds": 0.206666,
+      "accepted_elapsed_from_container_start_seconds": 189.03818095800122,
+      "raw_report_elapsed_seconds": 188.8315149580012,
+      "running_executable_hashes": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/8/exe\n"
+    },
+    "el-3-geth-lighthouse": {
+      "container": "b82d79245970c835e99c86ea8b15e87cd02869c5a502beecbc698ee1e8104ec8",
+      "image_id": "sha256:082275b7dfeea0e86ee8d45e327c0fc01ce9d614e52477cd89443c7a5a369392",
+      "command": [
+        "geth  --override.genesis=/network-configs/genesis.json --verbosity=4 --datadir=/data/geth/execution-data --http --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug,txpool --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug,txpool --ws.origins=* --nat=extip:172.16.0.12 --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0 --metrics.port=9001 --discovery.port=30303 --port=30303 --miner.gasprice=1 --miner.gaslimit=150000000 --bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303 --networkid=1337 --rpc.rate_limit=0"
+      ],
+      "entrypoint": [
+        "sh",
+        "-c"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "docker_started_at": "2026-11-21T16:22:57.214736987Z",
+      "start_ack_offset_seconds": 0.177954,
+      "accepted_elapsed_from_container_start_seconds": 212.55135914699463,
+      "raw_report_elapsed_seconds": 212.37340514699463,
+      "running_executable_hashes": "/proc/10/exe /usr/local/bin/engine-capture 308e4ab626ce50d0f858fce7657f6267465661d9fccf07ee8f24a600b73a5801  /proc/10/exe\n/proc/8/exe /usr/local/bin/eth2030-final-node 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/8/exe\n"
+    },
+    "glamsterdam-qualified-full-el": {
+      "container": "768b44be606b",
+      "image_id": "sha256:7e28a791e2375932bceb6e9d8b1b46aa0a0d48ddf7e5c0db841b96044a076b82",
+      "command": [
+        "--override.genesis=/network-configs/genesis.json",
+        "--datadir=/data/geth/execution-data",
+        "--http",
+        "--http.addr=0.0.0.0",
+        "--http.port=8545",
+        "--http.vhosts=*",
+        "--http.api=admin,engine,net,eth,web3,debug,txpool",
+        "--rpc.rate_limit=0",
+        "--authrpc.port=8551",
+        "--authrpc.addr=0.0.0.0",
+        "--authrpc.jwtsecret=/jwt/jwtsecret",
+        "--syncmode=full",
+        "--networkid=1337",
+        "--port=30303",
+        "--nat=extip:172.16.0.34",
+        "--bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303",
+        "--metrics",
+        "--metrics.addr=0.0.0.0",
+        "--metrics.port=9001"
+      ],
+      "entrypoint": [
+        "geth"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "docker_started_at": "2026-11-21T16:26:33.065653721Z",
+      "start_ack_offset_seconds": 0.184325,
+      "accepted_elapsed_from_container_start_seconds": 219.6610315460037,
+      "raw_report_elapsed_seconds": 219.4767065460037,
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/eth2030 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/7/exe\n/proc/9/exe /usr/local/bin/engine-capture e02dc8259e990aab4beacbf20cca3b18088aa0d17ac22759f196b1410667724e  /proc/9/exe\n"
+    },
+    "glamsterdam-qualified-snap-el": {
+      "container": "1503a09c0f25",
+      "image_id": "sha256:7e28a791e2375932bceb6e9d8b1b46aa0a0d48ddf7e5c0db841b96044a076b82",
+      "command": [
+        "--override.genesis=/network-configs/genesis.json",
+        "--datadir=/data/geth/execution-data",
+        "--http",
+        "--http.addr=0.0.0.0",
+        "--http.port=8545",
+        "--http.vhosts=*",
+        "--http.api=admin,engine,net,eth,web3,debug,txpool",
+        "--rpc.rate_limit=0",
+        "--authrpc.port=8551",
+        "--authrpc.addr=0.0.0.0",
+        "--authrpc.jwtsecret=/jwt/jwtsecret",
+        "--syncmode=snap",
+        "--networkid=1337",
+        "--port=30303",
+        "--nat=extip:172.16.0.36",
+        "--bootnodes=enode://89a11216e88e57b0a64e271411d162de8b3097ee531a8f99f69f510389b47f2517f9bf1fe7d816cf5501a4dee25efb173f05f8b1340b3b20d580d4465bc75d48@172.16.0.10:30303",
+        "--metrics",
+        "--metrics.addr=0.0.0.0",
+        "--metrics.port=9001"
+      ],
+      "entrypoint": [
+        "geth"
+      ],
+      "memory_limit": 4096000000,
+      "nano_cpus": 2000000000,
+      "docker_started_at": "2026-11-21T16:30:17.122667041Z",
+      "start_ack_offset_seconds": 0.210612,
+      "accepted_elapsed_from_container_start_seconds": 176.95264344700732,
+      "raw_report_elapsed_seconds": 176.74203144700732,
+      "running_executable_hashes": "/proc/7/exe /usr/local/bin/eth2030 8d56e60988a014622c3fe8882eb74af9ead972785ea6318e5aa5eee660f64bec  /proc/7/exe\n/proc/9/exe /usr/local/bin/engine-capture e02dc8259e990aab4beacbf20cca3b18088aa0d17ac22759f196b1410667724e  /proc/9/exe\n"
+    }
+  }
+}

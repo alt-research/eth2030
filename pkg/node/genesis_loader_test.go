@@ -1,31 +1,57 @@
 package node
 
 import (
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/eth2030/eth2030/core/eips"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/engine"
+	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/trie/bintrie"
 )
+
+// builderRequestGenesisJSON deploys the owned test contracts before root creation.
+func builderRequestGenesisJSON(chainID uint64) []byte {
+	var g map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(chainID), &g); err != nil {
+		panic(err)
+	}
+	alloc := g["alloc"].(map[string]any)
+	alloc[types.BuilderDepositRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderDepositRuntime())}
+	inhibitor := types.Hash{}
+	for i := range inhibitor {
+		inhibitor[i] = 255
+	}
+	alloc[types.BuilderExitRequestAddress.Hex()] = map[string]any{"balance": "0", "nonce": "0x1", "code": "0x" + hex.EncodeToString(eips.BuilderExitRuntime()), "storage": map[string]string{(types.Hash{}).Hex(): inhibitor.Hex()}}
+	data, _ := json.Marshal(g)
+	return data
+}
 
 // minimalGenesisJSON builds a small genesis.json payload for testing.
 func minimalGenesisJSON(chainID uint64) []byte {
 	g := map[string]any{
 		"config": map[string]any{
-			"chainId":             chainID,
-			"homesteadBlock":      0,
-			"eip155Block":         0,
-			"eip158Block":         0,
-			"byzantiumBlock":      0,
-			"constantinopleBlock": 0,
-			"petersburgBlock":     0,
-			"istanbulBlock":       0,
-			"berlinBlock":         0,
-			"londonBlock":         0,
-			"shanghaiTime":        0,
-			"cancunTime":          0,
-			"pragueTime":          0,
+			"chainId":                 chainID,
+			"terminalTotalDifficulty": "0x0",
+			"homesteadBlock":          0,
+			"eip155Block":             0,
+			"eip158Block":             0,
+			"byzantiumBlock":          0,
+			"constantinopleBlock":     0,
+			"petersburgBlock":         0,
+			"istanbulBlock":           0,
+			"berlinBlock":             0,
+			"londonBlock":             0,
+			"shanghaiTime":            0,
+			"cancunTime":              0,
+			"pragueTime":              0,
+			"osakaTime":               0,
 		},
 		"nonce":      "0x0",
 		"timestamp":  "0x0",
@@ -40,6 +66,36 @@ func minimalGenesisJSON(chainID uint64) []byte {
 	}
 	data, _ := json.Marshal(g)
 	return data
+}
+
+func TestNodeRejectsIncoherentCanonicalScheduleBeforeGenesisAdoption(t *testing.T) {
+	for _, field := range []string{"shanghaiTime", "cancunTime", "pragueTime", "osakaTime"} {
+		t.Run(field, func(t *testing.T) {
+			var input map[string]any
+			if err := json.Unmarshal(minimalGenesisJSON(1337), &input); err != nil {
+				t.Fatal(err)
+			}
+			forks := input["config"].(map[string]any)
+			forks["amsterdamTime"] = 100
+			delete(forks, field)
+			data, err := json.Marshal(input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			cfg := DefaultConfig()
+			cfg.DataDir, cfg.RPCPort, cfg.EnginePort = t.TempDir(), 0, 0
+			cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
+			if err := os.WriteFile(cfg.GenesisPath, data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if node, err := New(&cfg); err == nil || node != nil || !strings.Contains(err.Error(), "fork schedule") {
+				if node != nil {
+					_ = node.Stop()
+				}
+				t.Fatalf("incoherent production startup accepted: node=%v error=%v", node, err)
+			}
+		})
+	}
 }
 
 func TestLoadGenesisFile_Basic(t *testing.T) {
@@ -144,7 +200,7 @@ func TestLoadGenesisFile_HexStringNonce(t *testing.T) {
 		"config": {"chainId": 3151908, "homesteadBlock": 0, "eip155Block": 0,
 		           "eip158Block": 0, "byzantiumBlock": 0, "constantinopleBlock": 0,
 		           "petersburgBlock": 0, "istanbulBlock": 0, "berlinBlock": 0,
-		           "londonBlock": 0, "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
+		           "londonBlock": 0, "terminalTotalDifficulty": "0x0", "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
 		"nonce": "0x0", "timestamp": "0x0", "extraData": "0x",
 		"gasLimit": "0x1C9C380", "difficulty": "0x0",
 		"alloc": {
@@ -182,7 +238,7 @@ func TestLoadGenesisFile_Storage(t *testing.T) {
 		"config": {"chainId": 1, "homesteadBlock": 0, "eip155Block": 0,
 		           "eip158Block": 0, "byzantiumBlock": 0, "constantinopleBlock": 0,
 		           "petersburgBlock": 0, "istanbulBlock": 0, "berlinBlock": 0,
-		           "londonBlock": 0, "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
+		           "londonBlock": 0, "terminalTotalDifficulty": "0x0", "shanghaiTime": 0, "cancunTime": 0, "pragueTime": 0},
 		"nonce": "0x0", "timestamp": "0x0", "extraData": "0x",
 		"gasLimit": "0x1C9C380", "difficulty": "0x0",
 		"alloc": {
@@ -390,6 +446,197 @@ func TestNodeWithGenesisFile(t *testing.T) {
 	}
 	if n.Config().NetworkID != 1337 {
 		t.Errorf("NetworkID = %d, want 1337 (from genesis chainId)", n.Config().NetworkID)
+	}
+}
+
+func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
+	const genesisTime = uint64(100)
+	var input map[string]any
+	if err := json.Unmarshal(builderRequestGenesisJSON(1337), &input); err != nil {
+		t.Fatal(err)
+	}
+	input["timestamp"] = "0x64"
+	cfgFields := input["config"].(map[string]any)
+	cfgFields["amsterdamTime"] = genesisTime + 18
+	cfgFields["glamsterdanTime"] = genesisTime + 31
+	cfgFields["hogotaTime"] = genesisTime + 43
+	cfgFields["bpo2Time"] = genesisTime + 61
+	data, err := json.Marshal(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := DefaultConfig()
+	cfg.GenesisPath = filepath.Join(t.TempDir(), "genesis.json")
+	if err := os.WriteFile(cfg.GenesisPath, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	genesis, err := loadGenesisFile(&cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if genesis.Timestamp != genesisTime || genesis.ToBlock().Time() != genesisTime {
+		t.Fatalf("genesis time %d", genesis.Timestamp)
+	}
+	for _, fork := range []struct {
+		at     uint64
+		active func(uint64) bool
+	}{
+		{118, genesis.Config.IsAmsterdam},
+		{131, genesis.Config.IsGlamsterdan},
+		{143, genesis.Config.IsHogota},
+		{161, genesis.Config.IsBPO2},
+	} {
+		if fork.active(fork.at-1) || !fork.active(fork.at) {
+			t.Fatalf("fork did not switch at %d", fork.at)
+		}
+	}
+}
+
+func TestGenesisLoadsExplicitPQDraftProfile(t *testing.T) {
+	var genesis map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(88), &genesis); err != nil {
+		t.Fatal(err)
+	}
+	genesis["config"].(map[string]any)["pqDraft"] = map[string]any{
+		"time":       100,
+		"sigRecover": "0x0000000000000000000000000000000000007001",
+		"mldsa":      "0x0000000000000000000000000000000000007002",
+		"mldsaEth":   "0x0000000000000000000000000000000000007003",
+	}
+	data, err := json.Marshal(genesis)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "genesis.json")
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	spec, err := loadGenesisFile(&Config{GenesisPath: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pq := spec.Config.PQDraft
+	if pq == nil || pq.Time == nil || *pq.Time != 100 ||
+		pq.SigRecover != (types.Address{18: 0x70, 19: 1}) ||
+		pq.MLDSA != (types.Address{18: 0x70, 19: 2}) ||
+		pq.MLDSAETH != (types.Address{18: 0x70, 19: 3}) {
+		t.Fatalf("unexpected PQ draft configuration: %+v", pq)
+	}
+}
+
+func TestGenesisRejectsAmbiguousPQDraftAddress(t *testing.T) {
+	for _, value := range []string{"0x7001", "0x100000000000000000000000000000000000007001", "0x000000000000000000000000000000000000700z"} {
+		var draft pqDraftJSON
+		input := []byte(`{"sigRecover":"` + value + `"}`)
+		if err := json.Unmarshal(input, &draft); err == nil {
+			t.Fatalf("accepted ambiguous address %q", value)
+		}
+	}
+}
+
+func TestBinaryOverlayGenesisThroughEngine(t *testing.T) {
+	var genesis map[string]any
+	if err := json.Unmarshal(minimalGenesisJSON(88), &genesis); err != nil {
+		t.Fatal(err)
+	}
+	spec := genesis["config"].(map[string]any)
+	spec["binaryOverlayTime"] = 1
+	spec["binaryConversionTime"] = 2
+	spec["binaryConversionStride"] = 1
+	data, err := json.Marshal(genesis)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := makeTestConfig(t)
+	cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
+	if err := os.WriteFile(cfg.GenesisPath, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	n := newTestNode(t, &cfg)
+	bc := n.Blockchain()
+	funded := types.HexToAddress("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
+	build := func(parent *types.Block, at uint64, beacon byte, withdrawal *payload.Withdrawal) *payload.ExecutionPayloadV4 {
+		t.Helper()
+		attrs := new(payload.PayloadAttributesV4)
+		attrs.Timestamp = at
+		attrs.Withdrawals = []*payload.Withdrawal{}
+		if withdrawal != nil {
+			attrs.Withdrawals = append(attrs.Withdrawals, withdrawal)
+		}
+		attrs.ParentBeaconBlockRoot = types.Hash{31: beacon}
+		update, err := n.engBackend.ForkchoiceUpdatedV4(payload.ForkchoiceStateV1{HeadBlockHash: parent.Hash()}, attrs)
+		if err != nil || update.PayloadStatus.Status != engine.StatusValid || update.PayloadID == nil {
+			t.Fatalf("forkchoice: %+v, %v", update, err)
+		}
+		result, err := n.engBackend.GetPayloadByID(*update.PayloadID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return result.ExecutionPayload
+	}
+
+	first := build(bc.Genesis(), 1, 11, nil)
+	parent := bc.GetBlock(first.BlockHash)
+	if parent == nil || first.StateRoot != parent.Root() || first.StateRoot == bc.Genesis().Root() {
+		t.Fatal("Engine did not publish and import the overlay state root")
+	}
+	before, err := bc.StateAtBlock(parent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	balance := before.GetBalance(funded)
+	if balance.Sign() == 0 {
+		t.Fatal("first child cannot read the frozen genesis balance")
+	}
+	converted := build(parent, 2, 12, nil)
+	if converted.StateRoot == first.StateRoot {
+		t.Fatal("Engine did not apply the first conversion unit")
+	}
+	// Missing system code performs no writes. Reconstruct the overlay root
+	// from the one frozen account selected by the conversion stride.
+	want := bintrie.NewWithHashFunc(bintrie.HashFunctionBlake3)
+	updateAccount := func(address types.Address) {
+		t.Helper()
+		account := &types.Account{Balance: before.GetBalance(address), CodeHash: types.EmptyCodeHash.Bytes()}
+		if err := want.UpdateAccount(address, account, 0); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if first.StateRoot != want.Hash() {
+		t.Fatalf("first Engine root = %s, want %s", first.StateRoot, want.Hash())
+	}
+	updateAccount(funded)
+	blk := bc.GetBlock(converted.BlockHash)
+	if blk == nil || blk.Root() != want.Hash() || converted.StateRoot != want.Hash() {
+		t.Fatalf("second Engine root = %s, want %s", converted.StateRoot, want.Hash())
+	}
+	after, err := bc.StateAtBlock(blk)
+	if err != nil || after.GetBalance(funded).Cmp(balance) != 0 {
+		t.Fatalf("conversion changed the logical balance: %v", err)
+	}
+
+	// Missing beacon code cannot distinguish the state of two payloads.
+	// Use a real withdrawal difference to test independent overlay branches.
+	other := build(parent, 2, 13, &payload.Withdrawal{Address: funded, Amount: 1})
+	if other.BlockHash == converted.BlockHash || other.StateRoot == converted.StateRoot {
+		t.Fatal("competing payloads did not produce independent overlays")
+	}
+	headOnly := payload.ForkchoiceStateV1{HeadBlockHash: converted.BlockHash}
+	invalid := new(payload.PayloadAttributesV4)
+	invalid.Timestamp = converted.Timestamp
+	if _, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, invalid); !errors.Is(err, engine.ErrInvalidPayloadAttributes) {
+		t.Fatalf("invalid build timestamp: %v", err)
+	}
+	if bc.CurrentBlock().Hash() != converted.BlockHash {
+		t.Fatal("invalid build attributes rolled back a valid forkchoice")
+	}
+	headOnly.HeadBlockHash = other.BlockHash
+	if update, err := n.engBackend.ForkchoiceUpdatedV4(headOnly, nil); err != nil || update.PayloadStatus.Status != engine.StatusValid {
+		t.Fatalf("forkchoice reorg: %+v, %v", update, err)
+	}
+	if bc.CurrentBlock().Hash() != other.BlockHash || bc.State().GetRoot() != other.StateRoot {
+		t.Fatal("Engine forkchoice did not select the side block and its overlay")
 	}
 }
 

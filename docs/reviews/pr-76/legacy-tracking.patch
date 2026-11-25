@@ -1,0 +1,31 @@
+diff --git a/CHECK.md b/CHECK.md
+index f8fc131b..80ab573a 100644
+--- a/CHECK.md
++++ b/CHECK.md
+@@ -1,5 +1,14 @@
+ # Lean4 Verification Check-list
+ 
++## Complete ordinary blob sidecar validation (2026-11-18)
++
++- [x] Read pinned EIP-4844/7594 networking and proof requirements.
++- [x] Reproduce invalid ordinary-cell-proof admission through real node HTTP.
++- [x] Validate complete sidecar binding/proofs and preserve Frame regression behavior.
++- [x] Require full data for pool-based builders and return genuine legacy blob proofs.
++- [x] Qualify actual wire/admission/Engine consumers, affected checks/build and regression mutations.
++- [x] Publish the isolated blob-validation PR (PR 76).
++
+ ## Merged Frame roadmap and homepage progress (2026-11-18)
+ 
+ - [x] Reconcile PR 61's merged code and runtime evidence with roadmap/tracker claims.
+diff --git a/STATUS.md b/STATUS.md
+index 63e8d0ba..ef071874 100644
+--- a/STATUS.md
++++ b/STATUS.md
+@@ -1,3 +1,7 @@
++## Ordinary blob proof validation and Engine publication (2026-11-18)
++
++Reproduced and repaired invalid ordinary cell-proof admission through real HTTP. Preserve wrapper versions and pooled sidecars, authenticate KZG data, wait for complete pool data, derive genuine legacy proofs and expose canonical BlobAndProofV1 DATA. Shared payload collectors no longer fabricate zero proofs or publish missing data. Journal insert/rotation and fresh-node replay preserve authenticated sidecars. Frame checks remain qualified. Affected suites, targeted race/vet and build pass; four controlled mutations fail as intended. See [verification](docs/verification/glamsterdam-blob-validation-20261118.md). Complete eth/72 sparse relay and release gates remain open.
++
+ ## Merged roadmap and homepage progress (2026-11-18)
+ 
+ - Refreshed the active roadmap, progress report and next-stage/CL iteration

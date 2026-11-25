@@ -1,22 +1,35 @@
 package backend
 
 import (
-	"crypto/rand"
-	"encoding/binary"
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"log/slog"
 	"math/big"
 	"time"
 
+	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/block"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
-	"github.com/eth2030/eth2030/crypto/bls"
+	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/engine/payload"
 	enginepayload "github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/rlp"
 )
 
 // GetPayloadByID retrieves a previously requested payload by its ID.
 func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloadResponse, error) {
+	p, err := b.awaitPayload(id)
+	if err != nil {
+		return nil, err
+	}
+	return b.payloadResponse(id, p)
+}
+
+func (b *EngineBackend) awaitPayload(id payload.PayloadID) (*pendingPayload, error) {
 	slog.Debug("engine_getPayload", "payloadID", id)
 
 	b.mu.Lock()
@@ -39,6 +52,10 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 		return nil, p.err
 	}
 
+	return p, nil
+}
+
+func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload) (*payload.GetPayloadResponse, error) {
 	blk := p.block
 	header := blk.Header()
 
@@ -74,7 +91,11 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 		},
 	}
 
+	if p.result != nil {
+		execPayload.ExecutionRequests = p.result.Requests.Encode()
+	}
 	if ws := blk.Withdrawals(); ws != nil {
+		execPayload.Withdrawals = make([]*payload.Withdrawal, 0, len(ws))
 		for _, w := range ws {
 			execPayload.Withdrawals = append(execPayload.Withdrawals, &payload.Withdrawal{
 				Index:          w.Index,
@@ -86,7 +107,17 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 	}
 
 	blockValue := new(big.Int)
-	for _, receipt := range p.receipts {
+	for i, receipt := range p.receipts {
+		if i < len(blk.Transactions()) {
+			if frame, ok := blk.Transactions()[i].Inner().(*types.FrameTx8141); ok {
+				blobFee := gas.BlobBaseFeeForHeader(b.node.Blockchain().Config(), p.block.Header())
+				tip, err := types.FrameProposerTip(frame, receipt.GasUsed, header.BaseFee, blobFee)
+				if err == nil {
+					blockValue.Add(blockValue, tip)
+				}
+				continue
+			}
+		}
 		if receipt.EffectiveGasPrice != nil && header.BaseFee != nil {
 			tip := new(big.Int).Sub(receipt.EffectiveGasPrice, header.BaseFee)
 			if tip.Sign() > 0 {
@@ -104,31 +135,9 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 		"blockValue", blockValue,
 	)
 
-	blobsBundle := &payload.BlobsBundleV1{}
-	blobTxCount := 0
-	for _, tx := range blk.Transactions() {
-		if tx.Type() != types.BlobTxType {
-			continue
-		}
-		blobTxCount++
-		sc := tx.BlobSidecar()
-		if sc == nil {
-			slog.Debug("engine_getPayload: blob tx missing sidecar",
-				"txHash", tx.Hash(),
-				"blockNumber", blk.NumberU64(),
-			)
-			continue
-		}
-		blobsBundle.Commitments = append(blobsBundle.Commitments, sc.Commitments...)
-		blobsBundle.Proofs = append(blobsBundle.Proofs, sc.Proofs...)
-		blobsBundle.Blobs = append(blobsBundle.Blobs, sc.Blobs...)
-	}
-	if blobTxCount > 0 {
-		slog.Debug("engine_getPayload: blobsBundle",
-			"blobTxCount", blobTxCount,
-			"blobCount", len(blobsBundle.Blobs),
-			"blockNumber", blk.NumberU64(),
-		)
+	blobsBundle, err := payload.BuildBlobsBundleV1(blk.Transactions())
+	if err != nil {
+		return nil, err
 	}
 
 	// Cache blobs for engine_getBlobsV2 (PeerDAS).
@@ -137,14 +146,20 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 	if len(blobsBundle.Blobs) > 0 {
 		b.blobCacheMu.Lock()
 		// Clear old cache entries to avoid stale data
-		b.blobCache = make(map[types.Hash][]byte)
+		b.blobCache = make(map[types.Hash]*payload.BlobAndProofV2)
 		for _, tx := range blk.Transactions() {
-			if tx.Type() != types.BlobTxType {
+			if len(tx.BlobHashes()) == 0 {
 				continue
 			}
 			sc := tx.BlobSidecar()
 			if sc == nil {
 				slog.Warn("engine_getPayload: BlobSidecar is nil for blob tx")
+				continue
+			}
+			// The cache is consumed by PeerDAS V2/V3 retrieval only. Legacy
+			// sidecars must not be silently upgraded by a later query.
+			_, frame := tx.Inner().(*types.FrameTx8141)
+			if sc.Version != 1 && !frame {
 				continue
 			}
 			blobHashes := tx.BlobHashes()
@@ -154,7 +169,10 @@ func (b *EngineBackend) GetPayloadByID(id payload.PayloadID) (*payload.GetPayloa
 			)
 			for i, hash := range blobHashes {
 				if i < len(sc.Blobs) && len(sc.Blobs[i]) > 0 {
-					b.blobCache[hash] = sc.Blobs[i]
+					if len(sc.Proofs) < (i+1)*128 {
+						continue
+					}
+					b.blobCache[hash] = copyBlobCellProofs(sc.Blobs[i], sc.Proofs[i*128:(i+1)*128])
 					slog.Debug("engine_getPayload: cached blob", "hash", hash.Hex(), "index", i)
 				}
 			}
@@ -184,48 +202,36 @@ func (b *EngineBackend) GetPayloadV4ByID(id payload.PayloadID) (*payload.GetPayl
 		ExecutionPayload:  &resp.ExecutionPayload.ExecutionPayloadV3,
 		BlockValue:        resp.BlockValue,
 		BlobsBundle:       resp.BlobsBundle,
-		ExecutionRequests: [][]byte{},
+		ExecutionRequests: resp.ExecutionPayload.ExecutionRequests,
 	}, nil
 }
 
 // GetPayloadV6ByID retrieves a previously built payload for getPayloadV6 (Amsterdam).
 func (b *EngineBackend) GetPayloadV6ByID(id payload.PayloadID) (*payload.GetPayloadV6Response, error) {
-	resp, err := b.GetPayloadByID(id)
+	p, err := b.awaitPayload(id)
 	if err != nil {
 		return nil, err
 	}
-	var blobsBundleV2 *payload.BlobsBundleV2
-	if b1 := resp.BlobsBundle; b1 != nil && len(b1.Blobs) > 0 {
-		// Expand KZG proofs to cell proofs (128 per blob) for PeerDAS.
-		cellProofs, _ := expandBlobCellProofs(b1.Blobs, "GetPayloadV6ByID: ComputeCellsAndProofs failed")
-		blobsBundleV2 = &payload.BlobsBundleV2{
-			Commitments: b1.Commitments,
-			Proofs:      cellProofs,
-			Blobs:       b1.Blobs,
-		}
-		// Debug: print first proof bytes to verify non-zero
-		if len(cellProofs) > 0 && len(cellProofs[0]) >= 16 {
-			slog.Debug("GetPayloadV6ByID: BlobsBundleV2",
-				"blobCount", len(b1.Blobs),
-				"cellProofs", len(cellProofs),
-				"expectedProofs", len(b1.Blobs)*bls.KZGCellsPerExtBlob,
-				"firstProofHex", fmt.Sprintf("%x", cellProofs[0][:16]),
-			)
-		} else {
-			slog.Debug("GetPayloadV6ByID: BlobsBundleV2",
-				"blobCount", len(b1.Blobs),
-				"cellProofs", len(cellProofs),
-				"expectedProofs", len(b1.Blobs)*bls.KZGCellsPerExtBlob,
-			)
-		}
+	resp, err := b.payloadResponse(id, p)
+	if err != nil {
+		return nil, err
 	}
+	blobsBundleV2, err := payload.BuildBlobsBundleV2(p.block.Transactions())
+	if err != nil {
+		return nil, err
+	}
+
+	var blockBAL *bal.BlockAccessList
+	if p.result != nil {
+		blockBAL = p.result.BlockAccessList
+	}
+	v5 := enginepayload.BlockToPayloadV5(p.block, p.block.Header().MixDigest, resp.ExecutionPayload.Withdrawals, blockBAL, p.slot)
+	v5.ExecutionRequests = resp.ExecutionPayload.ExecutionRequests
 	return &payload.GetPayloadV6Response{
-		ExecutionPayload: &payload.ExecutionPayloadV5{
-			ExecutionPayloadV4: *resp.ExecutionPayload,
-		},
+		ExecutionPayload:  v5,
 		BlockValue:        resp.BlockValue,
 		BlobsBundle:       blobsBundleV2,
-		ExecutionRequests: [][]byte{},
+		ExecutionRequests: resp.ExecutionPayload.ExecutionRequests,
 	}, nil
 }
 
@@ -239,12 +245,24 @@ func (b *EngineBackend) GetPayloadBodiesByHash(hashes []types.Hash) ([]*payload.
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(h)
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }
 
 // GetPayloadBodiesByRange returns payload bodies for a range of block numbers.
 func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload.ExecutionPayloadBodyV2, error) {
+	head := b.node.Blockchain().CurrentBlock().NumberU64()
+	if start > head {
+		return []*payload.ExecutionPayloadBodyV2{}, nil
+	}
+	if remaining := head - start; count > remaining && count-remaining > 1 {
+		count = remaining + 1
+	}
 	results := make([]*payload.ExecutionPayloadBodyV2, count)
 	for i := uint64(0); i < count; i++ {
 		num := start + i
@@ -254,6 +272,11 @@ func (b *EngineBackend) GetPayloadBodiesByRange(start, count uint64) ([]*payload
 			continue
 		}
 		results[i] = enginepayload.BlockToPayloadBodyV2(blk)
+		encoded, err := b.node.Blockchain().BlockAccessList(blk.Hash())
+		if err != nil {
+			return nil, err
+		}
+		results[i].BlockAccessList = encoded
 	}
 	return results, nil
 }
@@ -279,150 +302,83 @@ func (b *EngineBackend) GetBlobsByVersionedHashes(hashes []types.Hash) []*payloa
 
 // GetBlobsV2ByVersionedHashes returns blobs with cell proofs.
 func (b *EngineBackend) GetBlobsV2ByVersionedHashes(hashes []types.Hash) []*payload.BlobAndProofV2 {
+	if !b.beginBlobPoolRead() {
+		return nil
+	}
+	defer b.workers.Done()
 	return b.computeBlobsV2(hashes)
 }
 
 // GetBlobsV3ByVersionedHashes returns blobs with cell proofs (sparse).
 func (b *EngineBackend) GetBlobsV3ByVersionedHashes(hashes []types.Hash) []*payload.BlobAndProofV2 {
+	if !b.beginBlobPoolRead() {
+		return nil
+	}
+	defer b.workers.Done()
 	return b.computeBlobsV2(hashes)
+}
+
+// A successful read joins shutdown ownership; syncing never exposes cached data.
+func (b *EngineBackend) beginBlobPoolRead() bool {
+	if b.beginWork() != nil {
+		return false
+	}
+	if source, ok := b.node.(interface {
+		SyncProgress() (bool, uint64, uint64, uint64)
+	}); ok {
+		if syncing, _, _, _ := source.SyncProgress(); syncing {
+			b.workers.Done()
+			return false
+		}
+	}
+	return true
 }
 
 func (b *EngineBackend) computeBlobsV2(hashes []types.Hash) []*payload.BlobAndProofV2 {
 	result := make([]*payload.BlobAndProofV2, len(hashes))
-	kzg := bls.DefaultKZGBackend()
-
+	var pending []types.Hash
+	var positions []int
 	b.blobCacheMu.RLock()
-	cachedBlobs := make([][]byte, len(hashes))
-	cacheHits := 0
-	// Debug: log the requested hashes and cache keys
-	var requestedHashes []string
-	for _, h := range hashes {
-		requestedHashes = append(requestedHashes, h.Hex())
-	}
-	var cacheKeys []string
-	for h := range b.blobCache {
-		cacheKeys = append(cacheKeys, h.Hex())
-	}
-	slog.Debug("computeBlobsV2: hash comparison",
-		"requested", requestedHashes,
-		"cacheKeys", cacheKeys,
-	)
-	for i, h := range hashes {
-		if blob, ok := b.blobCache[h]; ok {
-			cachedBlobs[i] = blob
-			cacheHits++
+	for i, hash := range hashes {
+		if cached := b.blobCache[hash]; cached != nil {
+			result[i] = copyBlobCellProofs(cached.Blob, cached.Proofs)
+		} else {
+			pending = append(pending, hash)
+			positions = append(positions, i)
 		}
 	}
-	cacheSize := len(b.blobCache)
 	b.blobCacheMu.RUnlock()
-
-	if len(hashes) > 0 {
-		slog.Debug("computeBlobsV2: looking up blobs",
-			"requested", len(hashes),
-			"cacheHits", cacheHits,
-			"cacheSize", cacheSize,
-		)
-	}
-
-	for i, blob := range cachedBlobs {
-		if len(blob) == 0 {
-			continue
-		}
-		_, cellProofs, err := kzg.ComputeCellsAndProofs(blob)
-		if err != nil {
-			slog.Warn("computeBlobsV2: ComputeCellsAndProofs failed for cached blob",
-				"hash", hashes[i], "err", err)
-			continue
-		}
-		proofs := make([][]byte, len(cellProofs))
-		for j, p := range cellProofs {
-			cp := p
-			proofs[j] = cp[:]
-		}
-		result[i] = &payload.BlobAndProofV2{
-			Blob:   blob,
-			Proofs: proofs,
-		}
-	}
-
-	if b.node.TxPool() != nil {
-		var pendingHashes []types.Hash
-		pendingIdx := make(map[int]int)
-		for i, h := range hashes {
-			if result[i] == nil {
-				pendingIdx[len(pendingHashes)] = i
-				pendingHashes = append(pendingHashes, h)
+	if len(pending) != 0 && b.node.TxPool() != nil {
+		for i, item := range b.node.TxPool().GetBlobsWithCellProofs(pending) {
+			if item != nil {
+				result[positions[i]] = copyBlobCellProofs(item.Blob, item.CellProofs)
 			}
 		}
-		if len(pendingHashes) > 0 {
-			raw := b.node.TxPool().GetBlobsByVersionedHashes(pendingHashes)
-			poolHits := 0
-			for j, r := range raw {
-				if r == nil || len(r.Blob) == 0 {
-					continue
-				}
-				poolHits++
-				origIdx := pendingIdx[j]
-				_, cellProofs, err := kzg.ComputeCellsAndProofs(r.Blob)
-				if err != nil {
-					slog.Warn("computeBlobsV2: ComputeCellsAndProofs failed",
-						"hash", pendingHashes[j], "err", err)
-					continue
-				}
-				proofs := make([][]byte, len(cellProofs))
-				for k, p := range cellProofs {
-					cp := p
-					proofs[k] = cp[:]
-				}
-				result[origIdx] = &payload.BlobAndProofV2{
-					Blob:   r.Blob,
-					Proofs: proofs,
-				}
-			}
-			slog.Debug("computeBlobsV2: txpool lookup",
-				"pending", len(pendingHashes),
-				"poolHits", poolHits,
-			)
-		}
-	}
-
-	found := 0
-	for _, r := range result {
-		if r != nil {
-			found++
-		}
-	}
-	if found < len(hashes) && len(hashes) > 0 {
-		slog.Warn("computeBlobsV2: missing blobs",
-			"requested", len(hashes),
-			"found", found,
-		)
 	}
 	return result
 }
 
-func generatePayloadID(parentHash types.Hash, attrs *block.BuildBlockAttributes) payload.PayloadID {
-	var buf [8]byte
-	copy(buf[:], parentHash[:8])
-	var tsBytes [8]byte
-	binary.BigEndian.PutUint64(tsBytes[:], attrs.Timestamp)
-	for i := range buf {
-		buf[i] ^= tsBytes[i]
+// Responses own their bytes: a caller cannot mutate pool or published-cache data.
+func copyBlobCellProofs(blob []byte, proofs [][]byte) *payload.BlobAndProofV2 {
+	out := &payload.BlobAndProofV2{Blob: bytes.Clone(blob), Proofs: make([][]byte, len(proofs))}
+	for i, proof := range proofs {
+		out.Proofs[i] = bytes.Clone(proof)
 	}
-	for i := 0; i < 8; i++ {
-		buf[i] ^= attrs.FeeRecipient[i]
-	}
-	for i := 0; i < 8; i++ {
-		buf[i] ^= attrs.Random[8+i]
-	}
+	return out
+}
 
+func generatePayloadID(parentHash types.Hash, attrs *block.BuildBlockAttributes, slot uint64) (payload.PayloadID, error) {
+	data, err := rlp.EncodeToBytes([]any{
+		parentHash, attrs.Timestamp, attrs.FeeRecipient, attrs.Random,
+		attrs.Withdrawals, attrs.BeaconRoot, attrs.GasLimit, attrs.InclusionListTxs, slot,
+	})
+	if err != nil {
+		return payload.PayloadID{}, err
+	}
+	hash := crypto.Keccak256Hash(data)
 	var id payload.PayloadID
-	copy(id[:], buf[:])
-
-	if id == (payload.PayloadID{}) {
-		rand.Read(id[:])
-	}
-	return id
+	copy(id[:], hash[:len(id)])
+	return id, nil
 }
 
 func encodeTxsRLP(txs []*types.Transaction) [][]byte {
@@ -437,31 +393,100 @@ func encodeTxsRLP(txs []*types.Transaction) [][]byte {
 	return encoded
 }
 
-// expandBlobCellProofs expands each blob's KZG proof to 128 per-cell KZG proofs.
-// This is required by the Fulu/PeerDAS spec for BlobsBundleV2.
-func expandBlobCellProofs(blobs [][]byte, warnLabel string) ([][]byte, int) {
-	if len(blobs) == 0 {
-		return nil, 0
+// GetPayloadV7ByID retrieves a previously built payload for getPayloadV7.
+// When EIP-7807 SSZ blocks are active at the payload timestamp, the response
+// additionally carries the SSZ payload encoding and its hash tree root —
+// the SSZ execution block hash the CL commits to.
+func (b *EngineBackend) GetPayloadV7ByID(id payload.PayloadID) (*payload.GetPayloadV6Response, error) {
+	resp, err := b.GetPayloadV6ByID(id)
+	if err != nil {
+		return nil, err
 	}
+	p, err := b.awaitPayload(id)
+	if err != nil {
+		return resp, nil
+	}
+	if p.block == nil || !b.node.Blockchain().Config().IsSSZBlock(p.block.Time()) {
+		return resp, nil
+	}
+	requests := types.Requests(nil)
+	balRLP := []byte(nil)
+	if p.result != nil {
+		requests = p.result.Requests
+		if p.result.BlockAccessList != nil {
+			balRLP, _ = p.result.BlockAccessList.EncodeRLP()
+		}
+	}
+	receipts := p.receipts
+	excessRegular := uint64(0)
+	if p.block.Header().CalldataExcessGas != nil {
+		excessRegular = *p.block.Header().CalldataExcessGas
+	}
+	ctx := types.ExecutionSSZContext{
+		BlobGasLimit:     gas.FusakaMaxBlobGasPerBlock,
+		BlobBaseFee:      gas.BlobBaseFeeForHeader(b.node.Blockchain().Config(), p.block.Header()),
+		ExcessRegularGas: excessRegular,
+		Requests:         requests,
+		BlockAccessList:  balRLP,
+		SlotNumber:       p.slot,
+	}
+	payloadSSZ, err := types.NewExecutionPayloadSSZ(p.block, receipts, ctx)
+	if err != nil {
+		slog.Debug("GetPayloadV7ByID: ssz build failed", "err", err, "receipts", len(receipts), "balRLP", len(balRLP))
+		return resp, nil
+	}
+	enc, err := payloadSSZ.MarshalSSZ()
+	if err != nil {
+		return resp, nil
+	}
+	root, err := payloadSSZ.HashTreeRoot()
+	if err != nil {
+		return resp, nil
+	}
+	resp.SSZPayload = json.RawMessage(`"` + "0x" + hex.EncodeToString(enc) + `"`)
+	resp.SSZBlockHash = &root
+	return resp, nil
+}
 
-	kzg := bls.DefaultKZGBackend()
-	proofs := make([][]byte, 0, len(blobs)*bls.KZGCellsPerExtBlob)
-	totalProofs := 0
-	for _, blob := range blobs {
-		_, cellProofs, err := kzg.ComputeCellsAndProofs(blob)
-		if err != nil {
-			slog.Warn(warnLabel, "err", err)
-			for range bls.KZGCellsPerExtBlob {
-				proofs = append(proofs, make([]byte, bls.KZGBytesPerProof))
-				totalProofs++
-			}
+func (b *EngineBackend) SetCustodyColumns(mask types.CellMask) {
+	if h, ok := b.node.EthHandler().(interface{ SetCustodyColumns(types.CellMask) }); ok {
+		h.SetCustodyColumns(mask)
+	}
+}
+func (b *EngineBackend) GetBlobsV4ByVersionedHashes(hashes []types.Hash, mask types.CellMask) []*payload.BlobCellsAndProofsV1 {
+	if !b.beginBlobPoolRead() {
+		return nil
+	}
+	defer b.workers.Done()
+	h, ok := b.node.EthHandler().(interface {
+		GetBlobCells([]types.Hash, types.CellMask) []types.BlobCells
+	})
+	if !ok {
+		return nil
+	}
+	cells := h.GetBlobCells(hashes, mask)
+	if cells == nil {
+		return nil
+	}
+	result := make([]*payload.BlobCellsAndProofsV1, len(hashes))
+	for i := range result {
+		if i >= len(cells) || cells[i].Cells == nil {
 			continue
 		}
-		for _, p := range cellProofs {
-			cp := p
-			proofs = append(proofs, cp[:])
-			totalProofs++
+		item := &payload.BlobCellsAndProofsV1{BlobCells: make([]*hexutil.Bytes, mask.OneCount()), Proofs: make([]*hexutil.Bytes, mask.OneCount())}
+		if i < len(cells) {
+			for j := range item.BlobCells {
+				if j < len(cells[i].Cells) && cells[i].Cells[j] != nil {
+					value := hexutil.Bytes(cells[i].Cells[j])
+					item.BlobCells[j] = &value
+				}
+				if item.BlobCells[j] != nil && j < len(cells[i].Proofs) && cells[i].Proofs[j] != nil {
+					value := hexutil.Bytes(cells[i].Proofs[j])
+					item.Proofs[j] = &value
+				}
+			}
 		}
+		result[i] = item
 	}
-	return proofs, totalProofs
+	return result
 }

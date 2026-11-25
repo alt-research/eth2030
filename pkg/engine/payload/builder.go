@@ -11,6 +11,7 @@ import (
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
 	coreconfig "github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	corevm "github.com/eth2030/eth2030/core/vm"
@@ -93,7 +94,7 @@ func (pb *PayloadBuilder) StartBuild(
 		return fmt.Errorf("payload timestamp: %w", err)
 	}
 
-	blk, receipts, err := builder.BuildBlock(parentHeader, &block.BuildBlockAttributes{
+	blk, result, err := builder.BuildBlockWithResult(parentHeader, &block.BuildBlockAttributes{
 		Timestamp:    attrs.Timestamp,
 		FeeRecipient: attrs.SuggestedFeeRecipient,
 		Random:       attrs.PrevRandao,
@@ -116,14 +117,15 @@ func (pb *PayloadBuilder) StartBuild(
 	}
 
 	// Calculate block value as the sum of effective tips paid by transactions.
-	blockValue := calcBlockValue(blk, receipts, parentHeader.BaseFee)
+	blockValue := calcBlockValue(pb.config, blk, result.Receipts, blk.Header().BaseFee)
 
 	pb.payloads[id] = &BuiltPayload{
 		Block:             blk,
-		Receipts:          receipts,
+		Receipts:          result.Receipts,
 		BlockValue:        blockValue,
 		BlobsBundle:       &BlobsBundleV1{},
-		ExecutionRequests: [][]byte{},
+		ExecutionRequests: result.Requests.Encode(),
+		BAL:               result.BlockAccessList,
 	}
 
 	return nil
@@ -143,7 +145,7 @@ func (pb *PayloadBuilder) GetPayload(id PayloadID) (*BuiltPayload, error) {
 
 // calcBlockValue computes the total tips (block value) from receipts.
 // Block value = sum over txs of (effectiveGasPrice - baseFee) * gasUsed.
-func calcBlockValue(block *types.Block, receipts []*types.Receipt, baseFee *big.Int) *big.Int {
+func calcBlockValue(cfg *coreconfig.ChainConfig, block *types.Block, receipts []*types.Receipt, baseFee *big.Int) *big.Int {
 	total := new(big.Int)
 	if baseFee == nil {
 		return total
@@ -155,6 +157,14 @@ func calcBlockValue(block *types.Block, receipts []*types.Receipt, baseFee *big.
 			break
 		}
 		tx := txs[i]
+		if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+
+			tip, err := types.FrameProposerTip(frame, receipt.GasUsed, baseFee, gas.BlobBaseFeeForHeader(cfg, block.Header()))
+			if err == nil {
+				total.Add(total, tip)
+			}
+			continue
+		}
 
 		// Compute effective gas price.
 		effectivePrice := effectiveTipPerGas(tx, baseFee)

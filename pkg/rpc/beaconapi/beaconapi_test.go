@@ -340,3 +340,5 @@ func TestBeaconGetBlockMissingParams(t *testing.T) {
 		t.Errorf("error code = %d, want %d", resp.Error.Code, BeaconErrBadRequest)
 	}
 }
+
+func (m *mockBeaconBackend) IsOsaka(uint64) bool { return false }

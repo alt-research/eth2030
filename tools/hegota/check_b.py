@@ -83,6 +83,7 @@ def read_events(path):
                 passed.add(package+'::'+test)
     need(started and started == ended, 'incomplete Go run')
     need(not named['fail'] and not packages['fail'], 'failed Go run')
+    need(sum(packages.values()) == len(ended), 'duplicate Go package completions')
     return passed, {'log_sha256': sha(path), 'named': dict(named), 'packages': dict(packages), 'completed_packages': len(ended)}
 
 def fingerprint(root, artifacts):
@@ -94,6 +95,10 @@ def verify_report(report, tests, hashes, digest):
     need(set(report['passed_tests']) == tests and all(v == 'pass' for v in report['passed_tests'].values()),
          'B native test evidence omitted/failed/skipped')
     need(report['tasks'] == 12 and report['criteria'] == sum(map(len, REQUIRED.values())), 'B coverage count differs')
+    run = report['run']
+    need(run['named'].get('pass', 0) >= len(tests) and not run['named'].get('fail', 0)
+         and run['packages'].get('pass', 0) > 0 and not run['packages'].get('fail', 0)
+         and run['completed_packages'] == sum(run['packages'].values()), 'B run is empty, incomplete or failed')
 
 def main():
     parser = argparse.ArgumentParser()

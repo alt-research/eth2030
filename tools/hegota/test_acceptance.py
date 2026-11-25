@@ -1,7 +1,7 @@
 import hashlib
 import json
 import unittest
-from acceptance import COMMANDS, validate_acceptance, validate_reference, validate_skips, validate_inventory, validate_run
+from acceptance import COMMANDS, validate_acceptance, validate_reference, validate_skips, validate_inventory, validate_run, validate_baseline
 from check import ROOT
 
 
@@ -68,6 +68,27 @@ class AcceptanceEvidence(unittest.TestCase):
         c['tests'].pop()
         with self.assertRaisesRegex(ValueError, 'semantic acceptance coverage omitted'):
             self.validate()
+
+    def test_native_gas_cases_cannot_be_replaced_with_a_label(self):
+        c = next(c for t in self.matrix['tasks'] for c in t['criteria'] if c['id'] == 'gas_and_settlement')
+        c['tests'] = []
+        with self.assertRaisesRegex(ValueError, 'gas/settlement coverage omitted'):
+            self.validate()
+
+    def test_unknown_or_canceled_package_results_are_rejected(self):
+        import copy
+        run = copy.deepcopy(self.evidence['full_suite'])
+        run['package_events']['canceled'] = 1
+        run['started_packages'] = run['completed_packages'] = 2
+        with self.assertRaisesRegex(ValueError, 'unknown or missing execution counter'):
+            validate_run(run)
+
+    def test_boolean_completion_is_not_a_package_count(self):
+        import copy
+        run = copy.deepcopy(self.evidence['full_suite'])
+        run['completed_packages'] = True
+        with self.assertRaisesRegex(ValueError, 'run is incomplete'):
+            validate_run(run)
 
     def test_stale_or_missing_fingerprint_is_rejected(self):
         path = next(iter(self.evidence['artifacts']))
@@ -160,10 +181,71 @@ class AcceptanceEvidence(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'revision is not locked'):
             validate_reference(ROOT, lock, load('specs/hegota/profiles.json'), load('evidence/hegota-a/baseline.json'))
 
+    def test_reference_wrapper_cannot_reuse_the_direct_backend_label(self):
+        load = lambda p: json.loads((ROOT/p).read_text())
+        report = load('evidence/hegota-a/baseline.json')
+        report['reference_backend'] = 'wrapper/'+report['reference_backend']
+        with self.assertRaisesRegex(ValueError, 'reference identity differs'):
+            validate_reference(ROOT, load('specs/hegota/source-lock.json'), load('specs/hegota/profiles.json'), report)
+
     def test_skip_counts_must_match_the_inventory(self):
         with self.assertRaisesRegex(ValueError, 'skip inventory/count mismatch'):
             validate_skips({'full_suite': [], 'race_suite': []},
                            {'full_suite': dict(self.evidence['full_suite'], named_test_or_subtest_events={'pass': 100, 'fail': 0, 'skip': 1})})
+
+
+class BaselineEvidence(unittest.TestCase):
+    def setUp(self):
+        self.baseline = json.loads((ROOT/'evidence/hegota-a/baseline.json').read_text())
+
+    def test_all_locked_cases_are_present_and_agree(self):
+        validate_baseline(ROOT, self.baseline)
+
+    def test_summary_cannot_hide_missing_case_results(self):
+        self.baseline['results'] = []
+        with self.assertRaisesRegex(ValueError, 'case results missing'):
+            validate_baseline(ROOT, self.baseline)
+
+    def test_duplicate_case_cannot_replace_missing_fork(self):
+        self.baseline['results'][1] = self.baseline['results'][0]
+        with self.assertRaisesRegex(ValueError, 'case coverage differs'):
+            validate_baseline(ROOT, self.baseline)
+
+    def test_unknown_case_is_rejected(self):
+        self.baseline['results'][0]['fork'] = 'UnknownFork'
+        with self.assertRaisesRegex(ValueError, 'case coverage differs'):
+            validate_baseline(ROOT, self.baseline)
+
+    def test_matching_but_wrong_roots_or_logs_do_not_pass(self):
+        import copy
+        for field in ('root', 'logs'):
+            bad = copy.deepcopy(self.baseline)
+            bad['results'][0]['native_'+field] = bad['results'][0]['reference_'+field] = '0x'+'11'*32
+            with self.assertRaisesRegex(ValueError, 'pinned oracle'):
+                validate_baseline(ROOT, bad)
+
+    def test_gas_must_be_an_actual_positive_differential_match(self):
+        import copy
+        for native, reference in [(1, 2), (0, 0), (True, True), ('41012', '41012')]:
+            bad = copy.deepcopy(self.baseline)
+            bad['results'][0].update(native_gas=native, reference_gas=reference)
+            with self.assertRaisesRegex(ValueError, 'gas differs or is invalid'):
+                validate_baseline(ROOT, bad)
+
+    def test_case_failure_cannot_hide_behind_green_totals(self):
+        self.baseline['results'][0]['passed'] = False
+        with self.assertRaisesRegex(ValueError, 'case did not pass'):
+            validate_baseline(ROOT, self.baseline)
+
+    def test_case_errors_cannot_hide_behind_a_pass_flag(self):
+        self.baseline['results'][0]['error'] = 'executor failed'
+        with self.assertRaisesRegex(ValueError, 'case did not pass'):
+            validate_baseline(ROOT, self.baseline)
+
+    def test_wrapper_cannot_be_relabeled_as_native(self):
+        self.baseline['native_backend'] = 'wrapper/geth'
+        with self.assertRaisesRegex(ValueError, 'not the native executor'):
+            validate_baseline(ROOT, self.baseline)
 
 
 if __name__ == '__main__':

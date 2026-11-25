@@ -2,7 +2,7 @@
   "date": "2026-11-26",
   "source_base_commit": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
   "branch_baseline": "89b3b1f2d12352777903de9803f3c93285bdcdf1",
-  "source_fingerprint_sha256": "8a5e5bc8e446280d697fb9233f1edeed8011784be673390011279fd15401abf4",
+  "source_fingerprint_sha256": "2b4b1b402966c14f5cb7227b0c61563d72992be44df58af1412896cde22a8282",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "f68ae095ac48440ef4dacc86bae4443b6fb1bb070faa67a56bf049c46e7e2996",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -33,7 +33,7 @@
     "pkg/core/execution/frame_8141.go": "9cfd6288f0ed0d42d0b9c7b89d12e09968ae02bf52c31e436e3a8fd84c5b09f1",
     "pkg/core/execution/frame_8141_test.go": "45f6a9bf7738ef5fa3cdb65790f812ed4f7aa63ce63359b9f2cb96653aa89298",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
-    "pkg/core/execution/hegota_semantic_goldens_test.go": "4d66c8c1bec3a0015217bf88ee570c0a6c09666ed0705e2c0dbcad4c3e7ba4e1",
+    "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
     "pkg/core/execution/processor.go": "b8b716255ede58e074347cdddcd2dae25790c70563cd96bd7cee6b73d2698194",
     "pkg/core/execution/requests.go": "c1ede7cd7b431eea81c06565a437ab9ff382913f7013e35b4eb858dcbe881a83",
     "pkg/core/gaspool/gas_pool.go": "ddf46742848055c478936e9798b6b2ecea1c0216ad5a9e5e8dfb014e6d9b281a",
@@ -115,27 +115,27 @@
     "pkg/txpool/local_tx_test.go": "a55ca0c7e00f839d3242c12a0155f71bb15f2f73cc8e455d45a9716a59b59256",
     "pkg/txpool/txpool.go": "ad803926ba2bea830f4d41f6592a23edaf4d75ac3592938e55df2be1ce19848f",
     "pkg/txpool/txpool_test.go": "837a8b0af5d6a239552ff8e772a5095b92a2c8e221efeadd7531af8ea5aaedc9",
-    "tools/hegota/acceptance.py": "877993b711d1d0f2752f87823c411bc2bf46b782ed5601cdf22edd8daf018eb4",
+    "tools/hegota/acceptance.py": "a8c4aed8cff2df263e799b3e43a8858d0a273deda64d4c2300f8a6b86a0d3e31",
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
-    "tools/hegota/check.py": "3418e440450b8206acf80ec0fd42a22f7c1b7b4ac67fcfdf8efc94e1c66eb958",
+    "tools/hegota/check.py": "f51c8828fa73cb88cded339bd36ca898a199d9ae227ab9adde567e6c9a30c5b6",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
-    "tools/hegota/semantic_goldens.py": "52ff44fc665046df2d20101d88ce742588e3f4a3e642550b9dc0ea14426bf863",
-    "tools/hegota/test_acceptance.py": "349422d2dcf02b079a6e73a1e3fa52dcd8886fd222d162d3350aa8a7d4c9234f",
+    "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
+    "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
-    "tools/hegota/test_semantic_goldens.py": "5f1d0805de0e9f673c80b4007b9c278c13ea35358499d9e853c1779152d8fb7f"
+    "tools/hegota/test_semantic_goldens.py": "bcb92d26c10e277f376433fa90c3a0047fc9be5746af4efd4f7506bc88f15d40"
   },
   "binaries": [
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "31c6035c9b3f90d9fb7c2d6b28f6c8034690614576b7ab4f0315ca433cd264c4",
+      "sha256": "cf2a316268716115e512989e376d495cada4fdab21a9c1c37ba65ab6559c924e",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "83f835c796404895796df29f8202b6e704d6670cd36b292c125d6901a7028963",
+      "sha256": "27f123e146032da948d280fc6fc50015be2b297be5a020a36ffe8935c0188fe7",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     }
@@ -149,7 +149,8 @@
     "TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
     "TestHegotaSemanticGoldens",
     "TestCanonicalFrameProcessorForkTimeBeforeMutation",
-    "TestCanonicalFrameAdmissionTracksForkTimeAndReorg"
+    "TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
+    "TestHegotaGasOracleGoldens"
   ],
   "container": {
     "entrypoint": "eth2030",
@@ -160,5 +161,5 @@
   "baseline_reference": "direct upstream go-ethereum v1.17.10 tests.StateTest.RunNoVerify",
   "canonical_head_selection_status": "native FCU switches validated canonical head/state and refreshes pool; specific HGT-006-R16 closed",
   "historical_evidence": "evidence/hegota-a/history/6a17479/runtime.json",
-  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/eaa13674987d2371e3e038a3f360c106cff50697/evidence/hegota-a/runtime.json"
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/5fb8c99843d296a2b41edd48ebfdb0283037ed01/evidence/hegota-a/runtime.json"
 }

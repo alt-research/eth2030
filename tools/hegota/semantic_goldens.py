@@ -86,7 +86,7 @@ def keyed_nonce(i):
     applied = (valid and i['approval_succeeds'] and not i['approval_reverts'] and
                not i.get('transaction_invalid', False) and i['state_budget'] >= charge and (bool(keys) or legacy < MAX_NONCE))
     after = [MAX_NONCE if seq == MAX_NONCE else seq+1 for _ in keys] if applied and keys else list(stored)
-    after_legacy = legacy+1 if applied and not keys else i['legacy_nonce']
+    after_legacy = (legacy if keys else legacy+1) if applied else i['legacy_nonce']
     return dict(valid=valid, approval_applied=applied, legacy_nonce=after_legacy, stored=after,
                 state_charge=charge if applied else 0, execution_access=12100*len(keys) if shape else 0,
                 replay_valid=valid_at(after_legacy, after))
@@ -164,8 +164,8 @@ def check(data=None):
     if data is None:
         data = json.loads((ROOT/'specs/hegota/semantic-goldens.json').read_text())
     fields(data, {'version', 'purpose', 'gas_vectors', 'recent_root_vectors', 'trace_vectors', 'boundary_vectors'})
-    require(data['version'] == 3, 'unknown semantic corpus version')
-    family(data['gas_vectors'], {'gas-standard', 'gas-floor-state'}, 'gas')
+    require(data['version'] == 4, 'unknown semantic corpus version')
+    family(data['gas_vectors'], {'gas-standard', 'gas-floor-state', 'gas-refund-capped', 'gas-refund-floor', 'gas-clipped-tip-blob'}, 'gas')
     family(data['recent_root_vectors'], {'recent-root-domain'}, 'root domain')
     for v in data['gas_vectors']:
         fields(v, {'id', 'input', 'expected'}, label='gas vector')
@@ -176,6 +176,7 @@ def check(data=None):
         require(i['signature_scheme'] == 'ARBITRARY' and i['empty_signature_message'] is True, 'unsupported gas oracle signature model')
         for k, value in i.items():
             if k not in ('frame_data', 'signature', 'signature_scheme', 'empty_signature_message'): integer(value)
+        require(i['execution_used'] <= i['execution_limit'] and i['state_used'] <= i['state_limit'], 'gas oracle exceeds frame budget')
         tokens = raw.count(0)+4*(len(raw)-raw.count(0))
         intrinsic = 12000+475+4*tokens+16*len(sig)+100
         floor = 12000+475+100+64*(len(raw)+len(sig))
@@ -186,8 +187,10 @@ def check(data=None):
         before = intrinsic+i['execution_used']+i['state_used']; refund = min(i['refund_counter'], before//5)
         used = max(before-refund-i['state_used'], floor)+i['state_used']
         base = used*i['base_fee']+i['blob_count']*131072*i['blob_base_fee']; tip = min(i['tip_cap']*used, escrow-base)
+        require(used <= maximum and 0 <= base+tip <= escrow <= i['max_fee'], 'gas settlement invariant violated')
         result = dict(intrinsic=intrinsic, calldata_floor=floor, standard_limit=standard, max_gas=maximum, required_max_fee=required,
-                      max_cost=escrow, gas_used=used, payer_refund=escrow-base-tip, block_execution_gas=max(before-i['state_used'], floor), block_state_gas=i['state_used'])
+                      max_cost=escrow, gas_used=used, payer_refund=escrow-base-tip, block_execution_gas=max(before-i['state_used'], floor), block_state_gas=i['state_used'],
+                      burned=base, priority_fee=tip, gas_price=i['base_fee']+(escrow-required)//maximum)
         require(same(result, v['expected']), v['id']+': gas oracle mismatch')
     for v in data['recent_root_vectors']:
         result = root_domain(v['source_address'], v['salt'], v['root'], v['slot'])
@@ -211,11 +214,12 @@ def check(data=None):
     ids = [v['id'] for v in data['boundary_vectors']]
     require(len(ids) == len(set(ids)) and not set(ids) & TRACES, 'duplicate boundary vector')
     require(set(ids) == BOUNDARY_IDS, 'missing conditional boundary coverage')
-    return dict(gas_oracles=2, root_domain_oracles=1, native_semantic_cases=7,
+    return dict(gas_oracles=len(data['gas_vectors']), root_domain_oracles=1, native_semantic_cases=7,
                 conditional_rule_oracles=2+len(ids), unexecuted_semantic_trace_seeds=0)
 
 
 BOUNDARY_IDS = {'nonce-duplicate', 'nonce-unsorted', 'nonce-key-overflow', 'nonce-too-many-keys',
+                'nonce-keyed-preserves-current-legacy', 'nonce-sixteen-keys',
                 'nonce-sequential-first-use', 'nonce-sequential-existing', 'nonce-exhaustion', 'nonce-already-exhausted',
                 'nonce-state-budget-short', 'nonce-approval-revert', 'nonce-transaction-invalid',
                 'nonce-empty-legacy', 'nonce-legacy-created-before-approval', 'nonce-empty-max',

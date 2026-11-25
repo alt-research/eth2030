@@ -17,6 +17,95 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 )
 
+// Budget/payment methods consume independent frozen expectations. Execution
+// usage is an oracle input here; the existing VM trace goldens exercise actual
+// frame execution and rollback separately.
+func TestHegotaGasOracleGoldens(t *testing.T) {
+	raw, err := os.ReadFile("../../../specs/hegota/semantic-goldens.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var corpus struct {
+		Vectors []struct {
+			ID    string
+			Input struct {
+				Data           string `json:"frame_data"`
+				Signature      string
+				ExecutionLimit uint64 `json:"execution_limit"`
+				StateLimit     uint64 `json:"state_limit"`
+				BaseFee        uint64 `json:"base_fee"`
+				BlobBaseFee    uint64 `json:"blob_base_fee"`
+				BlobCount      uint64 `json:"blob_count"`
+				MaxFee         uint64 `json:"max_fee"`
+				TipCap         uint64 `json:"tip_cap"`
+			}
+			Expected struct {
+				Intrinsic uint64
+				Floor     uint64 `json:"calldata_floor"`
+				Standard  uint64 `json:"standard_limit"`
+				MaxGas    uint64 `json:"max_gas"`
+				MaxCost   uint64 `json:"max_cost"`
+				GasUsed   uint64 `json:"gas_used"`
+				GasPrice  uint64 `json:"gas_price"`
+				Refund    uint64 `json:"payer_refund"`
+				Burned    uint64
+				Tip       uint64 `json:"priority_fee"`
+			}
+		} `json:"gas_vectors"`
+	}
+	if err := json.Unmarshal(raw, &corpus); err != nil {
+		t.Fatal(err)
+	}
+	if len(corpus.Vectors) != 5 {
+		t.Fatal("missing gas oracle coverage")
+	}
+	for _, v := range corpus.Vectors {
+		t.Run(v.ID, func(t *testing.T) {
+			decode := func(s string) []byte {
+				b, err := hex.DecodeString(strings.TrimPrefix(s, "0x"))
+				if err != nil {
+					t.Fatal(err)
+				}
+				return b
+			}
+			bigValue := func(n uint64) *big.Int { return new(big.Int).SetUint64(n) }
+			tx := &types.FrameTx8141{ChainID: big.NewInt(1337), Sender: types.Address{19: 0x91},
+				Fees: types.FrameFeeBudget{MaxFee: bigValue(v.Input.MaxFee), MaxPriorityFeePerGas: bigValue(v.Input.TipCap)},
+				Frames: []types.Frame8141{{Mode: types.ModeVerify, Flags: 3, Data: decode(v.Input.Data),
+					Limits: types.FrameGasLimits{Execution: v.Input.ExecutionLimit, State: v.Input.StateLimit}}},
+				Signatures: []types.FrameSignature{{Scheme: types.FrameSignatureArbitrary, Signature: decode(v.Input.Signature)}},
+			}
+			for range v.Input.BlobCount {
+				tx.BlobVersionedHashes = append(tx.BlobVersionedHashes, types.Hash{0: 1})
+			}
+			budget, err := tx.GasBudget()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if budget.Intrinsic != v.Expected.Intrinsic || budget.CalldataFloor != v.Expected.Floor ||
+				budget.MaxGas != v.Expected.MaxGas || budget.StateReservation != v.Input.StateLimit ||
+				budget.ExecutionReservation != v.Expected.MaxGas-v.Input.StateLimit ||
+				budget.Intrinsic+v.Input.ExecutionLimit+v.Input.StateLimit != v.Expected.Standard {
+				t.Fatalf("budget differs from independent oracle: %+v", budget)
+			}
+			payment, err := tx.Payment(bigValue(v.Input.BaseFee), bigValue(v.Input.BlobBaseFee))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if payment.Escrow().Cmp(bigValue(v.Expected.MaxCost)) != 0 || payment.GasPrice().Cmp(bigValue(v.Expected.GasPrice)) != 0 {
+				t.Fatal("upfront payment differs from independent oracle")
+			}
+			settled, err := payment.Settle(v.Expected.GasUsed)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if settled.Refund.Cmp(bigValue(v.Expected.Refund)) != 0 || settled.Burned.Cmp(bigValue(v.Expected.Burned)) != 0 || settled.Tip.Cmp(bigValue(v.Expected.Tip)) != 0 {
+				t.Fatalf("settlement differs from independent oracle: %+v", settled)
+			}
+		})
+	}
+}
+
 // These frozen expected effects are derived from the pinned specification, not
 // regenerated from native execution. The two extension oracles have a separate
 // Python consumer and do not imply activation of a combined transaction format.

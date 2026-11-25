@@ -10,8 +10,8 @@
 
 ## Case-level baseline and fee/nonce audit
 
-- [ ] Bind all 12 recorded differential outcomes to the locked fixture cases, roots/logs and native/reference gas agreement.
-- [ ] Add an explicit gas/settlement acceptance criterion with capped-refund, floor and blob/clipped-budget goldens and native fee-method consumers.
-- [ ] Preserve approval-time legacy nonce in the isolated keyed oracle; cover the 16-key valid boundary.
-- [ ] Reject canceled/unknown run counters and malformed completion types.
-- [ ] Verify all original A deliverables, refresh evidence, commit/push and record exact-head results on the English PR.
+- [x] Bind all 12 recorded differential outcomes to the locked fixture cases, roots/logs and native/reference gas agreement.
+- [x] Add an explicit gas/settlement acceptance criterion with capped-refund, floor and blob/clipped-budget goldens and native fee-method consumers.
+- [x] Preserve approval-time legacy nonce in the isolated keyed oracle; cover the 16-key valid boundary.
+- [x] Reject canceled/unknown run counters and malformed completion types.
+- [x] Verify all original A deliverables and refresh evidence; publication and exact-head hosted results are tracked on the English PR.

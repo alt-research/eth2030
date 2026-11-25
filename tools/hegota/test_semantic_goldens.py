@@ -76,6 +76,26 @@ sys.exit(2)
         with self.assertRaisesRegex(ValueError, 'missing or unknown fields'):
             check(self.data)
 
+    def test_every_gas_fee_and_refund_oracle_is_consumed(self):
+        for v in self.data['gas_vectors']:
+            with self.subTest(case=v['id']):
+                original = v['expected']['payer_refund']
+                v['expected']['payer_refund'] += 1
+                with self.assertRaisesRegex(ValueError, 'gas oracle mismatch'):
+                    check(self.data)
+                v['expected']['payer_refund'] = original
+
+    def test_impossible_execution_cannot_be_a_valid_oracle(self):
+        self.data['gas_vectors'][0]['input']['execution_used'] = 50001
+        with self.assertRaisesRegex(ValueError, 'exceeds frame budget'):
+            check(self.data)
+
+    def test_keyed_approval_preserves_current_account_nonce(self):
+        v = next(v for v in self.data['boundary_vectors'] if v['id'] == 'nonce-keyed-preserves-current-legacy')
+        v['expected']['legacy_nonce'] = v['input']['legacy_nonce']
+        with self.assertRaisesRegex(ValueError, 'conditional oracle mismatch'):
+            check(self.data)
+
     def test_text_seed_cannot_replace_a_fixture(self):
         self.vector('approval-zero')['input'] = 'APPROVE scope=0'
         with self.assertRaisesRegex(ValueError, 'concrete fixture'):

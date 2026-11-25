@@ -9,7 +9,7 @@ from pathlib import Path
 from codec_goldens import vectors
 from semantic_goldens import check as check_semantics
 from acceptance import (validate_acceptance, validate_inventory, validate_reference,
-                        validate_skips)
+                        validate_skips, validate_baseline)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -150,7 +150,7 @@ def main():
     for path,expected_hash in verification['artifacts'].items():
         require(digest(ROOT/path)==expected_hash,f'verification artifact changed: {path}')
     baseline=read(ROOT/'evidence/hegota-a/baseline.json')
-    require(baseline['expected']==baseline['executed']==baseline['passed']==12 and baseline['failed']==baseline['skipped']==0,'baseline incomplete')
+    validate_baseline(ROOT,baseline)
     validate_reference(ROOT,lock,profile,baseline)
     validate_inventory(ROOT,read(ROOT/'specs/hegota/conformance.json'),verification)
     validate_skips(read(ROOT/'evidence/hegota-a/skipped-tests.json'),verification)

@@ -257,6 +257,26 @@
           "commands": [
             "semantic_oracles"
           ]
+        },
+        {
+          "id": "gas_and_settlement",
+          "status": "verified",
+          "statement": "Independent gas, floor, capped-refund, blob and clipped-budget oracles agree with native gas-budget and fee-settlement methods.",
+          "artifacts": [
+            "specs/hegota/semantic-goldens.json",
+            "pkg/core/execution/hegota_semantic_goldens_test.go",
+            "docs/plans/hegota-a/semantic-adrs.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens/gas-standard",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens/gas-floor-state",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens/gas-refund-capped",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens/gas-refund-floor",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens/gas-clipped-tip-blob"
+          ],
+          "commands": [
+            "semantic_oracles"
+          ]
         }
       ]
     },

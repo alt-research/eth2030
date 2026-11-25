@@ -1,5 +1,7 @@
 # Group A completeness and adverse-input recheck
 
+> Historical review at `5fb8c998`. The [case-level baseline and fee audit](CASE_LEVEL_AUDIT.md) records the subsequent gaps, fixes and current qualification.
+
 Review date: 2026-11-26. Starting revision: `eaa13674987d2371e3e038a3f360c106cff50697`, current PR #168; canonical master is `89b3b1f2d12352777903de9803f3c93285bdcdf1`. This review retains the earlier production head-number fix and all 25 original acceptance criteria. It tests the acceptance mechanisms as well as the features they describe.
 
 ## Findings and closures

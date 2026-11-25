@@ -1,7 +1,7 @@
-# Group A completeness recheck
+# Group A acceptance status
 
-The 2026-11-26 review closes the reproduced oracle-coverage, optimization, run/race/provenance and stale-metadata gaps at [PR #168](https://github.com/alt-research/eth2030/pull/168). The original production head-height repair is retained; canonical time-fork execution/admission and reorg now have independent regressions. All seven A tasks and 25 criteria pass source-bound acceptance with 57 required executed Go records.
+All seven original A deliverables now have **26 explicit acceptance criteria**, including a separate gas/settlement criterion. The latest [case-level baseline and fee/nonce audit](CASE_LEVEL_AUDIT.md) closes the missing persisted-case validation, fee/refund/blob coverage and approval-time keyed nonce preservation gaps. Previous reviews and results remain historical at their original revisions.
 
-Fresh build/vet, both host binaries, full Go (23,531 named passes, zero failures), focused race (3,504 passes, zero failures), 49 Python regressions in both normal and optimized modes, and 12/12 zero-skip differential cases passed. Two core conditional nonce/root oracles plus 23 boundary vectors are executable, without activating incompatible drafts. [Audit and closure details](AUDIT.md) identify the scope and negative controls.
+Fresh qualification: build/vet and both host binaries; full Go 23,537 named pass events with zero failures; focused race 3,510 passes with zero failures; 65 Python regressions in both standard and optimized modes; 12/12 mandatory native/direct-Geth cases with zero skips. Five native fee-method cases, seven native VM traces and 27 isolated conditional rule cases are executable. Current source-bound verification records all 62 required Go outcomes and separate skip inventories.
 
-Publication and exact-head hosted results are recorded directly in the English PR description; earlier runs remain pinned to their original revisions and are not counted as new checks.
+Normative source pins, all 72 proposal histories, production activation rules and D01–D09 remain unchanged. Exact-head publication/hosted outcomes are tracked in the English PR #168 description.

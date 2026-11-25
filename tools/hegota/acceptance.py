@@ -9,7 +9,7 @@ REQUIRED = {
     'HGT-004': {'native_route', 'wrapper_route', 'head_selection'},
     'HGT-005': {'legacy_boundaries', 'canonical_head_height', 'genesis_migration'},
     'HGT-006': {'differential', 'prerequisite_inventory', 'skip_inventory'},
-    'HGT-007': {'encoding', 'approval', 'rollback', 'conditional_nonce_roots'},
+    'HGT-007': {'encoding', 'approval', 'gas_and_settlement', 'rollback', 'conditional_nonce_roots'},
     'HGT-008': {'bid_authentication', 'bls', 'pq', 'kzg', 'native_backend', 'il_validation', 'experimental'},
     'HGT-009': {'scope', 'update_history'},
 }
@@ -38,17 +38,54 @@ def validate_reference(root, lock, profiles, baseline):
          'active reference module checksum differs')
     profile = next(p for p in profiles['profiles'] if p['id'] == 'native-history-v1')
     need(profile['reference_version'] == version and version in profile['oracle'] and
-         f'go-ethereum@{version}/' in baseline['reference_backend'], 'profile/runner reference identity differs')
+         baseline['reference_backend'] == f'upstream/go-ethereum@{version}/tests.StateTest.RunNoVerify', 'profile/runner reference identity differs')
 
 
 def validate_run(run):
-    need(run['exit_code'] == 0, 'acceptance run failed')
+    need(type(run['exit_code']) is int and run['exit_code'] == 0, 'acceptance run failed')
     tests, packages = run['named_test_or_subtest_events'], run['package_events']
+    need(set(tests) == set(packages) == {'pass', 'fail', 'skip'}, 'unknown or missing execution counter')
     need(all(type(v) is int and v >= 0 for v in list(tests.values())+list(packages.values())), 'invalid execution counters')
     need(tests['fail'] == packages['fail'] == 0, 'acceptance run failed')
     need(type(run['started_packages']) is int and run['started_packages'] > 0 and tests['pass'] > 0 and packages['pass'] > 0,
          'acceptance run is empty')
-    need(run['started_packages'] == run['completed_packages'] == sum(packages.values()), 'acceptance run is incomplete')
+    need(type(run['completed_packages']) is int and run['started_packages'] == run['completed_packages'] == sum(packages.values()), 'acceptance run is incomplete')
+
+
+def validate_baseline(root, baseline):
+    directory = root/'pkg/core/eftest/testdata/hegota'
+    manifest = json.loads((directory/'manifest.json').read_text())
+    need(type(baseline['version']) is int and manifest['version'] == baseline['version'] == 1 and manifest['expected_cases'] == 12, 'unknown baseline version/scope')
+    need(baseline['native_backend'] == 'native/core/execution.ApplyTransaction', 'baseline is not the native executor')
+    for k, expected in {'expected': 12, 'executed': 12, 'passed': 12, 'failed': 0, 'skipped': 0}.items():
+        need(type(baseline[k]) is int and baseline[k] == expected, 'baseline incomplete')
+    oracles = {}
+    seen = set()
+    for fixture in manifest['fixtures']:
+        name = fixture['path']
+        need(name not in seen and '/' not in name and name not in ('', '.', '..'), 'invalid/duplicate baseline fixture')
+        seen.add(name)
+        raw = (directory/name).read_bytes()
+        need(hashlib.sha256(raw).hexdigest() == fixture['sha256'], 'baseline fixture digest mismatch')
+        count = 0
+        for test, data in json.loads(raw).items():
+            for fork, posts in data['post'].items():
+                for i, post in enumerate(posts):
+                    oracles[(name, test, fork, i)] = post
+                    count += 1
+        need(count == fixture['cases'], 'baseline fixture count mismatch')
+    rows = baseline['results']
+    need(len(rows) == len(oracles) == 12, 'baseline case results missing')
+    keys = [(r['path'], r['name'], r['fork'], r['index']) for r in rows]
+    need(len(set(keys)) == len(rows) and set(keys) == set(oracles), 'baseline case coverage differs from manifest')
+    for row, key in zip(rows, keys):
+        need(type(row['index']) is int and row['passed'] is True and not row.get('error'), 'baseline case did not pass')
+        post = oracles[key]
+        for field, oracle in [('root', post['hash']), ('logs', post['logs'])]:
+            need(re.fullmatch(r'0x[0-9a-fA-F]{64}', oracle) and int(oracle[2:], 16) != 0, 'invalid baseline oracle')
+            need(row['native_'+field] == row['reference_'+field] == oracle, 'baseline '+field+' differs from pinned oracle')
+        need(type(row['native_gas']) is int and type(row['reference_gas']) is int and
+             row['native_gas'] > 0 and row['native_gas'] == row['reference_gas'], 'baseline gas differs or is invalid')
 
 
 def validate_sources(root, runtime, evidence):
@@ -122,6 +159,9 @@ def validate_acceptance(root, register, matrix, evidence, runtime, checked_comma
                 'verify-rollback', 'atomic-body-rollback', 'cross-frame-refill-rollback'}
     need({MODULE+'core/execution::TestHegotaSemanticGoldens/'+s for s in expected} <= native,
          'native semantic acceptance coverage omitted')
+    gas = {'gas-standard', 'gas-floor-state', 'gas-refund-capped', 'gas-refund-floor', 'gas-clipped-tip-blob'}
+    need({MODULE+'core/execution::TestHegotaGasOracleGoldens/'+s for s in gas} <= set(semantics['gas_and_settlement'].get('tests', [])),
+         'native gas/settlement coverage omitted')
     return {'complete': bool(all_complete), 'tasks': len(rows), 'criteria': criteria_count}
 
 

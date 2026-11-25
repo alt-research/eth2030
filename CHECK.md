@@ -1,3 +1,14 @@
+## Current Glamsterdam conformance closure (2026-11-25)
+
+- [x] Preserve the original checkout and publish independent master-targeted EL corrections.
+- [x] Complete the native official block corpus, independent BAL recovery and current strict CL reference campaign.
+- [x] Repair actual canonical light-client serving/notification defects with real red/green consumers.
+- [x] Verify all eight combined release stages, real independent wire consumers and the native node build.
+- [x] Integrate every qualified Lighthouse correction into eth2030 after latest CI passes.
+- [x] Reconcile source-specific progress and residual boundaries on the homepage/roadmap and in PR165 evidence.
+
+Publication gate: recheck the final documentation CI, all EL targets/heads and cumulative merge orders after publication; retain the immutable result in PR165 metadata. EL merge remains the separate user action. Original-04 remains unconfirmed; excluded/later work is not marked passed.
+
 ## Remaining-code closure (2026-11-22)
 
 - [x] Preserve the original checkout and freeze shared source at PR126 head43002a5d; all new PRs target master with explicit ancestry.

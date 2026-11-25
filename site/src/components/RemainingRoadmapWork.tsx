@@ -12,6 +12,12 @@ export default function RemainingRoadmapWork() {
     <h2 id="remaining-work-heading" className="mt-2 text-xl font-bold text-eth-text">What still needs work</h2>
     <p data-remaining-adopted-todos={remaining.adoptedDevelopmentTodos} className="mt-3 text-sm leading-7 text-eth-text/80">Earlier frozen development ledger: {remaining.adoptedDevelopmentTodos} confirmed open implementation TODOs in that retained scope. PR #{remaining.mergedProgressPr} is merged into master.</p>
     <p className="mt-2 text-xs leading-6 text-eth-dim">{remaining.policy}</p>
+    <div data-current-conformance={remaining.currentConformanceReview.state} className="mt-5 border-t border-eth-teal/20 pt-4">
+      <h3 className="text-sm font-bold text-eth-text">{remaining.currentConformanceReview.title}</h3>
+      <p className="mt-2 text-xs leading-6 text-eth-dim">{remaining.currentConformanceReview.detail}</p>
+      <ul className="mt-3 grid gap-3 md:grid-cols-3">{remaining.currentConformanceReview.reviews.map(item => <li key={item.id} data-conformance-review={item.id} data-state={item.state} className="text-xs leading-6"><a className="text-eth-teal underline" href={item.url}>{item.title} ↗</a><p className="text-eth-dim">{item.state} · target {item.target}</p></li>)}</ul>
+      <p className="mt-3 text-xs leading-6 text-eth-dim">{remaining.currentConformanceReview.boundary}</p>
+    </div>
     <div className="mt-5 border-t border-eth-teal/20 pt-4" aria-label="Current specification repair reviews">
       <h3 className="text-sm font-bold text-eth-text">Current specification repairs</h3>
       <p className="mt-2 text-xs leading-6 text-eth-dim">These repairs and proof extensions are merged. Their retained reviews preserve source-specific CI and runtime evidence; broader proof research remains later work.</p>

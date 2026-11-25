@@ -1,8 +1,8 @@
 {
-  "reviewed": "November 24, 2026",
+  "reviewed": "November 25, 2026",
   "source": "https://eips.ethereum.org/EIPS/eip-7773",
-  "sourceRevision": "b055feec322fbc37e9d77a393a50b3ff56b31c92",
-  "sourceSnapshot": "https://github.com/ethereum/EIPs/blob/b055feec322fbc37e9d77a393a50b3ff56b31c92/EIPS/eip-7773.md",
+  "sourceRevision": "d27448e08f60513856bbe228ea7ce04f156209dc",
+  "sourceSnapshot": "https://github.com/ethereum/EIPs/blob/d27448e08f60513856bbe228ea7ce04f156209dc/EIPS/eip-7773.md",
   "officialStatus": "Review",
   "scheduledCore": [
     2780,

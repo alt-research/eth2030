@@ -1,0 +1,400 @@
+{
+  "checked_at": "2026-11-25T02:20:19.802390+00:00",
+  "reviews": [
+    {
+      "number": 160,
+      "url": "https://github.com/alt-research/eth2030/pull/160",
+      "head": "0d47b9cb35a05c3c5251471b6ebeb3b06cfeebc2",
+      "target": "master",
+      "state": "open",
+      "merged": false,
+      "checks": [
+        {
+          "name": "real-proof-success",
+          "id": 138609812349,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367124/job/138609812349"
+        },
+        {
+          "name": "real-proof (stf)",
+          "id": 138577604704,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367124/job/138577604704"
+        },
+        {
+          "name": "real-proof (executor)",
+          "id": 138577604533,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367124/job/138577604533"
+        },
+        {
+          "name": "real-proof (bridge-backend)",
+          "id": 138577604458,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367124/job/138577604458"
+        },
+        {
+          "name": "real-proof (native-vectors)",
+          "id": 138577603891,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367124/job/138577603891"
+        },
+        {
+          "name": "Go tests (goethkzg)",
+          "id": 138577259783,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577259783"
+        },
+        {
+          "name": "Go tests (integration)",
+          "id": 138577258963,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258963"
+        },
+        {
+          "name": "Go tests (blst)",
+          "id": 138577258959,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258959"
+        },
+        {
+          "name": "Go tests (race)",
+          "id": 138577258822,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258822"
+        },
+        {
+          "name": "Published wallet and DEX application sequences",
+          "id": 138577258754,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258754"
+        },
+        {
+          "name": "Native signed Osaka and Amsterdam state tests",
+          "id": 138577258685,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258685"
+        },
+        {
+          "name": "Consensus fixture and control regressions",
+          "id": 138577258589,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258589"
+        },
+        {
+          "name": "Geth-backed EF state tests",
+          "id": 138577258582,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258582"
+        },
+        {
+          "name": "Build, Vet, Lint, Test",
+          "id": 138577258044,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45431367142/job/138577258044"
+        }
+      ]
+    },
+    {
+      "number": 161,
+      "url": "https://github.com/alt-research/eth2030/pull/161",
+      "head": "209686f189cf8f9b716cd9e975f35bb69853c88b",
+      "target": "master",
+      "state": "open",
+      "merged": false,
+      "checks": [
+        {
+          "name": "Go tests (integration)",
+          "id": 138678270247,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678270247"
+        },
+        {
+          "name": "Consensus fixture and control regressions",
+          "id": 138678270093,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678270093"
+        },
+        {
+          "name": "Go tests (race)",
+          "id": 138678270071,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678270071"
+        },
+        {
+          "name": "Go tests (goethkzg)",
+          "id": 138678270052,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678270052"
+        },
+        {
+          "name": "Native signed Osaka and Amsterdam state tests",
+          "id": 138678270025,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678270025"
+        },
+        {
+          "name": "Go tests (blst)",
+          "id": 138678269893,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678269893"
+        },
+        {
+          "name": "Geth-backed EF state tests",
+          "id": 138678269869,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678269869"
+        },
+        {
+          "name": "Published wallet and DEX application sequences",
+          "id": 138678269574,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678269574"
+        },
+        {
+          "name": "Build, Vet, Lint, Test",
+          "id": 138678269296,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563307/job/138678269296"
+        },
+        {
+          "name": "Site build and evidence checks",
+          "id": 138678093070,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45459563197/job/138678093070"
+        }
+      ]
+    },
+    {
+      "number": 162,
+      "url": "https://github.com/alt-research/eth2030/pull/162",
+      "head": "99045706520bdc336b743d422e6ec55ac51015f9",
+      "target": "master",
+      "state": "open",
+      "merged": false,
+      "checks": [
+        {
+          "name": "Build, Vet, Lint, Test",
+          "id": 138694275636,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694275636"
+        },
+        {
+          "name": "Go tests (integration)",
+          "id": 138694262841,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262841"
+        },
+        {
+          "name": "Go tests (race)",
+          "id": 138694262698,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262698"
+        },
+        {
+          "name": "Consensus fixture and control regressions",
+          "id": 138694262683,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262683"
+        },
+        {
+          "name": "Published wallet and DEX application sequences",
+          "id": 138694262560,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262560"
+        },
+        {
+          "name": "Native signed Osaka and Amsterdam state tests",
+          "id": 138694262493,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262493"
+        },
+        {
+          "name": "Geth-backed EF state tests",
+          "id": 138694262384,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262384"
+        },
+        {
+          "name": "Go tests (blst)",
+          "id": 138694262378,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262378"
+        },
+        {
+          "name": "Go tests (goethkzg)",
+          "id": 138694262340,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45464056732/job/138694262340"
+        }
+      ]
+    },
+    {
+      "number": 163,
+      "url": "https://github.com/alt-research/eth2030/pull/163",
+      "head": "bf7b24dc63cf5f9c5c5351ddfcb7179d75dae320",
+      "target": "master",
+      "state": "open",
+      "merged": false,
+      "checks": [
+        {
+          "name": "Go tests (integration)",
+          "id": 138705436431,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705436431"
+        },
+        {
+          "name": "Build, Vet, Lint, Test",
+          "id": 138705436293,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705436293"
+        },
+        {
+          "name": "Go tests (blst)",
+          "id": 138705436032,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705436032"
+        },
+        {
+          "name": "Consensus fixture and control regressions",
+          "id": 138705435942,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435942"
+        },
+        {
+          "name": "Native signed Osaka and Amsterdam state tests",
+          "id": 138705435886,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435886"
+        },
+        {
+          "name": "Go tests (goethkzg)",
+          "id": 138705435745,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435745"
+        },
+        {
+          "name": "Go tests (race)",
+          "id": 138705435725,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435725"
+        },
+        {
+          "name": "Geth-backed EF state tests",
+          "id": 138705435704,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435704"
+        },
+        {
+          "name": "Published wallet and DEX application sequences",
+          "id": 138705435396,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45467228503/job/138705435396"
+        }
+      ]
+    },
+    {
+      "number": 164,
+      "url": "https://github.com/alt-research/eth2030/pull/164",
+      "head": "a7e13cb2d1526b8fe2b8210d7e2d6bc653ce0419",
+      "target": "master",
+      "state": "open",
+      "merged": false,
+      "checks": [
+        {
+          "name": "real-proof-success",
+          "id": 138819270961,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498381/job/138819270961"
+        },
+        {
+          "name": "real-proof (native-vectors)",
+          "id": 138787482131,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498381/job/138787482131"
+        },
+        {
+          "name": "real-proof (stf)",
+          "id": 138787481908,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498381/job/138787481908"
+        },
+        {
+          "name": "real-proof (bridge-backend)",
+          "id": 138787481763,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498381/job/138787481763"
+        },
+        {
+          "name": "real-proof (executor)",
+          "id": 138787481419,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498381/job/138787481419"
+        },
+        {
+          "name": "Go tests (integration)",
+          "id": 138787211693,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211693"
+        },
+        {
+          "name": "Published wallet and DEX application sequences",
+          "id": 138787211578,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211578"
+        },
+        {
+          "name": "Go tests (goethkzg)",
+          "id": 138787211519,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211519"
+        },
+        {
+          "name": "Native signed Osaka and Amsterdam state tests",
+          "id": 138787211439,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211439"
+        },
+        {
+          "name": "Go tests (race)",
+          "id": 138787211367,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211367"
+        },
+        {
+          "name": "Go tests (blst)",
+          "id": 138787211319,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211319"
+        },
+        {
+          "name": "Geth-backed EF state tests",
+          "id": 138787211252,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211252"
+        },
+        {
+          "name": "Build, Vet, Lint, Test",
+          "id": 138787211169,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787211169"
+        },
+        {
+          "name": "Consensus fixture and control regressions",
+          "id": 138787210786,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498227/job/138787210786"
+        },
+        {
+          "name": "native-geth-snap2",
+          "id": 138787210549,
+          "conclusion": "success",
+          "url": "https://github.com/alt-research/eth2030/actions/runs/45490498398/job/138787210549"
+        }
+      ]
+    }
+  ],
+  "all_latest_code_checks_passed": true,
+  "el_merge_performed": false,
+  "publication_gate": "Documentation review165 and final merge compatibility are verified separately after publication."
+}

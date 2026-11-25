@@ -23,6 +23,13 @@ REQUIRED = {
  'HGT-019': {'schemes', 'signing_commitments', 'default_accounts'},
 }
 MODULE = 'github.com/eth2030/eth2030/'
+CRITICAL_BOUNDARIES = {
+ ('HGT-011', 'pool_isolation'): {'TestFrame8141DelegatedCallGasAndForwarding'},
+ ('HGT-015', 'bal'): {'TestFrame8141DirectPrecompileBALGasBoundary',
+                     'TestFrame8141SstoreBALReadSurvivesPostStateFailure',
+                     'TestFrame8141SelfdestructBALPreStateBoundary',
+                     'TestFrame8141DelegationBALBeforeFailedChildChecks'},
+}
 
 def need(ok, message):
     if not ok:
@@ -38,7 +45,7 @@ def validate_manifest(root, manifest):
     need(manifest['profiles']['8250-nonce-only-delta-isolated-v1']['decision'] == 'D01-open',
          'D01 cannot be silently closed')
     sources = manifest['normative_sources']
-    need({8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934} <= {s['eip'] for s in sources},
+    need({8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 7702} <= {s['eip'] for s in sources},
          'missing normative source')
     for source in sources:
         need(sha(root/source['path']) == source['sha256'], 'normative source changed: '+source['path'])
@@ -51,6 +58,8 @@ def validate_manifest(root, manifest):
              row['id']+': criterion omission/duplicate')
         for criterion in criteria:
             label = row['id']+'/'+criterion['id']
+            critical = {MODULE+'core/execution::'+n for n in CRITICAL_BOUNDARIES.get((row['id'], criterion['id']), set())}
+            need(critical <= set(criterion['tests']), label+': mandatory boundary regression omitted')
             need(criterion['clauses'] and criterion['statement'] and criterion['files'] and criterion['tests'],
                  label+': no clause/file/executed-test mapping')
             for path in criterion['files']:

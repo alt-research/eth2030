@@ -55,6 +55,12 @@
       "path": "refs/EIPs/EIPS/eip-2718.md",
       "sha256": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 7702,
+      "path": "refs/EIPs/EIPS/eip-7702.md",
+      "sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
     }
   ],
   "profiles": {
@@ -245,19 +251,25 @@
         },
         {
           "id": "pool_isolation",
-          "statement": "State pools and refunds stay frame-isolated; entry access and creation/deposit charge the proper dimension.",
+          "statement": "State pools and refunds stay frame-isolated; entry access and creation/deposit charge the proper dimension. Delegation access is charged before EIP-150 forwarding for all four code-executing call instructions, with independent upstream call-body comparison.",
           "clauses": [
             "8141/Frame gas pools",
-            "8141/State-gas attribution and refills"
+            "8141/State-gas attribution and refills",
+            "7702/Gas Costs",
+            "8038/Account access pricing"
           ],
           "files": [
-            "pkg/core/vm/frame_8141.go"
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/vm/delegation_gas.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/core/vm/amsterdam_gas_table.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CreationChargesAndCodeDeposit",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
-            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState"
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding"
           ]
         },
         {
@@ -416,17 +428,24 @@
       "criteria": [
         {
           "id": "bal",
-          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928.",
+          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets.",
           "clauses": [
             "7928/Recording Semantics",
-            "8141/Behavior"
+            "8141/Behavior",
+            "7928/Gas Validation Before State Access",
+            "7928/EIP-7702 Delegation",
+            "7928/SSTORE"
           ],
           "files": [
             "pkg/core/vm/frame_8141_bal.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
-            "github.com/eth2030/eth2030/bal::TestEIP7928WireEncoding"
+            "github.com/eth2030/eth2030/bal::TestEIP7928WireEncoding",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DirectPrecompileBALGasBoundary",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks"
           ]
         },
         {

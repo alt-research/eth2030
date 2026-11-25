@@ -56,3 +56,17 @@ class GroupBCoverageTests(unittest.TestCase):
                 log.write_text(''.join(json.dumps(e)+'\n' for e in events))
                 with self.assertRaisesRegex(ValueError, message):
                     read_events(log)
+
+    def test_missing_delegation_source_rejected(self):
+        manifest = self.manifest()
+        manifest['normative_sources'] = [s for s in manifest['normative_sources'] if s['eip'] != 7702]
+        with self.assertRaisesRegex(ValueError, 'missing normative source'):
+            validate_manifest(ROOT, manifest)
+
+    def test_missing_dispatch_boundary_regression_rejected(self):
+        manifest = self.manifest()
+        row = next(t for t in manifest['tasks'] if t['id'] == 'HGT-015')
+        criterion = next(c for c in row['criteria'] if c['id'] == 'bal')
+        criterion['tests'] = [t for t in criterion['tests'] if not t.endswith('TestFrame8141DirectPrecompileBALGasBoundary')]
+        with self.assertRaisesRegex(ValueError, 'mandatory boundary regression omitted'):
+            validate_manifest(ROOT, manifest)

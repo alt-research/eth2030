@@ -1,6 +1,7 @@
 package execution
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"testing"
@@ -8,6 +9,12 @@ import (
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/types"
+	gethcommon "github.com/ethereum/go-ethereum/common"
+	gethstate "github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/tracing"
+	gethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm/runtime"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 func TestFrame8141DirectPrecompileBALGasBoundary(t *testing.T) {
@@ -121,6 +128,27 @@ func TestFrame8141DelegatedCallGasAndForwarding(t *testing.T) {
 					}
 					if len(result.Logs) != 1 || len(result.Logs[0].Data) != 32 || new(big.Int).SetBytes(result.Logs[0].Data).Uint64() != child {
 						t.Fatalf("wrong pre-forwarding charge: logs=%+v child GAS=%d", result.Logs, child)
+					}
+					if !warm {
+						// The unchanged upstream Amsterdam VM is an independent
+						// oracle for the call body, not for the Frame envelope.
+						sdk, err := gethstate.New(gethtypes.EmptyRootHash, gethstate.NewDatabaseForTesting())
+						if err != nil {
+							t.Fatal(err)
+						}
+						sdk.SetCode(gethcommon.Address(caller), code, tracing.CodeChangeUnspecified)
+						sdk.SetCode(gethcommon.Address(authority), types.AddressToDelegation(delegate), tracing.CodeChangeUnspecified)
+						sdk.SetCode(gethcommon.Address(delegate), db.GetCode(delegate), tracing.CodeChangeUnspecified)
+						sdkCfg := *params.AllDevChainProtocolChanges
+						sdkCfg.AmsterdamTime, sdkCfg.BogotaTime = new(uint64), nil
+						_, left, err := runtime.Call(gethcommon.Address(caller), nil, &runtime.Config{
+							ChainConfig: &sdkCfg, State: sdk, GasLimit: 17000,
+							Origin: gethcommon.Address(tx.Sender), BlockNumber: big.NewInt(1), Time: 12, Value: new(big.Int),
+						})
+						logs := sdk.Logs()
+						if err != nil || 17000-left != result.GasUsed.Execution-3000 || len(logs) != 1 || !bytes.Equal(logs[0].Data, result.Logs[0].Data) {
+							t.Fatalf("native call body differs from independent Amsterdam VM: left=%d err=%v logs=%+v", left, err, logs)
+						}
 					}
 				})
 			}

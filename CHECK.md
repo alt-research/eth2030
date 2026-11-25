@@ -1,5 +1,14 @@
 # Lean4 Verification Check-list
 
+## Hegotá executable development plan (2026-11-25)
+
+- [x] Expand the macro research into one complete implementation and release plan.
+- [x] Verify actual client entrypoints, integration paths, repository boundaries, and test tooling.
+- [x] Define dependency-ordered work items, deliverables, acceptance criteria, and scope decisions.
+- [x] Account for every reviewed EIP, cross-client validation, operational recovery, and release gates.
+- [x] Validate plan consistency and links, run a local build, and update STATUS.md.
+- [x] Commit only this task's documentation changes.
+
 ## Hegotá macro planning and EIP discussion review (2026-11-25)
 
 - [x] Verify current EF priorities, Hegotá Meta EIP, and recent All Core Devs decisions.

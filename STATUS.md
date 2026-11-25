@@ -1,5 +1,15 @@
 # Project Status
 
+## Hegotá Executable Development Plan (2026-11-25)
+
+### Current Status: PLAN COMPLETE; IMPLEMENTATION TASKS NOT STARTED
+
+Created [the complete development plan](docs/plans/hegota-development-plan-2026-11.md) with 77 dependency-ordered tasks and individual dispositions for all 72 reviewed proposals. It defines specification decisions, native-client integration, Frames/state/gas/receipts, public mempool/P2P/RPC, conditional PQ and migration work, FOCIL/CL integration, candidate admission, differential and cross-client tests, recovery, release gates, and maintenance. The 18–28 week initial scheduling range explicitly assumes two EL engineers, one CL/integration engineer, shared testing support, stable core scope and limited mature candidates; it must be re-estimated after the baseline audit and is not an official fork date.
+
+Additional repository findings: native and geth-wrapper binaries follow distinct paths; Docker's native entrypoint differs from parts of the devnet README; existing Frames/FOCIL smoke checks and the feature-runner verdict aggregation are insufficient for conformance acceptance. The expected sibling checkouts are absent locally. The plan makes these prerequisite tasks and does not claim that implementation, official devnet interoperability, fixture conformance, or external deployment has been completed.
+
+Verification: `cd pkg && env -u GOROOT go build ./...`; task-ID/dependency DAG validation; 72-EIP coverage and local-link checks; `git diff --check`. Only documentation and task tracking changed.
+
 ## Hegotá Macro Planning and EIP Discussion Review (2026-11-25)
 
 ### Current Status: RESEARCH AND PLANNING COMPLETE; IMPLEMENTATION NOT STARTED IN THIS TASK

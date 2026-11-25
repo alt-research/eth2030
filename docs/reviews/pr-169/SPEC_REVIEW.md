@@ -6,7 +6,7 @@ The execution scope is the 12 tasks under Group B in the development plan. The m
 
 Work starts from merged master `960baab3103e0d34435433be0f8314f127521052`. The EIPs reference is `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`; the consensus-specs reference remains `d2021d2719235f0df4726a1d330502cb15aa8ea3`. The upstream EIPs master was checked on 2026-11-26 and still matched the local pin. Reference contents were not edited.
 
-The register hashes EIP-8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 2718, 7702 and 2929. Existing A locks retain the wider prerequisite source set. The current 8141 text is byte-identical to its implementation revision `dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f`.
+The register hashes EIP-8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 2718, 7702, 2929 and 214. Existing A locks retain the wider prerequisite source set. The current 8141 text is byte-identical to its implementation revision `dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f`.
 
 ## D01: nonce-only delta remains isolated
 
@@ -51,3 +51,7 @@ The final verification record is `evidence/hegota-b/verification.json`, with exa
 The independent historical Geth differential baseline covers its declared 12 historical cases; it is not an independent implementation oracle for these Frames profiles. Base Python goldens, the four isolated keyed goldens, normative recent-root vectors and native execution tests have separate roles. Public combined Hegota release, Group C pool behavior, official devnet interoperability and independent-client Frames equivalence are not inferred from these results.
 
 The [second audit](SECOND_AUDIT.md) records four subsequently reproduced dispatch/BAL defects, their normative corrections and the additional regression/independent-call-body qualification. Earlier completion labels are not reused as proof that those defects were absent.
+
+## Third clause audit
+
+The [third audit](THIRD_AUDIT.md) revisits all 12 tasks and corrects two additional consensus-visible omissions: APPROVE must ignore its offset for an empty RETURN region, and static SSTORE must fail before its gas calculation accesses storage. Three new regression parents cover exact gas, full-width operands, return bytes, approval rollback and BAL inclusion. The coverage checker requires those consumers and EIP-214 as a pinned normative source.

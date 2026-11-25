@@ -1,0 +1,74 @@
+{
+  "review_head": "f4991136aeedfdae4e4bdc64a1bf7715f7dfaf1b",
+  "qualified_ci_checkout": "370699564056bba8809dc03b2094f00b39d6bf3b",
+  "reference": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "job": 138908083879,
+  "run": 45525625554,
+  "job_url": "https://github.com/jiayaoqijia/lighthouse/actions/runs/45525625554/job/138908083879",
+  "job_conclusion": "success",
+  "artifact_id": 14982933817,
+  "artifact_bytes": 1120752,
+  "artifact_sha256": "7d2d3ee19d7deb0fa29c03b20d9e8f27f81060bbe296e0bc56cca710ac6d5e72",
+  "artifact_download_verified": true,
+  "per_case_records_reparsed": 12195,
+  "unique_case_paths": 12195,
+  "all_passed_without_errors_or_dirty_source": true,
+  "crypto_profiles": {
+    "real": 2515,
+    "fixture_fake": 9680
+  },
+  "inventory": {
+    "ssz": 9344,
+    "fcr": 330,
+    "all": 12195,
+    "client_role": 4,
+    "synthetic_operations": 6
+  },
+  "client_role_unrun": [
+    {
+      "path": "tests/minimal/gloas/light_client/sync/pyspec_tests/advance_finality_without_sync_committee",
+      "status": "unrun_client_role",
+      "reason": "This client is a full-node LC server; wallet/store sync is a separate role."
+    },
+    {
+      "path": "tests/minimal/gloas/light_client/sync/pyspec_tests/light_client_sync",
+      "status": "unrun_client_role",
+      "reason": "This client is a full-node LC server; wallet/store sync is a separate role."
+    },
+    {
+      "path": "tests/minimal/gloas/light_client/sync/pyspec_tests/light_client_sync_no_force_update",
+      "status": "unrun_client_role",
+      "reason": "This client is a full-node LC server; wallet/store sync is a separate role."
+    },
+    {
+      "path": "tests/minimal/gloas/light_client/sync/pyspec_tests/supply_sync_committee_from_past_update",
+      "status": "unrun_client_role",
+      "reason": "This client is a full-node LC server; wallet/store sync is a separate role."
+    }
+  ],
+  "input_byte_identity": {
+    "reference": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+    "cases": 9344,
+    "files": 37376,
+    "byte_identity": true
+  },
+  "consumer_binaries": {
+    "real": {
+      "revision": "370699564056bba8809dc03b2094f00b39d6bf3b",
+      "tree": "59e45eb596e7695fea22605425f1bd124a4aeaa7",
+      "dirty": false,
+      "features": "ef_tests",
+      "mode": "real",
+      "sha256": "72e6a26d3a28dd4f42a8c68ac29ae76ad60e324f0270f102e3e8ed9d4a0930fc"
+    },
+    "fixture_fake": {
+      "revision": "370699564056bba8809dc03b2094f00b39d6bf3b",
+      "tree": "59e45eb596e7695fea22605425f1bd124a4aeaa7",
+      "dirty": false,
+      "features": "ef_tests,fake_crypto_real_pubkeys",
+      "mode": "fixture_fake",
+      "sha256": "050a60552773bf74a6cdcd82a87965e842f85e75ff5135e7114b754fbb279c2c"
+    }
+  },
+  "merge_gate": "Other required latest-head checks remain separate and must complete before merge."
+}

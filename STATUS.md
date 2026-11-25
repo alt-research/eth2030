@@ -1,5 +1,18 @@
 # Project Status
 
+## EIP and Consensus Reference Update (2026-11-25)
+
+### Current Status: COMPLETE
+
+Updated the two reference submodules to their upstream default branch (`master`) heads, as explicitly requested:
+
+- `refs/EIPs`: `49beda901dcf3747ed4b91f853a333595fb2cbc4` → `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa` (2026-11-25 UTC).
+- `refs/consensus-specs`: `14e6ce5a5334910b0d0575d782e468305ad92373` → `d2021d2719235f0df4726a1d330502cb15aa8ea3` (2026-11-23 UTC).
+
+Both submodule working trees were clean before and after the update. The new pins match the Hegotá research snapshot; all 70 published EIP file hashes in that manifest match the updated checkout. Updated the development plan's current-reference note while preserving historical research provenance. No upstream specification text or client implementation was edited.
+
+Verification: each submodule HEAD equals its fetched `origin/master`; `cd pkg && env -u GOROOT go build ./...`; `git diff --check`.
+
 ## Hegotá Executable Development Plan (2026-11-25)
 
 ### Current Status: PLAN COMPLETE; IMPLEMENTATION TASKS NOT STARTED

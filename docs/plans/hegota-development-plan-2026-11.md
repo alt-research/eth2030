@@ -25,7 +25,7 @@
 
 本计划复用 2026-11-25 的研究快照：EIPs `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`，consensus-specs `d2021d2719235f0df4726a1d330502cb15aa8ea3`。尚未合入的提案以来源清单中的 PR head SHA 为准。实际实施前，HGT-001 还必须选定相容的 EELS、EEST、execution-apis、CL、测试工具和 devnet 配置版本。
 
-本地 `refs/EIPs` 与 `refs/consensus-specs` 仍是 2 月快照，只读保留。新规范快照在只读参考目录之外准备，记录 SHA/校验值；不直接更新子模块或修改上游正文来迁就现有实现。
+计划编制时，本地 `refs/EIPs` 与 `refs/consensus-specs` 还是 2 月快照。2026-11-25 已按用户指令分别更新到上游 `master` 的 `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa` 与 `d2021d2719235f0df4726a1d330502cb15aa8ea3`，与本计划采用的研究版本一致。参考正文继续只读；后续引用更新记录 SHA/校验值，不修改上游正文来迁就现有实现。历史研究清单中的旧本地引用保留为当时基线。
 
 [EIP-8081](https://eips.ethereum.org/EIPS/eip-8081) 仍登记 7805、8141 为 SFI；较晚会议对 8015 等存在更新，详见逐项登记。2026-11-26 ACDC #192 尚未举行，不能把其可能结果用于本计划的已决事项。[会议议程](https://github.com/ethereum/pm/issues/2305)
 

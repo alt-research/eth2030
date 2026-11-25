@@ -51,6 +51,8 @@ jobs:
           cat /sys/fs/cgroup/cpu.max || true
           cat /sys/fs/cgroup/memory.max || true
       - name: Install pinned local proving components
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: bash tools/canonical-prover/bootstrap.sh
       - name: Build the native node and complete real-prover bundle
         run: |

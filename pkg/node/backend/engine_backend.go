@@ -261,7 +261,7 @@ func (b *EngineBackend) processBlockV5(
 	var slotNumber *uint64
 	if p.SlotNumber != "" {
 		slot, err := strconv.ParseUint(strings.TrimPrefix(p.SlotNumber, "0x"), 16, 64)
-		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != p.SlotNumber {
+		if !strings.HasPrefix(p.SlotNumber, "0x") || err != nil || fmt.Sprintf("0x%x", slot) != strings.ToLower(p.SlotNumber) {
 			return payload.PayloadStatusV1{}, engine.ErrInvalidParams
 		}
 		slotNumber = &slot

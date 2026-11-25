@@ -1,8 +1,8 @@
 {
   "date": "2026-11-26",
-  "source_base_commit": "24d2553ac1f3f27e4745c443003a19c1505c37dc",
+  "source_base_commit": "7769210ffe14beb83f7424e7b3443188fa1ae3bc",
   "branch_baseline": "960baab3103e0d34435433be0f8314f127521052",
-  "source_fingerprint_sha256": "6ee7e87eb6d79aff2497e6dcb02c02d3a7246360961f289b6b4977cf3e849158",
+  "source_fingerprint_sha256": "29c6219dc9c0ec9de361bd6f1bc070a98f3eca266c69f350a48af4a80b584e2b",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "66a45668ea877a1ad16e8ac96d4fbde2ad4718012f46c1d7a8ca63d7961e8aad",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -38,6 +38,7 @@
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
     "pkg/core/execution/frame_system_deployment_test.go": "f15f277d644e7a4b76348d338f265557eeb44f0ca333099113dcd30ff5a413e5",
+    "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
     "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
     "pkg/core/execution/processor.go": "b8b716255ede58e074347cdddcd2dae25790c70563cd96bd7cee6b73d2698194",
@@ -148,14 +149,14 @@
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "758352011fa5a09dd87f3215082bb7bcce2aef434d7e2c4f9a94c5fae78a4e3c",
+      "sha256": "751e1fd214f056b08cdceb0d66b6c3b09b8c445f401e8c8789cc66cacece6e9a",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "aed96ec7039f0874f3e32f678039464f06e523d232893c01defdc6c640c9cff0",
+      "sha256": "07cbfca44d0cff214e55386bfb0077a049debf2226dcffc5f69a0f04f47c5042",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     }

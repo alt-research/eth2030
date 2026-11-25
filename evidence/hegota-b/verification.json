@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "0dafd3b845fa6fe005f046dc87c3f71c1b500a9f7c57f508fb7dbb347688934a",
+    "log_sha256": "0852d394522e9012651245180134edc7a7dba2592190385b89bc2b9375c92b51",
     "named": {
-      "pass": 23692,
+      "pass": 23693,
       "skip": 124
     },
     "packages": {
@@ -15,7 +15,7 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "18e80a8bd6df33164f96a6e5916aaca9a3569275828a0c5ecdffeb73971d538d",
+  "source_fingerprint_sha256": "c89c4326743c04a38234becac9488a23c358d7403d92ec10815fc7e5de9dff8e",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
@@ -38,6 +38,7 @@
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
     "pkg/core/execution/frame_system_deployment_test.go": "f15f277d644e7a4b76348d338f265557eeb44f0ca333099113dcd30ff5a413e5",
+    "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
     "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
     "pkg/core/execution/processor.go": "b8b716255ede58e074347cdddcd2dae25790c70563cd96bd7cee6b73d2698194",
@@ -71,7 +72,7 @@
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "specs/hegota/b-codec-goldens.json": "b9c7aa32de028e67aa4932bf64f6cffb83f766b6e76cd4132498d65bd6418bbc",
     "specs/hegota/codec-goldens.json": "74c6c5122a8909a6fa7e5e0f4153feb8e3de19dff9af79fd3d4022153e872b52",
-    "specs/hegota/group-b.json": "4cfaff6c5ff5a5bcbc9c1b3f4dee579e1a67219173b8ae8c52baa9ae0c51888f",
+    "specs/hegota/group-b.json": "f8428556d67735e64c698971f2cf9dfdcf743c20c36ca3e08d6491d95cc684dc",
     "tools/hegota/b_vectors.py": "f07a8a4536dbd83e1a5859e3f024c0506d348a81d6c8cc26df92073a777399ad",
     "tools/hegota/check_b.py": "04a4c2f5948a92bf815133de9508419e5e4255f9257d89c4305edc845d844ba7",
     "tools/hegota/test_group_b.py": "b480302ce3290d46add0d42d712f9102a2f9b5000a001b1e6780f062f2ce8cc6"
@@ -108,6 +109,7 @@
     "github.com/eth2030/eth2030/core/execution::TestFrame8141IntrospectionBoundaries": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8141P256NativeValidationAndDefaultCode": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaCreateAndLegacyIntrospection": "pass",
     "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaKeyedSponsorDoesNotCreateLegacySender": "pass",
@@ -144,13 +146,13 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "24d2553ac1f3f27e4745c443003a19c1505c37dc",
+  "source_revision": "7769210ffe14beb83f7424e7b3443188fa1ae3bc",
   "baseline_revision": "960baab3103e0d34435433be0f8314f127521052",
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "e43e90aea2431dc2c836d02b6373d22a7007202785d1ca5f0a3e6d9c3fabef8c",
-    "race_named_pass": 7932,
+    "race_log_sha256": "bc1f3d88d4a055c8305e01fd615002bf506857d5384ac5de06a95cce4e1d4b28",
+    "race_named_pass": 7933,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "full_named_skip": 124,
@@ -179,5 +181,12 @@
       "expected_exit_code": 1,
       "log_sha256": "c0a29dc38770cb8281c97218d51a61d8477074cd0742c285a95520917e03dce2"
     }
-  ]
+  ],
+  "hosted_predecessor": {
+    "revision": "b7e646ff57cc8601566cce0e9354ba0e4582a668",
+    "passed_checks": 10,
+    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45677820968",
+    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45677820888",
+    "scope": "Predecessor evidence only; excludes the later warmness test. Final current-head CI is recorded on PR #169 after publication."
+  }
 }

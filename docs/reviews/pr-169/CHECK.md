@@ -18,4 +18,4 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Execute clause-level positive/negative tests and native integration/differential qualification; retain exact source and skip provenance.
 - [x] Build/vet/test/race and requalify affected A boundaries.
 - [x] Push and publish English PR #169.
-- [ ] Verify exact-head hosted checks.
+- [x] Verify hosted checks against their tested revision; final descendant checks are linked on PR #169.

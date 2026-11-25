@@ -147,6 +147,8 @@ func applyAmsterdamMessage(cfg *corconfig.ChainConfig, db state.StateDB, header 
 	if len(trackers) > 0 {
 		tracker = trackers[0]
 		if tracker != nil {
+			tracker.RecordAddressTouch(msg.From)
+			tracker.RecordAddressTouch(header.Coinbase)
 			evm.SetBALTracker(tracker, 0)
 		}
 	}

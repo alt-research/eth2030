@@ -228,15 +228,30 @@ func TestEIP8282PreforkQueueAndDynamicFee(t *testing.T) {
 	}
 }
 
-func TestEIP8282RejectMalformedSystemOutput(t *testing.T) {
+// EIP-7685 leaves request_data opaque at the EL boundary. CL record/count
+// admission is independent of whether a successful custom system call executes.
+func TestEIP8282OpaqueSystemOutput(t *testing.T) {
 	for _, size := range []uint64{1, 65 * 184} {
 		db := newBuilderRequestTestState()
-		// Return zero-filled bytes of the requested length from canonical address.
 		code := []byte{0x61, byte(size >> 8), byte(size), 0x5f, 0xf3}
 		db.SetCode(types.BuilderDepositRequestAddress, code)
-		root := db.GetRoot()
-		if _, err := ProcessRequests(config.TestConfig, db, builderRequestHeader()); err == nil || db.GetRoot() != root {
-			t.Fatalf("invalid type-3 width/count %d accepted or changed state", size)
+		requests, err := ProcessRequests(config.TestConfig, db, builderRequestHeader())
+		if err != nil || len(requests) != 1 || requests[0].Type != types.BuilderDepositRequestType || len(requests[0].Data) != int(size) {
+			t.Fatalf("opaque type-3 output %d: requests=%+v err=%v", size, requests, err)
 		}
+		for _, b := range requests[0].Data {
+			if b != 0 {
+				t.Fatal("opaque system output changed")
+			}
+		}
+	}
+}
+
+func TestEIP8282FailedSystemCallRevertsPostBlockEffects(t *testing.T) {
+	db := newBuilderRequestTestState()
+	db.SetCode(types.BuilderDepositRequestAddress, []byte{0x60, 0x01, 0x5f, 0x55, 0x5f, 0x5f, 0xfd})
+	root := db.GetRoot()
+	if _, err := ProcessRequests(config.TestConfig, db, builderRequestHeader()); err == nil || db.GetRoot() != root {
+		t.Fatalf("failing system call accepted or retained earlier queue effects: %v", err)
 	}
 }

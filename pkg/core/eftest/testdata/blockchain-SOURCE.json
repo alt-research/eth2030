@@ -1,0 +1,111 @@
+{
+  "release": "ethereum/execution-specs tests@v21.0.2",
+  "archive_sha256": "e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9",
+  "cases": [
+    {
+      "file": "bal.json",
+      "case": "tests/amsterdam/eip2780_reduce_intrinsic_tx_gas/test_authorization_oog.py::test_preparation_rollback_restores_block_state_budget[fork_Amsterdam-blockchain_test-exact_fit-mixed-failure_point_authorization]",
+      "upstream_info": {
+        "hash": "0x4a0ec0dbc2b1756160b1b3bda49d9c3af622c34111a4042fb5b781b4ce527708",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Exclude rolled-back authorization charges from the block state budget.\n\nFail before or after the authorization gas commit, then probe the next\ntransaction's inclusion at the restored state-budget boundary.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/amsterdam/eip2780_reduce_intrinsic_tx_gas/test_authorization_oog.py#L1671",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2780.md",
+        "reference-spec-version": "7243c92ba812437c64bae9fc6524ee269b29daa9"
+      },
+      "retained_json_sha256": "32cdd19061ab086908c15ce3080dff4f18efadc0401a30f9abc0776f16fdf440"
+    },
+    {
+      "file": "bal_delegation.json",
+      "case": "tests/prague/eip7702_set_code_tx/test_gas.py::test_intrinsic_gas_cost[fork_Amsterdam-blockchain_test_from_state_test-valid_True-single_valid_authorization_eoa_self_sponsored_authority]",
+      "upstream_info": {
+        "hash": "0x8978ec1fa2938bf3820e38b471f64f1db411f38eb60c32d13fa3e33fa2bdb615",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Test sending a transaction with the exact intrinsic gas required and also\ninsufficient gas.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/prague/eip7702_set_code_tx/test_gas.py#L1314",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7702.md",
+        "reference-spec-version": "99f1be49f37c034bdd5c082946f5968710dbfc87"
+      },
+      "retained_json_sha256": "b234ed5c83ecd00ff8e47ae612ad022a071eaa0f0bd3c50d56b03eb99072a9d7"
+    },
+    {
+      "file": "bal_floor.json",
+      "case": "tests/amsterdam/eip7976_increase_calldata_floor_cost/test_transaction_validity.py::test_transaction_validity_zero_byte_data[fork_Amsterdam-blockchain_test_from_state_test-type_4-single_authorization-zero_bytes-exact_gas-floor_gas_greater_than_intrinsic_gas]",
+      "upstream_info": {
+        "hash": "0x270544878091eb13f943013c3e4821dbdfce19d96ed28d0c4966856f006ceaae",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Pin the standard zero-byte weight at both validity boundaries.\n\nUse authorizations to lift the standard cost above the floor for\nshort calldata, then cross into floor-dominated pricing.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/amsterdam/eip7976_increase_calldata_floor_cost/test_transaction_validity.py#L352",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7976.md",
+        "reference-spec-version": "c998ef94eb16a6af8a9b8e2084f947b17ea14865"
+      },
+      "retained_json_sha256": "272e5233be12da401868a32cca6f123b816c157a5435d811e7616aacf5703bcb"
+    },
+    {
+      "file": "bal_storage.json",
+      "case": "tests/amsterdam/eip8038_state_access_gas_cost_increase/test_ext_code_opcodes_gas.py::test_ext_code_opcode_gas_precompile_target[fork_Amsterdam-blockchain_test_from_state_test-EXTCODECOPY]",
+      "upstream_info": {
+        "hash": "0x7fe81bc82e9e3e4a548249c32661250200c7a4ebc2e57c20dd32e252ed05c774",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "An ``EXT*`` read of a precompile pays the warm access cost.\n\nPrecompiles are in the accessed set from the start of the\ntransaction, so no access list is needed and no cold surcharge\napplies. The code-read surcharge still does, even though a precompile\nholds no code to read \u2014 it is unconditional.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/amsterdam/eip8038_state_access_gas_cost_increase/test_ext_code_opcodes_gas.py#L199",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8038.md",
+        "reference-spec-version": "f83531466a3862853424a81d000727b3043ef2cc"
+      },
+      "retained_json_sha256": "2703ad340057ab12a569ec56e3b54cca8e70d63884bee8920eb0ccedeb701cf8"
+    },
+    {
+      "file": "history.json",
+      "case": "tests/prague/eip2935_historical_block_hashes_from_state/test_block_hashes.py::test_invalid_history_contract_calls[fork_Amsterdam-blockchain_test-2**64]",
+      "upstream_info": {
+        "hash": "0x5debe1b400cd5dba7a941d68d1c903d0ac0809adc13253b2a644ffa80c66d271",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Test calling the history contract with invalid block numbers, such as\nblocks from the future or overflowing block numbers.\n\nAlso test the BLOCKHASH opcode with the same block numbers, which should\nnot affect the behavior of the opcode, even after verkle.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/prague/eip2935_historical_block_hashes_from_state/test_block_hashes.py#L380",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2935.md",
+        "reference-spec-version": "06aadd458ee04ede80498db55927b052eb5bef38"
+      },
+      "retained_json_sha256": "680a5d23c1c19457d76f048ad01517bcc9a8c40768ea43f2467e1c3937c3f753"
+    },
+    {
+      "file": "queue.json",
+      "case": "tests/amsterdam/eip8282_builder_execution_requests/test_modified_builder_contract.py::test_extra_builder_deposits[fork_Amsterdam-blockchain_test-max_plus_1_builder_deposit_requests]",
+      "upstream_info": {
+        "hash": "0xb19db4bcfadb42508fe6e18b1f7e86993d1a6624f7ff6a22c6a83fb825b74001",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Test how clients were to behave when more than the per-block maximum of\nbuilder deposit requests would be returned by the predeploy.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/amsterdam/eip8282_builder_execution_requests/test_modified_builder_contract.py#L111",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8282.md",
+        "reference-spec-version": "45e570a246207d5b1fb095e259e3f98bb0922639"
+      },
+      "retained_json_sha256": "ac9c0fe712bb9967ace6da4eb666a7e80443d45ef94527eb0f72442837100caa"
+    },
+    {
+      "file": "zero_withdrawal.json",
+      "case": "tests/amsterdam/eip7928_block_level_access_lists/test_block_access_lists_eip4895.py::test_bal_withdrawal_to_system_address[fork_Amsterdam-blockchain_test-zero]",
+      "upstream_info": {
+        "hash": "0x4f5dd0e7646ddabc189000e65a2bbe9b1f6e4ea61a63a9550f4ae350c358d4d1",
+        "fixture-format": "blockchain_test",
+        "comment": "`execution-specs` generated test",
+        "filling-transition-tool": "2.19.0",
+        "description": "Ensure BAL includes SYSTEM_ADDRESS as a withdrawal recipient.",
+        "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/amsterdam/eip7928_block_level_access_lists/test_block_access_lists_eip4895.py#L875",
+        "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7928.md",
+        "reference-spec-version": "f834f0004aa5110a5f1ac0d6b80e3dc4b842d040"
+      },
+      "retained_json_sha256": "06692a7bd7aabfa68008f3501090674ee1c6d2f8c1e32945741afa47ee5d232e"
+    }
+  ]
+}

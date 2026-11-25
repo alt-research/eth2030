@@ -48,6 +48,7 @@ func makeGenesisBlock() (*types.Block, *state.MemoryStateDB) {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 	statedb := newBuilderRequestTestState()
 	// Fund a sender for transactions.
@@ -96,6 +97,7 @@ func buildBlock(t *testing.T, parent *types.Block, statedb *state.MemoryStateDB,
 		RequestsHash:      &emptyRequestsHash2,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{

@@ -1118,9 +1118,6 @@ func opExtcodecopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 	length := stack.Pop()
 
 	l := length.Uint64()
-	if l == 0 {
-		return nil, nil
-	}
 
 	var code []byte
 	if evm.StateDB != nil {
@@ -1130,6 +1127,12 @@ func opExtcodecopy(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 		if evm.balTracker != nil {
 			evm.balTracker.RecordAddressTouch(addr)
 		}
+	}
+
+	// The account is accessed once pre-state gas is paid, even when no
+	// bytes are copied. Zero length still ignores memory/code offsets.
+	if l == 0 {
+		return nil, nil
 	}
 
 	cOff := codeOffset.Uint64()
@@ -1242,6 +1245,12 @@ func opBlobBaseFee(pc *uint64, evm *EVM, contract *Contract, memory *Memory, sta
 // Returns the hash of one of the 256 most recent complete blocks.
 func opBlockhash(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	num := stack.Peek()
+	// BLOCKHASH consumes a uint256. Truncating an overflowing future number
+	// could turn 2**64 into block zero and disclose the wrong historical hash.
+	if !num.IsUint64() {
+		num.SetUint64(0)
+		return nil, nil
+	}
 	num64 := num.Uint64()
 
 	var upper uint64

@@ -166,6 +166,12 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 
 	if b.config != nil && b.config.IsAmsterdam(attrs.Timestamp) {
 		header.SlotNumber = attrs.SlotNumber
+		// The low-level constructor defaults an omitted slot to uint64 zero.
+		// Engine callers validate and provide the authoritative CL slot.
+		if header.SlotNumber == nil {
+			slot := uint64(0)
+			header.SlotNumber = &slot
+		}
 	}
 
 	if attrs.BeaconRoot != nil {

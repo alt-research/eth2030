@@ -39,6 +39,7 @@ func MakeGenesis(gasLimit uint64, baseFee *big.Int) *types.Block {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 	return types.NewBlock(header, &types.Body{Withdrawals: []*types.Withdrawal{}})
 }
@@ -86,6 +87,7 @@ func MakeBlockWithState(parent *types.Block, txs []*types.Transaction, statedb s
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{

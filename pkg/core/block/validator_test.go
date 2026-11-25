@@ -29,6 +29,7 @@ func makeValidParent() *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 
@@ -72,6 +73,7 @@ func makeValidChild(parent *types.Header) *types.Header {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 }
 

@@ -621,7 +621,8 @@ func capturePreState(cfg *corconfig.ChainConfig, statedb state.StateDB, tx *type
 // by comparing pre-tx state snapshots with post-tx state.
 func populateTracker(tracker *bal.AccessTracker, statedb state.StateDB, preBalances map[types.Address]*big.Int, preNonces map[types.Address]uint64) {
 	for addr, preBal := range preBalances {
-		tracker.RecordAddressTouch(addr)
+		// Baseline capture is bookkeeping, not a protocol state access.
+		// Runtime hooks record loaded addresses; net changes also retain them.
 		postBal := statedb.GetBalance(addr)
 		if preBal.Cmp(postBal) != 0 {
 			tracker.RecordBalanceChange(addr, preBal, postBal)
@@ -657,6 +658,12 @@ func ProcessWithdrawals(statedb state.StateDB, withdrawals []*types.Withdrawal) 
 		amount := new(big.Int).SetUint64(w.Amount)
 		amount.Mul(amount, big.NewInt(1_000_000_000))
 		statedb.AddBalance(w.Address, amount)
+		// EIP-4895 applies EIP-161 after each withdrawal, including zero
+		// amounts. A later withdrawal can resurrect a freshly empty account
+		// and must not retain its former storage.
+		if statedb.Empty(w.Address) {
+			statedb.Finalise(true)
+		}
 	}
 }
 

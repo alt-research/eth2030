@@ -52,6 +52,7 @@ func makeGenesisInteg(gasLimit uint64, baseFee *big.Int) *types.Block {
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 	return types.NewBlock(header, &types.Body{Withdrawals: []*types.Withdrawal{}})
 }
@@ -109,6 +110,7 @@ func makeBlockWithStateInteg(parent *types.Block, txs []*types.Transaction, stat
 		RequestsHash:      &emptyRequestsHash,
 		CalldataGasUsed:   &calldataGasUsed,
 		CalldataExcessGas: &calldataExcessGas,
+		SlotNumber:        new(uint64),
 	}
 
 	body := &types.Body{
@@ -630,6 +632,7 @@ func TestReorg_Simple(t *testing.T) {
 		UncleHash:  block.EmptyUncleHash,
 	}
 	emptyWHash := types.EmptyRootHash
+	b1Header.SlotNumber = new(uint64)
 	b1Header.WithdrawalsHash = &emptyWHash
 	zeroBlobGas := uint64(0)
 	var pExcess, pUsed uint64

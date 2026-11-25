@@ -26,6 +26,7 @@ var (
 	ErrInvalidDifficulty      = errors.New("invalid difficulty for post-merge block")
 	ErrInvalidUncleHash       = errors.New("invalid uncle hash for post-merge block")
 	ErrInvalidNonce           = errors.New("invalid nonce for post-merge block")
+	ErrMissingSlotNumber      = errors.New("missing Amsterdam slot number")
 	ErrInvalidRequestHash     = errors.New("invalid requests hash")
 	ErrInvalidBlockAccessList = errors.New("invalid block access list hash")
 	ErrMissingBlockAccessList = errors.New("missing block access list hash")
@@ -114,6 +115,11 @@ func (v *BlockValidator) ValidateHeader(header, parent *types.Header) error {
 	// Post-merge (PoS) checks: difficulty = 0, nonce = 0, no uncles.
 	if err := verifyPostMerge(header); err != nil {
 		return err
+	}
+
+	// EIP-7843 extends every Amsterdam header, including slot zero.
+	if v.config != nil && v.config.IsAmsterdam(header.Time) && header.SlotNumber == nil {
+		return ErrMissingSlotNumber
 	}
 
 	// EIP-1559: verify base fee.

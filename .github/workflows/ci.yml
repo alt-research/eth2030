@@ -177,10 +177,12 @@ jobs:
           curl --fail --location --retry 5 --retry-all-errors https://github.com/ethereum/execution-specs/releases/download/tests%40v21.0.2/fixtures.tar.gz -o "$RUNNER_TEMP/eels-fixtures.tar.gz"
           printf '%s  %s\n' 'e2fa7ea2ea516459f9ab92284b2927892f318f4e1f78ca802cb05a6c3b479ed9' "$RUNNER_TEMP/eels-fixtures.tar.gz" | sha256sum -c -
           mkdir -p "$RUNNER_TEMP/eels-native"
-          tar -xzf "$RUNNER_TEMP/eels-fixtures.tar.gz" -C "$RUNNER_TEMP/eels-native" fixtures/state_tests/for_osaka fixtures/state_tests/for_amsterdam
+          tar -xzf "$RUNNER_TEMP/eels-fixtures.tar.gz" -C "$RUNNER_TEMP/eels-native" fixtures/state_tests/for_osaka fixtures/state_tests/for_amsterdam fixtures/blockchain_tests/for_osaka fixtures/blockchain_tests/for_amsterdam
       - name: Build the native executor
         working-directory: pkg
-        run: go build -o "$RUNNER_TEMP/native-state-tests" ./cmd/native-state-tests
+        run: |
+          go build -o "$RUNNER_TEMP/native-state-tests" ./cmd/native-state-tests
+          go build -buildvcs=true -ldflags "-X main.sourceRevision=$GITHUB_SHA -X main.sourceModified=false" -o "$RUNNER_TEMP/native-blockchain-tests" ./cmd/native-blockchain-tests
       - name: Execute both complete selected fork corpora
         run: |
           mkdir -p native-state-results
@@ -199,6 +201,22 @@ jobs:
               assert len(report['cases']) == expected
               assert len({(c['file'], c['name'], c['index']) for c in report['cases']}) == expected
               assert all(c['passed'] and c['expected_root'] == c['got_root'] for c in report['cases'])
+          PYTHON
+          "$RUNNER_TEMP/native-blockchain-tests" -fork Osaka "$RUNNER_TEMP/eels-native/fixtures/blockchain_tests/for_osaka" > native-state-results/osaka-blockchain.json 2> native-state-results/osaka-blockchain.log || failed=1
+          "$RUNNER_TEMP/native-blockchain-tests" -fork Amsterdam "$RUNNER_TEMP/eels-native/fixtures/blockchain_tests/for_amsterdam" > native-state-results/amsterdam-blockchain.json 2> native-state-results/amsterdam-blockchain.log || failed=1
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          for fork, cases, blocks in [('Osaka', 17441, 19875), ('Amsterdam', 26349, 32745)]:
+              report = json.loads(Path(f'native-state-results/{fork.lower()}-blockchain.json').read_text())
+              assert report['native_revision'] == os.environ['GITHUB_SHA']
+              assert report['executor'] == 'eth2030-native-blockchain-import'
+              assert report['fork'] == fork and not report['errors'], report['errors']
+              assert report['passed'] == cases and report['failed'] == 0
+              assert len(report['cases']) == cases
+              assert len({(case['file'], case['name']) for case in report['cases']}) == cases
+              assert sum(len(case['blocks']) for case in report['cases']) == blocks
+              assert all(case['passed'] and case['expected_head'] == case['got_head'] and case['expected_root'] == case['got_root'] for case in report['cases'])
           PYTHON
           exit "$failed"
       - name: Retain native case results and failure diagnostics

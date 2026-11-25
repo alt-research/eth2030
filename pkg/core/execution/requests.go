@@ -84,18 +84,16 @@ func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb st
 	type requestQueue struct {
 		address  types.Address
 		kind     byte
-		size     int
-		limit    int
 		required bool
 	}
 	queues := []requestQueue{
-		{types.WithdrawalRequestAddress, types.WithdrawalRequestType, types.WithdrawalRequestSSZSize, types.MaxWithdrawalRequestsPerPayload, false},
-		{types.ConsolidationRequestAddress, types.ConsolidationRequestType, types.ConsolidationRequestSSZSize, types.MaxConsolidationRequestsPerPayload, false},
+		{types.WithdrawalRequestAddress, types.WithdrawalRequestType, false},
+		{types.ConsolidationRequestAddress, types.ConsolidationRequestType, false},
 	}
 	if cfg.IsAmsterdam(header.Time) {
 		queues = append(queues,
-			requestQueue{types.BuilderDepositRequestAddress, types.BuilderDepositRequestType, types.BuilderDepositRequestSSZSize, types.MaxBuilderDepositRequestsPerPayload, true},
-			requestQueue{types.BuilderExitRequestAddress, types.BuilderExitRequestType, types.BuilderExitRequestSSZSize, types.MaxBuilderExitRequestsPerPayload, true},
+			requestQueue{types.BuilderDepositRequestAddress, types.BuilderDepositRequestType, true},
+			requestQueue{types.BuilderExitRequestAddress, types.BuilderExitRequestType, true},
 		)
 	}
 	for _, queue := range queues {
@@ -109,9 +107,10 @@ func collectRequests(cfg *config.ChainConfig, getHash vm.GetHashFunc, statedb st
 		if err != nil {
 			return nil, fmt.Errorf("request type %d system call: %w", queue.kind, err)
 		}
-		if len(data)%queue.size != 0 || len(data)/queue.size > queue.limit {
-			return nil, fmt.Errorf("request type %d: invalid response size %d", queue.kind, len(data))
-		}
+		// EIP-7685 transports opaque request_data. The predeploy bounds its
+		// normal drain rate; SSZ record/count admission belongs to the CL.
+		// A successful system call is not an EL failure because custom code
+		// returns data outside those CL limits.
 		if len(data) != 0 {
 			requests = append(requests, types.NewRequest(queue.kind, data))
 		}

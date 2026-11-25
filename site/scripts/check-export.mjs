@@ -211,10 +211,8 @@ assert.match(roadmap, /These repairs and proof extensions are merged/);
 
 // The retained implementation score must not conceal newly found audit defects
 // or present pending review delivery as a merged/current conformance result.
-for (const html of [home, roadmap]) {
-  assert.ok(html.includes(remaining.currentConformanceReview.summary));
-  assert.ok(html.includes('Current correction reviews'));
-}
+assert.ok(home.includes(remaining.currentConformanceReview.summary));
+assert.ok(home.includes('Current correction reviews'));
 assert.equal(remaining.currentConformanceReview.originalFaultStatus, 'unconfirmed');
 assert.equal(remaining.currentConformanceReview.reviews.length, 11);
 for (const review of remaining.currentConformanceReview.reviews) {
@@ -260,16 +258,18 @@ assert.deepEqual(glamsterdamMapped.filter(entry => entry.status !== 'complete').
 assert.deepEqual(officialScope.networking, [7975, 8070, 8136, 8159, 8189]);
 assert.deepEqual(officialScope.informational.map(entry => entry.number), [7904, 8261]);
 assert.ok(!officialScope.scheduledCore.includes(8025) && !officialScope.scheduledCore.includes(7904));
+// The scope explanation is retained on the homepage; roadmap shows the charts directly.
+assert.match(home, /data-official-complete="20" data-official-total="20"/);
+assert.match(home, /20\/20 scheduled core EIPs labelled Complete/);
+assert.match(home, /Networking references/);
+assert.match(home, /Informational references/);
+assert.ok(home.includes(officialScope.sourceSnapshot));
+for (const number of officialScope.networking) assert.ok(home.includes(`data-official-network-eip="${number}"`));
+for (const item of officialScope.informational) assert.ok(home.includes(`data-official-info-eip="${item.number}"`));
+assert.doesNotMatch(roadmap, /data-official-glamsterdam="true"|Official upgrade scope/);
 for (const html of [home, roadmap]) {
-  assert.match(html, /data-official-complete="20" data-official-total="20"/);
-  assert.match(html, /20\/20 scheduled core EIPs labelled Complete/);
-  assert.match(html, /Networking references/);
-  assert.match(html, /Informational references/);
   assert.match(html, /Later rounds/);
-  assert.ok(html.includes(officialScope.sourceSnapshot));
   for (const id of officialScope.laterProofEntries) assert.ok(html.includes(`data-later-proof="${id}"`));
-  for (const number of officialScope.networking) assert.ok(html.includes(`data-official-network-eip="${number}"`));
-  for (const item of officialScope.informational) assert.ok(html.includes(`data-official-info-eip="${item.number}"`));
   assert.doesNotMatch(html, /16\/17 mapped entries complete|canonical Ethereum STF execution is the remaining Glamsterdam/i);
 }
 const officialCard = roadmap.match(/<article[^>]*id="fork-glamsterdam"[^>]*>(.*?)<\/article>/s)?.[1];

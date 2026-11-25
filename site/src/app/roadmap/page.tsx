@@ -2,7 +2,6 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import GlitchText from '@/components/ui/GlitchText';
 import MatrixRain from '@/components/ui/MatrixRain';
-import OfficialGlamsterdamScope from '@/components/OfficialGlamsterdamScope';
 import LaterProofWork from '@/components/LaterProofWork';
 import officialScope from '@/data/official-glamsterdam.json';
 import DevelopmentProgress from '@/components/DevelopmentProgress';
@@ -80,7 +79,6 @@ export default function RoadmapPage() {
       </section>
 
       <div className={styles.intro}><div><span>01 / PROTOCOL ROADMAP</span><h2>Six upgrades. One view.</h2><p>Glamsterdam follows the official scheduled core list; later cards retain project planning labels.</p></div><div className={styles.snapshot}><i /> REVIEWED UPDATE <b>{officialScope.reviewed}</b></div></div>
-      <OfficialGlamsterdamScope />
       <section className={styles.cards} aria-label="Ethereum roadmap upgrades">{roadmapStages.map((phase, index) => <PhaseCard key={phase.id} phase={phase} index={index} />)}</section>
       <LaterProofWork />
       <aside className={styles.caveat}><span>READING THE SIGNAL</span><p>Glamsterdam counts ETH2030 entries labelled <strong>Complete</strong> against the twenty core EIPs scheduled in <a href={officialScope.source}>EIP-7773</a>. Networking and informational references are listed separately. Other cards retain mapped project-planning denominators. These labels do not establish new latest-spec conformance or public-network readiness. EIP-8025 and canonical guest research are shown in later rounds without an official fork assignment. EF&apos;s roadmap evolves, and I*–L* remain placeholders.</p><a href="https://github.com/alt-research/eth2030/blob/master/STATUS.md" target="_blank" rel="noreferrer">Read project status ↗</a></aside>

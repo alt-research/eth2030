@@ -18,3 +18,7 @@ Local qualification at functional revision `7769210f`:
 The first full run exposed an existing checkpoint ETA test clock-tick flake. The test now explicitly establishes elapsed time; a fresh complete run passed. No production checkpoint behavior changed.
 
 Published as [PR #169](https://github.com/alt-research/eth2030/pull/169). All 10 triggered checks passed on predecessor `b7e646ff` ([CI](https://github.com/alt-research/eth2030/actions/runs/45677820968), [snap2](https://github.com/alt-research/eth2030/actions/runs/45677820888)). That revision excludes the later warmness test, which has a fresh local full/race qualification above. Final current-head CI is reported separately on PR #169; predecessor results are not reused as descendant results. No public composed Hegota release, independent-client Frames equivalence or Group C–J completion is claimed.
+
+## Second audit in progress, 2026-11-26
+
+The user requested a fresh no-omission review. Previous results above remain historical qualification, not proof that the new audit found no gaps. Every Group B requirement is being checked against normative clauses and actual execution before the audit is closed.

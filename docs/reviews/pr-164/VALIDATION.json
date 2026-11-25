@@ -1,0 +1,18 @@
+{
+  "geth": "v1.17.10 stock eth+snap handlers and production query/database",
+  "fork": "Amsterdam at zero; Bogota disabled",
+  "requests": 9,
+  "responses": 9,
+  "raw_gzip_artifacts_authenticated": true,
+  "unavailable_first_slot_before_valid_second": true,
+  "truncated_prefix": true,
+  "native_fetchSnapBALPath_three_steps": true,
+  "wrong_commitment_rejected": true,
+  "cross_peer_recovery": true,
+  "all_peers_eth_status_validated": true,
+  "full_affected_race_suites": 2,
+  "final_amsterdam_targeted_race": "passed",
+  "affected_vet": "passed",
+  "both_node_builds": "passed",
+  "scope_boundary": "Independently encoded archival BALs are preseeded in Geth DB. This qualifies real encrypted protocol serving, native hash admission and the production Node BAL-fetch/recovery path; native full block import and moving/canonical pivot campaigns remain separate evidence."
+}

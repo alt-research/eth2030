@@ -1,0 +1,38 @@
+name: Independent snap2 BAL interoperability
+on:
+  pull_request:
+    paths:
+      - 'pkg/node/**'
+      - 'pkg/p2p/**'
+      - 'pkg/bal/**'
+      - 'pkg/eth/**'
+      - 'pkg/sync/**'
+      - 'pkg/core/config/**'
+      - 'pkg/go.mod'
+      - 'pkg/go.sum'
+      - 'pkg/core/types/**'
+      - '.github/workflows/independent-snap2-interop.yml'
+  workflow_dispatch:
+jobs:
+  native-geth-snap2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ETH2030_INTEROP_OUTPUT: ${{ github.workspace }}/snap2-interop-results
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: pkg/go.sum
+      - name: Exercise native recovery against stock Geth encrypted peers
+        working-directory: pkg
+        run: go test -race ./node -run TestIndependentGethSnap2PositionalTruncationAndNativeRecovery -count=1 -timeout=90s -v
+      - name: Retain raw requests, responses and decoded positional receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: independent-snap2-${{ github.sha }}
+          path: snap2-interop-results/
+          if-no-files-found: error
+          retention-days: 90

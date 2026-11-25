@@ -1,0 +1,2669 @@
+{
+  "research_date": "2026-11-25",
+  "timezone": "Asia/Shanghai",
+  "repository_baseline": "dbe10116b703f88a97a6c45f1443b489e8e3b4ce",
+  "eips_upstream_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+  "consensus_specs_upstream_commit": "d2021d2719235f0df4726a1d330502cb15aa8ea3",
+  "local_reference_commits": {
+    "refs/EIPs": "49beda901dcf3747ed4b91f853a333595fb2cbc4",
+    "refs/consensus-specs": "14e6ce5a5334910b0d0575d782e468305ad92373"
+  },
+  "scope_counts": {
+    "meta": 58,
+    "forkcast": 67,
+    "meta_forkcast_union": 69,
+    "reviewed_proposals": 72,
+    "process_and_prerequisite_context": 5
+  },
+  "methodology": "Pinned specification sources and public topic streams were fetched in full. Analysis selects mechanisms, consequential replies, and dated scope decisions. Fetch completeness is not a claim of exhaustive semantic review. Deleted/hidden posts, private Discord, video, and all historical PRs are outside completeness claims. Discussion timestamps use UTC.",
+  "forkcast_generated_at": "2026-11-25T00:50:13.351Z",
+  "source_files": [
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8081.md",
+      "sha256": "3277980efee1941de37aa05967172262c0e1b1caa20165f532964e60085b84d6",
+      "bytes": 5028
+    },
+    {
+      "url": "https://forkcast.org/api/eips.json",
+      "sha256": "11303582e85b163ae849dfcbfb87dc1577a18b03ba12b7a5d5635f065e8653f3",
+      "bytes": 607796
+    },
+    {
+      "url": "https://forkcast.org/api/calls.json",
+      "sha256": "b5e323244b5a101ded495b3c27ebbf569deaa1f49179ea21e4c9bc2cdc171349",
+      "bytes": 46084
+    },
+    {
+      "url": "https://forkcast.org/search-light.json",
+      "sha256": "7b3fe63425b03c947076cad31797f94c50eb697e14fa358012ba7bb04fb0a4e5",
+      "bytes": 1871059
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/beacon-chain.md",
+      "sha256": "2df221334fe269189cb0c78433f169e97fae21655b2dfd3862ee6fa174356a58",
+      "bytes": 12862
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/builder.md",
+      "sha256": "221fb097e1d1e9acc92e2777be0f137826dd83ad879af3b1e797c2f8a8123fd5",
+      "bytes": 1233
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/fork-choice.md",
+      "sha256": "029bf4c8e3a9301ea169c03a9c3158ed5cadf5e871e253171472486fc12b7985",
+      "bytes": 13588
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/fork.md",
+      "sha256": "c174c34afbbf755be04ba29edebaf2d6605a1b8b26aa05d80428c3c221ca2485",
+      "bytes": 4982
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/inclusion-list.md",
+      "sha256": "7a5e2e5f33ad528a4f12a3a949e4b7ca28a03c8d5818d4e7c9d3fdde8ed20d35",
+      "bytes": 5878
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/p2p-interface.md",
+      "sha256": "df20b69de69280176fa1ccb085e11b59a22db388f1f95ab4a8d64ad2a4003238",
+      "bytes": 21485
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/d2021d2719235f0df4726a1d330502cb15aa8ea3/specs/heze/validator.md",
+      "sha256": "d9a04de954a0082d6e8825638c79f69ebfdaa1632133a79363c7e4a4448fe5d7",
+      "bytes": 9500
+    }
+  ],
+  "records": [
+    {
+      "eip": 2488,
+      "in_review_scope": true,
+      "title": "Deprecate the CALLCODE opcode",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "requires": "7",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/239",
+          "date": "2026-06-18"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-2488.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e606d541a486a736c43cc9fbb2849bdcc1cab911bba54e0b891b3ccfb9d6ecd0",
+      "spec_lines": 58,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-2488-deprecate-the-callcode-opcode/3957",
+      "discussion_topic_id": 3957,
+      "discussion_stream_posts": 4,
+      "discussion_fetched_posts": 4,
+      "discussion_visible_posts": 4,
+      "discussion_latest_created_at": "2025-12-14T09:02:19.925Z",
+      "discussion_sha256": "24a665af7526c1da1ed4836b09207675b82354b911db9fb07a23074504b3aeeb",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 3298,
+      "in_review_scope": true,
+      "title": "Remove storage-clear refund and refund cap",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2780, 3529, 7778, 8037, 8038",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-3298.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "623a5db8d64dd86cdaa2409905df785ec9dc58acdd59be8a18f29d8e9f86eb31",
+      "spec_lines": 97,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430",
+      "discussion_topic_id": 5430,
+      "discussion_stream_posts": 32,
+      "discussion_fetched_posts": 32,
+      "discussion_visible_posts": 32,
+      "discussion_latest_created_at": "2026-09-05T06:13:23.510Z",
+      "discussion_sha256": "874dec202b5376a62d372da9f2407d7ab94579368b08cccc53420896f57a930c",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 4758,
+      "in_review_scope": true,
+      "title": "Deactivate SELFDESTRUCT",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/237",
+          "date": "2026-05-21",
+          "timestamp": 4148
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-4758.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "8e4973a1ea21de41953a6ff56ba17f2e45067559963e8f9ab5aeb3b624ea5def",
+      "spec_lines": 50,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-4758-deactivate-selfdestruct/8710",
+      "discussion_topic_id": 8710,
+      "discussion_stream_posts": 40,
+      "discussion_fetched_posts": 40,
+      "discussion_visible_posts": 40,
+      "discussion_latest_created_at": "2023-09-20T01:42:08.561Z",
+      "discussion_sha256": "9c4086e5cd59dc5b6f84ecb6795c4431ad30d088ba471d27c6381491b907afc4",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 5920,
+      "in_review_scope": true,
+      "title": "PAY opcode",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "214, 2929, 7523",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-5920.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "f9b6d29381744114128f035d4a2a989a3d6ae08f838506fff96cd3c76e26ff11",
+      "spec_lines": 100,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717",
+      "discussion_topic_id": 11717,
+      "discussion_stream_posts": 61,
+      "discussion_fetched_posts": 61,
+      "discussion_visible_posts": 61,
+      "discussion_latest_created_at": "2025-05-13T22:12:13.658Z",
+      "discussion_sha256": "8c7c8017ddcc606fa5a3d099543e0ed8c9f53cebf91f3a380d67068db8f6aadc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7645,
+      "in_review_scope": true,
+      "title": "Alias ORIGIN to SENDER",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/239",
+          "date": "2026-06-18"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7645.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "57c2d8606b731a01ae2077f817032f31629a379fa8b403fe66e67a5fc6660647",
+      "spec_lines": 73,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7645-alias-origin-to-sender/19047",
+      "discussion_topic_id": 19047,
+      "discussion_stream_posts": 13,
+      "discussion_fetched_posts": 13,
+      "discussion_visible_posts": 13,
+      "discussion_latest_created_at": "2026-06-17T19:03:13.010Z",
+      "discussion_sha256": "5c6450e9f9caefe9c9d69235c4582eefed0c6516cb7b8ac26f7d4f17ae402150",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7666,
+      "in_review_scope": true,
+      "title": "EVM-ify the identity precompile",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "3855",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7666.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ea392f32efc0ae218c2f37d75577976a067f6a846caeb228fb76fa2ae3c2227b",
+      "spec_lines": 55,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7561-evm-ify-the-identity-precompile/19445",
+      "discussion_topic_id": 19445,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2025-04-20T16:21:25.462Z",
+      "discussion_sha256": "1c0ed82c0ffb414b7a149b10da6b83600cde4412f13fb67318e153176a87ef1b",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7668,
+      "in_review_scope": true,
+      "title": "Remove bloom filters",
+      "document_status": "Stagnant",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7668.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "816047a5594113227ddc9f64b7bcc1bc56bb66f4135c03c3cb526d3049ae3882",
+      "spec_lines": 45,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447",
+      "discussion_topic_id": 19447,
+      "discussion_stream_posts": 17,
+      "discussion_fetched_posts": 17,
+      "discussion_visible_posts": 17,
+      "discussion_latest_created_at": "2026-02-20T20:12:05.759Z",
+      "discussion_sha256": "ea0c836574eeb9eb725b8b4f7df2505e142e1e3f138124d28a1678156790f4bc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7709,
+      "in_review_scope": true,
+      "title": "Read BLOCKHASH from Storage and Update Cost",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2935",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/236",
+          "date": "2026-05-07",
+          "timestamp": 4379
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7709.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ed806dda2e43f8c887e52a89988dbe7354a8dfd305587955e09b6254994716ea",
+      "spec_lines": 110,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7709-read-blockhash-opcode-from-storage-and-adjust-gas-cost/20052",
+      "discussion_topic_id": 20052,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-05-05T17:29:07.405Z",
+      "discussion_sha256": "c5c555387751013c52c7b12a1608c08f53ad494975fb7ca66de53df2d3247dcb",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7716,
+      "in_review_scope": true,
+      "title": "Anti-Correlation Attestation Penalties",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/177",
+          "date": "2026-04-16",
+          "timestamp": 3532
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/189",
+          "date": "2026-10-15"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7716.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "759f1689c19cfa2b95eb3ec4ce21dd0fcd0e0e2c7145b78ae7d31852bda557d7",
+      "spec_lines": 276,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7716-anti-correlation-attestation-penalties/20137",
+      "discussion_topic_id": 20137,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2024-05-27T20:08:13.214Z",
+      "discussion_sha256": "c8f132138958bc23a7d816b5e2126c468856f33322057dabbcf4be0fc305bafc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7723,
+      "in_review_scope": false,
+      "title": "Network Upgrade Inclusion Stages",
+      "document_status": "Last Call",
+      "document_type": "Meta",
+      "requires": null,
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7723.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "8ea53bb13dfc56645d917b12cffd937f39bf9e6b5283f8e96fbf59eb2d6a1c0a",
+      "spec_lines": 124,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7723-network-upgrade-inclusion-stages/20281",
+      "discussion_topic_id": 20281,
+      "discussion_stream_posts": 24,
+      "discussion_fetched_posts": 24,
+      "discussion_visible_posts": 24,
+      "discussion_latest_created_at": "2026-07-09T15:49:00.686Z",
+      "discussion_sha256": "068c711c61b6641875691b0938d0f1c1fe213edabc1a0b27232618c38fb8bf22",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7732,
+      "in_review_scope": false,
+      "title": "Enshrined Proposer-Builder Separation",
+      "document_status": "Last Call",
+      "document_type": "Standards Track",
+      "requires": "7685",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7732.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "0b147a11e313e11713479bd4a9e09983929eb54afaa9dd962d7857832918d49c",
+      "spec_lines": 622,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7732-enshrined-proposer-builder-separation-epbs/19634",
+      "discussion_topic_id": 19634,
+      "discussion_stream_posts": 4,
+      "discussion_fetched_posts": 4,
+      "discussion_visible_posts": 4,
+      "discussion_latest_created_at": "2025-04-24T19:06:57.080Z",
+      "discussion_sha256": "1bc94cc7c22adbf344060112d43ea91ec6dc27724a1056d99c17be78365fbbe8",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7773,
+      "in_review_scope": false,
+      "title": "Hardfork Meta - Glamsterdam",
+      "document_status": "Review",
+      "document_type": "Meta",
+      "requires": "7607, 7723",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7773.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "13d6acab704198d116c5a03f3849164ad4ac2af4301f568d31078c1c3201f2da",
+      "spec_lines": 84,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7773-glamsterdam-network-upgrade-meta-thread/21195",
+      "discussion_topic_id": 21195,
+      "discussion_stream_posts": 14,
+      "discussion_fetched_posts": 14,
+      "discussion_visible_posts": 14,
+      "discussion_latest_created_at": "2025-10-23T14:24:05.357Z",
+      "discussion_sha256": "aa9cb53db80350bee0b7519128db6112d820b589a4450111542e22a87a0d7cc4",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7805,
+      "in_review_scope": true,
+      "title": "Fork-choice enforced Inclusion Lists (FOCIL)",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "SFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Considered",
+          "call": "acdc/171",
+          "date": "2025-12-11"
+        },
+        {
+          "status": "Scheduled",
+          "call": "acdc/175",
+          "date": "2026-02-19"
+        }
+      ],
+      "latest_tracked_stage": "SFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7805.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
+      "spec_lines": 204,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7805-committee-based-fork-choice-enforced-inclusion-lists-focil/21578",
+      "discussion_topic_id": 21578,
+      "discussion_stream_posts": 17,
+      "discussion_fetched_posts": 17,
+      "discussion_visible_posts": 17,
+      "discussion_latest_created_at": "2026-11-21T09:23:02.109Z",
+      "discussion_sha256": "539ba04ccb49044b9a7af03a968a04753932f699018fe0347e274580c65078b4",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7807,
+      "in_review_scope": true,
+      "title": "SSZ execution blocks",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7495, 7773, 7916",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Declined",
+          "call": "acde/232",
+          "date": "2026-03-12"
+        },
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7807.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "75a4aae64ad35a43fef8dc18fd51d90f7459f925900d9dac380dc41982da91ff",
+      "spec_lines": 132,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7807-ssz-execution-blocks/21580",
+      "discussion_topic_id": 21580,
+      "discussion_stream_posts": 4,
+      "discussion_fetched_posts": 4,
+      "discussion_visible_posts": 4,
+      "discussion_latest_created_at": "2026-08-19T04:12:21.380Z",
+      "discussion_sha256": "7d0e3edc1a5ded5d8f147fec619a0cfb30be0672119f907c9a8943b70d5f4818",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7819,
+      "in_review_scope": true,
+      "title": "SETDELEGATE instruction",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7702",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7819.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "431cc6e41caf5e4ada27a3a94e55af40cc9bec7434502c05e87fbeabdade346e",
+      "spec_lines": 139,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7819-create-delegate/21763",
+      "discussion_topic_id": 21763,
+      "discussion_stream_posts": 36,
+      "discussion_fetched_posts": 36,
+      "discussion_visible_posts": 36,
+      "discussion_latest_created_at": "2026-09-22T06:25:52.702Z",
+      "discussion_sha256": "df15e50514ca6ec9e6291fc72a8693647fa10f817fb1673f71328711615b5c59",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7851,
+      "in_review_scope": true,
+      "title": "Code-Controlled EOA Delegation",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7702",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/238",
+          "date": "2026-06-04"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7851.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "439e4826ef1aa6a370b59da167d553d4b3cf33a8038db7e010f3950b0aa3aae5",
+      "spec_lines": 109,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7851-code-controlled-eoa-delegation/22344",
+      "discussion_topic_id": 22344,
+      "discussion_stream_posts": 34,
+      "discussion_fetched_posts": 34,
+      "discussion_visible_posts": 34,
+      "discussion_latest_created_at": "2026-06-10T17:14:16.950Z",
+      "discussion_sha256": "7979fc2537702c929146e8a21896ccb81a0d6deb4709fad88957f24294bd5c04",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7862,
+      "in_review_scope": true,
+      "title": "Delayed State Root",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/240",
+          "date": "2026-07-02"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7862.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "2f044dc1c00ae5558aa3c17367da056acf0f76701f492ae63e77fb0b9b293cdc",
+      "spec_lines": 168,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7862-delayed-execution-layer-state-root/22559",
+      "discussion_topic_id": 22559,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2025-04-23T07:06:15.745Z",
+      "discussion_sha256": "56c5a2a283ffa946b1b3bb35c656a29b49b68682cffdc21201e4fcad1781f080",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7906,
+      "in_review_scope": true,
+      "title": "Transaction Assertions via State Diff Opcode",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2929, 8141",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7906.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "fcde21b02c0c7c04b9e787fbfb5bc33e9fa3cbef419b53b47d979a7451777fea",
+      "spec_lines": 369,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-restricted-behavior-transaction-type/23130",
+      "discussion_topic_id": 23130,
+      "discussion_stream_posts": 38,
+      "discussion_fetched_posts": 38,
+      "discussion_visible_posts": 38,
+      "discussion_latest_created_at": "2026-11-23T13:15:36.480Z",
+      "discussion_sha256": "d089477646bfc65d633599e9999430b23919de1a59b3216c9827a8594e00daa1",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7907,
+      "in_review_scope": true,
+      "title": "Meter Contract Code Size",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "170, 2929, 7702, 7954",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "PFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7907.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5ab7597f76df7da70806003e7a3a4ee1167442a766af868d4d321429fe38de6b",
+      "spec_lines": 95,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156",
+      "discussion_topic_id": 23156,
+      "discussion_stream_posts": 46,
+      "discussion_fetched_posts": 46,
+      "discussion_visible_posts": 46,
+      "discussion_latest_created_at": "2026-10-28T14:35:14.002Z",
+      "discussion_sha256": "54bb448a211d084f0a1e46569c5de368b13dd343b0956a3016059d7072aa8ac6",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7923,
+      "in_review_scope": true,
+      "title": "Linear, Page-Based Memory Costing",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7923.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "38077cfd67bac06d3ccf95979440d99d8eb9218da855a68a097bfb8084677844",
+      "spec_lines": 342,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-linearize-memory-costing/23290",
+      "discussion_topic_id": 23290,
+      "discussion_stream_posts": 34,
+      "discussion_fetched_posts": 34,
+      "discussion_visible_posts": 34,
+      "discussion_latest_created_at": "2026-09-21T19:39:01.468Z",
+      "discussion_sha256": "24f52a2b04f32cc386ec0ce82eb2457dc3ee3fded1fb3783049ed8fee746b316",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7928,
+      "in_review_scope": false,
+      "title": "Block-Level Access Lists",
+      "document_status": "Last Call",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7928.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
+      "spec_lines": 581,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7928-block-level-access-lists/23337",
+      "discussion_topic_id": 23337,
+      "discussion_stream_posts": 35,
+      "discussion_fetched_posts": 35,
+      "discussion_visible_posts": 35,
+      "discussion_latest_created_at": "2025-12-02T01:57:15.862Z",
+      "discussion_sha256": "7553ef965750d1d1a82e7954fb36add6a864228ed50afa5e393ffb622d74f122",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7973,
+      "in_review_scope": true,
+      "title": "Warm Account Write Metering",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2200",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7973.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1762762e76102f0bfd20789bd96016bec8b8116d00f0b804275cbf5f77a87f7e",
+      "spec_lines": 140,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7973-warm-account-write-metering/25907",
+      "discussion_topic_id": 25907,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2025-11-19T20:07:27.952Z",
+      "discussion_sha256": "5efccac1dcf985d451464e092ab6797aafc53528b982fd32135b2315979025ff",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 7979,
+      "in_review_scope": true,
+      "title": "Call and Return Opcodes for the EVM",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/238",
+          "date": "2026-06-04"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-7979.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9a3906c2a5bc4a197b96f3644f21a073f731057b39801bb259a80aa02ee6eab5",
+      "spec_lines": 424,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-7979-call-and-return-opcodes-for-the-evm/24615",
+      "discussion_topic_id": 24615,
+      "discussion_stream_posts": 43,
+      "discussion_fetched_posts": 43,
+      "discussion_visible_posts": 43,
+      "discussion_latest_created_at": "2026-09-26T08:08:40.197Z",
+      "discussion_sha256": "7cea6e2e06516df476dcc483f6cf224de763bea5daf938526e0accb263b98fa4",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8015,
+      "in_review_scope": true,
+      "title": "Remove `deposit` and `eth1data` fields",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "6110, 7688, 7773",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/183",
+          "date": "2026-07-23"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        },
+        {
+          "status": "Scheduled",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "SFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8015.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "ce565f18648ce6bf7c61d4bb9d964c712d1c3f11e10f7bafbda0a67da129b216",
+      "spec_lines": 178,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8015-remove-legacy-deposit-and-eth1data-fields/25401",
+      "discussion_topic_id": 25401,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2025-09-09T16:35:44.625Z",
+      "discussion_sha256": "b2ddaab50584203c18369a189aa4db275e57c0b2687a35e59895622ef9171431",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8025,
+      "in_review_scope": true,
+      "title": "Optional Execution Proofs",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "4844, 6110, 7002, 7251, 7688, 7732, 7928, 8282",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/178",
+          "date": "2026-05-14",
+          "timestamp": 4125
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/189",
+          "date": "2026-10-15"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8025.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c358101a47c8be0c565ef6d19fae7f2200d30c9dfad7f979c02c76fa3b6b715f",
+      "spec_lines": 1009,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-optional-execution-proofs/25500",
+      "discussion_topic_id": 25500,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-05-18T09:48:42.715Z",
+      "discussion_sha256": "c30b34e6c49bb01318567d63a5a0bd2f69100e5968bb13af04b406996a22badc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8077,
+      "in_review_scope": true,
+      "title": "eth/XX - announce transactions with nonce",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7642",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8077.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "05eb72ad5ae885653963ad34d451aa2b27661daccc6c69067b781865c7fa1604",
+      "spec_lines": 102,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8077-eth-xx-add-nonce-and-source-to-transactions-announcement/26505",
+      "discussion_topic_id": 26505,
+      "discussion_stream_posts": 4,
+      "discussion_fetched_posts": 4,
+      "discussion_visible_posts": 4,
+      "discussion_latest_created_at": "2026-08-19T04:24:01.719Z",
+      "discussion_sha256": "8d8412e2af67c592a6d2ac6c9b03c3b691c1a867eac9398046af6b01e07980e8",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8081,
+      "in_review_scope": false,
+      "title": "Hardfork Meta - Hegotá",
+      "document_status": "Draft",
+      "document_type": "Meta",
+      "requires": "7723, 7773",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8081.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "3277980efee1941de37aa05967172262c0e1b1caa20165f532964e60085b84d6",
+      "spec_lines": 112,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8081-hegota-network-upgrade-meta-thread/26876",
+      "discussion_topic_id": 26876,
+      "discussion_stream_posts": 17,
+      "discussion_fetched_posts": 17,
+      "discussion_visible_posts": 16,
+      "discussion_latest_created_at": "2026-09-21T19:05:09.308Z",
+      "discussion_sha256": "b2da8452e0da83585d189e69e02cf870c4164f9a9bca735b3b8d14c3bf772f3f",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8094,
+      "in_review_scope": true,
+      "title": "eth/vhash - Blob-Aware Mempool",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7642",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8094.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c5a94b085a47477e1eef3b12c49f88f3ce1b4219137db8f476ad56c73a3c1347",
+      "spec_lines": 124,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8094-eth-vhash-blob-aware-mempool/26834",
+      "discussion_topic_id": 26834,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2025-12-10T17:59:09.741Z",
+      "discussion_sha256": "09218f1a8bde1e3abab4294537f0c40a52d533a1a1c0067bbfda9d576a8fb85d",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8105,
+      "in_review_scope": true,
+      "title": "Universal Enshrined Encrypted Mempool",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": null,
+          "date": null
+        },
+        {
+          "status": "Withdrawn",
+          "call": null,
+          "date": "2026-02-23"
+        }
+      ],
+      "latest_tracked_stage": "撤回",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8105.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "7486cb72d3a4776cf37fed93d893865ab5a607647400797f8cbd58800544ccef",
+      "spec_lines": 153,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8105-universal-enshrined-encrypted-mempool/27201",
+      "discussion_topic_id": 27201,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2026-08-14T14:22:02.116Z",
+      "discussion_sha256": "d3dc9d95d542f8c6549b0d88bf02eb56073f22cb9cd1936fd115f2a9a6ba6f29",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8115,
+      "in_review_scope": true,
+      "title": "Batch priority fees at end of block",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "1559, 4895",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8115.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "55ab16f6b3f9778ea5ce777dbbc67a95d627cda00c78f1de4922f36da79d4e23",
+      "spec_lines": 52,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8115-batch-priority-fees-at-end-of-block/27358",
+      "discussion_topic_id": 27358,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2025-12-30T09:47:53.257Z",
+      "discussion_sha256": "0a2494dea1337332e9a9d251105e3edd4bd8f87719665505a9c816e44ce9fd77",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8116,
+      "in_review_scope": true,
+      "title": "Replace cumulative receipt fields",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8116.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "587ad8509b9df4473a75366a7361bb191b87941726f45cde79ff85ef7559fea5",
+      "spec_lines": 55,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8116-replace-cumulative-receipt-fields/27359",
+      "discussion_topic_id": 27359,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2025-12-30T10:27:18.858Z",
+      "discussion_sha256": "de6459b5a4df2e1290a80b7ae1c6538e329b882db184eaa54db26e0b0d8c09e3",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8131,
+      "in_review_scope": true,
+      "title": "Unified Transaction Content Floor",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2028, 2780, 2930, 4844, 7623, 7702, 7825, 7976, 7981",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/238",
+          "date": "2026-06-04"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8131.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1a4b65e01ec304dc2f67452c75db8ef49d8d6cda008aecb8a2b0fd1c11ee36ee",
+      "spec_lines": 201,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8131-add-auth-data-to-eip-7623-floor/27567",
+      "discussion_topic_id": 27567,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-01-22T17:15:47.960Z",
+      "discussion_sha256": "f3233d54052ede1033fe15418b8e0405a7c47fca15e1202d001dfe8fd31caa60",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8141,
+      "in_review_scope": true,
+      "title": "Frame Transaction",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "1559, 2718, 2780, 3529, 3607, 4844, 7594, 7702, 7708, 7778, 7825, 7976, 8037",
+      "meta_stage": "SFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Considered",
+          "call": "acde/233",
+          "date": "2026-03-26",
+          "timestamp": 5871
+        },
+        {
+          "status": "Scheduled",
+          "call": "acde/244",
+          "date": "2026-08-27"
+        }
+      ],
+      "latest_tracked_stage": "SFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8141.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+      "spec_lines": 1565,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/frame-transaction/27617",
+      "discussion_topic_id": 27617,
+      "discussion_stream_posts": 181,
+      "discussion_fetched_posts": 181,
+      "discussion_visible_posts": 181,
+      "discussion_latest_created_at": "2026-11-20T01:32:37.281Z",
+      "discussion_sha256": "adf6dd78d1eddab3eee489cb5cabe0132a4985e741eb92ea00af99388ea5e8ff",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8142,
+      "in_review_scope": true,
+      "title": "Block-in-Blobs (BiB)",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "4844, 7594, 7732, 7892, 7928",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": null,
+          "date": "2026-09-21"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8142.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "8153607a02e4e06b9ced70860b8f6400a68d9728a86e59c61321bb78449fe3fa",
+      "spec_lines": 720,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8142-block-in-blobs-bib/27621",
+      "discussion_topic_id": 27621,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-01-29T18:26:55.105Z",
+      "discussion_sha256": "a64f4f8c6e10931523098c12d00f794e8fe4f21f6389ee129592a05dd4ef3beb",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8146,
+      "in_review_scope": true,
+      "title": "Block Access List Sidecars",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732, 7928",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/240",
+          "date": "2026-07-02"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8146.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "d2e2b20121e35dabe18a3eb37a8144ddeb772db08f09e2e6e99ace5a2372155b",
+      "spec_lines": 343,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8146-block-access-list-sidecars/27757",
+      "discussion_topic_id": 27757,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-07-10T09:04:24.426Z",
+      "discussion_sha256": "9332a8cb44f6728c23e929222cbf1b36a608a6bf4a286071e5d6005f986cc6bb",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8148,
+      "in_review_scope": true,
+      "title": "Custom sweep threshold for validators",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7251, 7685",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/179",
+          "date": "2026-05-28",
+          "timestamp": 2068
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8148.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "58a0123e5d983f51c4485ab6d1630a5388ff8bb00596bcdb5f0667aec0d3a700",
+      "spec_lines": 690,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8148-custom-sweep-threshold-for-validators/27669",
+      "discussion_topic_id": 27669,
+      "discussion_stream_posts": 25,
+      "discussion_fetched_posts": 25,
+      "discussion_visible_posts": 25,
+      "discussion_latest_created_at": "2026-11-16T17:22:44.737Z",
+      "discussion_sha256": "d2b14eeca849eef185c9d7f985729cf470521372899855ed6bc662e24f18945b",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8151,
+      "in_review_scope": true,
+      "title": "Account Code Restricted ecRecover",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "3607, 7702, 8038",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/238",
+          "date": "2026-06-04"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8151.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80",
+      "spec_lines": 192,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8151-account-code-restricted-ecrecover/27690",
+      "discussion_topic_id": 27690,
+      "discussion_stream_posts": 30,
+      "discussion_fetched_posts": 30,
+      "discussion_visible_posts": 30,
+      "discussion_latest_created_at": "2026-11-24T23:20:39.370Z",
+      "discussion_sha256": "a093d685b7b3c6060f3880f4ffbac19d9a5381704242f34a5cc7538038f2b58c",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8163,
+      "in_review_scope": true,
+      "title": "Reserve `EXTENSION (0xae)` opcode",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "requires": "141",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/235",
+          "date": "2026-04-23"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8163.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "dbd3bcf2bd669e4b83ca6d12e172ee5cdaafb470210ec3db7254fc07bb4f07bb",
+      "spec_lines": 112,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8163-reserve-0xae-extension-opcode/27756",
+      "discussion_topic_id": 27756,
+      "discussion_stream_posts": 12,
+      "discussion_fetched_posts": 12,
+      "discussion_visible_posts": 11,
+      "discussion_latest_created_at": "2026-10-05T14:48:21.320Z",
+      "discussion_sha256": "85b245e80d4bc8c9ef86c82aae48baa7e6370d391468ab68ef951d55533b281b",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8173,
+      "in_review_scope": true,
+      "title": "Foundations of EVM Control Flow",
+      "document_status": "Review",
+      "document_type": "Informational",
+      "requires": null,
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8173.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "41a9fd6186dc5c1672edb2b86ac78577d435ea51f4dfa41bd068821364f171b2",
+      "spec_lines": 636,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8173-foundations-of-evm-control-flow/27855",
+      "discussion_topic_id": 27855,
+      "discussion_stream_posts": 8,
+      "discussion_fetched_posts": 8,
+      "discussion_visible_posts": 8,
+      "discussion_latest_created_at": "2026-06-17T18:32:53.141Z",
+      "discussion_sha256": "83b9c8fbaeca8dd8a5b7d052926b96745b769a9f74b6ee8ca42244faaa3b2e24",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8182,
+      "in_review_scope": true,
+      "title": "Private ETH and ERC-20 Transfers",
+      "document_status": "Review",
+      "document_type": "Standards Track",
+      "requires": "20",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/237",
+          "date": "2026-05-21",
+          "timestamp": 2172
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8182.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5fcacb0f71bec7f46b37edacc7060a2a0c03dc4538caa809453460ee2d0e809e",
+      "spec_lines": 1193,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8182-private-eth-and-erc-20-transfers/27889",
+      "discussion_topic_id": 27889,
+      "discussion_stream_posts": 32,
+      "discussion_fetched_posts": 32,
+      "discussion_visible_posts": 32,
+      "discussion_latest_created_at": "2026-09-16T06:56:43.472Z",
+      "discussion_sha256": "6f1b0d27f6298e04b6b7c79972e4481f1f255180f9386a64b267a48c5892a9ad",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8184,
+      "in_review_scope": true,
+      "title": "LUCID encrypted mempool",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2718, 7805",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/230",
+          "date": "2026-02-12"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/232",
+          "date": "2026-03-12"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8184.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "146e5450a3ec8a180a0e18df658e2fb7a4b171b2908daadcc1006c3a64cfde07",
+      "spec_lines": 580,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8184-lucid-encrypted-mempool/28017",
+      "discussion_topic_id": 28017,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2026-09-07T21:20:15.026Z",
+      "discussion_sha256": "74b2a22516b3f3afedff2e9c7110a4cc2f87677223ed0ccb05d4861c0ca67293",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8188,
+      "in_review_scope": true,
+      "title": "Last-Written Block for Accounts and Slots",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "8037",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/237",
+          "date": "2026-05-21",
+          "timestamp": 1269
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8188.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "dc2306ba2877472dc2f5d85ae4024adc8127a02a0388130f656afa6e815e807f",
+      "spec_lines": 169,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip8188-state-tiering-by-write-age/28234",
+      "discussion_topic_id": 28234,
+      "discussion_stream_posts": 6,
+      "discussion_fetched_posts": 6,
+      "discussion_visible_posts": 6,
+      "discussion_latest_created_at": "2026-05-29T15:36:14.361Z",
+      "discussion_sha256": "48792c90518fbaad16320aa800f0cab1b614bf4ef6a470ccc5096a7072a732c6",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8198,
+      "in_review_scope": true,
+      "title": "Quick Slots",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7843, 7892",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/188",
+          "date": "2026-10-01"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/191",
+          "date": "2026-11-12"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8198.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "3b8ff3656f4736a6acdc707e4560e6470024a49631e2cf7f1a493bc3e912e7cc",
+      "spec_lines": 291,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8198-quick-slots/28057",
+      "discussion_topic_id": 28057,
+      "discussion_stream_posts": 6,
+      "discussion_fetched_posts": 6,
+      "discussion_visible_posts": 6,
+      "discussion_latest_created_at": "2026-09-24T00:47:00.688Z",
+      "discussion_sha256": "a42ce9f616534baa2ece936ad60840ad3dbb8ec5abd19937be7193a961a05411",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8200,
+      "in_review_scope": true,
+      "title": "EVMification",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "152, 7666, 7823, 7883",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/242",
+          "date": "2026-07-30"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8200.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "15d2e9e885d61c6fe3004754fb907b3c9d46ab5610863257ab0a5cd2cf33ed1c",
+      "spec_lines": 107,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8200-evmification/28036",
+      "discussion_topic_id": 28036,
+      "discussion_stream_posts": 6,
+      "discussion_fetched_posts": 6,
+      "discussion_visible_posts": 6,
+      "discussion_latest_created_at": "2026-06-25T01:08:10.199Z",
+      "discussion_sha256": "ff3fc6c1b5e104b5ee01726748bdb31d75295fae396ccf107c9f67edba8c21f1",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8205,
+      "in_review_scope": true,
+      "title": "Withdrawal credentials preregistration",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "6110, 7685, 7732",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/177",
+          "date": "2026-04-16",
+          "timestamp": 3853
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8205.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c6259cbcdd486f0354f852d92d1355d34f0332a02b7faef11f84440542cae9f0",
+      "spec_lines": 587,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8205-withdrawal-credentials-preregistration/28084",
+      "discussion_topic_id": 28084,
+      "discussion_stream_posts": 15,
+      "discussion_fetched_posts": 15,
+      "discussion_visible_posts": 15,
+      "discussion_latest_created_at": "2026-11-18T01:16:52.353Z",
+      "discussion_sha256": "dd333739662443b9de15da76d6d1fbadca3e9dd5af432dae970eeb90b77e1ade",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8219,
+      "in_review_scope": true,
+      "title": "Checked Arithmetic Opcodes",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8219.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "609d426fc454180b8b79c6da5e59d66c7e723508aeca9376f3761f5a22d73e12",
+      "spec_lines": 329,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8219-checked-arithmetic-opcodes/27913",
+      "discussion_topic_id": 27913,
+      "discussion_stream_posts": 9,
+      "discussion_fetched_posts": 9,
+      "discussion_visible_posts": 9,
+      "discussion_latest_created_at": "2026-07-03T15:23:26.864Z",
+      "discussion_sha256": "951b9ca4b14e502a3ba98ee25d387da288b79e73ef75e8ee723af4727ff9acdf",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8237,
+      "in_review_scope": true,
+      "title": "Independent CL/EL Sync",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/235",
+          "date": "2026-04-23"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8237.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "192437824e82227014f4675cee81b4b24bcca7027406c321e6142838f22542af",
+      "spec_lines": 245,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8237-independent-cl-el-sync/28331",
+      "discussion_topic_id": 28331,
+      "discussion_stream_posts": 10,
+      "discussion_fetched_posts": 10,
+      "discussion_visible_posts": 10,
+      "discussion_latest_created_at": "2026-09-24T06:31:20.324Z",
+      "discussion_sha256": "045500a688c5e3cac15ee9acfc7b1ce98957a5f8b702e44c57ba3ecec128469f",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8243,
+      "in_review_scope": true,
+      "title": "Batching Attestations at Source",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/180",
+          "date": "2026-06-11"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8243.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "877bc6b37c3b1a71bd71a132ab8e9a6641c900b31966f92cda1f1f16375085a7",
+      "spec_lines": 359,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8243-batching-attestations-at-source/28606",
+      "discussion_topic_id": 28606,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-06-30T16:33:09.737Z",
+      "discussion_sha256": "6ad32d53a01720163a94463be571b50bd4b89e0f3d8347c0bfa27b637e21a990",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8250,
+      "in_review_scope": true,
+      "title": "Keyed Nonces for Frame Transactions",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7928, 7976, 8037, 8038, 8141",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/240",
+          "date": "2026-07-02"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8250.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+      "spec_lines": 341,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8250-keyed-nonces-for-frame-transactions/28437",
+      "discussion_topic_id": 28437,
+      "discussion_stream_posts": 5,
+      "discussion_fetched_posts": 5,
+      "discussion_visible_posts": 5,
+      "discussion_latest_created_at": "2026-10-23T06:55:10.638Z",
+      "discussion_sha256": "00a72100e3acc67f207e494d4f91989e2eaee0f0ef5d9ba98e86d1e7fb66ce95",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8253,
+      "in_review_scope": true,
+      "title": "Bump nonce of zero-nonce storage accounts",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "161, 684",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/236",
+          "date": "2026-05-07",
+          "timestamp": 4879
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8253.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "00f0047eefb41228d82400f792081fa83555ee0a094785409180d4e6bb7d0f6b",
+      "spec_lines": 122,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8253-upgrade-pre-spurious-dragon-accounts/28505",
+      "discussion_topic_id": 28505,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-05-12T09:20:34.036Z",
+      "discussion_sha256": "50e0b357da78d4e7c06bf3230e1e647c0f260cbd6a1569390de3198eb494f65c",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8272,
+      "in_review_scope": true,
+      "title": "Recent Roots for Frame Transactions",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7843, 8141",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/240",
+          "date": "2026-07-02"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8272.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+      "spec_lines": 432,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8272-recent-roots-for-frame-transactions/28621",
+      "discussion_topic_id": 28621,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2026-07-17T12:27:09.622Z",
+      "discussion_sha256": "cf8eb0d5003312b5ca136e98c6a6cc237ef2347e89e499e17d7dbcd1f930df66",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8279,
+      "in_review_scope": true,
+      "title": "Block Access List Byte Floor",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2780, 7623, 7702, 7825, 7928, 7976, 7981, 8037, 8038, 8131",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/238",
+          "date": "2026-06-04"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8279.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9d68b6670efa1ce22157bd367042aee00746223eaaf598fad57c211b495475dc",
+      "spec_lines": 316,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8279-block-access-list-byte-floor/28662",
+      "discussion_topic_id": 28662,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-07-10T12:27:05.095Z",
+      "discussion_sha256": "d34ed143e912ae6f313a48ec5fbbd3b5d69ad4b02e7356324dc9cab5b5c1f2f5",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8288,
+      "in_review_scope": true,
+      "title": "In-mempool signature and proof aggregation",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2718, 8141",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8288.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "0536c4333e5ee8b16bd4dd13a8dfac33f9fa66defc0cd1a2ecabaedf40c9c7c2",
+      "spec_lines": 597,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8288-frame-type-for-pq-sig-and-stark-aggregation/28723",
+      "discussion_topic_id": 28723,
+      "discussion_stream_posts": 15,
+      "discussion_fetched_posts": 15,
+      "discussion_visible_posts": 15,
+      "discussion_latest_created_at": "2026-11-16T16:42:10.359Z",
+      "discussion_sha256": "bc2a0745ccdfe251b39e78d643ea14d2df65eca4b78ff4b4dc73d6a59e4ef22b",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8298,
+      "in_review_scope": true,
+      "title": "SETCODEFROM Code Reuse Instruction",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "3607, 6780, 7702, 7928, 8037, 8038",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/240",
+          "date": "2026-07-02"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8298.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13",
+      "spec_lines": 253,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8298-setcodefrom-code-reuse-instruction/28779",
+      "discussion_topic_id": 28779,
+      "discussion_stream_posts": 23,
+      "discussion_fetched_posts": 23,
+      "discussion_visible_posts": 23,
+      "discussion_latest_created_at": "2026-11-24T14:27:14.790Z",
+      "discussion_sha256": "37fc71cb13bd5bfb2801e47304602e358d5b40d341e8bfb789d886bd72cbb54a",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8304,
+      "in_review_scope": true,
+      "title": "Trustless log and transaction index",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "4788",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/239",
+          "date": "2026-06-18"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/246",
+          "date": "2026-09-24"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8304.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c03c929fdf37d7be2d65866bc2801d9f13b14a86c18b360bd01951d9618c5861",
+      "spec_lines": 382,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8304-trustless-log-and-transaction-index/28824",
+      "discussion_topic_id": 28824,
+      "discussion_stream_posts": 19,
+      "discussion_fetched_posts": 19,
+      "discussion_visible_posts": 19,
+      "discussion_latest_created_at": "2026-11-22T14:05:02.569Z",
+      "discussion_sha256": "f4d4132cbadb1b5a10159f886d2d8bab3d0ada7b81218d5add0915ad826f492d",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8321,
+      "in_review_scope": true,
+      "title": "Hash-Chain RANDAO",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7916",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/183",
+          "date": "2026-07-23"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8321.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "387b8dafcef6df198386f53969ac834afa0e16763728d084d01d8b1fd864c3be",
+      "spec_lines": 419,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8321-hash-chain-randao/28942",
+      "discussion_topic_id": 28942,
+      "discussion_stream_posts": 8,
+      "discussion_fetched_posts": 8,
+      "discussion_visible_posts": 7,
+      "discussion_latest_created_at": "2026-11-18T01:16:59.847Z",
+      "discussion_sha256": "27736bf889506c61ace94b10b604bc1f9042805a882ac2c636cee191d38cfcfc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8333,
+      "in_review_scope": true,
+      "title": "Align Checkpoint with Epoch Boundary Block",
+      "document_status": "Withdrawn",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/188",
+          "date": "2026-10-01"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8333.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "11b027538796f9b8aa53a7a4c0d5a66b08fc42120131b4ddd97d4d1750a4855f",
+      "spec_lines": 135,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8333-align-checkpoint-with-epoch-boundary-block/29003",
+      "discussion_topic_id": 29003,
+      "discussion_stream_posts": 7,
+      "discussion_fetched_posts": 7,
+      "discussion_visible_posts": 7,
+      "discussion_latest_created_at": "2026-08-25T15:10:30.475Z",
+      "discussion_sha256": "3705abea49015dccb6893fa6f091614cbe7bb414dda9cd14dda61a81627d4385",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8334,
+      "in_review_scope": true,
+      "title": "Bundled Attestation Propagation",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/183",
+          "date": "2026-07-23"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/sukunrt/EIPs/f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04/EIPS/eip-8334.md",
+      "spec_commit": "f7f0cfb3a7550dbb5b77fe97fbc86a04f13efe04",
+      "spec_sha256": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
+      "spec_lines": 123,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/11905",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8334-bundled-attestation-propagation/29008",
+      "discussion_topic_id": 29008,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-07-14T08:59:07.347Z",
+      "discussion_sha256": "6940687a10c1c4e18e677307901d05d219515738fdfcfdfc79e8752bf742c2f2",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8341,
+      "in_review_scope": true,
+      "title": "Partial Execution Payload Commitments",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/183",
+          "date": "2026-07-23"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/nerolation/EIPs/7c0a835f2be7a1678990473a20212fb97e3ed017/EIPS/eip-8341.md",
+      "spec_commit": "7c0a835f2be7a1678990473a20212fb97e3ed017",
+      "spec_sha256": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
+      "spec_lines": 384,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/11936",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8341-partial-execution-payload-commitments/29030",
+      "discussion_topic_id": 29030,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-07-17T13:19:53.851Z",
+      "discussion_sha256": "5e0c84a49a5c858e16a99a8b95352c6073976154150b28ae5e11cf1c3a9bed09",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8355,
+      "in_review_scope": true,
+      "title": "Precompiles for ML-DSA Verification",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8355.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "01207bab5558e0692ba295b81a64e1d349f634a3b6dc127433fc3f4d31aed714",
+      "spec_lines": 418,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8355-precompiles-for-ml-dsa-verification/29211",
+      "discussion_topic_id": 29211,
+      "discussion_stream_posts": 20,
+      "discussion_fetched_posts": 20,
+      "discussion_visible_posts": 20,
+      "discussion_latest_created_at": "2026-11-11T19:04:54.736Z",
+      "discussion_sha256": "d9a2f1e25cbc7d44832e81d8c951b50cf6bf0753f9990f0a99b49eff9ed75f63",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8358,
+      "in_review_scope": true,
+      "title": "Net Gas Metering for Account Changes",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "161, 2200, 2780, 2929, 3529, 7702, 7708, 8037, 8038",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8358.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e28022d3734416969a287cb651e675d0f91ac67dde4c6b03c0d84de61c8c926e",
+      "spec_lines": 221,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8358-net-gas-metering-for-account-changes/29304",
+      "discussion_topic_id": 29304,
+      "discussion_stream_posts": 6,
+      "discussion_fetched_posts": 6,
+      "discussion_visible_posts": 6,
+      "discussion_latest_created_at": "2026-08-13T03:39:32.574Z",
+      "discussion_sha256": "68f0d1bc185a47f59441181d734560a3c83d9dbe563655aa2e8d8b9369ea0534",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8359,
+      "in_review_scope": true,
+      "title": "Beacon Block Reporting Field",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/189",
+          "date": "2026-10-15"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/hanniabu/EIPs/06ee26f2b86f36c839f9c41d99fcf49ab8323e5d/EIPS/eip-8359.md",
+      "spec_commit": "06ee26f2b86f36c839f9c41d99fcf49ab8323e5d",
+      "spec_sha256": "cf1a820d463d3249c7906313ef468ddbd893a359283480cbd78f209004e7108e",
+      "spec_lines": 364,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/12063",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8359-beacon-block-reporting-field/29224",
+      "discussion_topic_id": 29224,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-09-07T08:00:03.834Z",
+      "discussion_sha256": "7d0f109eaf752c07d4f5437c9ba3f652d694f5d0e55f2330e7969fed3477f0ea",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8360,
+      "in_review_scope": true,
+      "title": "TCREATE Opcode",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "161, 684, 1014, 1153, 2681, 3529, 6780, 7708, 7928, 8037, 8038",
+      "meta_stage": "CFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/245",
+          "date": "2026-09-10"
+        },
+        {
+          "status": "Considered",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8360.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "a9de2df039c4aee07c4b6fe4d6ab1dd2c7dd35358e024d36d117ef853e37323b",
+      "spec_lines": 243,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8360-tcreate-opcode/29258",
+      "discussion_topic_id": 29258,
+      "discussion_stream_posts": 11,
+      "discussion_fetched_posts": 11,
+      "discussion_visible_posts": 11,
+      "discussion_latest_created_at": "2026-09-29T04:16:17.877Z",
+      "discussion_sha256": "b294a99be3efdffb91fc043ea8c4e1ede8c3ada908f2443c5ce9c6d8296b5153",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8363,
+      "in_review_scope": true,
+      "title": "Tapered Issuance Burn",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/188",
+          "date": "2026-10-01"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8363.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "c7401db129b5fd2e523ab02707d0efe8312444ec902e46a5e71885a480058a84",
+      "spec_lines": 408,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8363-tapered-issuance-burn/29263",
+      "discussion_topic_id": 29263,
+      "discussion_stream_posts": 228,
+      "discussion_fetched_posts": 228,
+      "discussion_visible_posts": 228,
+      "discussion_latest_created_at": "2026-10-31T20:12:24.222Z",
+      "discussion_sha256": "052349e619abf3a36fb5a1784d68357a13b373fbf03b8dd91383b77673a41df3",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8365,
+      "in_review_scope": true,
+      "title": "Disallow new 0x00 validators",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "6110, 7251, 7732",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/188",
+          "date": "2026-10-01"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8365.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "6c400df484c77c34e674541c70f58415de199dc030a3d92733667523f0c1cbd2",
+      "spec_lines": 105,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8365-bls-withdrawal-credential-retirement/29284",
+      "discussion_topic_id": 29284,
+      "discussion_stream_posts": 6,
+      "discussion_fetched_posts": 6,
+      "discussion_visible_posts": 6,
+      "discussion_latest_created_at": "2026-08-20T06:38:25.459Z",
+      "discussion_sha256": "09986fb52baa6e7ff8baeb8ded958de96e934979681d6fb40843c82e481073cc",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8367,
+      "in_review_scope": true,
+      "title": "Balance sunset for retired BLS validators",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "8365, 8433",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ensi321/EIPs/c55245baa104ff8f6e02285cb9e58d66640cf829/EIPS/eip-8367.md",
+      "spec_commit": "c55245baa104ff8f6e02285cb9e58d66640cf829",
+      "spec_sha256": "0f5ef5985581057709c4068d60eadf097a108a039c68cc4433191c332432ddbf",
+      "spec_lines": 139,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/12099",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8367-balance-sunset-for-retired-bls-validators/29299",
+      "discussion_topic_id": 29299,
+      "discussion_stream_posts": 5,
+      "discussion_fetched_posts": 5,
+      "discussion_visible_posts": 5,
+      "discussion_latest_created_at": "2026-08-20T09:14:49.953Z",
+      "discussion_sha256": "06315cc5fc23a4171efb4a3fac8cb20ae0e053a2a762616185e42caba4116f92",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8368,
+      "in_review_scope": true,
+      "title": "CPSB Recalibration for New Gas Limit",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "8037",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        }
+      ],
+      "latest_tracked_stage": "PFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8368.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5092c19d1dff03b1dc647ffff28653bf02eb224f4ad15ff9b42100b69d49b9c7",
+      "spec_lines": 46,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8368-cpsb-recalibration-for-new-gas-limit/29293",
+      "discussion_topic_id": 29293,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-08-19T04:01:03.896Z",
+      "discussion_sha256": "3dae6c219d20ed01e979d6be7cf005a042119d085120678521b9b586ea1acf59",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8369,
+      "in_review_scope": true,
+      "title": "VOPS Profiles for FOCIL Eligibility",
+      "document_status": "Draft",
+      "document_type": "Informational",
+      "requires": "1559, 2718, 2930, 3607, 4844, 7702, 7732, 7805, 7843, 7928, 8141, 8250, 8272",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8369.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "d599b45c5a5d7a40d7d2f81b3440ea75b6d30658e678f061a9a56267c2c7404d",
+      "spec_lines": 212,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8369-vops-profiles-for-focil-eligibility/29298",
+      "discussion_topic_id": 29298,
+      "discussion_stream_posts": 4,
+      "discussion_fetched_posts": 4,
+      "discussion_visible_posts": 4,
+      "discussion_latest_created_at": "2026-09-09T12:57:18.859Z",
+      "discussion_sha256": "436f18fdc418272113b236e8b9b03b50260215a0994845f00eb7d6a86ad3db2a",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8371,
+      "in_review_scope": true,
+      "title": "RowDAS - Distributed Blob Reconstruction",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7594, 8136",
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/184",
+          "date": "2026-08-06"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/189",
+          "date": "2026-10-15"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8371.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "e28d183b0c5d4445014bd3863949e20023d59b270003098b933875b145fc1816",
+      "spec_lines": 181,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8371-rowdas-distributed-blobspace-reconstruction/29320",
+      "discussion_topic_id": 29320,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-10-15T14:07:16.394Z",
+      "discussion_sha256": "9682ec46877bcd666f5f79f43a2f14b11913b99f138d6ed6368c225d02242b1d",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8372,
+      "in_review_scope": true,
+      "title": "Normalized state gas limit",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "8037",
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        }
+      ],
+      "latest_tracked_stage": "PFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8372.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "db7eae2b26e156041353154d196c5d6373f4b176e42ca4f76129d9f7603a5515",
+      "spec_lines": 109,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8372-normalized-state-gas-limit/29332",
+      "discussion_topic_id": 29332,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-08-06T17:55:30.653Z",
+      "discussion_sha256": "2a768249912fac969ba632e8fabdc7a5a14aa82c3a2d55e98ed64159471420f4",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8374,
+      "in_review_scope": true,
+      "title": "Persist Warm Access Sets Across Reverts",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "2929",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acde/247",
+          "date": "2026-10-08"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8374.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "577593d70590e5997fbd8f9b64b799fd5cb6531d8f3e3a61bcf410f97e997155",
+      "spec_lines": 59,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8374-persist-warm-access-sets-across-reverts/29341",
+      "discussion_topic_id": 29341,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-08-07T09:00:43.718Z",
+      "discussion_sha256": "e95d61e0bfc95dc70e0ca605cc20067fa65534b3fa528c642beae2eb1cbec907",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8375,
+      "in_review_scope": true,
+      "title": "ePBS Mandatory Burn of Execution Rewards",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acde/243",
+          "date": "2026-08-13"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/benaadams/EIPs/b2bb0ef69e4b236703c30468d5773e896410a679/EIPS/eip-8375.md",
+      "spec_commit": "b2bb0ef69e4b236703c30468d5773e896410a679",
+      "spec_sha256": "1eec83e88f2d941647042a166220bdb622b25587bae2bcb74f9a3ca2e09a7153",
+      "spec_lines": 1106,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/12130",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8375-ember-epbs-mandatory-burn-of-execution-rewards/29380",
+      "discussion_topic_id": 29380,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-08-10T10:47:43.151Z",
+      "discussion_sha256": "2e072c4d7f7a59a39d06cf529f83ff85eeb5a3cfe7f134e82592c7a11b5967aa",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8379,
+      "in_review_scope": true,
+      "title": "Top-up Sync",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "DFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/185",
+          "date": "2026-08-20"
+        },
+        {
+          "status": "Declined",
+          "call": "acdc/188",
+          "date": "2026-10-01"
+        }
+      ],
+      "latest_tracked_stage": "DFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8379.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "b9d674ce711f1814088311453f97a4195c830f8bcc256ed9a89d69ddc3ede02b",
+      "spec_lines": 151,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8379-top-up-sync/29405",
+      "discussion_topic_id": 29405,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-08-12T13:57:59.881Z",
+      "discussion_sha256": "12d7652f514c819cb108df6f529f3e0f417b0fd0e6f732b3f7ce2555a715065d",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8383,
+      "in_review_scope": true,
+      "title": "Reduce CL Block Retention Window",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": null,
+      "meta_stage": "PFI",
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/185",
+          "date": "2026-08-20"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8383.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "5d65f73db81174beeabaa309538bf23e5c49e1daae4625fdc9a15a0ab380dea1",
+      "spec_lines": 162,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8383-reduce-cl-block-retention-window/29449",
+      "discussion_topic_id": 29449,
+      "discussion_stream_posts": 1,
+      "discussion_fetched_posts": 1,
+      "discussion_visible_posts": 1,
+      "discussion_latest_created_at": "2026-08-17T22:18:35.258Z",
+      "discussion_sha256": "d4cd0b5c8139b7ee3b678aa632e8a6ab56ac25d158ed39c3239f4a47d2cae4e0",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8411,
+      "in_review_scope": true,
+      "title": "Fast Execution Payload Broadcast",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7732",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/187",
+          "date": "2026-09-17"
+        },
+        {
+          "status": "Considered",
+          "call": "acdc/190",
+          "date": "2026-10-29"
+        }
+      ],
+      "latest_tracked_stage": "CFI",
+      "spec_source": "https://raw.githubusercontent.com/ethereum/EIPs/ade9e9cab7e148bba4cd293f916a4a189cd7a8aa/EIPS/eip-8411.md",
+      "spec_commit": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "spec_sha256": "9d4bdb57522b7ea5c788e531c4bb8ca925630114e96641a51f49955b49563c08",
+      "spec_lines": 203,
+      "pending_pr": null,
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8411-fast-execution-payload-broadcast/29613",
+      "discussion_topic_id": 29613,
+      "discussion_stream_posts": 2,
+      "discussion_fetched_posts": 2,
+      "discussion_visible_posts": 2,
+      "discussion_latest_created_at": "2026-09-17T07:26:49.872Z",
+      "discussion_sha256": "3fe3d420a282e0c018ad3f31b190f2c408d74ee7cc5f8e85b851a61f37a4d8a6",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8483,
+      "in_review_scope": true,
+      "title": "Post-Quantum Material Registration",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "7002, 7251, 7685, 7732",
+      "meta_stage": null,
+      "forkcast_stage_history": [
+        {
+          "status": "Proposed",
+          "call": "acdc/191",
+          "date": "2026-11-12"
+        }
+      ],
+      "latest_tracked_stage": "PFI",
+      "spec_source": "https://raw.githubusercontent.com/potuz/EIPs/d62cd56be2b898ec187d4d215d20c07b052a78bb/EIPS/eip-8483.md",
+      "spec_commit": "d62cd56be2b898ec187d4d215d20c07b052a78bb",
+      "spec_sha256": "34d049bc8b429ef93c4132fc35bec3ccddbae1d9e1f7aa6640f62bee42234a02",
+      "spec_lines": 742,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/12609",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8483-post-quantum-material-registration/30186",
+      "discussion_topic_id": 30186,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2026-11-24T17:39:26.854Z",
+      "discussion_sha256": "54c0f5ee985c2fa9bf1b5ac2c3c7d863b4e82b606b85db6050998ee9b18a1423",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    },
+    {
+      "eip": 8504,
+      "in_review_scope": true,
+      "title": "Proof frames for leanSPHINCS signatures",
+      "document_status": "Draft",
+      "document_type": "Standards Track",
+      "requires": "8141",
+      "meta_stage": null,
+      "forkcast_stage_history": [],
+      "latest_tracked_stage": null,
+      "spec_source": "https://raw.githubusercontent.com/lambdaclass/EIPs/654c0c3b2b5e066073012284fa93b2fea0522763/EIPS/eip-8504.md",
+      "spec_commit": "654c0c3b2b5e066073012284fa93b2fea0522763",
+      "spec_sha256": "84e05a14d23f3ce99e63a9231b0fd74c81182ea5f769aed5081378a99a8c498c",
+      "spec_lines": 256,
+      "pending_pr": "https://github.com/ethereum/EIPs/pull/12672",
+      "discussion_url": "https://ethereum-magicians.org/t/eip-8504-proof-frames-for-leansphincs-signatures/30448",
+      "discussion_topic_id": 30448,
+      "discussion_stream_posts": 3,
+      "discussion_fetched_posts": 3,
+      "discussion_visible_posts": 3,
+      "discussion_latest_created_at": "2026-11-20T15:17:28.674Z",
+      "discussion_sha256": "a7a25c2f0a9a771e0908203544d35fccba50c7f66c82d79cab3da42ce2e5a8ad",
+      "review_depth": "Macro review of specification mechanisms, selected key replies and recent scope history; not exhaustive conformance or transcript audit."
+    }
+  ]
+}

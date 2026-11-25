@@ -1,5 +1,15 @@
 # Lean4 Verification Check-list
 
+## Hegotá macro planning and EIP discussion review (2026-11-25)
+
+- [x] Verify current EF priorities, Hegotá Meta EIP, and recent All Core Devs decisions.
+- [x] Read relevant local EIP and consensus specifications; compare pinned references with current upstream.
+- [x] Review each scoped/proposed/declined EIP and its public discussion, recording evidence and limitations.
+- [x] Map the critical path and candidate work to ETH2030 implementation evidence.
+- [x] Write a sourced Chinese macro development plan and EIP review register.
+- [x] Verify document links and counts, run a local Go build, and update STATUS.md.
+- [x] Commit only this task's documentation changes.
+
 ## Inclusion List JSON Refactor (2026-03-21)
 - [x] Extract small inclusion-list JSON parsing helpers in `pkg/engine/inclusion_list.go`.
 - [x] Reuse the helpers from the custom marshal/unmarshal code.

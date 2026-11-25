@@ -1,5 +1,21 @@
 # Project Status
 
+## Hegotá Macro Planning and EIP Discussion Review (2026-11-25)
+
+### Current Status: RESEARCH AND PLANNING COMPLETE; IMPLEMENTATION NOT STARTED IN THIS TASK
+
+Created a Chinese macro development plan, an individual review register for 72 proposals, and a source manifest with 77 EIP/context records. The research compares the current Hegotá Meta EIP with EF priorities, public proposal discussions, and dated ACD/breakout records through November 25. It records stale Meta entries, the Quick Slots withdrawal, continuing FOCIL scope review, evolving Frames/PQ interfaces, and inter-EIP specification inconsistencies. Public topic streams were fetched completely; the analysis reviews selected consequential replies and scope history, not every historical PR, video, private discussion, or implementation rule.
+
+The implementation baseline is `dbe10116b703f88a97a6c45f1443b489e8e3b4ce`. Read-only reference submodules remain pinned to February 2026. The plan identifies old FrameTx/APPROVE semantics, the node backend's unsupported inclusion-list storage path, and the need for a versioned specification composition and conformance matrix before feature work.
+
+Deliverables:
+
+- [Macro development plan](docs/plans/hegota-macro-plan-2026-11.md)
+- [Individual EIP/discussion register](docs/plans/hegota-eip-review-2026-11.md)
+- [Pinned sources and discussion coverage](docs/plans/hegota-sources-2026-11.json)
+
+Verification: `cd pkg && env -u GOROOT go build ./...`; `cd pkg && env -u GOROOT go test ./core/types ./core/eips ./core/vm ./txpool/frametx ./focil ./engine/... ./node/backend/...`; document/source coverage, snapshot hashes and local-link checks. These establish the local baseline only; current Hegotá conformance and cross-client devnet validation remain future implementation gates. No protocol code, reference submodules, or sibling repositories were changed.
+
 ## Website Strawmap Refresh (2026-11-05)
 
 ### Current Status: LOCAL UPDATE COMPLETE; FURTHER AUDIT AND DEPLOYMENT PENDING

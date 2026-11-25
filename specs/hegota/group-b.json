@@ -61,6 +61,12 @@
       "path": "refs/EIPs/EIPS/eip-7702.md",
       "sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 2929,
+      "path": "refs/EIPs/EIPS/eip-2929.md",
+      "sha256": "177b2040bf0376b1182eb5571c7fda7a41b6f594083fa816506d65cfcf2acc4a",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
     }
   ],
   "profiles": {
@@ -328,7 +334,9 @@
           "id": "transient_warmness",
           "statement": "Transient state resets between frames and access warmness follows snapshots.",
           "clauses": [
-            "8141/Cross-frame interactions"
+            "8141/Cross-frame interactions",
+            "7702/Gas Costs",
+            "2929/Specification"
           ],
           "files": [
             "pkg/core/vm/frame_8141.go",
@@ -337,7 +345,8 @@
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
             "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert"
           ]
         }
       ]

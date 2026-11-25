@@ -218,3 +218,30 @@ func TestFrame8141DelegationBALBeforeFailedChildChecks(t *testing.T) {
 		})
 	}
 }
+
+func TestFrame8141DelegationWarmnessSurvivesChildRevert(t *testing.T) {
+	tx, db, cfg, header := frameExecutionFixture(t)
+	caller, authority, delegate := types.Address{19: 0x90}, types.Address{19: 0x91}, types.Address{19: 0x92}
+	db.SetCode(authority, types.AddressToDelegation(delegate))
+	db.SetCode(delegate, []byte{0x5f, 0x5f, 0xfd})
+	var code []byte
+	for i := 0; i < 2; i++ {
+		code = append(code, 0x5f, 0x5f, 0x5f, 0x5f, 0x5f, 0x73)
+		code = append(code, authority[:]...)
+		code = append(code, 0x61, 0x27, 0x10, 0xf1, 0x50)
+	}
+	db.SetCode(caller, append(code, 0))
+	tx.Frames = append(tx.Frames, types.Frame8141{Mode: types.ModeSender, Target: &caller, Limits: types.FrameGasLimits{Execution: 30000}})
+	receipt, _, err := ApplyTransaction(cfg, db, header, signFrameExecution(t, tx, false), new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Two CALLs: 16 stack gas + 2 POP + 4 REVERT each; account accesses
+	// are 6000 on the first call and 200 on the second, plus frame entry.
+	if result := receipt.FrameResults8141[1]; result.Status != 1 || result.GasUsed.Execution != 9244 {
+		t.Fatalf("child rollback incorrectly undid parent delegation warming: %+v", result)
+	}
+	if !db.AddressInAccessList(authority) || !db.AddressInAccessList(delegate) {
+		t.Fatal("parent call's delegation access was reverted with the child")
+	}
+}

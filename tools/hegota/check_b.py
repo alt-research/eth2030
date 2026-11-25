@@ -24,6 +24,7 @@ REQUIRED = {
 }
 MODULE = 'github.com/eth2030/eth2030/'
 CRITICAL_BOUNDARIES = {
+ ('HGT-012', 'transient_warmness'): {'TestFrame8141DelegationWarmnessSurvivesChildRevert'},
  ('HGT-011', 'pool_isolation'): {'TestFrame8141DelegatedCallGasAndForwarding'},
  ('HGT-015', 'bal'): {'TestFrame8141DirectPrecompileBALGasBoundary',
                      'TestFrame8141SstoreBALReadSurvivesPostStateFailure',
@@ -45,7 +46,7 @@ def validate_manifest(root, manifest):
     need(manifest['profiles']['8250-nonce-only-delta-isolated-v1']['decision'] == 'D01-open',
          'D01 cannot be silently closed')
     sources = manifest['normative_sources']
-    need({8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 7702} <= {s['eip'] for s in sources},
+    need({8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 7702, 2929} <= {s['eip'] for s in sources},
          'missing normative source')
     for source in sources:
         need(sha(root/source['path']) == source['sha256'], 'normative source changed: '+source['path'])

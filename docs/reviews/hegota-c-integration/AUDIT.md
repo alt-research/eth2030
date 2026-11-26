@@ -1,0 +1,29 @@
+# Group C specification and implementation audit
+
+Reviewed on 2026-11-26 from merged Group B baseline `5d777ad06f886c8b20fb010a47e65ddb05df8287`. The [detailed plan](../../plans/hegota-c/PLAN.md) contains all ten tasks and forty criteria; [the native register](../../../specs/hegota/group-c.json) binds clauses, code and executed consumers. No Group D–J qualification is implied.
+
+## Specification decisions
+
+EIPs master remains `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`; consensus-specs remains `d2021d2719235f0df4726a1d330502cb15aa8ea3`. Reference contents were not edited. The C plan adds missing protocol-prefix combinations, exact top-level permissions, dependencies/reorg handling, exposure lifecycle, dimensional/counted resources and native transport/API acceptance criteria.
+
+- Public pool restrictions are separate from consensus execution. Inclusion-list and private inputs retain ordinary execution semantics; only public candidates undergo the bounded generic prefix policy.
+- EIP-8272 extends all four EIP-8141 shapes with optional expiry/root frames, requires exact deployed runtime and tuple keys, and uses canonical-head slot+1 at admission. No slot is inferred from a timestamp. Exact candidate context is rechecked while building.
+- EIP-8250's stale three-fee example still conflicts with EIP-8141's two-field budget. D01 remains open. The explicit nonce-only research policy has no public decoder/gossip/import/fork route; all selected-key, legacy-read and MAX semantics are native tested.
+- The merged canonical-paymaster asset has no frozen reproducible runtime and disagrees with current witness layout. Upstream PR #12041 remains open/unmerged. Local v1 is selected only by `--experimental-frame-paymaster-v1`, remains explicitly nonstandard, and has separate exact-runtime accounting/dependency tests. No local bytes are labeled upstream canonical code.
+- The specific noncanonical-paymaster subsection, replacement/eviction rules and policy summary govern generic code sponsors despite the conflicting restrictive sentence in the canonical subsection. Empty-code sponsors use exposure accounting without the code-paymaster count cap.
+- Simulation and derived receipt status are documented client API choices in [the API profile](../../plans/hegota-c/RPC_PROFILE.md). Signed gas limits are never mutated to claim an authenticated minimum estimate.
+
+## Implemented findings and independent controls
+
+1. Missing recent-root prefix grammar and missing pool slot context prevented ordinary public admission. The shared executor now supports all sixteen shapes and exact top-level SLOTNUM/tuple-key permissions. Native tests execute all sixteen, retain no simulation writes and exclude body dependencies.
+2. Prefix validation previously re-executed on every reset. Pre-state code-hash/account/storage read sets and reverse indices now permit unchanged-state reuse, including reverted-child reads. VM activation rules belong in the cache profile; block-height rollback tests guard this independently of timestamp gates.
+3. Prospective payer metadata is installed only after successful admission. Replacement, resource failures, code adoption, aggregate max_fee exposure and delayed withdrawals preserve exact ownership/counts. The isolated keyed policy also caps a formerly empty-code sponsor when code is adopted.
+4. Frame ranking now uses actual blob fees. Sender-head ordering preserves nonce dependencies and existing regular-before-blob scheduling; equal-priced ordinary transactions retain the caller's stable order. Full-suite failures exposed and corrected an earlier hash-tie regression; those failed attempts are not qualification evidence.
+5. Protocol handlers bind Frame replies to announcement type/size and request identity, deduplicate hashes, batch bounded requests/responses and ignore unknown types. Exact typed bytes and v1 blob/cell proofs reach actual two-peer native admission. Structured receipts are checked through a real handler, separately from consensus receipt bytes.
+6. The public builder checks the exact candidate snapshot/slot/time and bounds consecutive unpaid approval failures at three, resetting on approval. Transient failure is not immediate eviction. Removed hashes cannot regain counters or stale announcements.
+7. Authenticated Frame simulation returns measured per-frame execution/state gas, payer, immutable hashes, escrow/refund/tip, logs, return data and bounded opcode observations. It supports bounded request cancellation and isolated account/block overrides. Ordinary type-6 call paths reject incomplete CALL input explicitly.
+8. A nested INVALID instruction has no dispatch entry and previously bypassed the public trace error latch. The latch now survives a parent catching that exceptional halt. An overlay of the prior interpreter makes the new native counterexample fail; the current interpreter passes. A second prior-code overlay independently detects the adopted-paymaster cap omission.
+
+## Completion boundary
+
+The register is intended to qualify mechanisms within the selected profiles and does not resolve either public specification gate. `check_c.py` deliberately reports `public_complete: false`; changing that claim, removing any criterion, weakening an upstream source pin or omitting required native boundary consumers is rejected. The final evidence must come from complete successful current-source full/race runs and preserved A/B oracle consumers, with all optional skips inventoried. Hosted results must refer to the pushed head, not an earlier B revision.

@@ -87,3 +87,21 @@ the merged text and proposed authorization/layout differ, and no finalized
 fork schedule pins this hash. `public_complete: false` and the draft PR remain
 honest release markers until that upstream decision is made. The proposal
 profile can already be deployed, executed and qualified explicitly.
+
+## Local qualification
+
+Implementation revision: `95a0382f` (later edits qualify documentation/evidence).
+All 240 full-suite and 57 focused-race packages completed successfully:
+24,004/9,587 passing test/subtest events and zero failures. Native/wrapper
+builds, full vet, the independent 12/12 historical baseline and 91 Python
+regressions in each normal/optimized mode pass. The A/B/C required consumers
+are 62/79/91 with zero required skips; 124/74 optional full/race skips are
+separately inventoried.
+
+Four explicit feature mutations fail their native consumers while preserving
+positive controls: disable exact proposal recognition, read the wrong
+withdrawal slot, omit the pending-rotation dependency, and omit candidate
+withdrawal availability. These are current-source mutations, not claims that
+the unmodified predecessor compiles against new APIs. Their log and overlay
+hashes are retained in C evidence alongside the preceding audit controls.
+Exact pushed-head hosted results belong in the English PR description/checks.

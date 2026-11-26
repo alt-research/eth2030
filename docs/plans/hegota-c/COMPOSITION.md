@@ -75,21 +75,29 @@ checks add no read/warming. Paid reads survive rejection and outer revert;
 warming follows ordinary snapshot rollback. Delegation is classified raw and
 never followed by this check.
 
-## Canonical paymaster runtime remains unspecified
+## Canonical paymaster proposal implemented; upstream standardization pending
 
 The merged CanonicalPaymaster.sol has no frozen reproducible runtime/compiler
 settings; its calldata authorization and nonstandard inline verbatim bindings
 also prevent treating the local template as an identical implementation.
 [EIPs #12041](https://github.com/ethereum/EIPs/pull/12041) at
 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6 remains open/unmerged. Its proposed
-355-byte runtime changes witness and administration semantics. The local
-459-byte v1 stays explicitly experimental. Neither earns upstream canonical
-recognition. Generic coded PAY tracing, one pending PAY and max_fee exposure
-remain available; an empty-code sponsor is governed by exposure alone.
+355-byte runtime changes witness and administration semantics. That exact
+runtime is now implemented and independently reproduced from its annotated
+assembly, selected with `--experimental-frame-paymaster-12041`. It has separate
+SIGPARAM authorization, slots 0 through 3, 24-hour withdrawal/rotation, cancellation,
+raw slot-1 reservation, cache invalidation and candidate-state availability.
+The 459-byte local v1 remains a distinct, mutually exclusive profile. Neither
+selection claims a finalized upstream standard or mainnet activation.
 
 The current implementer discussion independently confirms this boundary:
 [EIP-8141 post 182](https://ethereum-magicians.org/t/eip-8141-frame-transaction/27617/182)
 reports tracing every PAY frame without a pinned canonical paymaster. The
 EELS mempool fixture work is still draft and lists canonical paymaster work
-as outstanding. This single upstream template gate must remain explicit in
-completion reports; it cannot be resolved by choosing unmerged bytes locally.
+as outstanding. This does not prevent implementing the pinned proposal's
+determinate behavior. Native base/keyed plain/blob consumers now qualify that
+explicit version through real transport, simulation, construction, independent
+import, administration, reorg and disk restart. See the complete
+[source reconciliation](../../reviews/pr-170/CANONICAL_PAYMASTER.md).
+The single remaining gate is upstream adoption/fork pinning, rather than a
+missing local runtime implementation. `public_complete: false` remains explicit.

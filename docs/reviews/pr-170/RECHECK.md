@@ -1,5 +1,10 @@
 # Group C independent completeness re-audit
 
+The later canonical-paymaster follow-up is recorded in
+[CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md). It implements the exact
+PR-12041 proposal and corrects candidate withdrawal availability. The source,
+counts and qualification below describe the preceding independent audit.
+
 Baseline: pushed PR head 6b9bbf8a4e5d5aa92432bf773ed54ceb0cce0059. This audit
 checks HGT-020–029, all forty criteria, including public EIP-8250 and conditional
 EIP-8151. It does not adopt Group D–J proposals or official CL/devnet release claims.

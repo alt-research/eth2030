@@ -67,6 +67,27 @@ MANDATORY = {
  'rpc/ethapi::TestFrame8250TxPoolMapDoesNotAliasLegacyNonce',
 }
 
+PAYMASTER_REQUIRED = {
+ 'core/framepay::TestPR12041ReproducesUpstreamAssembly',
+ 'core/framepay::TestPR12041LayoutAndProfileIsolation',
+ 'core/execution::TestPR12041NativePaymentAuthorization',
+ 'core/execution::TestPR12041NativeDeployment',
+ 'core/execution::TestPR12041NativeTreasuryAndAdministration',
+ 'core/execution::TestPR12041AuthorizationBindsEntireTransaction',
+ 'core/execution::TestPR12041PublicPolicyDoesNotChangeConsensus',
+ 'core/execution::TestPR12041OrdinaryCallerAdministration',
+ 'txpool::TestPR12041PoolExactSelectionAndUsage',
+ 'txpool::TestPR12041PoolWithdrawalReservationAndLifecycle',
+ 'txpool::TestPR12041PoolTracksAllSlotsAndRotation',
+ 'txpool::TestPR12041PoolReplacementMovesExposure',
+ 'txpool::TestPR12041BuildRechecksWithdrawalAvailability',
+ 'node::TestPR12041NativePeersPoolBuildSimulationAndRestart',
+ 'node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart',
+ 'cmd/eth2030::TestPR12041FlagSelection',
+ 'cmd/send-frame::TestMakeFramePR12041Interface',
+}
+MANDATORY |= PAYMASTER_REQUIRED
+
 def validate_manifest(root, manifest):
     need(manifest['version'] == 2, 'unknown C manifest version')
     need(manifest['profiles']['8250-delta']['public_activation'] is False, 'independent oracle promoted to public activation')
@@ -77,6 +98,17 @@ def validate_manifest(root, manifest):
     need(manifest['profiles']['8151-conditional'] == {'activation': 'EIP8151Time; explicit, nil default', 'signer_dependencies': 'raw-code class, separate helper hash', 'local_shares': {'canonical_default':64, 'other_default':8, 'pay_counting':'distinct paymasters, separate from other frames'}}, 'conditional 8151 profile changed without qualification')
     template = manifest['profiles']['paymaster-v1']
     need(template['public_default'] is False and template['upstream_canonical'] is False, 'local template promoted to upstream canonical code')
+    need(manifest['profiles']['paymaster-12041'] == {
+        'public_default': False, 'upstream_canonical': False,
+        'selection': '--experimental-frame-paymaster-12041',
+        'revision': '4a98fcefa5c6f02a25289bf55b9d92902d02b4c6',
+        'runtime_bytes': 355,
+        'code_hash': '0xda42f0d11838c4c0c3129b8b8e93e9718127ad6b315e517e1088125707c4d45c',
+        'storage': ['signer','pending_withdrawal_amount','pending_unlock_time','pending_new_signer'],
+        'delay_seconds': 86400, 'local_pay_execution_limit': 15000,
+        'authorization': 'protocol-verified index 1, non-ARBITRARY, empty msg',
+        'ecRecover_dependencies': False,
+    }, 'unqualified paymaster proposal/version/authority')
     need(set(manifest['public_gates']) == {'PAYMASTER-CODE'} and all(manifest['public_gates'].values()), 'public specification gate omitted')
     need({8141, 8250, 8272, 7594, 2718, 1474, 8151} <= {s['eip'] for s in manifest['normative_sources']}, 'missing C normative source')
     artifacts = {'specs/hegota/group-c.json', 'tools/hegota/check_b.py', *manifest['additional_artifacts']}

@@ -2,10 +2,11 @@
 
 ## Canonical paymaster source and discussion audit
 
-- [ ] Re-read current EIP-8141, its Solidity asset, PR #12041's complete history/reviews and current implementer discussion; distinguish merged requirements from the proposed runtime.
-- [ ] Reconcile runtime recognition, authorization, storage, delayed withdrawal/rotation, EIP-8151 and pool lifecycle requirements against production paths.
-- [ ] Implement every determinate omission with independent native positive/negative controls and explicit profile selection where upstream proposals diverge.
-- [ ] Verify builds, relevant/full/race tests and source-bound A/B/C evidence; commit/push and update the English PR with exact current-head results.
+- [x] Re-read current EIP-8141, its Solidity asset, PR #12041's complete history/reviews and current implementer discussion; distinguish merged requirements from the proposed runtime.
+- [x] Reconcile runtime recognition, authorization, storage, delayed withdrawal/rotation, EIP-8151 and pool lifecycle requirements against production paths.
+- [x] Implement every determinate omission with independent native positive/negative controls and explicit profile selection where upstream proposals diverge.
+- [x] Verify builds, relevant/full/race tests, the 12-case baseline, normal/optimized Python and four native mutation controls; bind all mandatory A/B/C consumers to current-source evidence.
+- [ ] Commit/push the final evidence and update the English PR with exact current-head hosted results.
 
 ## Independent completeness re-audit
 
@@ -60,7 +61,7 @@ Hosted current-head verification remains required. Its live result, exact head S
 Public specification decisions and remaining gate:
 
 - [x] D01: selected two-fee EIP-8141/EIP-8250 composition resolved by merged history and qualified public consumers; explicit optional activation, no mainnet schedule. Independent oracle provenance is preserved.
-- [ ] Upstream canonical-paymaster compiled runtime: PR #12041 remains unmerged; the local v1 template remains opt-in research code.
+- [ ] Upstream adoption/fork pinning: the exact PR #12041 proposal is implemented and explicitly selectable, but remains unmerged. Local v1 is a separate opt-in profile.
 
 ## Follow-up completeness audit (2026-11-26)
 

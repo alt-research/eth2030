@@ -86,10 +86,28 @@
         "other_default": 8,
         "pay_counting": "distinct paymasters, separate from other frames"
       }
+    },
+    "paymaster-12041": {
+      "public_default": false,
+      "upstream_canonical": false,
+      "selection": "--experimental-frame-paymaster-12041",
+      "revision": "4a98fcefa5c6f02a25289bf55b9d92902d02b4c6",
+      "runtime_bytes": 355,
+      "code_hash": "0xda42f0d11838c4c0c3129b8b8e93e9718127ad6b315e517e1088125707c4d45c",
+      "storage": [
+        "signer",
+        "pending_withdrawal_amount",
+        "pending_unlock_time",
+        "pending_new_signer"
+      ],
+      "delay_seconds": 86400,
+      "local_pay_execution_limit": 15000,
+      "authorization": "protocol-verified index 1, non-ARBITRARY, empty msg",
+      "ecRecover_dependencies": false
     }
   },
   "public_gates": {
-    "PAYMASTER-CODE": "merged reproducible canonical runtime; PR 12041 is open"
+    "PAYMASTER-CODE": "Upstream standardization/fork pin: exact PR-12041 proposal is implemented and explicitly selectable, but remains unmerged."
   },
   "tasks": [
     {
@@ -161,17 +179,23 @@
           "statement": "exact exceptions:** expiry TIMESTAMP only in its actual protocol frame/runtime context. Recent-root SLOTNUM and tuple-derived SLOAD only at top level, exact address and exact runtime, no nested permission. Canonical-paymaster exception requires an admitted exact template; generic noncanonical paymasters receive no trace exemption. Optimizations must match normal gas/receipts/warming and are optional.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/core/types/frame_8141_pool.go",
             "pkg/core/vm/frame_8141.go",
-            "pkg/core/execution/frame_8141.go"
+            "pkg/core/execution/frame_8141.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/vm::TestFrameCPublicVerifierPermissionsAreExactAndTopLevel",
             "github.com/eth2030/eth2030/core/vm::TestFrameCSenderDefaultCodeCallException",
-            "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile"
+            "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile",
+            "github.com/eth2030/eth2030/core/framepay::TestPR12041ReproducesUpstreamAssembly",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041PublicPolicyDoesNotChangeConsensus",
+            "github.com/eth2030/eth2030/txpool::TestPR12041PoolExactSelectionAndUsage",
+            "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -186,20 +210,23 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8151 Public Mempool / Signer Dependencies / Pending Transaction Limit"
+            "EIP-8151 Public Mempool / Signer Dependencies / Pending Transaction Limit",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/core/execution/frame_dependencies.go",
             "pkg/core/vm/ecrecover_8151.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/txpool.go"
+            "pkg/txpool/txpool.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestFrameCAllSixteenPrefixesExecuteAndCaptureDependencies",
             "github.com/eth2030/eth2030/core/vm::TestEIP8151CallFamiliesAndOuterRevert",
             "github.com/eth2030/eth2030/core/vm::TestEIP8151RecoveryCodeClassGasAndUnpaidAccess",
             "github.com/eth2030/eth2030/txpool::TestFrame8151SignerClassesReorgAndSeparateHelperDependency",
-            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache"
+            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
+            "github.com/eth2030/eth2030/txpool::TestPR12041PoolTracksAllSlotsAndRotation"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -401,18 +428,24 @@
           "id": "C23.2",
           "statement": "kinds:** distinguish self-payment, empty-code sponsor, generic noncanonical code paymaster and admitted exact canonical template. Apply cap one only to the relevant noncanonical PAY contract; an empty-code sponsor is not a paymaster. Subtract an entire canonical pending withdrawal once per payer, including matured/unexecuted requests.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/txpool/frame_8141.go",
             "pkg/core/framepay/paymaster.go",
-            "pkg/node/node.go"
+            "pkg/node/node.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141CodedPaymasterExposureLimit",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal",
             "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile",
-            "github.com/eth2030/eth2030/txpool::TestFrameCExposureUsesValidatedPayPrefixClassification"
+            "github.com/eth2030/eth2030/txpool::TestFrameCExposureUsesValidatedPayPrefixClassification",
+            "github.com/eth2030/eth2030/core/framepay::TestPR12041LayoutAndProfileIsolation",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041NativePaymentAuthorization",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041NativeDeployment",
+            "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -420,16 +453,20 @@
           "id": "C23.3",
           "statement": "atomic transitions:** validate prospective replacement against exposure with the old reservation removed; move payer reservations and counters only on successful admission. A failed fee bump, replacement, capacity check, sidecar verification or state read cannot retain prospective metadata or drop the old transaction.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/txpool/frame_8141.go",
             "pkg/core/framepay/paymaster.go",
-            "pkg/node/node.go"
+            "pkg/node/node.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolReplacementChangesPayerAtomically",
-            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic"
+            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041AuthorizationBindsEntireTransaction",
+            "github.com/eth2030/eth2030/txpool::TestPR12041PoolReplacementMovesExposure"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -437,18 +474,22 @@
           "id": "C23.4",
           "statement": "revalidation:** deterministic insolvency handling, withdrawal/code changes, replacement to a different payer, inclusion, eviction, reset, fork rollback and reorg all preserve exact exposure/counts. The local experimental template remains explicitly identified and does not become upstream-standard bytecode through tests.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/txpool/frame_8141.go",
             "pkg/core/framepay/paymaster.go",
-            "pkg/node/node.go"
+            "pkg/node/node.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure",
             "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReplacementMovesWithdrawalAdjustedExposure",
-            "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal"
+            "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041NativeTreasuryAndAdministration",
+            "github.com/eth2030/eth2030/core/execution::TestPR12041OrdinaryCallerAdministration"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -616,22 +657,25 @@
       "criteria": [
         {
           "id": "C26.1",
-          "statement": "context:** ordinary pool selection uses the same candidate state snapshot and exact payload slot/time/fee context as execution. Root/expiry/public-policy admission is rechecked as required; consensus validity of private/IL input remains separate from public propagation. Apply ordinary/blob class preference only among executable sender heads, preserving blob Frame -> scalar successor order and independent keyed domains.",
+          "statement": "context:** ordinary pool selection uses the same candidate state snapshot and exact payload slot/time/fee context as execution. Root/expiry/public-policy admission is rechecked as required; consensus validity of private/IL input remains separate from public propagation. Apply ordinary/blob class preference only among executable sender heads, preserving blob Frame -> scalar successor order and independent keyed domains. Recheck selected paymaster withdrawal-adjusted availability against candidate state.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/core/block/builder.go",
             "pkg/core/block/ordering.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/txpool/frame_8141.go"
+            "pkg/txpool/frame_8141.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/block::TestFrameCBlobAndOrdinarySenderOrdering",
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound"
+            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
+            "github.com/eth2030/eth2030/txpool::TestPR12041BuildRechecksWithdrawalAvailability"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -702,17 +746,20 @@
           "id": "C27.1",
           "statement": "submission:** real native eth_sendRawTransaction accepts valid plain/nonblob and network-wrapped blob Frames through the same admission path as gossip. Strict DATA/QUANTITY widths, canonical decoding, invalid signature and sidecar errors are explicit; keyed admission/execution require the schema selected by explicit EIP8250Time.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/node/backend/rpc_backend.go",
             "pkg/rpc/ethapi/eth_api.go",
-            "pkg/rpc/types/types.go"
+            "pkg/rpc/types/types.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameBlobSidecarThroughActualHTTPAdmission",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -871,17 +918,20 @@
           "statement": "real peers:** submit via external HTTP RPC to one native node and observe a second connected peer receive/fetch/admit the same bytes without manual pool insertion or Engine IL injection. Cover plain and blob transport and invalid propagation controls.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/node/backend/engine_backend.go",
             "pkg/node/backend/engine_fcu.go",
-            "pkg/node/frame_c_integration_test.go"
+            "pkg/node/frame_c_integration_test.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds",
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestPR12041NativePeersPoolBuildSimulationAndRestart"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -890,17 +940,20 @@
           "statement": "ordinary builds:** build from pending transactions, independently import the payload, select canonical FCU and compare state/receipts/BAL, payer/fees/nonce and raw query bytes across nodes. Existing inclusion-list tests remain separate consumers.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/node/backend/engine_backend.go",
             "pkg/node/backend/engine_fcu.go",
-            "pkg/node/frame_c_integration_test.go"
+            "pkg/node/frame_c_integration_test.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart",
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -909,12 +962,14 @@
           "statement": "recovery:** restart from disk and reorg across sender/payer code/state, root write/deployment, expiry and activation boundaries. Check affected revalidation, reservation/index cleanup and canonical receipt/body queries; distinguish legitimate reorg reinjection from forbidden repropagation of an evicted transaction.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "Explicit proposal profile: EIPs #12041 at 4a98fcefa5c6f02a25289bf55b9d92902d02b4c6; see docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
           ],
           "files": [
             "pkg/node/backend/engine_backend.go",
             "pkg/node/backend/engine_fcu.go",
-            "pkg/node/frame_c_integration_test.go"
+            "pkg/node/frame_c_integration_test.go",
+            "pkg/core/framepay/paymaster_12041.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart",
@@ -923,7 +978,9 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot",
-            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache"
+            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
+            "github.com/eth2030/eth2030/node::TestPR12041NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -1000,6 +1057,18 @@
     "pkg/rpc/ethapi/direct_api.go",
     "pkg/eiptest/stf.go",
     "pkg/core/config/frame_extensions_test.go",
-    "docs/reviews/pr-170/RECHECK.md"
+    "docs/reviews/pr-170/RECHECK.md",
+    "pkg/core/framepay/paymaster.go",
+    "pkg/core/framepay/paymaster_12041.go",
+    "pkg/core/framepay/paymaster_12041_test.go",
+    "pkg/core/framepay/contracts/pr12041.asm",
+    "pkg/core/framepay/contracts/pr12041.hex",
+    "pkg/core/framepay/README.md",
+    "pkg/core/execution/frame_paymaster_12041_test.go",
+    "pkg/txpool/frame_paymaster_12041_test.go",
+    "pkg/cmd/send-frame/main.go",
+    "pkg/cmd/send-frame/main_test.go",
+    "pkg/cmd/eth2030/main_test.go",
+    "docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
   ]
 }

@@ -1,7 +1,7 @@
 import copy
 import json
 import unittest
-from check_c import ROOT, REQUIRED, validate_manifest, verify_report
+from check_c import ROOT, REQUIRED, PAYMASTER_REQUIRED, MODULE, validate_manifest, verify_report
 
 class GroupCIntegrityTests(unittest.TestCase):
     def setUp(self):
@@ -69,4 +69,18 @@ class GroupCIntegrityTests(unittest.TestCase):
             for row in manifest['tasks']:
                 for criterion in row['criteria']:
                     criterion['tests']=[test for test in criterion['tests'] if boundary not in test]
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+
+    def test_paymaster_proposal_cannot_change_identity_or_authority(self):
+        for key,value in [('public_default',True),('upstream_canonical',True),('revision','master'),('code_hash','0x'+'00'*32),('ecRecover_dependencies',True),('delay_seconds',43200)]:
+            manifest=copy.deepcopy(self.manifest)
+            manifest['profiles']['paymaster-12041'][key]=value
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+
+    def test_every_paymaster_consumer_required(self):
+        for boundary in PAYMASTER_REQUIRED:
+            manifest=copy.deepcopy(self.manifest)
+            for row in manifest['tasks']:
+                for criterion in row['criteria']:
+                    criterion['tests']=[name for name in criterion['tests'] if name!=MODULE+boundary]
             with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)

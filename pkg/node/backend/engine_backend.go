@@ -15,6 +15,7 @@ import (
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/mev"
+	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/forkchoice"
@@ -74,6 +75,13 @@ type txPoolReader struct {
 
 func (r *txPoolReader) Pending() []*types.Transaction {
 	return r.pool.PendingFlat()
+}
+
+func (r *txPoolReader) ValidateFrameForBuild(tx *types.Transaction, db state.StateDB, header *types.Header) error {
+	return r.pool.ValidateFrameForBuild(tx, db, header)
+}
+func (r *txPoolReader) FrameBuildResult(hash types.Hash, approved bool) {
+	r.pool.FrameBuildResult(hash, approved)
 }
 
 // NewEngineBackend creates and starts the engine backend.

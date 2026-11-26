@@ -921,6 +921,13 @@ func FormatReceipt(receipt *types.Receipt, tx *types.Transaction, blockTimestamp
 	if receipt.Type == types.FrameTxType {
 		switch {
 		case receipt.FrameResults8141 != nil:
+			rpcReceipt.Status = EncodeUint64(types.ReceiptStatusSuccessful)
+			for _, frame := range receipt.FrameResults8141 {
+				if frame.Status == types.ReceiptStatusFailed {
+					rpcReceipt.Status = EncodeUint64(types.ReceiptStatusFailed)
+					break
+				}
+			}
 			payer := EncodeAddress(receipt.Payer)
 			rpcReceipt.Payer = &payer
 			frames := make([]RPCFrameResult, 0, len(receipt.FrameResults8141))

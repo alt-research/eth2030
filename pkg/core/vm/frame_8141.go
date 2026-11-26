@@ -9,6 +9,13 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
+// FrameObserver receives actual top-level Frame execution, without replacing
+// opcode/call tracing or applying public-pool restrictions to the body.
+type FrameObserver interface {
+	BeginFrame(int)
+	EndFrame(int, []byte, uint64, uint64, error)
+}
+
 // FrameStateGas tracks EIP-8141's explicit, isolated state pools. Snapshots
 // are taken with the same StateDB snapshot that journals the corresponding writes.
 type FrameStateGas struct {
@@ -201,6 +208,13 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	ctx := evm.frame8141
 	frame := ctx.Tx.Frames[index]
 	ctx.Index, ctx.Left = index, frame.Limits.State
+	var output []byte
+	if observer := evm.Config.FrameObserver; observer != nil {
+		observer.BeginFrame(index)
+		defer func() {
+			observer.EndFrame(index, output, frame.Limits.Execution-gasLeft, ctx.Results[index].GasUsed.State, err)
+		}()
+	}
 	evm.returnData = nil
 	snapshot := evm.StateDB.Snapshot()
 	gasLeft = frame.Limits.Execution
@@ -277,7 +291,7 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 			return gasLeft, nil
 		}
 	}
-	_, gasLeft, err = evm.Call(caller, target, frame.Data, gasLeft, value)
+	output, gasLeft, err = evm.Call(caller, target, frame.Data, gasLeft, value)
 	return gasLeft, err
 }
 

@@ -103,3 +103,46 @@ func TestFrameCLocalPaymasterRequiresExplicitProfile(t *testing.T) {
 		t.Fatal("local paymaster silently granted canonical privileges")
 	}
 }
+
+func TestFrameCBuildContextAndUnpaidRetryBound(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	slot := uint64(2)
+	pool.Reset(db, &types.Header{Time: 100, Number: big.NewInt(1), SlotNumber: &slot, GasLimit: 30000000, BaseFee: big.NewInt(1)})
+	ref := types.RecentRootReference{Slot: 1, Root: types.Hash{31: 7}}
+	db.SetCode(types.RecentRootAddress, types.RecentRootCode)
+	db.SetState(types.RecentRootAddress, ref.StorageKey(), ref.EntryHash())
+	frame.Frames = append([]types.Frame8141{{Mode: types.ModeVerify, Target: &types.RecentRootAddress, Data: ref.AppendTo(nil), Limits: types.FrameGasLimits{Execution: 20000}}}, frame.Frames...)
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(tx); err != nil {
+		t.Fatal(err)
+	}
+	root := db.GetRoot()
+	candidate := &types.Header{Time: 101, Number: big.NewInt(2), SlotNumber: &slot, GasLimit: 30000000, BaseFee: big.NewInt(1)}
+	if err := pool.ValidateFrameForBuild(tx, db, candidate); err != nil {
+		t.Fatal(err)
+	}
+	skipped := uint64(8193)
+	candidate.SlotNumber = &skipped
+	if err := pool.ValidateFrameForBuild(tx, db, candidate); err == nil {
+		t.Fatal("builder used admission slot instead of exact skipped payload slot")
+	}
+	pool.FrameBuildResult(tx.Hash(), false)
+	pool.FrameBuildResult(tx.Hash(), false)
+	if pool.Get(tx.Hash()) == nil {
+		t.Fatal("transient validation evicted before multiple attempts")
+	}
+	pool.FrameBuildResult(tx.Hash(), true)
+	if len(pool.lookup.frameBuildFailures) != 0 {
+		t.Fatal("approval did not reset failures")
+	}
+	for i := 0; i < 3; i++ {
+		pool.FrameBuildResult(tx.Hash(), false)
+	}
+	if pool.Get(tx.Hash()) != nil || len(pool.lookup.frameDependencies) != 0 || len(pool.lookup.frameBuildFailures) != 0 {
+		t.Fatal("bounded unpaid work retained transaction or metadata")
+	}
+	pool.FrameBuildResult(tx.Hash(), false)
+	if len(pool.lookup.frameBuildFailures) != 0 || db.GetRoot() != root {
+		t.Fatal("removed attempt resurrected metadata or mutated state")
+	}
+}

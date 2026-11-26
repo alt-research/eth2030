@@ -285,3 +285,13 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	receipt.Bloom = types.LogsBloom(receipt.Logs)
 	return receipt, used, nil
 }
+
+// ReplayFrame8141 executes authenticated raw Frames using consensus semantics.
+// The caller owns the disposable state and any bounded observers/tracers.
+func ReplayFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, tracing vm.Config) (*types.Receipt, uint64, error) {
+	if _, ok := tx.Inner().(*types.FrameTx8141); !ok {
+		return nil, 0, errors.New("canonical Frame required")
+	}
+	db.SetTxContext(tx.Hash(), 0)
+	return executeFrame8141(config, getHash, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, false, blobBaseFee, tracing)
+}

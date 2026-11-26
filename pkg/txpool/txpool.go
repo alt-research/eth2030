@@ -145,14 +145,15 @@ type StateReader interface {
 
 // txLookup tracks transactions by hash for fast duplicate detection.
 type txLookup struct {
-	all               map[types.Hash]*types.Transaction
-	framePayers       map[types.Hash]types.Address
-	frameValidations  map[types.Hash]*execution.FramePrefixValidation
-	frameDependencies map[execution.FrameDependency]map[types.Hash]struct{}
+	frameBuildFailures map[types.Hash]uint8
+	all                map[types.Hash]*types.Transaction
+	framePayers        map[types.Hash]types.Address
+	frameValidations   map[types.Hash]*execution.FramePrefixValidation
+	frameDependencies  map[execution.FrameDependency]map[types.Hash]struct{}
 }
 
 func newTxLookup() *txLookup {
-	return &txLookup{all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address), frameValidations: make(map[types.Hash]*execution.FramePrefixValidation), frameDependencies: make(map[execution.FrameDependency]map[types.Hash]struct{})}
+	return &txLookup{frameBuildFailures: make(map[types.Hash]uint8), all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address), frameValidations: make(map[types.Hash]*execution.FramePrefixValidation), frameDependencies: make(map[execution.FrameDependency]map[types.Hash]struct{})}
 }
 
 func (l *txLookup) Get(hash types.Hash) *types.Transaction {
@@ -165,6 +166,7 @@ func (l *txLookup) Add(tx *types.Transaction) {
 
 func (l *txLookup) Remove(hash types.Hash) {
 	delete(l.all, hash)
+	delete(l.frameBuildFailures, hash)
 	delete(l.framePayers, hash)
 	if validation := l.frameValidations[hash]; validation != nil {
 		for dep := range validation.Dependencies {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/framepay"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
@@ -280,4 +281,33 @@ func fullBlobProof(blob, commitment []byte) ([]byte, error) {
 		return nil, err
 	}
 	return proof[:], nil
+}
+
+// ValidateFrameForBuild does not reuse admission caches: earlier selected
+// transactions and skipped slots can change validation in the candidate state.
+func (pool *TxPool) ValidateFrameForBuild(tx *types.Transaction, db state.StateDB, header *types.Header) error {
+	pool.mu.RLock()
+	defer pool.mu.RUnlock()
+	blobFee := gas.BlobBaseFeeForHeader(pool.frameConfig, header)
+	_, err := execution.ValidateFrame8141Dependencies(pool.frameConfig, db, header, tx, blobFee, pool.config.ExperimentalFramePaymasterV1)
+	return err
+}
+
+// FrameBuildResult applies a local three-consecutive-unpaid-attempt policy.
+// Success resets the counter; removed transactions cannot regain metadata.
+func (pool *TxPool) FrameBuildResult(hash types.Hash, approved bool) {
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+	tx := pool.lookup.Get(hash)
+	if tx == nil || !isCanonicalFrame8141(tx) {
+		return
+	}
+	if approved {
+		delete(pool.lookup.frameBuildFailures, hash)
+		return
+	}
+	pool.lookup.frameBuildFailures[hash]++
+	if pool.lookup.frameBuildFailures[hash] >= 3 {
+		pool.removeFrameLocked(hash)
+	}
 }

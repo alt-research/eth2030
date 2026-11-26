@@ -141,11 +141,11 @@ def main():
                   'criteria': sum(map(len, REQUIRED.values())), 'run': summary,
                   'source_fingerprint_sha256': digest, 'artifacts': hashes,
                   'passed_tests': {test: 'pass' for test in sorted(tests)},
-                  'scope': 'Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.'}
+                  'scope': 'Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.'}
         report_path.write_text(json.dumps(report, indent=2)+'\n')
     report = json.loads(report_path.read_text())
     verify_report(report, tests, hashes, digest)
-    print(json.dumps({'result': 'pass', 'tasks': 12, 'criteria': report['criteria'], 'native_tests': len(tests), 'D01': 'open; isolated profile only'}))
+    print(json.dumps({'result': 'pass', 'tasks': 12, 'criteria': report['criteria'], 'native_tests': len(tests), '8250_oracle': 'isolated; historical D01-open provenance; public composition qualified in Group C'}))
 
 if __name__ == '__main__':
     main()

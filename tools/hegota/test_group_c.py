@@ -62,3 +62,11 @@ class GroupCIntegrityTests(unittest.TestCase):
     def test_closed_gate_claim_rejected(self):
         report={'source_fingerprint_sha256':'x','artifacts':{},'tasks':10,'criteria':40,'public_complete':True,'public_gates':{},'selected_profile_consumers_passed':True,'passed_tests':{}}
         with self.assertRaises(ValueError):verify_report(report,self.manifest,set(),{},'x')
+
+    def test_cross_transaction_boundaries_required(self):
+        for boundary in ['TestFrameCRevalidationDropsInvalidBeforeSharedExposure','TestFrameCSharedPayerRevalidationEvictsByPolicy','TestFrameCSignerRevalidationUsesOneHeadSnapshot','TestFrameCBlobAndOrdinarySenderOrdering']:
+            manifest=copy.deepcopy(self.manifest)
+            for row in manifest['tasks']:
+                for criterion in row['criteria']:
+                    criterion['tests']=[test for test in criterion['tests'] if boundary not in test]
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)

@@ -233,7 +233,7 @@
         },
         {
           "id": "C21.3",
-          "statement": "canonical transitions:** remove included transactions and release resources; compare actual new canonical state and handle code adoption. Reorg tests must remove a dependency through the old branch without a replacement write on the new branch. Never infer absence of changes solely from the added branch's BAL.",
+          "statement": "canonical transitions:** remove included transactions and release resources; compare actual new canonical state and handle code adoption. Reorg tests must remove a dependency through the old branch without a replacement write on the new branch. Never infer absence of changes solely from the added branch's BAL. Prepare all surviving metadata against one head before applying shared reservations or signer limits; stale invalid entries and old witness paths must not evict valid peers.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling"
@@ -246,7 +246,9 @@
           "tests": [
             "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
             "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart",
-            "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg"
+            "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
+            "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure",
+            "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -268,7 +270,8 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrame8151PayRecoveriesCountDistinctPaymasters",
             "github.com/eth2030/eth2030/txpool::TestFrame8151ReservedAndOtherDigestShares",
-            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic"
+            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic",
+            "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -442,6 +445,8 @@
             "pkg/node/node.go"
           ],
           "tests": [
+            "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure",
+            "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReplacementMovesWithdrawalAdjustedExposure",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal"
           ],
@@ -508,7 +513,7 @@
         },
         {
           "id": "C24.4",
-          "statement": "eviction:** invalid first, then nearest expiry, then lowest effective priority with deterministic tie breaks. Remove exposure/dependencies and suppress stale queued announcements. Re-admission requires receipt again. Bound unpaid builder validation attempts with a documented local retry policy that permits more than one transient failure.",
+          "statement": "eviction:** invalid first, then nearest expiry, then lowest effective priority with deterministic tie breaks. Remove exposure/dependencies and suppress stale queued announcements. Re-admission requires receipt again. Bound unpaid builder validation attempts with a documented local retry policy that permits more than one transient failure. Apply the same expiry/priority eviction policy when a shared payer becomes insolvent at a new head.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection"
           ],
@@ -518,9 +523,10 @@
             "pkg/core/block/ordering.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
+            "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolExpiryAndFeeChanges",
-            "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression"
+            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
+            "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -610,7 +616,7 @@
       "criteria": [
         {
           "id": "C26.1",
-          "statement": "context:** ordinary pool selection uses the same candidate state snapshot and exact payload slot/time/fee context as execution. Root/expiry/public-policy admission is rechecked as required; consensus validity of private/IL input remains separate from public propagation.",
+          "statement": "context:** ordinary pool selection uses the same candidate state snapshot and exact payload slot/time/fee context as execution. Root/expiry/public-policy admission is rechecked as required; consensus validity of private/IL input remains separate from public propagation. Apply ordinary/blob class preference only among executable sender heads, preserving blob Frame -> scalar successor order and independent keyed domains.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling"
@@ -622,6 +628,7 @@
             "pkg/txpool/frame_8141.go"
           ],
           "tests": [
+            "github.com/eth2030/eth2030/core/block::TestFrameCBlobAndOrdinarySenderOrdering",
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound"
@@ -642,8 +649,9 @@
             "pkg/txpool/frame_8141.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee",
-            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/block::TestFrameCBlobAndOrdinarySenderOrdering",
+            "github.com/eth2030/eth2030/core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -914,6 +922,7 @@
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
+            "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot",
             "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
@@ -990,6 +999,7 @@
     "specs/hegota/profiles.json",
     "pkg/rpc/ethapi/direct_api.go",
     "pkg/eiptest/stf.go",
-    "pkg/core/config/frame_extensions_test.go"
+    "pkg/core/config/frame_extensions_test.go",
+    "docs/reviews/pr-170/RECHECK.md"
   ]
 }

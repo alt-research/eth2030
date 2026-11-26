@@ -59,6 +59,10 @@ MANDATORY = {
  'txpool::TestFrame8151ReservedAndOtherDigestShares',
  'txpool::TestFrame8151ActivationInvalidatesPrefixCache',
  'node::TestLoadGenesisFile_ScheduledForksRoundTrip',
+ 'txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure',
+ 'txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy',
+ 'txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot',
+ 'core/block::TestFrameCBlobAndOrdinarySenderOrdering',
  'txpool::TestFrame8151PayRecoveriesCountDistinctPaymasters',
  'rpc/ethapi::TestFrame8250TxPoolMapDoesNotAliasLegacyNonce',
 }

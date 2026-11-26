@@ -39,7 +39,7 @@ These boundaries are tracked separately from implemented mechanisms and executed
 
 ### HGT-021: dependencies and revalidation
 
-- **C21.1 capture:** record sender nonce/code/balance/existence/storage, helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries.
+- **C21.1 capture:** record sender code/balance/existence/storage and selected nonce domains (legacy nonce only when selected or explicitly read), helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries.
 - **C21.2 index:** maintain reverse dependency indices and cached pre-state values. Re-simulate affected transactions; unchanged unrelated dependencies must not invoke the VM again. Base/blob fees, dimensional block limits, fork state and time/slot transitions still require their applicable cheap validity checks.
 - **C21.3 canonical transitions:** remove included transactions and release resources; compare actual new canonical state and handle code adoption. Reorg tests must remove a dependency through the old branch without a replacement write on the new branch. Never infer absence of changes solely from the added branch's BAL.
 - **C21.4 lifecycle:** replace/remove dependency metadata atomically with transactions. Fork rollback, failed admission, resource rejection, reset, expiry and reorg must leave no orphan entries, cached acceptance or stale signer/nonce assumptions.
@@ -61,7 +61,7 @@ These boundaries are tracked separately from implemented mechanisms and executed
 ### HGT-024: ranking, replacement and bounds
 
 - **C24.1 fees:** rank using the including context's actual base and blob base fees and a documented effective-priority policy under the total fee budget. Do not substitute blob base fee 1 on an active head. No fabricated per-gas/per-blob cap is introduced for canonical Frames.
-- **C24.2 replacement:** same sender/nonce identity (or isolated selected-key identity), both max_fee and priority increment, configured rounding/zero boundaries and any explicitly configured larger blob increment. Cross-format replacements cannot bypass the canonical identity/policy rules.
+- **C24.2 replacement:** exact sender/selected-key/sequence identity for EIP-8250, otherwise sender/nonce identity, both max_fee and priority increment, configured rounding/zero boundaries and any explicitly configured larger blob increment. Cross-format replacements cannot bypass the canonical identity/policy rules.
 - **C24.3 limits:** independent execution/state/blob capacity, per-sender count, pool count and total bytes including sidecars. Oversized public admission is a local limit, not block invalidity. Reject before persistent metadata/counters grow without bound.
 - **C24.4 eviction:** invalid first, then nearest expiry, then lowest effective priority with deterministic tie breaks. Remove exposure/dependencies and suppress stale queued announcements. Re-admission requires receipt again. Bound unpaid builder validation attempts with a documented local retry policy that permits more than one transient failure.
 
@@ -128,3 +128,18 @@ txpool_inspect use keyed:<transaction-hash> for keyed entries within the sender
 map so ordinary scalar entries cannot collide. This is a local API convention,
 not an EIP wire field. Simulation uses the schema selected by the exact
 simulation timestamp, including explicit hypothetical time overrides.
+
+## Cross-transaction audit corrections
+
+Head revalidation first prepares every prefix and removes invalid entries, then
+arbitrates shared payer and signer limits using metadata from that same head.
+An invalid reservation or stale signer witness path cannot evict another valid
+transaction. Shared-resource pruning uses explicit expiry deadlines, then the
+lowest effective priority, with deterministic hash ties. Slot-based root expiry
+continues to use its separate index; slot numbers are not mixed with timestamps.
+
+Builder class preference applies only among executable sender heads. A blob
+Frame consuming the legacy nonce precedes its ordinary successor; nonempty keyed
+domains remain independent. This preserves the existing preference for unrelated
+ordinary transactions without partitioning a sender's account-nonce sequence.
+See [the complete clause audit](../../reviews/pr-170/RECHECK.md).

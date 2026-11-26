@@ -9,7 +9,6 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
-	"github.com/eth2030/eth2030/rlp"
 )
 
 type IndexedChange[T any] struct {
@@ -23,12 +22,13 @@ type SlotChanges struct {
 }
 
 type AccountChanges struct {
-	Address        types.Address
-	StorageChanges []SlotChanges
-	StorageReads   []*big.Int
-	BalanceChanges []IndexedChange[*big.Int]
-	NonceChanges   []IndexedChange[uint64]
-	CodeChanges    []IndexedChange[[]byte]
+	adoptedCodeHashes map[uint64]types.Hash
+	Address           types.Address
+	StorageChanges    []SlotChanges
+	StorageReads      []*big.Int
+	BalanceChanges    []IndexedChange[*big.Int]
+	NonceChanges      []IndexedChange[uint64]
+	CodeChanges       []IndexedChange[[]byte]
 }
 
 // EncodeRLP encodes the EIP-7928 account-grouped wire format. Internal
@@ -57,7 +57,7 @@ func (list *BlockAccessList) EncodeRLP() ([]byte, error) {
 		accounts = append(accounts, account)
 		first = last
 	}
-	return rlp.EncodeToBytes(accounts)
+	return EncodeAccountChanges(accounts)
 }
 
 func encodeAccountChanges(entries []AccessEntry) (AccountChanges, error) {
@@ -86,7 +86,15 @@ func encodeAccountChanges(entries []AccessEntry) (AccountChanges, error) {
 			account.NonceChanges = append(account.NonceChanges, IndexedChange[uint64]{idx, change.NewValue})
 		}
 		if change := entry.CodeChange; change != nil {
-			account.CodeChanges = append(account.CodeChanges, IndexedChange[[]byte]{idx, change.NewCode})
+			if change.NewCodeHash != nil {
+				if account.adoptedCodeHashes == nil {
+					account.adoptedCodeHashes = make(map[uint64]types.Hash)
+				}
+				account.adoptedCodeHashes[idx] = *change.NewCodeHash
+				account.CodeChanges = append(account.CodeChanges, IndexedChange[[]byte]{idx, nil})
+			} else {
+				account.CodeChanges = append(account.CodeChanges, IndexedChange[[]byte]{idx, change.NewCode})
+			}
 		}
 	}
 	for slot, changes := range writes {

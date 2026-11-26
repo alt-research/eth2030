@@ -86,6 +86,16 @@ func (evm *EVM) FlushFrameBAL8141() {
 	}); ok {
 		for address, original := range b.codes {
 			if final := b.db.GetCode(address); !bytes.Equal(original, final) {
+				if evm.codeAdoptions != nil {
+					if hash, adopted := evm.codeAdoptions.origins[address]; adopted {
+						if out, ok := b.output.(interface {
+							RecordCodeAdoption(types.Address, []byte, types.Hash)
+						}); ok {
+							out.RecordCodeAdoption(address, original, hash)
+							continue
+						}
+					}
+				}
 				output.RecordCodeChange(address, original, final)
 			}
 		}

@@ -17,3 +17,12 @@ activation boundaries. Proof/dependency encoding, inherited base/keyed signing,
 deduplication, gas and recognized-prefix handling now have independent vectors
 and native constraint/position/work tests. Execution/pool/payload integration,
 SETCODEFROM and ASSERT are still in progress.
+
+SETCODEFROM now has native opcode, fixed execution pricing, paid-access/static/
+system guards, raw source validation, execution-environment code adoption,
+snapshot origins and creation completion support. BAL supports strict hash-only
+adoption tuples and strictly-earlier availability resolution without a bytecode
+fallback. Native tests cover invalid/warm/cold/same/large sources, CALL families,
+7702, CREATE/CREATE2, ignored invalid initcode return, same-transaction rejection,
+revert and immediate-aware scans. Full bal/vm/execution suites pass. Consumer
+wiring, public proxy limits and broader compatibility qualification remain open.

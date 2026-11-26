@@ -48,6 +48,7 @@ func (evm *EVM) revertCreationSnapshot(snapshot, createdSnapshot int) {
 // fee settlement), before state finalization and BAL reconciliation. SELFDESTRUCT
 // itself leaves code, storage and nonce observable until this boundary.
 func (evm *EVM) FinalizeSelfDestructs() {
+	defer evm.finalizeCodeAdoptions8298()
 	if !evm.isEIP8246() || evm.StateDB == nil {
 		return
 	}

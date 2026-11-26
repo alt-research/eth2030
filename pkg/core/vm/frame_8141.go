@@ -665,6 +665,9 @@ func gasFrameCall8141(op OpCode, evm *EVM, contract *Contract, stack *Stack, mem
 // checkFrameValidation applies the public prefix trace rules at every call depth.
 func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack, pc uint64) error {
 	f := evm.frame8141
+	if f != nil && f.PublicValidation && op == SETCODEFROM {
+		return errors.New("Frame public validation executed SETCODEFROM")
+	}
 	if f == nil || !f.PublicValidation {
 		return nil
 	}
@@ -750,7 +753,7 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 		if address == f.Tx.Sender && len(code) == 0 {
 			return nil
 		} // explicit sender default-code exception
-		if len(code) == 0 || types.HasDelegationPrefix(code) {
+		if len(code) == 0 || types.HasDelegationPrefix(code) || (evm.forkRules.IsEIP8298 && HasOpcode8298(code, SETCODEFROM)) {
 			return errors.New("Frame public validation called an empty or delegated third-party account")
 		}
 	}

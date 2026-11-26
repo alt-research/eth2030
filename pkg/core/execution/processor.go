@@ -762,6 +762,19 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		evm.SetJumpTable(vm.SelectJumpTable(forkRules))
 		precompileAddrs = vm.SelectPrecompiles(forkRules)
 		evm.SetForkRules(forkRules)
+		if forkRules.IsEIP8298 {
+			var systems []types.Address
+			if rules.IsCancun {
+				systems = append(systems, eips.BeaconRootAddress)
+			}
+			if rules.IsPrague {
+				systems = append(systems, eips.HistoryStorageAddress, types.WithdrawalRequestAddress, types.ConsolidationRequestAddress)
+			}
+			if rules.IsAmsterdam {
+				systems = append(systems, types.BuilderDepositRequestAddress, types.BuilderExitRequestAddress)
+			}
+			evm.SetSystemContracts8298(systems)
+		}
 		if pq := config.PQDraft; pq != nil && pq.Time != nil && header.Time >= *pq.Time {
 			if !rules.IsBerlin {
 				return nil, errors.New("PQ draft activation requires Berlin account access accounting")

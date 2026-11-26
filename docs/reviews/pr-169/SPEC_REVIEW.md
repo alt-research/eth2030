@@ -55,3 +55,7 @@ The [second audit](SECOND_AUDIT.md) records four subsequently reproduced dispatc
 ## Third clause audit
 
 The [third audit](THIRD_AUDIT.md) revisits all 12 tasks and corrects two additional consensus-visible omissions: APPROVE must ignore its offset for an empty RETURN region, and static SSTORE must fail before its gas calculation accesses storage. Three new regression parents cover exact gas, full-width operands, return bytes, approval rollback and BAL inclusion. The coverage checker requires those consumers and EIP-214 as a pinned normative source.
+
+## Fourth clause audit
+
+The [fourth audit](FOURTH_AUDIT.md) corrects the account-reconstruction BAL baseline for prefunded CREATE/CREATE2 destinations. Transaction-original fields are captured before resetting the account. New execution, rollback and native build/import tests reject fabricated net-zero balance changes while preserving exact state-gas semantics; unchanged upstream Amsterdam independently checks the eight creation call bodies.

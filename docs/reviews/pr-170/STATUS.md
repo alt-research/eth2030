@@ -2,16 +2,17 @@
 
 All HGT-020–029 implementation mechanisms are locally qualified within the selected profiles. Public composed completion is **not claimed**: D01 and the missing merged reproducible canonical-paymaster runtime remain specification gates. See [the audit](AUDIT.md), [the detailed plan](../../plans/hegota-c/PLAN.md), [the API profile](../../plans/hegota-c/RPC_PROFILE.md) and [the forty-criterion register](../../../specs/hegota/group-c.json).
 
-Implementation source: `c973c4aa8c8a1d83442d04bc3f8b542e15e00510`, including bounded timestamp/root expiry heaps, exact candidate context and native malformed-DATA rejection. Subsequent edits are qualification/documentation only. The merged baseline remains `5d777ad06f886c8b20fb010a47e65ddb05df8287`; references/oracles were not edited.
+Implementation source: `6f54ec223efd698e888fc4d87273c3880d420b1c`, including bounded timestamp/root expiry heaps, exact candidate context, native malformed-DATA rejection and the factory-funding dependency correction. Subsequent edits are qualification/documentation only. The merged baseline remains `5d777ad06f886c8b20fb010a47e65ddb05df8287`; references/oracles were not edited.
 
 Local qualification completed on 2026-11-26:
 
-- Full suite: 23,852 passing test/subtest events, zero failures, 124 optional skips; all 240 packages completed (221 passing, 19 without executed tests).
-- Focused race: 9,386 passing test/subtest events, zero failures, 74 optional skips; all 54 packages completed (51 passing, three without executed tests).
+- Full suite: 23,857 passing test/subtest events, zero failures, 124 optional skips; all 240 packages completed (221 passing, 19 without executed tests).
+- Focused race: 9,391 passing test/subtest events, zero failures, 74 optional skips; all 54 packages completed (51 passing, three without executed tests).
 - Native full build, native and Geth-wrapper binary builds, vet and the 12/12 independent historical differential baseline pass.
 - Ordinary and optimized Python: 85 checks pass each. Encoding/hash, arithmetic/state/semantic and isolated keyed/root oracles remain unchanged and pass.
-- Mandatory consumers: A 62, B 79, C 49, all executed and passing, with zero required skips. C covers ten tasks and forty criteria. Full/race optional reasons are recorded separately in `evidence/hegota-a/skipped-tests.json`.
+- Mandatory consumers: A 62, B 79, C 50, all executed and passing, with zero required skips. C covers ten tasks and forty criteria. Full/race optional reasons are recorded separately in `evidence/hegota-a/skipped-tests.json`.
 - The actual two-peer plain/blob path covers HTTP submission, fetch/admission, ordinary pool building without IL injection, independent import/FCU, exact bytes, state/receipts and restart. Authenticated simulation/trace retains no canonical or pool effects.
+- A prior-code native counterexample admits both forbidden CREATE/CREATE2 factory-funding cases; the current implementation rejects them while preserving the approved-factory-payer exception and private consensus validity.
 - A prior isolated-policy overlay fails the code-adoption paymaster-cap counterexample. Caught INVALID also passes against the prior interpreter and is correctly recorded as extra coverage, not a new defect.
 
 All A/B/C source/evidence checks pass. Shared-payer exposure uses already-validated prefix classification, avoiding repeated verification of unrelated signatures. English draft [PR #170](https://github.com/alt-research/eth2030/pull/170) is published from `codex/hegota-c-integration` against `master`. Exact-head hosted verification and immutable workflow links are maintained in the PR description/current checks. They remain required in addition to this source-bound local record; predecessor results are not reused for a new head.

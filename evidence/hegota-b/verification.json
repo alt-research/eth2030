@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "a730104c90797825a441e1a4a97cea073d3774baa4af384cc27bf0b5cd48d3eb",
+    "log_sha256": "f2747400da9bcc295a61f30e1a96e3180fa548237597bcc2315dc5f851db4e4f",
     "named": {
-      "pass": 23852,
+      "pass": 23857,
       "skip": 124
     },
     "packages": {
@@ -15,7 +15,7 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "c02a7f12424dc453b7b28be63a169d68097c9cf6da1934cc867a98ee858d4bab",
+  "source_fingerprint_sha256": "a21fd98ef323cc87ba114f1e132c279a13983da8d88e706ff3e8f3ef96fb89ee",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
@@ -32,10 +32,10 @@
     "pkg/core/chain/transaction_readback.go": "49bd254fbeae2ca8e253e4ac9ee9d999aae4a4a2249f6b64544a51b79004fedb",
     "pkg/core/eftest/hegota_goldens_test.go": "eec2d755e42b6239c867f4270014c0490e196d3d276d2a3f99e26f13395681f7",
     "pkg/core/execution/amsterdam_system_gas_test.go": "0e0aa523c92cb6e80e30a227e6fb1bbbce09236f6c5e2a5044e49b4bba2ac337",
-    "pkg/core/execution/frame_8141.go": "ae7132a8ca25b8563cf2ea142414d01b5e0a803ffca78c6e93350419ed4077d3",
+    "pkg/core/execution/frame_8141.go": "9ebfd94b53dae52ca2695a8d6a636be23ad35692207fccf3e17f45b98c484871",
     "pkg/core/execution/frame_8141_conformance_test.go": "681e49d1f66f2cdbb6de28c98bcc7e7281abad8c331070122612d6e4236a0abe",
     "pkg/core/execution/frame_8141_test.go": "c506e0de2054c4bc9b221c8a70fc00b5869fb081520078aa4a8e8538dc64f99b",
-    "pkg/core/execution/frame_8250.go": "2ccf4dcd276120dd164ec9ed89af9c1beeafa96df2b0be2461ff4a43c602614c",
+    "pkg/core/execution/frame_8250.go": "a55213cf2bdf0179ced6aedf2a2a18ec1381c228ac6be682d557427bfb7ffc8c",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
     "pkg/core/execution/frame_backend_audit_test.go": "fd09ede31bd631a95c8fdc36c4e1b77f8dd33ca252c5df0c57cd232dde95e83a",
@@ -68,7 +68,7 @@
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
-    "pkg/core/vm/interpreter.go": "47abbe479a5e5ccf1dd724a91ffea0e2e49845cfe57fd8b17bebfec8693d929e",
+    "pkg/core/vm/interpreter.go": "7aeb4cdd09b4952b2997258fe47ee25e114c3a19d4d25c76d837631530cee438",
     "pkg/core/vm/jump_table.go": "dc6c82c9bbe976f6a7e7b898cf1919a985c0e0bd5f3bdb57d0fbd0c966650d16",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
     "refs/EIPs/EIPS/eip-214.md": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
@@ -172,12 +172,12 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "c973c4aa8c8a1d83442d04bc3f8b542e15e00510",
+  "source_revision": "6f54ec223efd698e888fc4d87273c3880d420b1c",
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native and wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "2bd105f423aa4291cd9cb1b505001584706b18c53a87101bd225d3eb9a39263f",
-    "race_named_pass": 9386,
+    "race_log_sha256": "347fdc2fc0242815eb40404bf287bc5a8161a81e5eb3e56eb13c54aa31aa7dc5",
+    "race_named_pass": 9391,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "required_native_consumer_skips": 0,
@@ -189,7 +189,7 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 85,
-    "python_log_sha256": "a68e06e0cdcf52d877cbb340406885b8e08f7774bce0ae34921a1a5aa5f2c54e",
-    "optimized_python_log_sha256": "3d9b60d9c9162ab85b15d6c0ddc8c9e2057deb50c17f33d8eceb15ec04a7de9a"
+    "python_log_sha256": "2f01fbfb5b63e126caa11f1a435481cb092383c8726daa99e250cf8c277edf87",
+    "optimized_python_log_sha256": "a68e06e0cdcf52d877cbb340406885b8e08f7774bce0ae34921a1a5aa5f2c54e"
   }
 }

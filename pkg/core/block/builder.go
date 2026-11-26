@@ -364,7 +364,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		pendingTxs = b.txPool.Pending()
 	}
 
-	// Separate and sort: regular txs first, then blob txs.
+	// Check blob availability before ordering executable sender heads.
 	// Blob txs are only included when they carry sidecar data (blobs + KZG
 	// commitments + proofs). Without a sidecar the CL would see blob versioned
 	// hashes in the payload but receive an empty BlobsBundle — causing rejection.
@@ -375,7 +375,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			validBlobTxs = append(validBlobTxs, tx)
 		}
 	}
-	allSorted := append(regularTxs, validBlobTxs...)
+	allSorted := orderBuilderTransactions(append(regularTxs, validBlobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	// Partition transactions into non-conflicting groups for parallel execution
 	// observability (gigagas parallel path, M+ roadmap). The groups are not yet
@@ -736,9 +736,8 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		gasUsed  uint64
 	)
 
-	// Sort transactions: separate regular and blob, each by price descending.
-	regularTxs, blobTxs := sortedTxListsAt(txsByPrice, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
-	allSorted := append(regularTxs, blobTxs...)
+	// Apply the local class preference among executable sender heads.
+	allSorted := orderBuilderTransactions(txsByPrice, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	snapshot := statedb.Snapshot()
 

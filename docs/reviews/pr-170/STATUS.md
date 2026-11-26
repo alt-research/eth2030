@@ -6,6 +6,8 @@ The latest EIPs master is 514f00c369f9586e4d70a25da798ae2bd3d0ead7. The four C n
 
 A native red control reproduced shared-payer revalidation losing a valid transaction because a later-visited invalid transaction still reserved funds. Revalidation now prepares all transactions against the head and removes invalid entries before shared-resource arbitration, then evicts by expiry and effective priority rather than hash alone. Existing pool tests and the new adversarial controls pass; final combined qualification remains pending.
 
+A second red control reproduced blob/scalar queue partitioning dropping an executable ordinary successor of a blob Frame. Both builder interfaces now apply the existing ordinary-before-blob policy only among executable sender heads. Six actual build/replay cases cover base Frames, EIP-8250 empty-key legacy domains and independent nonempty keyed domains; prior unrelated-sender ordering controls remain intact.
+
 
 ## Current public integration follow-through (2026-11-26)
 

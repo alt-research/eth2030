@@ -55,6 +55,45 @@
       "path": "refs/EIPs/EIPS/eip-8151.md",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80"
+    },
+    {
+      "eip": 2780,
+      "path": "specs/hegota/upstream/2026-11-27/eip-2780.md",
+      "revision": "5310a31af7458fa7d95a8f9ef4a185738495e034",
+      "blob": "5810f375698717ec92251f37505fba2d815bc684",
+      "sha256": "1c6b65ea16676301a01f277aa28875f34677cd65e4cc834b26c2802940329a3b"
+    },
+    {
+      "eip": 8037,
+      "path": "specs/hegota/upstream/2026-11-27/eip-8037.md",
+      "revision": "514f00c369f9586e4d70a25da798ae2bd3d0ead7",
+      "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc",
+      "sha256": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a"
+    },
+    {
+      "eip": 8038,
+      "path": "specs/hegota/upstream/2026-11-27/eip-8038.md",
+      "revision": "b0c9c52b789d0fd7fcc44896456b43daa67b8ca5",
+      "blob": "2953df7781f6dd4ccbd03cc8eaea23a77fd17ba5",
+      "sha256": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864"
+    },
+    {
+      "eip": 7610,
+      "path": "refs/EIPs/EIPS/eip-7610.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e934db8fded813da2d2cf231dbdcd0f829418b5394db3750fb31292d3dbfacd6"
+    },
+    {
+      "eip": 7976,
+      "path": "refs/EIPs/EIPS/eip-7976.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "e8ca247a5565f78af284f1211f3e24d37813f892b73058c79c53562914204859"
+    },
+    {
+      "eip": 7981,
+      "path": "refs/EIPs/EIPS/eip-7981.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "f7dc9e4c9b137619ecdc029d0a294d94664a368d52e842175716fd43eb6219fd"
     }
   ],
   "profiles": {
@@ -104,6 +143,14 @@
       "local_pay_execution_limit": 15000,
       "authorization": "protocol-verified index 1, non-ARBITRARY, empty msg",
       "ecRecover_dependencies": false
+    },
+    "creation-8037-20261127": {
+      "activation": "existing native HogotaTime; canonical Frames only exist at that fork",
+      "collision": "nonce, code or complete current non-empty storage root",
+      "state_charge": "existence before child; storage-only collision rolls back account charge",
+      "unavailable_root": "fail closed",
+      "historical_profiles": "unchanged pinned pre-Hegota replay; not universal retroactive EIP-7610 activation",
+      "record": "docs/reviews/pr-170/LATEST_DEPENDENCIES.md"
     }
   },
   "public_gates": {
@@ -233,7 +280,7 @@
         },
         {
           "id": "C21.2",
-          "statement": "index:** maintain reverse dependency indices and cached pre-state values. Re-simulate affected transactions; unchanged unrelated dependencies must not invoke the VM again. Base/blob fees, dimensional block limits, fork state and time/slot transitions still require their applicable cheap validity checks.",
+          "statement": "index:** maintain reverse dependency indices and cached pre-state values. Re-simulate affected transactions; unchanged unrelated dependencies must not invoke the VM again. Base/blob fees, dimensional block limits, fork state and time/slot transitions still require their applicable cheap validity checks. Sender deployment also depends on the complete pre-state storage root consumed by EIP-7610 collision checks.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling"
@@ -255,7 +302,8 @@
             "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits",
             "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
             "github.com/eth2030/eth2030/txpool::TestFrame8151ActivationInvalidatesPrefixCache",
-            "github.com/eth2030/eth2030/node::TestLoadGenesisFile_ScheduledForksRoundTrip"
+            "github.com/eth2030/eth2030/node::TestLoadGenesisFile_ScheduledForksRoundTrip",
+            "github.com/eth2030/eth2030/txpool::TestFrameCDeploymentStorageRootCacheAndCandidate"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -682,7 +730,8 @@
             "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
-            "github.com/eth2030/eth2030/txpool::TestPR12041BuildRechecksWithdrawalAvailability"
+            "github.com/eth2030/eth2030/txpool::TestPR12041BuildRechecksWithdrawalAvailability",
+            "github.com/eth2030/eth2030/txpool::TestFrameCDeploymentStorageRootCacheAndCandidate"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
@@ -1004,16 +1053,30 @@
           "statement": "completion gate:** every criterion has positive/negative native consumers and current source/test provenance. Full build/vet/tests, affected race and hosted checks pass. Preserve A/B required consumers, independent oracles and explicit optional-test skip reasons. Do not claim official devnet/CL/RC qualification belonging to later groups.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "EIP-8037 Gas accounting for new accounts, merged #12624; EIP-7610 Specification",
+            "EIP-8038 SELFDESTRUCT and cost components, merged #12626",
+            "EIP-2780 Interactions with other EIPs, merged #12622"
           ],
           "files": [
             "pkg/node/frame_c_integration_test.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/node/backend/engine_fcu.go"
+            "pkg/node/backend/engine_fcu.go",
+            "pkg/core/vm/eip7610.go",
+            "pkg/core/vm/amsterdam_create.go",
+            "pkg/core/execution/frame_dependencies.go",
+            "pkg/eiptest/stf.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals",
+            "github.com/eth2030/eth2030/core/vm::TestEIP7610CompleteCurrentStorageRoot",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCCreationStorageCollisionAndRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCCreationCollisionForkBoundary",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCLatestSelfdestructAccountWrite",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCLatestDelegationRecipientWarming",
+            "github.com/eth2030/eth2030/txpool::TestFrameCDeploymentStorageRootCacheAndCandidate",
+            "github.com/eth2030/eth2030/eiptest::TestFrameCSTFCallUsesNativeCreationRules"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -1084,6 +1147,7 @@
     "pkg/cmd/send-frame/main.go",
     "pkg/cmd/send-frame/main_test.go",
     "pkg/cmd/eth2030/main_test.go",
-    "docs/reviews/pr-170/CANONICAL_PAYMASTER.md"
+    "docs/reviews/pr-170/CANONICAL_PAYMASTER.md",
+    "docs/reviews/pr-170/LATEST_DEPENDENCIES.md"
   ]
 }

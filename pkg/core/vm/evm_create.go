@@ -73,7 +73,7 @@ func NewCreateExecutor(rules ForkRules) *CreateExecutor {
 	return &CreateExecutor{
 		maxCodeSize:     MaxCodeSizeForFork(rules),
 		maxInitCodeSize: MaxInitCodeSizeForFork(rules),
-		eip7610Enabled:  rules.IsPrague || rules.IsGlamsterdan,
+		eip7610Enabled:  rules.IsHogota || rules.IsPrague || rules.IsGlamsterdan,
 	}
 }
 

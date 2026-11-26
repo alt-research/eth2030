@@ -266,6 +266,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 // the correct jump table. The caller (processor) converts ChainConfig.Rules
 // into this struct to avoid a circular import.
 type ForkRules struct {
+	IsHogota         bool // selected latest EIP-8037/7610 creation composition
 	IsEIP8151        bool // raw-code restricted ecRecover
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
 	IsGlamsterdan    bool
@@ -1166,6 +1167,15 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, types.Address{}, gas, ErrFrameStateGas
 		}
+	}
+	// The latest EIP-8037 composes EIP-7610. A storage-only destination
+	// still pays the conditional account charge above, then the child rollback
+	// restores it. In particular an underfunded charge halts the creator rather
+	// than being bypassed by an early collision return. Older pinned native
+	// fork profiles retain their historical nonce/code-only collision rule.
+	if (evm.forkRules.IsHogota || evm.frame8141 != nil) && HasNonEmptyStorage(evm.StateDB, contractAddr) {
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
+		return nil, types.Address{}, 0, ErrContractCreationCollision
 	}
 
 	// Reset an eligible existing account, retaining only its prefunding.

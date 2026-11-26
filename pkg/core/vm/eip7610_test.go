@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
@@ -17,6 +18,48 @@ func TestHasNonEmptyStorage_EmptyAccount(t *testing.T) {
 
 	if HasNonEmptyStorage(db, addr) {
 		t.Fatal("expected empty storage for fresh account")
+	}
+}
+
+func TestEIP7610CompleteCurrentStorageRoot(t *testing.T) {
+	for _, trieBacked := range []bool{false, true} {
+		t.Run(map[bool]string{false: "memory", true: "trie"}[trieBacked], func(t *testing.T) {
+			var db state.StateDB = state.NewMemoryStateDB()
+			if trieBacked {
+				db = state.NewTrieStateDB(rawdb.NewMemoryDB())
+			}
+			addr := types.Address{19: 0x90}
+			key, value := types.Hash{0: 0xff, 31: 0x80}, types.Hash{31: 1}
+			if HasNonEmptyStorage(db, addr) {
+				t.Fatal("absent account has non-empty storage")
+			}
+			db.SetState(addr, key, value)
+			if !HasNonEmptyStorage(db, addr) {
+				t.Fatal("dirty arbitrary storage key missed")
+			}
+			if _, err := db.Commit(); err != nil {
+				t.Fatal(err)
+			}
+			if !HasNonEmptyStorage(db, addr) {
+				t.Fatal("committed arbitrary storage key missed")
+			}
+			snapshot := db.Snapshot()
+			db.SetState(addr, key, types.Hash{})
+			if HasNonEmptyStorage(db, addr) {
+				t.Fatal("cleared dirty slot still collides")
+			}
+			db.RevertToSnapshot(snapshot)
+			if !HasNonEmptyStorage(db, addr) {
+				t.Fatal("reverted clearing lost the storage collision")
+			}
+		})
+	}
+	// An adapter exposing only the smaller VM interface cannot certify an
+	// empty root from a handful of slots. Unknown roots must never erase data.
+	db := state.NewMemoryStateDB()
+	adapter := &struct{ StateDB }{db}
+	if !HasNonEmptyStorage(adapter, types.Address{}) {
+		t.Fatal("missing complete-root capability failed open")
 	}
 }
 
@@ -35,7 +78,6 @@ func TestHasNonEmptyStorage_WithHighSlot(t *testing.T) {
 	db := state.NewMemoryStateDB()
 	addr := types.BytesToAddress([]byte{0x03})
 	db.CreateAccount(addr)
-	// Slot 5 is within the probed set.
 	db.SetState(addr, types.BytesToHash([]byte{5}), types.BytesToHash([]byte{0xff}))
 
 	if !HasNonEmptyStorage(db, addr) {
@@ -43,15 +85,15 @@ func TestHasNonEmptyStorage_WithHighSlot(t *testing.T) {
 	}
 }
 
-func TestHasNonEmptyStorage_UnprobedSlot(t *testing.T) {
+func TestHasNonEmptyStorage_ArbitrarySlot(t *testing.T) {
 	db := state.NewMemoryStateDB()
 	addr := types.BytesToAddress([]byte{0x04})
 	db.CreateAccount(addr)
-	// Slot 100 is outside CommonStorageSlots; the probe will miss it.
+	// EIP-7610 covers every key, not a fixed probe set.
 	db.SetState(addr, types.BytesToHash([]byte{100}), types.BytesToHash([]byte{0xaa}))
 
-	if HasNonEmptyStorage(db, addr) {
-		t.Fatal("slot 100 is outside the probed range; should report empty")
+	if !HasNonEmptyStorage(db, addr) {
+		t.Fatal("non-empty storage at slot 100 must collide")
 	}
 }
 

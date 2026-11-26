@@ -26,6 +26,7 @@ const (
 	FrameExistenceDependency
 	FrameStorageDependency
 	FrameSignerClassDependency
+	FrameStorageRootDependency
 )
 
 func (d FrameDependency) Value(db state.StateDB) string {
@@ -49,6 +50,9 @@ func (d FrameDependency) Value(db state.StateDB) string {
 		return "rejected"
 	case FrameStorageDependency:
 		v := db.GetState(d.Address, d.Slot)
+		return string(v[:])
+	case FrameStorageRootDependency:
+		v := db.StorageRoot(d.Address)
 		return string(v[:])
 	default:
 		panic("unknown Frame dependency")
@@ -132,6 +136,10 @@ func (s *frameReadSet) GetState(addr types.Address, slot types.Hash) types.Hash 
 func (s *frameReadSet) GetCommittedState(addr types.Address, slot types.Hash) types.Hash {
 	s.record(addr, FrameStorageDependency, slot)
 	return s.StateDB.GetCommittedState(addr, slot)
+}
+func (s *frameReadSet) StorageRoot(addr types.Address) types.Hash {
+	s.record(addr, FrameStorageRootDependency, types.Hash{})
+	return s.StateDB.StorageRoot(addr)
 }
 func (s *frameReadSet) FinalizePreState() {
 	if f, ok := s.StateDB.(interface{ FinalizePreState() }); ok {

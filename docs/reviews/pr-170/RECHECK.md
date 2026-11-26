@@ -1,5 +1,8 @@
 # Group C independent completeness re-audit
 
+The latest review is [the expanded dependency and candidate-boundary audit](LATEST_DEPENDENCIES.md).
+The qualification records below describe their stated earlier sources.
+
 ## November 27 production-path audit
 
 Starting head: `64d34cfd9111da29f77ee3edd1685d5866666279`. Current implementation:

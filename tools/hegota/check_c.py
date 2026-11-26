@@ -92,8 +92,27 @@ PAYMASTER_REQUIRED = {
 }
 MANDATORY |= PAYMASTER_REQUIRED
 
+LATEST_CREATION_REQUIRED = {
+ 'core/vm::TestEIP7610CompleteCurrentStorageRoot',
+ 'core/execution::TestFrameCCreationStorageCollisionAndRollback',
+ 'core/execution::TestFrameCCreationCollisionForkBoundary',
+ 'core/execution::TestFrameCLatestSelfdestructAccountWrite',
+ 'core/execution::TestFrameCLatestDelegationRecipientWarming',
+ 'txpool::TestFrameCDeploymentStorageRootCacheAndCandidate',
+ 'eiptest::TestFrameCSTFCallUsesNativeCreationRules',
+}
+MANDATORY |= LATEST_CREATION_REQUIRED
+
 def validate_manifest(root, manifest):
     need(manifest['version'] == 2, 'unknown C manifest version')
+    need(manifest['profiles']['creation-8037-20261127'] == {
+        'activation': 'existing native HogotaTime; canonical Frames only exist at that fork',
+        'collision': 'nonce, code or complete current non-empty storage root',
+        'state_charge': 'existence before child; storage-only collision rolls back account charge',
+        'unavailable_root': 'fail closed',
+        'historical_profiles': 'unchanged pinned pre-Hegota replay; not universal retroactive EIP-7610 activation',
+        'record': 'docs/reviews/pr-170/LATEST_DEPENDENCIES.md',
+    }, 'unqualified latest creation dependency composition')
     need(manifest['profiles']['8250-delta']['public_activation'] is False, 'independent oracle promoted to public activation')
     need(manifest['profiles']['8250-public'] == {'public_activation': True, 'activation': 'EIP8250Time; explicit, nil default', 'decision': 'D01-resolved-two-fee', 'fees': ['max_fee', 'max_priority_fee_per_gas']}, 'unqualified 8250 composition')
     decisions = json.loads((root/'specs/hegota/profiles.json').read_text())
@@ -114,7 +133,13 @@ def validate_manifest(root, manifest):
         'ecRecover_dependencies': False,
     }, 'unqualified paymaster proposal/version/authority')
     need(set(manifest['public_gates']) == {'PAYMASTER-CODE'} and all(manifest['public_gates'].values()), 'public specification gate omitted')
-    need({8141, 8250, 8272, 7594, 2718, 1474, 8151} <= {s['eip'] for s in manifest['normative_sources']}, 'missing C normative source')
+    need({8141, 8250, 8272, 7594, 2718, 1474, 8151, 2780, 7610, 7976, 7981, 8037, 8038} <= {s['eip'] for s in manifest['normative_sources']}, 'missing C normative source')
+    latest = {2780: ('5310a31af7458fa7d95a8f9ef4a185738495e034', '5810f375698717ec92251f37505fba2d815bc684'),
+              8037: ('514f00c369f9586e4d70a25da798ae2bd3d0ead7', '43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc'),
+              8038: ('b0c9c52b789d0fd7fcc44896456b43daa67b8ca5', '2953df7781f6dd4ccbd03cc8eaea23a77fd17ba5')}
+    for eip, (revision, blob) in latest.items():
+        source = next(s for s in manifest['normative_sources'] if s['eip'] == eip)
+        need(source['revision'] == revision and source['blob'] == blob and source['path'] == f'specs/hegota/upstream/2026-11-27/eip-{eip}.md', 'latest C dependency authority changed without requalification')
     artifacts = {'specs/hegota/group-c.json', 'tools/hegota/check_b.py', *manifest['additional_artifacts']}
     for source in manifest['normative_sources']:
         need(sha(root/source['path']) == source['sha256'], 'C normative source changed: '+source['path'])

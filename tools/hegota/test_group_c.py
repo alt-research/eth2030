@@ -1,9 +1,33 @@
 import copy
 import json
 import unittest
-from check_c import ROOT, REQUIRED, PAYMASTER_REQUIRED, MODULE, validate_manifest, verify_report
+from check_c import ROOT, REQUIRED, PAYMASTER_REQUIRED, LATEST_CREATION_REQUIRED, MODULE, validate_manifest, verify_report
 
 class GroupCIntegrityTests(unittest.TestCase):
+    def test_latest_creation_consumers_required(self):
+        for boundary in LATEST_CREATION_REQUIRED:
+            manifest=copy.deepcopy(self.manifest)
+            for row in manifest['tasks']:
+                for criterion in row['criteria']:
+                    criterion['tests']=[name for name in criterion['tests'] if name != MODULE+boundary]
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+
+    def test_latest_dependency_authority_required(self):
+        for eip in [2780, 7610, 7976, 7981, 8037, 8038]:
+            manifest=copy.deepcopy(self.manifest)
+            manifest['normative_sources']=[s for s in manifest['normative_sources'] if s['eip'] != eip]
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+        for eip in [2780, 8037, 8038]:
+            manifest=copy.deepcopy(self.manifest)
+            next(s for s in manifest['normative_sources'] if s['eip'] == eip)['revision']='master'
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+
+    def test_latest_creation_profile_required(self):
+        for key, value in [('activation','all historical forks'),('collision','nonce or code'),('state_charge','no state charge on any collision'),('unavailable_root','probe ten slots')]:
+            manifest=copy.deepcopy(self.manifest)
+            manifest['profiles']['creation-8037-20261127'][key]=value
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+
     def setUp(self):
         self.manifest=json.loads((ROOT/'specs/hegota/group-c.json').read_text())
     def test_complete_native_register(self):

@@ -80,3 +80,12 @@ Final local qualification completed on 2026-11-26:
 - Prior-code native/overlay controls reproduce the four follow-up omissions while retaining the relevant positive controls. Earlier factory-funding/paymaster counterexamples and the caught-INVALID review correction remain recorded honestly in C evidence.
 
 All A/B/C source/evidence checks pass. English draft [PR #170](https://github.com/alt-research/eth2030/pull/170) targets `master`. Exact pushed-head hosted verification and immutable workflow links are maintained in its description/current checks; predecessor results are not reused. The prior qualification at `0894e72d` is historical, and its 15 successful hosted checks do not attest to this follow-up head.
+# Latest dependency audit (November 27, 2026)
+
+Latest merged EIP-8037/8038/2780 dependency texts are now pinned separately from
+read-only historical refs. Native creation/storage-root checks, Frame state-gas
+rollback, deployment cache/candidate dependencies and STF fork configuration
+are corrected. Seven mandatory native consumers and provenance/profile guards
+were added. Full source qualification and exact final-head hosted checks are
+in progress; see [LATEST_DEPENDENCIES.md](LATEST_DEPENDENCIES.md).
+

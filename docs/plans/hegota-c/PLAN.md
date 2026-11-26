@@ -2,6 +2,13 @@
 
 Reviewed 2026-11-26 against merged project master `5d777ad06f886c8b20fb010a47e65ddb05df8287` (PR #169). This is the detailed acceptance addendum to Group C of [the development plan](../hegota-development-plan-2026-11.md). Its HGT-020–029 scope supersedes shorthand completion assumptions in the original table; no Group D–J work is implicitly adopted.
 
+The November 27 [dependency re-audit](../../reviews/pr-170/LATEST_DEPENDENCIES.md)
+adds the latest merged EIP-8037/8038/2780 texts to the C source register. The
+selected native Hegota composition rejects complete non-empty storage roots
+on creation and tracks that read for public sender-deployment revalidation.
+Existing historical A/B profiles and independent oracle expectations remain
+pinned; universal retroactive EIP-7610 activation is not claimed.
+
 ## Review conclusion
 
 The original ten-task outline is directionally consistent with the EIPs, but insufficient to establish complete conformance. It omits concrete prefix combinations, top-level permissions, exact context and dependency invalidation, atomic reservation/resource failures, blob transport restrictions and a defined Frame simulation contract. Existing helpers and successful Engine inclusion-list tests do not establish public-pool propagation or ordinary-pool builder integration.

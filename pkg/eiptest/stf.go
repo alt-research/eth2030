@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -130,31 +131,11 @@ func (p *STF) evmCall(statedb state.StateDB, from, to types.Address, data []byte
 		GasPrice: header.BaseFee,
 	}
 	evm := vm.NewEVMWithState(blockCtx, txCtx, vm.Config{}, statedb)
-	// Mirror the state processor: select jump table + precompiles from the
-	// head header's fork rules.
-	rules := p.s.cfg.Rules(header.Number, p.s.cfg.IsMerge(), header.Time)
-	forkRules := vm.ForkRules{
-		IsEIP8151:        rules.IsEIP8151,
-		IsGlamsterdan:    rules.IsGlamsterdan,
-		IsPrague:         rules.IsPrague,
-		IsCancun:         rules.IsCancun,
-		IsShanghai:       rules.IsShanghai,
-		IsMerge:          rules.IsMerge,
-		IsLondon:         rules.IsLondon,
-		IsBerlin:         rules.IsBerlin,
-		IsIstanbul:       rules.IsIstanbul,
-		IsConstantinople: rules.IsConstantinople,
-		IsByzantium:      rules.IsByzantium,
-		IsHomestead:      rules.IsHomestead,
-		IsEIP158:         rules.IsEIP158,
-		IsEIP7708:        rules.IsEIP7708,
-		IsEIP7954:        rules.IsEIP7954,
-		IsIPlus:          rules.IsIPlus,
-		LegacyNativeBLS:  rules.LegacyNativeBLS,
+	// Use production configuration directly. A second field list previously
+	// omitted Osaka/Amsterdam and would also omit the latest creation rules.
+	if _, err := execution.ConfigureBlockEVM(p.s.cfg, header, evm); err != nil {
+		return nil, err
 	}
-	evm.SetJumpTable(vm.SelectJumpTable(forkRules))
-	evm.SetPrecompiles(vm.SelectPrecompiles(forkRules))
-	evm.SetForkRules(forkRules)
 	ret, _, err := evm.Call(from, to, data, header.GasLimit, new(big.Int))
 	if err != nil {
 		return nil, err

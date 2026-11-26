@@ -19,6 +19,9 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 	existent := !evm.StateDB.Empty(address)
 	hash := evm.StateDB.GetCodeHash(address)
 	collision := evm.StateDB.GetNonce(address) != 0 || (hash != (types.Hash{}) && hash != types.EmptyCodeHash)
+	if !collision && evm.forkRules.IsHogota {
+		collision = HasNonEmptyStorage(evm.StateDB, address)
+	}
 	evm.StateDB.AddAddressToAccessList(address)
 	if parent != nil {
 		parent.Gas = gas

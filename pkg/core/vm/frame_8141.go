@@ -66,6 +66,17 @@ type frameJournalState struct {
 	snapshots map[int]FrameStateGas
 }
 
+// Preserve the underlying full-root read through the VM's smaller interface.
+// This also lets public prefix read-set adapters record collision dependencies.
+func (s *frameJournalState) StorageRoot(addr types.Address) types.Hash {
+	if roots, ok := s.StateDB.(interface {
+		StorageRoot(types.Address) types.Hash
+	}); ok {
+		return roots.StorageRoot(addr)
+	}
+	return types.Hash{} // unavailable is not an authenticated empty root
+}
+
 func (s *frameJournalState) Snapshot() int {
 	id := s.StateDB.Snapshot()
 	s.snapshots[id] = s.frame.clone()

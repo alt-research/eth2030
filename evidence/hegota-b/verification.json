@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "f2747400da9bcc295a61f30e1a96e3180fa548237597bcc2315dc5f851db4e4f",
+    "log_sha256": "3668cf702cacc021eb054058638ef6cc5d564e0a21da0e392042882f4280a032",
     "named": {
-      "pass": 23857,
+      "pass": 23874,
       "skip": 124
     },
     "packages": {
@@ -15,7 +15,7 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "a21fd98ef323cc87ba114f1e132c279a13983da8d88e706ff3e8f3ef96fb89ee",
+  "source_fingerprint_sha256": "0a43125417e7d27ecae7688c993c846b448f007f57af2f1b8db9545211ed284e",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
@@ -64,7 +64,7 @@
     "pkg/core/types/tx_frame_test.go": "0ed4abee48bc3e1e28525e8bbf5753f07f9d768ec988df43ac1572ecb86c71e6",
     "pkg/core/vm/amsterdam_gas_table.go": "06dab2b7dd77ffbf267d3c1dff21e6f1b45fe77e970066bffed59fdf8b6dca8b",
     "pkg/core/vm/delegation_gas.go": "8ef2b9e10e80bd1b87451e870907113825319b14ceffbf189f84d171e63720ad",
-    "pkg/core/vm/frame_8141.go": "accb4d185b72285620521be2a72dd382fb9fd5604f961cd0159e375bfce69886",
+    "pkg/core/vm/frame_8141.go": "1377f4b9bce359d7cdbfff4df84103d8b9e587c1c2fbf1e69e3ac1231b9635e6",
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
@@ -172,12 +172,12 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "6f54ec223efd698e888fc4d87273c3880d420b1c",
+  "source_revision": "0c849a53d86259fffd25b7ee9ee7e46f44a43779",
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native and wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "347fdc2fc0242815eb40404bf287bc5a8161a81e5eb3e56eb13c54aa31aa7dc5",
-    "race_named_pass": 9391,
+    "race_log_sha256": "c8d36216a7ca00c7f6b2c4594863f5a932b061468745682e6b6d1974210d6184",
+    "race_named_pass": 9408,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "required_native_consumer_skips": 0,
@@ -188,8 +188,8 @@
       "skipped": 0
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-    "python_regressions": 85,
-    "python_log_sha256": "2f01fbfb5b63e126caa11f1a435481cb092383c8726daa99e250cf8c277edf87",
-    "optimized_python_log_sha256": "a68e06e0cdcf52d877cbb340406885b8e08f7774bce0ae34921a1a5aa5f2c54e"
+    "python_regressions": 86,
+    "python_log_sha256": "2d9b2a687e3e87a090d5ee8fec73820dc16036e353de75798676099063a1973f",
+    "optimized_python_log_sha256": "fac83a8b4fa3762cb5c15c42fce692b019de5fdcdc6bdb474cd9681e5bad6b55"
   }
 }

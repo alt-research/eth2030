@@ -31,5 +31,7 @@ Public specification gates (unresolved, not counted as activated):
 - [x] Recheck upstream source identities, active discussions and the two public specification gates.
 - [x] Re-read Group C normative clauses and independently compare all forty criteria with production code.
 - [x] Exercise missing adversarial boundaries with native regression tests; implement every confirmed omission.
-- [ ] Requalify changed implementation with builds, relevant/full tests and race checks.
-- [ ] Refresh source-bound A/B/C evidence, update English PR content and push all authored changes.
+- [x] Requalify changed implementation with builds, relevant/full tests and race checks.
+- [x] Refresh source-bound A/B/C evidence, update English PR content and push all authored changes.
+
+The follow-up implementation is `0c849a53d86259fffd25b7ee9ee7e46f44a43779`. All 54 mandatory C consumers pass. Exact pushed-head hosted results are maintained in the English PR description/current checks and remain distinct from local qualification and the two unresolved public gates.

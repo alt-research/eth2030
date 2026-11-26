@@ -1,6 +1,7 @@
 package txpool
 
 import (
+	"encoding/binary"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/types"
 	"math"
@@ -203,5 +204,45 @@ func TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix(t *testing.T) {
 	}
 	if len(pool.lookup.frameValidations) != 0 || len(pool.lookup.framePayers) != 0 {
 		t.Fatal("invalid child prefix retained metadata")
+	}
+}
+
+func TestFrameCExpiryQueuesReplacementAndRemoval(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	slot := uint64(2)
+	head := &types.Header{Time: 100, Number: big.NewInt(1), SlotNumber: &slot, GasLimit: 30000000, BaseFee: big.NewInt(1)}
+	pool.Reset(db, head)
+	ref := types.RecentRootReference{Slot: 1, Root: types.Hash{31: 7}}
+	db.SetCode(types.RecentRootAddress, types.RecentRootCode)
+	db.SetState(types.RecentRootAddress, ref.StorageKey(), ref.EntryHash())
+	db.SetCode(types.FrameExpiryVerifier, types.FrameExpiryCode)
+	deadline := make([]byte, 8)
+	binary.BigEndian.PutUint64(deadline, 110)
+	frame.Frames = append([]types.Frame8141{{Mode: types.ModeVerify, Target: &types.FrameExpiryVerifier, Data: deadline, Limits: types.FrameGasLimits{Execution: 5000}}, {Mode: types.ModeVerify, Target: &types.RecentRootAddress, Data: ref.AppendTo(ref.AppendTo(nil)), Limits: types.FrameGasLimits{Execution: 20000}}}, frame.Frames...)
+	old := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(old); err != nil {
+		t.Fatal(err)
+	}
+	if pool.lookup.frameDeadlines.Len() != 1 || pool.lookup.frameRootExpiries.Len() != 1 {
+		t.Fatal("expiry/root dependencies not indexed distinctly")
+	}
+	next := *frame
+	next.Fees = types.FrameFeeBudget{MaxFee: big.NewInt(1100000), MaxPriorityFeePerGas: big.NewInt(3)}
+	replacement := signPoolFrame(t, &next, 1)
+	if err := pool.AddRemote(replacement); err != nil {
+		t.Fatal(err)
+	}
+	if pool.lookup.frameDeadlines.Len() != 1 || pool.lookup.frameDeadlines.byHash[old.Hash()] != nil || pool.lookup.frameRootExpiries.Len() != 1 {
+		t.Fatal("replacement retained old expiry index")
+	}
+	head.Time = 110
+	pool.Reset(db, head)
+	if pool.Get(replacement.Hash()) == nil {
+		t.Fatal("deadline equality expired too early")
+	}
+	slot = 8193
+	pool.Reset(db, head)
+	if pool.Get(replacement.Hash()) != nil || pool.lookup.frameDeadlines.Len() != 0 || pool.lookup.frameRootExpiries.Len() != 0 || len(pool.lookup.frameDependencies) != 0 {
+		t.Fatal("slot expiry leaked queue/dependency records")
 	}
 }

@@ -147,6 +147,8 @@ type StateReader interface {
 
 // txLookup tracks transactions by hash for fast duplicate detection.
 type txLookup struct {
+	frameDeadlines     frameExpiryQueue
+	frameRootExpiries  frameExpiryQueue
 	frameBuildFailures map[types.Hash]uint8
 	all                map[types.Hash]*types.Transaction
 	framePayers        map[types.Hash]types.Address
@@ -167,6 +169,8 @@ func (l *txLookup) Add(tx *types.Transaction) {
 }
 
 func (l *txLookup) Remove(hash types.Hash) {
+	l.frameDeadlines.remove(hash)
+	l.frameRootExpiries.remove(hash)
 	delete(l.all, hash)
 	delete(l.frameBuildFailures, hash)
 	delete(l.framePayers, hash)

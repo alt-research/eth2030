@@ -153,6 +153,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 }
 
 func (lookup *txLookup) installFrameValidation(hash types.Hash, validation *execution.FramePrefixValidation) {
+	lookup.indexFrameExpiry(hash)
 	// A revalidated transaction may have taken a different helper/storage path.
 	if old := lookup.frameValidations[hash]; old != nil {
 		for dep := range old.Dependencies {
@@ -188,6 +189,7 @@ func (pool *TxPool) removeFrameLocked(hash types.Hash) {
 	}
 }
 func (pool *TxPool) revalidateFrames8141() {
+	pool.expireFrames8141()
 	// Solvency conflicts have a deterministic survivor set, independent of Go map order.
 	var txs []*types.Transaction
 	for _, tx := range pool.lookup.all {

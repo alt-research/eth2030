@@ -269,11 +269,13 @@
             "pkg/txpool/frame_8250_delta.go",
             "pkg/core/execution/frame_8250.go",
             "pkg/core/types/frame_8272.go",
-            "pkg/txpool/frame_8141.go"
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/frame_expiry.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
+            "github.com/eth2030/eth2030/txpool::TestFrameCExpiryQueuesReplacementAndRemoval"
           ],
           "scope": "selected profiles; public gates unchanged"
         },
@@ -882,6 +884,7 @@
     "docs/plans/hegota-c/RPC_PROFILE.md",
     ".github/workflows/ci.yml",
     "tools/hegota/check_c.py",
-    "tools/hegota/test_group_c.py"
+    "tools/hegota/test_group_c.py",
+    "pkg/txpool/frame_expiry.go"
   ]
 }

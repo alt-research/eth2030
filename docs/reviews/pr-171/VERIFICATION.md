@@ -80,3 +80,15 @@ verdict. Existing A/B/C release gates remain in force.
 
 The PR's exact-head hosted checks are the live CI authority; this offline record
 claims the local runs above, not an unobserved hosted result.
+
+## Hosted observation
+
+On head `335466499783ceed25de596e2ba0fb8b3e5fb67d`, all nine
+[CI jobs](https://github.com/alt-research/eth2030/actions/runs/45895680692)
+and [independent snap2 interoperability](https://github.com/alt-research/eth2030/actions/runs/45895680579)
+completed successfully. This includes the complete selected official native
+state/blockchain corpora, published application sequences, pinned EF vectors,
+consensus/control fixtures, frozen paymaster rebuild, fixed-source checks,
+full Go tests and all four build variants. Actual canonical-proof acceptance
+and any final documentation-head reruns are separately reported by the live
+PR suite. No pending or canceled run is counted as a pass.

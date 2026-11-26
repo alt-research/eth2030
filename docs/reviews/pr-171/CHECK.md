@@ -19,4 +19,4 @@ consumers; open specification questions must not become invented consensus.
 - [x] Run required builds/vet/tests, full and affected race suites, A/B/C regression checks and source-bound D evidence.
 - [x] Inspect staged changes for conflict markers, duplicate work and baseline drift; preserve root trackers, refs and independent A/B/C oracles.
 - [x] Commit/push and publish [English PR #171](https://github.com/alt-research/eth2030/pull/171).
-- [ ] Verify exact-head hosted results (the PR check suite is the live authority).
+- [x] Verify the hosted CI workflow and independent snap2 interoperability on exact source `335466499783ceed25de596e2ba0fb8b3e5fb67d`; retain the PR suite as authority for final-head reruns and actual proof acceptance.

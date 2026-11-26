@@ -34,3 +34,11 @@ qualification. No automatic token compensation is invented.
 
 Published as [PR #171](https://github.com/alt-research/eth2030/pull/171).
 Hosted exact-head checks are tracked by the PR's live check suite; offline source evidence does not assert a hosted result.
+
+Hosted qualification of source-identical head
+`335466499783ceed25de596e2ba0fb8b3e5fb67d`: the complete nine-job
+[CI workflow](https://github.com/alt-research/eth2030/actions/runs/45895680692)
+and [independent snap2 interoperability](https://github.com/alt-research/eth2030/actions/runs/45895680579)
+passed. This final review-record update changes documentation only. Subsequent
+exact-head reruns and the actual canonical-proof families remain visible in the
+live PR suite; their result is not inferred from these earlier passes.

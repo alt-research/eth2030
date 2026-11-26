@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+  "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -14,7 +14,7 @@
     "docs/plans/hegota-c/COMPOSITION.md": "d13beb21fe8338b34b96252c1075588a5a20a8fa0ccc025e8a620c0e26c95824",
     "docs/plans/hegota-c/PLAN.md": "b646dd3411df998fb3f92b4b10e8f08dedcfc323777908453ce752c7d4b57db2",
     "docs/plans/hegota-c/RPC_PROFILE.md": "a3a5058e25333a3457af0d071e94251d866645eaa8a1a45b65f7274e5f4b1da0",
-    "docs/reviews/pr-170/CANONICAL_PAYMASTER.md": "ae77af4911284a89df5485a653e0ced0dabb38864019404cc3a0effdaf5a2b0d",
+    "docs/reviews/pr-170/CANONICAL_PAYMASTER.md": "42b27fcf83a56a8a6427836de8c1ecaccde7cd49ee698c798ba789fe100a2070",
     "docs/reviews/pr-170/RECHECK.md": "d5f4b8b8b434234fa90d3664a07c8d40d24c2d692e3f0f553d0629e44d76f40a",
     "pkg/cmd/eth2030/main.go": "019095a89383321c095148ada159aa1fbf4e8f2718a2c999378aa1dd9c3107e2",
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
@@ -56,8 +56,8 @@
     "pkg/core/types/frame_8272.go": "0be28d18506b64ee666624d96cc346123db19873a7059ac588fa6003fcec6bf9",
     "pkg/core/vm/ecrecover_8151.go": "6fcdac0b9d8c235b4a69f9ab021afd5140110c04ce62ca6a3e8341814b9f5866",
     "pkg/core/vm/ecrecover_8151_test.go": "4d65054454fc9759237bc57d26ece4d316c375b091d3d7b7724ccb1ae1438cd5",
-    "pkg/core/vm/frame_8141.go": "b009cc82cde9f01bf212f47427f83306e07110a9c2a5ca02dcaad66e8264af0a",
-    "pkg/core/vm/frame_public_validation_test.go": "e1a53e5028840f0260352102ee7f99254b4d4057e86af23991b27d2dcd7f8b1b",
+    "pkg/core/vm/frame_8141.go": "08b4ddb6b2e90b6496d871ab2175fd86bd7fd4aa3a9b4946be29bca3c4590ebe",
+    "pkg/core/vm/frame_public_validation_test.go": "8af1c2c90c78e85070dd413db240946123de54a40219f7b740122ebd5faa9580",
     "pkg/core/vm/interpreter.go": "ca6dcf866b66d10e41365aef704d715731dbb6f7fb5e1cc55048f50e0e0a7261",
     "pkg/eiptest/stf.go": "0c140387c3c8fa5eec600fdbfe7564b76c00ba44d8e30e6c0e286cb5e14628fc",
     "pkg/eth/frame_c_protocol_test.go": "5493b5a2172013dfc208307973d3304d79ade082244a6ee8abe6264a5dfef16b",
@@ -110,14 +110,14 @@
     "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1",
-    "specs/hegota/group-c.json": "09d6ff0e92746d13746165d17e68e5d3b2a5a7796c23197628bdc3805b538e7f",
+    "specs/hegota/group-c.json": "155ee8c415ac7907e5133b43f51ba3ab629356ede64b807bb6a644e33895003e",
     "specs/hegota/profiles.json": "2c98f6ded415c8c7b9651a84d4320b4abb26651386213699cec9f59d5b65fb5d",
     "tools/hegota/README.md": "bf596c9698470ab5bf8752f872bf55062dd1f00eb90a56f9cd139ad0c5bb9c45",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "93ff2116e721c851b38dc1a46e6c8efcceec27d6ea892fcff3754649748e6d1b",
+    "tools/hegota/check_c.py": "4ce9996c41b9caa3c18aecad0a43bcf42c06c82a6e135016d1f08f5f974ee6c3",
     "tools/hegota/test_group_c.py": "3a2fc66ec9ac11622020d0a911869162209f84bfe06ff35d39ea3b2035a4e8d6"
   },
-  "source_fingerprint_sha256": "cfe3699b8e73e9a11ead5e8a0c31d3354ce7b157ba91839913504574d0be4575",
+  "source_fingerprint_sha256": "c0d4512235ab25aaf84b6e51fb70c5f7a75efc87b6aa7b0572ae2fc248de693c",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -154,6 +154,7 @@
     "github.com/eth2030/eth2030/core/vm::TestEIP8151RecoveryCodeClassGasAndUnpaidAccess": "pass",
     "github.com/eth2030/eth2030/core/vm::TestFrameCPublicVerifierPermissionsAreExactAndTopLevel": "pass",
     "github.com/eth2030/eth2030/core/vm::TestFrameCSenderDefaultCodeCallException": "pass",
+    "github.com/eth2030/eth2030/core/vm::TestPR12041PaymasterRecognitionIsFrameBounded": "pass",
     "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds": "pass",
     "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression": "pass",
     "github.com/eth2030/eth2030/eth::TestFrameCStructuredReceiptThroughHandler": "pass",
@@ -212,9 +213,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "35a6fd9b1fb1bb68a4ffc2618f4f486c5647aaf1320205f9af3136bc0a618dc1",
+    "log_sha256": "698a66bab0c036a36c4744f5a8619234b4c4294dfa8f9f9e671bc1dca73d32ff",
     "named": {
-      "pass": 24004,
+      "pass": 24005,
       "skip": 124
     },
     "packages": {
@@ -226,10 +227,10 @@
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "f3c09c78b6bcf46c24b58cda151c04cc20d9fadf6764f5170c6e09d96622509c",
-    "race_log_sha256": "95aedf01b010f46bc31887d022c68e3a2fb93af26570f38e1c1e2861eccd5520",
+    "build_vet_commands_sha256": "91b6a307c831e43ab50705683d068a466fbc24cfe286203ad42f1cee91c705da",
+    "race_log_sha256": "dcc248993e2bbe4e072b6f619b920df6f3f38e043ff18bf3a4f82ac943b40b30",
     "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9587,
+    "race_named_pass": 9588,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "race_completed_packages": 57,
@@ -242,8 +243,8 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 91,
-    "python_log_sha256": "03ab11baca7fd9212d4ce4eacffed0677cd4751ae9c686326b0b696c24f8647c",
-    "optimized_python_log_sha256": "9dce175e6a564eadbcfec8ecb2f25fc472cd3e889a94afaed2565cf1755d798c"
+    "python_log_sha256": "63d463be222b2f3b6456593b8f1121a2ccc45c5d75e76c0df7dc59313920bba0",
+    "optimized_python_log_sha256": "e9646a651e2f9e59b68cf2986a1bac4c7336d3d256b566ab80eb31e3f1190838"
   },
   "negative_controls": [
     {
@@ -370,46 +371,58 @@
     {
       "name": "paymaster-12041-recognition",
       "control_kind": "explicit feature mutation, not an unmodified predecessor",
-      "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+      "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
       "expected_exit_code": 1,
       "overlay_path": "pkg/core/framepay/paymaster_12041.go",
       "overlay_source_sha256": "74f28d93bd8997f4ec7b0c64eeaae185658a350d21986b7f9fe8ead8971db1d2",
-      "log_sha256": "29fd093e634fe9a5db967525ab3294d7b47852401015e9cc3e77a1f5c3bdeeb0",
+      "log_sha256": "cefe722329fd87702e9fde8f9d0b82e2047a96b4cccf790a8a3083f86db61302",
       "failed_native_consumer": "TestPR12041PoolExactSelectionAndUsage",
       "positive_control": "TestFramePaymasterV1AuthenticatesCanonicalSignature passes"
     },
     {
       "name": "paymaster-12041-layout",
       "control_kind": "explicit feature mutation, not an unmodified predecessor",
-      "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+      "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
       "expected_exit_code": 1,
       "overlay_path": "pkg/core/framepay/paymaster_12041.go",
       "overlay_source_sha256": "f3d77ecee5d13bfd8db45af7393ac84a8c6840da94679b8f5a858c730083ba63",
-      "log_sha256": "51c285e67c9d6c3cb8e797f83bfc04e2c3e171451f9dc79bf99912011b0af2f0",
+      "log_sha256": "7e51b3a249c9674af8467216e0cdc27d9f671e30353d8b01076ea4a722a12e6f",
       "failed_native_consumer": "TestPR12041PoolWithdrawalReservationAndLifecycle",
       "positive_control": "TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal passes"
     },
     {
       "name": "paymaster-12041-dependencies",
       "control_kind": "explicit feature mutation, not an unmodified predecessor",
-      "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+      "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
       "expected_exit_code": 1,
       "overlay_path": "pkg/core/execution/frame_8141.go",
       "overlay_source_sha256": "d15ed8400998a4780912cefc55aba23006d4552b4486fac0499c2dddfbc9978c",
-      "log_sha256": "994b8b3882710ff8ef885f570964126924e7dd5a2e352cfd0a462d3da69411aa",
+      "log_sha256": "8a7a1ad5c85267eadf52c6c5356adc37adaf9e57bf60cccdefe7a49df0c707a6",
       "failed_native_consumer": "TestPR12041PoolTracksAllSlotsAndRotation",
       "positive_control": "TestCanonicalFrame8141PoolLastValidNonce passes"
     },
     {
       "name": "paymaster-12041-candidate",
       "control_kind": "explicit feature mutation, not an unmodified predecessor",
-      "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+      "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
       "expected_exit_code": 1,
       "overlay_path": "pkg/txpool/frame_8141.go",
       "overlay_source_sha256": "982adb3975c45b86fcdd7f5a30e0f7581baecb3efefb4f50b47dfe2267c94555",
-      "log_sha256": "ee7cd47ce22e059e75f7637a2c6fa62a6a4881cc80b9cd86f0bb6e8df35cbfa2",
+      "log_sha256": "68647462662569eeb9e09a1a3a5ecb4ff461d018fddff1f04d3a82da523c141f",
       "failed_native_consumer": "TestPR12041BuildRechecksWithdrawalAvailability",
       "positive_control": "TestFrameCBuildContextAndUnpaidRetryBound passes"
+    },
+    {
+      "name": "paymaster-12041-hotpath",
+      "control_kind": "exact prior-source overlay",
+      "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
+      "expected_exit_code": 1,
+      "overlay_path": "pkg/core/vm/frame_8141.go",
+      "overlay_source_sha256": "b009cc82cde9f01bf212f47427f83306e07110a9c2a5ca02dcaad66e8264af0a",
+      "log_sha256": "6c5908a54404994a214a196d50cd5dbd42b857fe2d293e71c3626aa334333944",
+      "failed_native_consumer": "TestPR12041PaymasterRecognitionIsFrameBounded",
+      "positive_control": "TestFrameCPublicVerifierPermissionsAreExactAndTopLevel passes",
+      "prior_source_revision": "b750e897a2a158c38f9da6133f4c7cf643816a75"
     }
   ],
   "review_correction": {
@@ -428,7 +441,7 @@
   },
   "canonical_paymaster_proposal": {
     "status": "complete_selected_proposal",
-    "source_revision": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+    "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
     "upstream_repository": "ethereum/EIPs",
     "upstream_revision": "4a98fcefa5c6f02a25289bf55b9d92902d02b4c6",
     "upstream_merged": false,
@@ -440,6 +453,13 @@
     "source_record": "docs/reviews/pr-170/CANONICAL_PAYMASTER.md",
     "storage": "signer/amount/unlock/new signer; all four dependencies",
     "eip8151": "actual SIGPARAM runtime has no ecRecover dependency; generic recovery paths retain conditional rules",
-    "remaining_gate": "upstream adoption/fork pinning, not a missing local implementation"
+    "remaining_gate": "upstream adoption/fork pinning, not a missing local implementation",
+    "bounded_recognition": {
+      "disabled_raw_code_reads": 0,
+      "selected_frame_max_raw_code_reads": 1,
+      "native_consumer": "github.com/eth2030/eth2030/core/vm::TestPR12041PaymasterRecognitionIsFrameBounded",
+      "snapshot_journal": true,
+      "prior_source_counterexample": "b750e897a2a158c38f9da6133f4c7cf643816a75"
+    }
   }
 }

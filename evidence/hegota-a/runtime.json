@@ -1,8 +1,8 @@
 {
   "date": "2026-11-26",
-  "source_base_commit": "95a0382f7b5b1ea8255521134ec3a4b9658d71ea",
+  "source_base_commit": "4ac957e9a57b5fc42c229b854410c72a8885808a",
   "branch_baseline": "5d777ad06f886c8b20fb010a47e65ddb05df8287",
-  "source_fingerprint_sha256": "93c4a0d090a9b2b6ab5f5c42321e8ec0d8ab3e693eb2c8db0f33ac324f5fcf8c",
+  "source_fingerprint_sha256": "a3ec169e06987ca63064161a086f3c88c8934fc8840714de642c75bde79cc674",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "56e32030782bf723797675c59dd7c2ed90087614a8d2d2ca2d322a61c5e83514",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -90,11 +90,11 @@
     "pkg/core/vm/eip7708_test.go": "ab4b5f1756b4ab36b44621d7bb9a6d9e1dd20f75c9f2c049e94dfc1968b20a7c",
     "pkg/core/vm/eip8141_opcodes_test.go": "ac8ac5e4c56e9ab5f34eb21300fa39d304945c7a8f55e1716a3523f20f5298af",
     "pkg/core/vm/evm_call_handlers.go": "f52fc42f22163df52f6807dcb26dc9f1aa59d3fc43403f6403950db4f1441f0c",
-    "pkg/core/vm/frame_8141.go": "b009cc82cde9f01bf212f47427f83306e07110a9c2a5ca02dcaad66e8264af0a",
+    "pkg/core/vm/frame_8141.go": "08b4ddb6b2e90b6496d871ab2175fd86bd7fd4aa3a9b4946be29bca3c4590ebe",
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
-    "pkg/core/vm/frame_public_validation_test.go": "e1a53e5028840f0260352102ee7f99254b4d4057e86af23991b27d2dcd7f8b1b",
+    "pkg/core/vm/frame_public_validation_test.go": "8af1c2c90c78e85070dd413db240946123de54a40219f7b740122ebd5faa9580",
     "pkg/core/vm/hegota_activation_test.go": "191393af7ec2e2bc486bc6c1cb8b002f88eb71c56d1036934fcb3292e761a915",
     "pkg/core/vm/interpreter.go": "ca6dcf866b66d10e41365aef704d715731dbb6f7fb5e1cc55048f50e0e0a7261",
     "pkg/core/vm/jump_table.go": "dc6c82c9bbe976f6a7e7b898cf1919a985c0e0bd5f3bdb57d0fbd0c966650d16",
@@ -194,7 +194,7 @@
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "f51c8828fa73cb88cded339bd36ca898a199d9ae227ab9adde567e6c9a30c5b6",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "93ff2116e721c851b38dc1a46e6c8efcceec27d6ea892fcff3754649748e6d1b",
+    "tools/hegota/check_c.py": "4ce9996c41b9caa3c18aecad0a43bcf42c06c82a6e135016d1f08f5f974ee6c3",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
@@ -207,14 +207,14 @@
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "9ba081aa1c78e2bb2bc521302b4de9c9225f1f42a049b416c222d2807a76ff8c",
+      "sha256": "aa5f1dd932c94bd9c25e7baccca5aa81ba53214d5fbbdd280f056bb97fbb08a6",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "current source host build/version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "9bb5e429dbae6f9850615fe7fe4e46f5d48da0c6a5e1aa1e2fc92dbfeee4e9df",
+      "sha256": "1b731769694271879221c396078b823fdecaad6b28b18bd3a393acec3da207a7",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "current source host build/version; actual native node exercised by fresh full/race suites; no container claim"
     }

@@ -16,3 +16,7 @@ Local qualification completed on 2026-11-26:
 - A prior isolated-policy overlay fails the code-adoption paymaster-cap counterexample. Caught INVALID also passes against the prior interpreter and is correctly recorded as extra coverage, not a new defect.
 
 All A/B/C source/evidence checks pass. Shared-payer exposure uses already-validated prefix classification, avoiding repeated verification of unrelated signatures. English draft [PR #170](https://github.com/alt-research/eth2030/pull/170) is published from `codex/hegota-c-integration` against `master`. Exact-head hosted verification and immutable workflow links are maintained in the PR description/current checks. They remain required in addition to this source-bound local record; predecessor results are not reused for a new head.
+
+## Follow-up completeness audit
+
+A fresh clause-to-production-code audit is in progress at the user's request, starting from `0894e72d999bdd27b9515dd3264d8227fdd3ded8`. Prior success records are retained as historical qualification, not substituted for qualification of any follow-up changes. Upstream EIPs master and paymaster PR #12041 were rechecked: their identities and open specification gates are unchanged.

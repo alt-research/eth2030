@@ -25,3 +25,11 @@ Public specification gates (unresolved, not counted as activated):
 
 - [ ] D01: authoritative EIP-8141/EIP-8250 combined envelope; the nonce-only profile remains isolated.
 - [ ] Upstream canonical-paymaster compiled runtime: PR #12041 remains unmerged; the local v1 template remains opt-in research code.
+
+## Follow-up completeness audit (2026-11-26)
+
+- [ ] Recheck upstream source identities, active discussions and the two public specification gates.
+- [ ] Re-read Group C normative clauses and independently compare all forty criteria with production code.
+- [ ] Exercise missing adversarial boundaries with native regression tests; implement every confirmed omission.
+- [ ] Requalify changed implementation with builds, relevant/full tests and race checks.
+- [ ] Refresh source-bound A/B/C evidence, update English PR content and push all authored changes.

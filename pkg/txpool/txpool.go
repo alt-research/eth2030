@@ -1431,6 +1431,9 @@ func EffectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
 
 // EffectiveGasPriceAt uses the total fee budget at the actual blob-fee context.
 func EffectiveGasPriceAt(tx *types.Transaction, baseFee, blobFee *big.Int) *big.Int {
+	if blobFee == nil {
+		blobFee = big.NewInt(1)
+	}
 	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
 		payment, err := frame.Payment(baseFee, blobFee)
 		if err != nil {

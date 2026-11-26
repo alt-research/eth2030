@@ -375,7 +375,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			validBlobTxs = append(validBlobTxs, tx)
 		}
 	}
-	allSorted := orderTransactionsAt(append(regularTxs, validBlobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
+	allSorted := append(regularTxs, validBlobTxs...)
 
 	// Partition transactions into non-conflicting groups for parallel execution
 	// observability (gigagas parallel path, M+ roadmap). The groups are not yet
@@ -738,7 +738,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 
 	// Sort transactions: separate regular and blob, each by price descending.
 	regularTxs, blobTxs := sortedTxListsAt(txsByPrice, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
-	allSorted := orderTransactionsAt(append(regularTxs, blobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
+	allSorted := append(regularTxs, blobTxs...)
 
 	snapshot := statedb.Snapshot()
 

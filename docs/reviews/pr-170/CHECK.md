@@ -1,5 +1,12 @@
 # Hegota Group C checklist
 
+## Latest-specification and candidate-boundary audit (2026-11-27)
+
+- [ ] Recheck every C normative source and consumed dependency against current upstream history and discussion.
+- [ ] Reconcile all forty criteria, emphasizing candidate failure/cancellation, resource restoration, cache boundaries and head transitions.
+- [ ] Reproduce and fix every confirmed omission using native counterexamples; preserve positive controls and independent expectations.
+- [ ] Verify required consumers/builds and any necessary full/race checks, update status/evidence and publish English exact-head results.
+
 ## Independent C production-path audit (2026-11-27)
 
 - [x] Reconcile current upstream EIP files, discussions and PR state with the forty-criterion register.

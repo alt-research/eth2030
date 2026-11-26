@@ -1,5 +1,12 @@
 # Hegota Group C checklist
 
+## Independent C production-path audit (2026-11-27)
+
+- [ ] Reconcile current upstream EIP files, discussions and PR state with the forty-criterion register.
+- [ ] Independently inspect validation, fee/context caches, simulation bounds, wire/RPC decoding and canonical lifecycle combinations.
+- [ ] Reproduce and correct every confirmed omission with native counterexamples and positive controls.
+- [ ] Qualify current source, preserve independent oracles, update evidence/status and publish English current-head results.
+
 ## Post-paymaster independent C audit
 
 - [x] Recheck current EIP text/discussion identities and all forty criteria against actual production entrypoints.

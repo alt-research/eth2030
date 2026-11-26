@@ -145,9 +145,16 @@ func (p *KeyedFramePolicy8250Delta) Revalidate(cfg *config.ChainConfig, db state
 	}
 	sort.Slice(senders, func(i, j int) bool { return bytes.Compare(senders[i][:], senders[j][:]) < 0 })
 	totals := make(map[types.Address]*big.Int)
+	paymasters := make(map[types.Address]bool)
 	for _, sender := range senders {
 		entry := p.entries[sender]
 		payer := entry.validation.Payer
+		end, _ := entry.tx.ValidationPrefix8250(header.Time)
+		codedPay := entry.tx.Frames[end].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0
+		if codedPay && paymasters[payer] {
+			delete(p.entries, sender)
+			continue
+		}
 		if totals[payer] == nil {
 			totals[payer] = new(big.Int)
 		}
@@ -156,6 +163,9 @@ func (p *KeyedFramePolicy8250Delta) Revalidate(cfg *config.ChainConfig, db state
 			delete(p.entries, sender)
 		} else {
 			totals[payer] = next
+			if codedPay {
+				paymasters[payer] = true
+			}
 		}
 	}
 }

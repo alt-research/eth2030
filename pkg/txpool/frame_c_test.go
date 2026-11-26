@@ -188,3 +188,20 @@ func TestFrameCZeroFeeBudgetDoesNotPanic(t *testing.T) {
 		t.Fatal("zero fee Frame lost on unchanged head")
 	}
 }
+
+func TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix(t *testing.T) {
+	pool, db, frame := framePoolFixture(t)
+	helper := types.Address{19: 0x90}
+	db.SetCode(helper, []byte{0xfe})
+	code := []byte{0x5f, 0x5f, 0x5f, 0x5f, 0x73}
+	code = append(code, helper[:]...)
+	code = append(code, 0x61, 0x27, 0x10, 0xfa, 0x50, 0x60, 3, 0x5f, 0x5f, 0xaa)
+	db.SetCode(frame.Sender, code)
+	frame.Frames[0].Limits.Execution = 30000
+	if err := pool.AddRemote(signPoolFrame(t, frame, 1)); err == nil {
+		t.Fatal("caught INVALID lost its public validation trace error")
+	}
+	if len(pool.lookup.frameValidations) != 0 || len(pool.lookup.framePayers) != 0 {
+		t.Fatal("invalid child prefix retained metadata")
+	}
+}

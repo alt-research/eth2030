@@ -424,6 +424,13 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 		}
 		operation := evm.jumpTable[op]
 		if operation == nil || operation.execute == nil {
+			// INVALID has no dispatch entry, but is still a banned validation
+			// opcode even if a parent catches the child's exceptional halt.
+			if op == INVALID {
+				if err := evm.checkFrameValidation(op, contract, stack, pc); err != nil {
+					evm.frameValidationErr = err
+				}
+			}
 			return nil, ErrInvalidOpCode
 		}
 

@@ -80,3 +80,34 @@ func TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion(t *testing.T
 		})
 	}
 }
+
+func TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster(t *testing.T) {
+	native, db, base := framePoolFixture(t)
+	db.SetNonce(types.NonceManager8250, 1)
+	db.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+	payer := framePoolAddress(t, 3)
+	head := &types.Header{Number: big.NewInt(1), Time: 100, GasLimit: 30000000, BaseFee: big.NewInt(1)}
+	policy := NewKeyedFramePolicy8250Delta()
+	for _, keyNumber := range []int{1, 2} {
+		tx := &types.FrameTx8250Delta{ChainID: base.ChainID, Sender: framePoolAddress(t, keyNumber), NonceKeys: []*big.Int{big.NewInt(1)}, Fees: base.Fees, Frames: []types.Frame8141{{Mode: types.ModeVerify, Flags: 2, Limits: types.FrameGasLimits{Execution: 1000}}, {Mode: types.ModeVerify, Flags: 1, Target: &payer, Limits: types.FrameGasLimits{Execution: 10000, State: 97920}}}}
+		signKeyedPolicyFrame(t, tx, keyNumber)
+		tx.Signatures = append(tx.Signatures, types.FrameSignature{Scheme: 1, Signer: &payer, Signature: make([]byte, 65)})
+		hash, _ := tx.SigningHash()
+		for i, k := range []int{keyNumber, 3} {
+			key, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", k))
+			sig, _ := gethcrypto.Sign(hash[:], key)
+			tx.Signatures[i].Signature = append([]byte{sig[64]}, sig[:64]...)
+		}
+		if err := policy.Admit(native.frameConfig, db, head, tx, big.NewInt(1)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(policy.entries) != 2 {
+		t.Fatal("empty-code sponsor incorrectly capped")
+	}
+	db.SetCode(payer, []byte{0x60, 1, 0x5f, 0x5f, 0xaa})
+	policy.Revalidate(native.frameConfig, db, head, big.NewInt(1))
+	if len(policy.entries) != 1 {
+		t.Fatal("code adoption bypassed noncanonical paymaster cap")
+	}
+}

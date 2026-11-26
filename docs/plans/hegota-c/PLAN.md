@@ -81,7 +81,7 @@ These boundaries are tracked separately from implemented mechanisms and executed
 
 ### HGT-027: public submission/query
 
-- **C27.1 submission:** real native eth_sendRawTransaction accepts valid plain/nonblob and network-wrapped blob Frames through the same admission path as gossip. Strict DATA/QUANTITY widths, canonical decoding, invalid signature and sidecar errors are explicit; public keyed decoding stays gated.
+- **C27.1 submission:** real native eth_sendRawTransaction accepts valid plain/nonblob and network-wrapped blob Frames through the same admission path as gossip. Strict DATA/QUANTITY widths, canonical decoding, invalid signature and sidecar errors are explicit; keyed admission/execution require the schema selected by explicit EIP8250Time.
 - **C27.2 transactions:** pending/mined/by-block queries return exact original identity, sender, chain/nonce, modes/flags/targets/limits/values/data, signatures/fees/blob hashes. Per-gas display fields cannot replace total max_fee. Invalid user JSON is not silently discarded.
 - **C27.3 receipts:** return payer and ordered frame results, execution/state usage, skipped/failed effects, global log indices and committed roots, including cold disk readback. Pin/document the derived transaction status API policy; do not add it to consensus RLP.
 - **C27.4 lifecycle:** inclusion, canonical fork selection, orphaned receipt queries, historical body retrieval, restart and fee derivation use the same original block context and persisted bytes.

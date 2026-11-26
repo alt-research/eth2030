@@ -182,7 +182,7 @@
       "criteria": [
         {
           "id": "C21.1",
-          "statement": "capture:** record sender nonce/code/balance/existence/storage, helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries. With EIP8151Time, record paid raw-code class reads and separate helper hashes; invalidate on either-direction class changes, retaining reads across revert and omitting unpaid accesses.",
+          "statement": "capture:** record sender code/balance/existence/storage and the selected nonce domains (legacy nonce only for the legacy domain or an explicit TXPARAM(0x0D) read), helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries. With EIP8151Time, record paid raw-code class reads and separate helper hashes; invalidate on either-direction class changes, retaining reads across revert and omitting unpaid accesses.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
@@ -283,7 +283,7 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8250 Mempool (isolated delta only)"
+            "EIP-8250 Mempool (selected nonce profile)"
           ],
           "files": [
             "pkg/txpool/frame_8250_delta.go",
@@ -303,7 +303,7 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8250 Mempool (isolated delta only)"
+            "EIP-8250 Mempool (selected nonce profile)"
           ],
           "files": [
             "pkg/txpool/frame_8250_delta.go",
@@ -323,7 +323,7 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8250 Mempool (isolated delta only)"
+            "EIP-8250 Mempool (selected nonce profile)"
           ],
           "files": [
             "pkg/txpool/frame_8250_delta.go",
@@ -345,7 +345,7 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8250 Mempool (isolated delta only)",
+            "EIP-8250 Mempool (selected nonce profile)",
             "EIP-8250 Activation / Mempool / Transaction payload; EIPs #11968 and #12414"
           ],
           "files": [
@@ -692,7 +692,7 @@
       "criteria": [
         {
           "id": "C27.1",
-          "statement": "submission:** real native eth_sendRawTransaction accepts valid plain/nonblob and network-wrapped blob Frames through the same admission path as gossip. Strict DATA/QUANTITY widths, canonical decoding, invalid signature and sidecar errors are explicit; public keyed decoding stays gated.",
+          "statement": "submission:** real native eth_sendRawTransaction accepts valid plain/nonblob and network-wrapped blob Frames through the same admission path as gossip. Strict DATA/QUANTITY widths, canonical decoding, invalid signature and sidecar errors are explicit; keyed admission/execution require the schema selected by explicit EIP8250Time.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection"
           ],

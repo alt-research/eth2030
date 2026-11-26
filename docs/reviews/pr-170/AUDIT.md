@@ -1,5 +1,7 @@
 # Group C specification and implementation audit
 
+Earlier audit sections are historical; the dated public composition follow-through supersedes their D01-open conclusion.
+
 Reviewed on 2026-11-26 from merged Group B baseline `5d777ad06f886c8b20fb010a47e65ddb05df8287`. The [detailed plan](../../plans/hegota-c/PLAN.md) contains all ten tasks and forty criteria; [the native register](../../../specs/hegota/group-c.json) binds clauses, code and executed consumers. No Group D–J qualification is implied.
 
 ## Specification decisions

@@ -44,6 +44,20 @@ func (pool *TxPool) frameProfile() string {
 	return string(encoded) + string(rules) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1)
 }
 func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
+	validation, err := pool.prepareFrame8141Result(tx)
+	if err != nil {
+		return nil, err
+	}
+	frame := tx.Inner().(*types.FrameTx8141)
+	if err := pool.validateFrameResources8141(frame, validation, true); err != nil {
+		return nil, err
+	}
+	return validation, nil
+}
+
+// Prepare against the head independently of other pending transactions. This
+// stage can remove stale entries before shared reservations are arbitrated.
+func (pool *TxPool) prepareFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
 	frame := tx.Inner().(*types.FrameTx8141)
 	if pool.frameConfig == nil || !pool.frameConfig.IsMerge() || !pool.frameConfig.IsHogota(pool.frameTime) {
 		return nil, errors.New("EIP-8141 requires Bogotá")
@@ -119,42 +133,56 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 		}
 		validation.Profile = profile
 	}
-	if err := pool.validateFrameSigners8151(frame, validation); err != nil {
-		return nil, err
-	}
-	payer := validation.Payer
-	reserved := frameMaxFee(frame.Fees.MaxFee)
-	canonical := pool.config.ExperimentalFramePaymasterV1 && frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
-	if canonical {
-		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
-	}
-	noncanonical := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0 && !canonical
-	for hash, pending := range pool.lookup.all {
-		other, ok := pending.Inner().(*types.FrameTx8141)
-		if !ok {
-			continue
-		}
-		if other.SameReplayIdentity(frame) {
-			continue
-		}
-		if other.Sender == frame.Sender {
-			return nil, errors.New("one pending Frame transaction per sender")
-		}
-		if pool.lookup.framePayers[hash] == payer {
-			reserved.Add(reserved, frameMaxFee(other.Fees.MaxFee))
-			if noncanonical && frameHasPayPrefix(other.Frames) {
-				return nil, errors.New("non-canonical Frame paymaster already has a pending transaction")
-			}
-		}
-	}
-	if db.GetBalance(payer).Cmp(reserved) < 0 {
-		return nil, ErrInsufficientFunds
-	}
-	if err := state.ReadError(db); err != nil {
+	if err := pool.validateFrameResources8141(frame, validation, false); err != nil {
 		return nil, err
 	}
 	tx.SetSender(frame.Sender)
 	return validation, nil
+}
+
+// EIP-8141 reservations use the signed max_fee, with one withdrawal per payer.
+// Aggregate checks run only after all head-invalid entries have left the pool.
+func (pool *TxPool) validateFrameResources8141(frame *types.FrameTx8141, validation *execution.FramePrefixValidation, aggregate bool) (result error) {
+	db := pool.state.(state.StateDB)
+	defer func() {
+		if err := state.ReadError(db); err != nil {
+			result = err
+		}
+	}()
+	if aggregate {
+		if err := pool.validateFrameSigners8151(frame, validation); err != nil {
+			return err
+		}
+	}
+	payer := validation.Payer
+	reserved := frameMaxFee(frame.Fees.MaxFee)
+	pay := frameHasPayPrefix(frame.Frames)
+	canonical := pool.config.ExperimentalFramePaymasterV1 && pay && framepay.IsV1(db.GetCode(payer))
+	if canonical {
+		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
+	}
+	noncanonical := pay && db.GetCodeSize(payer) > 0 && !canonical
+	if aggregate {
+		for hash, pending := range pool.lookup.all {
+			other, ok := pending.Inner().(*types.FrameTx8141)
+			if !ok || other.SameReplayIdentity(frame) {
+				continue
+			}
+			if other.Sender == frame.Sender {
+				return errors.New("one pending Frame transaction per sender")
+			}
+			if pool.lookup.framePayers[hash] == payer {
+				reserved.Add(reserved, frameMaxFee(other.Fees.MaxFee))
+				if noncanonical && frameHasPayPrefix(other.Frames) {
+					return errors.New("non-canonical Frame paymaster already has a pending transaction")
+				}
+			}
+		}
+	}
+	if db.GetBalance(payer).Cmp(reserved) < 0 {
+		return ErrInsufficientFunds
+	}
+	return nil
 }
 
 func (lookup *txLookup) installFrameValidation(hash types.Hash, validation *execution.FramePrefixValidation) {
@@ -195,20 +223,42 @@ func (pool *TxPool) removeFrameLocked(hash types.Hash) {
 }
 func (pool *TxPool) revalidateFrames8141() {
 	pool.expireFrames8141()
-	// Solvency conflicts have a deterministic survivor set, independent of Go map order.
 	var txs []*types.Transaction
 	for _, tx := range pool.lookup.all {
 		if isCanonicalFrame8141(tx) {
 			txs = append(txs, tx)
 		}
 	}
+	// Preparation is deterministic but does not arbitrate against stale peers.
 	sort.Slice(txs, func(i, j int) bool { a, b := txs[i].Hash(), txs[j].Hash(); return bytes.Compare(a[:], b[:]) < 0 })
+	var valid []*types.Transaction
 	for _, tx := range txs {
-		v, err := pool.validateFrame8141Result(tx)
+		validation, err := pool.prepareFrame8141Result(tx)
 		if err != nil {
 			pool.removeFrameLocked(tx.Hash())
-		} else {
-			pool.lookup.installFrameValidation(tx.Hash(), v)
+			continue
+		}
+		pool.lookup.installFrameValidation(tx.Hash(), validation)
+		valid = append(valid, tx)
+	}
+	// All metadata now describes the same head. Evict nearest expiry, then
+	// lowest effective priority, retaining deterministic hash ties.
+	sort.Slice(valid, func(i, j int) bool {
+		a, b := valid[i], valid[j]
+		if ae, be := frameExpiry(a), frameExpiry(b); ae != be {
+			return ae < be
+		}
+		ap, bp := EffectiveGasPriceAt(a, pool.baseFee, pool.blobBaseFee), EffectiveGasPriceAt(b, pool.baseFee, pool.blobBaseFee)
+		if order := ap.Cmp(bp); order != 0 {
+			return order < 0
+		}
+		ah, bh := a.Hash(), b.Hash()
+		return bytes.Compare(ah[:], bh[:]) < 0
+	})
+	for _, tx := range valid {
+		frame := tx.Inner().(*types.FrameTx8141)
+		if err := pool.validateFrameResources8141(frame, pool.lookup.frameValidations[tx.Hash()], true); err != nil {
+			pool.removeFrameLocked(tx.Hash())
 		}
 	}
 }

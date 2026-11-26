@@ -1,5 +1,12 @@
 # Hegota Group C status
 
+## Independent completeness re-audit in progress
+
+The latest EIPs master is 514f00c369f9586e4d70a25da798ae2bd3d0ead7. The four C normative documents are text-identical to the pinned references; consensus-specs and the open canonical-paymaster proposal are unchanged. Unmerged proof-frame, witness-read and validation-budget proposals are tracked without adoption.
+
+A native red control reproduced shared-payer revalidation losing a valid transaction because a later-visited invalid transaction still reserved funds. Revalidation now prepares all transactions against the head and removes invalid entries before shared-resource arbitration, then evicts by expiry and effective priority rather than hash alone. Existing pool tests and the new adversarial controls pass; final combined qualification remains pending.
+
+
 ## Current public integration follow-through (2026-11-26)
 
 D01 is resolved for the selected native 8141/8250 two-fee composition by merged author/base history, with the earlier decision preserved in profiles.json. See [COMPOSITION.md](../../plans/hegota-c/COMPOSITION.md). The public eight-field reader, explicit EIP8250Time, nonce-domain-aware pool/order/replacement/dependencies, public RPC/P2P/simulation/build/import/reorg/restart consumers and optional EIP8151Time signer protection are implemented. New native tests cover both activation directions, raw-code gas/BAL behavior and separate signer shares. Typed direct queries and txpool indexing also preserve complete keyed fields and independent replay identities.

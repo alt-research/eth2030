@@ -1,5 +1,13 @@
 # Hegota Group C checklist
 
+## Independent completeness re-audit
+
+- [ ] Recheck upstream EIP/consensus identities, merged changes and live discussion/review status.
+- [ ] Re-read every C normative clause and trace its actual admission, revalidation, builder, transport and RPC consumers.
+- [ ] Exercise interactions absent from the existing register, especially simultaneous dependency failures and shared-resource transitions.
+- [ ] Reproduce each confirmed omission before fixing it; preserve independent oracle expectations and reference contents.
+- [ ] Requalify the final source, refresh A/B/C evidence and publish the English PR with exact-head hosted results.
+
 ## Public integration follow-through (2026-11-26)
 
 The earlier D01 gate below is historical. EIPs #11968 establishes inheritance

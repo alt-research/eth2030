@@ -14,4 +14,4 @@ Local qualification completed on 2026-11-26:
 - The actual two-peer plain/blob path covers HTTP submission, fetch/admission, ordinary pool building without IL injection, independent import/FCU, exact bytes, state/receipts and restart. Authenticated simulation/trace retains no canonical or pool effects.
 - A prior isolated-policy overlay fails the code-adoption paymaster-cap counterexample. Caught INVALID also passes against the prior interpreter and is correctly recorded as extra coverage, not a new defect.
 
-All A/B/C source/evidence checks pass. Hosted checks and PR publication are pending; no older B run is reused as a current-head CI result.
+All A/B/C source/evidence checks pass. English draft [PR #170](https://github.com/alt-research/eth2030/pull/170) is published from `codex/hegota-c-integration` against `master`. Hosted checks are pending; no older B run is reused as a current-head CI result.

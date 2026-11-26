@@ -18,7 +18,8 @@ Baseline: merged master `5d777ad06f886c8b20fb010a47e65ddb05df8287`, after PR #16
 - [x] HGT-029: external RPC, two-peer propagation, build/import, receipts and restart/reorg end-to-end consumers.
 - [x] Add meaningful positive/negative tests and a complete clause-to-code-to-consumer register; preserve all A/B checks.
 - [x] Build/vet, full/race qualification, mandatory A/B/C consumers and source-bound evidence.
-- [ ] Push and publish an English PR, then verify current-head hosted checks.
+- [x] Push and publish English draft PR #170 in `alt-research/eth2030`.
+- [ ] Verify current-head hosted checks.
 
 Public specification gates (unresolved, not counted as activated):
 

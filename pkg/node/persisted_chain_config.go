@@ -22,6 +22,7 @@ var scheduledConfigFields = []string{
 	"BerlinBlock", "LondonBlock", "ArrowGlacierBlock", "GrayGlacierBlock",
 	"ShanghaiTime", "CancunTime", "PragueTime", "OsakaTime", "AmsterdamTime",
 	"GlamsterdanTime", "HogotaTime", "EIP8250Time", "EIP8151Time", "IPlusTime", "SSZBlockTime", "BPO1Time", "BPO2Time",
+	"EIP8298Time", "EIP7906Time", "EIP8504Time",
 }
 
 func checkPersistedChainConfig(db rawdb.Database, incoming *config.ChainConfig) error {

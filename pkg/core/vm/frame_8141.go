@@ -232,6 +232,14 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 		}()
 	}
 	evm.returnData = nil
+	if frame.Mode == types.ModeProof8504 {
+		if !evm.forkRules.IsEIP8504 {
+			return 0, errors.New("proof frame before EIP-8504 activation")
+		}
+		// Witness verification belongs to block/admission validation. This frame
+		// performs no call, destination access, warming, state change or log.
+		return 0, nil
+	}
 	snapshot := evm.StateDB.Snapshot()
 	gasLeft = frame.Limits.Execution
 	defer func() {
@@ -281,7 +289,7 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	}
 	evm.TxContext.Origin = caller
 	previousStatic := evm.readOnly
-	evm.readOnly = frame.Mode == types.ModeVerify
+	evm.readOnly = frame.Mode == types.ModeVerify || frame.Mode == types.ModeAssert7906
 	defer func() { evm.readOnly = previousStatic }()
 	if _, precompile := evm.precompile(target); !precompile && len(evm.StateDB.GetCode(target)) == 0 {
 		if frame.Mode == types.ModeVerify {

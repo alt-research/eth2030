@@ -266,6 +266,9 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 // the correct jump table. The caller (processor) converts ChainConfig.Rules
 // into this struct to avoid a circular import.
 type ForkRules struct {
+	IsEIP8298        bool
+	IsEIP7906        bool
+	IsEIP8504        bool
 	IsHogota         bool // selected latest EIP-8037/7610 creation composition
 	IsEIP8151        bool // raw-code restricted ecRecover
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes

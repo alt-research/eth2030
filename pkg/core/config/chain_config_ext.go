@@ -125,6 +125,18 @@ func (c *ChainConfig) Validate() error {
 	if c.EIP8151Time != nil && (c.GlamsterdanTime == nil || *c.EIP8151Time < *c.GlamsterdanTime) {
 		return errors.New("EIP8151 requires prior or simultaneous EIP-8038 activation")
 	}
+	for _, extension := range []struct {
+		name               string
+		time, prerequisite *uint64
+	}{
+		{"EIP8298", c.EIP8298Time, c.AmsterdamTime},
+		{"EIP7906", c.EIP7906Time, c.HogotaTime},
+		{"EIP8504", c.EIP8504Time, c.HogotaTime},
+	} {
+		if extension.time != nil && (extension.prerequisite == nil || *extension.time < *extension.prerequisite) {
+			return fmt.Errorf("%s requires prior or simultaneous prerequisite activation", extension.name)
+		}
+	}
 	// EIP-7892 BPO schedules extend Prague and may interleave with later forks.
 	for _, bpo := range []struct {
 		name string

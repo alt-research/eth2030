@@ -41,6 +41,10 @@ type ChainConfig struct {
 	EIP8250Time *uint64 `json:",omitempty"`
 	// EIP8151Time opts into account-code-restricted ecRecover.
 	EIP8151Time *uint64 `json:",omitempty"`
+	// Optional Group D draft profiles; all remain inactive by default.
+	EIP8298Time *uint64 `json:",omitempty"`
+	EIP7906Time *uint64 `json:",omitempty"`
+	EIP8504Time *uint64 `json:",omitempty"`
 	IPlusTime   *uint64
 	// SSZBlockTime activates EIP-7807 SSZ execution blocks: from this time
 	// the Engine API serves and accepts SSZ-encoded payloads with the
@@ -639,4 +643,17 @@ func (c *ChainConfig) IsEIP8250(time uint64) bool {
 }
 func (c *ChainConfig) IsEIP8151(time uint64) bool {
 	return c != nil && c.IsMerge() && c.IsGlamsterdan(time) && isTimestampForked(c.EIP8151Time, time)
+}
+
+func (c *ChainConfig) IsEIP8298(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsAmsterdam(time) && isTimestampForked(c.EIP8298Time, time)
+}
+func (c *ChainConfig) IsEIP7906(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsHogota(time) && isTimestampForked(c.EIP7906Time, time)
+}
+func (c *ChainConfig) IsEIP8504(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsHogota(time) && isTimestampForked(c.EIP8504Time, time)
+}
+func (c *ChainConfig) FrameExtensions(time uint64) types.FrameExtensions {
+	return types.FrameExtensions{Proof8504: c.IsEIP8504(time), Assert7906: c.IsEIP7906(time)}
 }

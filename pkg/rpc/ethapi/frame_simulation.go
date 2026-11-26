@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/eth2030/eth2030/core/types"
+	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
 )
 
@@ -34,6 +35,9 @@ func (api *EthAPI) simulateFrame(req *Request) *Response {
 		var rpcErr *rpctypes.RPCError
 		if errors.As(err, &rpcErr) {
 			return &Response{JSONRPC: "2.0", ID: req.ID, Error: rpcErr}
+		}
+		if errors.Is(err, rpcbackend.ErrInvalidCallArgs) {
+			return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 		}
 		return errorResponse(req.ID, ErrCodeInternal, err.Error())
 	}

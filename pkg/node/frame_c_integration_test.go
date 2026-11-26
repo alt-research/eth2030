@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"os"
@@ -195,10 +196,12 @@ func runFrameCNativePeers(t *testing.T, keyed, paymaster bool) {
 					t.Fatalf("ordinary simulation type %s: %v", kind, err)
 				}
 			}
-			for _, invalid := range []map[string]any{{"rawTransaction": rawHex, "slotNumber": "0x01"}, {"rawTransaction": rawHex, "traceLimit": "0x0"}, {"rawTransaction": rawHex, "unsigned": true}} {
+			for _, invalid := range []map[string]any{{"rawTransaction": rawHex, "slotNumber": "0x01"}, {"rawTransaction": rawHex, "traceLimit": "0x0"}, {"rawTransaction": rawHex, "unsigned": true}, {"rawTransaction": rawHex, "stateOverrides": map[string]any{sender.Hex(): map[string]any{"nonce": "0x00"}}}} {
 				var result any
-				if err := a.invoke("eth_simulateFrameV1", &result, invalid); err == nil {
-					t.Fatalf("invalid simulation accepted: %+v", invalid)
+				err := a.invoke("eth_simulateFrameV1", &result, invalid)
+				var rpcErr *track4RPCError
+				if !errors.As(err, &rpcErr) || rpcErr.Code != rpctypes.ErrCodeInvalidParams {
+					t.Fatalf("invalid simulation parameters must return -32602: input=%+v err=%v", invalid, err)
 				}
 			}
 			network, err := types.EncodePooledTransaction(tx)

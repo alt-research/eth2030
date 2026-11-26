@@ -44,6 +44,7 @@ MANDATORY = {
  'eth::TestFrameCStructuredReceiptThroughHandler',
  'node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation',
  'node/backend::TestFrameCSimulationTraceLimitIsExplicit',
+ 'node/backend::TestFrameCSimulationOverrideErrorsThroughRPC',
  'rpc/types::TestFrameCDerivedReceiptStatusIsNotConsensusRLP',
  'rpc/ethapi::TestFrameCPendingAndMinedQueryLocations',
  'node::TestFrameCNativePeersPoolBuildSimulationAndRestart',

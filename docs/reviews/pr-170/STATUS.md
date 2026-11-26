@@ -1,5 +1,9 @@
 # Hegota Group C status
 
+The November 27 production-path audit corrected one additional public API omission: invalid Frame simulation account overrides now return invalid-params (-32602) rather than internal-error (-32603). Actual native backend/RPC and HTTP consumers cover eight malformed override classes and all base/keyed, plain/blob and proposal-paymaster integration variants, with valid replay/override, nonce-mismatch and cancellation controls. An exact `64d34cfd` production overlay reproduces sixteen failing subcases and four passing controls. Final local and current-head hosted qualification are in progress; prior results below remain historical.
+
+## Prior mixed scalar lifecycle qualification
+
 The post-paymaster independent audit is locally qualified on implementation `b4840950340fea2d0779013c280edbe03b632133`: all 240 full-suite and 57 focused-race packages complete, with 24,024/9,607 passing events and zero failures. Builds, vet, native/wrapper binaries, independent baseline 12/12 and 91 Python checks per mode pass. All 62/79/94 mandatory A/B/C consumers execute with zero required skips. Two additional exact-prior-source controls reproduce non-tail Frame expiry eviction and stranded scalar successors; seven independent-keyed/inclusion controls still pass on that prior source. Both omissions are corrected across removal, expiry, dependency invalidation and bounded unpaid failure, with multiple successors, fresh-receipt readmission and persistent later gaps. The nineteen recorded native controls preserve prior evidence. See [RECHECK.md](RECHECK.md). References and independent expectations are unchanged. Exact pushed-head hosted results are maintained in the English PR description/checks; upstream proposal adoption/fork pinning remains a separate gate.
 
 ## Prior bounded-recognition qualification

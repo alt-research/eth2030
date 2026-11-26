@@ -124,6 +124,10 @@ func (evm *EVM) SetFrameTransaction(tx *types.FrameTx8141, payment *types.FrameP
 		evm.balTracker = ctx.bal
 	}
 	evm.frame8141 = ctx
+	if evm.forkRules.IsEIP7906 {
+		evm.jumpTable[TXTRACE] = &operation{execute: opTxTrace7906, constantGas: 100, minStack: 2, maxStack: 1024}
+		evm.jumpTable[EVENTDATACOPY] = &operation{execute: opEventDataCopy7906, constantGas: 3, dynamicGas: gasEventData7906, memorySize: memoryEventData7906, minStack: 4, maxStack: 1024}
+	}
 	evm.forkRules.IsEIP7708 = true
 	evm.StateDB = &frameJournalState{StateDB: evm.StateDB, frame: ctx, snapshots: make(map[int]FrameStateGas)}
 	evm.jumpTable[APPROVE] = &operation{execute: opApprove8141, minStack: 3, maxStack: 1024,
@@ -200,6 +204,9 @@ func (evm *EVM) approve8141(target types.Address, scope uint64) error {
 }
 
 func opApprove8141(_ *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	if evm.frame8141.Tx.Frames[evm.frame8141.Index].Mode == types.ModeAssert7906 {
+		return nil, ErrWriteProtection
+	}
 	offset, length, scope := stack.Pop(), stack.Pop(), stack.Pop()
 	ctx := evm.frame8141
 	target := ctx.Tx.Sender

@@ -26,3 +26,12 @@ fallback. Native tests cover invalid/warm/cold/same/large sources, CALL families
 7702, CREATE/CREATE2, ignored invalid initcode return, same-transaction rejection,
 revert and immediate-aware scans. Full bal/vm/execution suites pass. Consumer
 wiring, public proxy limits and broader compatibility qualification remain open.
+
+ASSERT execution now restores the full body to the post-payment prefix snapshot,
+preserves consumed execution/status, removes body state gas/logs and skips the
+remaining assertions. TXTRACE and EVENTDATACOPY have all selectors, full-width
+bounds, exact operand order and read-only subtree guards; the diff journal
+captures pre-values before payment/nonce writes and builds sorted net tables
+lazily. Native selector/copy/rollback/settlement/BAL tests and complete
+core/types, core/vm and core/execution suites pass. Additional composition and
+application compatibility cases remain part of final qualification.

@@ -57,7 +57,7 @@ func ValidateFrame8250DeltaPrefix(cfg *config.ChainConfig, db state.StateDB, hea
 	if header == nil || tx == nil || db == nil {
 		return nil, errors.New("isolated keyed prefix requires complete context")
 	}
-	if _, err := tx.ValidationPrefix8250(header.Time); err != nil {
+	if _, err := tx.ValidationPrefix8250WithExtensions(header.Time, cfg.FrameExtensions(header.Time)); err != nil {
 		return nil, err
 	}
 	copied := &frameReadSet{StateDB: db.Dup(), sender: tx.Sender, reads: make(map[FrameDependency]struct{})}

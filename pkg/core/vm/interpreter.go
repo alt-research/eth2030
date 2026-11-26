@@ -108,6 +108,7 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
+	FrameAssertionTrace    func() *AssertionTrace7906
 	OnFrameLegacyNonceRead func(types.Address)                                  // optional nonce dependency instrumentation
 	OnFrameRecovery8151    func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
 	FrameObserver          FrameObserver                                        // optional bounded per-frame simulation observer
@@ -455,6 +456,10 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 		}
 
 		if op == SETCODEFROM && evm.systemContracts8298[contract.Address] {
+			return nil, ErrWriteProtection
+		}
+
+		if op == APPROVE && evm.frame8141 != nil && evm.frame8141.Tx.Frames[evm.frame8141.Index].Mode == types.ModeAssert7906 {
 			return nil, ErrWriteProtection
 		}
 

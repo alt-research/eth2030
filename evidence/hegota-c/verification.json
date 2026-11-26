@@ -1,7 +1,7 @@
 {
-  "date": "2026-11-26",
+  "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
-  "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+  "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -15,7 +15,7 @@
     "docs/plans/hegota-c/PLAN.md": "b646dd3411df998fb3f92b4b10e8f08dedcfc323777908453ce752c7d4b57db2",
     "docs/plans/hegota-c/RPC_PROFILE.md": "a3a5058e25333a3457af0d071e94251d866645eaa8a1a45b65f7274e5f4b1da0",
     "docs/reviews/pr-170/CANONICAL_PAYMASTER.md": "42b27fcf83a56a8a6427836de8c1ecaccde7cd49ee698c798ba789fe100a2070",
-    "docs/reviews/pr-170/RECHECK.md": "d2c5ec6959f6ec4feb252462d5d082e5deac73796bb8b2b463378e91d9cc6133",
+    "docs/reviews/pr-170/RECHECK.md": "efd23026e7fe04e8ba7d14531a155fa07af3fd01b1c64ebc9b5ec5cfd4de03da",
     "pkg/cmd/eth2030/main.go": "019095a89383321c095148ada159aa1fbf4e8f2718a2c999378aa1dd9c3107e2",
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
     "pkg/cmd/send-frame/main.go": "f483efa608e564e258563fdebecc4f333dce8a25405c3c50ea983f626d4bf9eb",
@@ -66,13 +66,14 @@
     "pkg/node/backend/engine_backend.go": "0bb9b49103e80fbea5605b5f8cc727ecdbbf92edaa8088942f256a8e56453f8b",
     "pkg/node/backend/engine_fcu.go": "5e5cbcad74cd207e8d11298899f3c320764dbb7106a6b95daf87e07aef5e0380",
     "pkg/node/backend/frame_simulation.go": "2d8cd2f408b5d405073adce0a0f9dd417771a270e79b59aff352a05d46aa5c7a",
+    "pkg/node/backend/frame_simulation_rpc_test.go": "9b69315d9c15f9ae108fc35ca702ca346bfb831bec2b07f0021852477f515b2d",
     "pkg/node/backend/frame_simulation_test.go": "7f344cece45dd0b7d486f29d6c50af568ec79a8ea8cf4fafc97d47f26ae95cf3",
     "pkg/node/backend/rpc_backend.go": "3cb249c94c87316f7943c8bee95e1c46840227357173e47a1eb9f324ed0c7a93",
     "pkg/node/backend/simulation.go": "ec71df2d3f8523d81b476f7e0b9a036c8beb6f0e46b84e28b88bb0d704e9f22f",
     "pkg/node/config.go": "1718a3d90f97ac97f63c25c494202cb19508f39fd780cd2fac613472c632c058",
     "pkg/node/frame_8141_integration_test.go": "9e6703a73a041fca3d375200b30864115894ae2f3d9a5c93ffc7e59556091650",
     "pkg/node/frame_blob_rpc_test.go": "2374595f9c0d631fbe340dc3076886c8c04ceca0afd3540ecfb9118af351c847",
-    "pkg/node/frame_c_integration_test.go": "eb91a8dca570353956d11608849a806165967aea942fabc008b55c7bf1d992dc",
+    "pkg/node/frame_c_integration_test.go": "81b6b837feaa783dd3c2066ab257325988d225e0c3eaa579fb26bd0011808295",
     "pkg/node/genesis_loader.go": "a0d583129cd2e5703f3d9cbeafd9e8c20c0ec6cbfb2ce2cf11b4fdd0f8b5b3dd",
     "pkg/node/genesis_loader_test.go": "940da6454489acad794f08c87328189b72336849e8054264d910be1d3dd688fb",
     "pkg/node/node.go": "42f8e50cf72e6ad3acbb46ab5932d7c529924bec71e61a0a46cd2a8492b60811",
@@ -82,7 +83,7 @@
     "pkg/rpc/ethapi/direct_api.go": "fb9e860680ef63801b607ec421c1c4c00af4e83474f86f897bda959d75884a68",
     "pkg/rpc/ethapi/eth_api.go": "ce0c59373e43167ea770e226ebbef01db27cc349fcabe50d7e12b5e1dd80e410",
     "pkg/rpc/ethapi/frame_query_test.go": "d55953f8d234dd8311109cad050a54a6cf4e3e18677f25062a4c312f45b0374b",
-    "pkg/rpc/ethapi/frame_simulation.go": "f11ef1a49b901fba88108df99eb231f49d6d0e99ef3f93a68eb314665611d6f6",
+    "pkg/rpc/ethapi/frame_simulation.go": "8a503b102860afbaa3c3d4f10b75d0984d76ab9ac08b01431a8a05de88fe64d5",
     "pkg/rpc/ethapi/txpool_api.go": "8891940a5127c1eb315be7c9f9c1764c5b947b1074fdc3e005212a15e7972d33",
     "pkg/rpc/types/frame_8141_test.go": "5baf81629167e1a7cc9a090a467fda76817849db160c9f36ef4306e5cace81fa",
     "pkg/rpc/types/frame_simulation.go": "5b78e0ffd261a44a7474f07df0982073efc73b5820a9f06ca22c7f63d920bda7",
@@ -111,14 +112,14 @@
     "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1",
-    "specs/hegota/group-c.json": "eb9c772378ac4fa14fe235a2bfea84b1b35a274bf204111e3e82f8421dc6702b",
+    "specs/hegota/group-c.json": "98b725a8fa93c17901145cbe82db4f52ad4c637018382252c28d566217d24991",
     "specs/hegota/profiles.json": "2c98f6ded415c8c7b9651a84d4320b4abb26651386213699cec9f59d5b65fb5d",
     "tools/hegota/README.md": "bf596c9698470ab5bf8752f872bf55062dd1f00eb90a56f9cd139ad0c5bb9c45",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "7859d3364798db54681b3e2287c83bcf9c0562478ee1336938a28c7d10910a51",
-    "tools/hegota/test_group_c.py": "5aa118a93964866279e1de050096fa0edd0d69f7172b8e97c18ca50c18f51ee7"
+    "tools/hegota/check_c.py": "29857816eaf935b8ef92aed0eb711687372314e553ce348ac0bfed416ef98985",
+    "tools/hegota/test_group_c.py": "f7f59f09ed3279c03db4d69da98b571f4146ea8fcf4152afb332cb5f969a91aa"
   },
-  "source_fingerprint_sha256": "5af85bfe946e0989b996260984e8ffed61c436bd7ad7dac31e9b3e581574b4b0",
+  "source_fingerprint_sha256": "27f92b369b4a5591cf9463e94a63632d6fdb50ed4350093a76d263a9b89552d2",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -160,6 +161,7 @@
     "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression": "pass",
     "github.com/eth2030/eth2030/eth::TestFrameCStructuredReceiptThroughHandler": "pass",
     "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation": "pass",
+    "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC": "pass",
     "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationTraceLimitIsExplicit": "pass",
     "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart": "pass",
     "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart": "pass",
@@ -216,9 +218,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
+    "log_sha256": "3a429cd21ef1c5dc66edb286abf865d73e4991992acccbc960c285e34b51b2fb",
     "named": {
-      "pass": 24024,
+      "pass": 24037,
       "skip": 124
     },
     "packages": {
@@ -230,10 +232,10 @@
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "1154b03f7494cf5493c77b54062a49343e6e922d3f48eb4956aaad2b330f44d3",
-    "race_log_sha256": "221120ce8c8925c78949457a245739d645011e2973769bf9e8f41efa8710c8bd",
+    "build_vet_commands_sha256": "512e8f901dbc9565d76ff06e1997d30bf3e67b02243d88ce06a4e3681143a7ff",
+    "race_log_sha256": "5b4222f6ae6f177dd58f6a01f2c79901ccfac8b3702545e793f3d1c7a8efe3ee",
     "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9607,
+    "race_named_pass": 9620,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "race_completed_packages": 57,
@@ -246,8 +248,8 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 91,
-    "python_log_sha256": "3d9e5c39190ba2f81849be0916c738f3db38388ec6466a43a5640a1802122f4d",
-    "optimized_python_log_sha256": "13082ff5b006c80930fe07e3600dc72fb061ac8754d3d41c83688e1b133ddb3f"
+    "python_log_sha256": "b4ddf076dd69fb751fce3a26c369193b4174ffe34d729d67e8d6fd520494440c",
+    "optimized_python_log_sha256": "b9e390507dd1ec73baffca365a19459275d4493b416fb4e949bc6d41371b94de"
   },
   "negative_controls": [
     {
@@ -486,6 +488,51 @@
         "TestFrameCEvictionIncludesNonTailScalarFrame/base",
         "TestFrameCEvictionIncludesNonTailScalarFrame/empty_keys"
       ]
+    },
+    {
+      "name": "frame-simulation-invalid-overrides",
+      "control_kind": "exact prior-source overlay",
+      "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
+      "prior_source_revision": "64d34cfd9111da29f77ee3edd1685d5866666279",
+      "expected_exit_code": 1,
+      "overlay_path": "pkg/rpc/ethapi/frame_simulation.go",
+      "overlay_source_sha256": "f11ef1a49b901fba88108df99eb231f49d6d0e99ef3f93a68eb314665611d6f6",
+      "test_source_sha256": {
+        "pkg/node/backend/frame_simulation_rpc_test.go": "9b69315d9c15f9ae108fc35ca702ca346bfb831bec2b07f0021852477f515b2d",
+        "pkg/node/frame_c_integration_test.go": "81b6b837feaa783dd3c2066ab257325988d225e0c3eaa579fb26bd0011808295"
+      },
+      "log_sha256": "187b8a2229ec629b67124fe1ba6ac999c4accdf07e732b1c3c670a74bc7b2f92",
+      "failed_native_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC",
+        "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+        "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+        "github.com/eth2030/eth2030/node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart",
+        "github.com/eth2030/eth2030/node::TestPR12041NativePeersPoolBuildSimulationAndRestart"
+      ],
+      "failing_subcases": [
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/address",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/balance",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/balance_overflow",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/code",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/conflicting_storage",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/nonce",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/storage_key",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/storage_value",
+        "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart/blob_false",
+        "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart/blob_true",
+        "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart/blob_false",
+        "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart/blob_true",
+        "github.com/eth2030/eth2030/node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart/blob_false",
+        "github.com/eth2030/eth2030/node::TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart/blob_true",
+        "github.com/eth2030/eth2030/node::TestPR12041NativePeersPoolBuildSimulationAndRestart/blob_false",
+        "github.com/eth2030/eth2030/node::TestPR12041NativePeersPoolBuildSimulationAndRestart/blob_true"
+      ],
+      "positive_controls": [
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/cancelled",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/nonce_mismatch",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/valid_override",
+        "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC/valid_replay"
+      ]
     }
   ],
   "review_correction": {
@@ -504,7 +551,7 @@
   },
   "canonical_paymaster_proposal": {
     "status": "complete_selected_proposal",
-    "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+    "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
     "upstream_repository": "ethereum/EIPs",
     "upstream_revision": "4a98fcefa5c6f02a25289bf55b9d92902d02b4c6",
     "upstream_merged": false,
@@ -540,5 +587,15 @@
       "EIP-8250 empty keys account nonce",
       "EIP-8250 nonempty independent keys"
     ]
+  },
+  "simulation_rpc_errors": {
+    "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
+    "record": "docs/reviews/pr-170/RECHECK.md",
+    "normative_error_semantics": "EIP-1474 Error codes; selected ETH2030 Frame simulation v1 API",
+    "consumer": "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationOverrideErrorsThroughRPC",
+    "invalid_override_classes": 8,
+    "native_http_profiles": 8,
+    "prior_source_positive_controls": 4,
+    "prior_source_failing_subcases": 16
   }
 }

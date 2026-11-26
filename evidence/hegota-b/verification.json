@@ -1,12 +1,12 @@
 {
-  "date": "2026-11-26",
+  "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
+    "log_sha256": "3a429cd21ef1c5dc66edb286abf865d73e4991992acccbc960c285e34b51b2fb",
     "named": {
-      "pass": 24024,
+      "pass": 24037,
       "skip": 124
     },
     "packages": {
@@ -172,14 +172,14 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
-  "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+  "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "1154b03f7494cf5493c77b54062a49343e6e922d3f48eb4956aaad2b330f44d3",
-    "race_log_sha256": "221120ce8c8925c78949457a245739d645011e2973769bf9e8f41efa8710c8bd",
+    "build_vet_commands_sha256": "512e8f901dbc9565d76ff06e1997d30bf3e67b02243d88ce06a4e3681143a7ff",
+    "race_log_sha256": "5b4222f6ae6f177dd58f6a01f2c79901ccfac8b3702545e793f3d1c7a8efe3ee",
     "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9607,
+    "race_named_pass": 9620,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "race_completed_packages": 57,
@@ -192,7 +192,7 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 91,
-    "python_log_sha256": "3d9e5c39190ba2f81849be0916c738f3db38388ec6466a43a5640a1802122f4d",
-    "optimized_python_log_sha256": "13082ff5b006c80930fe07e3600dc72fb061ac8754d3d41c83688e1b133ddb3f"
+    "python_log_sha256": "b4ddf076dd69fb751fce3a26c369193b4174ffe34d729d67e8d6fd520494440c",
+    "optimized_python_log_sha256": "b9e390507dd1ec73baffca365a19459275d4493b416fb4e949bc6d41371b94de"
   }
 }

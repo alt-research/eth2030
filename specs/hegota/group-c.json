@@ -844,7 +844,8 @@
           "id": "C28.1",
           "statement": "selected API:** freeze JSON schema/version and errors for canonical Frame simulation before coding. Support complete transaction input through a documented native API. Existing standard methods must explicitly handle or reject type 6 instead of simulating it as ordinary CALL. Client extensions are labeled as such.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "EIP-1474 Error codes: invalid method parameters (-32602) versus internal JSON-RPC error (-32603); ETH2030 Frame simulation v1 selects invalid-params for malformed overrides"
           ],
           "files": [
             "pkg/node/backend/frame_simulation.go",

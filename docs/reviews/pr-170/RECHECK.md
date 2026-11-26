@@ -1,5 +1,70 @@
 # Group C independent completeness re-audit
 
+## November 27 production-path audit
+
+Starting head: `64d34cfd9111da29f77ee3edd1685d5866666279`. Current implementation:
+`4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9`. This is a fresh review of all forty
+criteria, including independently checking the RPC adapter rather than relying
+on direct backend rejection or previously successful method labels.
+
+The current upstream EIP-8141/8250/8272/8151 blobs still exactly match the four
+identities in the November 26 audit below. Their latest numbered discussion
+posts and complete post-ID streams are unchanged (181/187, 5/6, 3/3 and 32/33).
+Canonical-paymaster #12041 remains open/unmerged at `4a98fcef`, with one author
+review requested; PR #170 has no new review comments and is mergeable against
+the unchanged `5d777ad0` master. No unmerged proposal became a new consensus rule.
+
+The audit found one remaining adapter omission. Invalid account overrides from
+`applySimulationOverrides` carry `rpcbackend.ErrInvalidCallArgs`. The Frame RPC
+adapter preserved structured RPC errors but mapped that unstructured sentinel
+to internal-error (-32603). Therefore malformed addresses, quantities, code,
+storage widths and conflicting storage overrides were correctly rejected by
+the backend but reported incorrectly to callers. This contradicts the selected
+Frame simulation v1 API contract and EIP-1474's distinction between invalid
+method parameters and internal JSON-RPC errors.
+
+The adapter now maps that sentinel, including wrapped errors, to invalid-params
+(-32602). Structured execution/cancellation errors are preserved and other
+backend failures retain the internal-error path. Well-encoded overrides still
+execute authenticated transactions: a nonce mismatch returns `valid: false`
+rather than an invalid-params error. No EIP-8141/8250 encoding, signature,
+consensus or public-pool rule changes.
+
+`TestFrameCSimulationOverrideErrorsThroughRPC` is a mandatory native consumer.
+It uses the actual native chain/backend plus the production JSON-RPC adapter:
+eight malformed override classes and four controls (valid signed replay, valid
+nonce override, execution-invalid nonce, transport cancellation). Existing real
+HTTP two-peer tests additionally assert -32602 in all eight base/keyed,
+plain/blob and proposal-paymaster variants. The exact prior production-file
+overlay has sixteen failing regression subcases, five failing enclosing tests
+and four passing controls. Current code passes them. Original refs and independent
+oracle expectations are unchanged; all nineteen earlier controls are retained.
+
+| Criteria | Production-path review |
+|---|---|
+| C20.1–4 | Prefix grammar/work bounds and VM trace permissions, caught/transient behavior and exact top-level exceptions remain covered; no new prefix species or consensus restriction. |
+| C21.1–4 | Actual reads/reverse indices, separate signer class and helper code hashes, cached head checks, batch refresh and scalar successor cleanup remain consistent. |
+| C22.1–4 | Root code/slot/age/storage predicates, expiry heaps, activation rollback, full key identities and independent account ordering remain consistent. |
+| C23.1–4 | Signed maximum-fee exposure, each payer kind, one withdrawal per payer and atomic replacement/release remain consistent. |
+| C24.1–4 | Actual fee context, fee bump/identity, independent capacities, sidecar bytes, invalid/expiry/priority eviction and retry bounds remain covered. |
+| C25.1–4 | Plain envelopes versus blob wrappers, handler request correlation/advertised metadata, proof checks, bounded batches and structured receipts retain native consumers. |
+| C26.1–4 | Candidate state/slot validation, sender-head ordering, separate dimensions and cancellation/private-input boundaries retain native consumers. |
+| C27.1–4 | Shared authenticated submission, exact keyed formatting and complete pending/mined/cold receipt/body context remain consistent. |
+| C28.1–4 | Corrected RPC parameter-error mapping; raw authentication, hypothetical state, dual dimensions, explicit trace limits and cancellation/state isolation remain covered. |
+| C29.1–4 | Full real HTTP/P2P/build/import/FCU/reorg/restart profiles retain their consumers; exact prior-source RPC controls distinguish the adapter gap from the already working execution paths. |
+
+Local qualification on `4d4a0e0c`: full/race 24,037/9,620 passing events, zero
+failures; all 240/57 packages complete. Mandatory A/B/C consumers 62/79/95
+execute with zero required skips. Full build/vet, both binaries, baseline 12/12
+and 91 Python checks per mode pass. Optional 124/74 skips are separately
+inventoried. Current source/log hashes and twenty counterexamples are recorded
+in A/B/C evidence.
+Exact pushed-head hosted results are maintained in the live English PR; older
+runs are never substituted. Upstream canonical-paymaster adoption/fork pinning
+remains the separate release boundary described in CANONICAL_PAYMASTER.md.
+
+## Prior mixed scalar lifecycle audit
+
 ## Post-paymaster mixed nonce lifecycle audit (2026-11-26)
 
 This audit starts from pushed source `e12ddc37c7ee08e83caa27e268d4619dc425cd11`.

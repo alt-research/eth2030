@@ -1,9 +1,9 @@
 {
-  "date": "2026-11-26",
+  "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
-  "source_base_commit": "b4840950340fea2d0779013c280edbe03b632133",
+  "source_base_commit": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
   "branch_baseline": "5d777ad06f886c8b20fb010a47e65ddb05df8287",
-  "source_fingerprint_sha256": "cfb14e47ad184dbbc4a25615259f8538cf265f212bfa87841f030bb7c12f918b",
+  "source_fingerprint_sha256": "8d952d4b33a390208a0ea1f064ff28236b859fce9ec8fb0749370e880bb6fda7",
   "host": {
     "os": "Darwin",
     "architecture": "arm64",
@@ -19,9 +19,9 @@
   },
   "full_suite": {
     "command": "env -u GOROOT GOFLAGS=-p=4 go test -json ./... -count=1",
-    "log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
+    "log_sha256": "3a429cd21ef1c5dc66edb286abf865d73e4991992acccbc960c285e34b51b2fb",
     "named_test_or_subtest_events": {
-      "pass": 24024,
+      "pass": 24037,
       "fail": 0,
       "skip": 124
     },
@@ -36,9 +36,9 @@
   },
   "race_suite": {
     "command": "env -u GOROOT GOFLAGS=-p=4 go test -race -json ./core/{types,vm,execution,block,chain,state,framepay} ./txpool/... ./eth ./node ./node/backend ./rpc/... ./engine/... ./cmd/eth2030 ./cmd/send-frame -count=1",
-    "log_sha256": "221120ce8c8925c78949457a245739d645011e2973769bf9e8f41efa8710c8bd",
+    "log_sha256": "5b4222f6ae6f177dd58f6a01f2c79901ccfac8b3702545e793f3d1c7a8efe3ee",
     "named_test_or_subtest_events": {
-      "pass": 9607,
+      "pass": 9620,
       "fail": 0,
       "skip": 74
     },
@@ -62,7 +62,7 @@
   "python_checks": {
     "source_admission": "72 proposals; 15 repository roles; 108 pinned files; 99 local normative hashes",
     "checker_regressions": 91,
-    "log_sha256": "3d9e5c39190ba2f81849be0916c738f3db38388ec6466a43a5640a1802122f4d",
+    "log_sha256": "b4ddf076dd69fb751fce3a26c369193b4174ffe34d729d67e8d6fd520494440c",
     "codec_goldens": 7,
     "arithmetic_oracles": 5,
     "native_gas_cases": 5,
@@ -73,7 +73,7 @@
     "unexecuted_latest_spec_seeds": 0,
     "optimized_mode": {
       "checker_regressions": 91,
-      "log_sha256": "13082ff5b006c80930fe07e3600dc72fb061ac8754d3d41c83688e1b133ddb3f"
+      "log_sha256": "b9e390507dd1ec73baffca365a19459275d4493b416fb4e949bc6d41371b94de"
     },
     "pending_recheck": false
   },
@@ -81,8 +81,8 @@
     "matrix": "specs/hegota/acceptance.json",
     "tasks": 7,
     "criteria": 26,
-    "source_fingerprint_sha256": "cfb14e47ad184dbbc4a25615259f8538cf265f212bfa87841f030bb7c12f918b",
-    "test_log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
+    "source_fingerprint_sha256": "8d952d4b33a390208a0ea1f064ff28236b859fce9ec8fb0749370e880bb6fda7",
+    "test_log_sha256": "3a429cd21ef1c5dc66edb286abf865d73e4991992acccbc960c285e34b51b2fb",
     "passed_tests": {
       "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart": "pass",
       "github.com/eth2030/eth2030/core/chain::TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody": "pass",
@@ -157,9 +157,9 @@
     ]
   },
   "previous_qualification": {
-    "revision": "e12ddc37c7ee08e83caa27e268d4619dc425cd11",
-    "verification": "https://github.com/alt-research/eth2030/blob/e12ddc37c7ee08e83caa27e268d4619dc425cd11/evidence/hegota-a/verification.json",
-    "scope": "Prior paymaster and bounded-recognition qualification; mixed scalar lifecycle is freshly qualified."
+    "revision": "64d34cfd9111da29f77ee3edd1685d5866666279",
+    "verification": "https://github.com/alt-research/eth2030/blob/64d34cfd9111da29f77ee3edd1685d5866666279/evidence/hegota-a/verification.json",
+    "scope": "Prior mixed scalar lifecycle qualification; RPC override error classification is freshly qualified."
   },
   "not_claimed": [
     "Group D\u2013J, official devnet/independent CL or container/RC qualification",
@@ -181,10 +181,10 @@
     "docs/reviews/pr-168/CHECK.md": "e76885936e7ebee9161b0ce900b49e3adde3284d1b66f66276124baf11b36158",
     "docs/reviews/pr-168/STATUS.md": "a781be17bb534f131d05010a90cf49a550603185de817687cba883c9fa8e0176",
     "evidence/hegota-a/baseline.json": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b",
-    "evidence/hegota-a/runtime.json": "84b1616dca5d1f9acfe441df1f8a6d1156aa0572d05502b2373ed0ef2eccac48",
-    "evidence/hegota-a/skipped-tests.json": "4b20121638cd29e0aa4ff90a270d2280d9d1d85cec8a97012fc1e500fe1a576e",
-    "evidence/hegota-b/verification.json": "20f7125ad1bf36067e614bb15af8897e1ef734ab8b45340ff48c060156495012",
-    "evidence/hegota-c/verification.json": "30db23f7c1a2917c8cac7565ca69954a5264c7fb1f48db04dff05019f8945ac2",
+    "evidence/hegota-a/runtime.json": "420bec086bd0269153849e4b13d5e011be198dc6e433c6cbc92a31f323ecb229",
+    "evidence/hegota-a/skipped-tests.json": "fb23166b75cc7cb8c86bd400146dc12c1746de27581cb31feaf4ff67d28506e3",
+    "evidence/hegota-b/verification.json": "620748ebafd485248786eeb37d568004d0c61f73cf24dc5974149ef74d9d59dc",
+    "evidence/hegota-c/verification.json": "d4ab00ca19f477f208110474c5e4628abd166421354702659124084b6db90834",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
     "pkg/cmd/eth2030-baseline/main.go": "98ac0ee8c568e405f2c98edfd2ae99cdaa06ef835642451553539e7548d337f6",
     "pkg/cmd/eth2030-geth/main.go": "f52f60fa69f3e7d074f7554d0ed81714e3a00596277867437c04b8e6151b990f",
@@ -329,6 +329,7 @@
     "pkg/node/backend/engine_bogota.go": "0cafe65b8d775cbc9939bc88495698348fa69c3ea189f033590a337d50852fa2",
     "pkg/node/backend/engine_fcu.go": "5e5cbcad74cd207e8d11298899f3c320764dbb7106a6b95daf87e07aef5e0380",
     "pkg/node/backend/frame_simulation.go": "2d8cd2f408b5d405073adce0a0f9dd417771a270e79b59aff352a05d46aa5c7a",
+    "pkg/node/backend/frame_simulation_rpc_test.go": "9b69315d9c15f9ae108fc35ca702ca346bfb831bec2b07f0021852477f515b2d",
     "pkg/node/backend/frame_simulation_test.go": "7f344cece45dd0b7d486f29d6c50af568ec79a8ea8cf4fafc97d47f26ae95cf3",
     "pkg/node/backend/request_context_test.go": "5ac3003fbd477a6748871dcafdd396480eec8868fc6fe36d4568166eaeee75fa",
     "pkg/node/backend/rpc_backend.go": "3cb249c94c87316f7943c8bee95e1c46840227357173e47a1eb9f324ed0c7a93",
@@ -336,7 +337,7 @@
     "pkg/node/bogota_deferred_integration_test.go": "00e007aa3737c19bd617e9dc17409e86ea34f5c2c348577d6c3f006e87bed019",
     "pkg/node/config.go": "1718a3d90f97ac97f63c25c494202cb19508f39fd780cd2fac613472c632c058",
     "pkg/node/frame_8141_integration_test.go": "9e6703a73a041fca3d375200b30864115894ae2f3d9a5c93ffc7e59556091650",
-    "pkg/node/frame_c_integration_test.go": "eb91a8dca570353956d11608849a806165967aea942fabc008b55c7bf1d992dc",
+    "pkg/node/frame_c_integration_test.go": "81b6b837feaa783dd3c2066ab257325988d225e0c3eaa579fb26bd0011808295",
     "pkg/node/genesis_loader.go": "a0d583129cd2e5703f3d9cbeafd9e8c20c0ec6cbfb2ce2cf11b4fdd0f8b5b3dd",
     "pkg/node/genesis_loader_test.go": "940da6454489acad794f08c87328189b72336849e8054264d910be1d3dd688fb",
     "pkg/node/hegota_backend_test.go": "d3588342e20be21525c0c8d0424d4c80021ae9e4a6cfb6dd669f0ebca364a5c4",
@@ -349,7 +350,7 @@
     "pkg/rpc/ethapi/direct_api.go": "fb9e860680ef63801b607ec421c1c4c00af4e83474f86f897bda959d75884a68",
     "pkg/rpc/ethapi/eth_api.go": "ce0c59373e43167ea770e226ebbef01db27cc349fcabe50d7e12b5e1dd80e410",
     "pkg/rpc/ethapi/frame_query_test.go": "d55953f8d234dd8311109cad050a54a6cf4e3e18677f25062a4c312f45b0374b",
-    "pkg/rpc/ethapi/frame_simulation.go": "f11ef1a49b901fba88108df99eb231f49d6d0e99ef3f93a68eb314665611d6f6",
+    "pkg/rpc/ethapi/frame_simulation.go": "8a503b102860afbaa3c3d4f10b75d0984d76ab9ac08b01431a8a05de88fe64d5",
     "pkg/rpc/ethapi/txpool_api.go": "8891940a5127c1eb315be7c9f9c1764c5b947b1074fdc3e005212a15e7972d33",
     "pkg/rpc/types/frame_8141_test.go": "5baf81629167e1a7cc9a090a467fda76817849db160c9f36ef4306e5cace81fa",
     "pkg/rpc/types/frame_simulation.go": "5b78e0ffd261a44a7474f07df0982073efc73b5820a9f06ca22c7f63d920bda7",
@@ -379,7 +380,7 @@
     "specs/hegota/conformance.json": "87cd2b5f121fbb67f85d232d72d87cce9e92a628bf1254a1f888cfab2d7c98a6",
     "specs/hegota/frame-schema.json": "7727c65dd6109042b1b3b7bf1e8524a6ad3e6efac0cdfedd50792b23f7805427",
     "specs/hegota/group-b.json": "c38ab4ed79f18d43368830961ff6a3298d04e480b5ae993c4b91caf2fe2c334d",
-    "specs/hegota/group-c.json": "eb9c772378ac4fa14fe235a2bfea84b1b35a274bf204111e3e82f8421dc6702b",
+    "specs/hegota/group-c.json": "98b725a8fa93c17901145cbe82db4f52ad4c637018382252c28d566217d24991",
     "specs/hegota/profiles.json": "2c98f6ded415c8c7b9651a84d4320b4abb26651386213699cec9f59d5b65fb5d",
     "specs/hegota/proposals/eip-8334.md": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
     "specs/hegota/proposals/eip-8341.md": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
@@ -397,24 +398,24 @@
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "f51c8828fa73cb88cded339bd36ca898a199d9ae227ab9adde567e6c9a30c5b6",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "7859d3364798db54681b3e2287c83bcf9c0562478ee1336938a28c7d10910a51",
+    "tools/hegota/check_c.py": "29857816eaf935b8ef92aed0eb711687372314e553ce348ac0bfed416ef98985",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
     "tools/hegota/test_group_b.py": "da76d39f9087cbcd79a91243c9b769dbaf44a2a246fc34997fccd2dd07ad0ef0",
-    "tools/hegota/test_group_c.py": "5aa118a93964866279e1de050096fa0edd0d69f7172b8e97c18ca50c18f51ee7",
+    "tools/hegota/test_group_c.py": "f7f59f09ed3279c03db4d69da98b571f4146ea8fcf4152afb332cb5f969a91aa",
     "tools/hegota/test_semantic_goldens.py": "bcb92d26c10e277f376433fa90c3a0047fc9be5746af4efd4f7506bc88f15d40"
   },
   "group_b_qualification": {
-    "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+    "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
     "record": "evidence/hegota-b/verification.json",
     "tasks": 12,
     "criteria": 36,
     "scope": "Base 8141; independent 8250 nonce oracle; ordinary 8272 contract. Public integration is qualified separately in C; independent vectors unchanged."
   },
   "group_c_qualification": {
-    "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+    "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
     "record": "evidence/hegota-c/verification.json",
     "tasks": 10,
     "criteria": 40,

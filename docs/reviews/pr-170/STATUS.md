@@ -20,3 +20,5 @@ All A/B/C source/evidence checks pass. Shared-payer exposure uses already-valida
 ## Follow-up completeness audit
 
 A fresh clause-to-production-code audit is in progress at the user's request, starting from `0894e72d999bdd27b9515dd3264d8227fdd3ded8`. Prior success records are retained as historical qualification, not substituted for qualification of any follow-up changes. Upstream EIPs master and paymaster PR #12041 were rechecked: their identities and open specification gates are unchanged.
+
+Two follow-up omissions are fixed: cached keyed validation now rechecks both block gas dimensions, and pending transaction queries return EIP-1474 null location fields across the native, pool and direct API adapters. The two dimensional cases fail on the old implementation. A prior-code API overlay fails all three pending controls while all three mined controls pass; current native plain/blob propagation, build/import and restart tests pass with pending/mined/restarted location assertions. Complete final-source qualification and refreshed evidence are pending. Earlier runs started before the API/test changes are not used as final-source qualification.

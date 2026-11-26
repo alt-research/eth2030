@@ -33,7 +33,7 @@ func TestFrameCPendingAndMinedQueryLocations(t *testing.T) {
 				default:
 					var response *Response
 					if route == "native" {
-						response = NewEthAPI(backend).HandleRequest(request)
+						response = NewEthAPI(backend, nil).HandleRequest(request)
 					} else {
 						response = NewTxPoolAPI(backend).GetTransactionByHash(request)
 					}

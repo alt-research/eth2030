@@ -12,13 +12,28 @@ var FrameExpiryCode = []byte{0x60, 0x08, 0x36, 0x14, 0x60, 0x0a, 0x57, 0x5f, 0x5
 // ValidationPrefix8141 locates the end of the public-mempool validation prefix.
 // This checks structure and declared work; successful approval is checked by execution.
 func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
-	if err := tx.Validate(); err != nil {
+	return tx.ValidationPrefix8141WithExtensions(timestamp, FrameExtensions{})
+}
+
+func (tx *FrameTx8141) ValidationPrefix8141WithExtensions(timestamp uint64, extensions FrameExtensions) (int, error) {
+	if err := tx.ValidateWithExtensions(extensions); err != nil {
 		return 0, err
 	}
 	return tx.validationPrefix8141(timestamp)
 }
 
 func (tx *FrameTx8141) validationPrefix8141(timestamp uint64) (int, error) {
+	if len(tx.Frames) == 0 {
+		return 0, errors.New("Frame validation prefix is missing")
+	}
+	if tx.HasProofFrames8504() {
+		logical, indices := tx.withoutProofFrames8504()
+		end, err := logical.validationPrefix8141(timestamp)
+		if err != nil {
+			return 0, err
+		}
+		return indices[end], nil
+	}
 	start := 0
 	if tx.Frames[0].Target != nil && *tx.Frames[0].Target == FrameExpiryVerifier {
 		frame := tx.Frames[0]
@@ -87,6 +102,14 @@ func (tx *FrameTx8141) validationPrefix8141(timestamp uint64) (int, error) {
 // ValidationDeployIndex8141 skips the protocol verifiers. Call only after
 // ValidationPrefix8141 has accepted the grammar.
 func (tx *FrameTx8141) ValidationDeployIndex8141() int {
+	if tx.HasProofFrames8504() {
+		logical, indices := tx.withoutProofFrames8504()
+		index := logical.ValidationDeployIndex8141()
+		if index < 0 {
+			return -1
+		}
+		return indices[index]
+	}
 	index := 0
 	if index < len(tx.Frames) && tx.Frames[index].Target != nil && *tx.Frames[index].Target == FrameExpiryVerifier {
 		index++
@@ -102,8 +125,25 @@ func (tx *FrameTx8141) ValidationDeployIndex8141() int {
 
 // ValidationPrefix8250 uses the replacement signing hash and nonce rules.
 func (tx *FrameTx8250Delta) ValidationPrefix8250(timestamp uint64) (int, error) {
-	if err := tx.Validate(); err != nil {
+	return tx.ValidationPrefix8250WithExtensions(timestamp, FrameExtensions{})
+}
+
+func (tx *FrameTx8250Delta) ValidationPrefix8250WithExtensions(timestamp uint64, extensions FrameExtensions) (int, error) {
+	if err := tx.ValidateWithExtensions(extensions); err != nil {
 		return 0, err
 	}
 	return tx.ExecutionFields().validationPrefix8141(timestamp)
+}
+
+func (tx *FrameTx8141) withoutProofFrames8504() (*FrameTx8141, []int) {
+	logical := *tx
+	logical.Frames = nil
+	var indices []int
+	for i, f := range tx.Frames {
+		if f.Mode != ModeProof8504 {
+			logical.Frames = append(logical.Frames, f)
+			indices = append(indices, i)
+		}
+	}
+	return &logical, indices
 }

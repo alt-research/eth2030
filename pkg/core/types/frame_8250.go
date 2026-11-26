@@ -115,19 +115,23 @@ func (tx *FrameTx8250Delta) SigningHash() (Hash, error) {
 }
 
 func (tx *FrameTx8250Delta) Validate() error {
+	return tx.ValidateWithExtensions(FrameExtensions{})
+}
+
+func (tx *FrameTx8250Delta) ValidateWithExtensions(extensions FrameExtensions) error {
 	if err := ValidateNonceKeys8250(tx.NonceKeys, tx.NonceSeq); err != nil {
 		return err
 	}
 	base := tx.ExecutionFields()
 	base.Signatures = nil
-	if err := base.Validate(); err != nil {
+	digest, err := tx.SigningHash()
+	if err != nil {
+		return err
+	}
+	if err := base.validateFrameFields(extensions, &digest); err != nil {
 		return err
 	}
 	if _, err := tx.GasBudget(); err != nil {
-		return err
-	}
-	digest, err := tx.SigningHash()
-	if err != nil {
 		return err
 	}
 	for _, sig := range tx.Signatures {
@@ -142,7 +146,11 @@ func (tx *FrameTx8250Delta) GasBudget() (FrameGasBudget, error) {
 	if err := ValidateNonceKeys8250(tx.NonceKeys, tx.NonceSeq); err != nil {
 		return FrameGasBudget{}, err
 	}
-	base, err := tx.ExecutionFields().GasBudget()
+	digest, err := tx.SigningHash()
+	if err != nil {
+		return FrameGasBudget{}, err
+	}
+	base, err := tx.ExecutionFields().frameGasBudget(&digest)
 	if err != nil {
 		return FrameGasBudget{}, err
 	}

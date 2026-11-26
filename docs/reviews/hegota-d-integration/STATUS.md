@@ -10,3 +10,10 @@ including malformed inputs, key/message changes and tampering in every layer.
 Valid signatures use exactly 515 Keccak-f permutations; all 7,740 truncations
 are rejected before hashing. Full Group D integration/release qualification is
 not claimed yet.
+
+The latest direct-proof source and EIP-8288 clarification snapshot are pinned.
+The [32-criterion plan](PLAN.md) records source/format conflicts and conditional
+activation boundaries. Proof/dependency encoding, inherited base/keyed signing,
+deduplication, gas and recognized-prefix handling now have independent vectors
+and native constraint/position/work tests. Execution/pool/payload integration,
+SETCODEFROM and ASSERT are still in progress.

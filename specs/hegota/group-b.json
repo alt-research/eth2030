@@ -267,7 +267,7 @@
         },
         {
           "id": "pool_isolation",
-          "statement": "State pools and refunds stay frame-isolated; entry access and creation/deposit charge the proper dimension. Delegation access is charged before EIP-150 forwarding for all four code-executing call instructions, with independent upstream call-body comparison.",
+          "statement": "State pools and refunds stay frame-isolated; entry access and creation/deposit charge the proper dimension. Delegation access is charged before EIP-150 forwarding for all four code-executing call instructions, with independent upstream call-body comparison. Prefunded CREATE/CREATE2 pays only code-deposit state gas, with unchanged upstream state/gas comparison.",
           "clauses": [
             "8141/Frame gas pools",
             "8141/State-gas attribution and refills",
@@ -285,7 +285,8 @@
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CreationChargesAndCodeDeposit",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL"
           ]
         },
         {
@@ -325,7 +326,7 @@
         },
         {
           "id": "approval_batches",
-          "statement": "Call/frame/atomic batch/whole-transaction failures have distinct effects and retain executed gas/status.",
+          "statement": "Call/frame/atomic batch/whole-transaction failures have distinct effects and retain executed gas/status. Failed creation, enclosing Frame and atomic-batch rollback restore prefunding and omit net-zero account changes from BAL.",
           "clauses": [
             "8141/Behavior",
             "8141/Cross-frame interactions"
@@ -337,7 +338,8 @@
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141FailureRestoresApprovalsAndFunds",
-            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges"
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL"
           ]
         },
         {
@@ -391,7 +393,8 @@
             "pkg/core/execution/frame_8141.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport"
           ]
         }
       ]
@@ -447,14 +450,16 @@
       "criteria": [
         {
           "id": "bal",
-          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets. Static write prohibition is checked before SSTORE gas calculation and must not introduce a storage read.",
+          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets. Static write prohibition is checked before SSTORE gas calculation and must not introduce a storage read. Account reconstruction captures transaction-original leaf fields before reset, so unchanged prefunding never becomes a fabricated balance change.",
           "clauses": [
             "7928/Recording Semantics",
             "8141/Behavior",
             "7928/Gas Validation Before State Access",
             "7928/EIP-7702 Delegation",
             "7928/SSTORE",
-            "214/Specification"
+            "214/Specification",
+            "7928/Balance (balance_changes)",
+            "8037/Gas accounting for new accounts"
           ],
           "files": [
             "pkg/core/vm/frame_8141_bal.go"
@@ -466,7 +471,10 @@
             "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport"
           ]
         },
         {

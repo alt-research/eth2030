@@ -71,6 +71,11 @@ class GroupBCoverageTests(unittest.TestCase):
             ('HGT-015', 'bal', 'TestFrame8141StaticSstoreHasNoStorageAccess'),
             ('HGT-003', 'scope_identity', 'TestFrame8141ApproveEmptyReturnIgnoresOffset'),
             ('HGT-003', 'scope_identity', 'TestFrame8141ApproveReturnMemoryBoundaries'),
+            ('HGT-011', 'pool_isolation', 'TestFrame8141PrefundedCreationBAL'),
+            ('HGT-012', 'approval_batches', 'TestFrame8141PrefundedCreationRollbackBAL'),
+            ('HGT-013', 'build_import', 'TestCanonicalFrame8141PrefundedCreateBuildImport'),
+            ('HGT-015', 'bal', 'TestFrame8141PrefundedCreationBAL'),
+            ('HGT-015', 'bal', 'TestCanonicalFrame8141PrefundedCreateBuildImport'),
         ):
             with self.subTest(test=name):
                 manifest = self.manifest()

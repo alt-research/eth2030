@@ -27,12 +27,18 @@ CRITICAL_BOUNDARIES = {
  ('HGT-003', 'scope_identity'): {'TestFrame8141ApproveEmptyReturnIgnoresOffset',
                                 'TestFrame8141ApproveReturnMemoryBoundaries'},
  ('HGT-012', 'transient_warmness'): {'TestFrame8141DelegationWarmnessSurvivesChildRevert'},
- ('HGT-011', 'pool_isolation'): {'TestFrame8141DelegatedCallGasAndForwarding'},
+ ('HGT-011', 'pool_isolation'): {'TestFrame8141DelegatedCallGasAndForwarding',
+                               'TestFrame8141PrefundedCreationBAL'},
+ ('HGT-012', 'approval_batches'): {'TestFrame8141PrefundedCreationRollbackBAL'},
+ ('HGT-013', 'build_import'): {'core/block::TestCanonicalFrame8141PrefundedCreateBuildImport'},
  ('HGT-015', 'bal'): {'TestFrame8141DirectPrecompileBALGasBoundary',
                      'TestFrame8141SstoreBALReadSurvivesPostStateFailure',
                      'TestFrame8141SelfdestructBALPreStateBoundary',
                      'TestFrame8141DelegationBALBeforeFailedChildChecks',
-                     'TestFrame8141StaticSstoreHasNoStorageAccess'},
+                     'TestFrame8141StaticSstoreHasNoStorageAccess',
+                     'TestFrame8141PrefundedCreationBAL',
+                     'TestFrame8141PrefundedCreationRollbackBAL',
+                     'core/block::TestCanonicalFrame8141PrefundedCreateBuildImport'},
 }
 
 def need(ok, message):
@@ -62,7 +68,8 @@ def validate_manifest(root, manifest):
              row['id']+': criterion omission/duplicate')
         for criterion in criteria:
             label = row['id']+'/'+criterion['id']
-            critical = {MODULE+'core/execution::'+n for n in CRITICAL_BOUNDARIES.get((row['id'], criterion['id']), set())}
+            critical = {MODULE+(n if '::' in n else 'core/execution::'+n)
+                        for n in CRITICAL_BOUNDARIES.get((row['id'], criterion['id']), set())}
             need(critical <= set(criterion['tests']), label+': mandatory boundary regression omitted')
             need(criterion['clauses'] and criterion['statement'] and criterion['files'] and criterion['tests'],
                  label+': no clause/file/executed-test mapping')

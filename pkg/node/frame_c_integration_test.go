@@ -178,6 +178,11 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			if pending["sender"] != sender.Hex() || pending["type"] != "0x6" {
 				t.Fatal("pending query lost Frame fields")
 			}
+			for _, field := range []string{"blockHash", "blockNumber", "transactionIndex"} {
+				if value, present := pending[field]; !present || value != nil {
+					t.Fatalf("EIP-1474 pending %s must be present and null, got %v", field, value)
+				}
+			}
 			// Build on the receiving node exclusively from its P2P-populated pool.
 			beacon := types.Hash{31: 1}
 			attrs := map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 0xfe}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x186a0", "inclusionListTransactions": []string{}}
@@ -211,6 +216,11 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			if source.Blockchain().State().GetRoot() != receiver.Blockchain().State().GetRoot() {
 				t.Fatal("native imports differ on state root")
 			}
+			var mined map[string]any
+			b.call(t, "eth_getTransactionByHash", &mined, tx.Hash().Hex())
+			if mined["blockHash"] != envelope.ExecutionPayload.BlockHash.Hex() || mined["blockNumber"] != "0x1" || mined["transactionIndex"] != "0x0" {
+				t.Fatalf("mined Frame location differs: %+v", mined)
+			}
 			if err := receiver.Stop(); err != nil {
 				t.Fatal(err)
 			}
@@ -219,6 +229,11 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			read.call(t, "eth_getTransactionReceipt", &other, tx.Hash().Hex())
 			if !reflect.DeepEqual(receipt, other) {
 				t.Fatal("restart changed Frame receipt")
+			}
+			var restored map[string]any
+			read.call(t, "eth_getTransactionByHash", &restored, tx.Hash().Hex())
+			if !reflect.DeepEqual(mined, restored) {
+				t.Fatal("restart changed mined Frame transaction metadata")
 			}
 		})
 	}

@@ -144,6 +144,7 @@ func (api *EthDirectAPI) GetTransactionByHash(hash string) (map[string]interface
 	}
 
 	result := formatTxAsMap(tx)
+	result["blockHash"], result["blockNumber"], result["transactionIndex"] = nil, nil, nil
 	if blockNum > 0 {
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
 		if header != nil {
@@ -151,8 +152,8 @@ func (api *EthDirectAPI) GetTransactionByHash(hash string) (map[string]interface
 			result["blockHash"] = encodeHash(bh)
 		}
 		result["blockNumber"] = encodeUint64(blockNum)
+		result["transactionIndex"] = encodeUint64(index)
 	}
-	result["transactionIndex"] = encodeUint64(index)
 	return result, nil
 }
 

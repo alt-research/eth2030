@@ -146,11 +146,14 @@ func (api *TxPoolAPI) GetTransactionByHash(req *Request) *Response {
 	if tx != nil {
 		var (
 			blockHash   *types.Hash
+			blockNumber *uint64
+			txIndex     *uint64
 			blockTS     uint64
 			baseFee     *big.Int
 			blobBaseFee *big.Int
 		)
 		if blockNum > 0 {
+			blockNumber, txIndex = &blockNum, &index
 			header := api.backend.HeaderByNumber(BlockNumber(blockNum))
 			if header != nil {
 				h := header.Hash()
@@ -160,7 +163,7 @@ func (api *TxPoolAPI) GetTransactionByHash(req *Request) *Response {
 				blobBaseFee = blobPriceForHeader(api.backend, header)
 			}
 		}
-		return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
+		return successResponse(req.ID, FormatTransaction(tx, blockHash, blockNumber, txIndex, blockTS, baseFee, blobBaseFee))
 	}
 
 	// Check pending pool.

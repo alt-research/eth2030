@@ -649,16 +649,20 @@
           "id": "C27.2",
           "statement": "transactions:** pending/mined/by-block queries return exact original identity, sender, chain/nonce, modes/flags/targets/limits/values/data, signatures/fees/blob hashes. Per-gas display fields cannot replace total max_fee. Invalid user JSON is not silently discarded.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "EIP-1474 eth_getTransactionByHash: pending block location fields are null"
           ],
           "files": [
             "pkg/rpc/types/types.go",
             "pkg/rpc/ethapi/eth_api.go",
-            "pkg/node/backend/rpc_backend.go"
+            "pkg/node/backend/rpc_backend.go",
+            "pkg/rpc/ethapi/direct_api.go",
+            "pkg/rpc/ethapi/txpool_api.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/rpc/types::TestFrame8141TransactionJSONPreservesEnvelope",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/rpc/ethapi::TestFrameCPendingAndMinedQueryLocations"
           ],
           "scope": "selected profiles; public gates unchanged"
         },
@@ -684,16 +688,20 @@
           "id": "C27.4",
           "statement": "lifecycle:** inclusion, canonical fork selection, orphaned receipt queries, historical body retrieval, restart and fee derivation use the same original block context and persisted bytes.",
           "clauses": [
-            "EIP-8141 Mempool/Behavior/Introspection"
+            "EIP-8141 Mempool/Behavior/Introspection",
+            "EIP-1474 eth_getTransactionByHash: pending block location fields are null"
           ],
           "files": [
             "pkg/rpc/types/types.go",
             "pkg/rpc/ethapi/eth_api.go",
-            "pkg/node/backend/rpc_backend.go"
+            "pkg/node/backend/rpc_backend.go",
+            "pkg/rpc/ethapi/direct_api.go",
+            "pkg/rpc/ethapi/txpool_api.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/rpc/ethapi::TestFrameCPendingAndMinedQueryLocations"
           ],
           "scope": "selected profiles; public gates unchanged"
         }

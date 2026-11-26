@@ -1241,11 +1241,14 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 
 	var (
 		blockHash   *types.Hash
+		blockNumber *uint64
+		txIndex     *uint64
 		blockTS     uint64
 		baseFee     *big.Int
 		blobBaseFee *big.Int
 	)
 	if blockNum > 0 {
+		blockNumber, txIndex = &blockNum, &index
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
 		if header != nil {
 			h := header.Hash()
@@ -1256,7 +1259,7 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 		}
 	}
 
-	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
+	return successResponse(req.ID, FormatTransaction(tx, blockHash, blockNumber, txIndex, blockTS, baseFee, blobBaseFee))
 }
 
 // getTransactionReceipt returns a receipt for a transaction hash.

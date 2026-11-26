@@ -84,6 +84,9 @@ func ValidateFrame8250DeltaPrefix(cfg *config.ChainConfig, db state.StateDB, hea
 	if err != nil {
 		return nil, err
 	}
+	if err := copied.checkPublicBalances(tx.Sender, receipt.Payer); err != nil {
+		return nil, err
+	}
 	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
 	for dep := range copied.reads {
 		result.Dependencies[dep] = dep.Value(db)

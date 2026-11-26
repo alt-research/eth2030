@@ -16,6 +16,7 @@ MODULE = 'github.com/eth2030/eth2030/'
 REQUIRED = {f'HGT-{g:03}': {f'C{g}.{i}' for i in range(1, 5)} for g in range(20, 30)}
 MANDATORY = {
  'core/execution::TestFrameCAllSixteenPrefixesExecuteAndCaptureDependencies',
+ 'core/execution::TestFrameCPublicFactoryFundingDependencyScope',
  'core/types::TestFrame8141PublicSixteenPrefixShapes',
  'core/types::TestFrame8141PublicRootGrammar',
  'core/types::TestFrameCPublicWorkBudgetEquality',

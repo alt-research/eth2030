@@ -2,6 +2,7 @@ package execution
 
 import (
 	"bytes"
+	"errors"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"math/big"
@@ -66,6 +67,7 @@ func (v *FramePrefixValidation) Unchanged(db state.StateDB) bool {
 }
 
 type frameReadSet struct {
+	directBalances map[types.Address]struct{} // actual balance reads, separate from conservative Empty dependencies
 	state.StateDB
 	reads map[FrameDependency]struct{}
 }
@@ -79,6 +81,10 @@ func (s *frameReadSet) account(addr types.Address) {
 	}
 }
 func (s *frameReadSet) GetBalance(addr types.Address) *big.Int {
+	if s.directBalances == nil {
+		s.directBalances = make(map[types.Address]struct{})
+	}
+	s.directBalances[addr] = struct{}{}
 	s.record(addr, FrameBalanceDependency, types.Hash{})
 	return s.StateDB.GetBalance(addr)
 }
@@ -139,4 +145,17 @@ func OrderedFrameDependencies(v *FramePrefixValidation) []FrameDependency {
 
 func (s *frameReadSet) FrameLegacyNonce8250(addr types.Address) uint64 {
 	return s.StateDB.GetNonce(addr)
+}
+
+// EIP-8141 Policy Summary admits sender/existence and approved payer balance
+// dependencies. A factory endowment is not a code-only factory dependency.
+// Classify after approval so a factory that is itself the approved payer keeps
+// the ordinary payer accounting path. Reads survive reverted child calls.
+func (s *frameReadSet) checkPublicBalances(sender, payer types.Address) error {
+	for address := range s.directBalances {
+		if address != sender && address != payer {
+			return errors.New("Frame public prefix depends on an unaccounted third-party balance")
+		}
+	}
+	return nil
 }

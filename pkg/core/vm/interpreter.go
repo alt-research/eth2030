@@ -1010,7 +1010,7 @@ func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if value != nil && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
+	if value != nil && value.Sign() > 0 && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
 		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
 	// Compute the new contract address
@@ -1048,7 +1048,7 @@ func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if endowment != nil && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
+	if endowment != nil && endowment.Sign() > 0 && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
 		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
 	nonce := evm.StateDB.GetNonce(caller)

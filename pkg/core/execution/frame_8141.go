@@ -62,6 +62,9 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 	if err != nil {
 		return nil, err
 	}
+	if err := copied.checkPublicBalances(frame.Sender, receipt.Payer); err != nil {
+		return nil, err
+	}
 	if experimentalPaymasterV1 && framepay.IsV1(copied.GetCode(receipt.Payer)) {
 		copied.GetState(receipt.Payer, types.BytesToHash([]byte{2}))
 		copied.GetState(receipt.Payer, types.BytesToHash([]byte{3}))

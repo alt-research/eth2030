@@ -108,17 +108,20 @@
           "statement": "trace:** enforce storage ownership, code/existence/delegation constraints, zero-value helper calls, banned opcode rules, GAS immediately followed by CALL-family instructions, deployment only at sender and nonempty deployed code. Restrictions apply at all call depths. Entry dispatch of the sender and the permitted default-code behavior are not interchangeable with generic third-party calls.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "EIP-8141 Policy Summary: factory code-only and admitted payer balance dependencies"
           ],
           "files": [
             "pkg/core/types/frame_8141_pool.go",
             "pkg/core/vm/frame_8141.go",
-            "pkg/core/execution/frame_8141.go"
+            "pkg/core/execution/frame_8141.go",
+            "pkg/core/execution/frame_dependencies.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolTraceRestrictions",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolRequiresOneCombinedApproval",
-            "github.com/eth2030/eth2030/txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix"
+            "github.com/eth2030/eth2030/txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCPublicFactoryFundingDependencyScope"
           ],
           "scope": "selected profiles; public gates unchanged"
         },

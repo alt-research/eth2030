@@ -1,76 +1,36 @@
 # Group D status
 
-Development begins from merged PR #170 at master
-`81e63f586642a1406d56db9fa7cbf00941feb7bf`. The working tree was clean and
-the branch was created directly from the fetched master, without replaying the
-merged Group C commits. Specification and duplication review is in progress.
-The first real primitive is implemented: the pinned leanSPHINCS verifier passes
-all 26 independent EthLib verification vectors mirrored by pinned leanVM,
-including malformed inputs, key/message changes and tampering in every layer.
-Valid signatures use exactly 515 Keccak-f permutations; all 7,740 truncations
-are rejected before hashing. Full Group D integration/release qualification is
-not claimed yet.
+HGT-030–037 is implemented and locally qualified for the explicitly selected
+native profiles. All 8 tasks, 32 criteria and 45 mandatory consumers pass,
+including the affected race run. Source implementation commit:
+`c449112d2e455eef15546ff46418431cd170daaa`.
 
-The latest direct-proof source and EIP-8288 clarification snapshot are pinned.
-The [32-criterion plan](../../plans/hegota-d/PLAN.md) records source/format conflicts and conditional
-activation boundaries. Proof/dependency encoding, inherited base/keyed signing,
-deduplication, gas and recognized-prefix handling now have independent vectors
-and native constraint/position/work tests. Execution/pool/payload integration,
-SETCODEFROM and ASSERT are still in progress.
+The branch starts directly from merged PR #170 at master
+`81e63f586642a1406d56db9fa7cbf00941feb7bf`; fetched master still matches that
+baseline. No merged Group C commits were replayed. Root trackers, read-only
+refs and independent A/B/C expected vectors remain unchanged. The existing
+8151 implementation and canonical paymaster are reused.
 
-SETCODEFROM now has native opcode, fixed execution pricing, paid-access/static/
-system guards, raw source validation, execution-environment code adoption,
-snapshot origins and creation completion support. BAL supports strict hash-only
-adoption tuples and strictly-earlier availability resolution without a bytecode
-fallback. Native tests cover invalid/warm/cold/same/large sources, CALL families,
-7702, CREATE/CREATE2, ignored invalid initcode return, same-transaction rejection,
-revert and immediate-aware scans. Full bal/vm/execution suites pass. Consumer
-wiring, public proxy limits and broader compatibility qualification remain open.
+The [normative plan](../../plans/hegota-d/PLAN.md),
+[composition/admission report](../../plans/hegota-d/COMPOSITION.md) and
+[verification record](VERIFICATION.md) map the complete work to sources,
+production consumers and positive/negative evidence. Machine-readable coverage
+and source-bound evidence live in `specs/hegota/group-d.json` and
+`evidence/hegota-d/verification.json`.
 
-ASSERT execution now restores the full body to the post-payment prefix snapshot,
-preserves consumed execution/status, removes body state gas/logs and skips the
-remaining assertions. TXTRACE and EVENTDATACOPY have all selectors, full-width
-bounds, exact operand order and read-only subtree guards; the diff journal
-captures pre-values before payment/nonce writes and builds sorted net tables
-lazily. Native selector/copy/rollback/settlement/BAL tests and complete
-core/types, core/vm and core/execution suites pass. Additional composition and
-application compatibility cases remain part of final qualification.
+Local validation: full build/vet/gofmt; 243 full-suite packages, 24,166 named
+passes; 68 affected race packages, 10,801 named passes; 102 Python regressions
+in normal and optimized mode; 12/12 independent historical baseline cases;
+A/B/C/D mandatory consumers 62/79/102/45, zero mandatory skips. Optional skips
+are inventoried separately, and all three isolated semantic-removal controls
+fail as intended. See the verification record for exact commands and hashes.
 
-The proof proposal is wired through bounded raw submission, exact wrappers,
-stateless verification caching, public admission (including body dependencies),
-one-wrapper lookup/accounting, builder collection, canonical union, header/body
-commitments, both Engine backends, payload body queries, chain/raw database
-codecs, restart and parallel processing. Native HTTP submission/simulation,
-Engine build/import/body retrieval/restart and live peer wrapper exchange pass.
-Missing/tampered/extra witnesses fail before state contamination. Ordinary eth
-transaction messages reject dependency transactions; hgtp/1 is a separately
-negotiated native experiment with a chain/pinned-profile handshake and bounded
-announce/request/response messages, not an official eth message assignment.
+These profiles do not schedule a public fork. 8504 provisional constants and
+official wire/Engine/CL assignments, incomplete 8288 aggregation, 7807 and
+omitted-proof IL composition, ecosystem qualification and the existing canonical
+paymaster upstream-adoption gate remain explicit. Native hgtp/1 and the pinned
+Gloas CL codec are identified experiments, not official multi-client devnet
+qualification. No automatic token compensation is invented.
 
-The Gloas 19/20-field progressive payload has independent remerkleable vectors
-for absent, active-empty and two witnesses, using pinned ethlambda's opaque
-progressive witness lists. EIP-7807's different execution-block schema is not
-silently mixed with this profile; its unspecified composition fails closed.
-The full integrated package run and remaining compatibility/composition review
-are still in progress; final completion/release qualification is not claimed.
-
-Cross-review added retired ECDSA pending/queued eviction, logical expiry indexing
-with leading proof frames, actual wrapper accounting in the total pool budget,
-EIP-8024 immediate-aware helper scanning and bounded queue draining beyond one
-network request. Migration/Frame control, native permit/multisig/fault-proof
-recovery kernels, persisted adopted code, real paymaster/token false-return,
-retry/atomic behavior and actual escrow/prestate trace consumers pass. D journals
-preserve the existing 8151 paid signer-class dependency contract.
-
-Canonical base/keyed PQ-wallet vectors now come from pinned EELS Python signing
-and verification algorithms. The actual HTTP/Engine/restart consumer uses a
-wallet that checks its key and the canonical zero-message declaration. Both
-canonical signature hashes and valid witnesses are independently generated;
-changed replay identities are rejected. The 8-task/32-criterion register and
-45 mandatory consumers are ready for final source-bound qualification.
-
-Final boundary review also covers creation-time adopted-runtime callbacks,
-transaction invalidation before payer approval, invalid/valid witness replacement
-atomicity and native Engine block-to-CL SSZ consumption. The canonical-only IL
-API rejects omitted dependency candidates explicitly until upstream specifies
-witness-bearing omission checks; it never executes a bare proof as authentication.
+Publication and hosted exact-head checks are tracked by the PR's live check
+suite; offline source evidence does not assert a hosted result.

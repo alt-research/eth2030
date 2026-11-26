@@ -7,6 +7,7 @@ import (
 
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -34,6 +35,9 @@ func NewParallelProcessor(config *config.ChainConfig) *ParallelProcessor {
 // If bal is nil, it falls back to sequential execution.
 // The returned receipts are always in original transaction order.
 func (p *ParallelProcessor) ProcessParallel(statedb state.StateDB, block *types.Block, accessList *bal.BlockAccessList) ([]*types.Receipt, error) {
+	if err := frameproof.VerifyBlock(block, p.config.IsEIP8504(block.Time()), p.config.FrameExtensions(block.Time())); err != nil {
+		return nil, err
+	}
 	txs := block.Transactions()
 	if len(txs) == 0 {
 		return nil, nil

@@ -1063,9 +1063,14 @@ func payloadToBlock(payload *ExecutionPayloadV3, parentBeaconBlockRoot types.Has
 		header.ParentBeaconRoot = &parentBeaconBlockRoot
 	}
 
+	if payload.DependencyWitnesses != nil {
+		hash := types.DependencyWitnessesHash8504(payload.DependencyWitnesses)
+		header.DependencyWitnessesHash = &hash
+	}
 	return types.NewBlock(header, &types.Body{
-		Transactions: txs,
-		Withdrawals:  withdrawals,
+		DependencyWitnesses: payload.DependencyWitnesses,
+		Transactions:        txs,
+		Withdrawals:         withdrawals,
 	}), nil
 }
 

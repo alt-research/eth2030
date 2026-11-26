@@ -7,16 +7,18 @@ import (
 // ExecutionPayloadBodyV1 is the response body for engine_getPayloadBodiesByHash/RangeV1.
 // Per Shanghai spec, it contains transactions and withdrawals only.
 type ExecutionPayloadBodyV1 struct {
-	Transactions [][]byte      `json:"transactions"`
-	Withdrawals  []*Withdrawal `json:"withdrawals"`
+	DependencyWitnesses [][]byte      `json:"dependencyWitnesses,omitempty"`
+	Transactions        [][]byte      `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
 }
 
 // ExecutionPayloadBodyV2 is the response body for engine_getPayloadBodiesByHash/RangeV2.
 // It extends V1 (transactions + withdrawals) with a blockAccessList field (EIP-7928).
 type ExecutionPayloadBodyV2 struct {
-	Transactions    [][]byte      `json:"transactions"`
-	Withdrawals     []*Withdrawal `json:"withdrawals"`
-	BlockAccessList []byte        `json:"blockAccessList"`
+	DependencyWitnesses [][]byte      `json:"dependencyWitnesses,omitempty"`
+	Transactions        [][]byte      `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
+	BlockAccessList     []byte        `json:"blockAccessList"`
 }
 
 // BlockToPayloadBodyV1 converts a types.Block to an ExecutionPayloadBodyV1.
@@ -43,8 +45,9 @@ func BlockToPayloadBodyV1(block *types.Block) *ExecutionPayloadBodyV1 {
 		}
 	}
 	return &ExecutionPayloadBodyV1{
-		Transactions: txs,
-		Withdrawals:  ws,
+		DependencyWitnesses: block.DependencyWitnesses8504(),
+		Transactions:        txs,
+		Withdrawals:         ws,
 	}
 }
 
@@ -52,8 +55,9 @@ func BlockToPayloadBodyV1(block *types.Block) *ExecutionPayloadBodyV1 {
 func BlockToPayloadBodyV2(block *types.Block) *ExecutionPayloadBodyV2 {
 	v1 := BlockToPayloadBodyV1(block)
 	return &ExecutionPayloadBodyV2{
-		Transactions: v1.Transactions,
-		Withdrawals:  v1.Withdrawals,
+		DependencyWitnesses: v1.DependencyWitnesses,
+		Transactions:        v1.Transactions,
+		Withdrawals:         v1.Withdrawals,
 	}
 }
 
@@ -64,8 +68,9 @@ func V2ToV1(v2 *ExecutionPayloadBodyV2) *ExecutionPayloadBodyV1 {
 		return nil
 	}
 	return &ExecutionPayloadBodyV1{
-		Transactions: v2.Transactions,
-		Withdrawals:  v2.Withdrawals,
+		DependencyWitnesses: v2.DependencyWitnesses,
+		Transactions:        v2.Transactions,
+		Withdrawals:         v2.Withdrawals,
 	}
 }
 

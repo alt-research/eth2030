@@ -134,3 +134,10 @@ func (s *assertionState7906) index() *vm.AssertionTrace7906 {
 	s.trace = t
 	return t
 }
+
+func (s *assertionState7906) FrameRecoveryCode8151(a types.Address) []byte {
+	if reader, ok := s.StateDB.(interface{ FrameRecoveryCode8151(types.Address) []byte }); ok {
+		return reader.FrameRecoveryCode8151(a)
+	}
+	return s.StateDB.GetCode(a)
+}

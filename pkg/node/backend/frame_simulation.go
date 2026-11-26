@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -65,14 +66,14 @@ func (b *RPCBackend) SimulateFrame(options rpctypes.FrameSimulationOptions, base
 		return nil, fmt.Errorf("header not found")
 	}
 	// Bound input before decoding so hex conversion cannot allocate unbounded memory.
-	if len(options.RawTransaction) > 2+2*128*1024 {
-		return invalid("Frame payload exceeds 128 KiB")
+	if len(options.RawTransaction) > 2+2*types.MaxDependencyWrapperBytes8504 {
+		return invalid("Frame payload exceeds bounded transport size")
 	}
 	raw, err := hexutil.Decode(options.RawTransaction)
 	if err != nil {
 		return invalid("invalid rawTransaction DATA")
 	}
-	tx, err := types.DecodeTxRLP(raw)
+	tx, err := types.DecodePooledTransaction(raw)
 	if err != nil {
 		return invalid("invalid canonical Frame envelope: " + err.Error())
 	}
@@ -81,12 +82,13 @@ func (b *RPCBackend) SimulateFrame(options rpctypes.FrameSimulationOptions, base
 		return invalid("canonical type-6 Frame required")
 	}
 	plain, err := tx.EncodeRLP()
+	if tx.HasDependencies8504() {
+		plain, err = types.EncodePooledTransaction(tx)
+	}
 	if err != nil || !bytes.Equal(raw, plain) {
 		return invalid("plain canonical Frame envelope required")
 	}
-	if err := frame.Validate(); err != nil {
-		return invalid("invalid Frame authentication/structure: " + err.Error())
-	}
+
 	budget, err := frame.GasBudget()
 	if err != nil {
 		return invalid(err.Error())
@@ -117,6 +119,9 @@ func (b *RPCBackend) SimulateFrame(options rpctypes.FrameSimulationOptions, base
 			return invalid("invalid slotNumber QUANTITY")
 		}
 		header.SlotNumber = &slot
+	}
+	if err := frameproof.VerifyTransaction(tx, b.node.Blockchain().Config().FrameExtensions(header.Time), false); err != nil {
+		return invalid("invalid Frame authentication/structure: " + err.Error())
 	}
 	if blobFee == nil {
 		blobFee = gas.BlobBaseFeeForHeader(b.node.Blockchain().Config(), header)

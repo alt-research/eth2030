@@ -196,6 +196,9 @@ type wirePooledTransactions struct {
 func (p PooledTransactionsPacket) EncodeRLP() ([]byte, error) {
 	packet := wirePooledTransactions{ID: p.RequestID}
 	for _, tx := range p.Transactions {
+		if tx.HasDependencies8504() {
+			return nil, fmt.Errorf("dependency transaction forbidden in PooledTransactions")
+		}
 		raw, err := types.EncodePooledTransaction(tx)
 		if err != nil {
 			return nil, err
@@ -231,6 +234,9 @@ func (p *PooledTransactionsPacket) DecodeRLP(data []byte) error {
 		tx, err := types.DecodePooledTransaction(encoded)
 		if err != nil {
 			return err
+		}
+		if tx.HasDependencies8504() {
+			return fmt.Errorf("dependency transaction forbidden in PooledTransactions")
 		}
 		p.Transactions = append(p.Transactions, tx)
 	}

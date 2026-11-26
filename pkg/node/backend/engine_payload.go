@@ -68,6 +68,7 @@ func (b *EngineBackend) payloadResponse(id payload.PayloadID, p *pendingPayload)
 	}
 	execPayload := &payload.ExecutionPayloadV4{
 		ExecutionPayloadV3: payload.ExecutionPayloadV3{
+			DependencyWitnesses: blk.DependencyWitnesses8504(),
 			ExecutionPayloadV2: payload.ExecutionPayloadV2{
 				ExecutionPayloadV1: payload.ExecutionPayloadV1{
 					ParentHash:    header.ParentHash,

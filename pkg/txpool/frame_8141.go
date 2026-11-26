@@ -12,9 +12,11 @@ import (
 
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/framepay"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/crypto/bls"
 )
 
@@ -41,7 +43,8 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 func (pool *TxPool) frameProfile() string {
 	encoded, _ := json.Marshal(pool.frameConfig)
 	rules, _ := json.Marshal(pool.frameConfig.Rules(new(big.Int).SetUint64(pool.frameNumber), pool.frameConfig.IsMerge(), pool.frameTime))
-	return string(encoded) + string(rules) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1) + strconv.FormatBool(pool.config.ExperimentalFramePaymaster12041)
+	extensions, _ := json.Marshal(pool.frameConfig.FrameExtensions(pool.frameTime))
+	return string(encoded) + string(rules) + string(extensions) + strconv.FormatBool(pool.frameConfig.IsEIP8298(pool.frameTime)) + strconv.FormatBool(pool.frameConfig.IsEIP8151(pool.frameTime)) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1) + strconv.FormatBool(pool.config.ExperimentalFramePaymaster12041)
 }
 func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
 	validation, err := pool.prepareFrame8141Result(tx)
@@ -69,7 +72,7 @@ func (pool *TxPool) prepareFrame8141Result(tx *types.Transaction) (*execution.Fr
 	if (frame.NonceProfile8250() != nil) != pool.frameConfig.IsEIP8250(pool.frameTime) {
 		return nil, errors.New("Frame nonce schema does not match EIP-8250 activation")
 	}
-	prefixEnd, err := frame.ValidationPrefix8141(pool.frameTime)
+	prefixEnd, err := frame.ValidationPrefix8141WithExtensions(pool.frameTime, pool.frameConfig.FrameExtensions(pool.frameTime))
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +84,9 @@ func (pool *TxPool) prepareFrame8141Result(tx *types.Transaction) (*execution.Fr
 		return nil, ErrOversizedRLP
 	}
 	if pool.lookup.Get(tx.Hash()) != tx {
+		if err := frameproof.VerifyTransaction(tx, pool.frameConfig.FrameExtensions(pool.frameTime), true); err != nil {
+			return nil, err
+		}
 		if err := validateFrameBlobProofs8141(tx); err != nil {
 			return nil, err
 		}
@@ -154,6 +160,27 @@ func (pool *TxPool) validateFrameResources8141(frame *types.FrameTx8141, validat
 		}
 	}()
 	if aggregate {
+		if pool.frameConfig.IsEIP8298(pool.frameTime) {
+			for dep := range validation.Dependencies {
+				if dep.Kind != execution.FrameCodeDependency {
+					continue
+				}
+				code := db.GetCode(dep.Address)
+				if !vm.HasOpcode8298(code, vm.DELEGATECALL) && !vm.HasOpcode8298(code, vm.CALLCODE) {
+					continue
+				}
+				dependents := 0
+				for hash := range pool.lookup.frameDependencies[dep] {
+					other := pool.lookup.Get(hash)
+					if other != nil && !other.Inner().(*types.FrameTx8141).SameReplayIdentity(frame) {
+						dependents++
+					}
+				}
+				if dependents >= MaxProxyDependents8298 {
+					return errors.New("SETCODEFROM proxy dependency pending limit")
+				}
+			}
+		}
 		if err := pool.validateFrameSigners8151(frame, validation); err != nil {
 			return err
 		}

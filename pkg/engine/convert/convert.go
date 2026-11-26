@@ -56,6 +56,10 @@ func PayloadToHeaderV3(p *engpayload.ExecutionPayloadV3) *types.Header {
 	header := PayloadToHeaderV2(&p.ExecutionPayloadV2)
 	header.BlobGasUsed = &p.BlobGasUsed
 	header.ExcessBlobGas = &p.ExcessBlobGas
+	if p.DependencyWitnesses != nil {
+		hash := types.DependencyWitnessesHash8504(p.DependencyWitnesses)
+		header.DependencyWitnessesHash = &hash
+	}
 	return header
 }
 

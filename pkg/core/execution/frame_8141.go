@@ -7,6 +7,7 @@ import (
 
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/framepay"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -46,6 +47,9 @@ func ValidateFrame8141DependenciesWithPaymaster(config *corconfig.ChainConfig, d
 	frame, ok := tx.Inner().(*types.FrameTx8141)
 	if !ok || header == nil {
 		return nil, errors.New("not a canonical Frame validation context")
+	}
+	if err := frameproof.VerifyTransaction(tx, config.FrameExtensions(header.Time), true); err != nil {
+		return nil, err
 	}
 	if _, err := frame.ValidationPrefix8141WithExtensions(header.Time, config.FrameExtensions(header.Time)); err != nil {
 		return nil, err

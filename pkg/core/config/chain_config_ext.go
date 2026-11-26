@@ -118,6 +118,10 @@ func (c *ChainConfig) Validate() error {
 		lastTimeName = f.name
 	}
 
+	if c.EIP8504Time != nil && c.SSZBlockTime != nil {
+		return errors.New("EIP-8504 Gloas witnesses and EIP-7807 SSZ block identity require a specified composition")
+	}
+
 	// Optional EIPs are independent schedules, not additional named-fork order.
 	if c.EIP8250Time != nil && (c.HogotaTime == nil || *c.EIP8250Time < *c.HogotaTime) {
 		return errors.New("EIP8250 requires prior or simultaneous EIP-8141 activation")

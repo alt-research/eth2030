@@ -96,6 +96,7 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
+	MaxDependencyBytes              uint64 // Local witness-wrapper memory budget; zero selects 64 MiB.
 	FrameSignerCanonicalLimit       int    // EIP-8151 local per-signer reserved share (default 64)
 	FrameSignerOtherLimit           int    // separate smaller share (default 8)
 	FramePriceBump                  uint64 // both Frame fee fields; zero selects 10 percent
@@ -150,6 +151,10 @@ type StateReader interface {
 
 // txLookup tracks transactions by hash for fast duplicate detection.
 type txLookup struct {
+	dependencyWrappers map[types.Hash]types.Hash
+	dependencyHashes   map[types.Hash]types.Hash
+	dependencySizes    map[types.Hash]uint64
+	dependencyBytes    uint64
 	frameDeadlines     frameExpiryQueue
 	frameRootExpiries  frameExpiryQueue
 	frameBuildFailures map[types.Hash]uint8
@@ -160,7 +165,7 @@ type txLookup struct {
 }
 
 func newTxLookup() *txLookup {
-	return &txLookup{frameBuildFailures: make(map[types.Hash]uint8), all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address), frameValidations: make(map[types.Hash]*execution.FramePrefixValidation), frameDependencies: make(map[execution.FrameDependency]map[types.Hash]struct{})}
+	return &txLookup{dependencyWrappers: make(map[types.Hash]types.Hash), dependencyHashes: make(map[types.Hash]types.Hash), dependencySizes: make(map[types.Hash]uint64), frameBuildFailures: make(map[types.Hash]uint8), all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address), frameValidations: make(map[types.Hash]*execution.FramePrefixValidation), frameDependencies: make(map[execution.FrameDependency]map[types.Hash]struct{})}
 }
 
 func (l *txLookup) Get(hash types.Hash) *types.Transaction {
@@ -169,9 +174,25 @@ func (l *txLookup) Get(hash types.Hash) *types.Transaction {
 
 func (l *txLookup) Add(tx *types.Transaction) {
 	l.all[tx.Hash()] = tx
+	if tx.HasDependencies8504() {
+		raw, err := types.EncodeDependencyWrapper8504(tx)
+		if err == nil {
+			hash, _ := types.DependencyWrapperHash8504(tx)
+			l.dependencyWrappers[hash] = tx.Hash()
+			l.dependencyHashes[tx.Hash()] = hash
+			l.dependencySizes[tx.Hash()] = uint64(len(raw))
+			l.dependencyBytes += uint64(len(raw))
+		}
+	}
 }
 
 func (l *txLookup) Remove(hash types.Hash) {
+	if wrapper, ok := l.dependencyHashes[hash]; ok {
+		delete(l.dependencyWrappers, wrapper)
+		delete(l.dependencyHashes, hash)
+		l.dependencyBytes -= l.dependencySizes[hash]
+		delete(l.dependencySizes, hash)
+	}
 	l.frameDeadlines.remove(hash)
 	l.frameRootExpiries.remove(hash)
 	delete(l.all, hash)
@@ -457,6 +478,27 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 			"reason", err.Error(),
 		)
 		return err
+	}
+
+	if tx.HasDependencies8504() {
+		raw, err := types.EncodeDependencyWrapper8504(tx)
+		if err != nil {
+			return err
+		}
+		limit := pool.config.MaxDependencyBytes
+		if limit == 0 {
+			limit = MaxDependencyPoolBytes8504
+		}
+		used := pool.lookup.dependencyBytes
+		frame := tx.Inner().(*types.FrameTx8141)
+		for hash, pending := range pool.lookup.all {
+			if old, ok := pending.Inner().(*types.FrameTx8141); ok && old.SameReplayIdentity(frame) {
+				used -= pool.lookup.dependencySizes[hash]
+			}
+		}
+		if uint64(len(raw)) > limit || used > limit-uint64(len(raw)) {
+			return errors.New("dependency wrapper pool byte limit")
+		}
 	}
 
 	// Determine sender (simplified - would normally recover from signature).

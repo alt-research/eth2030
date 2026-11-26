@@ -98,6 +98,9 @@ func (h *Handler) relayMask(hash types.Hash) types.CellMask {
 func (h *Handler) sendRelayAnnouncement(ep *EthPeer, txs []*types.Transaction) error {
 	var live []*types.Transaction
 	for _, tx := range txs {
+		if tx.HasDependencies8504() {
+			continue
+		}
 		if _, frame := tx.Inner().(*types.FrameTx8141); frame && h.txPool.Get(tx.Hash()) == nil {
 			continue
 		}
@@ -597,7 +600,7 @@ func (h *Handler) handleGetSparsePooled(ep *EthPeer, msg p2p.Msg) error {
 	size := 64
 	for _, hash := range req.Hashes {
 		tx := h.relayTransaction(hash)
-		if tx == nil {
+		if tx == nil || tx.HasDependencies8504() {
 			continue
 		}
 		meta, err := sparseMetadata(tx)

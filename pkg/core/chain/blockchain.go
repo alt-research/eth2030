@@ -1736,6 +1736,16 @@ func encodeBlockBody(body *types.Body) ([]byte, error) {
 		payload = append(payload, rlp.WrapList(wsPayload)...)
 	}
 
+	if body != nil && body.DependencyWitnesses != nil {
+		if body.Withdrawals == nil {
+			return nil, fmt.Errorf("dependency witnesses require withdrawals position")
+		}
+		encoded, err := rlp.EncodeToBytes(body.DependencyWitnesses)
+		if err != nil {
+			return nil, err
+		}
+		payload = append(payload, encoded...)
+	}
 	return rlp.WrapList(payload), nil
 }
 
@@ -1830,6 +1840,19 @@ func decodeBlockBody(data []byte) (*types.Body, error) {
 			withdrawals = []*types.Withdrawal{} // empty but non-nil
 		}
 		body.Withdrawals = withdrawals
+	}
+
+	if !s.AtListEnd() {
+		raw, err := s.RawItem()
+		if err != nil {
+			return nil, err
+		}
+		if err := rlp.DecodeBytes(raw, &body.DependencyWitnesses); err != nil {
+			return nil, err
+		}
+		if body.DependencyWitnesses == nil {
+			body.DependencyWitnesses = make([][]byte, 0)
+		}
 	}
 
 	if err := s.ListEnd(); err != nil {

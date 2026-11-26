@@ -9,6 +9,7 @@ import (
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -299,6 +300,21 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 					continue
 				}
 			}
+			if ilTx.HasDependencies8504() {
+				// Inclusion lists carry canonical bytes, not witnesses. Recover
+				// the admitted wrapper when available; never build a proof tx
+				// from a missing-witness bare IL declaration.
+				if source, ok := b.txPool.(interface {
+					Get(types.Hash) *types.Transaction
+				}); ok {
+					if pooled := source.Get(ilTx.Hash()); pooled != nil {
+						ilTx = pooled
+					}
+				}
+				if err := frameproof.VerifyTransaction(ilTx, b.config.FrameExtensions(header.Time), false); err != nil {
+					continue
+				}
+			}
 			statedb.SetTxContext(ilTx.Hash(), txIndex)
 
 			// EIP-7928: create per-transaction BAL tracker before execution.
@@ -441,6 +457,11 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 				if err != nil {
 					continue
 				}
+			}
+		}
+		if tx.HasDependencies8504() {
+			if err := frameproof.VerifyTransaction(tx, b.config.FrameExtensions(header.Time), false); err != nil {
+				continue
 			}
 		}
 		// Set tx context so logs are keyed correctly.
@@ -633,6 +654,15 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		slog.Debug("block parallelism score", "score", score.Score, "clusters", score.ClusterCount)
 	}
 
+	if b.config.IsEIP8504(header.Time) {
+		witnesses, err := frameproof.Collect(txs)
+		if err != nil {
+			return nil, nil, err
+		}
+		body.DependencyWitnesses = witnesses
+		hash := types.DependencyWitnessesHash8504(witnesses)
+		header.DependencyWitnessesHash = &hash
+	}
 	block := types.NewBlock(header, body)
 	if err := validateRLPBlockSize(b.config, block); err != nil {
 		return nil, nil, err
@@ -766,6 +796,11 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 			}
 		}
 
+		if tx.HasDependencies8504() {
+			if err := frameproof.VerifyTransaction(tx, b.config.FrameExtensions(header.Time), false); err != nil {
+				continue
+			}
+		}
 		// Set tx context so logs are keyed correctly.
 		statedb.SetTxContext(tx.Hash(), txIndex)
 
@@ -897,6 +932,15 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		header.WithdrawalsHash = &emptyWHash
 	}
 
+	if b.config.IsEIP8504(header.Time) {
+		witnesses, err := frameproof.Collect(txs)
+		if err != nil {
+			return nil, nil, err
+		}
+		body.DependencyWitnesses = witnesses
+		hash := types.DependencyWitnessesHash8504(witnesses)
+		header.DependencyWitnessesHash = &hash
+	}
 	block := types.NewBlock(header, body)
 	if err := validateRLPBlockSize(b.config, block); err != nil {
 		return nil, nil, err

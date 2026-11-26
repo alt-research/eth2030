@@ -121,6 +121,9 @@ func (w *SnapshotWriter) rebase(old *types.Header, update *PivotUpdate) error {
 				}
 				if !isOld {
 					for _, change := range account.CodeChanges {
+						if _, adopted := account.AdoptedCodeHash(change.Index); adopted {
+							continue
+						} // Hash-only adoption never installs empty bytecode. Missing code is proof-fetched at the final pivot below.
 						staged.Codes[crypto.Keccak256Hash(change.Value)] = bytes.Clone(change.Value)
 					}
 				}

@@ -9,6 +9,7 @@ import (
 	"github.com/eth2030/eth2030/bal"
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/eips"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -263,6 +264,10 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		"baseFee", header.BaseFee,
 		"timestamp", header.Time,
 	)
+
+	if err := frameproof.VerifyBlock(block, p.config.IsEIP8504(header.Time), p.config.FrameExtensions(header.Time)); err != nil {
+		return nil, err
+	}
 
 	// Determine if BAL tracking is active for this block.
 	balActive := p.config != nil && p.config.IsAmsterdam(header.Time)

@@ -77,6 +77,7 @@ type ExecutionPayloadV2 struct {
 
 // ExecutionPayloadV3 extends V2 with blob gas (Cancun/EIP-4844).
 type ExecutionPayloadV3 struct {
+	DependencyWitnesses [][]byte `json:"dependencyWitnesses,omitempty"` // Explicit native EIP-8504 profile; no official method version assigned.
 	ExecutionPayloadV2
 	BlobGasUsed   uint64 `json:"blobGasUsed"`
 	ExcessBlobGas uint64 `json:"excessBlobGas"`

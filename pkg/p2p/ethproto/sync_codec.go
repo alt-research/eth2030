@@ -86,9 +86,10 @@ func (p *GetBlockHeadersPacket) DecodeRLP(data []byte) error {
 }
 
 type wireBody struct {
-	Transactions []gethrlp.RawValue
-	Uncles       []gethrlp.RawValue
-	Withdrawals  []*types.Withdrawal `rlp:"optional"`
+	Transactions        []gethrlp.RawValue
+	Uncles              []gethrlp.RawValue
+	Withdrawals         []*types.Withdrawal `rlp:"optional"`
+	DependencyWitnesses [][]byte            `rlp:"optional"`
 }
 type wireBodies struct {
 	ID     uint64
@@ -101,7 +102,10 @@ func (p BlockBodiesPacket) EncodeRLP() ([]byte, error) {
 		if body == nil {
 			return nil, fmt.Errorf("eth: nil body")
 		}
-		wb := wireBody{Withdrawals: body.Withdrawals}
+		wb := wireBody{Withdrawals: body.Withdrawals, DependencyWitnesses: body.DependencyWitnesses}
+		if body.DependencyWitnesses != nil && body.Withdrawals == nil {
+			return nil, fmt.Errorf("witnesses require withdrawals position")
+		}
 		for _, tx := range body.Transactions {
 			raw, err := tx.EncodeRLP()
 			if err != nil {
@@ -134,7 +138,7 @@ func (p *BlockBodiesPacket) DecodeRLP(data []byte) error {
 	p.RequestID = in.ID
 	p.Bodies = nil
 	for _, body := range in.Bodies {
-		result := &BlockBody{Withdrawals: body.Withdrawals}
+		result := &BlockBody{Withdrawals: body.Withdrawals, DependencyWitnesses: body.DependencyWitnesses}
 		for _, raw := range body.Transactions {
 			kind, _, _, err := gethrlp.Split(raw)
 			if err != nil {

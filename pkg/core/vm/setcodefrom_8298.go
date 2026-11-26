@@ -156,3 +156,11 @@ func HasOpcode8298(code []byte, wanted OpCode) bool {
 	}
 	return false
 }
+
+// Preserve the paid ecRecover signer-class dependency through code adoption.
+func (s *codeAdoptionJournal) FrameRecoveryCode8151(a types.Address) []byte {
+	if reader, ok := s.StateDB.(interface{ FrameRecoveryCode8151(types.Address) []byte }); ok {
+		return reader.FrameRecoveryCode8151(a)
+	}
+	return s.StateDB.GetCode(a)
+}

@@ -35,3 +35,21 @@ captures pre-values before payment/nonce writes and builds sorted net tables
 lazily. Native selector/copy/rollback/settlement/BAL tests and complete
 core/types, core/vm and core/execution suites pass. Additional composition and
 application compatibility cases remain part of final qualification.
+
+The proof proposal is wired through bounded raw submission, exact wrappers,
+stateless verification caching, public admission (including body dependencies),
+one-wrapper lookup/accounting, builder collection, canonical union, header/body
+commitments, both Engine backends, payload body queries, chain/raw database
+codecs, restart and parallel processing. Native HTTP submission/simulation,
+Engine build/import/body retrieval/restart and live peer wrapper exchange pass.
+Missing/tampered/extra witnesses fail before state contamination. Ordinary eth
+transaction messages reject dependency transactions; hgtp/1 is a separately
+negotiated native experiment with a chain/pinned-profile handshake and bounded
+announce/request/response messages, not an official eth message assignment.
+
+The Gloas 19/20-field progressive payload has independent remerkleable vectors
+for absent, active-empty and two witnesses, using pinned ethlambda's opaque
+progressive witness lists. EIP-7807's different execution-block schema is not
+silently mixed with this profile; its unspecified composition fails closed.
+The full integrated package run and remaining compatibility/composition review
+are still in progress; final completion/release qualification is not claimed.

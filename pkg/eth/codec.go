@@ -15,6 +15,9 @@ import (
 func encodeTransactions(txs []*types.Transaction) (p2p.Msg, error) {
 	var payload []byte
 	for i, tx := range txs {
+		if tx.HasDependencies8504() {
+			return p2p.Msg{}, fmt.Errorf("dependency transaction requires witness wrapper capability")
+		}
 		if _, ok := tx.Inner().(*types.FrameTx8141); ok && len(tx.BlobHashes()) > 0 {
 			return p2p.Msg{}, fmt.Errorf("blob-bearing Frame must be announced and requested")
 		}
@@ -69,6 +72,9 @@ func decodeTransactions(msg p2p.Msg) ([]*types.Transaction, error) {
 		tx, err := types.DecodeTxRLP(txData)
 		if err != nil {
 			return nil, fmt.Errorf("decode tx: %w", err)
+		}
+		if tx.HasDependencies8504() {
+			return nil, fmt.Errorf("dependency transaction forbidden in Transactions")
 		}
 		if _, ok := tx.Inner().(*types.FrameTx8141); ok && len(tx.BlobHashes()) > 0 {
 			return nil, fmt.Errorf("blob-bearing Frame is not allowed in Transactions messages")

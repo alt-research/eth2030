@@ -275,6 +275,9 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	if evm.balTracker != nil {
 		evm.balTracker.RecordAddressTouch(target)
 	}
+	if ctx.PublicValidation && evm.forkRules.IsEIP8298 && target != ctx.Tx.Sender && HasOpcode8298(evm.StateDB.GetCode(target), SETCODEFROM) {
+		return gasLeft, errors.New("Frame public target has mutable SETCODEFROM code")
+	}
 	caller := types.EntryPointAddress
 	if frame.Mode == types.ModeSender {
 		if !ctx.Approved {
@@ -713,7 +716,11 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 			return errors.New("Frame SLOTNUM outside top-level recent-root verifier")
 		}
 	case TIMESTAMP:
-		if f.Index != 0 || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
+		first := 0
+		for first < len(f.Tx.Frames) && f.Tx.Frames[first].Mode == types.ModeProof8504 {
+			first++
+		}
+		if f.Index != first || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
 			string(contract.Code) != string(types.FrameExpiryCode) {
 			return errors.New("Frame public validation timestamp is not the expiry verifier")
 		}

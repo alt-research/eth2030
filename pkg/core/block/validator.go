@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/rlp"
@@ -117,6 +118,10 @@ func (v *BlockValidator) ValidateHeader(header, parent *types.Header) error {
 		return err
 	}
 
+	if (v.config.IsEIP8504(header.Time)) != (header.DependencyWitnessesHash != nil) {
+		return fmt.Errorf("dependency witness header presence does not match EIP-8504 activation")
+	}
+
 	// EIP-7843 extends every Amsterdam header, including slot zero.
 	if v.config != nil && v.config.IsAmsterdam(header.Time) && header.SlotNumber == nil {
 		return ErrMissingSlotNumber
@@ -171,6 +176,9 @@ func (v *BlockValidator) ValidateBody(block *types.Block) error {
 		return err
 	}
 	header := block.Header()
+	if err := frameproof.VerifyBlock(block, v.config.IsEIP8504(header.Time), v.config.FrameExtensions(header.Time)); err != nil {
+		return err
+	}
 
 	// Post-merge: no uncles allowed.
 	if len(block.Uncles()) > 0 {

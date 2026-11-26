@@ -61,6 +61,9 @@ type Header struct {
 	GasUsedVec   *[3]uint64
 	ExcessGasVec *[3]uint64
 
+	// EIP-8504: appended witness-list commitment, explicit optional profile.
+	DependencyWitnessesHash *Hash
+
 	// Cache fields (not serialized).
 	hash atomic.Pointer[Hash]
 	size atomic.Uint64

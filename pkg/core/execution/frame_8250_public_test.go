@@ -26,10 +26,10 @@ func TestFrame8250PublicExecutionSchemaBoundary(t *testing.T) {
 			}
 			signDelta8250(t, profile)
 			tx := types.NewFrameTransaction8250(profile)
-			before := *header
+			before := types.NewBlock(header, nil).Header()
 			before.Time--
 			root := db.GetRoot()
-			if _, _, err := ReplayFrame8141(cfg, nil, db, &before, tx, nil, vm.Config{}); err == nil {
+			if _, _, err := ReplayFrame8141(cfg, nil, db, before, tx, nil, vm.Config{}); err == nil {
 				t.Fatal("pre-fork keyed envelope executed")
 			}
 			if db.GetRoot() != root {

@@ -100,7 +100,7 @@ func (tx *FrameTx8141) ValidationDeployIndex8141() int {
 	return -1
 }
 
-// ValidationPrefix8250 uses the isolated profile's signing hash and nonce rules.
+// ValidationPrefix8250 uses the replacement signing hash and nonce rules.
 func (tx *FrameTx8250Delta) ValidationPrefix8250(timestamp uint64) (int, error) {
 	if err := tx.Validate(); err != nil {
 		return 0, err

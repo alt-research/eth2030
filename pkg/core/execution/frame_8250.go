@@ -12,11 +12,11 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 )
 
-// ExecuteFrame8250Delta executes the isolated nonce-only delta profile (D01).
-// The profile is deliberately absent from public decoders, fork configuration,
-// block import and pool admission. Callers must use a disposable research state,
-// with the ordinary NONCE_MANAGER deployment already included in its genesis.
-// The native frame loop, journals, gas settlement and BAL output are reused.
+// ExecuteFrame8250Delta is the independent nonce-rule oracle entry point.
+// It bypasses public schema selection and requires a disposable research state.
+// Production transactions use NewFrameTransaction8250 and the ordinary native
+// dispatcher, with explicit EIP8250Time activation and predeployed NONCE_MANAGER.
+// Both entry points reuse the same frame loop, journals, settlement and BAL.
 func ExecuteFrame8250Delta(cfg *config.ChainConfig, db state.StateDB, header *types.Header,
 	tx *types.FrameTx8250Delta, gp *gaspool.GasPool, tracker vm.BALTracker,
 ) (*types.Receipt, uint64, error) {

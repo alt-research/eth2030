@@ -88,7 +88,7 @@ func TestFrame8250PublicIdentityDependenciesAndForkEviction(t *testing.T) {
 			before := pool.lookup.frameValidations[next.Hash()]
 			db.SetNonce(base.Sender, 56)
 			pool.Reset(db)
-			if pool.Get(next.Hash()) == nil || (pool.lookup.frameValidations[next.Hash()] != before) != legacyRead {
+			if pool.Get(next.Hash()) == nil || pool.PendingCount() != 1 || pool.QueuedCount() != 0 || (pool.lookup.frameValidations[next.Hash()] != before) != legacyRead {
 				t.Fatal("legacy dependency cache invalidation differs")
 			}
 			db.SetState(types.NonceManager8250, types.NonceSlot8250(base.Sender, big.NewInt(42)), types.Hash{31: 1})

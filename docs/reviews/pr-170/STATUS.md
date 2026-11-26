@@ -1,5 +1,7 @@
 # Hegota Group C status
 
+A final bounded-work audit reproduced 100 raw-code copies for 100 opcodes even with paymaster recognition disabled. The per-frame/profile recognition cache fixes that regression and follows the frame snapshot journal. Its new mandatory native consumer covers disabled and selected profiles, frame/profile boundaries and rollback. Fresh qualification superseding the earlier figures below is in progress.
+
 Canonical-paymaster source reconciliation and local qualification are complete on implementation `95a0382f`. The exact #12041 runtime, distinct layout, authorization, treasury/admin operations, public admission/dependencies/exposure and native transport/build/import/reorg/restart are implemented behind explicit proposal selection. A native counterexample exposed and fixed missing candidate-state withdrawal availability. All 240 full-suite and 57 focused-race packages pass (24,004/9,587 passing events, zero failures); native/wrapper builds, full vet, the independent 12/12 baseline and 91 Python checks per mode pass. Required A/B/C consumers are 62/79/91, with zero required skips. Four native feature-mutation controls fail as intended with passing positive controls. Exact pushed-head hosted results are maintained in the live English PR description/checks. See [CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md). Earlier qualifications below remain historical.
 
 ## Independent completeness re-audit completed locally

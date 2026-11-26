@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -32,6 +33,11 @@ type FrameStateGas struct {
 	Scopes           []uint8
 	created          map[types.Address]bool
 	bal              *frameBALJournal
+	paymasterChecked bool
+	paymasterIndex   int
+	paymasterProfile framepay.Profile
+	paymasterTarget  types.Address
+	paymasterAllowed bool
 }
 
 type frameStorageKey struct {
@@ -650,8 +656,18 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 	}
 	// Only the fixed PAY runtime receives the draft's canonical-code exception.
 	// STATICCALL/write protection and exact-scope approval still apply normally.
-	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && evm.Config.FramePaymasterProfile.Matches(evm.StateDB.GetCode(target)) {
-		return nil
+	profile := evm.Config.FramePaymasterProfile
+	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && profile != framepay.NoPaymaster {
+		// VERIFY cannot change runtime code. Resolve the raw-code exception
+		// once per frame/profile, not once per opcode (GetCode copies bytes).
+		// Primitive cache fields follow the ordinary frame snapshot journal.
+		if !f.paymasterChecked || f.paymasterIndex != f.Index || f.paymasterProfile != profile || f.paymasterTarget != target {
+			f.paymasterAllowed = profile.Matches(evm.StateDB.GetCode(target))
+			f.paymasterChecked, f.paymasterIndex, f.paymasterProfile, f.paymasterTarget = true, f.Index, profile, target
+		}
+		if f.paymasterAllowed {
+			return nil
+		}
 	}
 	deploy := f.Index == f.Tx.ValidationDeployIndex8141()
 	rootVerifier := frame.IsRecentRootVerifier() && evm.depth == 1 &&

@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"math/big"
@@ -78,5 +79,86 @@ func TestFrameCSenderDefaultCodeCallException(t *testing.T) {
 	stack.Push(big.NewInt(99))
 	if err := evm.checkFrameValidation(EXTCODESIZE, contract, stack, 0); err == nil {
 		t.Fatal("empty third party accepted")
+	}
+}
+
+type frameRecognitionReads struct {
+	StateDB
+	codeReads int
+}
+
+func (s *frameRecognitionReads) GetCode(address types.Address) []byte {
+	s.codeReads++
+	return s.StateDB.GetCode(address)
+}
+
+func TestPR12041PaymasterRecognitionIsFrameBounded(t *testing.T) {
+	db := state.NewMemoryStateDB()
+	payer := types.Address{19: 0x93}
+	db.SetCode(payer, make([]byte, 24576))
+	reads := &frameRecognitionReads{StateDB: db}
+	evm := NewEVMWithState(BlockContext{}, TxContext{}, Config{}, reads)
+	pay := types.Frame8141{Mode: types.ModeVerify, Flags: 1, Target: &payer}
+	ctx := evm.SetFrameTransaction(&types.FrameTx8141{Sender: types.Address{19: 42}, Frames: []types.Frame8141{pay, pay}}, nil)
+	ctx.PublicValidation = true
+	contract := NewContract(types.EntryPointAddress, payer, new(big.Int), 100000)
+	stack := NewStack()
+	for _, profile := range []framepay.Profile{framepay.NoPaymaster, framepay.LocalV1, framepay.PR12041} {
+		evm.Config.FramePaymasterProfile = profile
+		reads.codeReads = 0
+		for i := 0; i < 100; i++ {
+			if err := evm.checkFrameValidation(PUSH0, contract, stack, 0); err != nil {
+				t.Fatal(err)
+			}
+		}
+		want := 1
+		if profile == framepay.NoPaymaster {
+			want = 0
+		}
+		if reads.codeReads > want {
+			t.Fatalf("profile %d copied code %d times, want at most %d per immutable frame", profile, reads.codeReads, want)
+		}
+	}
+	// A later frame observes its own runtime, and a profile change must not
+	// reuse another version's permission. Cache state follows frame snapshots.
+	db.SetCode(payer, framepay.Runtime12041())
+	contract.Code = framepay.Runtime12041()
+	ctx.Index = 1
+	reads.codeReads = 0
+	for i := 0; i < 100; i++ {
+		if err := evm.checkFrameValidation(SLOAD, contract, stack, 0); err != nil {
+			t.Fatal("exact proposal lost exemption", err)
+		}
+	}
+	if reads.codeReads > 1 {
+		t.Fatal("exact runtime recognition repeated per opcode")
+	}
+	id := evm.StateDB.Snapshot()
+	ctx.Index = 0
+	reads.codeReads = 0
+	if err := evm.checkFrameValidation(SLOAD, contract, stack, 0); err != nil || reads.codeReads > 1 {
+		t.Fatal("frame identity did not refresh recognition", err)
+	}
+	evm.StateDB.RevertToSnapshot(id)
+	reads.codeReads = 0
+	if ctx.Index != 1 {
+		t.Fatal("frame snapshot not restored")
+	}
+	if err := evm.checkFrameValidation(SLOAD, contract, stack, 0); err != nil || reads.codeReads != 0 {
+		t.Fatal("restored immutable frame lost cached recognition", err)
+	}
+	for _, profile := range []framepay.Profile{framepay.NoPaymaster, framepay.LocalV1} {
+		evm.Config.FramePaymasterProfile = profile
+		reads.codeReads = 0
+		if err := evm.checkFrameValidation(SLOAD, contract, stack, 0); err == nil {
+			t.Fatal("stale proposal permission crossed profile boundary")
+		}
+		want := 1
+		if profile == framepay.NoPaymaster {
+			want = 0
+		}
+		if reads.codeReads > want {
+			t.Fatal("unexpected recognition read count")
+		}
 	}
 }

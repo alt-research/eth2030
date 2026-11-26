@@ -43,6 +43,12 @@
       "path": "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1"
+    },
+    {
+      "eip": 1153,
+      "path": "refs/EIPs/EIPS/eip-1153.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40"
     }
   ],
   "profiles": {
@@ -109,7 +115,8 @@
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8141 Policy Summary: factory code-only and admitted payer balance dependencies"
+            "EIP-8141 Policy Summary: factory code-only and admitted payer balance dependencies",
+            "EIP-8141 Validation Trace Rules plus EIP-1153 transient storage ownership/write semantics"
           ],
           "files": [
             "pkg/core/types/frame_8141_pool.go",
@@ -121,7 +128,8 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolTraceRestrictions",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolRequiresOneCombinedApproval",
             "github.com/eth2030/eth2030/txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix",
-            "github.com/eth2030/eth2030/core/execution::TestFrameCPublicFactoryFundingDependencyScope"
+            "github.com/eth2030/eth2030/core/execution::TestFrameCPublicFactoryFundingDependencyScope",
+            "github.com/eth2030/eth2030/core/execution::TestFrameCPublicTransientStorageScope"
           ],
           "scope": "selected profiles; public gates unchanged"
         },

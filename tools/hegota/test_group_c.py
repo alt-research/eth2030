@@ -38,7 +38,7 @@ class GroupCIntegrityTests(unittest.TestCase):
                 c['tests']=[n for n in c['tests'] if 'FrameCNativePeers' not in n]
         with self.assertRaises(ValueError):validate_manifest(ROOT,self.manifest)
     def test_followup_boundaries_required(self):
-        for boundary in ['TestFrameCIsolatedKeyedCachedDimensionalLimits', 'TestFrameCPendingAndMinedQueryLocations', 'TestFrameCSimulationTraceLimitIsExplicit']:
+        for boundary in ['TestFrameCIsolatedKeyedCachedDimensionalLimits', 'TestFrameCPendingAndMinedQueryLocations', 'TestFrameCSimulationTraceLimitIsExplicit', 'TestFrameCPublicTransientStorageScope']:
             manifest=copy.deepcopy(self.manifest)
             for row in manifest['tasks']:
                 for criterion in row['criteria']:

@@ -678,7 +678,11 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 		if next != CALL && next != CALLCODE && next != DELEGATECALL && next != STATICCALL {
 			return errors.New("Frame public validation observed GAS")
 		}
-	case SLOAD, SSTORE:
+	case TSTORE:
+		// The prefix's state-write exceptions name sender SSTORE and code
+		// installation only. EIP-1153 transient writes get no extra exception.
+		return errors.New("Frame public validation performed a transient storage write")
+	case SLOAD, SSTORE, TLOAD:
 		if op == SLOAD && rootVerifier {
 			refs, _ := types.DecodeRecentRootReferences(frame.Data)
 			key := bigToHash(stack.Back(0))

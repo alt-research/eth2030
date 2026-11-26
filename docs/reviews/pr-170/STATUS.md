@@ -1,15 +1,33 @@
 # Hegota Group C status
 
-## Independent completeness re-audit in progress
+## Independent completeness re-audit completed locally
 
-The latest EIPs master is 514f00c369f9586e4d70a25da798ae2bd3d0ead7. The four C normative documents are text-identical to the pinned references; consensus-specs and the open canonical-paymaster proposal are unchanged. Unmerged proof-frame, witness-read and validation-budget proposals are tracked without adoption.
+The latest EIPs master is 514f00c369f9586e4d70a25da798ae2bd3d0ead7. The four C
+normative documents are text-identical to the pinned references; consensus-specs
+and the open canonical-paymaster proposal are unchanged. The complete current
+8141/8250/8272/8151 discussion streams and PR #170 reviews were checked. Unmerged
+proof-frame, witness-read and verification-budget changes are not adopted.
 
-A native red control reproduced shared-payer revalidation losing a valid transaction because a later-visited invalid transaction still reserved funds. Revalidation now prepares all transactions against the head and removes invalid entries before shared-resource arbitration, then evicts by expiry and effective priority rather than hash alone. Existing pool tests and the new adversarial controls pass; final combined qualification remains pending.
+All forty C criteria were rechecked. The audit reproduced and corrected four
+cross-transaction omissions: invalid reservations interfering with valid peers,
+hash-only pruning after a payer balance reduction, stale signer-share accounting
+during simultaneous witness-path changes, and regular/blob partitioning dropping
+an executable scalar successor of a blob Frame. Native frozen-prior-source
+controls fail for each omission while ordinary and independent keyed controls
+pass. See [the full reconciliation](RECHECK.md).
 
-A second red control reproduced blob/scalar queue partitioning dropping an executable ordinary successor of a blob Frame. Both builder interfaces now apply the existing ordinary-before-blob policy only among executable sender heads. Six actual build/replay cases cover base Frames, EIP-8250 empty-key legacy domains and independent nonempty keyed domains; prior unrelated-sender ordering controls remain intact.
+Final local qualification on `c4fffe3922d534acd88b919e29defffad239e5d7`:
 
-A conditional EIP-8151 regression also swaps two senders' recovery-witness paths simultaneously. The old implementation incorrectly counted another transaction's stale signer share; the two-phase head refresh retains both valid transactions and updates their signer indices. The frozen prior-source overlay reproduces all three interaction failures while its ordinary and keyed-domain positive controls still pass.
+- Full suite: 23,947 passing events, zero failures, 124 optional skips; all 240 packages complete (221 pass, 19 without executed tests).
+- Focused race: 9,478 passing events, zero failures, 74 optional skips; all 54 packages complete (51 pass, three without executed tests).
+- Native/wrapper builds, full vet and independent historical baseline 12/12 pass.
+- Ordinary/optimized Python: 89 checks each. A/B/C required consumers: 62/79/74, all executed with zero required skips. Current source-bound A/B/C evidence passes.
+- Reference contents and all independent oracle expectations are unchanged. Previous counterexamples remain preserved alongside the four new native controls.
 
+The upstream canonical-paymaster bytecode gate remains the sole C specification
+boundary. Current pushed-head hosted results are maintained in the English PR
+description/current checks and are not inferred from the predecessor's 15 passes.
+The implementation and evidence below are historical qualifications.
 
 ## Current public integration follow-through (2026-11-26)
 

@@ -2,11 +2,14 @@
 
 ## Independent completeness re-audit
 
-- [ ] Recheck upstream EIP/consensus identities, merged changes and live discussion/review status.
-- [ ] Re-read every C normative clause and trace its actual admission, revalidation, builder, transport and RPC consumers.
-- [ ] Exercise interactions absent from the existing register, especially simultaneous dependency failures and shared-resource transitions.
-- [ ] Reproduce each confirmed omission before fixing it; preserve independent oracle expectations and reference contents.
-- [ ] Requalify the final source, refresh A/B/C evidence and publish the English PR with exact-head hosted results.
+- [x] Recheck upstream EIP/consensus identities, merged changes and live discussion/review status.
+- [x] Re-read every C normative clause and trace actual admission, revalidation, builder, transport and RPC consumers; record all forty criteria in RECHECK.md.
+- [x] Exercise simultaneous failures and shared-resource transitions; reproduce invalid reservation, expiry/priority, stale signer-share and mixed blob/scalar ordering omissions.
+- [x] Fix all four confirmed omissions with native prior-source red controls and preserved positive controls; leave references and independent oracles unchanged.
+- [x] Requalify the final source with full/race/build/vet/baseline and 89 Python checks per mode; refresh A/B/C evidence and prepare the English PR publication.
+
+Exact pushed-head hosted results are recorded in the live English PR description
+and checks. The canonical-paymaster upstream runtime boundary remains explicit.
 
 ## Public integration follow-through (2026-11-26)
 

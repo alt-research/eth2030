@@ -73,3 +73,14 @@ all four omission consumers, while the ordinary last-nonce, unrelated-sender
 class preference and nonempty-keyed ordering controls pass. These are real native
 counterexamples, not altered specification/oracle expectations. Qualification
 log hashes and exact final source identity belong in evidence/hegota-{a,b,c}.
+
+## Final local qualification
+
+Implementation source: c4fffe3922d534acd88b919e29defffad239e5d7. Full native
+build, native/wrapper binaries, vet, all 240 full-suite and 54 focused-race
+packages complete successfully: 23,947/9,478 passing events and zero failures.
+All 62/79/74 mandatory A/B/C consumers pass with zero required skips. The
+124/74 optional skips have separate inventories. The independent historical
+baseline passes 12/12 and ordinary/optimized Python each pass 89 checks.
+Current-head hosted results are recorded in the English PR description/checks;
+prior runs do not qualify this audit. PAYMASTER-CODE remains upstream-gated.

@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "3fe23f60bf0ace7e28485dcbe67abe9464649c14",
+  "source_revision": "c4fffe3922d534acd88b919e29defffad239e5d7",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -12,12 +12,14 @@
   "artifacts": {
     ".github/workflows/ci.yml": "56e32030782bf723797675c59dd7c2ed90087614a8d2d2ca2d322a61c5e83514",
     "docs/plans/hegota-c/COMPOSITION.md": "89120695657a0ae3a55995e813eefe04b6d57ac986b421e635e45e0b870467ca",
-    "docs/plans/hegota-c/PLAN.md": "dee8f9298dc4b416ff6a606d835b47ea0f19dc83ba0f3dbf9a5681156b103e0c",
+    "docs/plans/hegota-c/PLAN.md": "1ee0985d70f9a95f79e32ca850318713770f7973618d9e37d2a68d16f0b379c5",
     "docs/plans/hegota-c/RPC_PROFILE.md": "a3a5058e25333a3457af0d071e94251d866645eaa8a1a45b65f7274e5f4b1da0",
+    "docs/reviews/pr-170/RECHECK.md": "6a7c5fbbf45dba81c905798c54fb75b01117405126e5c6a3110d62225a5dec7f",
     "pkg/cmd/eth2030/main.go": "78d690943e5b7670bbd96e9dd0f0927727bf358aead07b97bb8fbfb34513231d",
-    "pkg/core/block/builder.go": "3d30377bb413489b4257d49e380e22d8906e0f95d17bffdfea44b848f588b942",
+    "pkg/core/block/builder.go": "bc9047ae96b77ca3af712f34b62be923c8e1ff2289dc289a8bfd917b7241f3f4",
     "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
-    "pkg/core/block/ordering.go": "0ff887fdc5266c89613d9557f90313bcffb57e606e3f068aa38ec8b38294e767",
+    "pkg/core/block/frame_mixed_ordering_test.go": "70aad6b139671a9108c2910e44bd8b01343ba639d2859170ed53be5e9fc3f9cf",
+    "pkg/core/block/ordering.go": "c66578e753120f3807bd1e4f086348aadc474f8d3997ecabcdf6176d436ae406",
     "pkg/core/block/ordering_test.go": "e6555967a01fac7771bb5c68c5323fb88b42775921c664d4d82f05ef45ae23bf",
     "pkg/core/config/chain_config.go": "25a1ce1822deec846ac8d52cf2a552243e25bb7fa6245695a46079ad0ea86c5e",
     "pkg/core/config/chain_config_ext.go": "4fc4dec11047a18bfc90f20ea8293bffd898533a5f41b828f51ecebcfc999487",
@@ -75,7 +77,7 @@
     "pkg/rpc/types/frame_8141_test.go": "5baf81629167e1a7cc9a090a467fda76817849db160c9f36ef4306e5cace81fa",
     "pkg/rpc/types/frame_simulation.go": "5b78e0ffd261a44a7474f07df0982073efc73b5820a9f06ca22c7f63d920bda7",
     "pkg/rpc/types/types.go": "5a9b25eb7e9e8e8ec0091880e00bcca828317e70c265825e29ba985f84a9d030",
-    "pkg/txpool/frame_8141.go": "0fec0539aeabe2de822ad6dddceee883273b3fa472e12a1dffbd53ae7f04cba3",
+    "pkg/txpool/frame_8141.go": "a80d41c2834c7d7441c7793fb7393b37ee80fec5f812e35c006f8105d10c7cd0",
     "pkg/txpool/frame_8141_test.go": "e80a7f7ad3f44cfb4db309d2a8384240b75c6b66cb8133ed0086ae2da7ade20e",
     "pkg/txpool/frame_8250_delta.go": "99e59908bab9415b3f272d1c489e42c9ff488a938aaee0b3d19ac1c72b27587c",
     "pkg/txpool/frame_8250_delta_test.go": "f49ea808c26b562d879ee921f99050a319672f3eb56d85389b74d28d625624c4",
@@ -83,8 +85,9 @@
     "pkg/txpool/frame_c_test.go": "e44a55293aedb79c482f0140b378cdcebcdd2da1335c5b0d92421b6cf672c52b",
     "pkg/txpool/frame_expiry.go": "5725af6818ed937199d4332b2c210bf9561703a7084e2395b45e1864c4df0e7b",
     "pkg/txpool/frame_paymaster_test.go": "a738c7132a788cc208a94c61f003d6bb6d65ce6f9baf3dda2ef5da63dda76373",
+    "pkg/txpool/frame_revalidation_batch_test.go": "3c8f9f202bd9b4ed4da81bc64605b96b762fcac557236ada2e3fa3a3f6f916da",
     "pkg/txpool/frame_signers_8151.go": "e12d304f27af3e4392838f8474976fa67117d68db1b954c2b57b270e6c86aa71",
-    "pkg/txpool/frame_signers_8151_test.go": "b0fa2013a18dd577e08bb8758b3006c7f9366ae04cea7b456f7f9ebe4d228049",
+    "pkg/txpool/frame_signers_8151_test.go": "5e15e2ee9bdb39e46ad0f9ccab5c9a59885897e0d0984bccbd5741cb6fd0110a",
     "pkg/txpool/hegota_activation_test.go": "48a29ebf0c4bd87d337e94fa086e2793c3b019effa0a4bd0dd7464ae6c566bae",
     "pkg/txpool/txpool.go": "f5e1946e279cd7c338c89929b6f977fefd7b1efe87826db206d0d60faa3861bc",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
@@ -96,18 +99,19 @@
     "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1",
-    "specs/hegota/group-c.json": "9c01debc1008afb136970576bfcad2ec92e64c1acde2b08c4f25da33f1020111",
+    "specs/hegota/group-c.json": "2bad17caf42f7b407bdd503f8611a2759d1dff4d94f4a6817e3b61e76f782e9d",
     "specs/hegota/profiles.json": "2c98f6ded415c8c7b9651a84d4320b4abb26651386213699cec9f59d5b65fb5d",
     "tools/hegota/README.md": "c867027ec586972404c63ac2e5b3dbb5b44f6e885f23751ccf3b297211f49135",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "c794a7605a3b22ede793274faf32324990be28f54f0ae6155f9efc943c0705e7",
-    "tools/hegota/test_group_c.py": "c3c56d4e4e707525c8aa7cd6cfae90aca13d65da8128faa13238b1c042074fea"
+    "tools/hegota/check_c.py": "0473f17ee6726fe9ad1c2c57520c7b11c8d8d6d96b610789d719cb86213b5706",
+    "tools/hegota/test_group_c.py": "2e745153e198d86167cd8941ec97bf7c03d524036d71bf85f3a5d96d40e3138f"
   },
-  "source_fingerprint_sha256": "191cc8bdf06b1b79712bc0b3064449bd704bc3da7add26e69f2910223fefe108",
+  "source_fingerprint_sha256": "7aa836c6bf8404f54cc1402ba4a4c8b8cd9c3c5551e936aa6425e0604c7e9224",
   "passed_tests": {
     "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart": "pass",
     "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart": "pass",
     "github.com/eth2030/eth2030/core/block::TestFrame8250BuilderOrderingKeepsKeyedDomainsIndependent": "pass",
+    "github.com/eth2030/eth2030/core/block::TestFrameCBlobAndOrdinarySenderOrdering": "pass",
     "github.com/eth2030/eth2030/core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee": "pass",
     "github.com/eth2030/eth2030/core/config::TestFrameExtensionActivationAndCompatibility": "pass",
     "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals": "pass",
@@ -171,15 +175,18 @@
     "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg": "pass",
+    "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure": "pass",
+    "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy": "pass",
+    "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCZeroFeeBudgetDoesNotPanic": "pass",
     "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReplacementMovesWithdrawalAdjustedExposure": "pass",
     "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal": "pass"
   },
   "run": {
-    "log_sha256": "cbc2875adf8a0973f401614a98f2b69e027cdb6a234cac505d8d3435bc2441e8",
+    "log_sha256": "782137f23ac668a5242bb5a3d75a3831f78d3652b85510e7ba87df3802876956",
     "named": {
-      "pass": 23935,
+      "pass": 23947,
       "skip": 124
     },
     "packages": {
@@ -191,8 +198,8 @@
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native/wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "c4be4641644edee610831344d308a7dd2768fcc77de5d56b8dc039f09ee5a747",
-    "race_named_pass": 9466,
+    "race_log_sha256": "a75e4407d0375218794a1edaec80045d45762bd235a99f79be92de60b9ad7ac7",
+    "race_named_pass": 9478,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "required_native_consumer_skips": 0,
@@ -203,9 +210,9 @@
       "skipped": 0
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-    "python_regressions": 88,
-    "python_log_sha256": "74ffa0b878d711e22b2dd28ab5269c7a8b482d5918e66f1d7bcf571c69750b8c",
-    "optimized_python_log_sha256": "bc149179fe12a0edaf21157257c656eb3907e4bb3aeaa8ef732ed4e5c67d4a27"
+    "python_regressions": 89,
+    "python_log_sha256": "1bed5503b198b0bcf70ab78860b680cb6c92f1fe5bc3c427da7ae64e9a69cc0b",
+    "optimized_python_log_sha256": "da5d9c1871ac8cec498e8148adbbd6c265dbecc7b2d24b74840583d35f26441c"
   },
   "negative_controls": [
     {
@@ -281,6 +288,53 @@
       ],
       "positive_control": "TestCanonicalFrame8141PoolLastValidNonce passes",
       "scope": "feature-disabling native overlay, not an unmodified-prior-source claim"
+    },
+    {
+      "name": "invalid-reservations-before-arbitration",
+      "prior_source_revision": "6b9bbf8a4e5d5aa92432bf773ed54ceb0cce0059",
+      "test_source_revision": "c4fffe3922d534acd88b919e29defffad239e5d7",
+      "expected_exit_code": 1,
+      "log_sha256": "e2c7cff36ffb70cc5af3b06c2c5180ee1cffb12da92c87c0054b444f861ed3ac",
+      "overlay_source_sha256": "0fec0539aeabe2de822ad6dddceee883273b3fa472e12a1dffbd53ae7f04cba3",
+      "failed_native_consumer": "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure",
+      "positive_control": "TestCanonicalFrame8141PoolLastValidNonce passes",
+      "scope": "exact prior-source Go overlay; unchanged references and independent oracle expectations"
+    },
+    {
+      "name": "shared-payer-expiry-priority-pruning",
+      "prior_source_revision": "6b9bbf8a4e5d5aa92432bf773ed54ceb0cce0059",
+      "test_source_revision": "c4fffe3922d534acd88b919e29defffad239e5d7",
+      "expected_exit_code": 1,
+      "log_sha256": "e2c7cff36ffb70cc5af3b06c2c5180ee1cffb12da92c87c0054b444f861ed3ac",
+      "overlay_source_sha256": "0fec0539aeabe2de822ad6dddceee883273b3fa472e12a1dffbd53ae7f04cba3",
+      "failed_native_consumer": "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy",
+      "positive_control": "TestCanonicalFrame8141PoolLastValidNonce passes",
+      "scope": "exact prior-source Go overlay; unchanged references and independent oracle expectations"
+    },
+    {
+      "name": "simultaneous-signer-path-refresh",
+      "prior_source_revision": "6b9bbf8a4e5d5aa92432bf773ed54ceb0cce0059",
+      "test_source_revision": "c4fffe3922d534acd88b919e29defffad239e5d7",
+      "expected_exit_code": 1,
+      "log_sha256": "e2c7cff36ffb70cc5af3b06c2c5180ee1cffb12da92c87c0054b444f861ed3ac",
+      "overlay_source_sha256": "0fec0539aeabe2de822ad6dddceee883273b3fa472e12a1dffbd53ae7f04cba3",
+      "failed_native_consumer": "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot",
+      "positive_control": "TestCanonicalFrame8141PoolLastValidNonce passes",
+      "scope": "exact prior-source Go overlay; unchanged references and independent oracle expectations"
+    },
+    {
+      "name": "mixed-blob-frame-account-nonce-ordering",
+      "prior_source_revision": "6b9bbf8a4e5d5aa92432bf773ed54ceb0cce0059",
+      "test_source_revision": "c4fffe3922d534acd88b919e29defffad239e5d7",
+      "expected_exit_code": 1,
+      "log_sha256": "a6b537f53f05188dc37c4ed72da4fbbcc1b5367d7c3358cabd64586a637ec755",
+      "overlay_sources_sha256": {
+        "ordering-builder.go": "3d30377bb413489b4257d49e380e22d8906e0f95d17bffdfea44b848f588b942",
+        "ordering-ordering.go": "0ff887fdc5266c89613d9557f90313bcffb57e606e3f068aa38ec8b38294e767"
+      },
+      "failed_native_consumer": "github.com/eth2030/eth2030/core/block::TestFrameCBlobAndOrdinarySenderOrdering",
+      "positive_controls": "both nonempty-keyed cases and TestBuildBlock_BlobTxsSeparateFromRegular pass",
+      "scope": "both builder interfaces drop scalar successors under base and empty-key profiles against prior code; no reference/oracle edits"
     }
   ],
   "review_correction": {

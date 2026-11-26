@@ -84,3 +84,24 @@ Earlier native counterexamples remain retained. PAYMASTER-CODE remains open;
 unmerged runtime proposals and upstream fixture counts are not counted as local
 production evidence. Exact pushed-head hosted status belongs in the live English
 PR description/current checks, without reusing predecessor runs.
+
+## Independent cross-transaction re-audit
+
+[RECHECK.md](RECHECK.md) reconciles all forty C criteria with current source,
+merged normative text and the complete discussion streams. It supersedes the
+predecessor's completeness assumption where shared-resource transitions and
+mixed regular/blob ordering were not exercised together.
+
+Frozen prior-source overlays from 6b9bbf8a reproduce invalid-reservation eviction,
+wrong expiry/priority pruning, stale signer shares during a simultaneous witness
+swap, and blob Frame account-nonce ordering loss. Ordinary last-nonce and
+unrelated class-preference controls pass; both nonempty-keyed ordering controls
+also pass against the old source. Current native consumers pass all cases.
+
+Source c4fffe3922d534acd88b919e29defffad239e5d7 passes 23,947 full-suite and
+9,478 race events, all 240/54 packages, build/vet, 12/12 independent baseline,
+89 ordinary/optimized Python checks and all 62/79/74 mandatory A/B/C consumers.
+Required skips are zero; optional full/race skips remain separately inventoried.
+The pinned EIP sources and independent expected values were not changed. Current
+hosted proof/check results belong in the live English PR description, with its
+actual final head, rather than being copied from 6b9bbf8a.

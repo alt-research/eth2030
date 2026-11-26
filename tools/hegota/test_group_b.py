@@ -58,7 +58,7 @@ class GroupBCoverageTests(unittest.TestCase):
                     read_events(log)
 
     def test_missing_normative_source_rejected(self):
-        for eip in (7702, 2929, 214):
+        for eip in (7702, 2929, 214, 1153):
             with self.subTest(eip=eip):
                 manifest = self.manifest()
                 manifest['normative_sources'] = [s for s in manifest['normative_sources'] if s['eip'] != eip]
@@ -76,6 +76,10 @@ class GroupBCoverageTests(unittest.TestCase):
             ('HGT-013', 'build_import', 'TestCanonicalFrame8141PrefundedCreateBuildImport'),
             ('HGT-015', 'bal', 'TestFrame8141PrefundedCreationBAL'),
             ('HGT-015', 'bal', 'TestCanonicalFrame8141PrefundedCreateBuildImport'),
+            ('HGT-012', 'transient_warmness', 'TestCanonicalFrame8141PersistentBackendJournals'),
+            ('HGT-013', 'native_route', 'TestCanonicalFrame8141PersistentBackendJournals'),
+            ('HGT-015', 'bal', 'TestCanonicalFrame8141PersistentBackendJournals'),
+            ('HGT-016', 'restart_history', 'TestCanonicalFrame8141PersistentBackendJournals'),
         ):
             with self.subTest(test=name):
                 manifest = self.manifest()

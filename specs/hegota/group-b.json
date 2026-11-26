@@ -73,6 +73,12 @@
       "path": "refs/EIPs/EIPS/eip-214.md",
       "sha256": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 1153,
+      "path": "refs/EIPs/EIPS/eip-1153.md",
+      "sha256": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
     }
   ],
   "profiles": {
@@ -344,11 +350,12 @@
         },
         {
           "id": "transient_warmness",
-          "statement": "Transient state resets between frames and access warmness follows snapshots.",
+          "statement": "Transient state resets between frames and access warmness follows snapshots. Memory, persisted/reopened Trie and Snap backends preserve exact warmness, nested transient rollback and inter-Frame clearing.",
           "clauses": [
             "8141/Cross-frame interactions",
             "7702/Gas Costs",
-            "2929/Specification"
+            "2929/Specification",
+            "1153/Specification"
           ],
           "files": [
             "pkg/core/vm/frame_8141.go",
@@ -358,7 +365,8 @@
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
             "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
           ]
         }
       ]
@@ -378,7 +386,8 @@
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrameProcessorForkTimeBeforeMutation",
-            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback"
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
           ]
         },
         {
@@ -474,7 +483,8 @@
             "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL",
             "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL",
-            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport"
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
           ]
         },
         {
@@ -541,7 +551,7 @@
         },
         {
           "id": "restart_history",
-          "statement": "Native FileDB restart, replay and reorg retain canonical Frame effects and receipts; no new public schema migration.",
+          "statement": "Native FileDB restart, replay and reorg retain canonical Frame effects and receipts; no new public schema migration. Committing and reopening native Trie/Snap state between signed Frame transactions preserves transaction-original storage values and exact canonical receipt/BAL bytes.",
           "clauses": [
             "8141/Behavior",
             "2718"
@@ -552,7 +562,8 @@
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
-            "github.com/eth2030/eth2030/core/chain::TestColdDiskReceiptDerivedFieldsMatchIndependentSDK"
+            "github.com/eth2030/eth2030/core/chain::TestColdDiskReceiptDerivedFieldsMatchIndependentSDK",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
           ]
         }
       ]

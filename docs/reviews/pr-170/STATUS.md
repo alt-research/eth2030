@@ -4,7 +4,15 @@
 
 D01 is resolved for the selected native 8141/8250 two-fee composition by merged author/base history, with the earlier decision preserved in profiles.json. See [COMPOSITION.md](../../plans/hegota-c/COMPOSITION.md). The public eight-field reader, explicit EIP8250Time, nonce-domain-aware pool/order/replacement/dependencies, public RPC/P2P/simulation/build/import/reorg/restart consumers and optional EIP8151Time signer protection are implemented. New native tests cover both activation directions, raw-code gas/BAL behavior and separate signer shares. Typed direct queries and txpool indexing also preserve complete keyed fields and independent replay identities.
 
-Final full/race/build/vet and source-bound A/B/C evidence refresh are in progress. The qualification figures below describe the predecessor and must not be reused as evidence for the new code. The upstream canonical-paymaster runtime remains the sole C specification gate; local v1 stays opt-in experimental.
+Local qualification is complete on implementation revision `3fe23f60bf0ace7e28485dcbe67abe9464649c14`:
+
+- Full suite: 23,935 passing test/subtest events, zero failures, 124 optional skips; 240 completed packages (221 pass, 19 without executed tests).
+- Focused race: 9,466 passing events, zero failures, 74 optional skips; 54 completed packages (51 pass, three without executed tests).
+- Native/wrapper builds, full vet and the independent 12/12 historical baseline pass. An initial test-only atomic Header copy flagged by vet was replaced with the native header-copy path before final qualification.
+- Ordinary/optimized Python: 88 checks each. Required A/B/C consumers: 62/79/70, all executed with zero required skips. Current A/B/C source-bound evidence passes.
+- Feature-disabling native overlays fail the keyed reset and EIP-8151 activation/dependency regressions while the ordinary last-nonce control passes. Earlier counterexamples remain preserved.
+
+The upstream canonical-paymaster runtime remains the sole C specification gate; local v1 stays opt-in experimental. Exact pushed-head hosted results are maintained in the English PR description/current checks. The historical figures below are not reused for the new code.
 
 ## Historical base-profile qualification
 

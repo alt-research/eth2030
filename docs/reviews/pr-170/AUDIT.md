@@ -72,6 +72,15 @@ fingerprints include activation flags so the old stateless validation cache
 cannot survive the boundary. Native gas/access/revert controls use the real
 MemoryStateDB rather than a mock that does not journal warming.
 
-Final qualification and exact implementation revision will be recorded after
-full/race/build/vet runs. PAYMASTER-CODE remains open; unmerged runtime proposals
-and upstream fixture counts are not counted as local production evidence.
+Final local qualification on 3fe23f60bf0ace7e28485dcbe67abe9464649c14 passes:
+23,935 full-suite and 9,466 focused-race events, zero failures, all 240/54 packages
+completed, native/wrapper builds, vet, 12/12 historical differential cases and
+88 Python checks in each mode. All 62/79/70 A/B/C required consumers execute
+with zero required skips. Optional 124/74 skips have separate inventories.
+Feature-disabling native overlays reproduce keyed scalar-reset and missing
+8151 execution-activation failures with the ordinary last-nonce control passing.
+These are integration mutations, not claims about unmodified predecessor code.
+Earlier native counterexamples remain retained. PAYMASTER-CODE remains open;
+unmerged runtime proposals and upstream fixture counts are not counted as local
+production evidence. Exact pushed-head hosted status belongs in the live English
+PR description/current checks, without reusing predecessor runs.

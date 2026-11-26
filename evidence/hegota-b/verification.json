@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "3668cf702cacc021eb054058638ef6cc5d564e0a21da0e392042882f4280a032",
+    "log_sha256": "cbc2875adf8a0973f401614a98f2b69e027cdb6a234cac505d8d3435bc2441e8",
     "named": {
-      "pass": 23874,
+      "pass": 23935,
       "skip": 124
     },
     "packages": {
@@ -15,13 +15,13 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "0a43125417e7d27ecae7688c993c846b448f007f57af2f1b8db9545211ed284e",
+  "source_fingerprint_sha256": "8341982450647c352b8706575d1ccd867446d408793c06ad216a3fea2d94dbda",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
     "pkg/bal/spec_test.go": "8401db90680311863c2065e488271a4670b4cb63d811e2ddc3895ec713ad13f1",
     "pkg/core/block/builder.go": "3d30377bb413489b4257d49e380e22d8906e0f95d17bffdfea44b848f588b942",
-    "pkg/core/block/frame_8141_integration_test.go": "3492c70786c496814548cc6d023f0002abe56ec2bf511619bebc502f172e2ea1",
+    "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
     "pkg/core/block/frame_prefunded_creation_test.go": "907fe4f3183d83fa617d31e505be06ccbe78b0f77a85c2b9d7354af74a1dfa2a",
     "pkg/core/block/frame_size_conformance_test.go": "6b291a196a5246bebf62a039fc449b7631ccfe72f34a373a30e51c01d1eb5bab",
     "pkg/core/block/validator.go": "e9c76f5b010baa261e75a64a4658e28e4c2253d5add2c8c4b46e7db76de6000d",
@@ -32,10 +32,10 @@
     "pkg/core/chain/transaction_readback.go": "49bd254fbeae2ca8e253e4ac9ee9d999aae4a4a2249f6b64544a51b79004fedb",
     "pkg/core/eftest/hegota_goldens_test.go": "eec2d755e42b6239c867f4270014c0490e196d3d276d2a3f99e26f13395681f7",
     "pkg/core/execution/amsterdam_system_gas_test.go": "0e0aa523c92cb6e80e30a227e6fb1bbbce09236f6c5e2a5044e49b4bba2ac337",
-    "pkg/core/execution/frame_8141.go": "9ebfd94b53dae52ca2695a8d6a636be23ad35692207fccf3e17f45b98c484871",
+    "pkg/core/execution/frame_8141.go": "942e69ed41bf5729645812aa66ee553b8fec540771baf686dcf9e7326418f266",
     "pkg/core/execution/frame_8141_conformance_test.go": "681e49d1f66f2cdbb6de28c98bcc7e7281abad8c331070122612d6e4236a0abe",
     "pkg/core/execution/frame_8141_test.go": "c506e0de2054c4bc9b221c8a70fc00b5869fb081520078aa4a8e8538dc64f99b",
-    "pkg/core/execution/frame_8250.go": "a55213cf2bdf0179ced6aedf2a2a18ec1381c228ac6be682d557427bfb7ffc8c",
+    "pkg/core/execution/frame_8250.go": "42ed6a36902fe61cb881be21adb06211822c7d392647c8b3058202cd0c9152bd",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
     "pkg/core/execution/frame_backend_audit_test.go": "fd09ede31bd631a95c8fdc36c4e1b77f8dd33ca252c5df0c57cd232dde95e83a",
@@ -46,16 +46,16 @@
     "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
     "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
-    "pkg/core/execution/processor.go": "b8b716255ede58e074347cdddcd2dae25790c70563cd96bd7cee6b73d2698194",
+    "pkg/core/execution/processor.go": "b7f87db7d7f2a08ff65b9212ef23fa56f8d767ef16daf8b1d5a3a5eb213fc313",
     "pkg/core/execution/system_transitions_test.go": "fc40b4ceda664a8a0de10901750e5fe2c15fa5043d618f11e26c470db2fcd3c9",
-    "pkg/core/types/frame_8141.go": "9c27f69b66b5570ed7ca6b397c2df2e804071f8622056fb8670f880822015529",
+    "pkg/core/types/frame_8141.go": "4083b6fdc4997bf3a89b06c0904ecfc8b737d5ca584d7b4c360a1393cea43cb6",
     "pkg/core/types/frame_8141_fees.go": "9dac8caa196d7891ffd6b4c2192d5b10986c1b8ecfd38f795cd0fe3f037282f1",
     "pkg/core/types/frame_8141_goldens_test.go": "93376b6ff7d6ecfe58fbfa42483794993de2b24af59119403244b8c7dcfdd409",
     "pkg/core/types/frame_8141_receipt.go": "5088c89854222c170f3e4fafc7500ed047b7e8834b840d6eb6b1a51d82245ffe",
     "pkg/core/types/frame_8141_receipt_conformance_test.go": "8a5d8894dc5f9ac37d4747ffb00af23e73bffd8504075028b234a568ee0441ec",
     "pkg/core/types/frame_8141_test.go": "3137a9b4855b2bdddfd9770e5d01d5704e941ffaaf6d3f1be5f85d02644a5fd9",
-    "pkg/core/types/frame_8250.go": "117b8c55043230a29149b29fee6f4e86f59d14b732a653e430e01171569d2bc9",
-    "pkg/core/types/frame_8250_test.go": "cf9a43cd5dcd6db8cae9b455e7aa7f4e3334b66db65950852509dc04900c647c",
+    "pkg/core/types/frame_8250.go": "51690dd646fa15796d7cc1051fac06a7a2ca75efa18ebc82748bd5ca3df8ef46",
+    "pkg/core/types/frame_8250_test.go": "dc932f747d4214525a3c456d7ac260ba18494a6273e541c3162d4949bd050e09",
     "pkg/core/types/frame_8272.go": "0be28d18506b64ee666624d96cc346123db19873a7059ac588fa6003fcec6bf9",
     "pkg/core/types/frame_8272_test.go": "780497f8768da9ecbacc5c2a3fb751f6e6ae63a8ac2d61afe0ea085b5ca43dec",
     "pkg/core/types/frame_receipt_rlp_test.go": "a53b9247cab18e7e7eada7abb1f1accbed1e13c081265b9d7d4296f4c909661f",
@@ -68,7 +68,7 @@
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
-    "pkg/core/vm/interpreter.go": "7aeb4cdd09b4952b2997258fe47ee25e114c3a19d4d25c76d837631530cee438",
+    "pkg/core/vm/interpreter.go": "7aad2b06b173641dbffe33e84d6c30d50869af414ca73b07303864614cbf78a3",
     "pkg/core/vm/jump_table.go": "dc6c82c9bbe976f6a7e7b898cf1919a985c0e0bd5f3bdb57d0fbd0c966650d16",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
     "refs/EIPs/EIPS/eip-214.md": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
@@ -87,7 +87,7 @@
     "specs/hegota/codec-goldens.json": "74c6c5122a8909a6fa7e5e0f4153feb8e3de19dff9af79fd3d4022153e872b52",
     "specs/hegota/group-b.json": "c38ab4ed79f18d43368830961ff6a3298d04e480b5ae993c4b91caf2fe2c334d",
     "tools/hegota/b_vectors.py": "f07a8a4536dbd83e1a5859e3f024c0506d348a81d6c8cc26df92073a777399ad",
-    "tools/hegota/check_b.py": "bf55a23e1f906f9b3bd9d3edc56521511876bc1da8ceec68e98ddcb6de96d96a",
+    "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
     "tools/hegota/test_group_b.py": "da76d39f9087cbcd79a91243c9b769dbaf44a2a246fc34997fccd2dd07ad0ef0"
   },
   "passed_tests": {
@@ -171,13 +171,13 @@
     "github.com/eth2030/eth2030/core/types::TestRecentRoot8272ReferenceVector": "pass",
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
-  "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "0c849a53d86259fffd25b7ee9ee7e46f44a43779",
+  "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
+  "source_revision": "3fe23f60bf0ace7e28485dcbe67abe9464649c14",
   "additional_qualification": {
-    "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native and wrapper binary builds; exit 0",
+    "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native/wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "c8d36216a7ca00c7f6b2c4594863f5a932b061468745682e6b6d1974210d6184",
-    "race_named_pass": 9408,
+    "race_log_sha256": "c4be4641644edee610831344d308a7dd2768fcc77de5d56b8dc039f09ee5a747",
+    "race_named_pass": 9466,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "required_native_consumer_skips": 0,
@@ -188,8 +188,8 @@
       "skipped": 0
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-    "python_regressions": 86,
-    "python_log_sha256": "2d9b2a687e3e87a090d5ee8fec73820dc16036e353de75798676099063a1973f",
-    "optimized_python_log_sha256": "fac83a8b4fa3762cb5c15c42fce692b019de5fdcdc6bdb474cd9681e5bad6b55"
+    "python_regressions": 88,
+    "python_log_sha256": "74ffa0b878d711e22b2dd28ab5269c7a8b482d5918e66f1d7bcf571c69750b8c",
+    "optimized_python_log_sha256": "bc149179fe12a0edaf21157257c656eb3907e4bb3aeaa8ef732ed4e5c67d4a27"
   }
 }

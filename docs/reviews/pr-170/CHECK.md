@@ -13,8 +13,10 @@ of its public consumers remains pending until the following work is complete.
 - [x] Connect keyed nonce validation/execution and dependency tracking to public admission, replacement, reorg, builder and import paths.
 - [x] Cover keyed RPC queries/simulation, blob sidecars, P2P and restart with native consumers.
 - [x] Audit EIP-8151's optional activation and signer-class public-pool requirements against its latest merged text.
-- [ ] Update decisions, plans and source-bound evidence without claiming an unmerged canonical-paymaster template is normative.
-- [ ] Run relevant/full/race tests, build and vet; commit, push and requalify the English PR.
+- [x] Update decisions, plans and source-bound evidence without claiming an unmerged canonical-paymaster template is normative.
+- [x] Run relevant/full/race tests, build and vet; prepare committed source-bound evidence and the English PR update.
+
+Pushed-head hosted qualification is recorded in the live English PR description/current checks; it is distinct from local qualification and must match the actual final head.
 
 Historical checklist entries below describe the earlier qualification. Current composition and its remaining canonical-runtime gate are documented in COMPOSITION.md and the follow-through section above.
 
@@ -37,9 +39,9 @@ Baseline: merged master `5d777ad06f886c8b20fb010a47e65ddb05df8287`, after PR #16
 - [x] Push and publish English draft PR #170 in `alt-research/eth2030`.
 Hosted current-head verification remains required. Its live result, exact head SHA and immutable workflow links are recorded in the PR description/current checks, without creating a new source revision solely to attest to itself.
 
-Public specification gates (unresolved, not counted as activated):
+Public specification decisions and remaining gate:
 
-- [ ] D01: authoritative EIP-8141/EIP-8250 combined envelope; the nonce-only profile remains isolated.
+- [x] D01: selected two-fee EIP-8141/EIP-8250 composition resolved by merged history and qualified public consumers; explicit optional activation, no mainnet schedule. Independent oracle provenance is preserved.
 - [ ] Upstream canonical-paymaster compiled runtime: PR #12041 remains unmerged; the local v1 template remains opt-in research code.
 
 ## Follow-up completeness audit (2026-11-26)

@@ -46,15 +46,7 @@ func paymaster12041Sign(t *testing.T, frame *types.FrameTx8141, sender int, spon
 			frame.Signatures[i].Message = bytes.Clone(message)
 		}
 	}
-	hash, err := frame.SigningHash()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for i, key := range keys {
-		digest := hash[:]
-		if len(frame.Signatures[i].Message) > 0 {
-			digest = frame.Signatures[i].Message
-		}
+	sign := func(i int, key *ecdsa.PrivateKey, digest []byte) {
 		if key.Curve == elliptic.P256() {
 			r, s, err := ecdsa.Sign(rand.Reader, key, digest)
 			if err != nil {
@@ -75,6 +67,22 @@ func paymaster12041Sign(t *testing.T, frame *types.FrameTx8141, sender int, spon
 				t.Fatal(err)
 			}
 			frame.Signatures[i].Signature = append([]byte{sig[64]}, sig[:64]...)
+		}
+	}
+	// Explicit-digest witnesses are committed bytes, not elided lengths.
+	// Fill them before computing the canonical hash for the remaining entries.
+	for i, key := range keys {
+		if len(frame.Signatures[i].Message) > 0 {
+			sign(i, key, frame.Signatures[i].Message)
+		}
+	}
+	hash, err := frame.SigningHash()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, key := range keys {
+		if len(frame.Signatures[i].Message) == 0 {
+			sign(i, key, hash[:])
 		}
 	}
 	return types.NewTransaction(frame)
@@ -134,6 +142,11 @@ func TestPR12041NativePaymentAuthorization(t *testing.T) {
 				inner := tx.Inner().(*types.FrameTx8141)
 				inner.Signatures[1].Signature[12] ^= 1
 				tx = types.NewTransaction(inner)
+			}
+			if kind != "zero_digest" && kind != "corrupted" {
+				if err := tx.Inner().(*types.FrameTx8141).Validate(); err != nil {
+					t.Fatal("runtime rejection fixture must have valid protocol signatures", err)
+				}
 			}
 			root := db.GetRoot()
 			before := new(big.Int).Set(db.GetBalance(payer))

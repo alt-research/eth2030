@@ -1,5 +1,7 @@
 # Hegota Group C status
 
+An independent post-paymaster audit reproduced two mixed scalar/ordinary pool omissions against exact prior source `e12ddc37`: a non-tail Frame was omitted from expiry-based capacity eviction, and scalar successors stayed pending after removal. Both are corrected, with real signed base/empty-key transactions, independent keyed/inclusion positive controls, fresh-receipt readmission and gap preservation. Focused txpool tests pass. Final full/race/build/vet and source-bound evidence qualification are in progress; the previous results below remain historical.
+
 Latest local qualification is complete on implementation `4ac957e9`: all 240 full-suite and 57 focused-race packages pass, with 24,005/9,588 passing events and zero failures. Builds, vet, both binaries, the 12/12 independent baseline and 91 Python checks per mode pass. Mandatory A/B/C consumers are 62/79/92, with zero required skips. The bounded-work audit reproduced 100 raw-code copies for 100 opcodes with recognition disabled; the per-frame/profile cache now performs zero disabled lookups and at most one selected lookup per immutable frame, following frame snapshots. The exact prior-source counterexample and four feature mutations retain positive controls. The exact PR-12041 proposal is fully implemented behind explicit selection; upstream adoption/fork pinning remains distinct. See [CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md). Exact pushed-head hosted results are maintained in the live English PR description/checks.
 
 ## Prior initial-proposal qualification

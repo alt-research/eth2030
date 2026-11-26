@@ -2,9 +2,9 @@
 
 ## Post-paymaster independent C audit
 
-- [ ] Recheck current EIP text/discussion identities and all forty criteria against actual production entrypoints.
-- [ ] Exercise additional cache, expiry, replacement, candidate-state and lifecycle interactions independently of prior passing labels.
-- [ ] Implement every confirmed omission with meaningful native counterexamples and preserved positive controls.
+- [x] Recheck current EIP text/discussion identities and all forty criteria against actual production entrypoints.
+- [x] Exercise additional cache, expiry, replacement, candidate-state and lifecycle interactions independently of prior passing labels.
+- [x] Implement every confirmed omission with meaningful native counterexamples and preserved positive controls.
 - [ ] Qualify the final source, refresh A/B/C evidence, commit/push and publish exact current-head results in the English PR.
 
 ## Canonical paymaster source and discussion audit

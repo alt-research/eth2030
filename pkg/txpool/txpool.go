@@ -1150,6 +1150,37 @@ func (pool *TxPool) addQueue(from types.Address, tx *types.Transaction) {
 	list.Add(tx)
 }
 
+// reconcileScalarPending restores the scalar nonce chain after removal. A
+// Frame may precede ordinary transactions, whereas nonempty EIP-8250 key sets
+// are independent of that chain. Inclusion may already have advanced state.
+// The caller holds pool.mu.
+func (pool *TxPool) reconcileScalarPending(from types.Address) {
+	if list := pool.pending[from]; list != nil {
+		next := pool.state.GetNonce(from)
+		var demote []*types.Transaction
+		for _, tx := range list.items {
+			if keyedFrame8250(tx) || tx.Nonce() < next {
+				continue
+			}
+			if tx.Nonce() != next {
+				demote = append(demote, tx)
+				continue
+			}
+			if next != ^uint64(0) {
+				next++
+			}
+		}
+		for _, tx := range demote {
+			list.RemoveTx(tx)
+			pool.addQueue(from, tx)
+		}
+		if list.Len() == 0 {
+			delete(pool.pending, from)
+		}
+	}
+	pool.promoteQueue(from)
+}
+
 // promoteQueue moves transactions from queue to pending when their nonce becomes
 // sequential with the current pending nonce.
 func (pool *TxPool) promoteQueue(from types.Address) {
@@ -1303,9 +1334,9 @@ func (pool *TxPool) Remove(hash types.Hash) {
 		}
 	}
 
-	// If a pending tx was removed, try to promote queued txs to fill the gap.
+	// Preserve processability after either inclusion or a local removal.
 	if wasPending {
-		pool.promoteQueue(from)
+		pool.reconcileScalarPending(from)
 	}
 }
 
@@ -1635,12 +1666,9 @@ type BlobAndProof struct {
 	Proof      []byte
 }
 
-// evictLowest removes the transaction with the lowest effective gas price from
-// the pool. It protects the highest-nonce pending tx for each sender (so every
-// sender keeps at least one tx). Returns the number of evicted transactions.
+// evictLowest applies Frame expiry/priority policy and ordinary tail eviction.
+// It returns the number of evicted transactions.
 func (pool *TxPool) evictLowest(baseFee *big.Int) int {
-	// Collect all transactions with their effective prices, excluding
-	// protected txs (highest-nonce pending tx per sender).
 	type candidate struct {
 		tx    *types.Transaction
 		from  types.Address
@@ -1650,26 +1678,22 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 
 	var candidates []candidate
 
-	// Gather pending txs. Only the highest-nonce (tail) tx per sender is
-	// evictable: removing the tail leaves the remaining sequence intact with
-	// no nonce gap, so no cascade is needed. Evicting a lower-nonce tx would
-	// orphan all higher-nonce txs, stranding them in queue permanently.
-	// Single-tx senders are protected (they are the sole pool anchor).
+	// All Frames are candidates, including a scalar Frame preceding ordinary
+	// successors. Ordinary transactions retain their scalar-tail/sole-anchor
+	// policy. Removing a scalar Frame queues any resulting orphaned suffix.
 	for addr, list := range pool.pending {
-		if list.Len() == 0 || (list.Len() == 1 && !isCanonicalFrame8141(list.items[0])) {
-			continue
+		var scalarTail *types.Transaction
+		for _, tx := range list.items {
+			if !keyedFrame8250(tx) {
+				scalarTail = tx
+			}
+			if isCanonicalFrame8141(tx) {
+				candidates = append(candidates, candidate{tx: tx, from: addr, price: EffectiveGasPriceAt(tx, baseFee, pool.blobBaseFee)})
+			}
 		}
-		last := list.items[list.Len()-1]
-		if keyedFrame8250(last) && list.Len() > 1 {
-			ordinary := list.items[list.Len()-2]
-			candidates = append(candidates, candidate{tx: ordinary, from: addr, price: EffectiveGasPriceAt(ordinary, baseFee, pool.blobBaseFee)})
+		if list.Len() > 1 && scalarTail != nil && !isCanonicalFrame8141(scalarTail) {
+			candidates = append(candidates, candidate{tx: scalarTail, from: addr, price: EffectiveGasPriceAt(scalarTail, baseFee, pool.blobBaseFee)})
 		}
-		candidates = append(candidates, candidate{
-			tx:    last,
-			from:  addr,
-			price: EffectiveGasPriceAt(last, baseFee, pool.blobBaseFee),
-			queue: false,
-		})
 	}
 
 	// All queued txs are eviction candidates.
@@ -1711,8 +1735,10 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 		"effectivePrice", c.price.String(),
 		"wasQueued", c.queue,
 	)
-	pool.lookup.Remove(c.tx.Hash())
-	if c.queue {
+	if isCanonicalFrame8141(c.tx) {
+		pool.removeFrameLocked(c.tx.Hash())
+	} else if c.queue {
+		pool.lookup.Remove(c.tx.Hash())
 		if list, ok := pool.queue[c.from]; ok {
 			list.RemoveTx(c.tx)
 			if list.Len() == 0 {
@@ -1720,6 +1746,7 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 			}
 		}
 	} else {
+		pool.lookup.Remove(c.tx.Hash())
 		// Evicting the tail pending tx: just remove it. The remaining lower-nonce
 		// txs form a valid contiguous sequence — no cascade needed.
 		if list, ok := pool.pending[c.from]; ok {

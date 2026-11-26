@@ -32,6 +32,8 @@ MANDATORY = {
  'txpool::TestFrameCZeroFeeBudgetDoesNotPanic',
  'txpool::TestFrameCExposureUsesValidatedPayPrefixClassification',
  'txpool::TestFrameCExpiryQueuesReplacementAndRemoval',
+ 'txpool::TestFrameCRemovalReconcilesScalarSuccessors',
+ 'txpool::TestFrameCEvictionIncludesNonTailScalarFrame',
  'txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix',
  'txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion',
  'txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster',

@@ -64,7 +64,7 @@ class GroupCIntegrityTests(unittest.TestCase):
         with self.assertRaises(ValueError):verify_report(report,self.manifest,set(),{},'x')
 
     def test_cross_transaction_boundaries_required(self):
-        for boundary in ['TestFrameCRevalidationDropsInvalidBeforeSharedExposure','TestFrameCSharedPayerRevalidationEvictsByPolicy','TestFrameCSignerRevalidationUsesOneHeadSnapshot','TestFrameCBlobAndOrdinarySenderOrdering']:
+        for boundary in ['TestFrameCRevalidationDropsInvalidBeforeSharedExposure','TestFrameCSharedPayerRevalidationEvictsByPolicy','TestFrameCSignerRevalidationUsesOneHeadSnapshot','TestFrameCBlobAndOrdinarySenderOrdering','TestFrameCRemovalReconcilesScalarSuccessors','TestFrameCEvictionIncludesNonTailScalarFrame']:
             manifest=copy.deepcopy(self.manifest)
             for row in manifest['tasks']:
                 for criterion in row['criteria']:

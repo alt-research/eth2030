@@ -228,6 +228,9 @@ func (pool *TxPool) removeFrameLocked(hash types.Hash) {
 			}
 		}
 	}
+	if !keyedFrame8250(tx) {
+		pool.reconcileScalarPending(from)
+	}
 }
 func (pool *TxPool) revalidateFrames8141() {
 	pool.expireFrames8141()

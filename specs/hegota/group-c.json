@@ -292,14 +292,17 @@
             "pkg/core/execution/frame_dependencies.go",
             "pkg/txpool/frame_8141.go",
             "pkg/txpool/frame_signers_8151.go",
-            "pkg/txpool/txpool.go"
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/frame_scalar_lifecycle_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrame8151PayRecoveriesCountDistinctPaymasters",
             "github.com/eth2030/eth2030/txpool::TestFrame8151ReservedAndOtherDigestShares",
             "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic",
-            "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot"
+            "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot",
+            "github.com/eth2030/eth2030/txpool::TestFrameCRemovalReconcilesScalarSuccessors",
+            "github.com/eth2030/eth2030/txpool::TestFrameCEvictionIncludesNonTailScalarFrame"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -562,13 +565,16 @@
           "files": [
             "pkg/txpool/frame_8141.go",
             "pkg/txpool/txpool.go",
-            "pkg/core/block/ordering.go"
+            "pkg/core/block/ordering.go",
+            "pkg/txpool/frame_scalar_lifecycle_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolExpiryAndFeeChanges",
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
-            "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy"
+            "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy",
+            "github.com/eth2030/eth2030/txpool::TestFrameCRemovalReconcilesScalarSuccessors",
+            "github.com/eth2030/eth2030/txpool::TestFrameCEvictionIncludesNonTailScalarFrame"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
@@ -711,11 +717,14 @@
             "pkg/core/block/builder.go",
             "pkg/core/block/ordering.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/txpool/frame_8141.go"
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/frame_scalar_lifecycle_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
-            "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression"
+            "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression",
+            "github.com/eth2030/eth2030/txpool::TestFrameCRemovalReconcilesScalarSuccessors",
+            "github.com/eth2030/eth2030/txpool::TestFrameCEvictionIncludesNonTailScalarFrame"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },

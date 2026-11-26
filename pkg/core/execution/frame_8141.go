@@ -17,7 +17,7 @@ import (
 func applyFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
 	header *types.Header, transaction *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
-	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, false, nil, tracing...)
+	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, nil, false, nil, tracing...)
 }
 
 func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int) (types.Address, error) {
@@ -30,7 +30,7 @@ func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, he
 	}
 	copied := db.Dup()
 	copied.SetTxContext(tx.Hash(), 0)
-	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, true, blobBaseFee)
+	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee)
 	if err != nil {
 		return types.Address{}, err
 	}
@@ -39,7 +39,7 @@ func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, he
 
 func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
 	header *types.Header, transaction *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker,
-	prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
+	profile *types.FrameTx8250Delta, prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
 	tx := transaction.Inner().(*types.FrameTx8141)
 	if config == nil || !config.IsMerge() || !config.IsHogota(header.Time) {
@@ -48,13 +48,27 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
 		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
 	}
-	if err := tx.Validate(); err != nil {
-		return nil, 0, err
+	var legacyNonce uint64
+	var budget types.FrameGasBudget
+	if profile == nil {
+		if err := tx.Validate(); err != nil {
+			return nil, 0, err
+		}
+		legacyNonce = db.GetNonce(tx.Sender)
+		if legacyNonce != tx.Nonce {
+			return nil, 0, errors.New("EIP-8141 nonce mismatch")
+		}
+		budget, err = tx.GasBudget()
+	} else {
+		if err := profile.Validate(); err != nil {
+			return nil, 0, err
+		}
+		legacyNonce = db.GetNonce(tx.Sender)
+		if err := validateNonceSet8250(db, profile); err != nil {
+			return nil, 0, err
+		}
+		budget, err = profile.GasBudget()
 	}
-	if db.GetNonce(tx.Sender) != tx.Nonce {
-		return nil, 0, errors.New("EIP-8141 nonce mismatch")
-	}
-	budget, err := tx.GasBudget()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -66,6 +80,9 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		blobFee = new(big.Int).Set(blobBaseFee)
 	}
 	payment, err := tx.Payment(header.BaseFee, blobFee)
+	if profile != nil {
+		payment, err = profile.Payment(header.BaseFee, blobFee)
+	}
 	if err != nil {
 		return nil, 0, err
 	}
@@ -83,6 +100,12 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		original.FinalizePreState()
 	}
 	txHash := transaction.Hash()
+	if profile != nil {
+		txHash, err = profile.Hash()
+		if err != nil {
+			return nil, 0, err
+		}
+	}
 	transaction.SetSender(tx.Sender)
 	db.ClearAccessList()
 	db.ClearTransientStorage()
@@ -115,6 +138,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		evm.SetBALTracker(tracker, 0)
 	}
 	ctx := evm.SetFrameTransaction(tx, payment)
+	ctx.NonceProfile, ctx.LegacyNonce = profile, legacyNonce
 	ctx.PublicValidation = prefixOnly
 	prefixEnd := -1
 	if prefixOnly {

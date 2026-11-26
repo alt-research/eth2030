@@ -1,0 +1,35 @@
+{
+  "profile": "8250-nonce-only-delta-isolated-v1",
+  "decision": "D01-open",
+  "public_activation": false,
+  "vectors": [
+    {
+      "id": "empty",
+      "wire": "0x06f859a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc080941111111111111111111111111111111111111111d0cf010380c782c3508302fd0080820100c8c780808083010203c58398968001c0",
+      "hash": "0xdcccec2e058cff21c8e2f583831b1570ed70532064ae07b852e23e47587f6f17",
+      "signing_hash": "0x026db99345577ea79bc0825187b505dedfd65065f606aeda27811267f1cef563",
+      "key_set_hash": "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+    },
+    {
+      "id": "zero-key",
+      "wire": "0x06f85aa0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc18080941111111111111111111111111111111111111111d0cf010380c782c3508302fd0080820100c8c780808083010203c58398968001c0",
+      "hash": "0x3fcbadc96f7e9ffd1414fe7ad53913dd333698fd6303276af8043e582d7c32e4",
+      "signing_hash": "0x9e3b8bd07c039b82997f6b7b1db0cfec3f401610394f8781f3092c02c36d495b",
+      "key_set_hash": "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d"
+    },
+    {
+      "id": "single-use",
+      "wire": "0x06f863a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc2802a88ffffffffffffffff941111111111111111111111111111111111111111d0cf010380c782c3508302fd0080820100c8c780808083010203c58398968001c0",
+      "hash": "0x2118856805a2103558eb6c889383544918e6639982cee37fae04fedb107468ac",
+      "signing_hash": "0x60c9d8de325cd526cd0a08595e491645081f6d5b76550c70b8e3207c9605ec86",
+      "key_set_hash": "0x54b8dd888e20129c3276b3f9ecfb536288e350f4538fdb01a6751daeff08dfa2"
+    },
+    {
+      "id": "uint256-boundary",
+      "wire": "0x06f882a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe1a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff88fffffffffffffffe941111111111111111111111111111111111111111d0cf010380c782c3508302fd0080820100c8c780808083010203c58398968001c0",
+      "hash": "0xaff4a9c3c105a7ea0f3d877ee0ded1d5ec369551c2230ca439e30c4bd881c3c2",
+      "signing_hash": "0x313feec6b9e22a82ac671e4aa375c4e4af1035f6c49a65df39258d02bb372e38",
+      "key_set_hash": "0x9d3f4b35d3a7dca202fde247a7a06c78d8c5fd77130c593212f65d004b29c60a"
+    }
+  ]
+}

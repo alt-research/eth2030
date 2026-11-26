@@ -1,0 +1,52 @@
+package execution
+
+import (
+	"errors"
+	"math"
+	"math/big"
+
+	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/state"
+	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
+)
+
+// ExecuteFrame8250Delta executes the isolated nonce-only delta profile (D01).
+// The profile is deliberately absent from public decoders, fork configuration,
+// block import and pool admission. Callers must use a disposable research state,
+// with the ordinary NONCE_MANAGER deployment already included in its genesis.
+// The native frame loop, journals, gas settlement and BAL output are reused.
+func ExecuteFrame8250Delta(cfg *config.ChainConfig, db state.StateDB, header *types.Header,
+	tx *types.FrameTx8250Delta, gp *gaspool.GasPool, tracker vm.BALTracker,
+) (*types.Receipt, uint64, error) {
+	if err := tx.Validate(); err != nil {
+		return nil, 0, err
+	}
+	hash, err := tx.Hash()
+	if err != nil {
+		return nil, 0, err
+	}
+	db.SetTxContext(hash, 0)
+	return executeFrame8141(cfg, nil, db, header, types.NewTransaction(tx.ExecutionFields()), gp, tracker, tx, false, nil)
+}
+
+func validateNonceSet8250(db state.StateDB, tx *types.FrameTx8250Delta) error {
+	if len(tx.NonceKeys) == 0 {
+		if db.GetNonce(tx.Sender) != tx.NonceSeq {
+			return errors.New("EIP-8250 legacy nonce mismatch")
+		}
+		return nil
+	}
+	for _, key := range tx.NonceKeys {
+		value := db.GetState(types.NonceManager8250, types.NonceSlot8250(tx.Sender, key))
+		want := tx.NonceSeq
+		if want == math.MaxUint64 {
+			want = 0
+		}
+		if new(big.Int).SetBytes(value[:]).Cmp(new(big.Int).SetUint64(want)) != 0 {
+			return errors.New("EIP-8250 keyed nonce mismatch")
+		}
+	}
+	return nil
+}

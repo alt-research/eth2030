@@ -167,6 +167,19 @@ func TestFrame8141BudgetAndFeeSettlement(t *testing.T) {
 
 func TestFrame8141StaticRejections(t *testing.T) {
 	alter := map[string]func(*FrameTx8141){
+		"unknown mode":          func(tx *FrameTx8141) { tx.Frames[0].Mode = 3 },
+		"chain ID overflow":     func(tx *FrameTx8141) { tx.ChainID = new(big.Int).Lsh(big.NewInt(1), 256) },
+		"max fee overflow":      func(tx *FrameTx8141) { tx.Fees.MaxFee = new(big.Int).Lsh(big.NewInt(1), 256) },
+		"negative priority fee": func(tx *FrameTx8141) { tx.Fees.MaxPriorityFeePerGas = big.NewInt(-1) },
+		"value overflow":        func(tx *FrameTx8141) { tx.Frames[1].Value = new(big.Int).Lsh(big.NewInt(1), 256) },
+		"no frames":             func(tx *FrameTx8141) { tx.Frames = nil },
+		"too many frames": func(tx *FrameTx8141) {
+			frame := tx.Frames[0]
+			tx.Frames = make([]Frame8141, 65)
+			for i := range tx.Frames {
+				tx.Frames[i] = frame
+			}
+		},
 		"nonce overflow":               func(tx *FrameTx8141) { tx.Nonce = math.MaxUint64 },
 		"state reservation overflow":   func(tx *FrameTx8141) { tx.Frames[0].Limits.State = math.MaxUint64 },
 		"execution cap":                func(tx *FrameTx8141) { tx.Frames[1].Limits.Execution = 1 << 24 },

@@ -144,6 +144,24 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			if replay.GetRoot() != built.Root() || result.BlockAccessList.Hash() != *built.Header().BlockAccessListHash {
 				t.Fatal("builder/replay state or BAL differs")
 			}
+			for name, corrupt := range map[string]func(*types.Header){
+				"receipt_root":   func(h *types.Header) { h.ReceiptHash[0] ^= 1 },
+				"state_root":     func(h *types.Header) { h.Root[0] ^= 1 },
+				"bal_commitment": func(h *types.Header) { (*h.BlockAccessListHash)[0] ^= 1 },
+				"block_gas":      func(h *types.Header) { h.GasUsed++ },
+				"logs_bloom":     func(h *types.Header) { h.Bloom[0] ^= 1 },
+			} {
+				t.Run("reject_"+name, func(t *testing.T) {
+					header := built.Header()
+					corrupt(header)
+					if err := bc.InsertBlock(types.NewBlock(header, built.Body())); err == nil {
+						t.Fatal("native import accepted corrupted Frame block")
+					}
+					if bc.CurrentBlock().Hash() != genesis.Hash() || bc.State().GetRoot() != alloc.GetRoot() {
+						t.Fatal("rejected Frame block changed canonical state")
+					}
+				})
+			}
 			if err := bc.InsertBlock(built); err != nil {
 				t.Fatalf("canonical import: %v", err)
 			}
@@ -207,5 +225,79 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			}
 			check()
 		})
+	}
+}
+
+func TestRecentRoot8272CanonicalForkSwitch(t *testing.T) {
+	cfg := *config.TestConfig
+	zero := uint64(0)
+	cfg.ChainID, cfg.HogotaTime, cfg.GlamsterdanTime, cfg.AmsterdamTime = big.NewInt(1337), &zero, &zero, &zero
+	key, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", 1))
+	sender := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
+	alloc := newBuilderRequestTestState()
+	alloc.AddBalance(sender, big.NewInt(100000000))
+	alloc.SetNonce(types.RecentRootAddress, 1)
+	alloc.SetCode(types.RecentRootAddress, types.RecentRootCode)
+	h := makeGenesisInteg(30_000_000, big.NewInt(1)).Header()
+	h.Root, h.SlotNumber = alloc.GetRoot(), &zero
+	genesis := types.NewBlock(h, &types.Body{Withdrawals: []*types.Withdrawal{}})
+	bc, err := chain.NewBlockchain(&cfg, genesis, alloc.Copy(), rawdb.NewMemoryDB())
+	if err != nil {
+		t.Fatal(err)
+	}
+	salt, root := types.Hash{31: 3}, types.Hash{31: 4}
+	frame := &types.FrameTx8141{ChainID: cfg.ChainID, Sender: sender, Fees: types.FrameFeeBudget{MaxFee: big.NewInt(10000000), MaxPriorityFeePerGas: big.NewInt(2)}, Frames: []types.Frame8141{
+		{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000}},
+		{Mode: types.ModeSender, Target: &types.RecentRootAddress, Data: append(append([]byte{}, salt[:]...), root[:]...), Limits: types.FrameGasLimits{Execution: 30000, State: 97920}},
+	}}
+	slot := uint64(1)
+	built, _, err := block.NewBlockBuilder(&cfg, bc, &mockTxPoolInteg{txs: []*types.Transaction{signFrameBlock(t, frame, 1)}}).BuildBlock(genesis.Header(), &block.BuildBlockAttributes{Timestamp: 12, SlotNumber: &slot, GasLimit: genesis.GasLimit()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bc.InsertBlock(built); err != nil {
+		t.Fatal(err)
+	}
+	ref := types.RecentRootReference{Source: types.RecentRootSource(sender, salt), Slot: 1, Root: root}
+	if bc.State().GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+		t.Fatal("canonical root write missing")
+	}
+	slot = 20 // Empty consensus slots do not imply execution writes or timestamp-derived slots.
+	frame.Nonce = 1
+	frame.Frames = []types.Frame8141{{Mode: types.ModeVerify, Target: &types.RecentRootAddress, Data: ref.AppendTo(nil), Limits: types.FrameGasLimits{Execution: 12000}}, frame.Frames[0]}
+	verified, receipts, err := block.NewBlockBuilder(&cfg, bc, &mockTxPoolInteg{txs: []*types.Transaction{signFrameBlock(t, frame, 1)}}).BuildBlock(built.Header(), &block.BuildBlockAttributes{Timestamp: 24, SlotNumber: &slot, GasLimit: genesis.GasLimit()})
+	if err != nil || len(receipts) != 1 {
+		t.Fatal("valid root after empty slots", err)
+	}
+	if err = bc.InsertBlock(verified); err != nil {
+		t.Fatal(err)
+	}
+	side, _, err := block.NewBlockBuilder(&cfg, bc, nil).BuildBlock(genesis.Header(), &block.BuildBlockAttributes{Timestamp: 25, SlotNumber: &slot, GasLimit: genesis.GasLimit()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bc.InsertBlock(side); err != nil {
+		t.Fatal(err)
+	}
+	if err = bc.Reorg(side); err != nil {
+		t.Fatal(err)
+	}
+	if !bc.State().GetState(types.RecentRootAddress, ref.StorageKey()).IsZero() {
+		t.Fatal("fork switch retained orphaned root")
+	}
+	frame.Nonce = 0
+	slot++
+	orphan, _, err := block.NewBlockBuilder(&cfg, bc, &mockTxPoolInteg{txs: []*types.Transaction{signFrameBlock(t, frame, 1)}}).BuildBlock(side.Header(), &block.BuildBlockAttributes{Timestamp: 36, SlotNumber: &slot, GasLimit: genesis.GasLimit()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(orphan.Transactions()) != 0 {
+		t.Fatal("builder included orphaned-root verifier")
+	}
+	if err = bc.Reorg(verified); err != nil {
+		t.Fatal(err)
+	}
+	if bc.State().GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+		t.Fatal("fork restoration lost root state")
 	}
 }

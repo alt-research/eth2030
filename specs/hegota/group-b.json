@@ -1,0 +1,763 @@
+{
+  "version": 1,
+  "baseline": "960baab3103e0d34435433be0f8314f127521052",
+  "normative_sources": [
+    {
+      "eip": 8141,
+      "path": "refs/EIPs/EIPS/eip-8141.md",
+      "sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 8250,
+      "path": "refs/EIPs/EIPS/eip-8250.md",
+      "sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 8272,
+      "path": "refs/EIPs/EIPS/eip-8272.md",
+      "sha256": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 8037,
+      "path": "refs/EIPs/EIPS/eip-8037.md",
+      "sha256": "37abe522c5dee68a47a27db6f7b88a71da5b66c8a72ebc601c467940b577b715",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 8038,
+      "path": "refs/EIPs/EIPS/eip-8038.md",
+      "sha256": "ad09e7c9a7c78855b00e793109056e6d30022bf4bbf0e237e757226de0e544e2",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 7843,
+      "path": "refs/EIPs/EIPS/eip-7843.md",
+      "sha256": "6b4500f8aa5a97009258831476efa1de89c4b1c0dfce760b6ccd9a75a415e470",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 7928,
+      "path": "refs/EIPs/EIPS/eip-7928.md",
+      "sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 7934,
+      "path": "refs/EIPs/EIPS/eip-7934.md",
+      "sha256": "99528dc7d4af27ac450b6d845f5617f395036a98222bc523e1af88255dcd62a9",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 2718,
+      "path": "refs/EIPs/EIPS/eip-2718.md",
+      "sha256": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 7702,
+      "path": "refs/EIPs/EIPS/eip-7702.md",
+      "sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 2929,
+      "path": "refs/EIPs/EIPS/eip-2929.md",
+      "sha256": "177b2040bf0376b1182eb5571c7fda7a41b6f594083fa816506d65cfcf2acc4a",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 214,
+      "path": "refs/EIPs/EIPS/eip-214.md",
+      "sha256": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    },
+    {
+      "eip": 1153,
+      "path": "refs/EIPs/EIPS/eip-1153.md",
+      "sha256": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa"
+    }
+  ],
+  "profiles": {
+    "8141-base": {
+      "public_activation": "HogotaTime; existing canonical seven-field implementation"
+    },
+    "8250-nonce-only-delta-isolated-v1": {
+      "public_activation": false,
+      "decision": "D01-open",
+      "rule": "Replace nonce only; preserve the current 8141 two-field total fee budget. The conflicting three-fee example is not silently adopted."
+    },
+    "8272-ordinary-contract": {
+      "public_activation": "No fork installation. Ordinary contract execution under 8141 and 7843; public pool grammar/dependency rules remain Group C."
+    }
+  },
+  "tasks": [
+    {
+      "id": "HGT-002",
+      "criteria": [
+        {
+          "id": "codec",
+          "statement": "The canonical seven-field typed payload round-trips byte-for-byte.",
+          "clauses": [
+            "8141/Payload Encoding"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141EnvelopeAndSigningVector",
+            "github.com/eth2030/eth2030/core/types::TestFrame8141IndependentWireGoldens",
+            "github.com/eth2030/eth2030/core/eftest::TestHegotaIndependentEncodingGoldens"
+          ]
+        },
+        {
+          "id": "hashes",
+          "statement": "Transaction hash, signing hash and witness-length commitments match independent goldens.",
+          "clauses": [
+            "8141/Signature Hash"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go",
+            "specs/hegota/codec-goldens.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141EnvelopeAndSigningVector",
+            "github.com/eth2030/eth2030/core/types::TestFrame8141IndependentWireGoldens",
+            "github.com/eth2030/eth2030/core/eftest::TestHegotaIndependentEncodingGoldens"
+          ]
+        },
+        {
+          "id": "boundaries",
+          "statement": "Invalid modes/flags, widths, frame counts and noncanonical RLP fail.",
+          "clauses": [
+            "8141/Constraints"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141StaticRejections",
+            "github.com/eth2030/eth2030/core/types::TestFrame8141RejectsNoncanonicalIntegerRLP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-003",
+      "criteria": [
+        {
+          "id": "scope_identity",
+          "statement": "APPROVE enforces flags, sender, payer and ADDRESS. APPROVE returns exactly its designated memory region under RETURN gas semantics, including an ignored full-width offset for zero length.",
+          "clauses": [
+            "8141/APPROVE/Behavior",
+            "8141/APPROVE/Gas"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/vm/jump_table.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141ApprovalScopeMatrix",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveEmptyReturnIgnoresOffset",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveReturnMemoryBoundaries"
+          ]
+        },
+        {
+          "id": "nonce_payment",
+          "statement": "Payment consumes current nonce once, escrows maximum cost, settles exact fees and cannot overflow.",
+          "clauses": [
+            "8141/Fee budget",
+            "8141/APPROVE"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/types/frame_8141_fees.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DeployPrefixConsumesCurrentSenderNonce",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ApprovalCannotWrapNonceAfterDefaultCalls",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ClippedTipUsesActualEscrowSettlement"
+          ]
+        },
+        {
+          "id": "nested_rollback",
+          "statement": "Nested approval and invalid VERIFY restore approval, fees and nonce.",
+          "clauses": [
+            "8141/Cross-frame interactions"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141FailureRestoresApprovalsAndFunds",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-010",
+      "criteria": [
+        {
+          "id": "parameters",
+          "statement": "Every selected transaction/frame/signature parameter is exposed with its prescribed meaning.",
+          "clauses": [
+            "8141/Introspection"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141IntrospectionOnExecutedState",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ArbitrarySignatureIntrospection"
+          ]
+        },
+        {
+          "id": "visibility_bounds",
+          "statement": "Only structures of future frames are visible; invalid indices and protocol witness reads exceptionally halt; data is padded.",
+          "clauses": [
+            "8141/FRAMEPARAM",
+            "8141/FRAMEDATALOAD",
+            "8141/SIGDATACOPY"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141IntrospectionBoundaries"
+          ]
+        },
+        {
+          "id": "non_frame",
+          "statement": "New instructions exceptionally halt outside Frame context.",
+          "clauses": [
+            "8141/Introspection"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-011",
+      "criteria": [
+        {
+          "id": "budgets_settlement",
+          "statement": "Independent execution/state/blob reservations, calldata floor, capped refund, escrow and clipped tip.",
+          "clauses": [
+            "8141/Gas Accounting",
+            "8037",
+            "8038"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8141_fees.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141BudgetAndFeeSettlement",
+            "github.com/eth2030/eth2030/core/types::TestFrame8141StaticRejections",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ClippedTipUsesActualEscrowSettlement"
+          ]
+        },
+        {
+          "id": "pool_isolation",
+          "statement": "State pools and refunds stay frame-isolated; entry access and creation/deposit charge the proper dimension. Delegation access is charged before EIP-150 forwarding for all four code-executing call instructions, with independent upstream call-body comparison. Prefunded CREATE/CREATE2 pays only code-deposit state gas, with unchanged upstream state/gas comparison.",
+          "clauses": [
+            "8141/Frame gas pools",
+            "8141/State-gas attribution and refills",
+            "7702/Gas Costs",
+            "8038/Account access pricing"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/vm/delegation_gas.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/core/vm/amsterdam_gas_table.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CreationChargesAndCodeDeposit",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL"
+          ]
+        },
+        {
+          "id": "block_dimensions",
+          "statement": "Block counts pre-refund execution and final state gas; real build/import agrees.",
+          "clauses": [
+            "8141/Block-level gas accounting",
+            "8037/Block-level gas accounting"
+          ],
+          "files": [
+            "pkg/core/execution/frame_8141.go",
+            "pkg/core/block/builder.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-012",
+      "criteria": [
+        {
+          "id": "state_ownership",
+          "statement": "Storage original values and cross-frame state-charge owners restore at each snapshot.",
+          "clauses": [
+            "8141/State-gas attribution and refills"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141BinaryOverlayAndTransactionOriginalSlots"
+          ]
+        },
+        {
+          "id": "approval_batches",
+          "statement": "Call/frame/atomic batch/whole-transaction failures have distinct effects and retain executed gas/status. Failed creation, enclosing Frame and atomic-batch rollback restore prefunding and omit net-zero account changes from BAL.",
+          "clauses": [
+            "8141/Behavior",
+            "8141/Cross-frame interactions"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141FailureRestoresApprovalsAndFunds",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL"
+          ]
+        },
+        {
+          "id": "transient_warmness",
+          "statement": "Transient state resets between frames and access warmness follows snapshots. Memory, persisted/reopened Trie and Snap backends preserve exact warmness, nested transient rollback and inter-Frame clearing.",
+          "clauses": [
+            "8141/Cross-frame interactions",
+            "7702/Gas Costs",
+            "2929/Specification",
+            "1153/Specification"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
+            "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-013",
+      "criteria": [
+        {
+          "id": "native_route",
+          "statement": "Typed Frames dispatch directly to the shared native executor with all fields and prerequisite activation.",
+          "clauses": [
+            "8141/Behavior"
+          ],
+          "files": [
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrameProcessorForkTimeBeforeMutation",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
+          ]
+        },
+        {
+          "id": "build_import",
+          "statement": "Native builder, independent-state replay and canonical import produce identical state/BAL, with one fee and nonce charge.",
+          "clauses": [
+            "8141/Behavior",
+            "7928/State Transition Function"
+          ],
+          "files": [
+            "pkg/core/block/builder.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-014",
+      "criteria": [
+        {
+          "id": "encoding",
+          "statement": "Canonical payer and per-frame results have the specified typed RLP and receipt root.",
+          "clauses": [
+            "8141/Receipt Encoding"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141_receipt.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141ReceiptVector",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+          ]
+        },
+        {
+          "id": "logs_indices",
+          "statement": "Frame logs flatten in order and disk readback restores RPC/block/transaction indices.",
+          "clauses": [
+            "8141/Receipt Encoding"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141_receipt.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/chain::TestCanonicalFrame8141DiskReceiptMetadataAndLogIndices"
+          ]
+        },
+        {
+          "id": "invalid_effects",
+          "statement": "Failed/skipped receipts reject effects that cannot survive their rollback.",
+          "clauses": [
+            "8141/Behavior",
+            "8141/Receipt Encoding"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141_receipt.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141ReceiptRejectsImpossibleFrameEffects"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-015",
+      "criteria": [
+        {
+          "id": "bal",
+          "statement": "BAL has executed reads/final changes, protocol accounting and no skipped targets; wire matches 7928. Pre-state OOG excludes untouched resources; post-state OOG and child balance/depth failure retain the already accessed resources, including explicit precompiles and delegation targets. Static write prohibition is checked before SSTORE gas calculation and must not introduce a storage read. Account reconstruction captures transaction-original leaf fields before reset, so unchanged prefunding never becomes a fabricated balance change.",
+          "clauses": [
+            "7928/Recording Semantics",
+            "8141/Behavior",
+            "7928/Gas Validation Before State Access",
+            "7928/EIP-7702 Delegation",
+            "7928/SSTORE",
+            "214/Specification",
+            "7928/Balance (balance_changes)",
+            "8037/Gas accounting for new accounts"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141_bal.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
+            "github.com/eth2030/eth2030/bal::TestEIP7928WireEncoding",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DirectPrecompileBALGasBoundary",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL",
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
+          ]
+        },
+        {
+          "id": "invalid_commitments",
+          "statement": "Production import rejects corrupted state/receipts/BAL/gas/bloom without canonical mutation; persisted BAL corruption fails.",
+          "clauses": [
+            "7928/Block Structure Modification",
+            "8141/Receipt Encoding"
+          ],
+          "files": [
+            "pkg/core/block/validator.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/chain::TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody"
+          ]
+        },
+        {
+          "id": "bounds_system_updates",
+          "statement": "Encoded block bytes and BAL items are bounded; prerequisite system updates are tested on the actual processor.",
+          "clauses": [
+            "7934/Block Size Cap",
+            "7928/Block Access List Size Constraint",
+            "8037/System contracts and system transactions"
+          ],
+          "files": [
+            "pkg/core/block/validator.go",
+            "pkg/core/execution/processor.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestFrameBlockRLPByteLimitBoundary",
+            "github.com/eth2030/eth2030/bal::TestBALItemCostLimitExceeded",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalPreBlockSystemsAgainstIndependentSDK",
+            "github.com/eth2030/eth2030/core/execution::TestAmsterdamActualSystemStateMargin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-016",
+      "criteria": [
+        {
+          "id": "raw_persistence",
+          "statement": "Raw canonical transactions and receipts round-trip; retained legacy field-count formats stay readable.",
+          "clauses": [
+            "8141/Payload Encoding",
+            "8141/Receipt Encoding",
+            "2718"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8141_receipt.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141EnvelopeAndSigningVector",
+            "github.com/eth2030/eth2030/core/types::TestFrameTxRoundTripDefaultMode",
+            "github.com/eth2030/eth2030/core/types::TestFrameTxRoundTripVerifyMode",
+            "github.com/eth2030/eth2030/core/types::TestFrameTx2DNonceRoundTrip",
+            "github.com/eth2030/eth2030/core/types::TestFrameTxReceiptRLPRoundTrip",
+            "github.com/eth2030/eth2030/core/types::TestLegacyTxRoundTrip",
+            "github.com/eth2030/eth2030/core/types::TestReceiptCodecEncodeDecode_Legacy",
+            "github.com/eth2030/eth2030/core/chain::TestCanonicalFrame8141DiskReceiptMetadataAndLogIndices"
+          ]
+        },
+        {
+          "id": "restart_history",
+          "statement": "Native FileDB restart, replay and reorg retain canonical Frame effects and receipts; no new public schema migration. Committing and reopening native Trie/Snap state between signed Frame transactions preserves transaction-original storage values and exact canonical receipt/BAL bytes.",
+          "clauses": [
+            "8141/Behavior",
+            "2718"
+          ],
+          "files": [
+            "pkg/core/chain/blockchain.go",
+            "pkg/core/chain/transaction_readback.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/chain::TestColdDiskReceiptDerivedFieldsMatchIndependentSDK",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-017",
+      "criteria": [
+        {
+          "id": "keys_codec",
+          "statement": "Isolated nonce-only delta checks canonical sorted uint256 sets, uint64 sequence, length-committing signatures, price exemption and access intrinsic.",
+          "clauses": [
+            "8250/Transaction payload",
+            "8250/Transaction introspection"
+          ],
+          "files": [
+            "pkg/core/types/frame_8250.go",
+            "specs/hegota/b-codec-goldens.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaIndependentWireGoldens",
+            "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaCodecAndSigningCommitments",
+            "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaRejectsMalformedNonceSets",
+            "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaDataAndAccessPricing"
+          ]
+        },
+        {
+          "id": "consumption_bal",
+          "statement": "Pre-state keyed/legacy checks, single-use exhaustion, disjoint/overlap ordering and non-warming BAL writes.",
+          "clauses": [
+            "8250/Stateful validity",
+            "8250/Nonce consumption",
+            "8250/Block access list"
+          ],
+          "files": [
+            "pkg/core/execution/frame_8250.go",
+            "pkg/core/vm/frame_8250.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaNativeNonceDomains",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaOverlapAndDisjointSets",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaSequenceExhaustionAndWholeSetAtomicity"
+          ]
+        },
+        {
+          "id": "rollback_create",
+          "statement": "Atomic approval/state charge/escrow rollback and retry; later body/atomic failure retains approved nonces; CREATE uses current legacy nonce with immutable introspection.",
+          "clauses": [
+            "8250/Nonce consumption",
+            "8250/Transaction introspection"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8250.go",
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaCreateAndLegacyIntrospection",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaRevertedApprovalCanBeRetried",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaKeyedSponsorDoesNotCreateLegacySender"
+          ]
+        },
+        {
+          "id": "deployment",
+          "statement": "The exact ordinary keyless deployment produces the manager address/runtime/nonce; no fork installation or boundary check.",
+          "clauses": [
+            "8250/Deployment",
+            "8250/Activation"
+          ],
+          "files": [
+            "pkg/core/execution/frame_8250.go",
+            "evidence/hegota-b/deployments.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrameSystemContractsOrdinaryKeylessDeployment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-018",
+      "criteria": [
+        {
+          "id": "domains_contract",
+          "statement": "Exact runtime, source/entry/storage domains and packed tuples match the EIP reference vector and native execution.",
+          "clauses": [
+            "8272/Entry and storage keys",
+            "8272/Bytecode",
+            "8272/Reference vector"
+          ],
+          "files": [
+            "pkg/core/types/frame_8272.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestRecentRoot8272ReferenceVector",
+            "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272NativeWriteVerifyAndReorg"
+          ]
+        },
+        {
+          "id": "slot_window",
+          "statement": "Actual header slot, not timestamp, controls previous/current/future slots, duplicates, 16 cold keys, static writes and exact gas bounds.",
+          "clauses": [
+            "8272/Current slot",
+            "8272/Validation operation",
+            "7843/Output"
+          ],
+          "files": [
+            "pkg/core/types/frame_8272.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272NormativeRuntimeBoundaries",
+            "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272SixteenColdKeysAndExactGas"
+          ]
+        },
+        {
+          "id": "overwrite_reorg",
+          "statement": "Same-slot final write, ring overwrite, delegate storage context, skipped slots and canonical fork switching have native witnesses.",
+          "clauses": [
+            "8272/Write operation",
+            "8272/Current slot"
+          ],
+          "files": [
+            "pkg/core/types/frame_8272.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272OverwriteAndStorageContext",
+            "github.com/eth2030/eth2030/core/block::TestRecentRoot8272CanonicalForkSwitch"
+          ]
+        },
+        {
+          "id": "deployment",
+          "statement": "The EIP ordinary keyless deployment produces the exact recent-root runtime; activation does not install code.",
+          "clauses": [
+            "8272/Deployment",
+            "8272/Activation"
+          ],
+          "files": [
+            "pkg/core/types/frame_8272.go",
+            "evidence/hegota-b/deployments.json"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrameSystemContractsOrdinaryKeylessDeployment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-019",
+      "criteria": [
+        {
+          "id": "schemes",
+          "statement": "SECP256K1/P256 lengths, curves, signer recovery, explicit digest, low-s and invalid signatures checked before execution; ARBITRARY remains unauthenticated.",
+          "clauses": [
+            "8141/Signature Validation"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141ProtocolSignatures",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141P256NativeValidationAndDefaultCode"
+          ]
+        },
+        {
+          "id": "signing_commitments",
+          "statement": "Chain/sender/frames/fee and empty/explicit-message witnesses follow canonical signing commitments.",
+          "clauses": [
+            "8141/Signature Hash"
+          ],
+          "files": [
+            "pkg/core/types/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrame8141EnvelopeAndSigningVector",
+            "github.com/eth2030/eth2030/core/types::TestFrame8141IndependentWireGoldens",
+            "github.com/eth2030/eth2030/core/eftest::TestHegotaIndependentEncodingGoldens"
+          ]
+        },
+        {
+          "id": "default_accounts",
+          "statement": "Default accounts require canonical SECP256K1 entries at the scope-selected indices; arbitrary witness cannot authenticate.",
+          "clauses": [
+            "8141/Default code"
+          ],
+          "files": [
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestFrame8141DefaultCodeDoesNotAuthenticateArbitraryWitness",
+            "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback"
+          ]
+        }
+      ]
+    }
+  ]
+}

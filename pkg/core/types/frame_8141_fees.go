@@ -28,13 +28,17 @@ type FrameSettlement struct {
 // Payment computes the maximum charge and effective GASPRICE under EIP-8141.
 // The same max_fee budget covers execution, state and blob gas.
 func (tx *FrameTx8141) Payment(baseFee, blobBaseFee *big.Int) (*FramePayment, error) {
-	if !frameUint256(tx.Fees.MaxFee) || !frameUint256(tx.Fees.MaxPriorityFeePerGas) ||
-		!frameUint256(baseFee) || !frameUint256(blobBaseFee) {
-		return nil, errors.New("EIP-8141 payment requires unsigned 256-bit fees")
-	}
 	budget, err := tx.GasBudget()
 	if err != nil {
 		return nil, err
+	}
+	return tx.paymentForBudget(baseFee, blobBaseFee, budget)
+}
+
+func (tx *FrameTx8141) paymentForBudget(baseFee, blobBaseFee *big.Int, budget FrameGasBudget) (*FramePayment, error) {
+	if !frameUint256(tx.Fees.MaxFee) || !frameUint256(tx.Fees.MaxPriorityFeePerGas) ||
+		!frameUint256(baseFee) || !frameUint256(blobBaseFee) {
+		return nil, errors.New("EIP-8141 payment requires unsigned 256-bit fees")
 	}
 	gas := new(big.Int).SetUint64(budget.MaxGas)
 	blobGas := new(big.Int).Mul(new(big.Int).SetUint64(uint64(len(tx.BlobVersionedHashes))), big.NewInt(131072))

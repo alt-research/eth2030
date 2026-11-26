@@ -110,6 +110,17 @@ func (s *frameJournalState) SubBalance(address types.Address, amount *big.Int) {
 	}
 	s.StateDB.SubBalance(address, amount)
 }
+func (s *frameJournalState) CreateAccount(address types.Address) {
+	// Account reconstruction clears leaf fields before prefunding is restored.
+	// Capture the transaction's original values before that reset, not on the
+	// first subsequent AddBalance/SetNonce/SetCode (EIP-7928 net changes).
+	if s.frame.bal != nil {
+		s.frame.bal.beforeBalance(address)
+		s.frame.bal.beforeNonce(address)
+		s.frame.bal.beforeCode(address)
+	}
+	s.StateDB.CreateAccount(address)
+}
 func (s *frameJournalState) SetNonce(address types.Address, nonce uint64) {
 	if s.frame.bal != nil {
 		s.frame.bal.beforeNonce(address)

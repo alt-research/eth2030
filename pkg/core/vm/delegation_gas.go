@@ -18,7 +18,7 @@ func callGasForWord(available, base uint64, requested *big.Int) uint64 {
 // Delegation is resolved after the recipient's known pre-state costs pass,
 // before balance/depth checks. The extra target has its own access gas check.
 func gasDelegationResolution(evm *EVM, c *Contract, address types.Address, cost uint64) (uint64, error) {
-	if evm.StateDB == nil || !(evm.forkRules.IsPrague || evm.forkRules.IsAmsterdam || evm.forkRules.IsGlamsterdan) {
+	if evm.StateDB == nil || !(evm.frame8141 != nil || evm.forkRules.IsPrague || evm.forkRules.IsAmsterdam || evm.forkRules.IsGlamsterdan) {
 		return cost, nil
 	}
 	if c.Gas < cost {
@@ -32,7 +32,7 @@ func gasDelegationResolution(evm *EVM, c *Contract, address types.Address, cost 
 		return cost, nil
 	}
 	cold, warm := uint64(2600), uint64(100)
-	if evm.forkRules.IsAmsterdam {
+	if evm.frame8141 != nil || evm.forkRules.IsAmsterdam {
 		cold = AmsterdamColdAccount
 	} else if evm.forkRules.IsGlamsterdan {
 		cold, warm = ColdAccountAccessGlamst, WarmStorageReadGlamst

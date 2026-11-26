@@ -1,5 +1,12 @@
 # Hegota Group C checklist
 
+## Canonical paymaster source and discussion audit
+
+- [ ] Re-read current EIP-8141, its Solidity asset, PR #12041's complete history/reviews and current implementer discussion; distinguish merged requirements from the proposed runtime.
+- [ ] Reconcile runtime recognition, authorization, storage, delayed withdrawal/rotation, EIP-8151 and pool lifecycle requirements against production paths.
+- [ ] Implement every determinate omission with independent native positive/negative controls and explicit profile selection where upstream proposals diverge.
+- [ ] Verify builds, relevant/full/race tests and source-bound A/B/C evidence; commit/push and update the English PR with exact current-head results.
+
 ## Independent completeness re-audit
 
 - [x] Recheck upstream EIP/consensus identities, merged changes and live discussion/review status.

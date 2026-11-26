@@ -1,5 +1,7 @@
 # Hegota Group C status
 
+Canonical-paymaster follow-up is in progress: re-reading current EIP-8141 and the full #12041 history/discussion before deciding the executable profile and closing every determinate implementation omission. Previous qualifications remain historical until this follow-up is requalified.
+
 ## Independent completeness re-audit completed locally
 
 The latest EIPs master is 514f00c369f9586e4d70a25da798ae2bd3d0ead7. The four C

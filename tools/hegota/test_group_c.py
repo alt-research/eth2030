@@ -37,6 +37,11 @@ class GroupCIntegrityTests(unittest.TestCase):
             for c in row['criteria']:
                 c['tests']=[n for n in c['tests'] if 'FrameCNativePeers' not in n]
         with self.assertRaises(ValueError):validate_manifest(ROOT,self.manifest)
+    def test_cached_keyed_dimensional_boundary_required(self):
+        for row in self.manifest['tasks']:
+            for criterion in row['criteria']:
+                criterion['tests']=[name for name in criterion['tests'] if 'TestFrameCIsolatedKeyedCachedDimensionalLimits' not in name]
+        with self.assertRaises(ValueError):validate_manifest(ROOT,self.manifest)
     def test_empty_unexecuted_report_rejected(self):
         report={'source_fingerprint_sha256':'x','artifacts':{},'tasks':10,'criteria':40,'public_complete':False,'public_gates':self.manifest['public_gates'],'selected_profile_consumers_passed':True,'passed_tests':{},'run':{'named':{},'packages':{},'completed_packages':0}}
         with self.assertRaises(ValueError):verify_report(report,self.manifest,set(),{},'x')

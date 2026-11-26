@@ -177,11 +177,14 @@
           "files": [
             "pkg/core/execution/frame_dependencies.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/txpool.go"
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/frame_8250_delta.go",
+            "pkg/txpool/frame_8250_delta_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits"
           ],
           "scope": "selected profiles; public gates unchanged"
         },
@@ -300,13 +303,15 @@
             "pkg/txpool/frame_8250_delta.go",
             "pkg/core/execution/frame_8250.go",
             "pkg/core/types/frame_8272.go",
-            "pkg/txpool/frame_8141.go"
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/frame_8250_delta_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion",
             "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaNativeNonceDomains",
             "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback",
-            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster"
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits"
           ],
           "scope": "selected profiles; public gates unchanged"
         }

@@ -34,6 +34,7 @@ MANDATORY = {
  'txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix',
  'txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion',
  'txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster',
+ 'txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits',
  'core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee',
  'eth::TestFrameCAnnouncementFetchMetadataAndBounds',
  'eth::TestFrameCEvictedAnnouncementSuppression',

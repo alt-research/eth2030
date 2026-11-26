@@ -116,6 +116,14 @@ func (p *KeyedFramePolicy8250Delta) Revalidate(cfg *config.ChainConfig, db state
 			delete(p.entries, sender)
 			continue
 		}
+		// Stable state dependencies do not cover the block's independent
+		// execution/state capacities. EIP-8250 changes nonce accounting only;
+		// EIP-8141's dimensional reservation rules still apply on every head.
+		budget, err := entry.tx.GasBudget()
+		if err != nil || budget.ExecutionReservation > header.GasLimit || budget.StateReservation > header.GasLimit {
+			delete(p.entries, sender)
+			continue
+		}
 		for _, f := range entry.tx.Frames {
 			if f.IsRecentRootVerifier() {
 				refs, _ := types.DecodeRecentRootReferences(f.Data)

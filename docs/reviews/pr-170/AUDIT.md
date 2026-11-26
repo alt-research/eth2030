@@ -29,3 +29,11 @@ EIPs master remains `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`; consensus-specs 
 ## Completion boundary
 
 The register is intended to qualify mechanisms within the selected profiles and does not resolve either public specification gate. `check_c.py` deliberately reports `public_complete: false`; changing that claim, removing any criterion, weakening an upstream source pin or omitting required native boundary consumers is rejected. The final evidence must come from complete successful current-source full/race runs and preserved A/B oracle consumers, with all optional skips inventoried. Hosted results must refer to the pushed head, not an earlier B revision.
+
+## Follow-up clause audit (2026-11-26)
+
+Upstream EIPs master, consensus-specs master and paymaster PR #12041 were rechecked; all pinned identities and both public gates are unchanged. The EIP-8141, EIP-8250 and EIP-8272 discussion topics were reviewed again. Historical opening examples in the latter two topics predate their current merged format and are not alternate normative encodings. PRs #12061/#12066 remain merged; #12537 remains an open wording correction with unchanged equations. PR #170 had no authored review findings at the start of this audit.
+
+A confirmed omission affected `KeyedFramePolicy8250Delta.Revalidate`: the unchanged-dependency fast path checked prefix shape, fees and root age but failed to compare execution/state reservations with the new header's gas limit. EIP-8250 changes nonce accounting only and preserves EIP-8141's independent block reservations. With unchanged state, a transaction at either exact dimensional boundary was retained when the header limit decreased by one, even though the production prefix executor rejected it.
+
+`TestFrameCIsolatedKeyedCachedDimensionalLimits` independently reproduces both failures on the preceding implementation. Revalidation now checks each dimension before cache reuse. Equality still preserves the same cached validation object; a one-unit deficit evicts the entry. The test is mandatory under C21.2 and C22.4, and a checker regression prevents dropping it. No public keyed decoder/activation route or canonical-runtime exception is added.

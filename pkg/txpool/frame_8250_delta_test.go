@@ -111,3 +111,54 @@ func TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster(t *testing.T) {
 		t.Fatal("code adoption bypassed noncanonical paymaster cap")
 	}
 }
+
+// EIP-8250 preserves EIP-8141's independent block reservations. A stable
+// validation read set does not make a transaction fit a smaller new block.
+func TestFrameCIsolatedKeyedCachedDimensionalLimits(t *testing.T) {
+	for _, dimension := range []string{"execution", "state"} {
+		t.Run(dimension, func(t *testing.T) {
+			native, db, base := framePoolFixture(t)
+			db.SetNonce(types.NonceManager8250, 1)
+			db.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+			frames := append([]types.Frame8141(nil), base.Frames...)
+			frames[0].Limits.Execution = 30000
+			frames[0].Limits.State = 97920
+			tx := &types.FrameTx8250Delta{ChainID: base.ChainID, Sender: base.Sender, NonceKeys: []*big.Int{big.NewInt(1)}, Fees: base.Fees, Frames: frames}
+			if dimension == "execution" {
+				tx.NonceSeq = 1
+				tx.Frames[0].Limits.State = 0
+				db.SetState(types.NonceManager8250, types.NonceSlot8250(tx.Sender, tx.NonceKeys[0]), types.Hash{31: 1})
+			}
+			signKeyedPolicyFrame(t, tx, 1)
+			budget, err := tx.GasBudget()
+			if err != nil {
+				t.Fatal(err)
+			}
+			limit := budget.ExecutionReservation
+			if dimension == "state" {
+				limit = budget.StateReservation
+				if budget.ExecutionReservation >= limit {
+					t.Fatal("state boundary does not isolate the state reservation")
+				}
+			}
+			head := &types.Header{Number: big.NewInt(1), Time: 100, GasLimit: limit, BaseFee: big.NewInt(1)}
+			policy := NewKeyedFramePolicy8250Delta()
+			if err := policy.Admit(native.frameConfig, db, head, tx, big.NewInt(1)); err != nil {
+				t.Fatal("exact boundary admission:", err)
+			}
+			validation := policy.entries[tx.Sender].validation
+			policy.Revalidate(native.frameConfig, db, head, big.NewInt(1))
+			if !policy.Contains(tx.Sender) || policy.entries[tx.Sender].validation != validation {
+				t.Fatal("exact unchanged boundary did not reuse validation")
+			}
+			head.GasLimit--
+			if _, err := execution.ValidateFrame8250DeltaPrefix(native.frameConfig, db, head, tx, big.NewInt(1)); err == nil {
+				t.Fatal("native execution unexpectedly fits below the reservation")
+			}
+			policy.Revalidate(native.frameConfig, db, head, big.NewInt(1))
+			if policy.Contains(tx.Sender) {
+				t.Fatal("cached validation retained a transaction exceeding the new dimensional limit")
+			}
+		})
+	}
+}

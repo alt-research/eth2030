@@ -107,9 +107,10 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
-	FrameObserver                FrameObserver   // optional bounded per-frame simulation observer
-	ExperimentalFramePaymasterV1 bool            // local research template; not upstream canonical code
-	Context                      context.Context // optional cancellation for isolated RPC execution
+	OnFrameLegacyNonceRead       func(types.Address) // optional isolated-profile dependency instrumentation
+	FrameObserver                FrameObserver       // optional bounded per-frame simulation observer
+	ExperimentalFramePaymasterV1 bool                // local research template; not upstream canonical code
+	Context                      context.Context     // optional cancellation for isolated RPC execution
 	Debug                        bool
 	Tracer                       EVMLogger
 	MaxCallDepth                 int

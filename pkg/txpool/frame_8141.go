@@ -18,7 +18,8 @@ import (
 	"github.com/eth2030/eth2030/crypto/bls"
 )
 
-func frameFeeBumped(old, next *big.Int) bool {
+func frameFeeBumped(old, next *big.Int) bool { return frameFeeBumpedPercent(old, next, PriceBump) }
+func frameFeeBumpedPercent(old, next *big.Int, percent uint64) bool {
 	if old == nil {
 		old = new(big.Int)
 	}
@@ -26,7 +27,8 @@ func frameFeeBumped(old, next *big.Int) bool {
 		return false
 	}
 	// Round upwards and require an actual increase, including zero-price replacements.
-	threshold := new(big.Int).Mul(old, big.NewInt(100+PriceBump))
+	multiplier := new(big.Int).Add(new(big.Int).SetUint64(percent), big.NewInt(100))
+	threshold := new(big.Int).Mul(old, multiplier)
 	threshold.Add(threshold, big.NewInt(99)).Div(threshold, big.NewInt(100))
 	return next.Cmp(old) > 0 && next.Cmp(threshold) >= 0
 }
@@ -115,7 +117,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 		validation.Profile = profile
 	}
 	payer := validation.Payer
-	reserved := new(big.Int).Set(frame.Fees.MaxFee)
+	reserved := frameMaxFee(frame.Fees.MaxFee)
 	canonical := pool.config.ExperimentalFramePaymasterV1 && frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
 	if canonical {
 		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
@@ -133,7 +135,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 			return nil, errors.New("one pending Frame transaction per sender")
 		}
 		if pool.lookup.framePayers[hash] == payer {
-			reserved.Add(reserved, other.Fees.MaxFee)
+			reserved.Add(reserved, frameMaxFee(other.Fees.MaxFee))
 			otherEnd, e := other.ValidationPrefix8141(pool.frameTime)
 			if noncanonical && e == nil && other.Frames[otherEnd].Flags == types.FrameApprovePayment {
 				return nil, errors.New("non-canonical Frame paymaster already has a pending transaction")
@@ -310,4 +312,11 @@ func (pool *TxPool) FrameBuildResult(hash types.Hash, approved bool) {
 	if pool.lookup.frameBuildFailures[hash] >= 3 {
 		pool.removeFrameLocked(hash)
 	}
+}
+
+func frameMaxFee(value *big.Int) *big.Int {
+	if value == nil {
+		return new(big.Int)
+	}
+	return new(big.Int).Set(value)
 }

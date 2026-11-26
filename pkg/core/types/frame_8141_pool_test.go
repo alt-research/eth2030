@@ -67,3 +67,19 @@ func TestFrame8141PublicRootGrammar(t *testing.T) {
 		})
 	}
 }
+
+func TestFrameCPublicWorkBudgetEquality(t *testing.T) {
+	tx := &FrameTx8141{Frames: []Frame8141{{Mode: ModeVerify, Flags: 3, Limits: FrameGasLimits{Execution: 99900, State: 500000}}}, Signatures: []FrameSignature{{Scheme: FrameSignatureArbitrary}}}
+	if _, err := tx.ValidationPrefix8141(0); err != nil {
+		t.Fatal("exact declared/signature work boundary", err)
+	}
+	tx.Frames[0].Limits.Execution++
+	if _, err := tx.ValidationPrefix8141(0); err == nil {
+		t.Fatal("100001 work accepted")
+	}
+	tx.Frames[0].Limits.Execution--
+	tx.Frames[0].Limits.State++
+	if _, err := tx.ValidationPrefix8141(0); err == nil {
+		t.Fatal("500001 state budget accepted")
+	}
+}

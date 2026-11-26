@@ -117,3 +117,23 @@ func TestFrame8141TransactionPriceIncludesBlockBlobFee(t *testing.T) {
 		t.Fatal("fixture did not distinguish a different blob base fee")
 	}
 }
+
+func TestFrameCDerivedReceiptStatusIsNotConsensusRLP(t *testing.T) {
+	receipt := &coretypes.Receipt{Type: coretypes.FrameTxType, Status: 1, FrameResults8141: []coretypes.FrameResult8141{{Status: 1}, {Status: 0}, {Status: 2}}}
+	before, err := receipt.EncodeRLP()
+	if err != nil {
+		t.Fatal(err)
+	}
+	rpc := FormatReceipt(receipt, nil, 0)
+	if rpc.Status != "0x0" {
+		t.Fatal("failed Frame body reported transaction success")
+	}
+	after, err := receipt.EncodeRLP()
+	if err != nil || string(before) != string(after) || receipt.Status != 1 {
+		t.Fatal("derived API status mutated consensus receipt")
+	}
+	receipt.FrameResults8141 = []coretypes.FrameResult8141{{Status: 1}, {Status: 2}}
+	if FormatReceipt(receipt, nil, 0).Status != "0x1" {
+		t.Fatal("skipped frame became independent failure")
+	}
+}

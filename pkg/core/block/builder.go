@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"math/big"
-	"sort"
 
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/config"
@@ -77,19 +76,8 @@ func sortedTxListsAt(pending []*types.Transaction, baseFee, blobFee *big.Int) (r
 			regular = append(regular, tx)
 		}
 	}
-	sortByPrice := func(txs []*types.Transaction) {
-		sort.Slice(txs, func(i, j int) bool {
-			pi := effectiveGasPriceAt(txs[i], baseFee, blobFee)
-			pj := effectiveGasPriceAt(txs[j], baseFee, blobFee)
-			if order := pi.Cmp(pj); order != 0 {
-				return order > 0
-			}
-			a, b := txs[i].Hash(), txs[j].Hash()
-			return a.Hex() < b.Hex()
-		})
-	}
-	sortByPrice(regular)
-	sortByPrice(blobs)
+	regular = orderTransactionsAt(regular, baseFee, blobFee)
+	blobs = orderTransactionsAt(blobs, baseFee, blobFee)
 	return regular, blobs
 }
 
@@ -387,7 +375,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			validBlobTxs = append(validBlobTxs, tx)
 		}
 	}
-	allSorted := append(regularTxs, validBlobTxs...)
+	allSorted := orderTransactionsAt(append(regularTxs, validBlobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	// Partition transactions into non-conflicting groups for parallel execution
 	// observability (gigagas parallel path, M+ roadmap). The groups are not yet
@@ -750,7 +738,7 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 
 	// Sort transactions: separate regular and blob, each by price descending.
 	regularTxs, blobTxs := sortedTxListsAt(txsByPrice, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
-	allSorted := append(regularTxs, blobTxs...)
+	allSorted := orderTransactionsAt(append(regularTxs, blobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	snapshot := statedb.Snapshot()
 

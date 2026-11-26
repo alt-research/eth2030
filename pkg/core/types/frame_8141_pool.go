@@ -15,6 +15,10 @@ func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
 	if err := tx.Validate(); err != nil {
 		return 0, err
 	}
+	return tx.validationPrefix8141(timestamp)
+}
+
+func (tx *FrameTx8141) validationPrefix8141(timestamp uint64) (int, error) {
 	start := 0
 	if tx.Frames[0].Target != nil && *tx.Frames[0].Target == FrameExpiryVerifier {
 		frame := tx.Frames[0]
@@ -94,4 +98,12 @@ func (tx *FrameTx8141) ValidationDeployIndex8141() int {
 		return index
 	}
 	return -1
+}
+
+// ValidationPrefix8250 uses the isolated profile's signing hash and nonce rules.
+func (tx *FrameTx8250Delta) ValidationPrefix8250(timestamp uint64) (int, error) {
+	if err := tx.Validate(); err != nil {
+		return 0, err
+	}
+	return tx.ExecutionFields().validationPrefix8141(timestamp)
 }

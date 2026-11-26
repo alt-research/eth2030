@@ -32,7 +32,8 @@ func (d FrameDependency) Value(db state.StateDB) string {
 	case FrameNonceDependency:
 		return new(big.Int).SetUint64(db.GetNonce(d.Address)).String()
 	case FrameCodeDependency:
-		return string(db.GetCode(d.Address))
+		v := db.GetCodeHash(d.Address)
+		return string(v[:])
 	case FrameExistenceDependency:
 		if db.Exist(d.Address) {
 			return "1"
@@ -134,4 +135,8 @@ func OrderedFrameDependencies(v *FramePrefixValidation) []FrameDependency {
 		return bytes.Compare(a.Slot[:], b.Slot[:]) < 0
 	})
 	return keys
+}
+
+func (s *frameReadSet) FrameLegacyNonce8250(addr types.Address) uint64 {
+	return s.StateDB.GetNonce(addr)
 }

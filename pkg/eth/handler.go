@@ -600,19 +600,30 @@ func (h *Handler) handleNewPooledTransactionHashes(ep *EthPeer, msg p2p.Msg) err
 	if err := decodeMsg(msg, &ann); err != nil {
 		return err
 	}
-	if len(ann.Hashes) == 0 {
-		return nil
+
+	if len(ann.Hashes) > 4096 || len(ann.Types) != len(ann.Hashes) || len(ann.Sizes) != len(ann.Hashes) {
+		return errors.New("invalid transaction announcement dimensions")
 	}
 	var unknown []types.Hash
-	for _, hash := range ann.Hashes {
+	announced := make(map[types.Hash]relayTxInfo)
+	seen := make(map[types.Hash]bool)
+	for i, hash := range ann.Hashes {
+		if ann.Sizes[i] == 0 || ann.Sizes[i] > MaxMessageSize {
+			return errors.New("invalid transaction announcement size")
+		}
+		if seen[hash] || !relayKnownType(ann.Types[i]) {
+			continue
+		}
+		seen[hash] = true
 		if h.txPool.Get(hash) == nil {
 			unknown = append(unknown, hash)
+			announced[hash] = relayTxInfo{ann.Types[i], ann.Sizes[i]}
 		}
 	}
 	if len(unknown) == 0 {
 		return nil
 	}
-	return ep.SendGetPooledTransactions(unknown)
+	return h.requestAnnouncedTransactions(ep, unknown, announced)
 }
 
 // handleGetPooledTransactions responds to a GetPooledTransactions (0x09) request
@@ -625,9 +636,26 @@ func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
 	if err := decodeMsg(msg, &req); err != nil {
 		return err
 	}
+	if len(req.Hashes) > 256 {
+		return errors.New("too many pooled transaction hashes")
+	}
 	var txs []*types.Transaction
+	size := 64
+	seen := make(map[types.Hash]bool)
 	for _, hash := range req.Hashes {
+		if seen[hash] {
+			continue
+		}
+		seen[hash] = true
 		if tx := h.txPool.Get(hash); tx != nil {
+			raw, err := types.EncodePooledTransaction(tx)
+			if err != nil {
+				return err
+			}
+			if size+len(raw)+8 > CellResponseLimit {
+				break
+			}
+			size += len(raw) + 8
 			txs = append(txs, tx)
 		}
 	}
@@ -645,7 +673,29 @@ func (h *Handler) handlePooledTransactions(ep *EthPeer, msg p2p.Msg) error {
 		return err
 	}
 	var added []*types.Transaction
+	if len(packet.Transactions) > 256 {
+		return errors.New("too many pooled transactions")
+	}
+	req, requestErr := h.takeRelayRequest(ep, packet.RequestID, p2p.PooledTransactionsMsg)
+	position := 0
 	for _, tx := range packet.Transactions {
+		_, frame := tx.Inner().(*types.FrameTx8141)
+		advertised, wasAdvertised := req.announced[tx.Hash()]
+		if frame || (wasAdvertised && advertised.kind == types.FrameTxType) {
+			if requestErr != nil {
+				return requestErr
+			}
+			for position < len(req.hashes) && req.hashes[position] != tx.Hash() {
+				position++
+			}
+			if position == len(req.hashes) {
+				return errors.New("unrequested or reordered Frame response")
+			}
+			position++
+			if err := validateRelayFrameMetadata(req, tx); err != nil {
+				return err
+			}
+		}
 		if err := h.txPool.AddRemote(tx); err == nil {
 			added = append(added, tx)
 		}

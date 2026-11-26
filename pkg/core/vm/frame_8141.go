@@ -425,6 +425,9 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 		value = new(big.Int)
 		switch param.Uint64() {
 		case 13:
+			if evm.Config.OnFrameLegacyNonceRead != nil {
+				evm.Config.OnFrameLegacyNonceRead(tx.Sender)
+			}
 			value.SetUint64(ctx.LegacyNonce)
 		case 14:
 			value.SetUint64(uint64(len(keys)))
@@ -706,6 +709,9 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 			return nil
 		}
 		code := evm.StateDB.GetCode(address)
+		if address == f.Tx.Sender && len(code) == 0 {
+			return nil
+		} // explicit sender default-code exception
 		if len(code) == 0 || types.HasDelegationPrefix(code) {
 			return errors.New("Frame public validation called an empty or delegated third-party account")
 		}

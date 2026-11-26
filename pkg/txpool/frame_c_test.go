@@ -146,3 +146,45 @@ func TestFrameCBuildContextAndUnpaidRetryBound(t *testing.T) {
 		t.Fatal("removed attempt resurrected metadata or mutated state")
 	}
 }
+
+func TestFrameCConfiguredReplacementAndSidecarBytes(t *testing.T) {
+	pool, _, frame := framePoolFixture(t)
+	pool.config.FramePriceBump = 25
+	old := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(old); err != nil {
+		t.Fatal(err)
+	}
+	next := *frame
+	next.Fees = types.FrameFeeBudget{MaxFee: big.NewInt(1100000), MaxPriorityFeePerGas: big.NewInt(3)}
+	if err := pool.AddRemote(signPoolFrame(t, &next, 1)); err != ErrReplacementUnderpriced {
+		t.Fatalf("configured bump ignored: %v", err)
+	}
+	next.Fees.MaxFee = big.NewInt(1250000)
+	replacement := signPoolFrame(t, &next, 1)
+	if err := pool.AddRemote(replacement); err != nil {
+		t.Fatal(err)
+	}
+	plain := transactionPoolBytes(replacement)
+	replacement.SetBlobSidecar(&types.BlobSidecarData{Blobs: [][]byte{make([]byte, 131072)}, Commitments: [][]byte{make([]byte, 48)}, Proofs: [][]byte{make([]byte, 48)}})
+	if transactionPoolBytes(replacement) <= plain+131072 {
+		t.Fatal("pool bytes omitted sidecar metadata")
+	}
+	if !frameFeeBumpedPercent(big.NewInt(1), big.NewInt(2), 25) || frameFeeBumpedPercent(big.NewInt(0), big.NewInt(0), 25) {
+		t.Fatal("rounding/zero fee increment differs")
+	}
+}
+
+func TestFrameCZeroFeeBudgetDoesNotPanic(t *testing.T) {
+	pool, _, frame := framePoolFixture(t)
+	pool.config.MinGasPrice = new(big.Int)
+	pool.SetBaseFee(new(big.Int))
+	frame.Fees = types.FrameFeeBudget{}
+	tx := signPoolFrame(t, frame, 1)
+	if err := pool.AddRemote(tx); err != nil {
+		t.Fatal(err)
+	}
+	pool.Reset(pool.state)
+	if pool.Get(tx.Hash()) == nil {
+		t.Fatal("zero fee Frame lost on unchanged head")
+	}
+}

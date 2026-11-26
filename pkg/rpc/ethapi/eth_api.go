@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/eth2030/eth2030/core/state"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"math/big"
 	"sync"
 
@@ -1311,7 +1312,10 @@ func (api *EthAPI) sendRawTransaction(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	rawBytes := fromHexBytes(dataHex)
+	rawBytes, decodeErr := hexutil.Decode(dataHex)
+	if decodeErr != nil {
+		return errorResponse(req.ID, ErrCodeInvalidParams, "invalid transaction DATA: "+decodeErr.Error())
+	}
 	if len(rawBytes) == 0 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "empty transaction data")
 	}

@@ -158,7 +158,8 @@ type Config struct {
 
 	// ExperimentalLocalTx enables type-0x08 LocalTx (proof-of-concept, not production-ready).
 	// When true, the txpool accepts type-0x08 txs and enforces ScopeHint access restrictions.
-	ExperimentalLocalTx bool // --experimental-local-tx
+	ExperimentalFramePaymasterV1 bool // explicitly select local research paymaster; not upstream canonical bytecode
+	ExperimentalLocalTx          bool // --experimental-local-tx
 
 	// AllowAATx controls whether the txpool accepts EIP-7701 AA transactions (type 0x05).
 	// Defaults to true (enabled on Glamsterdam+ networks). Set false to disable on

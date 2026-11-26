@@ -96,6 +96,8 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
+	FramePriceBump               uint64 // both Frame fee fields; zero selects 10 percent
+	FrameBlobPriceBump           uint64 // optional larger blob max_fee increment
 	ExperimentalFramePaymasterV1 bool   // explicit local paymaster profile
 	MaxBytes                     uint64 // encoded envelopes plus blob sidecars; zero uses 512 MiB
 
@@ -595,7 +597,18 @@ func (pool *TxPool) hasSufficientBump(oldTx, newTx *types.Transaction) bool {
 	oldFrame, oldCanonical := oldTx.Inner().(*types.FrameTx8141)
 	newFrame, newCanonical := newTx.Inner().(*types.FrameTx8141)
 	if oldCanonical || newCanonical {
-		return oldCanonical && newCanonical && frameFeeBumped(oldFrame.Fees.MaxFee, newFrame.Fees.MaxFee) && frameFeeBumped(oldFrame.Fees.MaxPriorityFeePerGas, newFrame.Fees.MaxPriorityFeePerGas)
+		if !oldCanonical || !newCanonical {
+			return false
+		}
+		bump := pool.config.FramePriceBump
+		if bump == 0 {
+			bump = PriceBump
+		}
+		maxBump := bump
+		if len(oldFrame.BlobVersionedHashes) > 0 || len(newFrame.BlobVersionedHashes) > 0 {
+			maxBump = max(bump, pool.config.FrameBlobPriceBump)
+		}
+		return frameFeeBumpedPercent(oldFrame.Fees.MaxFee, newFrame.Fees.MaxFee, maxBump) && frameFeeBumpedPercent(oldFrame.Fees.MaxPriorityFeePerGas, newFrame.Fees.MaxPriorityFeePerGas, bump)
 	}
 	oldPrice := EffectiveGasPrice(oldTx, pool.baseFee)
 	newPrice := EffectiveGasPrice(newTx, pool.baseFee)
@@ -1187,7 +1200,11 @@ func (pool *TxPool) PendingFlat() []*types.Transaction {
 		if pj == nil {
 			return true
 		}
-		return pi.Cmp(pj) > 0
+		if order := pi.Cmp(pj); order != 0 {
+			return order > 0
+		}
+		a, b := groups[i].txs[0].Hash(), groups[j].txs[0].Hash()
+		return bytes.Compare(a[:], b[:]) < 0
 	})
 
 	var all []*types.Transaction

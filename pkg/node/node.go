@@ -496,6 +496,7 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	poolCfg := txpool.DefaultConfig()
 	// BB-2.2: propagate experimental LocalTx flag into pool config.
 	poolCfg.AllowLocalTx = config.ExperimentalLocalTx
+	poolCfg.ExperimentalFramePaymasterV1 = config.ExperimentalFramePaymasterV1
 	// EIP-7701: propagate AA tx acceptance flag into pool config (--txpool.allow-aa).
 	poolCfg.AllowAATx = config.AllowAATx
 	// EIP-2780: tell the pool whether the chain runs Glamsterdan so it uses

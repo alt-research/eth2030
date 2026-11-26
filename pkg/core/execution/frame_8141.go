@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	corconfig "github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -61,6 +62,10 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 	if err != nil {
 		return nil, err
 	}
+	if experimentalPaymasterV1 && framepay.IsV1(copied.GetCode(receipt.Payer)) {
+		copied.GetState(receipt.Payer, types.BytesToHash([]byte{2}))
+		copied.GetState(receipt.Payer, types.BytesToHash([]byte{3}))
+	}
 	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
 	for dep := range copied.reads {
 		result.Dependencies[dep] = dep.Value(db)
@@ -97,7 +102,11 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		if err := profile.Validate(); err != nil {
 			return nil, 0, err
 		}
-		legacyNonce = db.GetNonce(tx.Sender)
+		if reader, ok := db.(interface{ FrameLegacyNonce8250(types.Address) uint64 }); ok && len(profile.NonceKeys) > 0 {
+			legacyNonce = reader.FrameLegacyNonce8250(tx.Sender)
+		} else {
+			legacyNonce = db.GetNonce(tx.Sender)
+		}
 		if err := validateNonceSet8250(db, profile); err != nil {
 			return nil, 0, err
 		}
@@ -176,7 +185,11 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	ctx.PublicValidation = prefixOnly
 	prefixEnd := -1
 	if prefixOnly {
-		prefixEnd, err = tx.ValidationPrefix8141(header.Time)
+		if profile != nil {
+			prefixEnd, err = profile.ValidationPrefix8250(header.Time)
+		} else {
+			prefixEnd, err = tx.ValidationPrefix8141(header.Time)
+		}
 		if err != nil {
 			return nil, 0, err
 		}

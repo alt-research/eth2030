@@ -20,11 +20,16 @@ type relayKey struct {
 	peer string
 	id   uint64
 }
+type relayTxInfo struct {
+	kind byte
+	size uint32
+}
 type relayRequest struct {
-	code    uint64
-	hashes  []types.Hash
-	mask    types.CellMask
-	expires time.Time
+	announced map[types.Hash]relayTxInfo
+	code      uint64
+	hashes    []types.Hash
+	mask      types.CellMask
+	expires   time.Time
 }
 type relayAnnouncement struct {
 	mask  types.CellMask
@@ -91,6 +96,17 @@ func (h *Handler) relayMask(hash types.Hash) types.CellMask {
 	return h.relay.store.Mask(hash)
 }
 func (h *Handler) sendRelayAnnouncement(ep *EthPeer, txs []*types.Transaction) error {
+	var live []*types.Transaction
+	for _, tx := range txs {
+		if _, frame := tx.Inner().(*types.FrameTx8141); frame && h.txPool.Get(tx.Hash()) == nil {
+			continue
+		}
+		live = append(live, tx)
+	}
+	txs = live
+	if len(txs) == 0 {
+		return nil
+	}
 	if ep.Peer().Version() < ETH72 {
 		return ep.SendNewPooledTransactionHashes(txs)
 	}
@@ -128,11 +144,21 @@ func (h *Handler) handleSparseAnnouncement(ep *EthPeer, msg p2p.Msg) error {
 	// field is validated by RLP decoding; its bits are ignored for non-blobs.
 	mask := ann.Mask
 	var ordinary []types.Hash
+	announced := make(map[types.Hash]relayTxInfo)
+	seen := make(map[types.Hash]bool)
 	for i, hash := range ann.Hashes {
+		if seen[hash] {
+			continue
+		}
+		seen[hash] = true
 		if ann.Sizes[i] == 0 || ann.Sizes[i] > MaxMessageSize {
 			return errors.New("invalid transaction announcement size")
 		}
 		if ann.Types[i] != types.BlobTxType {
+			if !relayKnownType(ann.Types[i]) {
+				continue
+			}
+			announced[hash] = relayTxInfo{ann.Types[i], ann.Sizes[i]}
 			if h.txPool.Get(hash) == nil {
 				ordinary = append(ordinary, hash)
 			}
@@ -158,11 +184,14 @@ func (h *Handler) handleSparseAnnouncement(ep *EthPeer, msg p2p.Msg) error {
 		}
 	}
 	if len(ordinary) > 0 {
-		return h.requestRelay(ep, p2p.PooledTransactionsMsg, ordinary, types.CellMask{})
+		return h.requestAnnouncedTransactions(ep, ordinary, announced)
 	}
 	return nil
 }
-func (h *Handler) requestRelay(ep *EthPeer, code uint64, hashes []types.Hash, mask types.CellMask) error {
+func (h *Handler) requestRelay(ep *EthPeer, code uint64, hashes []types.Hash, mask types.CellMask, announced ...map[types.Hash]relayTxInfo) error {
+	if len(hashes) > 256 {
+		hashes = hashes[:256]
+	}
 	r := h.relay
 	r.mu.Lock()
 	r.prune()
@@ -182,7 +211,15 @@ func (h *Handler) requestRelay(ep *EthPeer, code uint64, hashes []types.Hash, ma
 	}
 	id := ep.nextRequestID()
 	key := relayKey{ep.ID(), id}
-	r.requests[key] = relayRequest{code: code, hashes: append([]types.Hash(nil), hashes...), mask: mask, expires: time.Now().Add(5 * time.Second)}
+	info := make(map[types.Hash]relayTxInfo)
+	if len(announced) > 0 {
+		for _, hash := range hashes {
+			if v, ok := announced[0][hash]; ok {
+				info[hash] = v
+			}
+		}
+	}
+	r.requests[key] = relayRequest{announced: info, code: code, hashes: append([]types.Hash(nil), hashes...), mask: mask, expires: time.Now().Add(5 * time.Second)}
 	r.mu.Unlock()
 	var err error
 	if code == CellsMsg {
@@ -317,8 +354,14 @@ func (h *Handler) handleSparsePooled(ep *EthPeer, msg p2p.Msg) error {
 	if err != nil {
 		return err
 	}
+	if len(packet.Transactions) > 256 {
+		return errors.New("too many pooled transactions")
+	}
 	position := 0
 	for _, tx := range packet.Transactions {
+		if err := validateRelayFrameMetadata(req, tx); err != nil {
+			return err
+		}
 		for position < len(req.hashes) && req.hashes[position] != tx.Hash() {
 			position++
 		}
@@ -572,4 +615,50 @@ func (h *Handler) handleGetSparsePooled(ep *EthPeer, msg p2p.Msg) error {
 		size += len(raw) + 8
 	}
 	return ep.sendMessage(p2p.PooledTransactionsMsg, &reply)
+}
+
+func relayKnownType(kind byte) bool {
+	switch kind {
+	case types.LegacyTxType, types.AccessListTxType, types.DynamicFeeTxType, types.BlobTxType, types.SetCodeTxType, types.FrameTxType, types.PQTransactionType, types.AATxType, types.LocalTxType:
+		return true
+	}
+	return false
+}
+func validateRelayFrameMetadata(req relayRequest, tx *types.Transaction) error {
+	if advertised, ok := req.announced[tx.Hash()]; ok && (advertised.kind == types.FrameTxType || tx.Type() == types.FrameTxType) {
+		raw, err := tx.EncodeRLP()
+		if err != nil {
+			return err
+		}
+		if tx.Type() != advertised.kind || uint32(len(raw)) != advertised.size {
+			return errors.New("Frame response differs from advertised type/size")
+		}
+	}
+	return nil
+}
+
+func (h *Handler) requestAnnouncedTransactions(ep *EthPeer, hashes []types.Hash, announced map[types.Hash]relayTxInfo) error {
+	h.relay.mu.Lock()
+	h.relay.prune()
+	pending := make(map[types.Hash]bool)
+	for _, req := range h.relay.requests {
+		for _, hash := range req.hashes {
+			pending[hash] = true
+		}
+	}
+	h.relay.mu.Unlock()
+	var fresh []types.Hash
+	for _, hash := range hashes {
+		if !pending[hash] {
+			fresh = append(fresh, hash)
+		}
+	}
+	for len(fresh) > 0 {
+		n := min(256, len(fresh))
+		if err := h.requestRelay(ep, p2p.PooledTransactionsMsg, fresh[:n], types.CellMask{}, announced); err != nil {
+			return err
+		}
+		fresh = fresh[n:]
+	}
+	return nil
 }

@@ -6,7 +6,7 @@
 - [x] Reconcile runtime recognition, authorization, storage, delayed withdrawal/rotation, EIP-8151 and pool lifecycle requirements against production paths.
 - [x] Implement every determinate omission with independent native positive/negative controls and explicit profile selection where upstream proposals diverge.
 - [x] Verify builds, relevant/full/race tests, the 12-case baseline, normal/optimized Python and four native mutation controls; bind all mandatory A/B/C consumers to current-source evidence.
-- [ ] Commit/push the final evidence and update the English PR with exact current-head hosted results.
+- [x] Prepare final source-bound evidence and the English PR publication. Exact pushed-head hosted results are maintained in the live PR description/checks, without another commit solely to attest to itself.
 
 ## Independent completeness re-audit
 

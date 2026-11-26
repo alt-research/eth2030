@@ -203,26 +203,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stRevertTest",
+      "test": "TestEF_stCallCodes",
       "reason": [
-        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
-        "--- SKIP: TestEF_stRevertTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stStaticCall",
-      "reason": [
-        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
-        "--- SKIP: TestEF_stStaticCall (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP1559",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
-        "--- SKIP: TestEF_stEIP1559 (0.00s)"
+        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
+        "--- SKIP: TestEF_stCallCodes (0.00s)"
       ]
     },
     {
@@ -235,6 +219,14 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stStaticCall",
+      "reason": [
+        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
+        "--- SKIP: TestEF_stStaticCall (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stEIP150Specific",
       "reason": [
         "fixture_loader_test.go:319: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
@@ -243,10 +235,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCallCodes",
+      "test": "TestEF_stEIP1559",
       "reason": [
-        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
-        "--- SKIP: TestEF_stCallCodes (0.00s)"
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "--- SKIP: TestEF_stEIP1559 (0.00s)"
       ]
     },
     {
@@ -291,6 +283,14 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stRevertTest",
+      "reason": [
+        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
+        "--- SKIP: TestEF_stRevertTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stZeroCallsRevert",
       "reason": [
         "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
@@ -326,7 +326,7 @@
       "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
       "reason": [
         "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
-        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.09s)"
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.01s)"
       ]
     },
     {

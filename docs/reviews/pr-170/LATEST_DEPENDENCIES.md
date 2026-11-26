@@ -116,7 +116,7 @@ already conforming paths.
 
 ## Counterexamples and qualification
 
-The new native collision/cache/probe tests are also run with the seven affected
+The new native collision/cache/probe tests are also run with the eight affected
 production files from exact predecessor `53904476`. Two compile-only additions
 declare the new fork field and dependency enum; they do not add a producer,
 reader or collision behavior. This permits unchanged new tests to distinguish
@@ -124,11 +124,22 @@ the missing behavior from the predecessor's working empty/prefunded deployments,
 pre-fork replay, underfunded parent halts and clarification controls. Expected
 vectors and refs are never modified to obtain a passing result.
 
-The predecessor overlay fails eleven regression subcases in four enclosing
+The predecessor overlay fails thirteen regression subcases in five enclosing
 native consumers; twenty-one control subcases and both clarification consumers
 pass. This is an execution counterexample, not a compilation-failure control.
+
+The former unit assertion that slot 100 should be missed was corrected to the
+normative any-storage rule. It was an implementation-mirroring unit test, not
+one of the frozen independent wire/state oracles.
 
 Current local source/log identities, required consumers, optional skips and
 retained historical counterexamples are recorded in A/B/C verification evidence.
 Exact final-head hosted results belong to the live English PR checks and body;
 predecessor workflow results never attest to a new head.
+
+Implementation `79b82283` passes the full 240-package suite (24,078 passing
+events, zero failures, 124 optional skips) and the 58-package affected race suite,
+including STF (9,786 passing events, zero failures, 74 optional skips). Mandatory
+A/B/C consumers are 62/79/102 with zero required skips. Full build/vet, both
+binaries, independent baseline 12/12 and 94 Python checks in each mode pass.
+Twenty historical counterexamples are retained alongside the new control.

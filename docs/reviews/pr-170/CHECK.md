@@ -5,7 +5,7 @@
 - [x] Recheck every C normative source and consumed dependency against current upstream history and discussion.
 - [x] Reconcile all forty criteria, emphasizing candidate failure/cancellation, resource restoration, cache boundaries and head transitions.
 - [x] Reproduce and fix every confirmed omission using native counterexamples; preserve positive controls and independent expectations.
-- [ ] Verify required consumers/builds and any necessary full/race checks, update status/evidence and publish English exact-head results.
+- [x] Verify required consumers/builds and full/race checks, update status/evidence and prepare the committed English PR publication. Exact final-head hosted results are maintained in the live PR description/checks.
 
 ## Independent C production-path audit (2026-11-27)
 

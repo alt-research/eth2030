@@ -1,3 +1,21 @@
+# Latest dependency audit (November 27, 2026)
+
+Latest merged EIP-8037/8038/2780 dependency texts are now pinned separately from
+read-only historical refs. Native creation/storage-root checks, Frame state-gas
+rollback, deployment cache/candidate dependencies and STF fork configuration
+are corrected. Seven mandatory native consumers and provenance/profile guards
+were added. Local qualification on implementation `79b82283` passes:
+
+- Full suite: 24,078 passing events, zero failures, 124 optional skips; all 240 packages complete.
+- Focused race, including STF: 9,786 passing events, zero failures, 74 optional skips; all 58 packages complete.
+- Required A/B/C consumers: 62/79/102, zero required skips. Full builds/vet, both binaries, historical baseline 12/12 and 94 Python checks per mode pass.
+- The new predecessor control has thirteen failing regression subcases, five failing enclosing tests and twenty-one passing control subcases. All twenty previous controls remain preserved.
+
+See [LATEST_DEPENDENCIES.md](LATEST_DEPENDENCIES.md). Exact final-head hosted
+results are maintained in the live English PR description/current checks;
+predecessor results do not qualify this head. The canonical-paymaster upstream
+adoption/fork-pinning boundary remains explicit.
+
 # Hegota Group C status
 
 The November 27 production-path audit is locally qualified on implementation `4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9`: all 240 full-suite and 57 focused-race packages complete, with 24,037/9,620 passing events and zero failures. Builds, vet, native/wrapper binaries, independent baseline 12/12 and 91 Python checks per mode pass. All 62/79/95 mandatory A/B/C consumers execute with zero required skips. The audit corrected one public API omission: invalid Frame simulation account overrides now return invalid-params (-32602) rather than internal-error (-32603). Eight malformed override classes and eight native HTTP profiles pass alongside valid replay/override, nonce-mismatch and cancellation controls. The exact `64d34cfd` production-file overlay reproduces sixteen failing subcases and four passing controls. Twenty recorded counterexamples preserve the earlier evidence. See [RECHECK.md](RECHECK.md). References and independent expectations are unchanged. Exact pushed-head hosted results are maintained in the English PR description/checks; upstream proposal adoption/fork pinning remains distinct.
@@ -80,12 +98,3 @@ Final local qualification completed on 2026-11-26:
 - Prior-code native/overlay controls reproduce the four follow-up omissions while retaining the relevant positive controls. Earlier factory-funding/paymaster counterexamples and the caught-INVALID review correction remain recorded honestly in C evidence.
 
 All A/B/C source/evidence checks pass. English draft [PR #170](https://github.com/alt-research/eth2030/pull/170) targets `master`. Exact pushed-head hosted verification and immutable workflow links are maintained in its description/current checks; predecessor results are not reused. The prior qualification at `0894e72d` is historical, and its 15 successful hosted checks do not attest to this follow-up head.
-# Latest dependency audit (November 27, 2026)
-
-Latest merged EIP-8037/8038/2780 dependency texts are now pinned separately from
-read-only historical refs. Native creation/storage-root checks, Frame state-gas
-rollback, deployment cache/candidate dependencies and STF fork configuration
-are corrected. Seven mandatory native consumers and provenance/profile guards
-were added. Full source qualification and exact final-head hosted checks are
-in progress; see [LATEST_DEPENDENCIES.md](LATEST_DEPENDENCIES.md).
-

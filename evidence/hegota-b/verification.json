@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "3a429cd21ef1c5dc66edb286abf865d73e4991992acccbc960c285e34b51b2fb",
+    "log_sha256": "be004926d4b94416caba0f5df09e4718d2d6619bf9232f01c8cc753d8e9568c8",
     "named": {
-      "pass": 24037,
+      "pass": 24078,
       "skip": 124
     },
     "packages": {
@@ -15,7 +15,7 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "e932efff7c35f68bc1d3e137a4c8f7361612b0792e4170fc53d217c678574bff",
+  "source_fingerprint_sha256": "dbeb14ffe73327e661443748c57a5d81794c15f453b705c09aa02f2fa484faec",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
@@ -46,7 +46,7 @@
     "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
     "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
-    "pkg/core/execution/processor.go": "b7f87db7d7f2a08ff65b9212ef23fa56f8d767ef16daf8b1d5a3a5eb213fc313",
+    "pkg/core/execution/processor.go": "d99204acab5532f3eb1c4e24ccce497a3e4babe8c50a07857f0789e225882fd5",
     "pkg/core/execution/system_transitions_test.go": "fc40b4ceda664a8a0de10901750e5fe2c15fa5043d618f11e26c470db2fcd3c9",
     "pkg/core/types/frame_8141.go": "4083b6fdc4997bf3a89b06c0904ecfc8b737d5ca584d7b4c360a1393cea43cb6",
     "pkg/core/types/frame_8141_fees.go": "9dac8caa196d7891ffd6b4c2192d5b10986c1b8ecfd38f795cd0fe3f037282f1",
@@ -64,11 +64,11 @@
     "pkg/core/types/tx_frame_test.go": "0ed4abee48bc3e1e28525e8bbf5753f07f9d768ec988df43ac1572ecb86c71e6",
     "pkg/core/vm/amsterdam_gas_table.go": "06dab2b7dd77ffbf267d3c1dff21e6f1b45fe77e970066bffed59fdf8b6dca8b",
     "pkg/core/vm/delegation_gas.go": "8ef2b9e10e80bd1b87451e870907113825319b14ceffbf189f84d171e63720ad",
-    "pkg/core/vm/frame_8141.go": "08b4ddb6b2e90b6496d871ab2175fd86bd7fd4aa3a9b4946be29bca3c4590ebe",
+    "pkg/core/vm/frame_8141.go": "866a5d73e3b4da69b48a4a0d6599aca15345547194ec8c6e7e070b20c497b617",
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
-    "pkg/core/vm/interpreter.go": "ca6dcf866b66d10e41365aef704d715731dbb6f7fb5e1cc55048f50e0e0a7261",
+    "pkg/core/vm/interpreter.go": "544b14ba5748efab13d592123fcdcfb687c5c83c5a2798b64d870f112b7ce43a",
     "pkg/core/vm/jump_table.go": "dc6c82c9bbe976f6a7e7b898cf1919a985c0e0bd5f3bdb57d0fbd0c966650d16",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
     "refs/EIPs/EIPS/eip-214.md": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
@@ -172,17 +172,17 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
-  "source_revision": "4d4a0e0c65bb23c24ca0db2519c1b6e9264903b9",
+  "source_revision": "79b82283303cb48aafec37713f4acaab815d1519",
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "512e8f901dbc9565d76ff06e1997d30bf3e67b02243d88ce06a4e3681143a7ff",
-    "race_log_sha256": "5b4222f6ae6f177dd58f6a01f2c79901ccfac8b3702545e793f3d1c7a8efe3ee",
-    "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9620,
+    "build_vet_commands_sha256": "2927328e5863bc9969425e054fddd23a624de624527dfb9e4d040fb99064c39c",
+    "race_log_sha256": "898140ad3cc1957b40a0972825ee0b579559ebeb67f77ad25224b512ff6f39b1",
+    "race_command_sha256": "0e640348768e46cd067a0dd8691c9572526ffff4ae865ca8d1517b805c3f1011",
+    "race_named_pass": 9786,
     "race_named_fail": 0,
     "race_named_skip": 74,
-    "race_completed_packages": 57,
+    "race_completed_packages": 58,
     "required_native_consumer_skips": 0,
     "historical_baseline": {
       "cases": 12,
@@ -191,8 +191,8 @@
       "skipped": 0
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-    "python_regressions": 91,
-    "python_log_sha256": "b4ddf076dd69fb751fce3a26c369193b4174ffe34d729d67e8d6fd520494440c",
-    "optimized_python_log_sha256": "b9e390507dd1ec73baffca365a19459275d4493b416fb4e949bc6d41371b94de"
+    "python_regressions": 94,
+    "python_log_sha256": "8785231a290c6ff9eb35e8b7b7d60aef2d5a431a30af1da5c1cbf742e74b8bd0",
+    "optimized_python_log_sha256": "8bd8deb3b459f4a4f577a7b5805323f062c707026a740e499a6eb7c8ce90e4a1"
   }
 }

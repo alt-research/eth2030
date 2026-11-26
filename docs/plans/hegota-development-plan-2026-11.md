@@ -151,7 +151,7 @@ The seven Group A tasks (HGT-001/004/005/006/007/008/009) are accepted only thro
 
 ### C. 公开交易池、传播、RPC 与节点接入
 
-The 2026-11-26 [Group C specification audit and forty-criterion acceptance plan](hegota-c/PLAN.md) and [authenticated Frame RPC profile](hegota-c/RPC_PROFILE.md) define the detailed completion requirements for HGT-020–029. They supersede shorthand completion assumptions below. Selected-profile implementation does not close D01 or promote the experimental paymaster runtime to an upstream canonical template; public interoperability gates remain explicit.
+The 2026-11-26 [Group C specification audit and forty-criterion acceptance plan](hegota-c/PLAN.md) and [authenticated Frame RPC profile](hegota-c/RPC_PROFILE.md) define the detailed completion requirements for HGT-020–029. They supersede shorthand completion assumptions below. D01 is resolved for the selected native two-fee composition, with optional explicit EIP8250Time activation. The [November 27 dependency re-audit](../reviews/pr-170/LATEST_DEPENDENCIES.md) adds the latest merged EIP-8037/8038/2780 texts and complete storage-root creation/deployment-cache checks at the existing native Hegota boundary. Upstream canonical-paymaster adoption/fork pinning remains the sole formal public release gate; an opt-in proposal runtime is not promoted to an upstream canonical template.
 
 代码重点：`pkg/txpool`、`pkg/p2p`、`pkg/rpc`、`pkg/node/backend`、`pkg/engine`。Frames 的 mempool 策略以所选 8141 版本为依据，不沿用旧的 conservative/aggressive 名称推定规则。
 

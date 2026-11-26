@@ -1,4 +1,4 @@
-# Group D status
+# Group D status — PR #171
 
 HGT-030–037 is implemented and locally qualified for the explicitly selected
 native profiles. All 8 tasks, 32 criteria and 45 mandatory consumers pass,
@@ -32,5 +32,5 @@ paymaster upstream-adoption gate remain explicit. Native hgtp/1 and the pinned
 Gloas CL codec are identified experiments, not official multi-client devnet
 qualification. No automatic token compensation is invented.
 
-Publication and hosted exact-head checks are tracked by the PR's live check
-suite; offline source evidence does not assert a hosted result.
+Published as [PR #171](https://github.com/alt-research/eth2030/pull/171).
+Hosted exact-head checks are tracked by the PR's live check suite; offline source evidence does not assert a hosted result.

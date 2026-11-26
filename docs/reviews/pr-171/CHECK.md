@@ -18,4 +18,5 @@ consumers; open specification questions must not become invented consensus.
 - [x] Reconcile every criterion with source, production code, positive/negative consumers and explicit remaining upstream gates.
 - [x] Run required builds/vet/tests, full and affected race suites, A/B/C regression checks and source-bound D evidence.
 - [x] Inspect staged changes for conflict markers, duplicate work and baseline drift; preserve root trackers, refs and independent A/B/C oracles.
-- [ ] Commit/push, publish an English PR and verify exact-head hosted results (the PR check suite is the live authority).
+- [x] Commit/push and publish [English PR #171](https://github.com/alt-research/eth2030/pull/171).
+- [ ] Verify exact-head hosted results (the PR check suite is the live authority).

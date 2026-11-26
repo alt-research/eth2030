@@ -885,6 +885,7 @@
     ".github/workflows/ci.yml",
     "tools/hegota/check_c.py",
     "tools/hegota/test_group_c.py",
-    "pkg/txpool/frame_expiry.go"
+    "pkg/txpool/frame_expiry.go",
+    "tools/hegota/README.md"
   ]
 }

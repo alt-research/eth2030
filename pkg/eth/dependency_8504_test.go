@@ -1,6 +1,7 @@
 package eth
 
 import (
+	"encoding/binary"
 	"math/big"
 	"testing"
 	"time"
@@ -131,5 +132,64 @@ func TestDependency8504PeerRejectsWrongProfileAndUnsolicitedResponse(t *testing.
 		}
 		_ = left.Close()
 		_ = right.Close()
+	}
+}
+
+func TestDependency8504PeerDrainsBoundedAnnouncementQueue(t *testing.T) {
+	h, _ := dependencyHandler8504(t)
+	left, right := p2p.MsgPipe()
+	defer left.Close()
+	defer right.Close()
+	done := make(chan error, 1)
+	go func() { done <- h.runDependencyPeer8504("remote", left) }()
+	status, err := right.ReadMsg()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := right.WriteMsg(status); err != nil {
+		t.Fatal(err)
+	}
+	ann := make([]dependencyAnnouncement8504, 300)
+	for i := range ann {
+		binary.BigEndian.PutUint64(ann[i].WrapperHash[24:], uint64(i+1))
+		binary.BigEndian.PutUint64(ann[i].TransactionHash[24:], uint64(i+1001))
+		ann[i].Length = types.MaxDependencyWrapperBytes8504
+	}
+	raw, _ := gethrlp.EncodeToBytes(ann)
+	if err := right.WriteMsg(p2p.Msg{Code: dependencyAnnounce8504, Size: uint32(len(raw)), Payload: raw}); err != nil {
+		t.Fatal(err)
+	}
+	seen := make(map[types.Hash]bool)
+	for range ann {
+		message := make(chan p2p.Msg, 1)
+		go func() { msg, _ := right.ReadMsg(); message <- msg }()
+		var msg p2p.Msg
+		select {
+		case msg = <-message:
+		case err := <-done:
+			t.Fatal(err)
+		case <-time.After(3 * time.Second):
+			t.Fatal("bounded queue stopped draining")
+		}
+		var req dependencyRequestPacket8504
+		if msg.Code != dependencyRequest8504 || gethrlp.DecodeBytes(msg.Payload, &req) != nil || len(req.Hashes) != 1 || seen[req.Hashes[0]] {
+			t.Fatal("queue request bound/order/dedup", req)
+		}
+		seen[req.Hashes[0]] = true
+		// Empty is legal when a transaction was evicted between announce and
+		// request. Each completion must free an in-flight slot for the queue.
+		response, _ := gethrlp.EncodeToBytes(dependencyResponsePacket8504{ID: req.ID})
+		if err := right.WriteMsg(p2p.Msg{Code: dependencyResponse8504, Size: uint32(len(response)), Payload: response}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(seen) != len(ann) {
+		t.Fatal("announcement batch silently omitted wrappers")
+	}
+	_ = right.Close()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("peer did not stop")
 	}
 }

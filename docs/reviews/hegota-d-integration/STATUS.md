@@ -12,7 +12,7 @@ are rejected before hashing. Full Group D integration/release qualification is
 not claimed yet.
 
 The latest direct-proof source and EIP-8288 clarification snapshot are pinned.
-The [32-criterion plan](PLAN.md) records source/format conflicts and conditional
+The [32-criterion plan](../../plans/hegota-d/PLAN.md) records source/format conflicts and conditional
 activation boundaries. Proof/dependency encoding, inherited base/keyed signing,
 deduplication, gas and recognized-prefix handling now have independent vectors
 and native constraint/position/work tests. Execution/pool/payload integration,
@@ -53,3 +53,24 @@ progressive witness lists. EIP-7807's different execution-block schema is not
 silently mixed with this profile; its unspecified composition fails closed.
 The full integrated package run and remaining compatibility/composition review
 are still in progress; final completion/release qualification is not claimed.
+
+Cross-review added retired ECDSA pending/queued eviction, logical expiry indexing
+with leading proof frames, actual wrapper accounting in the total pool budget,
+EIP-8024 immediate-aware helper scanning and bounded queue draining beyond one
+network request. Migration/Frame control, native permit/multisig/fault-proof
+recovery kernels, persisted adopted code, real paymaster/token false-return,
+retry/atomic behavior and actual escrow/prestate trace consumers pass. D journals
+preserve the existing 8151 paid signer-class dependency contract.
+
+Canonical base/keyed PQ-wallet vectors now come from pinned EELS Python signing
+and verification algorithms. The actual HTTP/Engine/restart consumer uses a
+wallet that checks its key and the canonical zero-message declaration. Both
+canonical signature hashes and valid witnesses are independently generated;
+changed replay identities are rejected. The 8-task/32-criterion register and
+45 mandatory consumers are ready for final source-bound qualification.
+
+Final boundary review also covers creation-time adopted-runtime callbacks,
+transaction invalidation before payer approval, invalid/valid witness replacement
+atomicity and native Engine block-to-CL SSZ consumption. The canonical-only IL
+API rejects omitted dependency candidates explicitly until upstream specifies
+witness-bearing omission checks; it never executes a bare proof as authentication.

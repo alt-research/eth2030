@@ -14,7 +14,7 @@ consumers; open specification questions must not become invented consensus.
 - [ ] HGT-034: implement all normatively specified block dependency union/commitment/import checks with native invalid-block controls; distinguish direct verification from recursive aggregation.
 - [ ] HGT-035: implement SETCODEFROM activation, execution/initcode/reentrancy/rollback, code-hash persistence, migration and exact BAL changes.
 - [ ] HGT-036: reuse existing EIP-8151 protection, add migration/public-pool dependencies and compatibility/admission report without disabling safety checks.
-- [ ] HGT-037: implement POST_TX semantics and complete assertion/paymaster/body rollback boundaries, including token, retry and batch consumers.
+- [ ] HGT-037: implement ASSERT semantics and complete assertion/paymaster/body rollback boundaries, including token, retry and batch consumers.
 - [ ] Reconcile every criterion with source, production code, positive/negative consumers and explicit remaining upstream gates.
 - [ ] Run required builds/vet/tests, full and affected race suites, A/B/C regression checks and source-bound D evidence.
 - [ ] Inspect staged changes for conflict markers, duplicate work and baseline drift; commit/push, publish an English PR and verify exact-head hosted results.

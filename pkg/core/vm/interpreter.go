@@ -343,6 +343,9 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 	if rules.IsLegacyFrames {
 		table = enableLegacyFrameOpcodes(table)
 	}
+	if rules.IsEIP8298 {
+		table[SETCODEFROM] = &operation{execute: opSetCodeFrom8298, dynamicGas: gasSetCodeFrom8298, minStack: 1, maxStack: 1024, writes: true}
+	}
 	return table
 }
 
@@ -435,6 +438,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 		op := contract.GetOp(pc)
 		if debug {
 			tracePC, traceOp, traceGas, traceReservoir, traceLogged = pc, op, contract.Gas, contract.StateGasReservoir, false
+		}
+		if op == SETCODEFROM && !evm.forkRules.IsEIP8298 {
+			return nil, ErrInvalidOpCode
 		}
 		operation := evm.jumpTable[op]
 		if operation == nil || operation.execute == nil {

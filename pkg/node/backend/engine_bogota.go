@@ -219,6 +219,14 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			continue
 		}
 		if _, present := included[tx.Hash()]; !present {
+			// The IL API carries canonical transaction bytes, not witnesses.
+			// EIP-8504 only defines witnesses for the included dependency union;
+			// adding an omitted candidate's witness there would make that block
+			// invalid. Neither local pool contents nor PROOF-frame execution may
+			// supply a consensus validity verdict for this unspecified composition.
+			if tx.HasDependencies8504() {
+				return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
+			}
 			omitted = append(omitted, tx)
 		}
 	}

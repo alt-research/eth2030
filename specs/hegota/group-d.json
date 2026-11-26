@@ -1,0 +1,902 @@
+{
+  "version": 1,
+  "baseline": "81e63f586642a1406d56db9fa7cbf00941feb7bf",
+  "normative_sources": [
+    {
+      "eip": 8504,
+      "path": "specs/hegota/upstream/2026-11-27/group-d/eip-8504.md",
+      "revision": "96da3c17047ad31608c40bfe75049db78dc4417d",
+      "blob": "d5b17df22eaa7a1b705985e76d41378ed12ec712",
+      "sha256": "c2e898c21ecc94342e4fbe3490591c01027b91852dabfc1cbaf0c50ae02d976b"
+    },
+    {
+      "eip": 8288,
+      "path": "specs/hegota/upstream/2026-11-27/group-d/eip-8288.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "611f58a8668bbffb798c3b3b073cfaa275265f34",
+      "sha256": "4dd6e8ebc8abd64e615b4ff8e59ab4e09a13a2e3d18b090f9d3ea24735031c8f"
+    },
+    {
+      "eip": 8298,
+      "path": "refs/EIPs/EIPS/eip-8298.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "94f01555581bef0588f71aa8520b6c289c468890",
+      "sha256": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13"
+    },
+    {
+      "eip": 8151,
+      "path": "refs/EIPs/EIPS/eip-8151.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "bfd0db906f55033442a064357d8e6768490b8fd5",
+      "sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80"
+    },
+    {
+      "eip": 7906,
+      "path": "refs/EIPs/EIPS/eip-7906.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "2eff6bf25be056fc3c3342d376865e0f684bc16b",
+      "sha256": "fcde21b02c0c7c04b9e787fbfb5bc33e9fa3cbef419b53b47d979a7451777fea"
+    },
+    {
+      "eip": 8141,
+      "path": "refs/EIPs/EIPS/eip-8141.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "9bc38a368881fa52e1a1a9970274e6511874d13f",
+      "sha256": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639"
+    },
+    {
+      "eip": 8250,
+      "path": "refs/EIPs/EIPS/eip-8250.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "10bd1d84c9534c9db65f9ccbffcf8d5902b9c1ae",
+      "sha256": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9"
+    },
+    {
+      "eip": 8037,
+      "path": "specs/hegota/upstream/2026-11-27/eip-8037.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc",
+      "sha256": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a"
+    },
+    {
+      "eip": 8038,
+      "path": "specs/hegota/upstream/2026-11-27/eip-8038.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "2953df7781f6dd4ccbd03cc8eaea23a77fd17ba5",
+      "sha256": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864"
+    },
+    {
+      "eip": 7928,
+      "path": "refs/EIPs/EIPS/eip-7928.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb",
+      "sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72"
+    },
+    {
+      "eip": 6780,
+      "path": "refs/EIPs/EIPS/eip-6780.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "1b6a0e94cc47e859b9866e570391cf37dc55059a",
+      "sha256": "3941eed8379cc93abb7342c5b186bd883e8b1518b0025d94a49be068f8ea2101"
+    },
+    {
+      "eip": 3541,
+      "path": "refs/EIPs/EIPS/eip-3541.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "fc364983e4b04dffacdc752760f390e07a18ff95",
+      "sha256": "dff418f1ed441352ee656eb5ba1d96c12acdefc788251e4d63149cfb442fba07"
+    },
+    {
+      "eip": 3607,
+      "path": "refs/EIPs/EIPS/eip-3607.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "6d604006d60d277761e24f86830760da1fd16c40",
+      "sha256": "2c3789bcbb7fd59f03db7d2f179e185f3debcf8c58180ac0db62cb77af738fc7"
+    },
+    {
+      "eip": 7702,
+      "path": "refs/EIPs/EIPS/eip-7702.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "798d39edc354978ccb99ab0a7b7da2995a024a38",
+      "sha256": "3d46953e13ebc7ebe229971b301ede853aad6e29f4faf4db1eb9a2085accde1b"
+    },
+    {
+      "eip": 7807,
+      "path": "refs/EIPs/EIPS/eip-7807.md",
+      "revision": "c7cc5197513cd062a0fa0dc81cb66e5760228ac6",
+      "blob": "de4fa7868206a7c4755200d56ae855e10bcd77d9",
+      "sha256": "75a4aae64ad35a43fef8dc18fd51d90f7459f925900d9dac380dc41982da91ff"
+    }
+  ],
+  "profiles": {
+    "direct8504": {
+      "scheme": 16,
+      "witness_bytes": 7740,
+      "verify_permutations": 515,
+      "per_triple_gas": 3000,
+      "per_dependency_witness_gas": 495360,
+      "activation": "EIP8504Time; nil by default",
+      "transport": "hgtp/1; explicit native namespace; no official eth assignment",
+      "aggregation": false
+    },
+    "adoption8298": {
+      "activation": "EIP8298Time; nil by default",
+      "source_created_this_tx": "reject",
+      "code_change": "hash-only third element",
+      "proxy_pending_share": 8
+    },
+    "assert7906": {
+      "activation": "EIP7906Time; nil by default",
+      "mode": 3,
+      "txtrace": 182,
+      "eventdatacopy": 183,
+      "rollback": "entire body to post-payer prefix",
+      "automatic_token_compensation": false
+    }
+  },
+  "public_gates": [
+    "8504 provisional parameters and official transport/Engine/CL assignments",
+    "8288 AGGREGATED_VK and DEPS_HASH remain unspecified; direct profile only",
+    "8151 ecosystem/rollup compatibility qualification and canonical-paymaster upstream adoption",
+    "7807/8504 execution-block identity composition remains unspecified",
+    "Official cross-client/devnet and later Group E-J release qualification",
+    "8504 omitted inclusion-list dependency validity requires an upstream witness-bearing IL composition"
+  ],
+  "tasks": [
+    {
+      "id": "HGT-030",
+      "owner": "Specifications/PQ",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D30.1",
+          "statement": "Immutable latest source/history/discussion identities and frozen direct-profile ADR.",
+          "clauses": [
+            "Source identity and precedence"
+          ],
+          "files": [
+            "pkg/core/config/chain_config.go",
+            "pkg/core/config/chain_config_ext.go",
+            "pkg/node/genesis_loader.go",
+            "pkg/node/persisted_chain_config.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestDependency8504IndependentGloasProgressivePayload",
+            "github.com/eth2030/eth2030/crypto/leansphincs::TestEIP8504IndependentEthLibVerificationVectors"
+          ]
+        },
+        {
+          "id": "D30.2",
+          "statement": "Distinguish 8504, alternative #12714 and incomplete 8288; reject unsupported schemes/aggregation.",
+          "clauses": [
+            "Direct verification versus unfinished aggregation"
+          ],
+          "files": [
+            "pkg/core/config/chain_config.go",
+            "pkg/core/config/chain_config_ext.go",
+            "pkg/node/genesis_loader.go",
+            "pkg/node/persisted_chain_config.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504MissingTamperedAndWrapperControls"
+          ]
+        },
+        {
+          "id": "D30.3",
+          "statement": "Explicit nil-default activation, prerequisites, configuration persistence, compatibility and rollback.",
+          "clauses": [
+            "Optional activation and compatibility"
+          ],
+          "files": [
+            "pkg/core/config/chain_config.go",
+            "pkg/core/config/chain_config_ext.go",
+            "pkg/node/genesis_loader.go",
+            "pkg/node/persisted_chain_config.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/config::TestFrameDOptionalActivationAndCompatibility"
+          ]
+        },
+        {
+          "id": "D30.4",
+          "statement": "Provisional parameters and network/Engine/CL release boundaries are explicit, without invented standards.",
+          "clauses": [
+            "Unassigned transport and provisional CL limits"
+          ],
+          "files": [
+            "pkg/core/config/chain_config.go",
+            "pkg/core/config/chain_config_ext.go",
+            "pkg/node/genesis_loader.go",
+            "pkg/node/persisted_chain_config.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/eth::TestDependency8504NativePeerRequestAdmissionAndIsolation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-031",
+      "owner": "Types/PQ",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D31.1",
+          "statement": "Exact proof mode/flags/target/value/budget/batch validation; preserve base and keyed signing bytes.",
+          "clauses": [
+            "Proof frame constraints"
+          ],
+          "files": [
+            "pkg/core/types/frame_extensions_d.go",
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8250.go",
+            "pkg/core/types/dependency_8504.go",
+            "pkg/core/types/frame_8141_network.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrameDProofConstraintsAndAssertComposition"
+          ]
+        },
+        {
+          "id": "D31.2",
+          "statement": "Exact 96-byte triples, zero-hash substitution only in derived dependencies, sort/deduplicate and block union.",
+          "clauses": [
+            "Dependency derivation and canonical order"
+          ],
+          "files": [
+            "pkg/core/types/frame_extensions_d.go",
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8250.go",
+            "pkg/core/types/dependency_8504.go",
+            "pkg/core/types/frame_8141_network.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrameDDependenciesSortDeduplicateAndUnion"
+          ]
+        },
+        {
+          "id": "D31.3",
+          "statement": "Exact submission/wrapper bytes, dependency/witness binding, blob composition and malformed bounds.",
+          "clauses": [
+            "Wrapper and submission encodings"
+          ],
+          "files": [
+            "pkg/core/types/frame_extensions_d.go",
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8250.go",
+            "pkg/core/types/dependency_8504.go",
+            "pkg/core/types/frame_8141_network.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504IndependentSubmissionWrapperAndBlock"
+          ]
+        },
+        {
+          "id": "D31.4",
+          "statement": "Independent base/keyed vectors; repeated declarations charge verification repeatedly and witness bytes once.",
+          "clauses": [
+            "Gas Accounting"
+          ],
+          "files": [
+            "pkg/core/types/frame_extensions_d.go",
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8250.go",
+            "pkg/core/types/dependency_8504.go",
+            "pkg/core/types/frame_8141_network.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestFrameDIndependentProofFrameWireHashAndGas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-032",
+      "owner": "Crypto/VM",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D32.1",
+          "statement": "Real pinned leanSPHINCS implementation; no SHA2 substitute, stub or mock acceptance.",
+          "clauses": [
+            "leanSPHINCS"
+          ],
+          "files": [
+            "pkg/crypto/leansphincs/verify.go",
+            "pkg/crypto/leansphincs/README.md",
+            "pkg/crypto/leansphincs/testdata/ethlib-verify.json",
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/crypto/leansphincs::TestEIP8504IndependentEthLibVerificationVectors"
+          ]
+        },
+        {
+          "id": "D32.2",
+          "statement": "Complete independent EthLib vectors, valid/invalid encoding and tampering in every layer.",
+          "clauses": [
+            "Satisfying a Dependency"
+          ],
+          "files": [
+            "pkg/crypto/leansphincs/verify.go",
+            "pkg/crypto/leansphincs/README.md",
+            "pkg/crypto/leansphincs/testdata/ethlib-verify.json",
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/crypto/leansphincs::TestEIP8504IndependentEthLibVerificationVectors",
+            "github.com/eth2030/eth2030/core/execution::TestDependency8504CanonicalSigningHashWalletBaseAndKeyed"
+          ]
+        },
+        {
+          "id": "D32.3",
+          "statement": "Length rejection before hashing, fixed verifier iteration/permutation bounds, exact scheme/key/message binding.",
+          "clauses": [
+            "Verifier malformed length and fixed work"
+          ],
+          "files": [
+            "pkg/crypto/leansphincs/verify.go",
+            "pkg/crypto/leansphincs/README.md",
+            "pkg/crypto/leansphincs/testdata/ethlib-verify.json",
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/crypto/leansphincs::TestEIP8504VerifierRejectsEveryTruncationBeforeHashing"
+          ]
+        },
+        {
+          "id": "D32.4",
+          "statement": "No-call/no-state proof execution and receipts; intrinsic/floor/cap/public-work behavior matches the proposal.",
+          "clauses": [
+            "Proof frame execution and Gas Accounting"
+          ],
+          "files": [
+            "pkg/crypto/leansphincs/verify.go",
+            "pkg/crypto/leansphincs/README.md",
+            "pkg/crypto/leansphincs/testdata/ethlib-verify.json",
+            "pkg/core/vm/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestFrameDProofExecutionHasNoCallOrAccountAccess",
+            "github.com/eth2030/eth2030/core/types::TestFrameDProofPrefixPositionsAndExcludedWork"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-033",
+      "owner": "Txpool/P2P",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D33.1",
+          "statement": "Reject missing/invalid/extra/mismatched witnesses before prefix simulation, including proof frames in the body.",
+          "clauses": [
+            "Admission to the Public Mempool"
+          ],
+          "files": [
+            "pkg/core/frameproof/verify.go",
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/dependency_8504.go",
+            "pkg/eth/dependency_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/txpool::TestDependency8504PoolRejectsBodyWitnessBeforeSimulation"
+          ]
+        },
+        {
+          "id": "D33.2",
+          "statement": "Stateless verification caching, one admitted wrapper per transaction, atomic replacement/removal/byte accounting.",
+          "clauses": [
+            "Stateless verification and single admitted wrapper"
+          ],
+          "files": [
+            "pkg/core/frameproof/verify.go",
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/dependency_8504.go",
+            "pkg/eth/dependency_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/txpool::TestDependency8504PoolAdmissionLifecycleAndBytes",
+            "github.com/eth2030/eth2030/txpool::TestDependency8504ExpiryAndActualWrapperByteBudget",
+            "github.com/eth2030/eth2030/txpool::TestDependency8504ReplacementWrapperAtomicAccounting"
+          ]
+        },
+        {
+          "id": "D33.3",
+          "statement": "Announce/request-only capability-bound witness transport; never send dependencies as Transactions/PooledTransactions.",
+          "clauses": [
+            "Propagation"
+          ],
+          "files": [
+            "pkg/core/frameproof/verify.go",
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/dependency_8504.go",
+            "pkg/eth/dependency_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/eth::TestDependency8504NativePeerRequestAdmissionAndIsolation"
+          ]
+        },
+        {
+          "id": "D33.4",
+          "statement": "Actual RPC/peer retrieval, invalid propagation controls, bounded requests/cache and reorg/eviction behavior.",
+          "clauses": [
+            "Submission and Propagation"
+          ],
+          "files": [
+            "pkg/core/frameproof/verify.go",
+            "pkg/txpool/frame_8141.go",
+            "pkg/txpool/txpool.go",
+            "pkg/txpool/dependency_8504.go",
+            "pkg/eth/dependency_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/node::TestDependency8504ActualRPCSimulationEngineBodiesAndRestart",
+            "github.com/eth2030/eth2030/eth::TestDependency8504PeerRejectsWrongProfileAndUnsolicitedResponse",
+            "github.com/eth2030/eth2030/eth::TestDependency8504PeerDrainsBoundedAnnouncementQueue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-034",
+      "owner": "Engine/execution",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D34.1",
+          "statement": "Canonical dependency union, one witness per distinct dependency, exact list commitment including the empty list.",
+          "clauses": [
+            "Signatures in the Block"
+          ],
+          "files": [
+            "pkg/core/block/builder.go",
+            "pkg/core/block/validator.go",
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/parallel.go",
+            "pkg/core/types/block_rlp.go",
+            "pkg/core/types/header_rlp.go",
+            "pkg/core/chain/blockchain.go",
+            "pkg/core/rawdb/chaindb.go",
+            "pkg/engine/backend.go",
+            "pkg/node/backend/engine_backend.go",
+            "pkg/engine/payload/json.go",
+            "pkg/core/types/consensus_payload_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504IndependentSubmissionWrapperAndBlock",
+            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504EmptyBlockCommitment"
+          ]
+        },
+        {
+          "id": "D34.2",
+          "statement": "Header/body/payload/body-retrieval/persistence round trips and original bytes survive restart.",
+          "clauses": [
+            "Engine API and Consensus Layer"
+          ],
+          "files": [
+            "pkg/core/block/builder.go",
+            "pkg/core/block/validator.go",
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/parallel.go",
+            "pkg/core/types/block_rlp.go",
+            "pkg/core/types/header_rlp.go",
+            "pkg/core/chain/blockchain.go",
+            "pkg/core/rawdb/chaindb.go",
+            "pkg/engine/backend.go",
+            "pkg/node/backend/engine_backend.go",
+            "pkg/engine/payload/json.go",
+            "pkg/core/types/consensus_payload_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart",
+            "github.com/eth2030/eth2030/engine/payload::TestDependency8504PayloadAndBodyJSONPresence",
+            "github.com/eth2030/eth2030/p2p/ethproto::TestDependency8504BlockBodiesPreserveActiveEmptyAndBytes"
+          ]
+        },
+        {
+          "id": "D34.3",
+          "statement": "Build/import enforce all witness checks, gas/size bounds and ordinary validity; invalid payloads cannot contaminate state.",
+          "clauses": [
+            "Block validity and EIP7934 size"
+          ],
+          "files": [
+            "pkg/core/block/builder.go",
+            "pkg/core/block/validator.go",
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/parallel.go",
+            "pkg/core/types/block_rlp.go",
+            "pkg/core/types/header_rlp.go",
+            "pkg/core/chain/blockchain.go",
+            "pkg/core/rawdb/chaindb.go",
+            "pkg/engine/backend.go",
+            "pkg/node/backend/engine_backend.go",
+            "pkg/engine/payload/json.go",
+            "pkg/core/types/consensus_payload_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart"
+          ]
+        },
+        {
+          "id": "D34.4",
+          "statement": "Native independent payload consumers and wrong/missing/extra witness/hash/key/scheme controls; no recursive-proof claim.",
+          "clauses": [
+            "Consensus Layer progressive payload"
+          ],
+          "files": [
+            "pkg/core/block/builder.go",
+            "pkg/core/block/validator.go",
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/parallel.go",
+            "pkg/core/types/block_rlp.go",
+            "pkg/core/types/header_rlp.go",
+            "pkg/core/chain/blockchain.go",
+            "pkg/core/rawdb/chaindb.go",
+            "pkg/engine/backend.go",
+            "pkg/node/backend/engine_backend.go",
+            "pkg/engine/payload/json.go",
+            "pkg/core/types/consensus_payload_8504.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/types::TestDependency8504IndependentGloasProgressivePayload"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-035",
+      "owner": "VM/state",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D35.1",
+          "statement": "Exact source validity, low-160 address, system/static early halt, gas/warmness and pre-state BAL boundary.",
+          "clauses": [
+            "SETCODEFROM and Gas Costs"
+          ],
+          "files": [
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/core/vm/amsterdam_create.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/bal/code_adoption.go",
+            "pkg/bal/tracker.go",
+            "pkg/core/vm/frame_8141_bal.go",
+            "pkg/sync/statesync/pivot_rebase.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298GasValidityAndPaidAccess",
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298EarlyGuardsAndImmediateScan"
+          ]
+        },
+        {
+          "id": "D35.2",
+          "statement": "Self/delegate/callcode context, loaded-frame code versus reentry/introspection, nested and outer rollback.",
+          "clauses": [
+            "Deployed Code Execution"
+          ],
+          "files": [
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/core/vm/amsterdam_create.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/bal/code_adoption.go",
+            "pkg/bal/tracker.go",
+            "pkg/core/vm/frame_8141_bal.go",
+            "pkg/sync/statesync/pivot_rebase.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback"
+          ]
+        },
+        {
+          "id": "D35.3",
+          "statement": "All creation paths adopt immediately, ignore returned initcode bytes/deposit costs and reject same-transaction sources.",
+          "clauses": [
+            "Contract Creation"
+          ],
+          "files": [
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/core/vm/amsterdam_create.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/bal/code_adoption.go",
+            "pkg/bal/tracker.go",
+            "pkg/core/vm/frame_8141_bal.go",
+            "pkg/sync/statesync/pivot_rebase.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback"
+          ]
+        },
+        {
+          "id": "D35.4",
+          "statement": "Exact hash-only BAL changes, origin/availability resolution, persistence after source changes and no bytecode fallback.",
+          "clauses": [
+            "Block-Level Access Lists and code availability"
+          ],
+          "files": [
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/core/vm/amsterdam_create.go",
+            "pkg/core/vm/interpreter.go",
+            "pkg/bal/code_adoption.go",
+            "pkg/bal/tracker.go",
+            "pkg/core/vm/frame_8141_bal.go",
+            "pkg/sync/statesync/pivot_rebase.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298LoadedCodeReentryAndPersistentAvailability",
+            "github.com/eth2030/eth2030/bal::TestCodeAdoption8298CanonicalWireAndAvailability",
+            "github.com/eth2030/eth2030/core/execution::TestMigration8298NativeDelegationAdoptionRetirementAndFrameControl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-036",
+      "owner": "VM/txpool/ecosystem",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D36.1",
+          "statement": "Existing 8151 raw-code class/gas/BAL/dependency checks remain intact and are reused.",
+          "clauses": [
+            "EIP8151 paid raw-code class"
+          ],
+          "files": [
+            "pkg/core/vm/ecrecover_8151.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/txpool/migration_8298.go",
+            "pkg/txpool/frame_8141.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/txpool::TestMigration8298AssertionJournalsPreserve8151SignerClass",
+            "github.com/eth2030/eth2030/core/vm::TestEIP8151RecoveryCodeClassGasAndUnpaidAccess",
+            "github.com/eth2030/eth2030/core/vm::TestEIP8151CallFamiliesAndOuterRevert"
+          ]
+        },
+        {
+          "id": "D36.2",
+          "statement": "Code adoption retires ordinary origin/redelegation authority; ecRecover-off/on behavior is distinguished.",
+          "clauses": [
+            "ECDSA Transaction Origination"
+          ],
+          "files": [
+            "pkg/core/vm/ecrecover_8151.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/txpool/migration_8298.go",
+            "pkg/txpool/frame_8141.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestMigration8298NativeDelegationAdoptionRetirementAndFrameControl",
+            "github.com/eth2030/eth2030/txpool::TestMigration8298PoolEvictsRetiredOriginsAndAllowsFrames"
+          ]
+        },
+        {
+          "id": "D36.3",
+          "statement": "Public SETCODEFROM ban, immediate-aware mutable-helper scan, bounded proxy-code dependencies and complete lifecycle/reorg release.",
+          "clauses": [
+            "Public Mempool"
+          ],
+          "files": [
+            "pkg/core/vm/ecrecover_8151.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/txpool/migration_8298.go",
+            "pkg/txpool/frame_8141.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/txpool::TestMigration8298ProxyDependencyLimitReplacementEvictionAndReorg"
+          ]
+        },
+        {
+          "id": "D36.4",
+          "statement": "Real permit/multisig/fault-proof compatibility/admission report; unsafe ecosystem assumptions remain release gates.",
+          "clauses": [
+            "Backwards Compatibility and Security Considerations"
+          ],
+          "files": [
+            "pkg/core/vm/ecrecover_8151.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/vm/setcodefrom_8298.go",
+            "pkg/txpool/migration_8298.go",
+            "pkg/txpool/frame_8141.go",
+            "docs/plans/hegota-d/COMPOSITION.md"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestMigration8151PermitMultisigAndFaultProofAuthorization"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HGT-037",
+      "owner": "VM/execution",
+      "scope": "Explicit pinned native profile; public release gates remain open",
+      "criteria": [
+        {
+          "id": "D37.1",
+          "statement": "ASSERT static suffix, default behavior, approval prohibition throughout its subtree and unconditional body rollback.",
+          "clauses": [
+            "The ASSERT Frame Mode"
+          ],
+          "files": [
+            "pkg/core/vm/assertion_7906.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906WholeBodyRollbackAndPrefixSettlement",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906CaughtChildApprovalIsOrdinaryStaticFailure",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906FailureWithoutPayerInvalidatesTransaction"
+          ]
+        },
+        {
+          "id": "D37.2",
+          "statement": "Exact net pre/current balance/storage/code/nonce/event trace, ordering, pre-charge/payer and complete 256-bit checks.",
+          "clauses": [
+            "Transaction Trace Opcode and State Difference Semantics"
+          ],
+          "files": [
+            "pkg/core/vm/assertion_7906.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestAssertion7906AllSelectorsAndFullWidthBounds",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906PrestateNetDiffSortedAndLazy",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906ActualEscrowAndPrefixPrestateTrace"
+          ]
+        },
+        {
+          "id": "D37.3",
+          "statement": "Exact event copying, bounds/memory/gas and no trace-induced state/access-list/BAL reads.",
+          "clauses": [
+            "Event Data Copy Opcode and Gas Cost"
+          ],
+          "files": [
+            "pkg/core/vm/assertion_7906.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/vm::TestAssertion7906EventCopyBoundsAndGas"
+          ]
+        },
+        {
+          "id": "D37.4",
+          "statement": "Prefix nonce/payment preserved; body logs/state gas reverted while execution gas/status remain; token/false return/retry/batch/skipped-assert cases.",
+          "clauses": [
+            "ASSERT failure and The ASSERT Frame Mode Not Reverting Validation Prefix"
+          ],
+          "files": [
+            "pkg/core/vm/assertion_7906.go",
+            "pkg/core/execution/assertion_7906.go",
+            "pkg/core/execution/frame_8141.go"
+          ],
+          "tests": [
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906PaymasterTokenFalseReturnRetryAndAtomic",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceOpcodesExecuteAgainstPaidPrefix"
+          ]
+        }
+      ]
+    }
+  ],
+  "additional_artifacts": [
+    "docs/plans/hegota-d/COMPOSITION.md",
+    "docs/plans/hegota-d/PLAN.md",
+    "pkg/bal/code_adoption.go",
+    "pkg/bal/code_adoption_test.go",
+    "pkg/bal/decode.go",
+    "pkg/bal/hash.go",
+    "pkg/bal/tracker.go",
+    "pkg/bal/types.go",
+    "pkg/core/block/builder.go",
+    "pkg/core/block/dependency_8504_integration_test.go",
+    "pkg/core/block/validator.go",
+    "pkg/core/chain/blockchain.go",
+    "pkg/core/config/chain_config.go",
+    "pkg/core/config/chain_config_ext.go",
+    "pkg/core/config/chain_config_forks.go",
+    "pkg/core/config/chain_config_forks_test.go",
+    "pkg/core/config/genesis.go",
+    "pkg/core/config/group_d_extensions_test.go",
+    "pkg/core/execution/assertion_7906.go",
+    "pkg/core/execution/assertion_7906_test.go",
+    "pkg/core/execution/assertion_paymaster_7906_test.go",
+    "pkg/core/execution/dependency_wallet_8504_test.go",
+    "pkg/core/execution/frame_8141.go",
+    "pkg/core/execution/frame_8250.go",
+    "pkg/core/execution/migration_8298_test.go",
+    "pkg/core/execution/parallel.go",
+    "pkg/core/execution/processor.go",
+    "pkg/core/frameproof/verify.go",
+    "pkg/core/frameproof/verify_test.go",
+    "pkg/core/rawdb/chaindb.go",
+    "pkg/core/types/block.go",
+    "pkg/core/types/block_rlp.go",
+    "pkg/core/types/block_ssz.go",
+    "pkg/core/types/consensus_payload_8504.go",
+    "pkg/core/types/consensus_payload_8504_test.go",
+    "pkg/core/types/dependency_8504.go",
+    "pkg/core/types/frame_8141.go",
+    "pkg/core/types/frame_8141_network.go",
+    "pkg/core/types/frame_8141_pool.go",
+    "pkg/core/types/frame_8250.go",
+    "pkg/core/types/frame_extensions_d.go",
+    "pkg/core/types/frame_extensions_d_test.go",
+    "pkg/core/types/header.go",
+    "pkg/core/types/header_rlp.go",
+    "pkg/core/types/testdata/dependency_ssz/generate.py",
+    "pkg/core/types/testdata/dependency_ssz/vectors.json",
+    "pkg/core/types/testdata/frame-d-independent.json",
+    "pkg/core/types/transaction.go",
+    "pkg/core/vm/amsterdam_create.go",
+    "pkg/core/vm/assertion_7906.go",
+    "pkg/core/vm/assertion_7906_test.go",
+    "pkg/core/vm/frame_8141.go",
+    "pkg/core/vm/frame_8141_bal.go",
+    "pkg/core/vm/frame_d_proof_test.go",
+    "pkg/core/vm/interpreter.go",
+    "pkg/core/vm/migration_8151_compat_test.go",
+    "pkg/core/vm/opcodes.go",
+    "pkg/core/vm/selfdestruct_8246.go",
+    "pkg/core/vm/setcodefrom_8298.go",
+    "pkg/core/vm/setcodefrom_8298_test.go",
+    "pkg/crypto/leansphincs/testdata/ethlib-verify.json",
+    "pkg/crypto/leansphincs/verify.go",
+    "pkg/crypto/leansphincs/verify_test.go",
+    "pkg/engine/backend.go",
+    "pkg/engine/convert/convert.go",
+    "pkg/engine/payload/bodies.go",
+    "pkg/engine/payload/conversion.go",
+    "pkg/engine/payload/dependency_8504_test.go",
+    "pkg/engine/payload/json.go",
+    "pkg/engine/payload/types.go",
+    "pkg/eth/codec.go",
+    "pkg/eth/dependency_8504.go",
+    "pkg/eth/dependency_8504_test.go",
+    "pkg/eth/handler.go",
+    "pkg/eth/sparse_relay.go",
+    "pkg/eth/sync_fetch.go",
+    "pkg/internal/testutil/proof8504/canonical-wallet.json",
+    "pkg/internal/testutil/proof8504/fixture.go",
+    "pkg/internal/testutil/proof8504/vector.json",
+    "pkg/node/backend/engine_backend.go",
+    "pkg/node/backend/engine_bogota.go",
+    "pkg/node/backend/engine_payload.go",
+    "pkg/node/backend/frame_simulation.go",
+    "pkg/node/dependency_8504_integration_test.go",
+    "pkg/node/genesis_loader.go",
+    "pkg/node/node.go",
+    "pkg/node/persisted_chain_config.go",
+    "pkg/p2p/ethproto/dependency_8504_test.go",
+    "pkg/p2p/ethproto/protocol.go",
+    "pkg/p2p/ethproto/receipt_tx_codec.go",
+    "pkg/p2p/ethproto/sync_codec.go",
+    "pkg/rpc/types/types.go",
+    "pkg/sync/statesync/pivot_rebase.go",
+    "pkg/txpool/dependency_8504.go",
+    "pkg/txpool/dependency_8504_test.go",
+    "pkg/txpool/frame_8141.go",
+    "pkg/txpool/frame_expiry.go",
+    "pkg/txpool/migration_8298.go",
+    "pkg/txpool/migration_8298_test.go",
+    "pkg/txpool/txpool.go",
+    "specs/hegota/profiles.json",
+    "tools/hegota/check_d.py",
+    "tools/hegota/generate_d_pq_wallet.py",
+    "tools/hegota/test_group_d.py"
+  ]
+}

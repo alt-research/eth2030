@@ -49,3 +49,58 @@ func Transaction(nonce uint64) *types.Transaction {
 }
 
 var ApproveCode = []byte{0x60, 3, 0x5f, 0x5f, 0xaa}
+
+//go:embed canonical-wallet.json
+var canonicalWallet []byte
+
+func canonical8504() struct {
+	WalletCode string `json:"wallet_code"`
+	Cases      []struct {
+		Name, Transaction, Witness string
+		SigningHash                string `json:"signing_hash"`
+	}
+} {
+	var v struct {
+		WalletCode string `json:"wallet_code"`
+		Cases      []struct {
+			Name, Transaction, Witness string
+			SigningHash                string `json:"signing_hash"`
+		}
+	}
+	if err := json.Unmarshal(canonicalWallet, &v); err != nil {
+		panic(err)
+	}
+	return v
+}
+func CanonicalTransaction(keyed bool) (*types.Transaction, types.Hash) {
+	v := canonical8504()
+	i := 0
+	if keyed {
+		i = 1
+	}
+	row := v.Cases[i]
+	raw, err := hex.DecodeString(row.Transaction)
+	if err != nil {
+		panic(err)
+	}
+	tx, err := types.DecodeTxRLP(raw)
+	if err != nil {
+		panic(err)
+	}
+	w, err := hex.DecodeString(row.Witness)
+	if err != nil {
+		panic(err)
+	}
+	hash, err := hex.DecodeString(row.SigningHash)
+	if err != nil {
+		panic(err)
+	}
+	return tx.WithDependencyWitnesses8504([][]byte{w}), types.BytesToHash(hash)
+}
+func CanonicalWalletCode() []byte {
+	code, err := hex.DecodeString(canonical8504().WalletCode)
+	if err != nil {
+		panic(err)
+	}
+	return code
+}

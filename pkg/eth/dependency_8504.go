@@ -144,6 +144,46 @@ func (h *Handler) runDependencyPeer8504(id string, t p2p.Transport) error {
 	var requestedOrder []types.Hash
 	var next uint64
 	missed := 0
+	var queue []dependencyAnnouncement8504
+	queuedTx := make(map[types.Hash]bool)
+	drain := func() error {
+		for len(queue) > 0 && len(requests) < 16 {
+			want := make(map[types.Hash]dependencyAnnouncement8504)
+			var hashes []types.Hash
+			size := uint64(0)
+			for len(queue) > 0 && len(hashes) < maxDependencyRequests8504 {
+				a := queue[0]
+				if len(hashes) > 0 && size+a.Length > 2*1024*1024 {
+					break
+				}
+				queue = queue[1:]
+				delete(queuedTx, a.TransactionHash)
+				if h.txPool.Get(a.TransactionHash) != nil || requestedTx[a.TransactionHash] {
+					continue
+				}
+				if _, duplicate := want[a.WrapperHash]; duplicate {
+					continue
+				}
+				hashes = append(hashes, a.WrapperHash)
+				want[a.WrapperHash] = a
+				size += a.Length
+				requestedTx[a.TransactionHash] = true
+				requestedOrder = append(requestedOrder, a.TransactionHash)
+				if len(requestedOrder) > 16384 {
+					delete(requestedTx, requestedOrder[0])
+					requestedOrder = requestedOrder[1:]
+				}
+			}
+			if len(hashes) != 0 {
+				next++
+				requests[next] = dependencyRequestState8504{want, time.Now().Add(15 * time.Second)}
+				if err := peer.write(dependencyRequest8504, dependencyRequestPacket8504{next, hashes}); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	}
 	for {
 		msg, err := t.ReadMsg()
 		if err != nil {
@@ -173,42 +213,20 @@ func (h *Handler) runDependencyPeer8504(id string, t p2p.Transport) error {
 			if len(ann) > maxDependencyAnnouncements8504 {
 				return errors.New("too many dependency announcements")
 			}
-			want := make(map[types.Hash]dependencyAnnouncement8504)
-			var hashes []types.Hash
-			size := uint64(0)
 			for _, a := range ann {
 				if a.Length == 0 || a.Length > types.MaxDependencyWrapperBytes8504 {
 					return errors.New("invalid dependency announced length")
 				}
-				if h.txPool.Get(a.TransactionHash) != nil || requestedTx[a.TransactionHash] {
+				if h.txPool.Get(a.TransactionHash) != nil || requestedTx[a.TransactionHash] || queuedTx[a.TransactionHash] {
 					continue
 				}
-				if len(hashes) == maxDependencyRequests8504 || size+a.Length > 2*1024*1024 {
-					break
+				if len(queue) == maxDependencyAnnouncements8504 {
+					return errors.New("dependency announcement queue limit")
 				}
-				if _, duplicate := want[a.WrapperHash]; duplicate {
-					continue
-				}
-				hashes = append(hashes, a.WrapperHash)
-				want[a.WrapperHash] = a
-				size += a.Length
-				requestedTx[a.TransactionHash] = true
-				requestedOrder = append(requestedOrder, a.TransactionHash)
-				if len(requestedOrder) > 16384 {
-					delete(requestedTx, requestedOrder[0])
-					requestedOrder = requestedOrder[1:]
-				}
+				queue = append(queue, a)
+				queuedTx[a.TransactionHash] = true
 			}
-			if len(hashes) != 0 {
-				if len(requests) >= 16 {
-					return errors.New("too many outstanding dependency requests")
-				}
-				next++
-				requests[next] = dependencyRequestState8504{want, time.Now().Add(15 * time.Second)}
-				if err := peer.write(dependencyRequest8504, dependencyRequestPacket8504{next, hashes}); err != nil {
-					return err
-				}
-			}
+
 		case dependencyRequest8504:
 			if len(msg.Payload) > maxDependencyRequests8504*33+64 {
 				return errors.New("oversized dependency request")
@@ -274,6 +292,9 @@ func (h *Handler) runDependencyPeer8504(id string, t p2p.Transport) error {
 					continue
 				}
 				if err := h.txPool.AddRemote(tx); err != nil {
+					if h.txPool.Get(tx.Hash()) != nil {
+						continue
+					}
 					return fmt.Errorf("dependency admission: %w", err)
 				}
 				h.announceTransactions([]*types.Transaction{tx}, id)
@@ -281,6 +302,9 @@ func (h *Handler) runDependencyPeer8504(id string, t p2p.Transport) error {
 			missed += len(req.announced)
 		default:
 			return errors.New("unknown hgtp/1 message code")
+		}
+		if err := drain(); err != nil {
+			return err
 		}
 	}
 }

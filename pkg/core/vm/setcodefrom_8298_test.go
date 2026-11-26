@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/bal"
+	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 )
@@ -106,9 +107,13 @@ func TestSetCodeFrom8298ContextsCreationAndRollback(t *testing.T) {
 	}
 	for _, creation := range []string{"create", "create2"} {
 		evm, db, _ := adoptionEVM8298()
-		db.SetCode(source, []byte{byte(STOP)})
+		runtime := []byte{0x60, 0x42, 0x5f, 0x52, 0x60, 32, 0x5f, 0xf3}
+		db.SetCode(source, runtime)
 		// Return the forbidden EF prefix after adoption: it must be ignored.
-		init := append(bytes.Clone(adopt[:len(adopt)-1]), byte(PUSH1), 0xef, byte(PUSH0), byte(MSTORE8), byte(PUSH1), 1, byte(PUSH0), byte(RETURN))
+		init := bytes.Clone(adopt[:len(adopt)-1])
+		// Reenter during initcode and persist the adopted runtime's answer.
+		init = append(init, byte(PUSH1), 32, byte(PUSH0), byte(PUSH0), byte(PUSH0), byte(PUSH0), byte(ADDRESS), byte(PUSH2), 0xff, 0xff, byte(CALL), byte(POP), byte(PUSH0), byte(MLOAD), byte(PUSH0), byte(SSTORE))
+		init = append(init, byte(PUSH1), 0xef, byte(PUSH0), byte(MSTORE8), byte(PUSH1), 1, byte(PUSH0), byte(RETURN))
 		var ret []byte
 		var address types.Address
 		var err error
@@ -117,7 +122,7 @@ func TestSetCodeFrom8298ContextsCreationAndRollback(t *testing.T) {
 		} else {
 			ret, address, _, err = evm.Create2(target, init, 1000000, new(big.Int), new(big.Int))
 		}
-		if err != nil || !bytes.Equal(ret, []byte{0}) || !bytes.Equal(db.GetCode(address), ret) {
+		if err != nil || !bytes.Equal(ret, runtime) || !bytes.Equal(db.GetCode(address), ret) || db.GetState(address, types.Hash{}) != (types.Hash{31: 0x42}) {
 			t.Fatal(creation, ret, err)
 		}
 		// An adopted account created in this transaction remains an invalid source.
@@ -158,7 +163,45 @@ func TestSetCodeFrom8298EarlyGuardsAndImmediateScan(t *testing.T) {
 			t.Fatal("early guard accessed source", err)
 		}
 	}
+	for _, immediate := range []OpCode{DUPN, SWAPN, EXCHANGE} {
+		if HasOpcode8298([]byte{byte(immediate), byte(SETCODEFROM)}, SETCODEFROM) || HasOpcode8298([]byte{byte(immediate), byte(DELEGATECALL)}, DELEGATECALL) {
+			t.Fatal("8024 immediate treated as instruction")
+		}
+	}
 	if HasOpcode8298([]byte{byte(PUSH1), 0xa7, byte(STOP)}, SETCODEFROM) || !HasOpcode8298([]byte{byte(PUSH1), 1, 0xa7}, SETCODEFROM) {
 		t.Fatal("PUSH immediate misclassified")
+	}
+}
+
+func TestSetCodeFrom8298LoadedCodeReentryAndPersistentAvailability(t *testing.T) {
+	disk := rawdb.NewMemoryDB()
+	db := state.NewTrieStateDB(disk)
+	template, target := types.Address{19: 0x81}, types.Address{19: 0x82}
+	// The adopted runtime returns 0x42. Reentry immediately sees this runtime,
+	// while the enclosing CODESIZE still reports the loaded migration program.
+	db.SetCode(template, []byte{0x60, 0x42, 0x5f, 0x52, 0x60, 32, 0x5f, 0xf3})
+	code := append([]byte{byte(PUSH20)}, template[:]...)
+	code = append(code, byte(SETCODEFROM), byte(POP), byte(CODESIZE), byte(PUSH0), byte(MSTORE), byte(ADDRESS), byte(EXTCODESIZE), byte(PUSH1), 32, byte(MSTORE))
+	code = append(code, byte(PUSH1), 32, byte(PUSH1), 64, byte(PUSH0), byte(PUSH0), byte(PUSH0), byte(ADDRESS), byte(PUSH2), 0xff, 0xff, byte(CALL), byte(POP), byte(PUSH1), 96, byte(PUSH0), byte(RETURN))
+	db.SetCode(target, code)
+	evm := NewEVMWithState(BlockContext{}, TxContext{}, Config{}, db)
+	rules := ForkRules{IsAmsterdam: true, IsEIP8298: true, IsPrague: true, IsCancun: true}
+	evm.SetJumpTable(SelectJumpTable(rules))
+	evm.SetForkRules(rules)
+	out, _, err := evm.Call(types.Address{19: 0x83}, target, nil, 1_000_000, new(big.Int))
+	if err != nil || len(out) != 96 || new(big.Int).SetBytes(out[:32]).Uint64() != uint64(len(code)) || new(big.Int).SetBytes(out[32:64]).Uint64() != 8 || new(big.Int).SetBytes(out[64:]).Uint64() != 0x42 {
+		t.Fatal("loaded code/introspection/reentry divergence", out, err)
+	}
+	db.SetCode(template, []byte{0xfe})
+	root, err := db.Commit()
+	if err != nil {
+		t.Fatal(err)
+	}
+	reopened := state.NewTrieStateDB(disk)
+	if root == types.EmptyRootHash {
+		t.Fatal("adoption committed an empty trie")
+	}
+	if !bytes.Equal(reopened.GetCode(target), []byte{0x60, 0x42, 0x5f, 0x52, 0x60, 32, 0x5f, 0xf3}) || !bytes.Equal(reopened.GetCode(template), []byte{0xfe}) {
+		t.Fatal("source replacement/restart lost adopted bytecode")
 	}
 }

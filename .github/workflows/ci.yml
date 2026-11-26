@@ -17,6 +17,7 @@ on:
       - 'tools/hegota/**'
       - 'docs/plans/hegota-a/**'
       - 'docs/plans/hegota-c/**'
+      - 'docs/plans/hegota-d/**'
   pull_request:
     branches: [master]
     paths:
@@ -33,6 +34,7 @@ on:
       - 'tools/hegota/**'
       - 'docs/plans/hegota-a/**'
       - 'docs/plans/hegota-c/**'
+      - 'docs/plans/hegota-d/**'
   workflow_dispatch:
 
 permissions:
@@ -97,6 +99,7 @@ jobs:
           python3 tools/hegota/b_vectors.py
           python3 tools/hegota/check_b.py
           python3 tools/hegota/check_c.py
+          python3 tools/hegota/check_d.py
           python3 -m unittest discover -s tools/hegota -p 'test_*.py'
           python3 -O -m unittest discover -s tools/hegota -p 'test_*.py'
 

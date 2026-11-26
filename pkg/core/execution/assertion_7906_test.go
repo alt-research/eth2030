@@ -2,6 +2,7 @@ package execution
 
 import (
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/bal"
@@ -10,6 +11,24 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
 )
+
+func TestAssertion7906FailureWithoutPayerInvalidatesTransaction(t *testing.T) {
+	tx, db, cfg, h := frameExecutionFixture(t)
+	zero := uint64(0)
+	cfg.EIP7906Time = &zero
+	body, assertion := types.Address{19: 0xa1}, types.Address{19: 0xa2}
+	db.SetCode(tx.Sender, []byte{0})
+	db.SetCode(body, []byte{0x60, 1, 0x5f, 0x55, 0})
+	db.SetCode(assertion, []byte{0x5f, 0x5f, 0xfd})
+	tx.Frames = []types.Frame8141{{Mode: types.ModeDefault, Target: &body, Limits: types.FrameGasLimits{Execution: 20000, State: 97920}}, {Mode: types.ModeAssert7906, Target: &assertion, Limits: types.FrameGasLimits{Execution: 10000}}}
+	transaction := types.NewTransaction(tx)
+	before := db.GetRoot()
+	gp := new(gaspool.GasPool).AddGas(h.GasLimit)
+	r, _, err := ApplyTransaction(cfg, db, h, transaction, gp)
+	if err == nil || !strings.Contains(err.Error(), "ASSERT failed before payment approval") || r != nil || before != db.GetRoot() || gp.Gas() != h.GasLimit || gp.StateGas() != h.GasLimit {
+		t.Fatal("unpaid assertion failure did not invalidate/revert transaction", r, err)
+	}
+}
 
 func TestAssertion7906WholeBodyRollbackAndPrefixSettlement(t *testing.T) {
 	for _, assertion := range [][]byte{{0}, {0x5f, 0x5f, 0xfd}, {0xfe}, {0x5f, 0x5f, 0x60, 3, 0xaa}} {

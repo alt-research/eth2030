@@ -168,22 +168,29 @@ The 2026-11-26 [Group C specification audit and forty-criterion acceptance plan]
 | HGT-028 | call/simulate/estimate/trace；RPC/VM | HGT-013、HGT-027 | 符合选定 API 的模拟上下文、付款与双维成本；估 gas 失败解释、状态不落盘、trace 不改变执行结果 |
 | HGT-029 | 原生节点 lifecycle 与端到端；node/测试 | HGT-025、HGT-026、HGT-027、HGT-028、HGT-016 | 外部客户端提交→跨 peer 传播→构块→独立导入→收据→重启/重组回放闭环，实际运行入口固定 |
 
-### D. PQ 最小接口、账号迁移与交易断言
+### D. PQ interfaces, account migration and transaction assertions
 
-这些任务受 D02/D05/D06 及范围准入约束。规范依据：[8504 草案 PR](https://github.com/ethereum/EIPs/pull/12672)、[8288](https://eips.ethereum.org/EIPS/eip-8288)、[8298](https://eips.ethereum.org/EIPS/eip-8298)、[8151](https://eips.ethereum.org/EIPS/eip-8151)、[7906](https://eips.ethereum.org/EIPS/eip-7906)。只交付所选方案，完整递归聚合不自动进入当前版本。
+The current [32-criterion implementation plan](hegota-d/PLAN.md) and
+[composition/compatibility decision](hegota-d/COMPOSITION.md) supersede this
+section's original POST_TX shorthand. EIP-7906 now defines ASSERT mode 3,
+TXTRACE 0xb6 and EVENTDATACOPY 0xb7. EIP-8504 mode 4 uses direct verification;
+its latest complete draft is pinned separately from the historical proposal.
 
-| ID | 工作与主责 | 依赖 | 交付物与验收 |
+| ID | Work and owner | Dependencies | Deliverables and acceptance |
 | --- | --- | --- | --- |
-| HGT-030 | PQ 接口与聚合边界 ADR；规范/PQ | HGT-007、HGT-009 | scheme/dependency/witness/哈希的固定版本；8504 与完整 8288 边界、未定参数和准入条件明确 |
-| HGT-031 | proof frame 与 witness 编码；types/PQ | HGT-030、HGT-002 | declaration、零 hash 约定、排序去重、sidecar/witness 的规范字节向量；错误绑定和多余依赖拒绝 |
-| HGT-032 | verifier、gas 与参数；crypto/VM | HGT-031、HGT-011 | 与独立已核查实现的签名向量一致；code/binding 来源、参数、CPU 路径和成本上界固定，stub 不作为验收 |
-| HGT-033 | witness 的交易池/网络可用性；txpool/P2P | HGT-031、HGT-032、HGT-025 | witness 获取、校验、缓存、去重、失配与逐出；仅有 tx body 无 witness 不被误报完整验证 |
-| HGT-034 | block dependency/commitment 与导入；engine/execution | HGT-031、HGT-032、HGT-015、HGT-033 | declaration union 与 witness/承诺精确绑定；缺失/多余/错误 scheme、hash/VK 都有负向区块 |
-| HGT-035 | SETCODEFROM 与迁移执行；VM/state | HGT-012、HGT-021、HGT-009 | code adoption 时机、codehash、reentrancy、创建/销毁与 BAL；迁移前后旧私钥权限按规范变化 |
-| HGT-036 | ecRecover code restriction；VM/txpool | HGT-035、HGT-021 | empty/delegation/真实 code 分类、返回数据、gas、BAL、signer 代码依赖；Permit/multisig/OP fault-proof 有兼容准入报告 |
-| HGT-037 | POST_TX 断言与 paymaster 回滚；VM/state | HGT-012、HGT-015、HGT-023、HGT-009 | 可观察 diff/event 边界与失败回滚；nonce/付款保留和 token 补偿按最终规则，false-return token/重试/批次测试通过 |
+| HGT-030 | Profile and aggregation ADR; specifications/PQ | HGT-007, HGT-009 | Exact sources, parameters, direct/recursive boundaries, activation and public release gates. |
+| HGT-031 | Proof declarations, submissions and wrappers; types/PQ | HGT-030, HGT-002 | Exact bytes, zero-hash substitution, canonical ordering/deduplication and blob composition; malformed bindings rejected. |
+| HGT-032 | Real verifier, gas and bounds; crypto/VM | HGT-031, HGT-011 | Pinned leanSPHINCS independent vectors, fixed 515-permutation verification, no-call execution and witness pricing. |
+| HGT-033 | Witness pool/network availability; txpool/P2P | HGT-031, HGT-032, HGT-025 | Bounded verification/cache, one admitted wrapper, exact byte accounting, replacement/removal/reorg and isolated announce/request transport. |
+| HGT-034 | Block union, commitment and import; Engine/execution | HGT-031, HGT-032, HGT-015, HGT-033 | Exact witness union/commitment, Engine/body/persistence/CL codec consumers and invalid-block controls. |
+| HGT-035 | SETCODEFROM and migration; VM/state | HGT-012, HGT-021, HGT-009 | Immediate adoption, loaded code/reentry/initcode/rollback, hash-only BAL and retained bytecode availability. |
+| HGT-036 | Reused 8151 and ecosystem compatibility; VM/txpool | HGT-035, HGT-021 | Paid raw-code class checks, retired-origin eviction, bounded proxy dependencies, permit/multisig/fault-proof controls and release report. |
+| HGT-037 | ASSERT and paymaster rollback; VM/state | HGT-012, HGT-015, HGT-023, HGT-009 | Complete net trace/events, static suffix/body rollback, retained nonce/payment, discarded state gas/logs, false-return token/retry/atomic cases. |
 
-HGT-036 若发现不可接受的生态兼容风险，阻断该候选的发布准入；不能关闭已有安全检查来强行通过。HGT-034 的直接验证也不等于实现完整 8288 聚合。
+D02/D05/D06 now select explicit native profiles. Provisional upstream parameters,
+official transport assignments, ecosystem qualification and unspecified recursive
+aggregation remain public-release gates. No automatic token compensation is
+defined by these EIPs. Existing security checks remain enabled.
 
 ### E. FOCIL 与 AA-VOPS
 

@@ -1,9 +1,9 @@
 package node
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
-	"math/big"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,12 +22,8 @@ func TestDependency8504ActualRPCSimulationEngineBodiesAndRestart(t *testing.T) {
 	fields := genesis["config"].(map[string]any)
 	fields["terminalTotalDifficulty"], fields["amsterdamTime"], fields["bogotaTime"], fields["eip8504Time"] = 0, 0, 0, 0
 	genesis["gasLimit"] = "0x1c9c380"
-	tx := proof8504.Transaction(0)
-	frame := tx.Inner().(*types.FrameTx8141)
-	frame.Fees.MaxFee = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
-	frame.Fees.MaxPriorityFeePerGas = big.NewInt(1_000_000_000)
-	tx = tx.WithDependencyWitnesses8504(tx.DependencyWitnesses8504())
-	genesis["alloc"].(map[string]any)[tx.FrameSender().Hex()] = map[string]string{"balance": "10000000000000000000", "code": "0x" + hex.EncodeToString(proof8504.ApproveCode), "nonce": "0x0"}
+	tx, _ := proof8504.CanonicalTransaction(false)
+	genesis["alloc"].(map[string]any)[tx.FrameSender().Hex()] = map[string]string{"balance": "10000000000000000000", "code": "0x" + hex.EncodeToString(proof8504.CanonicalWalletCode()), "nonce": "0x0"}
 	rawGenesis, err := json.Marshal(genesis)
 	if err != nil {
 		t.Fatal(err)
@@ -122,6 +118,43 @@ func TestDependency8504ActualRPCSimulationEngineBodiesAndRestart(t *testing.T) {
 		}
 	}
 	readBodies(destination)
+	var balHex string
+	if err := json.Unmarshal(envelope.ExecutionPayload.BlockAccessList, &balHex); err != nil {
+		t.Fatal(err)
+	}
+	balBytes, err := hex.DecodeString(balHex[2:])
+	if err != nil {
+		t.Fatal(err)
+	}
+	cl := types.NewConsensusPayload8504(receiver.Blockchain().GetBlock(envelope.ExecutionPayload.BlockHash), balBytes)
+	encodedCL, err := cl.MarshalSSZ()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decodedCL types.ConsensusPayload8504
+	if err := decodedCL.UnmarshalSSZ(encodedCL); err != nil {
+		t.Fatal(err)
+	}
+	clRoot, err := cl.HashTreeRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	decodedRoot, err := decodedCL.HashTreeRoot()
+	if err != nil || clRoot != decodedRoot || decodedCL.BlockHash != envelope.ExecutionPayload.BlockHash || len(decodedCL.DependencyWitnesses) != 1 || !bytes.Equal(decodedCL.DependencyWitnesses[0], tx.DependencyWitnesses8504()[0]) || !bytes.Equal(decodedCL.BlockAccessList, balBytes) {
+		t.Fatal("native Engine block to CL payload lost commitment/witness/BAL", err)
+	}
+	// Included proof transactions need no omitted-candidate trial. An omitted
+	// proof cannot be authenticated from this canonical-bytes-only IL API.
+	var satisfied bogotaIntegrationStatus
+	destination.call(t, "engine_newPayloadV6", &satisfied, envelope.ExecutionPayload, []types.Hash{}, beacon, envelope.ExecutionRequests, []string{"0x" + hex.EncodeToString(canonical)})
+	if satisfied.Status != "VALID" || satisfied.InclusionListSatisfied == nil || !*satisfied.InclusionListSatisfied {
+		t.Fatal("included dependency IL", satisfied)
+	}
+	omitted := proof8504.Transaction(1)
+	omittedRaw, _ := omitted.EncodeRLP()
+	if err := destination.invoke("engine_newPayloadV6", &satisfied, envelope.ExecutionPayload, []types.Hash{}, beacon, envelope.ExecutionRequests, []string{"0x" + hex.EncodeToString(omittedRaw)}); err == nil {
+		t.Fatal("omitted bare proof received a validity verdict without witness-bearing IL specification")
+	}
 	if err := receiver.Stop(); err != nil {
 		t.Fatal(err)
 	}

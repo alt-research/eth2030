@@ -152,6 +152,8 @@ func HasOpcode8298(code []byte, wanted OpCode) bool {
 		}
 		if op >= PUSH1 && op <= PUSH32 {
 			pc += int(op-PUSH1) + 1
+		} else if op == DUPN || op == SWAPN || op == EXCHANGE {
+			pc++
 		}
 	}
 	return false

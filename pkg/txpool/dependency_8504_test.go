@@ -112,3 +112,35 @@ func TestDependency8504PoolRejectsBodyWitnessBeforeSimulation(t *testing.T) {
 		}
 	}
 }
+
+func TestDependency8504ReplacementWrapperAtomicAccounting(t *testing.T) {
+	pool, _, _ := dependencyPool8504()
+	old := proof8504.Transaction(0)
+	oldHash, _ := types.DependencyWrapperHash8504(old)
+	oldRaw, _ := types.EncodeDependencyWrapper8504(old)
+	if err := pool.AddRemote(old); err != nil {
+		t.Fatal(err)
+	}
+	next := proof8504.Transaction(0)
+	f := next.Inner().(*types.FrameTx8141)
+	f.Fees.MaxFee = big.NewInt(120_000_000)
+	f.Fees.MaxPriorityFeePerGas = big.NewInt(3)
+	nextHash, _ := types.DependencyWrapperHash8504(next)
+	nextRaw, _ := types.EncodeDependencyWrapper8504(next)
+	// A rejected witness must not remove the old replacement candidate/index.
+	w := next.DependencyWitnesses8504()
+	w[0][0] ^= 1
+	if err := pool.AddRemote(next.WithDependencyWitnesses8504(w)); err == nil || pool.Get(old.Hash()) == nil || pool.DependencyBytes8504() != uint64(len(oldRaw)) {
+		t.Fatal("invalid replacement changed admitted wrapper", err)
+	}
+	if err := pool.AddRemote(next); err != nil {
+		t.Fatal(err)
+	}
+	if pool.Count() != 1 || pool.Get(old.Hash()) != nil || pool.DependencyWrapper8504(oldHash) != nil || len(pool.DependencyWrapper8504(nextHash)) != len(nextRaw) || pool.DependencyBytes8504() != uint64(len(nextRaw)) || transactionPoolBytes(pool.Get(next.Hash())) != uint64(len(nextRaw)) {
+		t.Fatal("replacement leaked wrapper or byte accounting")
+	}
+	pool.Remove(next.Hash())
+	if pool.DependencyBytes8504() != 0 || pool.Count() != 0 || pool.DependencyWrapper8504(nextHash) != nil {
+		t.Fatal("replacement eviction leaked index/bytes")
+	}
+}

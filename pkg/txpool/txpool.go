@@ -757,6 +757,22 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool, validat
 		}
 		tx.SetSender(sender)
 	}
+	if tx.Type() <= types.SetCodeTxType && pool.frameConfig.IsEIP8298(pool.frameTime) {
+		if db, ok := pool.state.(interface{ GetCode(types.Address) []byte }); ok {
+			address := pool.senderOf(tx)
+			code := db.GetCode(address)
+			if len(code) != 0 {
+				if _, delegated := types.ParseDelegation(code); !delegated {
+					return errors.New("ECDSA origin retired by regular deployed code")
+				}
+				for _, pending := range pool.lookup.all {
+					if pool.senderOf(pending) == address && !samePoolIdentity(pending, tx) {
+						return errors.New("one pending transaction per delegated origin")
+					}
+				}
+			}
+		}
+	}
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
 		v, err := pool.validateFrame8141Result(tx)
 		if len(validation) > 0 {

@@ -74,7 +74,13 @@ func (l *txLookup) indexFrameExpiry(hash types.Hash) {
 	}
 	hasTime, hasSlot := false, false
 	var deadline, expirySlot uint64
-	for i, f := range frame.Frames {
+	logical := 0
+	for _, f := range frame.Frames {
+		if f.Mode == types.ModeProof8504 {
+			continue
+		}
+		i := logical
+		logical++
 		if i == 0 && f.Mode == types.ModeVerify && f.Flags == 0 && f.Target != nil && *f.Target == types.FrameExpiryVerifier && len(f.Data) == 8 {
 			hasTime = true
 			deadline = binary.BigEndian.Uint64(f.Data)

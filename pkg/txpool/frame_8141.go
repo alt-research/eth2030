@@ -260,6 +260,7 @@ func (pool *TxPool) removeFrameLocked(hash types.Hash) {
 	}
 }
 func (pool *TxPool) revalidateFrames8141() {
+	pool.evictRetiredOrigins8298()
 	pool.expireFrames8141()
 	var txs []*types.Transaction
 	for _, tx := range pool.lookup.all {
@@ -308,8 +309,12 @@ func frameExpiry(tx *types.Transaction) uint64 {
 	if !ok {
 		return math.MaxUint64
 	}
-	if len(frame.Frames) > 0 {
-		f := frame.Frames[0]
+	first := 0
+	for first < len(frame.Frames) && frame.Frames[first].Mode == types.ModeProof8504 {
+		first++
+	}
+	if first < len(frame.Frames) {
+		f := frame.Frames[first]
 		if f.Target != nil && *f.Target == types.FrameExpiryVerifier && len(f.Data) == 8 {
 			return binary.BigEndian.Uint64(f.Data)
 		}
@@ -317,6 +322,13 @@ func frameExpiry(tx *types.Transaction) uint64 {
 	return math.MaxUint64
 }
 func transactionPoolBytes(tx *types.Transaction) uint64 {
+	if tx.HasDependencies8504() {
+		raw, err := types.EncodeDependencyWrapper8504(tx)
+		if err != nil {
+			return math.MaxUint64
+		}
+		return uint64(len(raw))
+	}
 	raw, _ := tx.EncodeRLP()
 	size := uint64(len(raw))
 	if sc := tx.BlobSidecar(); sc != nil {

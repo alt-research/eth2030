@@ -6,7 +6,7 @@ The execution scope is the 12 tasks under Group B in the development plan. The m
 
 Work starts from merged master `960baab3103e0d34435433be0f8314f127521052`. The EIPs reference is `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`; the consensus-specs reference remains `d2021d2719235f0df4726a1d330502cb15aa8ea3`. The upstream EIPs master was checked on 2026-11-26 and still matched the local pin. Reference contents were not edited.
 
-The register hashes EIP-8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 2718, 7702, 2929 and 214. Existing A locks retain the wider prerequisite source set. The current 8141 text is byte-identical to its implementation revision `dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f`.
+The register hashes EIP-8141, 8250, 8272, 8037, 8038, 7843, 7928, 7934, 2718, 7702, 2929, 214 and 1153. Existing A locks retain the wider prerequisite source set. The current 8141 text is byte-identical to its implementation revision `dc5d5fa688b7fe87b95a907fcc128b4fde2f4d2f`.
 
 ## D01: nonce-only delta remains isolated
 
@@ -59,3 +59,7 @@ The [third audit](THIRD_AUDIT.md) revisits all 12 tasks and corrects two additio
 ## Fourth clause audit
 
 The [fourth audit](FOURTH_AUDIT.md) corrects the account-reconstruction BAL baseline for prefunded CREATE/CREATE2 destinations. Transaction-original fields are captured before resetting the account. New execution, rollback and native build/import tests reject fabricated net-zero balance changes while preserving exact state-gas semantics; unchanged upstream Amsterdam independently checks the eight creation call bodies.
+
+## Fifth independent audit
+
+The [fifth audit](FIFTH_AUDIT.md) adds a required canonical Frame consumer across memory and persisted/reopened Trie/Snap backends. It checks independent cold/warm gas, nested transient rollback, inter-Frame clearing, transaction-original storage after reopen and identical state/receipt/BAL commitments. No additional implementation defect was reproduced in selected native routes; this round closes the backend acceptance coverage gap without changing production implementation or activation.

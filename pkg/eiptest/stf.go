@@ -134,6 +134,7 @@ func (p *STF) evmCall(statedb state.StateDB, from, to types.Address, data []byte
 	// head header's fork rules.
 	rules := p.s.cfg.Rules(header.Number, p.s.cfg.IsMerge(), header.Time)
 	forkRules := vm.ForkRules{
+		IsEIP8151:        rules.IsEIP8151,
 		IsGlamsterdan:    rules.IsGlamsterdan,
 		IsPrague:         rules.IsPrague,
 		IsCancun:         rules.IsCancun,

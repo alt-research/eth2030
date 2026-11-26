@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify every Group C selected-profile criterion against native execution.
 
-Unresolved public specification gates are preserved, never counted as activated.
+Explicit composition decisions and unresolved upstream gates are checked independently.
 """
 import argparse
 import hashlib
@@ -45,15 +45,36 @@ MANDATORY = {
  'rpc/types::TestFrameCDerivedReceiptStatusIsNotConsensusRLP',
  'rpc/ethapi::TestFrameCPendingAndMinedQueryLocations',
  'node::TestFrameCNativePeersPoolBuildSimulationAndRestart',
+ 'node::TestFrame8250NativePeersPoolBuildSimulationAndRestart',
+ 'core/block::TestFrame8250BuildImportReorgAndRestart',
+ 'core/block::TestFrame8250BuilderOrderingKeepsKeyedDomainsIndependent',
+ 'core/config::TestFrameExtensionActivationAndCompatibility',
+ 'core/types::TestFrame8250PublicCopyAndUint256ChainID',
+ 'core/types::TestFrame8250DeltaIndependentWireGoldens',
+ 'core/execution::TestFrame8250PublicExecutionSchemaBoundary',
+ 'txpool::TestFrame8250PublicIdentityDependenciesAndForkEviction',
+ 'core/vm::TestEIP8151RecoveryCodeClassGasAndUnpaidAccess',
+ 'core/vm::TestEIP8151CallFamiliesAndOuterRevert',
+ 'txpool::TestFrame8151SignerClassesReorgAndSeparateHelperDependency',
+ 'txpool::TestFrame8151ReservedAndOtherDigestShares',
+ 'txpool::TestFrame8151ActivationInvalidatesPrefixCache',
+ 'node::TestLoadGenesisFile_ScheduledForksRoundTrip',
+ 'txpool::TestFrame8151PayRecoveriesCountDistinctPaymasters',
+ 'rpc/ethapi::TestFrame8250TxPoolMapDoesNotAliasLegacyNonce',
 }
 
 def validate_manifest(root, manifest):
-    need(manifest['version'] == 1, 'unknown C manifest version')
-    need(manifest['profiles']['8250-delta'] == {'public_activation': False, 'decision': 'D01-open'}, 'D01 public gate changed')
+    need(manifest['version'] == 2, 'unknown C manifest version')
+    need(manifest['profiles']['8250-delta']['public_activation'] is False, 'independent oracle promoted to public activation')
+    need(manifest['profiles']['8250-public'] == {'public_activation': True, 'activation': 'EIP8250Time; explicit, nil default', 'decision': 'D01-resolved-two-fee', 'fees': ['max_fee', 'max_priority_fee_per_gas']}, 'unqualified 8250 composition')
+    decisions = json.loads((root/'specs/hegota/profiles.json').read_text())
+    decision = next(d for d in decisions['decisions'] if d['id'] == 'D01')
+    need(decision['status'] == 'resolved_selected_native_composition' and decision['resolution_record'] == 'docs/plans/hegota-c/COMPOSITION.md' and decision['previous_decisions'] and {'https://github.com/ethereum/EIPs/pull/11968', 'https://github.com/ethereum/EIPs/pull/12414'} <= set(decision['authority']), 'D01 decision/history/authority missing')
+    need(manifest['profiles']['8151-conditional'] == {'activation': 'EIP8151Time; explicit, nil default', 'signer_dependencies': 'raw-code class, separate helper hash', 'local_shares': {'canonical_default':64, 'other_default':8, 'pay_counting':'distinct paymasters, separate from other frames'}}, 'conditional 8151 profile changed without qualification')
     template = manifest['profiles']['paymaster-v1']
     need(template['public_default'] is False and template['upstream_canonical'] is False, 'local template promoted to upstream canonical code')
-    need(set(manifest['public_gates']) == {'D01', 'PAYMASTER-CODE'} and all(manifest['public_gates'].values()), 'public specification gate omitted')
-    need({8141, 8250, 8272, 7594, 2718, 1474} <= {s['eip'] for s in manifest['normative_sources']}, 'missing C normative source')
+    need(set(manifest['public_gates']) == {'PAYMASTER-CODE'} and all(manifest['public_gates'].values()), 'public specification gate omitted')
+    need({8141, 8250, 8272, 7594, 2718, 1474, 8151} <= {s['eip'] for s in manifest['normative_sources']}, 'missing C normative source')
     artifacts = {'specs/hegota/group-c.json', 'tools/hegota/check_b.py', *manifest['additional_artifacts']}
     for source in manifest['normative_sources']:
         need(sha(root/source['path']) == source['sha256'], 'C normative source changed: '+source['path'])

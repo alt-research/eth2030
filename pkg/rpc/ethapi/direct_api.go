@@ -5,6 +5,7 @@
 package ethapi
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
@@ -104,7 +105,7 @@ func (api *EthDirectAPI) GetBlockByNumber(number string, fullTxs bool) (map[stri
 		if block == nil {
 			return nil, nil
 		}
-		return formatBlockAsMap(block, true), nil
+		return formatBlockAsMap(block, true, blobPriceForHeader(api.backend, block.Header())), nil
 	}
 
 	header := api.backend.HeaderByNumber(bn)
@@ -124,7 +125,7 @@ func (api *EthDirectAPI) GetBlockByHash(hash string, fullTxs bool) (map[string]i
 		if block == nil {
 			return nil, nil
 		}
-		return formatBlockAsMap(block, true), nil
+		return formatBlockAsMap(block, true, blobPriceForHeader(api.backend, block.Header())), nil
 	}
 
 	header := api.backend.HeaderByHash(h)
@@ -148,6 +149,7 @@ func (api *EthDirectAPI) GetTransactionByHash(hash string) (map[string]interface
 	if blockNum > 0 {
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
 		if header != nil {
+			result = formatTxAsMap(tx, header.BaseFee, blobPriceForHeader(api.backend, header))
 			bh := header.Hash()
 			result["blockHash"] = encodeHash(bh)
 		}
@@ -379,7 +381,7 @@ func extractCallArgs(args map[string]interface{}) (from types.Address, to *types
 }
 
 // formatBlockAsMap converts a block to a map[string]interface{}.
-func formatBlockAsMap(block *types.Block, fullTxs bool) map[string]interface{} {
+func formatBlockAsMap(block *types.Block, fullTxs bool, blobFees ...*big.Int) map[string]interface{} {
 	header := block.Header()
 	m := formatHeaderMap(header)
 
@@ -389,7 +391,11 @@ func formatBlockAsMap(block *types.Block, fullTxs bool) map[string]interface{} {
 		blockHash := block.Hash()
 		blockNum := block.NumberU64()
 		for i, tx := range txs {
-			txm := formatTxAsMap(tx)
+			blobFee := big.NewInt(1)
+			if len(blobFees) > 0 && blobFees[0] != nil {
+				blobFee = blobFees[0]
+			}
+			txm := formatTxAsMap(tx, block.Header().BaseFee, blobFee)
 			txm["blockHash"] = encodeHash(blockHash)
 			txm["blockNumber"] = encodeUint64(blockNum)
 			txm["transactionIndex"] = encodeUint64(uint64(i))
@@ -478,7 +484,25 @@ func formatHeaderMap(h *types.Header) map[string]interface{} {
 // FormatTxAsMap is the exported version of formatTxAsMap.
 func FormatTxAsMap(tx *types.Transaction) map[string]interface{} { return formatTxAsMap(tx) }
 
-func formatTxAsMap(tx *types.Transaction) map[string]interface{} {
+func formatTxAsMap(tx *types.Transaction, fees ...*big.Int) map[string]interface{} {
+	if _, ok := tx.Inner().(*types.FrameTx8141); ok {
+		var baseFee, blobFee *big.Int
+		if len(fees) > 0 {
+			baseFee = fees[0]
+		}
+		if len(fees) > 1 {
+			blobFee = fees[1]
+		}
+		encoded, err := json.Marshal(FormatTransaction(tx, nil, nil, nil, 0, baseFee, blobFee))
+		if err != nil {
+			return nil
+		}
+		var fields map[string]interface{}
+		if err := json.Unmarshal(encoded, &fields); err != nil {
+			return nil
+		}
+		return fields
+	}
 	m := map[string]interface{}{
 		"hash":     encodeHash(tx.Hash()),
 		"nonce":    encodeUint64(tx.Nonce()),

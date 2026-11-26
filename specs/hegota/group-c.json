@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "baseline": "5d777ad06f886c8b20fb010a47e65ddb05df8287",
   "normative_sources": [
     {
@@ -49,23 +49,46 @@
       "path": "refs/EIPs/EIPS/eip-1153.md",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40"
+    },
+    {
+      "eip": 8151,
+      "path": "refs/EIPs/EIPS/eip-8151.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80"
     }
   ],
   "profiles": {
-    "8141-public-base": "HogotaTime; exact seven-field envelope",
+    "8141-public-base": "HogotaTime until EIP8250Time; exact seven-field envelope",
     "8250-delta": {
       "public_activation": false,
-      "decision": "D01-open"
+      "decision": "historical isolated oracle; D01 resolved by COMPOSITION.md"
     },
     "paymaster-v1": {
       "public_default": false,
       "upstream_canonical": false,
       "selection": "--experimental-frame-paymaster-v1"
     },
-    "simulation": "ETH2030 authenticated Frame simulation v1"
+    "simulation": "ETH2030 authenticated Frame simulation v1",
+    "8250-public": {
+      "public_activation": true,
+      "activation": "EIP8250Time; explicit, nil default",
+      "decision": "D01-resolved-two-fee",
+      "fees": [
+        "max_fee",
+        "max_priority_fee_per_gas"
+      ]
+    },
+    "8151-conditional": {
+      "activation": "EIP8151Time; explicit, nil default",
+      "signer_dependencies": "raw-code class, separate helper hash",
+      "local_shares": {
+        "canonical_default": 64,
+        "other_default": 8,
+        "pay_counting": "distinct paymasters, separate from other frames"
+      }
+    }
   },
   "public_gates": {
-    "D01": "authoritative 8141/8250 combined envelope",
     "PAYMASTER-CODE": "merged reproducible canonical runtime; PR 12041 is open"
   },
   "tasks": [
@@ -89,7 +112,7 @@
             "github.com/eth2030/eth2030/core/types::TestFrame8141PublicRootGrammar",
             "github.com/eth2030/eth2030/core/types::TestFrame8141PublicSixteenPrefixShapes"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C20.2",
@@ -107,7 +130,7 @@
             "github.com/eth2030/eth2030/core/types::TestFrameCPublicWorkBudgetEquality",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolPrefixDoesNotExecuteBody"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C20.3",
@@ -131,7 +154,7 @@
             "github.com/eth2030/eth2030/core/execution::TestFrameCPublicFactoryFundingDependencyScope",
             "github.com/eth2030/eth2030/core/execution::TestFrameCPublicTransientStorageScope"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C20.4",
@@ -150,7 +173,7 @@
             "github.com/eth2030/eth2030/core/vm::TestFrameCSenderDefaultCodeCallException",
             "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -159,21 +182,26 @@
       "criteria": [
         {
           "id": "C21.1",
-          "statement": "capture:** record sender nonce/code/balance/existence/storage, helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries.",
+          "statement": "capture:** record sender nonce/code/balance/existence/storage, helper/factory/delegation code, payer balance/code, canonical withdrawal state, expiry runtime/deadline and all recent-root storage/code/activation/expiry dependencies. Record only the validation prefix. Duplicates must not multiply dependency or reservation entries. With EIP8151Time, record paid raw-code class reads and separate helper hashes; invalidate on either-direction class changes, retaining reads across revert and omitting unpaid accesses.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "EIP-8151 Public Mempool / Signer Dependencies / Pending Transaction Limit"
           ],
           "files": [
             "pkg/core/execution/frame_dependencies.go",
+            "pkg/core/vm/ecrecover_8151.go",
             "pkg/txpool/frame_8141.go",
             "pkg/txpool/txpool.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/execution::TestFrameCAllSixteenPrefixesExecuteAndCaptureDependencies",
+            "github.com/eth2030/eth2030/core/vm::TestEIP8151CallFamiliesAndOuterRevert",
+            "github.com/eth2030/eth2030/core/vm::TestEIP8151RecoveryCodeClassGasAndUnpaidAccess",
+            "github.com/eth2030/eth2030/txpool::TestFrame8151SignerClassesReorgAndSeparateHelperDependency",
             "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C21.2",
@@ -183,18 +211,25 @@
             "EIP-8272 Public mempool handling"
           ],
           "files": [
+            "pkg/core/config/chain_config.go",
+            "pkg/core/config/chain_config_ext.go",
+            "pkg/core/config/chain_config_forks.go",
             "pkg/core/execution/frame_dependencies.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/txpool.go",
             "pkg/txpool/frame_8250_delta.go",
-            "pkg/txpool/frame_8250_delta_test.go"
+            "pkg/txpool/frame_8250_delta_test.go",
+            "pkg/txpool/txpool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
+            "github.com/eth2030/eth2030/core/config::TestFrameExtensionActivationAndCompatibility",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFramePrefixUsesHeadBlockPrerequisites",
-            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits"
+            "github.com/eth2030/eth2030/txpool::TestFrame8250PublicIdentityDependenciesAndForkEviction",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits",
+            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
+            "github.com/eth2030/eth2030/txpool::TestFrame8151ActivationInvalidatesPrefixCache",
+            "github.com/eth2030/eth2030/node::TestLoadGenesisFile_ScheduledForksRoundTrip"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C21.3",
@@ -209,28 +244,33 @@
             "pkg/txpool/txpool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
-            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
+            "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C21.4",
-          "statement": "lifecycle:** replace/remove dependency metadata atomically with transactions. Fork rollback, failed admission, resource rejection, reset, expiry and reorg must leave no orphan entries, cached acceptance or stale signer/nonce assumptions.",
+          "statement": "lifecycle:** replace/remove dependency metadata atomically with transactions. Fork rollback, failed admission, resource rejection, reset, expiry and reorg must leave no orphan entries, cached acceptance or stale signer/nonce assumptions. Conditional EIP-8151 uses separate canonical/other digest shares, PAY distinct-paymaster counting and release on removal/replacement.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
-            "EIP-8272 Public mempool handling"
+            "EIP-8272 Public mempool handling",
+            "EIP-8151 Public Mempool / Signer Dependencies / Pending Transaction Limit"
           ],
           "files": [
             "pkg/core/execution/frame_dependencies.go",
             "pkg/txpool/frame_8141.go",
+            "pkg/txpool/frame_signers_8151.go",
             "pkg/txpool/txpool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
+            "github.com/eth2030/eth2030/txpool::TestFrame8151PayRecoveriesCountDistinctPaymasters",
+            "github.com/eth2030/eth2030/txpool::TestFrame8151ReservedAndOtherDigestShares",
+            "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -255,7 +295,7 @@
             "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272NormativeRuntimeBoundaries",
             "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272SixteenColdKeysAndExactGas"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C22.2",
@@ -275,7 +315,7 @@
             "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C22.3",
@@ -297,31 +337,40 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCExpiryQueuesReplacementAndRemoval"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C22.4",
-          "statement": "isolated keyed policy:** canonical key sets/sequence identity, max one pending per sender even for disjoint keys, overlapping/nonoverlapping pre-state changes, MAX exhaustion and optional pre-state legacy-nonce dependency. No public route or envelope activation bypasses D01.",
+          "statement": "public keyed profile: exact inherited two-fee envelope; timestamp-gated decoding/execution; complete selected-key replay identity, one pending Frame per sender, selected-slot and optional TXPARAM(0x0D) dependencies, replacement, MAX exhaustion, schema eviction across fork/reorg, independent ordinary account-nonce ordering, public network/build/import/RPC/restart consumers. Preserve isolated numeric/wire oracle expectations.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling",
-            "EIP-8250 Mempool (isolated delta only)"
+            "EIP-8250 Mempool (isolated delta only)",
+            "EIP-8250 Activation / Mempool / Transaction payload; EIPs #11968 and #12414"
           ],
           "files": [
-            "pkg/txpool/frame_8250_delta.go",
+            "pkg/core/execution/frame_8141.go",
             "pkg/core/execution/frame_8250.go",
+            "pkg/core/types/frame_8141.go",
+            "pkg/core/types/frame_8250.go",
             "pkg/core/types/frame_8272.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/frame_8250_delta_test.go"
+            "pkg/txpool/frame_8250_delta.go",
+            "pkg/txpool/frame_8250_delta_test.go",
+            "pkg/txpool/txpool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion",
-            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaNativeNonceDomains",
             "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback",
-            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster",
-            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits"
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaNativeNonceDomains",
+            "github.com/eth2030/eth2030/core/execution::TestFrame8250PublicExecutionSchemaBoundary",
+            "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaIndependentWireGoldens",
+            "github.com/eth2030/eth2030/core/types::TestFrame8250PublicCopyAndUint256ChainID",
+            "github.com/eth2030/eth2030/txpool::TestFrame8250PublicIdentityDependenciesAndForkEviction",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedCachedDimensionalLimits",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion",
+            "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -343,7 +392,7 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolAggregateExposureAndRevalidation",
             "github.com/eth2030/eth2030/txpool::TestFrameCZeroFeeBudgetDoesNotPanic"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C23.2",
@@ -362,7 +411,7 @@
             "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile",
             "github.com/eth2030/eth2030/txpool::TestFrameCExposureUsesValidatedPayPrefixClassification"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C23.3",
@@ -379,7 +428,7 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolReplacementChangesPayerAtomically",
             "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C23.4",
@@ -396,7 +445,7 @@
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReplacementMovesWithdrawalAdjustedExposure",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -410,32 +459,34 @@
             "EIP-8141 Mempool/Behavior/Introspection"
           ],
           "files": [
+            "pkg/core/block/ordering.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/txpool.go",
-            "pkg/core/block/ordering.go"
+            "pkg/txpool/txpool.go"
           ],
           "tests": [
+            "github.com/eth2030/eth2030/core/block::TestFrame8250BuilderOrderingKeepsKeyedDomainsIndependent",
             "github.com/eth2030/eth2030/core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee",
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolUsesCanonicalHeadFees"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C24.2",
-          "statement": "replacement:** same sender/nonce identity (or isolated selected-key identity), both max_fee and priority increment, configured rounding/zero boundaries and any explicitly configured larger blob increment. Cross-format replacements cannot bypass the canonical identity/policy rules.",
+          "statement": "replacement:** exact sender/selected-key/sequence identity for EIP-8250, otherwise sender/nonce identity, both max_fee and priority increment, configured rounding/zero boundaries and any explicitly configured larger blob increment. Cross-format replacements cannot bypass the canonical identity/policy rules.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection"
           ],
           "files": [
+            "pkg/core/block/ordering.go",
             "pkg/txpool/frame_8141.go",
-            "pkg/txpool/txpool.go",
-            "pkg/core/block/ordering.go"
+            "pkg/txpool/txpool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCConfiguredReplacementAndSidecarBytes",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolReplacementChangesPayerAtomically"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolReplacementChangesPayerAtomically",
+            "github.com/eth2030/eth2030/txpool::TestFrame8250PublicIdentityDependenciesAndForkEviction",
+            "github.com/eth2030/eth2030/txpool::TestFrameCConfiguredReplacementAndSidecarBytes"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C24.3",
@@ -453,7 +504,7 @@
             "github.com/eth2030/eth2030/txpool::TestFrameCConfiguredReplacementAndSidecarBytes",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C24.4",
@@ -471,7 +522,7 @@
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolExpiryAndFeeChanges",
             "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -485,16 +536,17 @@
             "EIP-8141 Networking"
           ],
           "files": [
+            "pkg/core/types/frame_8141_network.go",
             "pkg/eth/handler.go",
             "pkg/eth/sparse_relay.go",
-            "pkg/p2p/ethproto/receipt_tx_codec.go",
-            "pkg/core/types/frame_8141_network.go"
+            "pkg/p2p/ethproto/receipt_tx_codec.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds"
+            "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds",
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C25.2",
@@ -503,16 +555,17 @@
             "EIP-8141 Networking"
           ],
           "files": [
+            "pkg/core/types/frame_8141_network.go",
             "pkg/eth/handler.go",
             "pkg/eth/sparse_relay.go",
-            "pkg/p2p/ethproto/receipt_tx_codec.go",
-            "pkg/core/types/frame_8141_network.go"
+            "pkg/p2p/ethproto/receipt_tx_codec.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node::TestFrameBlobSidecarThroughActualHTTPAdmission"
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameBlobSidecarThroughActualHTTPAdmission",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C25.3",
@@ -530,7 +583,7 @@
             "github.com/eth2030/eth2030/eth::TestFrameCStructuredReceiptThroughHandler",
             "github.com/eth2030/eth2030/p2p/ethproto::TestCanonicalFrame8141ReceiptPages"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C25.4",
@@ -548,7 +601,7 @@
             "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds",
             "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -569,10 +622,11 @@
             "pkg/txpool/frame_8141.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C26.2",
@@ -591,7 +645,7 @@
             "github.com/eth2030/eth2030/core/block::TestFrameCBuilderOrdersSenderHeadsAtBlobFee",
             "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C26.3",
@@ -610,7 +664,7 @@
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound",
             "github.com/eth2030/eth2030/eth::TestFrameCEvictedAnnouncementSuppression"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C26.4",
@@ -629,7 +683,7 @@
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -643,15 +697,16 @@
             "EIP-8141 Mempool/Behavior/Introspection"
           ],
           "files": [
-            "pkg/rpc/types/types.go",
+            "pkg/node/backend/rpc_backend.go",
             "pkg/rpc/ethapi/eth_api.go",
-            "pkg/node/backend/rpc_backend.go"
+            "pkg/rpc/types/types.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node::TestFrameBlobSidecarThroughActualHTTPAdmission"
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameBlobSidecarThroughActualHTTPAdmission",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C27.2",
@@ -661,18 +716,19 @@
             "EIP-1474 eth_getTransactionByHash: pending block location fields are null"
           ],
           "files": [
-            "pkg/rpc/types/types.go",
-            "pkg/rpc/ethapi/eth_api.go",
             "pkg/node/backend/rpc_backend.go",
             "pkg/rpc/ethapi/direct_api.go",
-            "pkg/rpc/ethapi/txpool_api.go"
+            "pkg/rpc/ethapi/eth_api.go",
+            "pkg/rpc/ethapi/txpool_api.go",
+            "pkg/rpc/types/types.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/rpc/types::TestFrame8141TransactionJSONPreservesEnvelope",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/rpc/ethapi::TestFrameCPendingAndMinedQueryLocations"
+            "github.com/eth2030/eth2030/rpc/ethapi::TestFrame8250TxPoolMapDoesNotAliasLegacyNonce",
+            "github.com/eth2030/eth2030/rpc/ethapi::TestFrameCPendingAndMinedQueryLocations",
+            "github.com/eth2030/eth2030/rpc/types::TestFrame8141TransactionJSONPreservesEnvelope"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C27.3",
@@ -690,7 +746,7 @@
             "github.com/eth2030/eth2030/rpc/types::TestFrame8141ReceiptReadBack",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C27.4",
@@ -700,18 +756,19 @@
             "EIP-1474 eth_getTransactionByHash: pending block location fields are null"
           ],
           "files": [
-            "pkg/rpc/types/types.go",
-            "pkg/rpc/ethapi/eth_api.go",
             "pkg/node/backend/rpc_backend.go",
             "pkg/rpc/ethapi/direct_api.go",
-            "pkg/rpc/ethapi/txpool_api.go"
+            "pkg/rpc/ethapi/eth_api.go",
+            "pkg/rpc/ethapi/txpool_api.go",
+            "pkg/rpc/types/types.go"
           ],
           "tests": [
+            "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart",
             "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/rpc/ethapi::TestFrameCPendingAndMinedQueryLocations"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -735,7 +792,7 @@
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C28.2",
@@ -744,17 +801,18 @@
             "EIP-8141 Mempool/Behavior/Introspection"
           ],
           "files": [
+            "pkg/core/execution/frame_8141.go",
+            "pkg/core/vm/frame_8141.go",
             "pkg/node/backend/frame_simulation.go",
             "pkg/rpc/ethapi/frame_simulation.go",
-            "pkg/rpc/types/frame_simulation.go",
-            "pkg/core/execution/frame_8141.go",
-            "pkg/core/vm/frame_8141.go"
+            "pkg/rpc/types/frame_simulation.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation",
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C28.3",
@@ -773,7 +831,7 @@
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C28.4",
@@ -793,7 +851,7 @@
             "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation",
             "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationTraceLimitIsExplicit"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     },
@@ -808,15 +866,16 @@
             "EIP-8272 Public mempool handling"
           ],
           "files": [
-            "pkg/node/frame_c_integration_test.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/node/backend/engine_fcu.go"
+            "pkg/node/backend/engine_fcu.go",
+            "pkg/node/frame_c_integration_test.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds"
+            "github.com/eth2030/eth2030/eth::TestFrameCAnnouncementFetchMetadataAndBounds",
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C29.2",
@@ -826,15 +885,16 @@
             "EIP-8272 Public mempool handling"
           ],
           "files": [
-            "pkg/node/frame_c_integration_test.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/node/backend/engine_fcu.go"
+            "pkg/node/backend/engine_fcu.go",
+            "pkg/node/frame_c_integration_test.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart"
+            "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrame8250NativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C29.3",
@@ -844,17 +904,19 @@
             "EIP-8272 Public mempool handling"
           ],
           "files": [
-            "pkg/node/frame_c_integration_test.go",
             "pkg/node/backend/engine_backend.go",
-            "pkg/node/backend/engine_fcu.go"
+            "pkg/node/backend/engine_fcu.go",
+            "pkg/node/frame_c_integration_test.go"
           ],
           "tests": [
+            "github.com/eth2030/eth2030/core/block::TestFrame8250BuildImportReorgAndRestart",
+            "github.com/eth2030/eth2030/core/config::TestFrameExtensionActivationAndCompatibility",
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg",
             "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg",
-            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFrameAdmissionTracksForkTimeAndReorg"
+            "github.com/eth2030/eth2030/txpool::TestFrameCValidationDependencyCache"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },
         {
           "id": "C29.4",
@@ -872,7 +934,7 @@
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
             "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals"
           ],
-          "scope": "selected profiles; public gates unchanged"
+          "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         }
       ]
     }
@@ -918,6 +980,16 @@
     "tools/hegota/check_c.py",
     "tools/hegota/test_group_c.py",
     "pkg/txpool/frame_expiry.go",
-    "tools/hegota/README.md"
+    "tools/hegota/README.md",
+    "docs/plans/hegota-c/COMPOSITION.md",
+    "pkg/core/vm/ecrecover_8151.go",
+    "pkg/txpool/frame_signers_8151.go",
+    "pkg/node/genesis_loader.go",
+    "pkg/node/persisted_chain_config.go",
+    "pkg/rpc/ethapi/txpool_api.go",
+    "specs/hegota/profiles.json",
+    "pkg/rpc/ethapi/direct_api.go",
+    "pkg/eiptest/stf.go",
+    "pkg/core/config/frame_extensions_test.go"
   ]
 }

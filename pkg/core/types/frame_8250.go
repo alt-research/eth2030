@@ -19,11 +19,9 @@ const (
 var NonceManager8250 = HexToAddress("0x8250968C12e01A19d6F667b9B2F3b3A4d0e51cB7")
 var NonceManagerCode8250 = []byte{0x60, 0, 0x60, 0, 0xfd}
 
-// FrameTx8250Delta implements the EIP-8250 instruction to replace only the
-// nonce field of EIP-8141. D01 remains open: 8250's three-fee example disagrees
-// with that instruction and 8141's two-fee budget. This isolated profile is NOT
-// a TxData implementation and is never decoded by public transaction readers.
-// It must not be activated on a public chain without a composition decision.
+// FrameTx8250Delta replaces only the EIP-8141 nonce, inheriting its two-field
+// fee budget (EIPs #11968 and #12414). It is also the independent semantic
+// representation used by the nonce conformance vectors.
 type FrameTx8250Delta struct {
 	ChainID             *big.Int
 	NonceKeys           []*big.Int
@@ -185,3 +183,40 @@ func (tx *FrameTx8250Delta) Payment(baseFee, blobFee *big.Int) (*FramePayment, e
 	}
 	return tx.ExecutionFields().paymentForBudget(baseFee, blobFee, budget)
 }
+
+// NewFrameTransaction8250 creates an immutable native transaction with the
+// eight-field envelope. Construction copies all inputs, including nonce keys.
+func NewFrameTransaction8250(profile *FrameTx8250Delta) *Transaction {
+	base := profile.ExecutionFields()
+	base.Nonce = profile.NonceSeq
+	base.nonce8250 = true
+	base.nonceKeys8250 = profile.NonceKeys
+	return NewTransaction(base)
+}
+
+// NonceProfile8250 returns the selected nonce schema, or nil for pre-fork 8141.
+// Nonce is the replay sequence in this profile, not the account nonce.
+func (tx *FrameTx8141) NonceProfile8250() *FrameTx8250Delta {
+	if !tx.nonce8250 {
+		return nil
+	}
+	return &FrameTx8250Delta{ChainID: tx.ChainID, NonceKeys: tx.nonceKeys8250,
+		NonceSeq: tx.Nonce, Sender: tx.Sender, Frames: tx.Frames, Signatures: tx.Signatures,
+		Fees: tx.Fees, BlobVersionedHashes: tx.BlobVersionedHashes}
+}
+
+// SameReplayIdentity compares the exact public replacement identity.
+func (tx *FrameTx8141) SameReplayIdentity(other *FrameTx8141) bool {
+	if tx.Sender != other.Sender || tx.Nonce != other.Nonce || tx.nonce8250 != other.nonce8250 || len(tx.nonceKeys8250) != len(other.nonceKeys8250) {
+		return false
+	}
+	for i, key := range tx.nonceKeys8250 {
+		if key.Cmp(other.nonceKeys8250[i]) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// HasKeyedNonces separates replay sequences from the legacy account nonce.
+func (tx *FrameTx8141) HasKeyedNonces() bool { return tx.nonce8250 && len(tx.nonceKeys8250) > 0 }

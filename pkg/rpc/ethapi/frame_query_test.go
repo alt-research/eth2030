@@ -50,6 +50,9 @@ func TestFrameCPendingAndMinedQueryLocations(t *testing.T) {
 				if err := json.Unmarshal(encoded, &fields); err != nil {
 					t.Fatal(err)
 				}
+				if fields["sender"] != tx.FrameSender().Hex() || fields["fees"] == nil || fields["frames"] == nil {
+					t.Fatal("query adapter lost authenticated Frame fields")
+				}
 				want := map[string]any{"blockHash": nil, "blockNumber": nil, "transactionIndex": nil}
 				if mined {
 					want = map[string]any{"blockHash": backend.Headers[42].Hash().Hex(), "blockNumber": "0x2a", "transactionIndex": "0x3"}
@@ -61,5 +64,17 @@ func TestFrameCPendingAndMinedQueryLocations(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func TestFrame8250TxPoolMapDoesNotAliasLegacyNonce(t *testing.T) {
+	sender := types.Address{19: 42}
+	keyed := types.NewFrameTransaction8250(&types.FrameTx8250Delta{Sender: sender, NonceKeys: []*big.Int{big.NewInt(42)}})
+	ordinary := types.NewTransaction(&types.LegacyTx{Nonce: 0, GasPrice: big.NewInt(1)})
+	txs := map[types.Address][]*types.Transaction{sender: {ordinary, keyed}}
+	content := FormatTxPoolMap(txs)[sender.Hex()]
+	inspect := formatTxPoolInspect(txs)[sender.Hex()]
+	if len(content) != 2 || len(inspect) != 2 || content["0x0"] == nil || content["keyed:"+keyed.Hash().Hex()] == nil {
+		t.Fatal("txpool nonce map overwrote an independent keyed domain")
 	}
 }

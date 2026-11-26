@@ -53,8 +53,11 @@ and then supply its complete successful JSON event log with
 normal and optimized Python modes. CI verifies A, B and C independently.
 
 A green C result qualifies selected-profile consumers. It deliberately reports
-`public_complete: false`: the 8141/8250 combined envelope (D01) and a merged,
-reproducible upstream canonical-paymaster runtime remain specification gates.
+`public_complete: false`: a merged, reproducible upstream canonical-paymaster
+runtime remains unspecified. D01 is resolved for the explicit EIP8250Time
+composition by merged delta/base history and preserved independent vectors;
+its native public consumers are mandatory, as are conditional EIP-8151 signer
+class/gas/share regressions.
 The local paymaster v1 requires an explicit experimental selection. See
 `docs/plans/hegota-c/PLAN.md` and `docs/plans/hegota-c/RPC_PROFILE.md` for exact
 scope and the authenticated simulation contract. No vector expectation or

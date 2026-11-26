@@ -1,5 +1,13 @@
 # Hegota Group C status
 
+## Current public integration follow-through (2026-11-26)
+
+D01 is resolved for the selected native 8141/8250 two-fee composition by merged author/base history, with the earlier decision preserved in profiles.json. See [COMPOSITION.md](../../plans/hegota-c/COMPOSITION.md). The public eight-field reader, explicit EIP8250Time, nonce-domain-aware pool/order/replacement/dependencies, public RPC/P2P/simulation/build/import/reorg/restart consumers and optional EIP8151Time signer protection are implemented. New native tests cover both activation directions, raw-code gas/BAL behavior and separate signer shares. Typed direct queries and txpool indexing also preserve complete keyed fields and independent replay identities.
+
+Final full/race/build/vet and source-bound A/B/C evidence refresh are in progress. The qualification figures below describe the predecessor and must not be reused as evidence for the new code. The upstream canonical-paymaster runtime remains the sole C specification gate; local v1 stays opt-in experimental.
+
+## Historical base-profile qualification
+
 HGT-020–029 mechanisms are locally qualified within the selected profiles, including the follow-up completeness audit. Public composed completion is **not claimed**: D01 and the missing merged reproducible canonical-paymaster runtime remain specification gates. See [the audit](AUDIT.md), [the detailed plan](../../plans/hegota-c/PLAN.md), [the API profile](../../plans/hegota-c/RPC_PROFILE.md) and [the forty-criterion register](../../../specs/hegota/group-c.json).
 
 Implementation source: `0c849a53d86259fffd25b7ee9ee7e46f44a43779`. Subsequent edits are qualification/documentation only. The merged baseline remains `5d777ad06f886c8b20fb010a47e65ddb05df8287`; references and independent oracle expectations were not edited. Upstream EIPs/consensus-specs pins and paymaster PR #12041 were rechecked on 2026-11-26 and remain unchanged.

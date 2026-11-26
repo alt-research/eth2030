@@ -96,6 +96,8 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
+	FrameSignerCanonicalLimit    int    // EIP-8151 local per-signer reserved share (default 64)
+	FrameSignerOtherLimit        int    // separate smaller share (default 8)
 	FramePriceBump               uint64 // both Frame fee fields; zero selects 10 percent
 	FrameBlobPriceBump           uint64 // optional larger blob max_fee increment
 	ExperimentalFramePaymasterV1 bool   // explicit local paymaster profile
@@ -194,37 +196,64 @@ type txSortedList struct {
 	items []*types.Transaction
 }
 
-func (l *txSortedList) Add(tx *types.Transaction) {
-	// Insert maintaining nonce order.
-	idx := sort.Search(len(l.items), func(i int) bool {
-		return l.items[i].Nonce() >= tx.Nonce()
-	})
-	if idx < len(l.items) && l.items[idx].Nonce() == tx.Nonce() {
-		// Replace existing tx with same nonce (if higher gas price).
-		l.items[idx] = tx
-		return
-	}
-	l.items = append(l.items, nil)
-	copy(l.items[idx+1:], l.items[idx:])
-	l.items[idx] = tx
+// Keyed Frames share no scalar ordering with ordinary account transactions.
+// Keep them after the nonce-ordered ordinary sequence without aliasing its keys.
+func keyedFrame8250(tx *types.Transaction) bool {
+	frame, ok := tx.Inner().(*types.FrameTx8141)
+	return ok && frame.HasKeyedNonces()
 }
-
-func (l *txSortedList) Remove(nonce uint64) bool {
+func samePoolIdentity(a, b *types.Transaction) bool {
+	af, ao := a.Inner().(*types.FrameTx8141)
+	bf, bo := b.Inner().(*types.FrameTx8141)
+	if ao && bo {
+		return af.SameReplayIdentity(bf)
+	}
+	return !keyedFrame8250(a) && !keyedFrame8250(b) && a.Nonce() == b.Nonce()
+}
+func (l *txSortedList) Add(tx *types.Transaction) {
+	for i, old := range l.items {
+		if samePoolIdentity(old, tx) {
+			l.items[i] = tx
+			return
+		}
+	}
+	l.items = append(l.items, tx)
+	sort.SliceStable(l.items, func(i, j int) bool {
+		a, b := l.items[i], l.items[j]
+		if keyedFrame8250(a) != keyedFrame8250(b) {
+			return !keyedFrame8250(a)
+		}
+		return a.Nonce() < b.Nonce()
+	})
+}
+func (l *txSortedList) RemoveTx(candidate *types.Transaction) bool {
 	for i, tx := range l.items {
-		if tx.Nonce() == nonce {
+		if tx.Hash() == candidate.Hash() {
 			l.items = append(l.items[:i], l.items[i+1:]...)
 			return true
 		}
 	}
 	return false
 }
-
+func (l *txSortedList) Remove(nonce uint64) bool {
+	if tx := l.Get(nonce); tx != nil {
+		return l.RemoveTx(tx)
+	}
+	return false
+}
 func (l *txSortedList) Get(nonce uint64) *types.Transaction {
-	idx := sort.Search(len(l.items), func(i int) bool {
-		return l.items[i].Nonce() >= nonce
-	})
-	if idx < len(l.items) && l.items[idx].Nonce() == nonce {
-		return l.items[idx]
+	for _, tx := range l.items {
+		if !keyedFrame8250(tx) && tx.Nonce() == nonce {
+			return tx
+		}
+	}
+	return nil
+}
+func (l *txSortedList) Replacement(candidate *types.Transaction) *types.Transaction {
+	for _, tx := range l.items {
+		if samePoolIdentity(tx, candidate) {
+			return tx
+		}
 	}
 	return nil
 }
@@ -238,7 +267,7 @@ func (l *txSortedList) Ready(baseNonce uint64) []*types.Transaction {
 	var ready []*types.Transaction
 	expectedNonce := baseNonce
 	for _, tx := range l.items {
-		if tx.Nonce() != expectedNonce {
+		if keyedFrame8250(tx) || tx.Nonce() != expectedNonce {
 			break
 		}
 		ready = append(ready, tx)
@@ -434,6 +463,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Check nonce relative to state to decide pending vs queue.
 	stateNonce := pool.state.GetNonce(from)
+	if keyedFrame8250(tx) {
+		stateNonce = tx.Nonce()
+	} // selected slots already validated
 	if err := corestate.ReadError(pool.state); err != nil {
 		return fmt.Errorf("txpool state: %w", err)
 	}
@@ -573,7 +605,7 @@ func (pool *TxPool) senderTxCount(from types.Address) int {
 func (pool *TxPool) checkReplacement(from types.Address, tx *types.Transaction) (bool, error) {
 	// Check pending list first.
 	if list, ok := pool.pending[from]; ok {
-		if old := list.Get(tx.Nonce()); old != nil {
+		if old := list.Replacement(tx); old != nil {
 			if !pool.hasSufficientBump(old, tx) {
 				return false, ErrReplacementUnderpriced
 			}
@@ -583,7 +615,7 @@ func (pool *TxPool) checkReplacement(from types.Address, tx *types.Transaction) 
 	}
 	// Check queue.
 	if list, ok := pool.queue[from]; ok {
-		if old := list.Get(tx.Nonce()); old != nil {
+		if old := list.Replacement(tx); old != nil {
 			if !pool.hasSufficientBump(old, tx) {
 				return false, ErrReplacementUnderpriced
 			}
@@ -601,7 +633,7 @@ func (pool *TxPool) hasSufficientBump(oldTx, newTx *types.Transaction) bool {
 	oldFrame, oldCanonical := oldTx.Inner().(*types.FrameTx8141)
 	newFrame, newCanonical := newTx.Inner().(*types.FrameTx8141)
 	if oldCanonical || newCanonical {
-		if !oldCanonical || !newCanonical {
+		if !oldCanonical || !newCanonical || !oldFrame.SameReplayIdentity(newFrame) {
 			return false
 		}
 		bump := pool.config.FramePriceBump
@@ -1128,8 +1160,15 @@ func (pool *TxPool) promoteQueue(from types.Address) {
 	pendingList := pool.pending[from]
 	var nextNonce uint64
 	if pendingList != nil && pendingList.Len() > 0 {
-		last := pendingList.items[pendingList.Len()-1]
-		nextNonce = last.Nonce() + 1
+		nextNonce = pool.state.GetNonce(from)
+		for _, tx := range pendingList.items {
+			if !keyedFrame8250(tx) {
+				if tx.Nonce() == ^uint64(0) {
+					return
+				}
+				nextNonce = tx.Nonce() + 1
+			}
+		}
 	} else {
 		nextNonce = pool.state.GetNonce(from)
 	}
@@ -1138,7 +1177,7 @@ func (pool *TxPool) promoteQueue(from types.Address) {
 	promoted := queueList.Ready(nextNonce)
 	for _, tx := range promoted {
 		pool.addPending(from, tx)
-		queueList.Remove(tx.Nonce())
+		queueList.RemoveTx(tx)
 		txpoolLog.Debug("tx_promoted",
 			"event", "tx_promoted",
 			"hash", tx.Hash().Hex(),
@@ -1187,7 +1226,15 @@ func (pool *TxPool) PendingFlat() []*types.Transaction {
 			continue
 		}
 		txs := make([]*types.Transaction, len(list.items))
-		copy(txs, list.items) // list.items is already nonce-sorted
+		copy(txs, list.items) // ordinary transactions remain nonce-sorted
+		if keyedFrame8250(txs[len(txs)-1]) {
+			keyed := txs[len(txs)-1]
+			groups = append(groups, senderGroup{txs: []*types.Transaction{keyed}, headPrice: EffectiveGasPriceAt(keyed, pool.baseFee, pool.blobBaseFee)})
+			txs = txs[:len(txs)-1]
+			if len(txs) == 0 {
+				continue
+			}
+		}
 		groups = append(groups, senderGroup{
 			txs:       txs,
 			headPrice: EffectiveGasPriceAt(txs[0], pool.baseFee, pool.blobBaseFee),
@@ -1241,7 +1288,7 @@ func (pool *TxPool) Remove(hash types.Hash) {
 	wasPending := false
 
 	if list, ok := pool.pending[from]; ok {
-		if list.Remove(tx.Nonce()) {
+		if list.RemoveTx(tx) {
 			wasPending = true
 		}
 		if list.Len() == 0 {
@@ -1249,7 +1296,7 @@ func (pool *TxPool) Remove(hash types.Hash) {
 		}
 	}
 	if list, ok := pool.queue[from]; ok {
-		list.Remove(tx.Nonce())
+		list.RemoveTx(tx)
 		if list.Len() == 0 {
 			delete(pool.queue, from)
 		}
@@ -1310,7 +1357,7 @@ func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 			for addr, list := range lists {
 				for _, tx := range append([]*types.Transaction(nil), list.items...) {
 					if _, canonical := tx.Inner().(*types.FrameTx8141); tx.Type() == types.FrameTxType && !canonical {
-						list.Remove(tx.Nonce())
+						list.RemoveTx(tx)
 						pool.lookup.Remove(tx.Hash())
 					}
 				}
@@ -1327,6 +1374,9 @@ func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 		var toRemove []uint64
 		var toQueue []*types.Transaction
 		for _, tx := range list.items {
+			if keyedFrame8250(tx) {
+				continue
+			}
 			if tx.Nonce() < stateNonce {
 				// Confirmed: evict from pool entirely.
 				toRemove = append(toRemove, tx.Nonce())
@@ -1343,7 +1393,7 @@ func (pool *TxPool) Reset(stateReader StateReader, heads ...*types.Header) {
 		}
 		totalConfirmed += len(toRemove)
 		for _, tx := range toQueue {
-			list.Remove(tx.Nonce())
+			list.RemoveTx(tx)
 			pool.addQueue(addr, tx)
 		}
 		totalDemoted += len(toQueue)
@@ -1609,6 +1659,10 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 			continue
 		}
 		last := list.items[list.Len()-1]
+		if keyedFrame8250(last) && list.Len() > 1 {
+			ordinary := list.items[list.Len()-2]
+			candidates = append(candidates, candidate{tx: ordinary, from: addr, price: EffectiveGasPriceAt(ordinary, baseFee, pool.blobBaseFee)})
+		}
 		candidates = append(candidates, candidate{
 			tx:    last,
 			from:  addr,
@@ -1659,7 +1713,7 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 	pool.lookup.Remove(c.tx.Hash())
 	if c.queue {
 		if list, ok := pool.queue[c.from]; ok {
-			list.Remove(c.tx.Nonce())
+			list.RemoveTx(c.tx)
 			if list.Len() == 0 {
 				delete(pool.queue, c.from)
 			}
@@ -1668,7 +1722,7 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 		// Evicting the tail pending tx: just remove it. The remaining lower-nonce
 		// txs form a valid contiguous sequence — no cascade needed.
 		if list, ok := pool.pending[c.from]; ok {
-			list.Remove(c.tx.Nonce())
+			list.RemoveTx(c.tx)
 			if list.Len() == 0 {
 				delete(pool.pending, c.from)
 			}
@@ -1708,7 +1762,7 @@ func (pool *TxPool) SetBaseFee(baseFee *big.Int) {
 			}
 		}
 		for _, tx := range demote {
-			list.Remove(tx.Nonce())
+			list.RemoveTx(tx)
 			pool.addQueue(addr, tx)
 			txpoolLog.Debug("tx_demoted",
 				"event", "tx_demoted",

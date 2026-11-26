@@ -74,8 +74,12 @@ func TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion(t *testing.T
 				t.Fatal("consumed single-use key retained")
 			}
 			raw, _ := tx.Encode()
-			if _, err := types.DecodeTxRLP(raw); err == nil {
-				t.Fatal("isolated keyed envelope escaped D01 public decoding gate")
+			public, err := types.DecodeTxRLP(raw)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := native.AddRemote(public); err == nil {
+				t.Fatal("keyed envelope admitted before activation")
 			}
 		})
 	}

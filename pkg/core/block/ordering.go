@@ -46,6 +46,11 @@ func orderTransactionsAt(input []*types.Transaction, baseFee, blobFee *big.Int) 
 				key = "sender:" + from.Hex()
 			}
 		}
+		// Keyed replay domains are independent of the account-nonce sequence.
+		// Public policy admits one per sender; private input can contain many.
+		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && frame.HasKeyedNonces() {
+			key = "keyed:" + tx.Hash().Hex()
+		}
 		if _, exists := groups[key]; !exists {
 			order[key] = len(order)
 		}

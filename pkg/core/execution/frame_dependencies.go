@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"math/big"
 	"sort"
 )
@@ -24,6 +25,7 @@ const (
 	FrameCodeDependency
 	FrameExistenceDependency
 	FrameStorageDependency
+	FrameSignerClassDependency
 )
 
 func (d FrameDependency) Value(db state.StateDB) string {
@@ -40,6 +42,11 @@ func (d FrameDependency) Value(db state.StateDB) string {
 			return "1"
 		}
 		return "0"
+	case FrameSignerClassDependency:
+		if vm.PermittedRecoveryCode8151(db.GetCode(d.Address)) {
+			return "permitted"
+		}
+		return "rejected"
 	case FrameStorageDependency:
 		v := db.GetState(d.Address, d.Slot)
 		return string(v[:])
@@ -48,10 +55,18 @@ func (d FrameDependency) Value(db state.StateDB) string {
 	}
 }
 
+type FrameSignerRecovery8151 struct {
+	Address   types.Address
+	Canonical bool
+	Pay       bool
+	Paymaster types.Address
+}
+
 type FramePrefixValidation struct {
-	Profile      string // caller-selected execution/activation profile
-	Payer        types.Address
-	Dependencies map[FrameDependency]string
+	SignerRecoveries []FrameSignerRecovery8151
+	Profile          string // caller-selected execution/activation profile
+	Payer            types.Address
+	Dependencies     map[FrameDependency]string
 }
 
 func (v *FramePrefixValidation) Unchanged(db state.StateDB) bool {
@@ -67,6 +82,7 @@ func (v *FramePrefixValidation) Unchanged(db state.StateDB) bool {
 }
 
 type frameReadSet struct {
+	sender         types.Address
 	directBalances map[types.Address]struct{} // actual balance reads, separate from conservative Empty dependencies
 	state.StateDB
 	reads map[FrameDependency]struct{}
@@ -158,4 +174,12 @@ func (s *frameReadSet) checkPublicBalances(sender, payer types.Address) error {
 		}
 	}
 	return nil
+}
+
+// A recovery depends on its raw-code class, not the hash of permitted code.
+func (s *frameReadSet) FrameRecoveryCode8151(address types.Address) []byte {
+	if address != s.sender {
+		s.record(address, FrameSignerClassDependency, types.Hash{})
+	}
+	return s.StateDB.GetCode(address)
 }

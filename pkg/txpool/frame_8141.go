@@ -48,6 +48,9 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 	if pool.frameConfig == nil || !pool.frameConfig.IsMerge() || !pool.frameConfig.IsHogota(pool.frameTime) {
 		return nil, errors.New("EIP-8141 requires Bogotá")
 	}
+	if (frame.NonceProfile8250() != nil) != pool.frameConfig.IsEIP8250(pool.frameTime) {
+		return nil, errors.New("Frame nonce schema does not match EIP-8250 activation")
+	}
 	prefixEnd, err := frame.ValidationPrefix8141(pool.frameTime)
 	if err != nil {
 		return nil, err
@@ -68,7 +71,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 	if !ok {
 		return nil, errors.New("Frame validation requires a snapshot-capable StateDB")
 	}
-	if frame.Nonce != db.GetNonce(frame.Sender) {
+	if !frame.HasKeyedNonces() && frame.Nonce != db.GetNonce(frame.Sender) {
 		return nil, errors.New("Frame public nonce must match the current sender nonce")
 	}
 	budget, err := frame.GasBudget()
@@ -116,6 +119,9 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 		}
 		validation.Profile = profile
 	}
+	if err := pool.validateFrameSigners8151(frame, validation); err != nil {
+		return nil, err
+	}
 	payer := validation.Payer
 	reserved := frameMaxFee(frame.Fees.MaxFee)
 	canonical := pool.config.ExperimentalFramePaymasterV1 && frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
@@ -128,7 +134,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 		if !ok {
 			continue
 		}
-		if other.Sender == frame.Sender && other.Nonce == frame.Nonce {
+		if other.SameReplayIdentity(frame) {
 			continue
 		}
 		if other.Sender == frame.Sender {
@@ -180,7 +186,7 @@ func (pool *TxPool) removeFrameLocked(hash types.Hash) {
 	pool.lookup.Remove(hash)
 	for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
 		if list := lists[from]; list != nil {
-			list.Remove(tx.Nonce())
+			list.RemoveTx(tx)
 			if list.Len() == 0 {
 				delete(lists, from)
 			}
@@ -244,7 +250,7 @@ func (pool *TxPool) fitsBytes(tx *types.Transaction, from types.Address) bool {
 		return false
 	}
 	for _, pending := range pool.lookup.all {
-		if pool.senderOf(pending) == from && pending.Nonce() == tx.Nonce() {
+		if pool.senderOf(pending) == from && samePoolIdentity(pending, tx) {
 			continue
 		}
 		part := transactionPoolBytes(pending)

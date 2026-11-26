@@ -20,7 +20,11 @@ import (
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
-func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) { runFrameCNativePeers(t, false) }
+func TestFrame8250NativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+	runFrameCNativePeers(t, true)
+}
+func runFrameCNativePeers(t *testing.T, keyed bool) {
 	for _, blob := range []bool{false, true} {
 		t.Run(fmt.Sprintf("blob_%t", blob), func(t *testing.T) {
 			const token = "frame-c-native"
@@ -31,10 +35,20 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 				t.Fatal(err)
 			}
-			genesis["gasLimit"] = "0x186a0"
+			gasLimit := "0x186a0"
+			if keyed {
+				gasLimit = "0x61a80"
+			}
+			genesis["gasLimit"] = gasLimit
 			spec := genesis["config"].(map[string]any)
 			spec["terminalTotalDifficulty"], spec["amsterdamTime"], spec["bogotaTime"] = 0, 0, 0
+			if keyed {
+				spec["eip8250Time"] = 0
+			}
 			alloc := genesis["alloc"].(map[string]any)
+			if keyed {
+				alloc[types.NonceManager8250.Hex()] = map[string]string{"nonce": "1", "code": "0x60006000fd", "balance": "0"}
+			}
 			alloc[sender.Hex()] = map[string]string{"balance": "1000000000000000000"}
 			alloc[target.Hex()] = map[string]string{"balance": "0", "nonce": "1", "code": "0x60015f555f5fa060425f5360015ff3"}
 			rawGenesis, _ := json.Marshal(genesis)
@@ -62,6 +76,10 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 				{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000}},
 				{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: 30000, State: 97920}},
 			}, Signatures: []types.FrameSignature{{Scheme: types.FrameSignatureSecp256k1, Signature: make([]byte, 65)}}}
+			if keyed {
+				frame.Frames[0].Limits.State = types.KeyedNonceFirstUseStateGas8250
+				frame = types.NewFrameTransaction8250(&types.FrameTx8250Delta{ChainID: frame.ChainID, Sender: sender, NonceKeys: []*big.Int{big.NewInt(42)}, NonceSeq: ^uint64(0), Frames: frame.Frames, Signatures: frame.Signatures, Fees: frame.Fees}).Inner().(*types.FrameTx8141)
+			}
 			var sidecar *types.BlobSidecarData
 			if blob {
 				data := make([]byte, types.FrameBytesPerBlob)
@@ -186,6 +204,11 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			if pending["sender"] != sender.Hex() || pending["type"] != "0x6" {
 				t.Fatal("pending query lost Frame fields")
 			}
+			if keyed {
+				if pending["nonceSeq"] != "0xffffffffffffffff" || pending["nonce"] != nil || !reflect.DeepEqual(pending["nonceKeys"], []any{"0x2a"}) {
+					t.Fatalf("keyed pending schema: %+v", pending)
+				}
+			}
 			for _, field := range []string{"blockHash", "blockNumber", "transactionIndex"} {
 				if value, present := pending[field]; !present || value != nil {
 					t.Fatalf("EIP-1474 pending %s must be present and null, got %v", field, value)
@@ -193,7 +216,7 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			}
 			// Build on the receiving node exclusively from its P2P-populated pool.
 			beacon := types.Hash{31: 1}
-			attrs := map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 0xfe}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x186a0", "inclusionListTransactions": []string{}}
+			attrs := map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{19: 0xfe}, "parentBeaconBlockRoot": beacon, "targetGasLimit": gasLimit, "inclusionListTransactions": []string{}}
 			var fc payload.ForkchoiceUpdatedResult
 			b.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: receiver.Blockchain().Genesis().Hash()}, attrs)
 			if fc.PayloadID == nil || fc.PayloadStatus.Status != "VALID" {
@@ -223,6 +246,12 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 			}
 			if source.Blockchain().State().GetRoot() != receiver.Blockchain().State().GetRoot() {
 				t.Fatal("native imports differ on state root")
+			}
+			if keyed {
+				slot := types.NonceSlot8250(sender, big.NewInt(42))
+				if receiver.Blockchain().State().GetNonce(sender) != 0 || receiver.Blockchain().State().GetState(types.NonceManager8250, slot) != types.BytesToHash(new(big.Int).SetUint64(^uint64(0)).Bytes()) {
+					t.Fatal("public keyed import altered account nonce or lost single-use state")
+				}
 			}
 			var mined map[string]any
 			b.call(t, "eth_getTransactionByHash", &mined, tx.Hash().Hex())

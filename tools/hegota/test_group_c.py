@@ -23,9 +23,21 @@ class GroupCIntegrityTests(unittest.TestCase):
     def test_duplicate_criterion_rejected(self):
         m=copy.deepcopy(self.manifest);m['tasks'][0]['criteria'][1]=m['tasks'][0]['criteria'][0]
         with self.assertRaises(ValueError):validate_manifest(ROOT,m)
-    def test_public_nonce_gate_cannot_open(self):
-        self.manifest['profiles']['8250-delta']['public_activation']=True
-        with self.assertRaises(ValueError):validate_manifest(ROOT,self.manifest)
+    def test_unqualified_public_composition_rejected(self):
+        for field,value in [('fees',['max_priority_fee_per_gas','max_fee_per_gas','max_fee_per_blob_gas']),('activation','HogotaTime'),('decision','D01-open')]:
+            manifest=copy.deepcopy(self.manifest)
+            manifest['profiles']['8250-public'][field]=value
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
+    def test_conditional_signer_profile_required(self):
+        del self.manifest['profiles']['8151-conditional']
+        with self.assertRaises((ValueError,KeyError)):validate_manifest(ROOT,self.manifest)
+    def test_public_integration_boundaries_required(self):
+        for boundary in ['TestFrame8250NativePeersPoolBuildSimulationAndRestart','TestFrame8250PublicExecutionSchemaBoundary','TestFrame8250PublicIdentityDependenciesAndForkEviction','TestEIP8151CallFamiliesAndOuterRevert','TestFrame8151ReservedAndOtherDigestShares','TestFrame8151PayRecoveriesCountDistinctPaymasters','TestFrame8250TxPoolMapDoesNotAliasLegacyNonce']:
+            manifest=copy.deepcopy(self.manifest)
+            for row in manifest['tasks']:
+                for criterion in row['criteria']:
+                    criterion['tests']=[test for test in criterion['tests'] if boundary not in test]
+            with self.assertRaises(ValueError):validate_manifest(ROOT,manifest)
     def test_local_template_cannot_be_canonical(self):
         self.manifest['profiles']['paymaster-v1']['upstream_canonical']=True
         with self.assertRaises(ValueError):validate_manifest(ROOT,self.manifest)

@@ -107,10 +107,11 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
-	OnFrameLegacyNonceRead       func(types.Address) // optional isolated-profile dependency instrumentation
-	FrameObserver                FrameObserver       // optional bounded per-frame simulation observer
-	ExperimentalFramePaymasterV1 bool                // local research template; not upstream canonical code
-	Context                      context.Context     // optional cancellation for isolated RPC execution
+	OnFrameLegacyNonceRead       func(types.Address)                                  // optional nonce dependency instrumentation
+	OnFrameRecovery8151          func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
+	FrameObserver                FrameObserver                                        // optional bounded per-frame simulation observer
+	ExperimentalFramePaymasterV1 bool                                                 // local research template; not upstream canonical code
+	Context                      context.Context                                      // optional cancellation for isolated RPC execution
 	Debug                        bool
 	Tracer                       EVMLogger
 	MaxCallDepth                 int
@@ -264,6 +265,7 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 // the correct jump table. The caller (processor) converts ChainConfig.Rules
 // into this struct to avoid a circular import.
 type ForkRules struct {
+	IsEIP8151        bool // raw-code restricted ecRecover
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
 	IsGlamsterdan    bool
 	IsLegacyFrames   bool
@@ -666,7 +668,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 	// Execute precompile or contract code.
 	if isPrecompile {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		if err != nil {
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
@@ -785,7 +787,7 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 		defer func() { evm.finishStateGasFrame(meter, &gasLeft, err) }()
 	}
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		return ret, gasLeft, err
 	}
 
@@ -848,7 +850,7 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 		defer func() { evm.finishStateGasFrame(meter, &gasLeft, err) }()
 	}
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		return ret, gasLeft, err
 	}
 
@@ -924,7 +926,7 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 
 	// Check for precompiled contract.
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		if err != nil {
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}

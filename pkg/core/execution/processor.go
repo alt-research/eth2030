@@ -734,6 +734,7 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		}
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
+			IsEIP8151:        config.IsEIP8151(header.Time),
 			IsGlamsterdan:    rules.IsGlamsterdan,
 			IsLegacyFrames:   config.IsLegacyFrameEnabledAt(header.Number, header.Time),
 			IsAmsterdam:      rules.IsAmsterdam,

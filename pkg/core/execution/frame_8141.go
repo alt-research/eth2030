@@ -40,7 +40,7 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
 		return nil, err
 	}
-	copied := &frameReadSet{StateDB: db.Dup(), reads: make(map[FrameDependency]struct{})}
+	copied := &frameReadSet{StateDB: db.Dup(), sender: frame.Sender, reads: make(map[FrameDependency]struct{})}
 	copied.SetTxContext(tx.Hash(), 0)
 	// Check exact code and complete age/storage predicates even when a malicious
 	// runtime would return without executing SLOTNUM or SLOAD.
@@ -58,7 +58,19 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 			}
 		}
 	}
-	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee, vm.Config{ExperimentalFramePaymasterV1: experimentalPaymasterV1})
+	recoveries := make(map[FrameSignerRecovery8151]struct{})
+	canonicalHash := tx.SigningHash()
+	tracing := vm.Config{OnFrameRecovery8151: func(address types.Address, digest types.Hash, paymaster types.Address, pay bool) {
+		if address == frame.Sender {
+			return
+		}
+		if !pay {
+			paymaster = types.Address{}
+		}
+		recoveries[FrameSignerRecovery8151{Address: address, Canonical: digest == canonicalHash, Pay: pay, Paymaster: paymaster}] = struct{}{}
+	}, ExperimentalFramePaymasterV1: experimentalPaymasterV1,
+		OnFrameLegacyNonceRead: func(addr types.Address) { copied.record(addr, FrameNonceDependency, types.Hash{}) }}
+	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee, tracing)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +82,9 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 		copied.GetState(receipt.Payer, types.BytesToHash([]byte{3}))
 	}
 	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
+	for recovery := range recoveries {
+		result.SignerRecoveries = append(result.SignerRecoveries, recovery)
+	}
 	for dep := range copied.reads {
 		result.Dependencies[dep] = dep.Value(db)
 	}
@@ -89,6 +104,14 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	}
 	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
 		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
+	}
+	// Explicit research callers pass a profile; public callers must match the
+	// schema selected at this exact block timestamp. No fork-state installation.
+	if profile == nil {
+		profile = tx.NonceProfile8250()
+		if (profile != nil) != config.IsEIP8250(header.Time) {
+			return nil, 0, errors.New("Frame nonce schema does not match EIP-8250 activation")
+		}
 	}
 	var legacyNonce uint64
 	var budget types.FrameGasBudget

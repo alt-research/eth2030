@@ -18,9 +18,9 @@ Implement only rules belonging to the selected profile. Public-pool rejection mu
 
 Recheck source identities before publishing. Reference contents remain read-only. Any changed normative source must get a dated impact record; conditional proposals do not enter the public path from helper presence.
 
-## Explicit unresolved/profile boundaries
+## Composition decisions and unresolved/profile boundaries
 
-1. **D01, keyed nonces:** EIP-8250 says to replace only nonce fields but retains a stale three-fee example conflicting with EIP-8141's two-fee budget. Preserve B's isolated nonce-only delta. Implement/test selected-key identity, one pending transaction per sender, dependencies and replacement in an explicitly isolated policy consumer. Public decoding, gossip, activation or database migration requires an authoritative combined schema. An isolated consumer does not qualify public composed interoperability.
+1. **D01 resolved for the selected native profile:** inherit the current two-field EIP-8141 fee budget and replace only the nonce position. The explicit EIP8250Time selects the eight-field public envelope. Merged author/base history and the actual pinned EELS branch establish composition; see [the decision and boundaries](COMPOSITION.md). Nil leaves the base format selected; historical decoding does not bypass activation checks. Independent isolated oracle expectations remain frozen.
 2. **Canonical paymaster recognition:** the merged Solidity asset uses a calldata signature over the hash covering that calldata and contains nonstandard inline `verbatim` bindings. It supplies no frozen compiled runtime/settings. ETH2030 paymaster v1 changes witness handling and is explicitly local. An official canonical-code exception cannot be claimed for those bytes. Keep exact code recognition/versioning mechanically separate from generic/default-code sponsorship and from any expressly selected research template. PR #12041 is tracked as an alternative, not merged authority. Do not rewrite the merged reference to manufacture equivalence.
 3. **Noncanonical paymasters:** the canonical subsection contains a restrictive sentence, while Policy Summary, Paymasters, Non-canonical paymaster, Replacement and Eviction and rationale explicitly admit noncanonical paymasters. Apply the specific noncanonical rules (generic trace rules, cap one, maximum-fee exposure), without extending the canonical trace exception. Document this textual inconsistency rather than deleting the specific rules.
 4. **RPC/simulation:** EIP-8141 specifies consensus data and requires per-frame/dimensional estimates, but does not standardize a complete JSON simulation schema. Freeze a documented ETH2030 API profile before implementing it. A type-6 call must never fall through ordinary CALL parsing. A scalar gas result is not a substitute for per-frame execution/state budgets. Signed payload fields cannot be mutated in a gas search while claiming unchanged authentication or signing hash.
@@ -49,7 +49,7 @@ These boundaries are tracked separately from implemented mechanisms and executed
 - **C22.1 roots:** enforce exact verifier grammar/runtime and tuple predicates; duplicates are allowed, with distinct dependency records. Cover 1/16/17 tuples, malformed lengths and 8191/8192 boundaries.
 - **C22.2 context:** admission SLOTNUM is canonical head slot+1, checked for overflow; it does not tick through skipped empty slots. Payload inclusion uses the exact proposed header slot and timestamp. Root-age eviction and optional local admission margin are explicit; a timestamp-derived slot is forbidden.
 - **C22.3 dependency lifecycle:** expiry queue and reverse indices are updated on replacement/removal. Revalidate complete age/storage predicates on relevant changes, lost deployment, code change, activation rollback and long reorg. All 16 prefix shapes remain bounded by the shared validation budget.
-- **C22.4 isolated keyed policy:** canonical key sets/sequence identity, max one pending per sender even for disjoint keys, overlapping/nonoverlapping pre-state changes, MAX exhaustion and optional pre-state legacy-nonce dependency. No public route or envelope activation bypasses D01.
+- **C22.4 public keyed profile:** exact inherited two-fee encoding; explicit timestamp activation; complete selected-key/sequence replacement identity, one pending Frame per sender, MAX exhaustion, optional pre-state legacy-nonce dependency, schema eviction across fork/reorg and independent ordinary account-nonce ordering. Public RPC, P2P, builder/import and restart must consume the same signed envelope. Preserve isolated numeric/wire expectations.
 
 ### HGT-023: payer exposure and paymasters
 
@@ -109,3 +109,22 @@ These boundaries are tracked separately from implemented mechanisms and executed
 5. Native two-peer, ordinary builder, recovery/reorg end-to-end qualification and complete criterion register (HGT-029).
 
 Reuse existing canonical execution and interfaces. Completion reports separate implemented mechanisms, tested selected profiles and unresolved public interoperability gates. No missing authoritative schema/template/API is replaced by an invented consensus rule.
+
+## Conditional signer protection and public keyed API
+
+The November 26 composition follow-through implements EIP-8151 only under
+explicit EIP8151Time with the EIP-8038 prerequisite. Its merged Public Mempool
+section applies immediately to that selected profile: paid raw-code class
+reads, both-direction revalidation including reorg, separate helper hash
+tracking, reserved canonical-digest and smaller other-digest shares, and PAY
+counting once per distinct paymaster separately from other frames. The default
+shares are 64/8, configurable local limits. Generic PAY remains traced; no
+unmerged runtime receives canonical status. See COMPOSITION.md for source
+history and why the canonical runtime gate remains open.
+
+Keyed transaction JSON carries nonceKeys and nonceSeq, omitting the scalar nonce
+field; eth_getTransactionCount remains the account nonce. txpool_content and
+txpool_inspect use keyed:<transaction-hash> for keyed entries within the sender
+map so ordinary scalar entries cannot collide. This is a local API convention,
+not an EIP wire field. Simulation uses the schema selected by the exact
+simulation timestamp, including explicit hypothetical time overrides.

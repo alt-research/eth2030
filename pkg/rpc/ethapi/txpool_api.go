@@ -280,7 +280,7 @@ func formatTxPoolInspect(txMap map[types.Address][]*types.Transaction) map[strin
 		addrHex := encodeAddress(addr)
 		nonceMap := make(map[string]string)
 		for _, tx := range txs {
-			nonceStr := encodeUint64(tx.Nonce())
+			nonceStr := txPoolReplayKey(tx)
 			nonceMap[nonceStr] = fmt.Sprintf("%s: %s gas", encodeBigInt(tx.Value()), encodeUint64(tx.Gas()))
 		}
 		result[addrHex] = nonceMap
@@ -300,7 +300,7 @@ func formatTxPoolMap(txMap map[types.Address][]*types.Transaction) map[string]ma
 		addrHex := encodeAddress(addr)
 		nonceMap := make(map[string]*RPCTransaction)
 		for _, tx := range txs {
-			nonceStr := encodeUint64(tx.Nonce())
+			nonceStr := txPoolReplayKey(tx)
 			nonceMap[nonceStr] = FormatTransaction(tx, nil, nil, nil, 0, nil)
 		}
 		result[addrHex] = nonceMap
@@ -355,4 +355,14 @@ func EffectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
 		effective.Set(tx.GasFeeCap())
 	}
 	return effective
+}
+
+// The legacy nonce map cannot identify an independent keyed replay domain.
+// This local txpool API uses a hash key for keyed Frames to avoid silently
+// overwriting an ordinary transaction with the same integer sequence.
+func txPoolReplayKey(tx *types.Transaction) string {
+	if frame, ok := tx.Inner().(*types.FrameTx8141); ok && frame.HasKeyedNonces() {
+		return "keyed:" + tx.Hash().Hex()
+	}
+	return encodeUint64(tx.Nonce())
 }

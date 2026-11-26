@@ -60,7 +60,7 @@ func ValidateFrame8250DeltaPrefix(cfg *config.ChainConfig, db state.StateDB, hea
 	if _, err := tx.ValidationPrefix8250(header.Time); err != nil {
 		return nil, err
 	}
-	copied := &frameReadSet{StateDB: db.Dup(), reads: make(map[FrameDependency]struct{})}
+	copied := &frameReadSet{StateDB: db.Dup(), sender: tx.Sender, reads: make(map[FrameDependency]struct{})}
 	if copied.GetNonce(types.NonceManager8250) == 0 || string(copied.GetCode(types.NonceManager8250)) != string(types.NonceManagerCode8250) {
 		return nil, errors.New("isolated EIP-8250 profile requires deployed nonce manager")
 	}

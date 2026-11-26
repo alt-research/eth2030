@@ -69,6 +69,8 @@ func (c *ChainConfig) ForkSchedule() []ForkID {
 		{Name: "Amsterdam", Timestamp: c.AmsterdamTime},
 		{Name: "Glamsterdan", Timestamp: c.GlamsterdanTime},
 		{Name: "Hogota", Timestamp: c.HogotaTime},
+		{Name: "EIP8250", Timestamp: c.EIP8250Time},
+		{Name: "EIP8151", Timestamp: c.EIP8151Time},
 		{Name: "IPlus", Timestamp: c.IPlusTime},
 		{Name: "SSZBlocks", Timestamp: c.SSZBlockTime},
 	}

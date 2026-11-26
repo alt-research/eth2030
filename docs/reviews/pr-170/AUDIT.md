@@ -43,3 +43,33 @@ A second confirmed omission affected pending `eth_getTransactionByHash` results:
 A third omission was in the selected client simulation contract rather than an EIP consensus rule: opcode traces silently truncated at `traceLimit` and returned success, contrary to `RPC_PROFILE.md`'s explicit capture-exhaustion error. The pre-fix boundary consumer reproduces a four-step execution reported as a complete three-step trace. Frame simulation now retains at most one bounded sentinel step to distinguish an exact fit from overflow and rejects overflow explicitly, preserving the general tracer's existing behavior. Exact-limit and untraced settlement/no-state-effect controls pass. The native API consumer also explicitly checks ordinary `eth_simulateV1` acceptance and type-6 rejection.
 
 The generic prefix storage-read/state-write checks also omitted EIP-1153 transient storage. EIP-8141's state-write exceptions explicitly permit sender SSTORE and sender code installation; TSTORE has no additional exception. TLOAD remains subject to the sender storage boundary. The new ordinary-VM deployment consumer reproduces acceptance of factory TSTORE, factory TLOAD and constructor TSTORE on prior code. Public checks now cover transient storage at every call depth, including caught helper writes, while allowing sender TLOAD and preserving private consensus execution and state isolation. This applies EIP-8141's generic storage/state-write clauses to the storage semantics defined by EIP-1153; EIP-8141 does not separately enumerate TLOAD/TSTORE in its banned-opcode table. EIP-1153's existing semantics are pinned as a supporting normative source; no new opcode activation is introduced.
+
+## Public composition follow-through (2026-11-26)
+
+The earlier D01-open conclusion was too conservative: it omitted the author’s
+merged #11968 delta instruction and later base #12414, corroborated by actual
+EELS branch 6013c4e after #3897. COMPOSITION.md records the ordered evidence,
+stale three-fee example and retained uint256 chain ID. No reference or independent
+wire/state expectation was modified. The public implementation reuses the native
+Frame representation with a private nonce-schema marker so every existing
+sidecar, receipt, RPC and import consumer sees the same authenticated transaction.
+Timestamp checks enforce the schema; historical readers alone do not activate it.
+
+Keyed sequences are excluded from scalar account-nonce replacement, queue/reset
+and builder ordering. Exact key-set identity controls public replacement; one
+pending Frame per sender remains enforced. Selected slots and optional TXPARAM
+legacy reads drive revalidation. The historical prototype switch cannot bypass
+the post-8250 schema. Typed direct RPC Frame formatting and local txpool replay
+keys correct two additional completeness omissions discovered during this audit.
+
+EIP-8151's merged public section requires conditional signer protection. Its
+explicit activation uses the native stateful precompile, paid raw-code class
+reads, separate helper hash dependencies, both-direction class/reorg changes,
+canonical/other digest shares and distinct PAY paymaster counts. Fork-rule
+fingerprints include activation flags so the old stateless validation cache
+cannot survive the boundary. Native gas/access/revert controls use the real
+MemoryStateDB rather than a mock that does not journal warming.
+
+Final qualification and exact implementation revision will be recorded after
+full/race/build/vet runs. PAYMASTER-CODE remains open; unmerged runtime proposals
+and upstream fixture counts are not counted as local production evidence.

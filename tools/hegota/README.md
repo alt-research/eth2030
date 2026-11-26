@@ -42,3 +42,20 @@ incorrect conditional semantics. CI runs the source/acceptance checks and strict
 baseline before the normal Go checks; Go tests execute the native fixtures.
 
 Persisted differential reports are checked case by case against the pinned manifest and fixture state/log oracles, with exact coverage and native/reference gas agreement. The explicit gas/settlement acceptance criterion requires all five native budget/payment/settlement consumers; passing summary counters or arithmetic-only labels cannot replace them.
+
+Group C is registered in `specs/hegota/group-c.json` with ten tasks and forty
+clause/code/native-consumer criteria. Run `python3 tools/hegota/check_c.py` to
+verify committed source-bound evidence. To qualify an implementation revision,
+first complete `cd pkg && env -u GOROOT GOFLAGS=-p=4 go test -json ./... -count=1`
+and then supply its complete successful JSON event log with
+`python3 tools/hegota/check_c.py --write --log /absolute/path/to/full.jsonl`.
+`test_group_c.py` checks omission, stale-source and public-gate controls in both
+normal and optimized Python modes. CI verifies A, B and C independently.
+
+A green C result qualifies selected-profile consumers. It deliberately reports
+`public_complete: false`: the 8141/8250 combined envelope (D01) and a merged,
+reproducible upstream canonical-paymaster runtime remain specification gates.
+The local paymaster v1 requires an explicit experimental selection. See
+`docs/plans/hegota-c/PLAN.md` and `docs/plans/hegota-c/RPC_PROFILE.md` for exact
+scope and the authenticated simulation contract. No vector expectation or
+reference submodule is regenerated to obtain a green C result.

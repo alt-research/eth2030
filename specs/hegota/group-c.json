@@ -343,7 +343,8 @@
           "tests": [
             "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141CodedPaymasterExposureLimit",
             "github.com/eth2030/eth2030/txpool::TestFramePaymasterV1ReservationsIncludeDelayedWithdrawal",
-            "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile"
+            "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile",
+            "github.com/eth2030/eth2030/txpool::TestFrameCExposureUsesValidatedPayPrefixClassification"
           ],
           "scope": "selected profiles; public gates unchanged"
         },

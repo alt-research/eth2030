@@ -246,3 +246,26 @@ func TestFrameCExpiryQueuesReplacementAndRemoval(t *testing.T) {
 		t.Fatal("slot expiry leaked queue/dependency records")
 	}
 }
+
+func TestFrameCExposureUsesValidatedPayPrefixClassification(t *testing.T) {
+	pool, db, self := framePoolFixture(t)
+	payer := framePoolAddress(t, 3)
+	db.SetCode(payer, []byte{0x60, 3, 0x60, 0x0a, 0xb0, 0xb3, 0x5f, 0x5f, 0xaa})
+	self.Sender = payer
+	// A payment-capable DEFAULT body is outside the public validation prefix;
+	// this sender's self-payment must not consume the noncanonical PAY cap.
+	self.Frames = append(self.Frames, types.Frame8141{Mode: types.ModeDefault, Flags: 1, Limits: types.FrameGasLimits{Execution: 1000}})
+	if err := pool.AddRemote(signPoolFrame(t, self, 3)); err != nil {
+		t.Fatal(err)
+	}
+	_, _, other := framePoolFixture(t)
+	sponsorPoolFrame(t, other, 3)
+	if err := pool.AddRemote(signPoolFrame(t, other, 1, 3)); err != nil {
+		t.Fatalf("self-payment body incorrectly counted as PAY prefix: %v", err)
+	}
+	third := *other
+	third.Sender = framePoolAddress(t, 2)
+	if err := pool.AddRemote(signPoolFrame(t, &third, 2, 3)); err == nil {
+		t.Fatal("second noncanonical PAY prefix bypassed the cap")
+	}
+}

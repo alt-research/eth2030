@@ -75,8 +75,7 @@ func (p *KeyedFramePolicy8250Delta) Admit(cfg *config.ChainConfig, db state.Stat
 	for sender, entry := range p.entries {
 		if sender != frozen.Sender && entry.validation.Payer == result.Payer {
 			reserved.Add(reserved, frameMaxFee(entry.tx.Fees.MaxFee))
-			otherEnd, e := entry.tx.ValidationPrefix8250(header.Time)
-			if paymaster && e == nil && entry.tx.Frames[otherEnd].Flags == types.FrameApprovePayment {
+			if paymaster && frameHasPayPrefix(entry.tx.Frames) {
 				return errors.New("noncanonical keyed paymaster already pending")
 			}
 		}

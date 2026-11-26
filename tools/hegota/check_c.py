@@ -28,6 +28,7 @@ MANDATORY = {
  'txpool::TestFrameCBuildContextAndUnpaidRetryBound',
  'txpool::TestFrameCConfiguredReplacementAndSidecarBytes',
  'txpool::TestFrameCZeroFeeBudgetDoesNotPanic',
+ 'txpool::TestFrameCExposureUsesValidatedPayPrefixClassification',
  'txpool::TestFrameCExpiryQueuesReplacementAndRemoval',
  'txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix',
  'txpool::TestFrameCIsolatedKeyedPolicyIdentityDependenciesAndExhaustion',

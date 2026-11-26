@@ -136,8 +136,7 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 		}
 		if pool.lookup.framePayers[hash] == payer {
 			reserved.Add(reserved, frameMaxFee(other.Fees.MaxFee))
-			otherEnd, e := other.ValidationPrefix8141(pool.frameTime)
-			if noncanonical && e == nil && other.Frames[otherEnd].Flags == types.FrameApprovePayment {
+			if noncanonical && frameHasPayPrefix(other.Frames) {
 				return nil, errors.New("non-canonical Frame paymaster already has a pending transaction")
 			}
 		}
@@ -321,4 +320,16 @@ func frameMaxFee(value *big.Int) *big.Int {
 		return new(big.Int)
 	}
 	return new(big.Int).Set(value)
+}
+
+// Already-admitted frames have a validated immutable prefix. Classification
+// must not re-verify every other transaction's signatures while accounting
+// for one payer's exposure. Only VERIFY/1 belongs to the public pay prefix.
+func frameHasPayPrefix(frames []types.Frame8141) bool {
+	for _, frame := range frames {
+		if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment {
+			return true
+		}
+	}
+	return false
 }

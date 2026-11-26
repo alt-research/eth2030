@@ -124,6 +124,14 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 					t.Fatalf("%s silently accepted incomplete type-6 call", method)
 				}
 			}
+			for _, kind := range []string{"0x0", "0x6"} {
+				var result any
+				calls := map[string]any{"blockStateCalls": []any{map[string]any{"calls": []any{map[string]any{"type": kind, "from": sender.Hex(), "to": sender.Hex(), "gas": "0x5208"}}}}}
+				err := a.invoke("eth_simulateV1", &result, calls, "latest")
+				if (err != nil) != (kind == "0x6") {
+					t.Fatalf("ordinary simulation type %s: %v", kind, err)
+				}
+			}
 			for _, invalid := range []map[string]any{{"rawTransaction": rawHex, "slotNumber": "0x01"}, {"rawTransaction": rawHex, "traceLimit": "0x0"}, {"rawTransaction": rawHex, "unsigned": true}} {
 				var result any
 				if err := a.invoke("eth_simulateFrameV1", &result, invalid); err == nil {

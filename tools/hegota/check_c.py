@@ -40,6 +40,7 @@ MANDATORY = {
  'eth::TestFrameCEvictedAnnouncementSuppression',
  'eth::TestFrameCStructuredReceiptThroughHandler',
  'node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation',
+ 'node/backend::TestFrameCSimulationTraceLimitIsExplicit',
  'rpc/types::TestFrameCDerivedReceiptStatusIsNotConsensusRLP',
  'rpc/ethapi::TestFrameCPendingAndMinedQueryLocations',
  'node::TestFrameCNativePeersPoolBuildSimulationAndRestart',

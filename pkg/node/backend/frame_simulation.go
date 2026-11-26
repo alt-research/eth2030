@@ -144,7 +144,10 @@ func (b *RPCBackend) SimulateFrame(options rpctypes.FrameSimulationOptions, base
 		observer.tracer = vm.NewStructLogTracer()
 		observer.tracer.DisableStack = true
 		observer.tracer.DisableStorage = true
-		observer.tracer.Limit = int(limit)
+		// The general tracer silently truncates at Limit. Retain one bounded
+		// sentinel step so this API can reject incomplete traces while accepting
+		// a complete trace containing exactly the requested number of steps.
+		observer.tracer.Limit = int(limit) + 1
 		cfg.Debug = true
 		cfg.Tracer = observer.tracer
 	}
@@ -160,6 +163,9 @@ func (b *RPCBackend) SimulateFrame(options rpctypes.FrameSimulationOptions, base
 	}
 	if observer.tracer != nil && observer.tracer.TraceError() != nil {
 		return nil, observer.tracer.TraceError()
+	}
+	if observer.tracer != nil && len(observer.tracer.Logs) > int(limit) {
+		return nil, vm.ErrTraceCaptureLimit
 	}
 	hash, _ := frame.SigningHash()
 	result := &rpctypes.FrameSimulationResult{Hash: hexutil.Encode(tx.Hash().Bytes()), SigningHash: hexutil.Encode(hash.Bytes()), IntrinsicGas: hexutil.EncodeUint64(budget.Intrinsic), CalldataFloor: hexutil.EncodeUint64(budget.CalldataFloor), ExecutionReservation: hexutil.EncodeUint64(budget.ExecutionReservation), StateReservation: hexutil.EncodeUint64(budget.StateReservation), GasUsed: "0x0", BlobGasUsed: hexutil.EncodeUint64(tx.BlobGas()), BlobCost: hexutil.EncodeBig(new(big.Int).Mul(new(big.Int).SetUint64(tx.BlobGas()), blobFee)), Escrow: "0x0", Refund: "0x0", Tip: "0x0", Frames: observer.frames}

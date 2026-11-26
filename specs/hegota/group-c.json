@@ -782,7 +782,8 @@
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestFrameCNativePeersPoolBuildSimulationAndRestart",
-            "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation"
+            "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationAuthenticationOverridesAndCancellation",
+            "github.com/eth2030/eth2030/node/backend::TestFrameCSimulationTraceLimitIsExplicit"
           ],
           "scope": "selected profiles; public gates unchanged"
         }

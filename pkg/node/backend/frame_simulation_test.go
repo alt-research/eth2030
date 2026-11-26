@@ -2,12 +2,14 @@ package backend
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/rawdb"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	rpctypes "github.com/eth2030/eth2030/rpc/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -40,6 +42,39 @@ func frameSimulationFixture(t *testing.T) (*RPCBackend, *state.MemoryStateDB, *t
 		t.Fatal(err)
 	}
 	return backend, db, header, rpctypes.FrameSimulationOptions{RawTransaction: hexutil.Encode(raw), Trace: true}
+}
+
+func TestFrameCSimulationTraceLimitIsExplicit(t *testing.T) {
+	backend, db, header, options := frameSimulationFixture(t)
+	root := db.GetRoot()
+	txBytes, _ := hexutil.Decode(options.RawTransaction)
+	tx, err := types.DecodeTxRLP(txBytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sender := tx.Inner().(*types.FrameTx8141).Sender.Hex()
+	// Four opcodes, including APPROVE. Overriding code preserves the signed
+	// envelope and gives an exact trace-size boundary independent of gas search.
+	code := "0x60035f5faa"
+	options.StateOverrides = rpctypes.StateOverride{sender: {Code: &code}}
+	limit := "0x4"
+	options.TraceLimit = &limit
+	result, err := backend.SimulateFrame(options, header)
+	if err != nil || !result.Valid || len(result.Frames[0].StructLogs.([]map[string]any)) != 4 {
+		t.Fatalf("exact trace boundary: result=%+v err=%v", result, err)
+	}
+	limit = "0x3"
+	if result, err := backend.SimulateFrame(options, header); !errors.Is(err, vm.ErrTraceCaptureLimit) || result != nil {
+		t.Fatalf("truncated trace reported as complete: result=%+v err=%v", result, err)
+	}
+	options.Trace = false
+	untraced, err := backend.SimulateFrame(options, header)
+	if err != nil || !untraced.Valid || untraced.GasUsed != result.GasUsed {
+		t.Fatalf("trace limit changed untraced execution: %+v err=%v", untraced, err)
+	}
+	if db.GetRoot() != root {
+		t.Fatal("bounded trace simulation changed canonical state")
+	}
 }
 func TestFrameCSimulationAuthenticationOverridesAndCancellation(t *testing.T) {
 	backend, db, header, options := frameSimulationFixture(t)

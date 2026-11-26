@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
+  "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -15,7 +15,7 @@
     "docs/plans/hegota-c/PLAN.md": "b646dd3411df998fb3f92b4b10e8f08dedcfc323777908453ce752c7d4b57db2",
     "docs/plans/hegota-c/RPC_PROFILE.md": "a3a5058e25333a3457af0d071e94251d866645eaa8a1a45b65f7274e5f4b1da0",
     "docs/reviews/pr-170/CANONICAL_PAYMASTER.md": "42b27fcf83a56a8a6427836de8c1ecaccde7cd49ee698c798ba789fe100a2070",
-    "docs/reviews/pr-170/RECHECK.md": "d5f4b8b8b434234fa90d3664a07c8d40d24c2d692e3f0f553d0629e44d76f40a",
+    "docs/reviews/pr-170/RECHECK.md": "d2c5ec6959f6ec4feb252462d5d082e5deac73796bb8b2b463378e91d9cc6133",
     "pkg/cmd/eth2030/main.go": "019095a89383321c095148ada159aa1fbf4e8f2718a2c999378aa1dd9c3107e2",
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
     "pkg/cmd/send-frame/main.go": "f483efa608e564e258563fdebecc4f333dce8a25405c3c50ea983f626d4bf9eb",
@@ -87,7 +87,7 @@
     "pkg/rpc/types/frame_8141_test.go": "5baf81629167e1a7cc9a090a467fda76817849db160c9f36ef4306e5cace81fa",
     "pkg/rpc/types/frame_simulation.go": "5b78e0ffd261a44a7474f07df0982073efc73b5820a9f06ca22c7f63d920bda7",
     "pkg/rpc/types/types.go": "5a9b25eb7e9e8e8ec0091880e00bcca828317e70c265825e29ba985f84a9d030",
-    "pkg/txpool/frame_8141.go": "de04393ffe0b3215f959384dd55976687674380e1e99977b5801f7e788d6c758",
+    "pkg/txpool/frame_8141.go": "65ed4365221fa34b0a09da694422e553f79d26e36645dd08b493a19419bcba55",
     "pkg/txpool/frame_8141_test.go": "e80a7f7ad3f44cfb4db309d2a8384240b75c6b66cb8133ed0086ae2da7ade20e",
     "pkg/txpool/frame_8250_delta.go": "99e59908bab9415b3f272d1c489e42c9ff488a938aaee0b3d19ac1c72b27587c",
     "pkg/txpool/frame_8250_delta_test.go": "f49ea808c26b562d879ee921f99050a319672f3eb56d85389b74d28d625624c4",
@@ -97,10 +97,11 @@
     "pkg/txpool/frame_paymaster_12041_test.go": "914db8375e4a4fd503a24b6d6b368c2ddf9a67d945fe603c208c8079a7c0c70c",
     "pkg/txpool/frame_paymaster_test.go": "a738c7132a788cc208a94c61f003d6bb6d65ce6f9baf3dda2ef5da63dda76373",
     "pkg/txpool/frame_revalidation_batch_test.go": "3c8f9f202bd9b4ed4da81bc64605b96b762fcac557236ada2e3fa3a3f6f916da",
+    "pkg/txpool/frame_scalar_lifecycle_test.go": "38f4c90aa23f2222b590bb42f98efc12c03d9365671d3c8751824f70f267f0ff",
     "pkg/txpool/frame_signers_8151.go": "e12d304f27af3e4392838f8474976fa67117d68db1b954c2b57b270e6c86aa71",
     "pkg/txpool/frame_signers_8151_test.go": "5e15e2ee9bdb39e46ad0f9ccab5c9a59885897e0d0984bccbd5741cb6fd0110a",
     "pkg/txpool/hegota_activation_test.go": "48a29ebf0c4bd87d337e94fa086e2793c3b019effa0a4bd0dd7464ae6c566bae",
-    "pkg/txpool/txpool.go": "5b5dcb3aacba59ab1398bb6823801157472de461b5a7e5d936234e9b72746b31",
+    "pkg/txpool/txpool.go": "ed039dac09c87bdde2c0c9e18f3a0764a0c38a7add6a10d277030b01bb729f00",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
     "refs/EIPs/EIPS/eip-1474.md": "c7070c73e4399666dbdfc19dff89f3e61c142ffe44fa6798af135312918c59e6",
     "refs/EIPs/EIPS/eip-2718.md": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
@@ -110,14 +111,14 @@
     "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
     "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
     "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1",
-    "specs/hegota/group-c.json": "155ee8c415ac7907e5133b43f51ba3ab629356ede64b807bb6a644e33895003e",
+    "specs/hegota/group-c.json": "eb9c772378ac4fa14fe235a2bfea84b1b35a274bf204111e3e82f8421dc6702b",
     "specs/hegota/profiles.json": "2c98f6ded415c8c7b9651a84d4320b4abb26651386213699cec9f59d5b65fb5d",
     "tools/hegota/README.md": "bf596c9698470ab5bf8752f872bf55062dd1f00eb90a56f9cd139ad0c5bb9c45",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
-    "tools/hegota/check_c.py": "4ce9996c41b9caa3c18aecad0a43bcf42c06c82a6e135016d1f08f5f974ee6c3",
-    "tools/hegota/test_group_c.py": "3a2fc66ec9ac11622020d0a911869162209f84bfe06ff35d39ea3b2035a4e8d6"
+    "tools/hegota/check_c.py": "7859d3364798db54681b3e2287c83bcf9c0562478ee1336938a28c7d10910a51",
+    "tools/hegota/test_group_c.py": "5aa118a93964866279e1de050096fa0edd0d69f7172b8e97c18ca50c18f51ee7"
   },
-  "source_fingerprint_sha256": "c0d4512235ab25aaf84b6e51fb70c5f7a75efc87b6aa7b0572ae2fc248de693c",
+  "source_fingerprint_sha256": "5af85bfe946e0989b996260984e8ffed61c436bd7ad7dac31e9b3e581574b4b0",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -191,6 +192,7 @@
     "github.com/eth2030/eth2030/txpool::TestFrameCBuildContextAndUnpaidRetryBound": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCCaughtInvalidOpcodeCannotApprovePublicPrefix": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCConfiguredReplacementAndSidecarBytes": "pass",
+    "github.com/eth2030/eth2030/txpool::TestFrameCEvictionIncludesNonTailScalarFrame": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCExpiryQueuesReplacementAndRemoval": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCExposureUsesValidatedPayPrefixClassification": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCFailedAdmissionAndByteReplacementAreAtomic": "pass",
@@ -199,6 +201,7 @@
     "github.com/eth2030/eth2030/txpool::TestFrameCIsolatedKeyedSponsorCodeAdoptionCapsPaymaster": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCLocalPaymasterRequiresExplicitProfile": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCPublicRecentRootSlotAndReorg": "pass",
+    "github.com/eth2030/eth2030/txpool::TestFrameCRemovalReconcilesScalarSuccessors": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCRevalidationDropsInvalidBeforeSharedExposure": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCSharedPayerRevalidationEvictsByPolicy": "pass",
     "github.com/eth2030/eth2030/txpool::TestFrameCSignerRevalidationUsesOneHeadSnapshot": "pass",
@@ -213,9 +216,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "698a66bab0c036a36c4744f5a8619234b4c4294dfa8f9f9e671bc1dca73d32ff",
+    "log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
     "named": {
-      "pass": 24005,
+      "pass": 24024,
       "skip": 124
     },
     "packages": {
@@ -227,10 +230,10 @@
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "91b6a307c831e43ab50705683d068a466fbc24cfe286203ad42f1cee91c705da",
-    "race_log_sha256": "dcc248993e2bbe4e072b6f619b920df6f3f38e043ff18bf3a4f82ac943b40b30",
+    "build_vet_commands_sha256": "1154b03f7494cf5493c77b54062a49343e6e922d3f48eb4956aaad2b330f44d3",
+    "race_log_sha256": "221120ce8c8925c78949457a245739d645011e2973769bf9e8f41efa8710c8bd",
     "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9588,
+    "race_named_pass": 9607,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "race_completed_packages": 57,
@@ -243,8 +246,8 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 91,
-    "python_log_sha256": "63d463be222b2f3b6456593b8f1121a2ccc45c5d75e76c0df7dc59313920bba0",
-    "optimized_python_log_sha256": "e9646a651e2f9e59b68cf2986a1bac4c7336d3d256b566ab80eb31e3f1190838"
+    "python_log_sha256": "3d9e5c39190ba2f81849be0916c738f3db38388ec6466a43a5640a1802122f4d",
+    "optimized_python_log_sha256": "13082ff5b006c80930fe07e3600dc72fb061ac8754d3d41c83688e1b133ddb3f"
   },
   "negative_controls": [
     {
@@ -423,6 +426,66 @@
       "failed_native_consumer": "TestPR12041PaymasterRecognitionIsFrameBounded",
       "positive_control": "TestFrameCPublicVerifierPermissionsAreExactAndTopLevel passes",
       "prior_source_revision": "b750e897a2a158c38f9da6133f4c7cf643816a75"
+    },
+    {
+      "name": "scalar-successor-removal",
+      "control_kind": "exact prior-source overlay",
+      "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+      "prior_source_revision": "e12ddc37c7ee08e83caa27e268d4619dc425cd11",
+      "expected_exit_code": 1,
+      "overlay_source_sha256": {
+        "pkg/txpool/txpool.go": "5b5dcb3aacba59ab1398bb6823801157472de461b5a7e5d936234e9b72746b31",
+        "pkg/txpool/frame_8141.go": "de04393ffe0b3215f959384dd55976687674380e1e99977b5801f7e788d6c758"
+      },
+      "test_source_sha256": "38f4c90aa23f2222b590bb42f98efc12c03d9365671d3c8751824f70f267f0ff",
+      "log_sha256": "d6cc7a93149a6f935b3f5db50a7d030321a514c9778ea10866cba254489fab5d",
+      "failed_native_consumer": "TestFrameCRemovalReconcilesScalarSuccessors",
+      "positive_controls": [
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/dependency",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/expiry",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/remove",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/unpaid"
+      ],
+      "failing_subcases": [
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/dependency",
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/expiry",
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/remove",
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/unpaid",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/dependency",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/expiry",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/remove",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/unpaid"
+      ]
+    },
+    {
+      "name": "non-tail-frame-eviction",
+      "control_kind": "exact prior-source overlay",
+      "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+      "prior_source_revision": "e12ddc37c7ee08e83caa27e268d4619dc425cd11",
+      "expected_exit_code": 1,
+      "overlay_source_sha256": {
+        "pkg/txpool/txpool.go": "5b5dcb3aacba59ab1398bb6823801157472de461b5a7e5d936234e9b72746b31",
+        "pkg/txpool/frame_8141.go": "de04393ffe0b3215f959384dd55976687674380e1e99977b5801f7e788d6c758"
+      },
+      "test_source_sha256": "38f4c90aa23f2222b590bb42f98efc12c03d9365671d3c8751824f70f267f0ff",
+      "log_sha256": "d6cc7a93149a6f935b3f5db50a7d030321a514c9778ea10866cba254489fab5d",
+      "failed_native_consumer": "TestFrameCEvictionIncludesNonTailScalarFrame",
+      "positive_controls": [
+        "TestFrameCRemovalReconcilesScalarSuccessors/base/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/empty_keys/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/dependency",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/expiry",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/included",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/remove",
+        "TestFrameCRemovalReconcilesScalarSuccessors/keyed/unpaid"
+      ],
+      "failing_subcases": [
+        "TestFrameCEvictionIncludesNonTailScalarFrame/base",
+        "TestFrameCEvictionIncludesNonTailScalarFrame/empty_keys"
+      ]
     }
   ],
   "review_correction": {
@@ -441,7 +504,7 @@
   },
   "canonical_paymaster_proposal": {
     "status": "complete_selected_proposal",
-    "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
+    "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
     "upstream_repository": "ethereum/EIPs",
     "upstream_revision": "4a98fcefa5c6f02a25289bf55b9d92902d02b4c6",
     "upstream_merged": false,
@@ -461,5 +524,21 @@
       "snapshot_journal": true,
       "prior_source_counterexample": "b750e897a2a158c38f9da6133f4c7cf643816a75"
     }
+  },
+  "mixed_scalar_lifecycle": {
+    "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
+    "record": "docs/reviews/pr-170/RECHECK.md",
+    "consumers": {
+      "TestFrameCRemovalReconcilesScalarSuccessors": "pass",
+      "TestFrameCEvictionIncludesNonTailScalarFrame": "pass"
+    },
+    "subcases": 17,
+    "prior_source_failing_subcases": 10,
+    "prior_source_positive_controls": 7,
+    "nonce_domains": [
+      "base account nonce",
+      "EIP-8250 empty keys account nonce",
+      "EIP-8250 nonempty independent keys"
+    ]
   }
 }

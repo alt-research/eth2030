@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "698a66bab0c036a36c4744f5a8619234b4c4294dfa8f9f9e671bc1dca73d32ff",
+    "log_sha256": "b1fd45efe8802b6bd548e2e226c71987b34c24a2af4ca0decb0d264f05c32acb",
     "named": {
-      "pass": 24005,
+      "pass": 24024,
       "skip": 124
     },
     "packages": {
@@ -172,14 +172,14 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
-  "source_revision": "4ac957e9a57b5fc42c229b854410c72a8885808a",
+  "source_revision": "b4840950340fea2d0779013c280edbe03b632133",
   "additional_qualification": {
     "build": "full native/wrapper builds, exit 0",
     "vet": "full vet, exit 0",
-    "build_vet_commands_sha256": "91b6a307c831e43ab50705683d068a466fbc24cfe286203ad42f1cee91c705da",
-    "race_log_sha256": "dcc248993e2bbe4e072b6f619b920df6f3f38e043ff18bf3a4f82ac943b40b30",
+    "build_vet_commands_sha256": "1154b03f7494cf5493c77b54062a49343e6e922d3f48eb4956aaad2b330f44d3",
+    "race_log_sha256": "221120ce8c8925c78949457a245739d645011e2973769bf9e8f41efa8710c8bd",
     "race_command_sha256": "4bc67f2e6367df3e345cd5b86c635ad92ffd3ac3e356f0eddc7212754004a376",
-    "race_named_pass": 9588,
+    "race_named_pass": 9607,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "race_completed_packages": 57,
@@ -192,7 +192,7 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 91,
-    "python_log_sha256": "63d463be222b2f3b6456593b8f1121a2ccc45c5d75e76c0df7dc59313920bba0",
-    "optimized_python_log_sha256": "e9646a651e2f9e59b68cf2986a1bac4c7336d3d256b566ab80eb31e3f1190838"
+    "python_log_sha256": "3d9e5c39190ba2f81849be0916c738f3db38388ec6466a43a5640a1802122f4d",
+    "optimized_python_log_sha256": "13082ff5b006c80930fe07e3600dc72fb061ac8754d3d41c83688e1b133ddb3f"
   }
 }

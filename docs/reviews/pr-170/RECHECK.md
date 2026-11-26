@@ -1,5 +1,66 @@
 # Group C independent completeness re-audit
 
+## Post-paymaster mixed nonce lifecycle audit (2026-11-26)
+
+This audit starts from pushed source `e12ddc37c7ee08e83caa27e268d4619dc425cd11`.
+The implementation correction is `b4840950`. The forty-criterion table below
+still covers the complete C register; this follow-up additionally inspects the
+interactions of its C21.4, C24.4 and C26.3 lifecycle requirements with ordinary
+transactions already following an admitted Frame.
+
+The current upstream EIP-8141/8250/8272/8151 file blobs are respectively
+`9bc38a368881fa52e1a1a9970274e6511874d13f`,
+`10bd1d84c9534c9db65f9ccbffcf8d5902b9c1ae`,
+`0acc21ad8359be83c0929c7cc70e45326be8acff` and
+`bfd0db906f55033442a064357d8e6768490b8fd5`: all match the read-only
+references byte-for-byte. Current discussion streams have no additional post IDs
+(8141: 181 available/highest 187; 8250: 5/6; 8272: 3/3; 8151: 32/33).
+Their actual latest numbered posts were read, including EIP-8151's recovery-cache
+and witness discussion. No new merged requirement changes the selected C paths.
+PR #12041 is still open and unmerged at the same `4a98fcef` proposal; the bot still
+requests one author review. The exact proposal implementation and its explicit
+selection remain described in [CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md).
+
+Two genuine omissions were reproduced against the exact preceding production
+files, without modifying reference text or independent expected vectors:
+
+1. Capacity eviction only considered the scalar sender tail. A Frame at nonce 0
+   followed by an ordinary nonce 1 transaction was omitted, even if its expiry
+   was earlier than all other Frames. All pending Frames now participate in
+   expiry/priority ordering; ordinary tail and sole-anchor policy is preserved.
+2. Public removal, expiry, dependency invalidation and bounded unpaid-attempt
+   eviction removed a scalar Frame but left its ordinary successors pending.
+   Removal now reconciles the contiguous scalar sequence against current state,
+   queuing the orphaned suffix and preserving unrelated keyed domains. Normal
+   inclusion with an already advanced state nonce retains executable successors.
+   Freshly receiving an admissible predecessor promotes the suffix again, while
+   an existing later gap stays queued. This never resurrects an evicted Frame.
+
+The authority is EIP-8141 **Replacement and Eviction/Revalidation** (expiry order,
+resource release and nonce consumed once on payment) together with EIP-8250
+**Nonce state/Stateful validity/Nonce consumption**: empty `nonce_keys` uses the
+legacy account nonce; nonempty keys are independent. Pending/queued bookkeeping
+is local implementation policy preserving those validity rules, not a new
+consensus rule or a new public restriction.
+
+Mandatory native consumers `TestFrameCRemovalReconcilesScalarSuccessors` and
+`TestFrameCEvictionIncludesNonTailScalarFrame` use real signed ordinary and Frame
+transactions. Their 17 subcases cover base/empty-key/keyed domains, five removal
+causes, multiple successors, readmission and a persistent later gap. The exact
+old-source overlay has ten failing regression subcases and seven passing keyed
+or inclusion controls; the two enclosing tests also fail as expected. The current
+source passes all cases. The register/checker requires both consumers, with
+manifest-removal guards. Current qualification and log hashes are recorded in
+A/B/C evidence; exact pushed-head hosted results live in the English PR.
+
+Local qualification on `b4840950340fea2d0779013c280edbe03b632133`: full/race
+24,024/9,607 passing events, zero failures, all 240/57 packages complete;
+mandatory A/B/C 62/79/94 with zero required skips; build/vet/both binaries,
+baseline 12/12 and 91 Python checks per mode pass. Optional 124/74 skips are
+inventoried independently. Nineteen native negative controls are retained.
+
+## Prior independent audit
+
 The later canonical-paymaster follow-up is recorded in
 [CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md). It implements the exact
 PR-12041 proposal and corrects candidate withdrawal availability. The source,

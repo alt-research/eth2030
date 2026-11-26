@@ -41,3 +41,9 @@ The qualified primary native backends are memory, Trie and Snap; the existing co
 No production Go implementation, public wire/storage schema, activation switch or migration is changed in this round. Prior consensus corrections remain documented at their tested revisions. EIP-8250's conflicting fee example remains unresolved; HGT-017 completes only the development plan's allowed isolated state/vector scope. Public composed activation and Group C pool extensions remain separate.
 
 Fresh build/vet, full/focused-race suites, strict historical baseline and A/B source-bound qualification are recorded in the evidence. Hosted checks must be matched to their tested commit on PR #169.
+
+## Fresh local qualification
+
+At test/register revision `35c95f6ea19889e8d3e5be7f4a05bfc08f058e3a`, all 240 packages completed with 23,765 named passes, zero failures and 124 explicit skips. Focused race completed all 36 packages with 8,005 named passes, zero failures and 74 explicit skips. All 79 required B tests and 62 required A tests passed. Build/vet, both CLI builds, the strict 12-case historical baseline and 75 Python tests in normal/optimized modes passed. Individual skips and source/log digests remain in the evidence.
+
+The earlier account-reconstruction control was freshly rerun with current test sources: restoring only the wrapper from `2a092e43` makes its three earlier regression parents fail, with 15 failed test/subtest events. This rechecks the previous correction and is not a claim of a new fifth-audit implementation defect.

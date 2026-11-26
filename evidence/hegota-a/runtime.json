@@ -1,8 +1,8 @@
 {
   "date": "2026-11-26",
-  "source_base_commit": "52a84ba38b62ae6aea35a9815143d75a5d04773f",
+  "source_base_commit": "35c95f6ea19889e8d3e5be7f4a05bfc08f058e3a",
   "branch_baseline": "960baab3103e0d34435433be0f8314f127521052",
-  "source_fingerprint_sha256": "fd3911689bfebbe823bd2f15d567fb3ea7514e51f5f2069310445c03a9f91ea0",
+  "source_fingerprint_sha256": "d45450b8e2accae163d0efe5965203613d8c03b124e438c2030be6260493eea8",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "66a45668ea877a1ad16e8ac96d4fbde2ad4718012f46c1d7a8ca63d7961e8aad",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -38,6 +38,7 @@
     "pkg/core/execution/frame_8250.go": "73b353ed34d20c7f6a054f92b6c86abf9a6e6ebee4b8e40cee93ea6622d5d0d5",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
+    "pkg/core/execution/frame_backend_audit_test.go": "fd09ede31bd631a95c8fdc36c4e1b77f8dd33ca252c5df0c57cd232dde95e83a",
     "pkg/core/execution/frame_context_audit_test.go": "eeb6bfd54b4d5c18c1ae3ff8b224f338fed45d5783c7f51be2ec33d457fc6221",
     "pkg/core/execution/frame_dispatch_audit_test.go": "20df81361f0e70eeb24787163dd39c50401d5770011a1a1395237223b1372b37",
     "pkg/core/execution/frame_lifecycle_audit_test.go": "8a8dfb7fc0ad83e3e9d88c36372e3f01a2488c9e5a3b99065d52ae42ec0f6380",
@@ -143,26 +144,26 @@
     "tools/hegota/b_vectors.py": "f07a8a4536dbd83e1a5859e3f024c0506d348a81d6c8cc26df92073a777399ad",
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "f51c8828fa73cb88cded339bd36ca898a199d9ae227ab9adde567e6c9a30c5b6",
-    "tools/hegota/check_b.py": "64d1ba0ef8087cd44e9f02cddba7564d3e68bf71ed6cec2ecab1b5fdb07175b1",
+    "tools/hegota/check_b.py": "bf55a23e1f906f9b3bd9d3edc56521511876bc1da8ceec68e98ddcb6de96d96a",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
-    "tools/hegota/test_group_b.py": "8976ffc3a52e083e73404eaf3c98702bea08e948080aea79b878e967629dc86f",
+    "tools/hegota/test_group_b.py": "da76d39f9087cbcd79a91243c9b769dbaf44a2a246fc34997fccd2dd07ad0ef0",
     "tools/hegota/test_semantic_goldens.py": "bcb92d26c10e277f376433fa90c3a0047fc9be5746af4efd4f7506bc88f15d40"
   },
   "binaries": [
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "85921bd1ebca5bacc2c1d113aa837baf0e15d61d41f2b7401e2ac26251fd77ab",
+      "sha256": "83f20a9399972453112a505860ed18b0cfea78ea9405cceb8bc4db49ac2dafe7",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "9d6384d669ff3db302cf9b29f4c79cecfd987ee7758f511fa43b379626cee6d6",
+      "sha256": "13ecdf8ed50635e4f48b91736023176871eecbc3f463bd4c9fb074b8aa039d69",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "host --version; actual native node exercised by fresh full/race suites; no container claim"
     }
@@ -188,5 +189,5 @@
   "baseline_reference": "direct upstream go-ethereum v1.17.10 tests.StateTest.RunNoVerify",
   "canonical_head_selection_status": "native FCU switches validated canonical head/state and refreshes pool; specific HGT-006-R16 closed",
   "historical_evidence": "evidence/hegota-a/history/6a17479/runtime.json",
-  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/2a092e4344982614c3189437cf3bf5ebc28b1e56/evidence/hegota-a/runtime.json"
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/eeddcc6201cb2e4b498ed0ae291649a65a00c071/evidence/hegota-a/runtime.json"
 }

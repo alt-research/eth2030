@@ -51,4 +51,4 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Audit native state backends, failure boundaries, execution context, serialization/readback and block-wide commitments beyond existing register coverage.
 - [x] Close concrete coverage omissions with independent expected values and regression consumers; no additional implementation defect was reproduced.
 - [x] Complete local build/vet, full/focused race qualification, and refresh affected A/B source-bound evidence.
-- [ ] Commit/push owned changes, retain English PR content, and verify hosted checks at the published revision.
+- [x] Commit/push owned changes, retain English PR content, and verify all 10 checks at test/register head `b649750d`; final documentation-only descendant checks are reported on PR #169.

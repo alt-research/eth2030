@@ -262,5 +262,12 @@
     "base_revision": "eeddcc6201cb2e4b498ed0ae291649a65a00c071",
     "production_go_paths_changed": [],
     "new_native_test": "pkg/core/execution/frame_backend_audit_test.go"
+  },
+  "hosted_qualification": {
+    "revision": "b649750d216c98d9ba07f3dc8228b960abbd70de",
+    "passed_checks": 10,
+    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45744370015",
+    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45744370014",
+    "scope": "All fifth-audit test/register changes included. Later documentation-only descendant checks are reported separately on PR #169."
   }
 }

@@ -187,7 +187,7 @@
     "evidence/hegota-a/baseline.json": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b",
     "evidence/hegota-a/runtime.json": "b956ee026929b3dd61e21323c92741b923fccc882159e8341e4e7c929ba127db",
     "evidence/hegota-a/skipped-tests.json": "2e52d425207b9832251dcd53150a84af13432e610884dad791fa367ab36e40cc",
-    "evidence/hegota-b/verification.json": "1b656ff256a0888e79d071793e3a349cf38e2f0767828087944d369dd82ab000",
+    "evidence/hegota-b/verification.json": "033dc3c447ece3c8ce4bbcf71e3026cface2e77a1ed8b9e15e35919bad38cbbd",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
     "pkg/cmd/eth2030-baseline/main.go": "98ac0ee8c568e405f2c98edfd2ae99cdaa06ef835642451553539e7548d337f6",
     "pkg/cmd/eth2030-geth/main.go": "f52f60fa69f3e7d074f7554d0ed81714e3a00596277867437c04b8e6151b990f",

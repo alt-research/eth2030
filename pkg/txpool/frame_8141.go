@@ -1,8 +1,14 @@
 package txpool
 
 import (
+	"bytes"
+	"encoding/binary"
+	"encoding/json"
 	"errors"
+	"math"
 	"math/big"
+	"sort"
+	"strconv"
 
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/framepay"
@@ -24,41 +30,50 @@ func frameFeeBumped(old, next *big.Int) bool {
 	return next.Cmp(old) > 0 && next.Cmp(threshold) >= 0
 }
 
-// validateFrame8141 executes only the bounded validation prefix on a state copy.
-// Reservations are derived from the lookup so every removal releases exposure.
+// Validation remains pure with respect to persistent pool metadata.
 func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
+	_, err := pool.validateFrame8141Result(tx)
+	return err
+}
+func (pool *TxPool) frameProfile() string {
+	encoded, _ := json.Marshal(pool.frameConfig)
+	rules, _ := json.Marshal(pool.frameConfig.Rules(new(big.Int).SetUint64(pool.frameNumber), pool.frameConfig.IsMerge(), pool.frameTime))
+	return string(encoded) + string(rules) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1)
+}
+func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
 	frame := tx.Inner().(*types.FrameTx8141)
 	if pool.frameConfig == nil || !pool.frameConfig.IsMerge() || !pool.frameConfig.IsHogota(pool.frameTime) {
-		return errors.New("EIP-8141 requires Bogotá")
+		return nil, errors.New("EIP-8141 requires Bogotá")
 	}
-	if _, err := frame.ValidationPrefix8141(pool.frameTime); err != nil {
-		return err
+	prefixEnd, err := frame.ValidationPrefix8141(pool.frameTime)
+	if err != nil {
+		return nil, err
 	}
 	raw, err := tx.EncodeRLP()
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if len(raw) > MaxTxSize {
+		return nil, ErrOversizedRLP
 	}
 	if pool.lookup.Get(tx.Hash()) != tx {
 		if err := validateFrameBlobProofs8141(tx); err != nil {
-			return err
+			return nil, err
 		}
-	}
-	if len(raw) > MaxTxSize {
-		return ErrOversizedRLP
 	}
 	db, ok := pool.state.(state.StateDB)
 	if !ok {
-		return errors.New("Frame validation requires a snapshot-capable StateDB")
+		return nil, errors.New("Frame validation requires a snapshot-capable StateDB")
 	}
 	if frame.Nonce != db.GetNonce(frame.Sender) {
-		return errors.New("Frame public nonce must match the current sender nonce")
+		return nil, errors.New("Frame public nonce must match the current sender nonce")
 	}
 	budget, err := frame.GasBudget()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if budget.ExecutionReservation > pool.config.BlockGasLimit || budget.StateReservation > pool.config.BlockGasLimit {
-		return ErrGasLimit
+		return nil, ErrGasLimit
 	}
 	blobFee := pool.blobBaseFee
 	if blobFee == nil {
@@ -66,26 +81,45 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 	}
 	payment, err := frame.Payment(pool.baseFee, blobFee)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if pool.config.MinGasPrice != nil && payment.GasPrice().Cmp(pool.config.MinGasPrice) < 0 {
-		return ErrUnderpriced
+		return nil, ErrUnderpriced
 	}
 	header := &types.Header{Number: new(big.Int).SetUint64(pool.frameNumber), GasLimit: pool.config.BlockGasLimit, Time: pool.frameTime, BaseFee: pool.baseFee}
-	payer, err := execution.ValidateFrame8141Prefix(pool.frameConfig, db, header, tx, blobFee)
-	if err != nil {
-		return err
+	if pool.frameSlot != nil && *pool.frameSlot < math.MaxUint64 {
+		slot := *pool.frameSlot + 1
+		header.SlotNumber = &slot
 	}
-	reserved := new(big.Int)
-	if frame.Fees.MaxFee != nil {
-		reserved.Set(frame.Fees.MaxFee)
+	for _, f := range frame.Frames[:prefixEnd+1] {
+		if f.IsRecentRootVerifier() {
+			if header.SlotNumber == nil || string(db.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+				return nil, errors.New("recent-root validation requires exact code and next slot")
+			}
+			refs, _ := types.DecodeRecentRootReferences(f.Data)
+			for _, ref := range refs {
+				if !ref.IsRecent(*header.SlotNumber) || db.GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+					return nil, errors.New("recent-root dependency expired or changed")
+				}
+			}
+		}
 	}
-	prefixEnd, _ := frame.ValidationPrefix8141(pool.frameTime)
-	canonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
-	if canonicalPaymaster {
+	validation := pool.lookup.frameValidations[tx.Hash()]
+	profile := pool.frameProfile()
+	if validation == nil || validation.Profile != profile || !validation.Unchanged(db) {
+		validation, err = execution.ValidateFrame8141Dependencies(pool.frameConfig, db, header, tx, blobFee, pool.config.ExperimentalFramePaymasterV1)
+		if err != nil {
+			return nil, err
+		}
+		validation.Profile = profile
+	}
+	payer := validation.Payer
+	reserved := new(big.Int).Set(frame.Fees.MaxFee)
+	canonical := pool.config.ExperimentalFramePaymasterV1 && frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && framepay.IsV1(db.GetCode(payer))
+	if canonical {
 		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
 	}
-	nonCanonicalPaymaster := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0 && !canonicalPaymaster
+	noncanonical := frame.Frames[prefixEnd].Flags == types.FrameApprovePayment && db.GetCodeSize(payer) > 0 && !canonical
 	for hash, pending := range pool.lookup.all {
 		other, ok := pending.Inner().(*types.FrameTx8141)
 		if !ok {
@@ -93,50 +127,129 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 		}
 		if other.Sender == frame.Sender && other.Nonce == frame.Nonce {
 			continue
-		} // atomic replacement
+		}
 		if other.Sender == frame.Sender {
-			return errors.New("one pending Frame transaction per sender")
+			return nil, errors.New("one pending Frame transaction per sender")
 		}
 		if pool.lookup.framePayers[hash] == payer {
-			if other.Fees.MaxFee != nil {
-				reserved.Add(reserved, other.Fees.MaxFee)
-			}
-			if nonCanonicalPaymaster && other.Sender != payer {
-				return errors.New("non-canonical Frame paymaster already has a pending transaction")
+			reserved.Add(reserved, other.Fees.MaxFee)
+			otherEnd, e := other.ValidationPrefix8141(pool.frameTime)
+			if noncanonical && e == nil && other.Frames[otherEnd].Flags == types.FrameApprovePayment {
+				return nil, errors.New("non-canonical Frame paymaster already has a pending transaction")
 			}
 		}
 	}
 	if db.GetBalance(payer).Cmp(reserved) < 0 {
-		return ErrInsufficientFunds
+		return nil, ErrInsufficientFunds
+	}
+	if err := state.ReadError(db); err != nil {
+		return nil, err
 	}
 	tx.SetSender(frame.Sender)
-	pool.lookup.framePayers[tx.Hash()] = payer
-	return nil
+	return validation, nil
 }
 
-func (pool *TxPool) revalidateFrames8141() {
-	for hash, tx := range pool.lookup.all {
-		if _, ok := tx.Inner().(*types.FrameTx8141); !ok {
-			continue
-		}
-		if err := pool.validateFrame8141(tx); err == nil {
-			continue
-		}
-		from := tx.FrameSender()
-		pool.lookup.Remove(hash)
-		if list := pool.pending[from]; list != nil {
-			list.Remove(tx.Nonce())
-			if list.Len() == 0 {
-				delete(pool.pending, from)
-			}
-		}
-		if list := pool.queue[from]; list != nil {
-			list.Remove(tx.Nonce())
-			if list.Len() == 0 {
-				delete(pool.queue, from)
+func (lookup *txLookup) installFrameValidation(hash types.Hash, validation *execution.FramePrefixValidation) {
+	// A revalidated transaction may have taken a different helper/storage path.
+	if old := lookup.frameValidations[hash]; old != nil {
+		for dep := range old.Dependencies {
+			delete(lookup.frameDependencies[dep], hash)
+			if len(lookup.frameDependencies[dep]) == 0 {
+				delete(lookup.frameDependencies, dep)
 			}
 		}
 	}
+	lookup.frameValidations[hash] = validation
+	lookup.framePayers[hash] = validation.Payer
+	for dep := range validation.Dependencies {
+		if lookup.frameDependencies[dep] == nil {
+			lookup.frameDependencies[dep] = make(map[types.Hash]struct{})
+		}
+		lookup.frameDependencies[dep][hash] = struct{}{}
+	}
+}
+func (pool *TxPool) removeFrameLocked(hash types.Hash) {
+	tx := pool.lookup.Get(hash)
+	if tx == nil {
+		return
+	}
+	from := tx.FrameSender()
+	pool.lookup.Remove(hash)
+	for _, lists := range []map[types.Address]*txSortedList{pool.pending, pool.queue} {
+		if list := lists[from]; list != nil {
+			list.Remove(tx.Nonce())
+			if list.Len() == 0 {
+				delete(lists, from)
+			}
+		}
+	}
+}
+func (pool *TxPool) revalidateFrames8141() {
+	// Solvency conflicts have a deterministic survivor set, independent of Go map order.
+	var txs []*types.Transaction
+	for _, tx := range pool.lookup.all {
+		if isCanonicalFrame8141(tx) {
+			txs = append(txs, tx)
+		}
+	}
+	sort.Slice(txs, func(i, j int) bool { a, b := txs[i].Hash(), txs[j].Hash(); return bytes.Compare(a[:], b[:]) < 0 })
+	for _, tx := range txs {
+		v, err := pool.validateFrame8141Result(tx)
+		if err != nil {
+			pool.removeFrameLocked(tx.Hash())
+		} else {
+			pool.lookup.installFrameValidation(tx.Hash(), v)
+		}
+	}
+}
+
+// frameExpiry orders explicit deadlines and root expiration slots separately
+// through a stable local eviction key. No expiry sorts after finite expiry.
+func frameExpiry(tx *types.Transaction) uint64 {
+	frame, ok := tx.Inner().(*types.FrameTx8141)
+	if !ok {
+		return math.MaxUint64
+	}
+	if len(frame.Frames) > 0 {
+		f := frame.Frames[0]
+		if f.Target != nil && *f.Target == types.FrameExpiryVerifier && len(f.Data) == 8 {
+			return binary.BigEndian.Uint64(f.Data)
+		}
+	}
+	return math.MaxUint64
+}
+func transactionPoolBytes(tx *types.Transaction) uint64 {
+	raw, _ := tx.EncodeRLP()
+	size := uint64(len(raw))
+	if sc := tx.BlobSidecar(); sc != nil {
+		for _, list := range [][][]byte{sc.Blobs, sc.Commitments, sc.Proofs} {
+			for _, part := range list {
+				size += uint64(len(part)) + 9
+			}
+		}
+	}
+	return size
+}
+func (pool *TxPool) fitsBytes(tx *types.Transaction, from types.Address) bool {
+	limit := pool.config.MaxBytes
+	if limit == 0 {
+		limit = 512 << 20
+	}
+	size := transactionPoolBytes(tx)
+	if size > limit {
+		return false
+	}
+	for _, pending := range pool.lookup.all {
+		if pool.senderOf(pending) == from && pending.Nonce() == tx.Nonce() {
+			continue
+		}
+		part := transactionPoolBytes(pending)
+		if part > limit-size {
+			return false
+		}
+		size += part
+	}
+	return true
 }
 
 func validateFrameBlobProofs8141(tx *types.Transaction) error {

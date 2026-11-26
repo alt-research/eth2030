@@ -634,18 +634,25 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 	}
 	// Only the fixed PAY runtime receives the draft's canonical-code exception.
 	// STATICCALL/write protection and exact-scope approval still apply normally.
-	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && framepay.IsV1(evm.StateDB.GetCode(target)) {
+	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && evm.Config.ExperimentalFramePaymasterV1 && framepay.IsV1(evm.StateDB.GetCode(target)) {
 		return nil
 	}
-	deploy := f.Tx.Frames[f.Index].Mode == types.ModeDefault &&
-		(f.Index == 0 || (f.Index == 1 && f.Tx.Frames[0].Target != nil &&
-			*f.Tx.Frames[0].Target == types.FrameExpiryVerifier))
+	deploy := f.Index == f.Tx.ValidationDeployIndex8141()
+	rootVerifier := frame.IsRecentRootVerifier() && evm.depth == 1 &&
+		contract.Address == types.RecentRootAddress && string(contract.Code) == string(types.RecentRootCode)
+	if frame.IsRecentRootVerifier() && string(evm.StateDB.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+		return errors.New("Frame recent-root verifier runtime mismatch")
+	}
 	switch op {
 	case GASPRICE, BLOCKHASH, COINBASE, NUMBER, PREVRANDAO, GASLIMIT, BASEFEE,
-		BLOBBASEFEE, SLOTNUM, INVALID, SELFDESTRUCT, BALANCE, SELFBALANCE:
+		BLOBBASEFEE, INVALID, SELFDESTRUCT, BALANCE, SELFBALANCE:
 		return errors.New("Frame public validation used a block or balance dependency")
+	case SLOTNUM:
+		if !rootVerifier {
+			return errors.New("Frame SLOTNUM outside top-level recent-root verifier")
+		}
 	case TIMESTAMP:
-		if contract.Address != types.FrameExpiryVerifier ||
+		if f.Index != 0 || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
 			string(contract.Code) != string(types.FrameExpiryCode) {
 			return errors.New("Frame public validation timestamp is not the expiry verifier")
 		}
@@ -655,6 +662,16 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 			return errors.New("Frame public validation observed GAS")
 		}
 	case SLOAD, SSTORE:
+		if op == SLOAD && rootVerifier {
+			refs, _ := types.DecodeRecentRootReferences(frame.Data)
+			key := bigToHash(stack.Back(0))
+			for _, ref := range refs {
+				if ref.StorageKey() == key {
+					return nil
+				}
+			}
+			return errors.New("Frame recent-root verifier read an undeclared key")
+		}
 		if contract.Address != f.Tx.Sender || (op == SSTORE && !deploy) {
 			return errors.New("Frame public validation accessed mutable third-party state")
 		}

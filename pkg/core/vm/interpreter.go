@@ -107,10 +107,11 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
-	Context      context.Context // optional cancellation for isolated RPC execution
-	Debug        bool
-	Tracer       EVMLogger
-	MaxCallDepth int
+	ExperimentalFramePaymasterV1 bool            // local research template; not upstream canonical code
+	Context                      context.Context // optional cancellation for isolated RPC execution
+	Debug                        bool
+	Tracer                       EVMLogger
+	MaxCallDepth                 int
 }
 
 // EVM is the Ethereum Virtual Machine execution environment.

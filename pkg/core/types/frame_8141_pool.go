@@ -23,6 +23,12 @@ func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
 		}
 		start++
 	}
+	if start < len(tx.Frames) && tx.Frames[start].Target != nil && *tx.Frames[start].Target == RecentRootAddress {
+		if !tx.Frames[start].IsRecentRootVerifier() {
+			return 0, errors.New("invalid recent-root validation frame")
+		}
+		start++
+	}
 	if start < len(tx.Frames) && tx.Frames[start].Mode == ModeDefault && tx.Frames[start].Flags == 0 {
 		start++
 	}
@@ -72,4 +78,20 @@ func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
 		}
 	}
 	return end, nil
+}
+
+// ValidationDeployIndex8141 skips the protocol verifiers. Call only after
+// ValidationPrefix8141 has accepted the grammar.
+func (tx *FrameTx8141) ValidationDeployIndex8141() int {
+	index := 0
+	if index < len(tx.Frames) && tx.Frames[index].Target != nil && *tx.Frames[index].Target == FrameExpiryVerifier {
+		index++
+	}
+	if index < len(tx.Frames) && tx.Frames[index].IsRecentRootVerifier() {
+		index++
+	}
+	if index < len(tx.Frames) && tx.Frames[index].Mode == ModeDefault && tx.Frames[index].Flags == 0 {
+		return index
+	}
+	return -1
 }

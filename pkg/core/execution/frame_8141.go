@@ -20,21 +20,55 @@ func applyFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db st
 	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, nil, false, nil, tracing...)
 }
 
+// ValidateFrame8141Prefix retains the address-only interface for existing callers.
 func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int) (types.Address, error) {
-	frame, ok := tx.Inner().(*types.FrameTx8141)
-	if !ok {
-		return types.Address{}, errors.New("not a canonical Frame transaction")
-	}
-	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
-		return types.Address{}, err
-	}
-	copied := db.Dup()
-	copied.SetTxContext(tx.Hash(), 0)
-	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee)
+	result, err := ValidateFrame8141Dependencies(config, db, header, tx, blobBaseFee, false)
 	if err != nil {
 		return types.Address{}, err
 	}
-	return receipt.Payer, nil
+	return result.Payer, nil
+}
+
+// ValidateFrame8141Dependencies validates on an independent snapshot. The local
+// paymaster candidate is opt-in and is never identified as upstream bytecode.
+func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, experimentalPaymasterV1 bool) (*FramePrefixValidation, error) {
+	frame, ok := tx.Inner().(*types.FrameTx8141)
+	if !ok || header == nil {
+		return nil, errors.New("not a canonical Frame validation context")
+	}
+	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
+		return nil, err
+	}
+	copied := &frameReadSet{StateDB: db.Dup(), reads: make(map[FrameDependency]struct{})}
+	copied.SetTxContext(tx.Hash(), 0)
+	// Check exact code and complete age/storage predicates even when a malicious
+	// runtime would return without executing SLOTNUM or SLOAD.
+	for _, f := range frame.Frames {
+		if !f.IsRecentRootVerifier() {
+			continue
+		}
+		if header.SlotNumber == nil || string(copied.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+			return nil, errors.New("recent-root verifier requires exact runtime and slot")
+		}
+		refs, _ := types.DecodeRecentRootReferences(f.Data)
+		for _, ref := range refs {
+			if !ref.IsRecent(*header.SlotNumber) || copied.GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+				return nil, errors.New("recent-root dependency is not valid")
+			}
+		}
+	}
+	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee, vm.Config{ExperimentalFramePaymasterV1: experimentalPaymasterV1})
+	if err != nil {
+		return nil, err
+	}
+	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
+	for dep := range copied.reads {
+		result.Dependencies[dep] = dep.Value(db)
+	}
+	if err := errors.Join(state.ReadError(copied), state.ReadError(db)); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
@@ -205,11 +239,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 			}
 		}
 		if prefixOnly && i == prefixEnd {
-			deployIndex := 0
-			if tx.Frames[0].Target != nil && *tx.Frames[0].Target == types.FrameExpiryVerifier {
-				deployIndex++
-			}
-			if deployIndex < len(tx.Frames) && tx.Frames[deployIndex].Mode == types.ModeDefault && db.GetCodeSize(tx.Sender) == 0 {
+			if tx.ValidationDeployIndex8141() >= 0 && db.GetCodeSize(tx.Sender) == 0 {
 				return nil, 0, errors.New("Frame deploy did not install sender code")
 			}
 			payer, err := evm.CheckFrameApproval8141()

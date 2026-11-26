@@ -1,8 +1,10 @@
 package txpool
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"github.com/eth2030/eth2030/core/execution"
 	"math/big"
 	"sort"
 	"sync"
@@ -94,6 +96,9 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
+	ExperimentalFramePaymasterV1 bool   // explicit local paymaster profile
+	MaxBytes                     uint64 // encoded envelopes plus blob sidecars; zero uses 512 MiB
+
 	MaxSize           int               // Maximum number of transactions in pool
 	MaxPerSender      int               // Maximum pending per sender
 	MinGasPrice       *big.Int          // Minimum gas price to accept
@@ -140,12 +145,14 @@ type StateReader interface {
 
 // txLookup tracks transactions by hash for fast duplicate detection.
 type txLookup struct {
-	all         map[types.Hash]*types.Transaction
-	framePayers map[types.Hash]types.Address
+	all               map[types.Hash]*types.Transaction
+	framePayers       map[types.Hash]types.Address
+	frameValidations  map[types.Hash]*execution.FramePrefixValidation
+	frameDependencies map[execution.FrameDependency]map[types.Hash]struct{}
 }
 
 func newTxLookup() *txLookup {
-	return &txLookup{all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address)}
+	return &txLookup{all: make(map[types.Hash]*types.Transaction), framePayers: make(map[types.Hash]types.Address), frameValidations: make(map[types.Hash]*execution.FramePrefixValidation), frameDependencies: make(map[execution.FrameDependency]map[types.Hash]struct{})}
 }
 
 func (l *txLookup) Get(hash types.Hash) *types.Transaction {
@@ -159,6 +166,15 @@ func (l *txLookup) Add(tx *types.Transaction) {
 func (l *txLookup) Remove(hash types.Hash) {
 	delete(l.all, hash)
 	delete(l.framePayers, hash)
+	if validation := l.frameValidations[hash]; validation != nil {
+		for dep := range validation.Dependencies {
+			delete(l.frameDependencies[dep], hash)
+			if len(l.frameDependencies[dep]) == 0 {
+				delete(l.frameDependencies, dep)
+			}
+		}
+	}
+	delete(l.frameValidations, hash)
 }
 
 func (l *txLookup) Count() int {
@@ -229,6 +245,7 @@ type TxPool struct {
 	frameConfig *config.ChainConfig
 	frameTime   uint64
 	frameNumber uint64
+	frameSlot   *uint64
 	chainID     *big.Int
 	pqForkKnown bool
 	pqActive    bool
@@ -293,6 +310,25 @@ func (pool *TxPool) updateHeadFeesLocked(header *types.Header) bool {
 		blob = gas.BlobBaseFeeForHeader(pool.frameConfig, header)
 	}
 	changed := pool.baseFee == nil || pool.baseFee.Cmp(base) != 0 || pool.blobBaseFee == nil || pool.blobBaseFee.Cmp(blob) != 0 || pool.config.BlockGasLimit != header.GasLimit
+	if header.Time != pool.frameTime {
+		changed = true
+	}
+	pool.frameTime = header.Time
+	if header.Number != nil {
+		pool.frameNumber = header.Number.Uint64()
+	}
+	if header.SlotNumber != nil {
+		slot := *header.SlotNumber
+		if pool.frameSlot == nil || *pool.frameSlot != slot {
+			changed = true
+		}
+		pool.frameSlot = &slot
+	} else {
+		if pool.frameSlot != nil {
+			changed = true
+		}
+		pool.frameSlot = nil
+	}
 	pool.baseFee, pool.blobBaseFee = base, blob
 	pool.config.BlockGasLimit = header.GasLimit
 	return changed
@@ -372,8 +408,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 		return ErrAlreadyKnown
 	}
 
-	// Validate the transaction.
-	if err := pool.validateTx(tx); err != nil {
+	// Prospective metadata is local until every admission check succeeds.
+	var validation *execution.FramePrefixValidation
+	if err := pool.validateTxData(tx, true, &validation); err != nil {
 		txpoolLog.Debug("tx_rejected",
 			"event", "tx_rejected",
 			"hash", hash.Hex(),
@@ -418,6 +455,10 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 			"maxGap", MaxNonceGap,
 		)
 		return ErrNonceTooHigh
+	}
+
+	if !pool.fitsBytes(tx, from) {
+		return ErrTxPoolFull
 	}
 
 	// Check for replace-by-fee: existing tx from same sender with same nonce.
@@ -471,6 +512,9 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Add to lookup.
 	pool.lookup.Add(tx)
+	if validation != nil {
+		pool.lookup.installFrameValidation(hash, validation)
+	}
 
 	if tx.Nonce() == stateNonce {
 		// This tx is immediately processable.
@@ -592,7 +636,7 @@ func (pool *TxPool) validateTx(tx *types.Transaction) error {
 	return pool.validateTxData(tx, true)
 }
 
-func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) (result error) {
+func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool, validation ...**execution.FramePrefixValidation) (result error) {
 	defer func() {
 		if err := corestate.ReadError(pool.state); err != nil {
 			result = fmt.Errorf("txpool state: %w", err)
@@ -620,7 +664,11 @@ func (pool *TxPool) validateTxData(tx *types.Transaction, fullBlob bool) (result
 		tx.SetSender(sender)
 	}
 	if _, canonicalFrame := tx.Inner().(*types.FrameTx8141); canonicalFrame {
-		return pool.validateFrame8141(tx)
+		v, err := pool.validateFrame8141Result(tx)
+		if len(validation) > 0 {
+			*validation[0] = v
+		}
+		return err
 	}
 	if tx.Type() == types.FrameTxType && !pool.frameConfig.IsLegacyFrameEnabledAt(new(big.Int).SetUint64(pool.frameNumber), pool.frameTime) {
 		return errors.New("frame transactions unavailable at canonical head")
@@ -1123,7 +1171,7 @@ func (pool *TxPool) PendingFlat() []*types.Transaction {
 		copy(txs, list.items) // list.items is already nonce-sorted
 		groups = append(groups, senderGroup{
 			txs:       txs,
-			headPrice: EffectiveGasPrice(txs[0], pool.baseFee),
+			headPrice: EffectiveGasPriceAt(txs[0], pool.baseFee, pool.blobBaseFee),
 		})
 	}
 
@@ -1359,8 +1407,13 @@ func (pool *TxPool) senderOf(tx *types.Transaction) types.Address {
 // For EIP-1559 transactions: min(MaxFeePerGas, BaseFee + MaxPriorityFeePerGas).
 // If baseFee is nil, returns GasFeeCap (MaxFeePerGas) as the effective price.
 func EffectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
+	return EffectiveGasPriceAt(tx, baseFee, big.NewInt(1))
+}
+
+// EffectiveGasPriceAt uses the total fee budget at the actual blob-fee context.
+func EffectiveGasPriceAt(tx *types.Transaction, baseFee, blobFee *big.Int) *big.Int {
 	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
-		payment, err := frame.Payment(baseFee, big.NewInt(1))
+		payment, err := frame.Payment(baseFee, blobFee)
 		if err != nil {
 			return new(big.Int)
 		}
@@ -1405,8 +1458,8 @@ func (pool *TxPool) PendingSorted() []*types.Transaction {
 	}
 
 	sort.Slice(all, func(i, j int) bool {
-		pi := EffectiveGasPrice(all[i], baseFee)
-		pj := EffectiveGasPrice(all[j], baseFee)
+		pi := EffectiveGasPriceAt(all[i], baseFee, pool.blobBaseFee)
+		pj := EffectiveGasPriceAt(all[j], baseFee, pool.blobBaseFee)
 		return pi.Cmp(pj) > 0
 	})
 	return all
@@ -1526,14 +1579,14 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 	// orphan all higher-nonce txs, stranding them in queue permanently.
 	// Single-tx senders are protected (they are the sole pool anchor).
 	for addr, list := range pool.pending {
-		if list.Len() <= 1 {
+		if list.Len() == 0 || (list.Len() == 1 && !isCanonicalFrame8141(list.items[0])) {
 			continue
 		}
 		last := list.items[list.Len()-1]
 		candidates = append(candidates, candidate{
 			tx:    last,
 			from:  addr,
-			price: EffectiveGasPrice(last, baseFee),
+			price: EffectiveGasPriceAt(last, baseFee, pool.blobBaseFee),
 			queue: false,
 		})
 	}
@@ -1544,7 +1597,7 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 			candidates = append(candidates, candidate{
 				tx:    tx,
 				from:  addr,
-				price: EffectiveGasPrice(tx, baseFee),
+				price: EffectiveGasPriceAt(tx, baseFee, pool.blobBaseFee),
 				queue: true,
 			})
 		}
@@ -1556,7 +1609,16 @@ func (pool *TxPool) evictLowest(baseFee *big.Int) int {
 
 	// Sort by price ascending so the cheapest is first.
 	sort.Slice(candidates, func(i, j int) bool {
-		return candidates[i].price.Cmp(candidates[j].price) < 0
+		a, b := candidates[i], candidates[j]
+		ae, be := frameExpiry(a.tx), frameExpiry(b.tx)
+		if ae != be {
+			return ae < be
+		}
+		if order := a.price.Cmp(b.price); order != 0 {
+			return order < 0
+		}
+		ah, bh := a.tx.Hash(), b.tx.Hash()
+		return bytes.Compare(ah[:], bh[:]) < 0
 	})
 
 	// Evict the cheapest.

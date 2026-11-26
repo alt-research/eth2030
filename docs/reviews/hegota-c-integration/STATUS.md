@@ -1,3 +1,9 @@
 # Hegota Group C status
 
-Specification/plan review in progress from merged Group B baseline `5d777ad06f886c8b20fb010a47e65ddb05df8287`. No task is marked complete from helper presence or old conservative/aggressive policy labels. Implementation starts after the clause-level plan correction. EIP-8250 D01 remains open until an authoritative combined schema is available.
+Plan audit completed on 2026-11-26 against EIPs `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa` and consensus-specs `d2021d2719235f0df4726a1d330502cb15aa8ea3`. The detailed acceptance register is [the C plan](../../plans/hegota-c/PLAN.md). Implementation is in progress; no complete-group claim is made.
+
+Implemented the first prefix/pool integration slice: recent-root grammar, top-level exact-runtime opcode/storage permissions, canonical-head-slot+1 admission with overflow rejection, pre-state dependency capture/cache/reverse indices, atomic accepted metadata, total encoded byte accounting, actual blob-fee-aware pool ranking and deterministic expiry/price eviction. Local paymaster v1 requires an explicit experimental pool profile rather than silently receiving upstream canonical privileges. Existing fork rollback tests found and now cover a cache-key requirement: VM activation rules, not just config identity, belong in the cache context.
+
+Validation: focused core/types, core/execution and txpool Frame/recent-root/paymaster tests pass, including the new 16-shape grammar and dependency/reorg/resource tests. Full build, suite, race and independent A/B requalification are pending. HGT-020–029 criteria remain open until their complete consumer registers pass.
+
+Public interoperability gates remain explicit: EIP-8250 D01 combined envelope and the unspecified merged canonical-paymaster compiled runtime. Neither is bypassed by isolated mechanisms or the local research template.

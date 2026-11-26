@@ -8,6 +8,8 @@ A native red control reproduced shared-payer revalidation losing a valid transac
 
 A second red control reproduced blob/scalar queue partitioning dropping an executable ordinary successor of a blob Frame. Both builder interfaces now apply the existing ordinary-before-blob policy only among executable sender heads. Six actual build/replay cases cover base Frames, EIP-8250 empty-key legacy domains and independent nonempty keyed domains; prior unrelated-sender ordering controls remain intact.
 
+A conditional EIP-8151 regression also swaps two senders' recovery-witness paths simultaneously. The old implementation incorrectly counted another transaction's stale signer share; the two-phase head refresh retains both valid transactions and updates their signer indices. The frozen prior-source overlay reproduces all three interaction failures while its ordinary and keyed-domain positive controls still pass.
+
 
 ## Current public integration follow-through (2026-11-26)
 

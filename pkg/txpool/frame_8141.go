@@ -263,8 +263,8 @@ func (pool *TxPool) revalidateFrames8141() {
 	}
 }
 
-// frameExpiry orders explicit deadlines and root expiration slots separately
-// through a stable local eviction key. No expiry sorts after finite expiry.
+// frameExpiry orders explicit timestamp deadlines. Root expiry is indexed
+// separately in canonical slot units. No deadline sorts after a finite one.
 func frameExpiry(tx *types.Transaction) uint64 {
 	frame, ok := tx.Inner().(*types.FrameTx8141)
 	if !ok {

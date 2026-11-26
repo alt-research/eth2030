@@ -210,3 +210,60 @@ func TestFrame8151ActivationInvalidatesPrefixCache(t *testing.T) {
 		t.Fatal("activation rollback retained stateful prefix cache")
 	}
 }
+
+// A validation prefix may choose a recovery witness from sender storage. Both
+// transactions must be refreshed before applying the EIP-8151 shared limits.
+func TestFrameCSignerRevalidationUsesOneHeadSnapshot(t *testing.T) {
+	pool, db, _ := framePoolFixture(t)
+	enableRecovery8151(pool)
+	pool.config.FrameSignerCanonicalLimit = 2
+	pool.config.FrameSignerOtherLimit = 1
+	makeTx := func(senderKey, oldSigner, newSigner int) *types.Transaction {
+		frame := recoveredSignerFrame8151(t, pool, senderKey, false, nil).Inner().(*types.FrameTx8141)
+		frame.Signatures = append(frame.Signatures, types.FrameSignature{Scheme: 0, Signature: make([]byte, 128)})
+		digest := types.Hash{31: 42}
+		for i, k := range []int{oldSigner, newSigner} {
+			private, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", k))
+			sig, err := gethcrypto.Sign(digest[:], private)
+			if err != nil {
+				t.Fatal(err)
+			}
+			input := frame.Signatures[2*i].Signature
+			copy(input, digest[:])
+			input[63] = 27 + sig[64]
+			copy(input[64:], sig[:64])
+		}
+		code, _ := hex.DecodeString("5f5460020260805f5fb55f5f60805f600161fffffa5060035f5faa")
+		db.SetCode(frame.Sender, code)
+		signing, err := frame.SigningHash()
+		if err != nil {
+			t.Fatal(err)
+		}
+		private, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", senderKey))
+		sig, err := gethcrypto.Sign(signing[:], private)
+		if err != nil {
+			t.Fatal(err)
+		}
+		frame.Signatures[1].Signature = append([]byte{sig[64]}, sig[:64]...)
+		return types.NewTransaction(frame)
+	}
+	first, second := makeTx(1, 2, 4), makeTx(3, 4, 2)
+	for _, tx := range []*types.Transaction{first, second} {
+		if err := pool.AddRemote(tx); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, tx := range []*types.Transaction{first, second} {
+		db.SetState(tx.FrameSender(), types.Hash{}, types.Hash{31: 1})
+	}
+	pool.Reset(db)
+	if pool.Count() != 2 {
+		t.Fatal("stale signer shares evicted a valid transaction during a simultaneous witness-path swap")
+	}
+	for i, tx := range []*types.Transaction{first, second} {
+		validation := pool.lookup.frameValidations[tx.Hash()]
+		if len(validation.SignerRecoveries) != 1 || validation.SignerRecoveries[0].Address != framePoolAddress(t, []int{4, 2}[i]) {
+			t.Fatal("signer index did not reflect the new head")
+		}
+	}
+}

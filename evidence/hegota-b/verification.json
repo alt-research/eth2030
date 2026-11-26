@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "4781e75a9cd89f69ee236206a90d34a6a4ceb13278499c1cc8007d740b7a6db8",
+    "log_sha256": "16cde85ef3d49f5d10bc5e2cdafef0b27e2e5537a0216c877aee29617a69e3a1",
     "named": {
-      "pass": 23765,
+      "pass": 23851,
       "skip": 124
     },
     "packages": {
@@ -15,12 +15,12 @@
     },
     "completed_packages": 240
   },
-  "source_fingerprint_sha256": "b14cbba8ebfbb9ef8b41f211cedcf5af162ddb624a8be2c3ff7713bcee687f77",
+  "source_fingerprint_sha256": "c02a7f12424dc453b7b28be63a169d68097c9cf6da1934cc867a98ee858d4bab",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
     "pkg/bal/spec_test.go": "8401db90680311863c2065e488271a4670b4cb63d811e2ddc3895ec713ad13f1",
-    "pkg/core/block/builder.go": "c934d8fbac0a3f996c84a1baed69f2979a7188bd77d7441d1b042791333d3776",
+    "pkg/core/block/builder.go": "3d30377bb413489b4257d49e380e22d8906e0f95d17bffdfea44b848f588b942",
     "pkg/core/block/frame_8141_integration_test.go": "3492c70786c496814548cc6d023f0002abe56ec2bf511619bebc502f172e2ea1",
     "pkg/core/block/frame_prefunded_creation_test.go": "907fe4f3183d83fa617d31e505be06ccbe78b0f77a85c2b9d7354af74a1dfa2a",
     "pkg/core/block/frame_size_conformance_test.go": "6b291a196a5246bebf62a039fc449b7631ccfe72f34a373a30e51c01d1eb5bab",
@@ -32,10 +32,10 @@
     "pkg/core/chain/transaction_readback.go": "49bd254fbeae2ca8e253e4ac9ee9d999aae4a4a2249f6b64544a51b79004fedb",
     "pkg/core/eftest/hegota_goldens_test.go": "eec2d755e42b6239c867f4270014c0490e196d3d276d2a3f99e26f13395681f7",
     "pkg/core/execution/amsterdam_system_gas_test.go": "0e0aa523c92cb6e80e30a227e6fb1bbbce09236f6c5e2a5044e49b4bba2ac337",
-    "pkg/core/execution/frame_8141.go": "c2192ca9aa67bbd8de2f61dcf50e843a389a9bb6a0d1fca1b20eb91a1c84a856",
+    "pkg/core/execution/frame_8141.go": "ae7132a8ca25b8563cf2ea142414d01b5e0a803ffca78c6e93350419ed4077d3",
     "pkg/core/execution/frame_8141_conformance_test.go": "681e49d1f66f2cdbb6de28c98bcc7e7281abad8c331070122612d6e4236a0abe",
     "pkg/core/execution/frame_8141_test.go": "c506e0de2054c4bc9b221c8a70fc00b5869fb081520078aa4a8e8538dc64f99b",
-    "pkg/core/execution/frame_8250.go": "73b353ed34d20c7f6a054f92b6c86abf9a6e6ebee4b8e40cee93ea6622d5d0d5",
+    "pkg/core/execution/frame_8250.go": "2ccf4dcd276120dd164ec9ed89af9c1beeafa96df2b0be2461ff4a43c602614c",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
     "pkg/core/execution/frame_8272_test.go": "ff4a289c14b05071edad7f3e483cb8a6668f78d060eadd7e0cd51c32160ef62c",
     "pkg/core/execution/frame_backend_audit_test.go": "fd09ede31bd631a95c8fdc36c4e1b77f8dd33ca252c5df0c57cd232dde95e83a",
@@ -64,11 +64,11 @@
     "pkg/core/types/tx_frame_test.go": "0ed4abee48bc3e1e28525e8bbf5753f07f9d768ec988df43ac1572ecb86c71e6",
     "pkg/core/vm/amsterdam_gas_table.go": "06dab2b7dd77ffbf267d3c1dff21e6f1b45fe77e970066bffed59fdf8b6dca8b",
     "pkg/core/vm/delegation_gas.go": "8ef2b9e10e80bd1b87451e870907113825319b14ceffbf189f84d171e63720ad",
-    "pkg/core/vm/frame_8141.go": "e7585e8a036fa55210604460bb356fde11c42a0143eb67cccb0bd44a95ee3973",
+    "pkg/core/vm/frame_8141.go": "accb4d185b72285620521be2a72dd382fb9fd5604f961cd0159e375bfce69886",
     "pkg/core/vm/frame_8141_bal.go": "95c7ff2089f45b71e2d67e6431df9d9ea7b311fe57f58f8658a6f8736d8bfa44",
     "pkg/core/vm/frame_8250.go": "4438f4eca10f2968858104f9e1bafb1d905833e091d5c797a4a502ac439bc953",
     "pkg/core/vm/frame_noncontext_test.go": "67be15df2a10a21871a37d4e83ed16b8c6a003397b648328323447f73f601fe5",
-    "pkg/core/vm/interpreter.go": "c48d0ef8f7dc0048f2dbf6330c9f3b60f9248e9e1f8cfd65408388f850af7dad",
+    "pkg/core/vm/interpreter.go": "47abbe479a5e5ccf1dd724a91ffea0e2e49845cfe57fd8b17bebfec8693d929e",
     "pkg/core/vm/jump_table.go": "dc6c82c9bbe976f6a7e7b898cf1919a985c0e0bd5f3bdb57d0fbd0c966650d16",
     "refs/EIPs/EIPS/eip-1153.md": "c0e7a2e793f3fa44f048b772a3fb4779199d29b6d240c97e3723ace1e46e1c40",
     "refs/EIPs/EIPS/eip-214.md": "9a5f743f3d670ea90561ee413e2536b5c85664761a64a27a638650a3b52a3dca",
@@ -172,102 +172,24 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "35c95f6ea19889e8d3e5be7f4a05bfc08f058e3a",
-  "baseline_revision": "960baab3103e0d34435433be0f8314f127521052",
+  "source_revision": "6825f77b00126bb2881f47b9a507c68a4f82f06d",
   "additional_qualification": {
-    "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; exit 0",
+    "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native and wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "5f463dcd754cab3d4042522a421ce55a72f9f0cbb5cca35e1eefa134c89b9504",
-    "race_named_pass": 8005,
+    "race_log_sha256": "5c497591b8b73e8e5d6671052148e904dd9ff31750e3b5332bd52defb193b6dc",
+    "race_named_pass": 9385,
     "race_named_fail": 0,
     "race_named_skip": 74,
-    "full_named_skip": 124,
-    "required_B_test_skips": 0,
+    "required_native_consumer_skips": 0,
     "historical_baseline": {
       "cases": 12,
       "passed": 12,
       "failed": 0,
       "skipped": 0
     },
-    "skip_inventory": "evidence/hegota-a/skipped-tests.json"
-  },
-  "negative_controls": [
-    {
-      "name": "recheck-previous-reconstruction-defect",
-      "original_revision": "2a092e4344982614c3189437cf3bf5ebc28b1e56",
-      "expected_exit_code": 1,
-      "log_sha256": "93a0c6207fac3e0e6bbe6f34640d3af94bf0835ac109f448ed01f15280d02af8",
-      "failed_parent_tests": [
-        "TestCanonicalFrame8141PrefundedCreateBuildImport",
-        "TestFrame8141PrefundedCreationBAL",
-        "TestFrame8141PrefundedCreationRollbackBAL"
-      ],
-      "failed_test_or_subtest_events": 15,
-      "original_vm_file_sha256": {
-        "pkg/core/vm/frame_8141_bal.go": "d02a1f6edf5b753427bb5fbb9554acecf7da496b545a510d7f73940ed48f8d74"
-      }
-    }
-  ],
-  "fifth_audit": {
-    "review": "docs/reviews/pr-169/FIFTH_AUDIT.md",
-    "implementation_findings": 0,
-    "coverage_gaps_closed": 1,
-    "new_regression_parents": 1,
-    "backends": [
-      "memory",
-      "persisted-reopened-trie",
-      "persisted-reopened-snap"
-    ],
-    "independent_expected_values": {
-      "cold_warm_frame_gas": [
-        100,
-        3004,
-        3004,
-        5104,
-        3004,
-        0,
-        5104,
-        204
-      ],
-      "transient_logs": [
-        42,
-        0
-      ],
-      "reopened_storage_frame_gas": [
-        100,
-        15107,
-        207
-      ],
-      "state_gas": 0
-    },
-    "scope": "Native cross-backend parity plus hand-worked gas/transient expectations; not independent Frame-envelope implementation",
-    "coverage_guards": "Missing backend consumer in any of four criteria and missing EIP-1153 are rejected by checker regression tests",
-    "public_composition": "D01 remains open; no public 8250 activation"
-  },
-  "hosted_predecessor": {
-    "revision": "eeddcc6201cb2e4b498ed0ae291649a65a00c071",
-    "passed_checks": 10,
-    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45742116960",
-    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45742116887",
-    "scope": "Immutable predecessor evidence only, before adding the required persistent-backend consumer. It is not reused as current-head hosted qualification."
-  },
-  "previous_audit": {
-    "revision": "eeddcc6201cb2e4b498ed0ae291649a65a00c071",
-    "report": "https://github.com/alt-research/eth2030/blob/eeddcc6201cb2e4b498ed0ae291649a65a00c071/evidence/hegota-b/verification.json",
-    "review": "docs/reviews/pr-169/FOURTH_AUDIT.md",
-    "finding_families": 1,
-    "regression_parents": 3
-  },
-  "production_code_delta": {
-    "base_revision": "eeddcc6201cb2e4b498ed0ae291649a65a00c071",
-    "production_go_paths_changed": [],
-    "new_native_test": "pkg/core/execution/frame_backend_audit_test.go"
-  },
-  "hosted_qualification": {
-    "revision": "b649750d216c98d9ba07f3dc8228b960abbd70de",
-    "passed_checks": 10,
-    "main_run": "https://github.com/alt-research/eth2030/actions/runs/45744370015",
-    "snap2_run": "https://github.com/alt-research/eth2030/actions/runs/45744370014",
-    "scope": "All fifth-audit test/register changes included. Later documentation-only descendant checks are reported separately on PR #169."
+    "skip_inventory": "evidence/hegota-a/skipped-tests.json",
+    "python_regressions": 85,
+    "python_log_sha256": "beddaab60b45a67f9a381a50e8a0c7539be39e7ee397be9967a523a1030fb9d2",
+    "optimized_python_log_sha256": "71394f8c53d83cdc1810f9c356e7e8622077d7e3e6881d2c34fa8f4a420693ed"
   }
 }

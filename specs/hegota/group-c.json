@@ -37,6 +37,12 @@
       "path": "refs/EIPs/EIPS/eip-1474.md",
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "c7070c73e4399666dbdfc19dff89f3e61c142ffe44fa6798af135312918c59e6"
+    },
+    {
+      "eip": 8141,
+      "path": "refs/EIPs/assets/eip-8141/CanonicalPaymaster.sol",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "8040050a46ea8b02f8444de464cd2a0a83d8250648600e6504b9a46648a165f1"
     }
   ],
   "profiles": {

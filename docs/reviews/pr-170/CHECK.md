@@ -1,5 +1,21 @@
 # Hegota Group C checklist
 
+## Public integration follow-through (2026-11-26)
+
+The earlier D01 gate below is historical. EIPs #11968 establishes inheritance
+from EIP-8141; #12414 changes the inherited fee tuple, corroborated by the
+EELS eips/bogota/eip-8250 branch at 6013c4eaed5c9cc1cbb8428541972d6976a8cabd.
+The selected composition uses [max_fee, max_priority_fee_per_gas]. Qualification
+of its public consumers remains pending until the following work is complete.
+
+- [ ] Integrate the eight-field envelope, signing hash and deep copies with native transaction readers; preserve historical decoding.
+- [ ] Add explicit optional EIP-8250 activation with strict pre/post-fork schema validation and no irregular state installation.
+- [ ] Connect keyed nonce validation/execution and dependency tracking to public admission, replacement, reorg, builder and import paths.
+- [ ] Cover keyed RPC queries/simulation, blob sidecars, P2P and restart with native consumers.
+- [ ] Audit EIP-8151's optional activation and signer-class public-pool requirements against its latest merged text.
+- [ ] Update decisions, plans and source-bound evidence without claiming an unmerged canonical-paymaster template is normative.
+- [ ] Run relevant/full/race tests, build and vet; commit, push and requalify the English PR.
+
 Checked task boxes qualify implemented mechanisms in the selected profiles. They do not close the two public specification gates below.
 
 Baseline: merged master `5d777ad06f886c8b20fb010a47e65ddb05df8287`, after PR #169. References are read-only; existing B implementation and independent expectations remain authoritative.

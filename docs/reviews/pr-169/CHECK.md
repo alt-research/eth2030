@@ -39,8 +39,8 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 
 ## Fourth independent clause audit, 2026-11-26
 
-- [ ] Recheck upstream source identity and all 12 tasks against the development plan, beyond the previous test register.
-- [ ] Audit state lifecycle, state-gas restoration, contract creation/deletion, returndata and signature/receipt boundaries against normative clauses.
-- [ ] Reproduce and repair any concrete omissions, with regression tests and independent expected values.
-- [ ] Requalify current sources, full/focused race checks, build/vet and affected A/B evidence.
+- [x] Recheck upstream source identity and all 12 tasks against the development plan, beyond the previous test register.
+- [x] Audit state lifecycle, state-gas restoration, contract creation/deletion, returndata and signature/receipt boundaries against normative clauses.
+- [x] Reproduce and repair any concrete omissions, with regression tests and independent expected values.
+- [x] Requalify current sources, full/focused race checks, build/vet and affected A/B evidence.
 - [ ] Commit/push only owned changes, keep PR content English and verify the published head.

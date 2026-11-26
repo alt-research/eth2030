@@ -203,6 +203,30 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stCallCodes",
+      "reason": [
+        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
+        "--- SKIP: TestEF_stCallCodes (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stEIP1559",
+      "reason": [
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "--- SKIP: TestEF_stEIP1559 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stStaticCall",
+      "reason": [
+        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
+        "--- SKIP: TestEF_stStaticCall (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stQuadraticComplexityTest",
       "reason": [
         "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
@@ -211,10 +235,18 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stZeroCallsRevert",
+      "test": "TestEF_stMemoryTest",
       "reason": [
-        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
-        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
+        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
+        "--- SKIP: TestEF_stMemoryTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stEIP150Specific",
+      "reason": [
+        "fixture_loader_test.go:319: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
+        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
       ]
     },
     {
@@ -223,14 +255,6 @@
       "reason": [
         "fixture_loader_test.go:312: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
         "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryStressTest",
-      "reason": [
-        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
-        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
       ]
     },
     {
@@ -251,6 +275,22 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stMemoryStressTest",
+      "reason": [
+        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
+        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stZeroCallsRevert",
+      "reason": [
+        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
+        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stRevertTest",
       "reason": [
         "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
@@ -258,51 +298,11 @@
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP150Specific",
-      "reason": [
-        "fixture_loader_test.go:319: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP150Specific",
-        "--- SKIP: TestEF_stEIP150Specific (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stStaticCall",
-      "reason": [
-        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
-        "--- SKIP: TestEF_stStaticCall (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCallCodes",
-      "reason": [
-        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
-        "--- SKIP: TestEF_stCallCodes (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryTest",
-      "reason": [
-        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
-        "--- SKIP: TestEF_stMemoryTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP1559",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
-        "--- SKIP: TestEF_stEIP1559 (0.00s)"
-      ]
-    },
-    {
       "package": "github.com/eth2030/eth2030/core/rawdb",
       "test": "TestNewAncientStore_ReadOnlyFlag",
       "reason": [
         "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
-        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.00s)"
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.04s)"
       ]
     },
     {
@@ -326,7 +326,7 @@
       "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
       "reason": [
         "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
-        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.01s)"
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.02s)"
       ]
     },
     {
@@ -542,7 +542,7 @@
       "test": "TestJsonAllOpcodes/MOD",
       "reason": [
         "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_mod.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/MOD (0.00s)"
+        "--- SKIP: TestJsonAllOpcodes/MOD (0.17s)"
       ]
     },
     {
@@ -1588,5 +1588,5 @@
       ]
     }
   ],
-  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/c9f847e03dabce8e579bfb6385801b8327625e96/evidence/hegota-a/skipped-tests.json"
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/2a092e4344982614c3189437cf3bf5ebc28b1e56/evidence/hegota-a/skipped-tests.json"
 }

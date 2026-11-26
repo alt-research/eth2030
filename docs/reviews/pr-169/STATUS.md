@@ -1,25 +1,21 @@
 # Hegota Group B status
 
-The third clause audit found and corrected two additional consensus-visible omissions: APPROVE incorrectly expanded memory for empty returns, and static SSTORE recorded a forbidden storage read before failing. The [third audit](THIRD_AUDIT.md) records exact normative clauses, original-source reproduction and all 12 task review outcomes. The [second audit](SECOND_AUDIT.md) retains the earlier four dispatch/BAL defect families and their separate evidence. Neither prior completion labels nor green CI are treated as proof of absence of omissions.
+The fourth independent clause audit found and fixed an account-reconstruction BAL omission: prefunded CREATE/CREATE2 destinations captured balance zero after account reset instead of their transaction-original balance. This could publish false net-zero balance changes after success, constructor revert, enclosing Frame failure or atomic-batch rollback. The [fourth audit](FOURTH_AUDIT.md) records normative clauses, all 12 task outcomes and original-source reproduction. Earlier [third](THIRD_AUDIT.md) and [second](SECOND_AUDIT.md) audits retain their own findings and evidence; green predecessor CI did not prove absence of this omission.
 
-All 12 selected Group B tasks now map to 36 criteria and 75 mandatory native test identities, with no required test skipped. The register is [`specs/hegota/group-b.json`](../../../specs/hegota/group-b.json), with current-source evidence in [`evidence/hegota-b/verification.json`](../../../evidence/hegota-b/verification.json). Both new APPROVE consumers, the static SSTORE consumer and the EIP-214 source are mandatory in the checker.
+All 12 selected Group B tasks now map to 36 criteria and 78 mandatory native test identities, with no required test skipped. The register is [`specs/hegota/group-b.json`](../../../specs/hegota/group-b.json), with current-source qualification in [`evidence/hegota-b/verification.json`](../../../evidence/hegota-b/verification.json). The checker requires the new lifecycle, rollback and real build/import consumers.
 
-Local qualification at functional revision `f68ba648ed0448650cf67c73df46d6b253ff9679`:
+Local qualification at functional revision `52a84ba38b62ae6aea35a9815143d75a5d04773f`:
 
-- Full Go: 23,746 named test/subtest passes, 0 failures, 124 explicit skips; all 240 packages completed.
-- Focused race: 7,986 passes, 0 failures, 74 explicit skips; all 36 packages completed. No mandatory B test skipped.
-- Restoring the two original VM files from `c9f847e0` causes all three new parent regressions to fail (nine failed test/subtest events); corrected sources pass.
-- Ten APPROVE memory cases agree with unchanged upstream Geth v1.17.10 Amsterdam RETURN on gas, returned bytes and validity, excluding the Frame entry. This does not claim independent Frame-envelope equivalence.
+- Full Go: 23,761 named test/subtest passes, 0 failures, 124 explicit skips; all 240 packages completed.
+- Focused race: 8,001 passes, 0 failures, 74 explicit skips; all 36 packages completed. All 78 required B tests passed.
+- Restoring only the old BAL wrapper from `2a092e43` causes all three new parent regressions to fail, with 15 failed test/subtest events across execution and block packages. Corrected sources pass.
+- Eight prefunded CREATE/CREATE2 call bodies agree with unchanged upstream Geth v1.17.10 Amsterdam state/gas. Earlier delegated-call and RETURN memory comparisons also pass in the full suite. These do not claim independent Frame-envelope or BAL-producer equivalence.
 - Build/vet and native/wrapper CLI builds passed. Historical native/Geth differential baseline: 12/12 passed, no skips.
 - Python: 75 tests passed in normal and optimized modes; base/isolated codec and semantic oracles passed.
 - A requalified on current shared VM sources: 7 tasks / 26 criteria and all 62 mandatory native test identities. Full/race skips remain individually inventoried.
 
-Public transaction/receipt wire and storage schemas are unchanged. Research histories containing previously incorrect Frame gas or BAL commitments can require rebuilding from a valid checkpoint; roots are not rewritten. No public-chain migration is performed.
+Public transaction/receipt wire and storage schemas are unchanged. Research history containing incorrectly computed Frame gas/BAL commitments may require rebuilding from a valid checkpoint; roots are not rewritten. No public-chain database migration is performed.
 
-EIP-8250 D01 remains open: its three-fee example conflicts with its nonce-only replacement instruction and the current 8141 two-field total budget. HGT-017 is verified under the development plan's isolated state/vector allowance. No public composed decoder, activation, pool/import path or database migration is added. EIP-8272 uses the exact ordinary contract. Public-pool extensions remain Group C.
+EIP-8250 D01 remains open: its three-fee example conflicts with its nonce-only replacement instruction and current 8141 two-field total budget. HGT-017 is verified under the development plan's isolated state/vector allowance, with no public composed decoder, activation switch, pool/import path or database migration. EIP-8272 uses the exact ordinary contract. Public-pool extensions remain Group C.
 
-[PR #169](https://github.com/alt-research/eth2030/pull/169) is the publication target. The previous head `c9f847e0` passed 10 checks but contains the two newly reproduced defects. All 10 triggered checks passed on corrected source head `46f57ce4` ([main CI](https://github.com/alt-research/eth2030/actions/runs/45693637673), [snap2](https://github.com/alt-research/eth2030/actions/runs/45693637672)). The evidence records that immutable tested head; final documentation-only descendant checks are reported separately on PR #169.
-
-## Fourth audit in progress
-
-A fresh review checks every Group B task directly against the development plan and normative clauses, including state lifecycle boundaries beyond the previous regression register. Previous passing runs are retained with their tested identities and are not proof of completeness.
+[PR #169](https://github.com/alt-research/eth2030/pull/169) remains the publication target. Previous head `2a092e43` passed 10 checks but contains the reproduced reconstruction defect. Hosted checks for the corrected published head are pending and must be verified separately.

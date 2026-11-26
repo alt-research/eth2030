@@ -45,3 +45,7 @@ The correction changes the BAL commitment for research blocks that exercised the
 EIP-8250 still contains the fee-field conflict with current EIP-8141. HGT-017 remains complete only under the development plan's isolated state/vector allowance; no public composed decoder, activation, pool/import path or database migration is enabled.
 
 Fresh local source-bound qualification is recorded in the A/B evidence. Hosted checks are reported against their tested commit on PR #169.
+
+## Fresh local qualification
+
+Functional revision `52a84ba38b62ae6aea35a9815143d75a5d04773f` completed all 240 packages with 23,761 named passes, zero failures and 124 explicit skips. The focused race run completed all 36 packages with 8,001 named passes, zero failures and 74 explicit skips. All 78 mandatory B tests and 62 mandatory A tests passed. Build/vet, both CLI builds, the 12-case historical differential baseline and 75 Python tests in normal/optimized modes passed. Source/log digests and individual skip reasons are retained in the evidence.

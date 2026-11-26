@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "16cde85ef3d49f5d10bc5e2cdafef0b27e2e5537a0216c877aee29617a69e3a1",
+    "log_sha256": "a730104c90797825a441e1a4a97cea073d3774baa4af384cc27bf0b5cd48d3eb",
     "named": {
-      "pass": 23851,
+      "pass": 23852,
       "skip": 124
     },
     "packages": {
@@ -172,12 +172,12 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Selected base 8141 native execution; isolated 8250 nonce-only delta; ordinary 8272 contract. D01 and Group C public pool remain separate.",
-  "source_revision": "6825f77b00126bb2881f47b9a507c68a4f82f06d",
+  "source_revision": "c973c4aa8c8a1d83442d04bc3f8b542e15e00510",
   "additional_qualification": {
     "build": "env -u GOROOT GOFLAGS=-p=4 go build ./...; native and wrapper binary builds; exit 0",
     "vet": "env -u GOROOT GOFLAGS=-p=4 go vet ./...; exit 0",
-    "race_log_sha256": "5c497591b8b73e8e5d6671052148e904dd9ff31750e3b5332bd52defb193b6dc",
-    "race_named_pass": 9385,
+    "race_log_sha256": "2bd105f423aa4291cd9cb1b505001584706b18c53a87101bd225d3eb9a39263f",
+    "race_named_pass": 9386,
     "race_named_fail": 0,
     "race_named_skip": 74,
     "required_native_consumer_skips": 0,
@@ -189,7 +189,7 @@
     },
     "skip_inventory": "evidence/hegota-a/skipped-tests.json",
     "python_regressions": 85,
-    "python_log_sha256": "beddaab60b45a67f9a381a50e8a0c7539be39e7ee397be9967a523a1030fb9d2",
-    "optimized_python_log_sha256": "71394f8c53d83cdc1810f9c356e7e8622077d7e3e6881d2c34fa8f4a420693ed"
+    "python_log_sha256": "a68e06e0cdcf52d877cbb340406885b8e08f7774bce0ae34921a1a5aa5f2c54e",
+    "optimized_python_log_sha256": "3d9b60d9c9162ab85b15d6c0ddc8c9e2057deb50c17f33d8eceb15ec04a7de9a"
   }
 }

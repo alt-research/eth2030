@@ -1,8 +1,8 @@
 {
   "date": "2026-11-26",
-  "source_base_commit": "6825f77b00126bb2881f47b9a507c68a4f82f06d",
+  "source_base_commit": "c973c4aa8c8a1d83442d04bc3f8b542e15e00510",
   "branch_baseline": "5d777ad06f886c8b20fb010a47e65ddb05df8287",
-  "source_fingerprint_sha256": "33b672e1935e58a67eac797a8cb4f5721a41976710055c3974bef01e83bbd1f9",
+  "source_fingerprint_sha256": "c3c51f1f4c4f0536474721362000ab187d8bc62307b205576e5f8789d31d644f",
   "source_file_sha256": {
     ".github/workflows/ci.yml": "56e32030782bf723797675c59dd7c2ed90087614a8d2d2ca2d322a61c5e83514",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
@@ -153,10 +153,10 @@
     "pkg/rpc/types/frame_simulation.go": "5b78e0ffd261a44a7474f07df0982073efc73b5820a9f06ca22c7f63d920bda7",
     "pkg/rpc/types/types.go": "6b69862f4e55cc766df3f63007346b9c82429e540a432df6df9f4c3bae56dc34",
     "pkg/sync/checkpoint/checkpoint_store_test.go": "764935e294bac04d3316626d4494ea18e06b5f59f6f46b7eec6d629d439b0aa0",
-    "pkg/txpool/frame_8141.go": "6803f3e272471668184c823fcc4b7bc49fc0a18a473fdcd8c529776856bffe52",
-    "pkg/txpool/frame_8250_delta.go": "968c0933312a2d71d3fc4a59c03633c38f1a73773419b1032dca2febfe76b8fb",
+    "pkg/txpool/frame_8141.go": "dce9f7c6c2d8de4323e92877bfd9acd3f52303ef35b9537566951841b0fe6c4e",
+    "pkg/txpool/frame_8250_delta.go": "7b65ede14e8aead2574bbf8a83f852b0bd203025dfa938af716fce3f286988d1",
     "pkg/txpool/frame_8250_delta_test.go": "5e2431ac9997ee9d7b146bc50d2471c619e3243fb1b1473738cff4284eb57736",
-    "pkg/txpool/frame_c_test.go": "ce5e9513f98e5d380fc370bf28255fe2df71255dfb809066389d819efaa45abc",
+    "pkg/txpool/frame_c_test.go": "e44a55293aedb79c482f0140b378cdcebcdd2da1335c5b0d92421b6cf672c52b",
     "pkg/txpool/frame_expiry.go": "5725af6818ed937199d4332b2c210bf9561703a7084e2395b45e1864c4df0e7b",
     "pkg/txpool/frame_paymaster_test.go": "a738c7132a788cc208a94c61f003d6bb6d65ce6f9baf3dda2ef5da63dda76373",
     "pkg/txpool/hegota_activation_test.go": "48a29ebf0c4bd87d337e94fa086e2793c3b019effa0a4bd0dd7464ae6c566bae",
@@ -168,7 +168,7 @@
     "tools/hegota/bls_vector.go": "6d7a8898020458b601d1ade61401467382ae8545212e83c454a15b0a4dbccf95",
     "tools/hegota/check.py": "f51c8828fa73cb88cded339bd36ca898a199d9ae227ab9adde567e6c9a30c5b6",
     "tools/hegota/check_b.py": "bf55a23e1f906f9b3bd9d3edc56521511876bc1da8ceec68e98ddcb6de96d96a",
-    "tools/hegota/check_c.py": "8818e8b368931a3207d2548b14ad75194ea92a5415ff3b729441f76bd448ce78",
+    "tools/hegota/check_c.py": "cc6beded115f06a86acecf449eca0ef38c1ac10d8ac233f92ab78c2806c03884",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
@@ -181,14 +181,14 @@
     {
       "path_role": "native",
       "entrypoint": "pkg/cmd/eth2030",
-      "sha256": "93f0f90646ad1793606d6be16c57f845dfe4c5994c21ce2b9d526bcc53f84b16",
+      "sha256": "59535cfaf6d000437c54ef0707511199b3d384279f65913c6bd40f4eecccde7f",
       "version_output": "eth2030 v0.1.0-dev (commit unknown)",
       "run": "current source host build/version; actual native node exercised by fresh full/race suites; no container claim"
     },
     {
       "path_role": "upstream_geth_wrapper",
       "entrypoint": "pkg/cmd/eth2030-geth",
-      "sha256": "12c2a9597b8218ab78ff92cc9ca34ca07dd8f101782f42d5f4ca7b04a3e27475",
+      "sha256": "1dc684de9370f03454bd8c010be979a729fa99b6e5cd00082ad373cb01a9efbd",
       "version_output": "eth2030-geth v0.2.0 (commit unknown)",
       "run": "current source host build/version; actual native node exercised by fresh full/race suites; no container claim"
     }

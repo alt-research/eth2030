@@ -5,6 +5,7 @@
 - [x] Re-read current EIP-8141, its Solidity asset, PR #12041's complete history/reviews and current implementer discussion; distinguish merged requirements from the proposed runtime.
 - [x] Reconcile runtime recognition, authorization, storage, delayed withdrawal/rotation, EIP-8151 and pool lifecycle requirements against production paths.
 - [x] Implement every determinate omission with independent native positive/negative controls and explicit profile selection where upstream proposals diverge.
+- [x] Reproduce and fix per-opcode raw-code copying; qualify frame/profile/rollback recognition bounds with an exact prior-source overlay and a mandatory native consumer.
 - [x] Verify builds, relevant/full/race tests, the 12-case baseline, normal/optimized Python and four native mutation controls; bind all mandatory A/B/C consumers to current-source evidence.
 - [x] Prepare final source-bound evidence and the English PR publication. Exact pushed-head hosted results are maintained in the live PR description/checks, without another commit solely to attest to itself.
 

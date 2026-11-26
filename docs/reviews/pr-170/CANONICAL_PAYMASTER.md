@@ -74,7 +74,7 @@ be deployed but authorize nothing, following the proposal.
 | Finalization | Anyone can finalize exactly at maturity, not one second earlier; absent actions reject. Withdrawal clears pending state before CALL. Insufficient funds and failed receivers restore funds/action state. Native reentrancy cannot pay twice. Rotation changes slot 0 and clears pending slots without moving ETH. |
 | Pool availability | Sum of signed max_fee plus raw slot-1 withdrawal, subtracted once per instance. Maturity alone never releases the withdrawal. Replacement transfers exposure atomically; removal, inclusion, reset and reorg release or rebuild indexes. |
 | Candidate state | Build validation repeats the selected version's withdrawal-adjusted availability against candidate state. It does not reserve unrelated, unselected pool transactions. A native counterexample reproduces the earlier missing check. |
-| Public validation work | Existing shared execution/state validation caps apply. This profile additionally selects #12041's optional 15,000 PAY execution limit. Higher-budget consensus-valid transactions remain valid privately; only local public admission is limited. |
+| Public validation work | Existing shared execution/state validation caps apply. This profile additionally selects #12041's optional 15,000 PAY execution limit. Runtime recognition is cached per immutable VERIFY frame/profile and follows frame snapshots: disabled selection reads no code, selected recognition reads raw code at most once. Higher-budget consensus-valid transactions remain valid privately; only local public admission is limited. |
 | EIP-8151 | The exact proposed runtime performs no ecRecover. Its protocol signature creates neither a recovered-code-class dependency nor an artificial signer-share charge. Actual ecRecover contracts retain the previously implemented class/quota rules. |
 | Native runtime paths | Base/keyed and plain/blob cases submit over HTTP, propagate to a second node, simulate authenticated execution, build from the actual public pool, independently import/select, invoke withdrawal administration, reorg orphan-only withdrawal state and receipts, reselect and restart from disk. |
 | Sending tool | `send-frame --paymaster <address> --paymaster-12041 --sponsor-key <key>` signs the empty-data interface and checks the selected runtime. Its private-key interface remains a secp256k1 convenience; native transaction admission also supports P256. |
@@ -90,12 +90,12 @@ profile can already be deployed, executed and qualified explicitly.
 
 ## Local qualification
 
-Implementation revision: `95a0382f` (later edits qualify documentation/evidence).
+Implementation revision: `4ac957e9` (later edits qualify documentation/evidence).
 All 240 full-suite and 57 focused-race packages completed successfully:
-24,004/9,587 passing test/subtest events and zero failures. Native/wrapper
+24,005/9,588 passing test/subtest events and zero failures. Native/wrapper
 builds, full vet, the independent 12/12 historical baseline and 91 Python
 regressions in each normal/optimized mode pass. The A/B/C required consumers
-are 62/79/91 with zero required skips; 124/74 optional full/race skips are
+are 62/79/92 with zero required skips; 124/74 optional full/race skips are
 separately inventoried.
 
 Four explicit feature mutations fail their native consumers while preserving
@@ -104,4 +104,9 @@ withdrawal slot, omit the pending-rotation dependency, and omit candidate
 withdrawal availability. These are current-source mutations, not claims that
 the unmodified predecessor compiles against new APIs. Their log and overlay
 hashes are retained in C evidence alongside the preceding audit controls.
+An additional exact `b750e897` predecessor overlay reproduces 100 raw-code
+copies for 100 opcodes with recognition disabled; the current bounded-work
+consumer and its frame/profile/rollback cases pass. Its positive verifier
+control passes against both versions. This fifth control is a real prior-source
+counterexample, separate from the four explicit feature mutations.
 Exact pushed-head hosted results belong in the English PR description/checks.

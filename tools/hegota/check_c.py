@@ -68,6 +68,7 @@ MANDATORY = {
 }
 
 PAYMASTER_REQUIRED = {
+	'core/vm::TestPR12041PaymasterRecognitionIsFrameBounded',
  'core/framepay::TestPR12041ReproducesUpstreamAssembly',
  'core/framepay::TestPR12041LayoutAndProfileIsolation',
  'core/execution::TestPR12041NativePaymentAuthorization',

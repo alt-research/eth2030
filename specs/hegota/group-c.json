@@ -134,7 +134,7 @@
         },
         {
           "id": "C20.2",
-          "statement": "work and stop:** signature validation cost plus declared prefix execution limits must be at most 100000; state limits at most 500000. Exercise equality and +1, including 16 cold root keys and default-account creation. Execute through successful completion of the payer-setting frame, never the body. Failed/caught banned validation behavior cannot be hidden by an outer success. Reverted approval does not terminate validation.",
+          "statement": "work and stop:** signature validation cost plus declared prefix execution limits must be at most 100000; state limits at most 500000. Exercise equality and +1, including 16 cold root keys and default-account creation. Execute through successful completion of the payer-setting frame, never the body. Failed/caught banned validation behavior cannot be hidden by an outer success. Reverted approval does not terminate validation. Exact paymaster recognition performs at most one raw-code lookup per immutable VERIFY frame/profile and no lookup when disabled; frame snapshot rollback preserves the bound and permissions.",
           "clauses": [
             "EIP-8141 Mempool/Behavior/Introspection",
             "EIP-8272 Public mempool handling"
@@ -146,7 +146,8 @@
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/types::TestFrameCPublicWorkBudgetEquality",
-            "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolPrefixDoesNotExecuteBody"
+            "github.com/eth2030/eth2030/txpool::TestCanonicalFrame8141PoolPrefixDoesNotExecuteBody",
+            "github.com/eth2030/eth2030/core/vm::TestPR12041PaymasterRecognitionIsFrameBounded"
           ],
           "scope": "selected native base/keyed profiles with explicit activation; canonical upstream runtime gate remains"
         },

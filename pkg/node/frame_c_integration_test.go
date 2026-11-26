@@ -148,6 +148,14 @@ func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
 				}
 				sidecar.Proofs[127] = bad
 			}
+			if !blob {
+				for _, badDATA := range []string{rawHex[2:], "0x6", "0xzz"} {
+					var result any
+					if err := a.invoke("eth_sendRawTransaction", &result, badDATA); err == nil {
+						t.Fatal("submission accepted malformed DATA")
+					}
+				}
+			}
 			var submitted types.Hash
 			a.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(network))
 			if submitted != tx.Hash() {

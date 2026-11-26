@@ -41,7 +41,7 @@ func (pool *TxPool) validateFrame8141(tx *types.Transaction) error {
 func (pool *TxPool) frameProfile() string {
 	encoded, _ := json.Marshal(pool.frameConfig)
 	rules, _ := json.Marshal(pool.frameConfig.Rules(new(big.Int).SetUint64(pool.frameNumber), pool.frameConfig.IsMerge(), pool.frameTime))
-	return string(encoded) + string(rules) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1)
+	return string(encoded) + string(rules) + strconv.FormatBool(pool.config.ExperimentalFramePaymasterV1) + strconv.FormatBool(pool.config.ExperimentalFramePaymaster12041)
 }
 func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
 	validation, err := pool.prepareFrame8141Result(tx)
@@ -58,6 +58,10 @@ func (pool *TxPool) validateFrame8141Result(tx *types.Transaction) (*execution.F
 // Prepare against the head independently of other pending transactions. This
 // stage can remove stale entries before shared reservations are arbitrated.
 func (pool *TxPool) prepareFrame8141Result(tx *types.Transaction) (*execution.FramePrefixValidation, error) {
+	paymasterProfile, err := framepay.SelectProfile(pool.config.ExperimentalFramePaymasterV1, pool.config.ExperimentalFramePaymaster12041)
+	if err != nil {
+		return nil, err
+	}
 	frame := tx.Inner().(*types.FrameTx8141)
 	if pool.frameConfig == nil || !pool.frameConfig.IsMerge() || !pool.frameConfig.IsHogota(pool.frameTime) {
 		return nil, errors.New("EIP-8141 requires Bogotá")
@@ -127,7 +131,7 @@ func (pool *TxPool) prepareFrame8141Result(tx *types.Transaction) (*execution.Fr
 	validation := pool.lookup.frameValidations[tx.Hash()]
 	profile := pool.frameProfile()
 	if validation == nil || validation.Profile != profile || !validation.Unchanged(db) {
-		validation, err = execution.ValidateFrame8141Dependencies(pool.frameConfig, db, header, tx, blobFee, pool.config.ExperimentalFramePaymasterV1)
+		validation, err = execution.ValidateFrame8141DependenciesWithPaymaster(pool.frameConfig, db, header, tx, blobFee, paymasterProfile)
 		if err != nil {
 			return nil, err
 		}
@@ -157,9 +161,13 @@ func (pool *TxPool) validateFrameResources8141(frame *types.FrameTx8141, validat
 	payer := validation.Payer
 	reserved := frameMaxFee(frame.Fees.MaxFee)
 	pay := frameHasPayPrefix(frame.Frames)
-	canonical := pool.config.ExperimentalFramePaymasterV1 && pay && framepay.IsV1(db.GetCode(payer))
+	paymasterProfile, err := framepay.SelectProfile(pool.config.ExperimentalFramePaymasterV1, pool.config.ExperimentalFramePaymaster12041)
+	if err != nil {
+		return err
+	}
+	canonical := pay && paymasterProfile.Matches(db.GetCode(payer))
 	if canonical {
-		reserved.Add(reserved, framepay.PendingWithdrawal(db, payer))
+		reserved.Add(reserved, paymasterProfile.PendingWithdrawal(db, payer))
 	}
 	noncanonical := pay && db.GetCodeSize(payer) > 0 && !canonical
 	if aggregate {
@@ -348,8 +356,30 @@ func (pool *TxPool) ValidateFrameForBuild(tx *types.Transaction, db state.StateD
 	pool.mu.RLock()
 	defer pool.mu.RUnlock()
 	blobFee := gas.BlobBaseFeeForHeader(pool.frameConfig, header)
-	_, err := execution.ValidateFrame8141Dependencies(pool.frameConfig, db, header, tx, blobFee, pool.config.ExperimentalFramePaymasterV1)
-	return err
+	paymasterProfile, err := framepay.SelectProfile(pool.config.ExperimentalFramePaymasterV1, pool.config.ExperimentalFramePaymaster12041)
+	if err != nil {
+		return err
+	}
+	validation, err := execution.ValidateFrame8141DependenciesWithPaymaster(pool.frameConfig, db, header, tx, blobFee, paymasterProfile)
+	if err != nil {
+		return err
+	}
+	frame := tx.Inner().(*types.FrameTx8141)
+	if frameHasPayPrefix(frame.Frames) && paymasterProfile.Matches(db.GetCode(validation.Payer)) {
+		// Earlier selected transactions can request a withdrawal. Recheck the
+		// selected version's availability in the candidate pre-state, without
+		// charging reservations for unrelated transactions still in the pool.
+		required := frameMaxFee(frame.Fees.MaxFee)
+		required.Add(required, paymasterProfile.PendingWithdrawal(db, validation.Payer))
+		insolvent := db.GetBalance(validation.Payer).Cmp(required) < 0
+		if err := state.ReadError(db); err != nil {
+			return err
+		}
+		if insolvent {
+			return ErrInsufficientFunds
+		}
+	}
+	return state.ReadError(db)
 }
 
 // FrameBuildResult applies a local three-consecutive-unpaid-attempt policy.

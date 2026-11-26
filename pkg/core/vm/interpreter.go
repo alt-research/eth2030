@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/rlp"
@@ -107,14 +108,14 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
-	OnFrameLegacyNonceRead       func(types.Address)                                  // optional nonce dependency instrumentation
-	OnFrameRecovery8151          func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
-	FrameObserver                FrameObserver                                        // optional bounded per-frame simulation observer
-	ExperimentalFramePaymasterV1 bool                                                 // local research template; not upstream canonical code
-	Context                      context.Context                                      // optional cancellation for isolated RPC execution
-	Debug                        bool
-	Tracer                       EVMLogger
-	MaxCallDepth                 int
+	OnFrameLegacyNonceRead func(types.Address)                                  // optional nonce dependency instrumentation
+	OnFrameRecovery8151    func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
+	FrameObserver          FrameObserver                                        // optional bounded per-frame simulation observer
+	FramePaymasterProfile  framepay.Profile                                     // explicit local public-pool runtime recognition
+	Context                context.Context                                      // optional cancellation for isolated RPC execution
+	Debug                  bool
+	Tracer                 EVMLogger
+	MaxCallDepth           int
 }
 
 // EVM is the Ethereum Virtual Machine execution environment.

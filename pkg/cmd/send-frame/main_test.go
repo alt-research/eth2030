@@ -77,3 +77,19 @@ func TestMakeFrameUsesPaymasterOwnerMetadata(t *testing.T) {
 		t.Fatal("paymaster without owner signature accepted")
 	}
 }
+
+func TestMakeFramePR12041Interface(t *testing.T) {
+	opts := options{key: fmt.Sprintf("%064x", 1), sponsor: fmt.Sprintf("%064x", 2), paymaster: "0x0000000000000000000000000000000000000093", paymaster12041: true, data: "0x", value: "0", execution: 30000, state: 97920}
+	tx, err := makeFrame(opts, big.NewInt(1337), 0, big.NewInt(1), big.NewInt(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	frame := tx.Inner().(*types.FrameTx8141)
+	if frame.Validate() != nil || len(frame.Frames[1].Data) != 0 || len(frame.Signatures[1].Message) != 0 || frame.Signatures[1].Signer == nil {
+		t.Fatal("proposal PAY interface/signing metadata")
+	}
+	opts.paymaster = ""
+	if _, err := makeFrame(opts, big.NewInt(1337), 0, big.NewInt(1), big.NewInt(1)); err == nil {
+		t.Fatal("proposal flag without instance")
+	}
+}

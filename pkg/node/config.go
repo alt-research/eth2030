@@ -158,8 +158,9 @@ type Config struct {
 
 	// ExperimentalLocalTx enables type-0x08 LocalTx (proof-of-concept, not production-ready).
 	// When true, the txpool accepts type-0x08 txs and enforces ScopeHint access restrictions.
-	ExperimentalFramePaymasterV1 bool // explicitly select local research paymaster; not upstream canonical bytecode
-	ExperimentalLocalTx          bool // --experimental-local-tx
+	ExperimentalFramePaymasterV1    bool // explicitly select local research paymaster; not upstream canonical bytecode
+	ExperimentalFramePaymaster12041 bool // opt into EIPs #12041 at 4a98fce, off by default
+	ExperimentalLocalTx             bool // --experimental-local-tx
 
 	// AllowAATx controls whether the txpool accepts EIP-7701 AA transactions (type 0x05).
 	// Defaults to true (enabled on Glamsterdam+ networks). Set false to disable on
@@ -343,6 +344,9 @@ func DefaultConfig() Config {
 
 // Validate checks configuration values for correctness.
 func (c *Config) Validate() error {
+	if c.ExperimentalFramePaymasterV1 && c.ExperimentalFramePaymaster12041 {
+		return errors.New("select exactly one experimental Frame paymaster profile")
+	}
 	if c.DataDir == "" {
 		return errors.New("config: datadir must not be empty")
 	}

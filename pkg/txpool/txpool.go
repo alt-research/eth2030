@@ -96,12 +96,13 @@ var (
 
 // Config holds TxPool configuration.
 type Config struct {
-	FrameSignerCanonicalLimit    int    // EIP-8151 local per-signer reserved share (default 64)
-	FrameSignerOtherLimit        int    // separate smaller share (default 8)
-	FramePriceBump               uint64 // both Frame fee fields; zero selects 10 percent
-	FrameBlobPriceBump           uint64 // optional larger blob max_fee increment
-	ExperimentalFramePaymasterV1 bool   // explicit local paymaster profile
-	MaxBytes                     uint64 // encoded envelopes plus blob sidecars; zero uses 512 MiB
+	FrameSignerCanonicalLimit       int    // EIP-8151 local per-signer reserved share (default 64)
+	FrameSignerOtherLimit           int    // separate smaller share (default 8)
+	FramePriceBump                  uint64 // both Frame fee fields; zero selects 10 percent
+	FrameBlobPriceBump              uint64 // optional larger blob max_fee increment
+	ExperimentalFramePaymasterV1    bool   // explicit local paymaster profile
+	ExperimentalFramePaymaster12041 bool   // pinned unmerged EIPs #12041 proposal
+	MaxBytes                        uint64 // encoded envelopes plus blob sidecars; zero uses 512 MiB
 
 	MaxSize           int               // Maximum number of transactions in pool
 	MaxPerSender      int               // Maximum pending per sender

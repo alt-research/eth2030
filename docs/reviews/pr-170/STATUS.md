@@ -1,6 +1,6 @@
 # Hegota Group C status
 
-Canonical-paymaster follow-up is in progress: re-reading current EIP-8141 and the full #12041 history/discussion before deciding the executable profile and closing every determinate implementation omission. Previous qualifications remain historical until this follow-up is requalified.
+Canonical-paymaster source reconciliation is complete. The exact #12041 runtime, distinct layout, authorization, treasury/admin operations, public admission/dependencies/exposure and native transport/build/import/reorg/restart are implemented behind explicit proposal selection. A native counterexample exposed and fixed missing candidate-state withdrawal availability. Relevant native tests pass; full source-bound qualification and current-head hosted checks remain pending. See [CANONICAL_PAYMASTER.md](CANONICAL_PAYMASTER.md). Previous qualifications remain historical until this follow-up is requalified.
 
 ## Independent completeness re-audit completed locally
 

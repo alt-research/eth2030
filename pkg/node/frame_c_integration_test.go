@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto/bls"
 	"github.com/eth2030/eth2030/engine/payload"
@@ -20,23 +21,37 @@ import (
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
-func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) { runFrameCNativePeers(t, false) }
-func TestFrame8250NativePeersPoolBuildSimulationAndRestart(t *testing.T) {
-	runFrameCNativePeers(t, true)
+func TestFrameCNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+	runFrameCNativePeers(t, false, false)
 }
-func runFrameCNativePeers(t *testing.T, keyed bool) {
+func TestFrame8250NativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+	runFrameCNativePeers(t, true, false)
+}
+func TestPR12041NativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+	runFrameCNativePeers(t, false, true)
+}
+func TestPR12041KeyedNativePeersPoolBuildSimulationAndRestart(t *testing.T) {
+	runFrameCNativePeers(t, true, true)
+}
+func runFrameCNativePeers(t *testing.T, keyed, paymaster bool) {
 	for _, blob := range []bool{false, true} {
 		t.Run(fmt.Sprintf("blob_%t", blob), func(t *testing.T) {
 			const token = "frame-c-native"
 			key, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", 1))
 			sender := types.Address(gethcrypto.PubkeyToAddress(key.PublicKey))
+			ownerKey, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", 2))
+			owner := types.Address(gethcrypto.PubkeyToAddress(ownerKey.PublicKey))
+			payer := sender
+			if paymaster {
+				payer = types.Address{19: 0x93}
+			}
 			target := types.Address{18: 0x89}
 			var genesis map[string]any
 			if err := json.Unmarshal(builderRequestGenesisJSON(1337), &genesis); err != nil {
 				t.Fatal(err)
 			}
 			gasLimit := "0x186a0"
-			if keyed {
+			if keyed || paymaster {
 				gasLimit = "0x61a80"
 			}
 			genesis["gasLimit"] = gasLimit
@@ -50,12 +65,17 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 				alloc[types.NonceManager8250.Hex()] = map[string]string{"nonce": "1", "code": "0x60006000fd", "balance": "0"}
 			}
 			alloc[sender.Hex()] = map[string]string{"balance": "1000000000000000000"}
+			if paymaster {
+				alloc[payer.Hex()] = map[string]any{"balance": "1000000000000000000", "nonce": "1", "code": "0x" + hex.EncodeToString(framepay.Runtime12041()), "storage": map[string]string{types.Hash{}.Hex(): types.BytesToHash(owner[:]).Hex()}}
+				alloc[owner.Hex()] = map[string]string{"balance": "0", "code": "0x00", "nonce": "1"}
+			}
 			alloc[target.Hex()] = map[string]string{"balance": "0", "nonce": "1", "code": "0x60015f555f5fa060425f5360015ff3"}
 			rawGenesis, _ := json.Marshal(genesis)
 			config := func() *Config {
 				cfg := makeTestConfig(t)
 				cfg.GenesisPath = filepath.Join(cfg.DataDir, "genesis.json")
 				cfg.EngineAuthToken = token
+				cfg.ExperimentalFramePaymaster12041 = paymaster
 				if err := os.WriteFile(cfg.GenesisPath, rawGenesis, 0600); err != nil {
 					t.Fatal(err)
 				}
@@ -76,8 +96,22 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 				{Mode: types.ModeVerify, Flags: 3, Limits: types.FrameGasLimits{Execution: 1000}},
 				{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: 30000, State: 97920}},
 			}, Signatures: []types.FrameSignature{{Scheme: types.FrameSignatureSecp256k1, Signature: make([]byte, 65)}}}
+			if paymaster {
+				frame.Frames[0].Flags = 2
+				frame.Frames = append(frame.Frames[:1], append([]types.Frame8141{{Mode: types.ModeVerify, Flags: 1, Target: &payer, Limits: types.FrameGasLimits{Execution: 15000}}}, frame.Frames[1:]...)...)
+				frame.Signatures = append(frame.Signatures, types.FrameSignature{Scheme: types.FrameSignatureSecp256k1, Signer: &owner, Signature: make([]byte, 65)})
+				withdrawal, err := framepay.RequestWithdrawal12041(big.NewInt(400000))
+				if err != nil {
+					t.Fatal(err)
+				}
+				frame.Frames = append(frame.Frames, types.Frame8141{Mode: types.ModeSender, Target: &payer, Data: withdrawal, Limits: types.FrameGasLimits{Execution: 50000, State: 2 * 97920}})
+			}
 			if keyed {
-				frame.Frames[0].Limits.State = types.KeyedNonceFirstUseStateGas8250
+				approval := 0
+				if paymaster {
+					approval = 1
+				}
+				frame.Frames[approval].Limits.State = types.KeyedNonceFirstUseStateGas8250
 				frame = types.NewFrameTransaction8250(&types.FrameTx8250Delta{ChainID: frame.ChainID, Sender: sender, NonceKeys: []*big.Int{big.NewInt(42)}, NonceSeq: ^uint64(0), Frames: frame.Frames, Signatures: frame.Signatures, Fees: frame.Fees}).Inner().(*types.FrameTx8141)
 			}
 			var sidecar *types.BlobSidecarData
@@ -110,6 +144,13 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 				t.Fatal(err)
 			}
 			frame.Signatures[0].Signature = append([]byte{signature[64]}, signature[:64]...)
+			if paymaster {
+				signature, err = gethcrypto.Sign(signingHash[:], ownerKey)
+				if err != nil {
+					t.Fatal(err)
+				}
+				frame.Signatures[1].Signature = append([]byte{signature[64]}, signature[:64]...)
+			}
 			tx := types.NewTransaction(frame)
 			tx.SetBlobSidecar(sidecar)
 			plain, err := tx.EncodeRLP()
@@ -121,13 +162,17 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 			before := source.Blockchain().State().GetRoot()
 			var simulated rpctypes.FrameSimulationResult
 			a.call(t, "eth_simulateFrameV1", &simulated, options, "latest")
-			if !simulated.Valid || simulated.Hash != tx.Hash().Hex() || simulated.SigningHash != signingHash.Hex() || simulated.Payer == nil || *simulated.Payer != sender.Hex() || len(simulated.Frames) != 2 || simulated.Frames[1].StateGasUsed != "0x17e80" || simulated.Frames[1].ReturnData != "0x42" {
+			last := 1
+			if paymaster {
+				last = 2
+			}
+			if !simulated.Valid || simulated.Hash != tx.Hash().Hex() || simulated.SigningHash != signingHash.Hex() || simulated.Payer == nil || *simulated.Payer != payer.Hex() || len(simulated.Frames) != len(frame.Frames) || simulated.Frames[last].StateGasUsed != "0x17e80" || simulated.Frames[last].ReturnData != "0x42" {
 				t.Fatalf("incomplete dimensional replay: %+v", simulated)
 			}
 			if source.Blockchain().State().GetRoot() != before || source.TxPool().Get(tx.Hash()) != nil {
 				t.Fatal("simulation leaked canonical or pool effects")
 			}
-			if simulated.Frames[1].StructLogs == nil {
+			if simulated.Frames[last].StructLogs == nil {
 				t.Fatal("Frame trace omitted executed opcodes")
 			}
 			noTrace := map[string]any{"rawTransaction": rawHex, "slotNumber": "0x1", "blockOverrides": map[string]any{"time": "0xc"}}
@@ -241,11 +286,34 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 			var receipt, other map[string]any
 			a.call(t, "eth_getTransactionReceipt", &receipt, tx.Hash().Hex())
 			b.call(t, "eth_getTransactionReceipt", &other, tx.Hash().Hex())
-			if !reflect.DeepEqual(receipt, other) || receipt["payer"] != sender.Hex() {
+			if !reflect.DeepEqual(receipt, other) || receipt["payer"] != payer.Hex() {
 				t.Fatal("native peers differ on persisted Frame receipt")
 			}
 			if source.Blockchain().State().GetRoot() != receiver.Blockchain().State().GetRoot() {
 				t.Fatal("native imports differ on state root")
+			}
+			if paymaster {
+				for _, pair := range []struct {
+					node *Node
+					rpc  track4RPC
+				}{{source, a}, {receiver, b}} {
+					if framepay.PR12041.PendingWithdrawal(pair.node.Blockchain().State(), payer).Int64() != 400000 {
+						t.Fatal("native import lost administrative withdrawal")
+					}
+					pair.rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: pair.node.Blockchain().Genesis().Hash()}, nil)
+					if fc.PayloadStatus.Status != "VALID" || framepay.PR12041.PendingWithdrawal(pair.node.Blockchain().State(), payer).Sign() != 0 {
+						t.Fatal("reorg retained orphan-only withdrawal state")
+					}
+					var orphan map[string]any
+					pair.rpc.call(t, "eth_getTransactionReceipt", &orphan, tx.Hash().Hex())
+					if orphan != nil {
+						t.Fatal("orphan receipt remained canonical")
+					}
+					pair.rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: envelope.ExecutionPayload.BlockHash}, nil)
+					if fc.PayloadStatus.Status != "VALID" || framepay.PR12041.PendingWithdrawal(pair.node.Blockchain().State(), payer).Int64() != 400000 || pair.node.TxPool().Get(tx.Hash()) != nil {
+						t.Fatal("reselection lost withdrawal or retained pool exposure")
+					}
+				}
 			}
 			if keyed {
 				slot := types.NonceSlot8250(sender, big.NewInt(42))
@@ -262,6 +330,9 @@ func runFrameCNativePeers(t *testing.T, keyed bool) {
 				t.Fatal(err)
 			}
 			reopened := newTestNode(t, receiverConfig)
+			if paymaster && framepay.PR12041.PendingWithdrawal(reopened.Blockchain().State(), payer).Int64() != 400000 {
+				t.Fatal("restart lost canonical paymaster storage")
+			}
 			read := track4NodeRPC(t, reopened, token)
 			read.call(t, "eth_getTransactionReceipt", &other, tx.Hash().Hex())
 			if !reflect.DeepEqual(receipt, other) {

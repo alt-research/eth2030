@@ -33,6 +33,16 @@ func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, he
 // ValidateFrame8141Dependencies validates on an independent snapshot. The local
 // paymaster candidate is opt-in and is never identified as upstream bytecode.
 func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, experimentalPaymasterV1 bool) (*FramePrefixValidation, error) {
+	profile, _ := framepay.SelectProfile(experimentalPaymasterV1, false)
+	return ValidateFrame8141DependenciesWithPaymaster(config, db, header, tx, blobBaseFee, profile)
+}
+
+// ValidateFrame8141DependenciesWithPaymaster pins an explicitly selected local
+// PAY runtime profile. Consensus always executes the actual deployed code.
+func ValidateFrame8141DependenciesWithPaymaster(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, paymasterProfile framepay.Profile) (*FramePrefixValidation, error) {
+	if !paymasterProfile.Valid() {
+		return nil, errors.New("invalid Frame paymaster profile")
+	}
 	frame, ok := tx.Inner().(*types.FrameTx8141)
 	if !ok || header == nil {
 		return nil, errors.New("not a canonical Frame validation context")
@@ -42,6 +52,17 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 	}
 	copied := &frameReadSet{StateDB: db.Dup(), sender: frame.Sender, reads: make(map[FrameDependency]struct{})}
 	copied.SetTxContext(tx.Hash(), 0)
+	for _, f := range frame.Frames {
+		target := frame.Sender
+		if f.Target != nil {
+			target = *f.Target
+		}
+		if f.Mode == types.ModeVerify && f.Flags == types.FrameApprovePayment && paymasterProfile.Matches(copied.GetCode(target)) {
+			if err := paymasterProfile.ValidatePayUsage(f); err != nil {
+				return nil, err
+			}
+		}
+	}
 	// Check exact code and complete age/storage predicates even when a malicious
 	// runtime would return without executing SLOTNUM or SLOAD.
 	for _, f := range frame.Frames {
@@ -68,7 +89,7 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 			paymaster = types.Address{}
 		}
 		recoveries[FrameSignerRecovery8151{Address: address, Canonical: digest == canonicalHash, Pay: pay, Paymaster: paymaster}] = struct{}{}
-	}, ExperimentalFramePaymasterV1: experimentalPaymasterV1,
+	}, FramePaymasterProfile: paymasterProfile,
 		OnFrameLegacyNonceRead: func(addr types.Address) { copied.record(addr, FrameNonceDependency, types.Hash{}) }}
 	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee, tracing)
 	if err != nil {
@@ -77,9 +98,12 @@ func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.State
 	if err := copied.checkPublicBalances(frame.Sender, receipt.Payer); err != nil {
 		return nil, err
 	}
-	if experimentalPaymasterV1 && framepay.IsV1(copied.GetCode(receipt.Payer)) {
-		copied.GetState(receipt.Payer, types.BytesToHash([]byte{2}))
-		copied.GetState(receipt.Payer, types.BytesToHash([]byte{3}))
+	if paymasterProfile.Matches(copied.GetCode(receipt.Payer)) {
+		// The proposed layout explicitly tracks all four slots, including
+		// pending rotation. Values in the result are taken from the pre-state.
+		for slot := byte(0); slot < 4; slot++ {
+			copied.GetState(receipt.Payer, types.Hash{31: slot})
+		}
 	}
 	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
 	for recovery := range recoveries {

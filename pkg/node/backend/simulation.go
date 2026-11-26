@@ -57,6 +57,9 @@ func parseSimulationMessage(args rpctypes.CallArgs, header *types.Header, base s
 		if err != nil || kind > 255 {
 			return nil, invalid("type", fmt.Errorf("must be a byte"))
 		}
+		if kind == uint64(types.FrameTxType) {
+			return nil, invalid("type", fmt.Errorf("use eth_simulateFrameV1 for complete authenticated Frame input"))
+		}
 	}
 	from := types.Address{}
 	if args.From != nil {

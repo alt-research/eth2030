@@ -9,6 +9,13 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
+// FrameObserver receives actual top-level Frame execution, without replacing
+// opcode/call tracing or applying public-pool restrictions to the body.
+type FrameObserver interface {
+	BeginFrame(int)
+	EndFrame(int, []byte, uint64, uint64, error)
+}
+
 // FrameStateGas tracks EIP-8141's explicit, isolated state pools. Snapshots
 // are taken with the same StateDB snapshot that journals the corresponding writes.
 type FrameStateGas struct {
@@ -26,6 +33,11 @@ type FrameStateGas struct {
 	Scopes           []uint8
 	created          map[types.Address]bool
 	bal              *frameBALJournal
+	paymasterChecked bool
+	paymasterIndex   int
+	paymasterProfile framepay.Profile
+	paymasterTarget  types.Address
+	paymasterAllowed bool
 }
 
 type frameStorageKey struct {
@@ -52,6 +64,17 @@ type frameJournalState struct {
 	StateDB
 	frame     *FrameStateGas
 	snapshots map[int]FrameStateGas
+}
+
+// Preserve the underlying full-root read through the VM's smaller interface.
+// This also lets public prefix read-set adapters record collision dependencies.
+func (s *frameJournalState) StorageRoot(addr types.Address) types.Hash {
+	if roots, ok := s.StateDB.(interface {
+		StorageRoot(types.Address) types.Hash
+	}); ok {
+		return roots.StorageRoot(addr)
+	}
+	return types.Hash{} // unavailable is not an authenticated empty root
 }
 
 func (s *frameJournalState) Snapshot() int {
@@ -201,6 +224,13 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	ctx := evm.frame8141
 	frame := ctx.Tx.Frames[index]
 	ctx.Index, ctx.Left = index, frame.Limits.State
+	var output []byte
+	if observer := evm.Config.FrameObserver; observer != nil {
+		observer.BeginFrame(index)
+		defer func() {
+			observer.EndFrame(index, output, frame.Limits.Execution-gasLeft, ctx.Results[index].GasUsed.State, err)
+		}()
+	}
 	evm.returnData = nil
 	snapshot := evm.StateDB.Snapshot()
 	gasLeft = frame.Limits.Execution
@@ -277,7 +307,7 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 			return gasLeft, nil
 		}
 	}
-	_, gasLeft, err = evm.Call(caller, target, frame.Data, gasLeft, value)
+	output, gasLeft, err = evm.Call(caller, target, frame.Data, gasLeft, value)
 	return gasLeft, err
 }
 
@@ -411,6 +441,9 @@ func opTxParam8141(_ *uint64, evm *EVM, _ *Contract, _ *Memory, stack *Stack) ([
 		value = new(big.Int)
 		switch param.Uint64() {
 		case 13:
+			if evm.Config.OnFrameLegacyNonceRead != nil {
+				evm.Config.OnFrameLegacyNonceRead(tx.Sender)
+			}
 			value.SetUint64(ctx.LegacyNonce)
 		case 14:
 			value.SetUint64(uint64(len(keys)))
@@ -634,18 +667,35 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 	}
 	// Only the fixed PAY runtime receives the draft's canonical-code exception.
 	// STATICCALL/write protection and exact-scope approval still apply normally.
-	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && framepay.IsV1(evm.StateDB.GetCode(target)) {
-		return nil
+	profile := evm.Config.FramePaymasterProfile
+	if frame.Mode == types.ModeVerify && frame.Flags == types.FrameApprovePayment && profile != framepay.NoPaymaster {
+		// VERIFY cannot change runtime code. Resolve the raw-code exception
+		// once per frame/profile, not once per opcode (GetCode copies bytes).
+		// Primitive cache fields follow the ordinary frame snapshot journal.
+		if !f.paymasterChecked || f.paymasterIndex != f.Index || f.paymasterProfile != profile || f.paymasterTarget != target {
+			f.paymasterAllowed = profile.Matches(evm.StateDB.GetCode(target))
+			f.paymasterChecked, f.paymasterIndex, f.paymasterProfile, f.paymasterTarget = true, f.Index, profile, target
+		}
+		if f.paymasterAllowed {
+			return nil
+		}
 	}
-	deploy := f.Tx.Frames[f.Index].Mode == types.ModeDefault &&
-		(f.Index == 0 || (f.Index == 1 && f.Tx.Frames[0].Target != nil &&
-			*f.Tx.Frames[0].Target == types.FrameExpiryVerifier))
+	deploy := f.Index == f.Tx.ValidationDeployIndex8141()
+	rootVerifier := frame.IsRecentRootVerifier() && evm.depth == 1 &&
+		contract.Address == types.RecentRootAddress && string(contract.Code) == string(types.RecentRootCode)
+	if frame.IsRecentRootVerifier() && string(evm.StateDB.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+		return errors.New("Frame recent-root verifier runtime mismatch")
+	}
 	switch op {
 	case GASPRICE, BLOCKHASH, COINBASE, NUMBER, PREVRANDAO, GASLIMIT, BASEFEE,
-		BLOBBASEFEE, SLOTNUM, INVALID, SELFDESTRUCT, BALANCE, SELFBALANCE:
+		BLOBBASEFEE, INVALID, SELFDESTRUCT, BALANCE, SELFBALANCE:
 		return errors.New("Frame public validation used a block or balance dependency")
+	case SLOTNUM:
+		if !rootVerifier {
+			return errors.New("Frame SLOTNUM outside top-level recent-root verifier")
+		}
 	case TIMESTAMP:
-		if contract.Address != types.FrameExpiryVerifier ||
+		if f.Index != 0 || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
 			string(contract.Code) != string(types.FrameExpiryCode) {
 			return errors.New("Frame public validation timestamp is not the expiry verifier")
 		}
@@ -654,7 +704,21 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 		if next != CALL && next != CALLCODE && next != DELEGATECALL && next != STATICCALL {
 			return errors.New("Frame public validation observed GAS")
 		}
-	case SLOAD, SSTORE:
+	case TSTORE:
+		// The prefix's state-write exceptions name sender SSTORE and code
+		// installation only. EIP-1153 transient writes get no extra exception.
+		return errors.New("Frame public validation performed a transient storage write")
+	case SLOAD, SSTORE, TLOAD:
+		if op == SLOAD && rootVerifier {
+			refs, _ := types.DecodeRecentRootReferences(frame.Data)
+			key := bigToHash(stack.Back(0))
+			for _, ref := range refs {
+				if ref.StorageKey() == key {
+					return nil
+				}
+			}
+			return errors.New("Frame recent-root verifier read an undeclared key")
+		}
 		if contract.Address != f.Tx.Sender || (op == SSTORE && !deploy) {
 			return errors.New("Frame public validation accessed mutable third-party state")
 		}
@@ -675,6 +739,9 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 			return nil
 		}
 		code := evm.StateDB.GetCode(address)
+		if address == f.Tx.Sender && len(code) == 0 {
+			return nil
+		} // explicit sender default-code exception
 		if len(code) == 0 || types.HasDelegationPrefix(code) {
 			return errors.New("Frame public validation called an empty or delegated third-party account")
 		}

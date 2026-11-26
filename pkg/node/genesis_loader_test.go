@@ -461,6 +461,8 @@ func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 	cfgFields["glamsterdanTime"] = genesisTime + 31
 	cfgFields["hogotaTime"] = genesisTime + 43
 	cfgFields["bpo2Time"] = genesisTime + 61
+	cfgFields["eip8250Time"] = genesisTime + 50
+	cfgFields["eip8151Time"] = genesisTime + 36
 	data, err := json.Marshal(input)
 	if err != nil {
 		t.Fatal(err)
@@ -485,6 +487,8 @@ func TestLoadGenesisFile_ScheduledForksRoundTrip(t *testing.T) {
 		{131, genesis.Config.IsGlamsterdan},
 		{143, genesis.Config.IsHogota},
 		{161, genesis.Config.IsBPO2},
+		{150, genesis.Config.IsEIP8250},
+		{136, genesis.Config.IsEIP8151},
 	} {
 		if fork.active(fork.at-1) || !fork.active(fork.at) {
 			t.Fatalf("fork did not switch at %d", fork.at)

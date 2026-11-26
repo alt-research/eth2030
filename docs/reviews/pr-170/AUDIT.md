@@ -1,0 +1,107 @@
+# Group C specification and implementation audit
+
+Earlier audit sections are historical; the dated public composition follow-through supersedes their D01-open conclusion.
+
+Reviewed on 2026-11-26 from merged Group B baseline `5d777ad06f886c8b20fb010a47e65ddb05df8287`. The [detailed plan](../../plans/hegota-c/PLAN.md) contains all ten tasks and forty criteria; [the native register](../../../specs/hegota/group-c.json) binds clauses, code and executed consumers. No Group D–J qualification is implied.
+
+## Specification decisions
+
+EIPs master remains `ade9e9cab7e148bba4cd293f916a4a189cd7a8aa`; consensus-specs remains `d2021d2719235f0df4726a1d330502cb15aa8ea3`. Reference contents were not edited. The C plan adds missing protocol-prefix combinations, exact top-level permissions, dependencies/reorg handling, exposure lifecycle, dimensional/counted resources and native transport/API acceptance criteria.
+
+- Public pool restrictions are separate from consensus execution. Inclusion-list and private inputs retain ordinary execution semantics; only public candidates undergo the bounded generic prefix policy.
+- EIP-8272 extends all four EIP-8141 shapes with optional expiry/root frames, requires exact deployed runtime and tuple keys, and uses canonical-head slot+1 at admission. No slot is inferred from a timestamp. Exact candidate context is rechecked while building.
+- EIP-8250's stale three-fee example still conflicts with EIP-8141's two-field budget. D01 remains open. The explicit nonce-only research policy has no public decoder/gossip/import/fork route; all selected-key, legacy-read and MAX semantics are native tested.
+- The merged canonical-paymaster asset has no frozen reproducible runtime and disagrees with current witness layout. Upstream PR #12041 remains open/unmerged. Local v1 is selected only by `--experimental-frame-paymaster-v1`, remains explicitly nonstandard, and has separate exact-runtime accounting/dependency tests. No local bytes are labeled upstream canonical code.
+- The specific noncanonical-paymaster subsection, replacement/eviction rules and policy summary govern generic code sponsors despite the conflicting restrictive sentence in the canonical subsection. Empty-code sponsors use exposure accounting without the code-paymaster count cap.
+- Simulation and derived receipt status are documented client API choices in [the API profile](../../plans/hegota-c/RPC_PROFILE.md). Signed gas limits are never mutated to claim an authenticated minimum estimate.
+
+## Implemented findings and independent controls
+
+1. Missing recent-root prefix grammar and missing pool slot context prevented ordinary public admission. The shared executor now supports all sixteen shapes and exact top-level SLOTNUM/tuple-key permissions. Native tests execute all sixteen, retain no simulation writes and exclude body dependencies.
+2. Prefix validation previously re-executed on every reset. Pre-state code-hash/account/storage read sets and reverse indices now permit unchanged-state reuse, including reverted-child reads. Timestamp and root-slot expiration use separately indexed bounded heaps; replacement/removal deletes both records without tombstone growth. VM activation rules belong in the cache profile; block-height rollback tests guard this independently of timestamp gates.
+3. Prospective payer metadata is installed only after successful admission. Replacement, resource failures, code adoption, aggregate max_fee exposure and delayed withdrawals preserve exact ownership/counts. Exposure summation classifies already-admitted prefixes without re-verifying other transactions’ signatures, keeping a new admission’s verification work independent of the shared payer’s pending count. The isolated keyed policy also caps a formerly empty-code sponsor when code is adopted.
+4. Frame ranking now uses actual blob fees. Sender-head ordering preserves nonce dependencies and existing regular-before-blob scheduling; equal-priced ordinary transactions retain the caller's stable order. Full-suite failures exposed and corrected an earlier hash-tie regression; those failed attempts are not qualification evidence.
+5. Protocol handlers bind Frame replies to announcement type/size and request identity, deduplicate hashes, batch bounded requests/responses and ignore unknown types. Exact typed bytes and v1 blob/cell proofs reach actual two-peer native admission. Structured receipts are checked through a real handler, separately from consensus receipt bytes.
+6. The public builder checks the exact candidate snapshot/slot/time and bounds consecutive unpaid approval failures at three, resetting on approval. Transient failure is not immediate eviction. Removed hashes cannot regain counters or stale announcements.
+7. Authenticated Frame simulation returns measured per-frame execution/state gas, payer, immutable hashes, escrow/refund/tip, logs, return data and bounded opcode observations. It supports bounded request cancellation and isolated account/block overrides. Ordinary type-6 call paths reject incomplete CALL input explicitly.
+8. Caught nested INVALID coverage confirms that the existing selected jump-table dispatch already retains its public trace error. A prior-interpreter overlay also passes this consumer: this is added coverage, not a new implementation defect, and a redundant defensive branch was removed. A separate prior-policy overlay fails the adopted-paymaster cap consumer and independently detects that actual omission.
+
+9. CREATE/CREATE2 endowment could introduce an unaccounted shared factory-balance dependency without a BALANCE opcode or value-bearing CALL. The pre-fix native counterexample admits both forbidden cases. Prefix validation now checks actual balance reads against the sender/approved-payer scope; conservative Empty predicates remain separately recorded. Zero endowment avoids a vacuous balance query. Both CREATE variants remain valid for private consensus execution, and a factory that is itself the approved payer retains the proper payer path. All sixteen ordinary prefix combinations continue to pass.
+
+## Completion boundary
+
+The register is intended to qualify mechanisms within the selected profiles and does not resolve either public specification gate. `check_c.py` deliberately reports `public_complete: false`; changing that claim, removing any criterion, weakening an upstream source pin or omitting required native boundary consumers is rejected. The final evidence must come from complete successful current-source full/race runs and preserved A/B oracle consumers, with all optional skips inventoried. Hosted results must refer to the pushed head, not an earlier B revision.
+
+## Follow-up clause audit (2026-11-26)
+
+Upstream EIPs master, consensus-specs master and paymaster PR #12041 were rechecked; all pinned identities and both public gates are unchanged. The EIP-8141, EIP-8250 and EIP-8272 discussion topics were reviewed again. Historical opening examples in the latter two topics predate their current merged format and are not alternate normative encodings. PRs #12061/#12066 remain merged; #12537 remains an open wording correction with unchanged equations. PR #170 had no authored review findings at the start of this audit.
+
+A confirmed omission affected `KeyedFramePolicy8250Delta.Revalidate`: the unchanged-dependency fast path checked prefix shape, fees and root age but failed to compare execution/state reservations with the new header's gas limit. EIP-8250 changes nonce accounting only and preserves EIP-8141's independent block reservations. With unchanged state, a transaction at either exact dimensional boundary was retained when the header limit decreased by one, even though the production prefix executor rejected it.
+
+`TestFrameCIsolatedKeyedCachedDimensionalLimits` independently reproduces both failures on the preceding implementation. Revalidation now checks each dimension before cache reuse. Equality still preserves the same cached validation object; a one-unit deficit evicts the entry. The test is mandatory under C21.2 and C22.4, and a checker regression prevents dropping it. No public keyed decoder/activation route or canonical-runtime exception is added.
+
+A second confirmed omission affected pending `eth_getTransactionByHash` results: the native handler and transaction-pool adapter passed zero block/index pointers to the formatter, and the direct adapter emitted a zero index. EIP-1474 requires explicit null block location fields for pending transactions. Actual two-node plain/blob consumers reproduce the native failure, while a dedicated API consumer reproduces all three adapters' pending failures and preserves mined location controls. Pending location fields are now null; actual native consumers additionally verify mined metadata and identical transaction queries after restart. This is mapped to C27.2/C27.4 without changing consensus or signed Frame bytes.
+
+A third omission was in the selected client simulation contract rather than an EIP consensus rule: opcode traces silently truncated at `traceLimit` and returned success, contrary to `RPC_PROFILE.md`'s explicit capture-exhaustion error. The pre-fix boundary consumer reproduces a four-step execution reported as a complete three-step trace. Frame simulation now retains at most one bounded sentinel step to distinguish an exact fit from overflow and rejects overflow explicitly, preserving the general tracer's existing behavior. Exact-limit and untraced settlement/no-state-effect controls pass. The native API consumer also explicitly checks ordinary `eth_simulateV1` acceptance and type-6 rejection.
+
+The generic prefix storage-read/state-write checks also omitted EIP-1153 transient storage. EIP-8141's state-write exceptions explicitly permit sender SSTORE and sender code installation; TSTORE has no additional exception. TLOAD remains subject to the sender storage boundary. The new ordinary-VM deployment consumer reproduces acceptance of factory TSTORE, factory TLOAD and constructor TSTORE on prior code. Public checks now cover transient storage at every call depth, including caught helper writes, while allowing sender TLOAD and preserving private consensus execution and state isolation. This applies EIP-8141's generic storage/state-write clauses to the storage semantics defined by EIP-1153; EIP-8141 does not separately enumerate TLOAD/TSTORE in its banned-opcode table. EIP-1153's existing semantics are pinned as a supporting normative source; no new opcode activation is introduced.
+
+## Public composition follow-through (2026-11-26)
+
+The earlier D01-open conclusion was too conservative: it omitted the author’s
+merged #11968 delta instruction and later base #12414, corroborated by actual
+EELS branch 6013c4e after #3897. COMPOSITION.md records the ordered evidence,
+stale three-fee example and retained uint256 chain ID. No reference or independent
+wire/state expectation was modified. The public implementation reuses the native
+Frame representation with a private nonce-schema marker so every existing
+sidecar, receipt, RPC and import consumer sees the same authenticated transaction.
+Timestamp checks enforce the schema; historical readers alone do not activate it.
+
+Keyed sequences are excluded from scalar account-nonce replacement, queue/reset
+and builder ordering. Exact key-set identity controls public replacement; one
+pending Frame per sender remains enforced. Selected slots and optional TXPARAM
+legacy reads drive revalidation. The historical prototype switch cannot bypass
+the post-8250 schema. Typed direct RPC Frame formatting and local txpool replay
+keys correct two additional completeness omissions discovered during this audit.
+
+EIP-8151's merged public section requires conditional signer protection. Its
+explicit activation uses the native stateful precompile, paid raw-code class
+reads, separate helper hash dependencies, both-direction class/reorg changes,
+canonical/other digest shares and distinct PAY paymaster counts. Fork-rule
+fingerprints include activation flags so the old stateless validation cache
+cannot survive the boundary. Native gas/access/revert controls use the real
+MemoryStateDB rather than a mock that does not journal warming.
+
+Final local qualification on 3fe23f60bf0ace7e28485dcbe67abe9464649c14 passes:
+23,935 full-suite and 9,466 focused-race events, zero failures, all 240/54 packages
+completed, native/wrapper builds, vet, 12/12 historical differential cases and
+88 Python checks in each mode. All 62/79/70 A/B/C required consumers execute
+with zero required skips. Optional 124/74 skips have separate inventories.
+Feature-disabling native overlays reproduce keyed scalar-reset and missing
+8151 execution-activation failures with the ordinary last-nonce control passing.
+These are integration mutations, not claims about unmodified predecessor code.
+Earlier native counterexamples remain retained. PAYMASTER-CODE remains open;
+unmerged runtime proposals and upstream fixture counts are not counted as local
+production evidence. Exact pushed-head hosted status belongs in the live English
+PR description/current checks, without reusing predecessor runs.
+
+## Independent cross-transaction re-audit
+
+[RECHECK.md](RECHECK.md) reconciles all forty C criteria with current source,
+merged normative text and the complete discussion streams. It supersedes the
+predecessor's completeness assumption where shared-resource transitions and
+mixed regular/blob ordering were not exercised together.
+
+Frozen prior-source overlays from 6b9bbf8a reproduce invalid-reservation eviction,
+wrong expiry/priority pruning, stale signer shares during a simultaneous witness
+swap, and blob Frame account-nonce ordering loss. Ordinary last-nonce and
+unrelated class-preference controls pass; both nonempty-keyed ordering controls
+also pass against the old source. Current native consumers pass all cases.
+
+Source c4fffe3922d534acd88b919e29defffad239e5d7 passes 23,947 full-suite and
+9,478 race events, all 240/54 packages, build/vet, 12/12 independent baseline,
+89 ordinary/optimized Python checks and all 62/79/74 mandatory A/B/C consumers.
+Required skips are zero; optional full/race skips remain separately inventoried.
+The pinned EIP sources and independent expected values were not changed. Current
+hosted proof/check results belong in the live English PR description, with its
+actual final head, rather than being copied from 6b9bbf8a.

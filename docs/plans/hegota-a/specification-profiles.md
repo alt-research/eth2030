@@ -26,3 +26,13 @@ HGT-001. The [source lock](../../../specs/hegota/source-lock.json) retains 15 re
 D01–D09 in [profiles.json](../../../specs/hegota/profiles.json) retain owners, affected tasks and closure conditions for nonce fees/envelope, PQ composition, FOCIL/network scope, claims, code adoption, assertion rollback, paired SELFDESTRUCT changes, state-growth alternatives and EIP/EELS widths. Independent 8250/8272 rule goldens do not resolve composition or activate public-network state changes.
 
 EIPs 8141, 8037 and 8038 are byte-identical at master's implementation pin `dc5d5fa6` and research pin `ade9e9ca`: reuse the implementation and qualify deltas. Source changes require appended dated old/new impact decisions; immutable URLs cannot silently acquire new digests. References under `refs/` remain unmodified.
+
+## D01 resolution addendum (2026-11-26)
+
+The earlier isolated-envelope assessment is superseded for the selected native
+8141/8250 profile by merged EIPs #11968/#12414 and actual EELS source at
+6013c4eaed5c9cc1cbb8428541972d6976a8cabd. The decision history is retained in
+profiles.json. See [COMPOSITION.md](../hegota-c/COMPOSITION.md) for the two-fee
+schema, explicit optional activation, native consumers and remaining upstream
+canonical-paymaster gate. Frozen A/B oracle provenance is historical and is not
+a declaration that the current selected public profile is still blocked by D01.

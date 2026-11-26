@@ -15,6 +15,7 @@ import (
 func paymasterPoolFixture(t *testing.T) (*TxPool, *state.MemoryStateDB, *types.FrameTx8141, types.Address) {
 	t.Helper()
 	pool, db, frame := framePoolFixture(t)
+	pool.config.ExperimentalFramePaymasterV1 = true
 	payer := types.Address{19: 0x93}
 	owner := framePoolAddress(t, 2)
 	db.SetCode(payer, framepay.RuntimeV1())

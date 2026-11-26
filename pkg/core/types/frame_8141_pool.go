@@ -15,11 +15,21 @@ func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
 	if err := tx.Validate(); err != nil {
 		return 0, err
 	}
+	return tx.validationPrefix8141(timestamp)
+}
+
+func (tx *FrameTx8141) validationPrefix8141(timestamp uint64) (int, error) {
 	start := 0
 	if tx.Frames[0].Target != nil && *tx.Frames[0].Target == FrameExpiryVerifier {
 		frame := tx.Frames[0]
 		if frame.Mode != ModeVerify || len(frame.Data) != 8 || binary.BigEndian.Uint64(frame.Data) < timestamp {
 			return 0, errors.New("Frame validation has expired")
+		}
+		start++
+	}
+	if start < len(tx.Frames) && tx.Frames[start].Target != nil && *tx.Frames[start].Target == RecentRootAddress {
+		if !tx.Frames[start].IsRecentRootVerifier() {
+			return 0, errors.New("invalid recent-root validation frame")
 		}
 		start++
 	}
@@ -72,4 +82,28 @@ func (tx *FrameTx8141) ValidationPrefix8141(timestamp uint64) (int, error) {
 		}
 	}
 	return end, nil
+}
+
+// ValidationDeployIndex8141 skips the protocol verifiers. Call only after
+// ValidationPrefix8141 has accepted the grammar.
+func (tx *FrameTx8141) ValidationDeployIndex8141() int {
+	index := 0
+	if index < len(tx.Frames) && tx.Frames[index].Target != nil && *tx.Frames[index].Target == FrameExpiryVerifier {
+		index++
+	}
+	if index < len(tx.Frames) && tx.Frames[index].IsRecentRootVerifier() {
+		index++
+	}
+	if index < len(tx.Frames) && tx.Frames[index].Mode == ModeDefault && tx.Frames[index].Flags == 0 {
+		return index
+	}
+	return -1
+}
+
+// ValidationPrefix8250 uses the replacement signing hash and nonce rules.
+func (tx *FrameTx8250Delta) ValidationPrefix8250(timestamp uint64) (int, error) {
+	if err := tx.Validate(); err != nil {
+		return 0, err
+	}
+	return tx.ExecutionFields().validationPrefix8141(timestamp)
 }

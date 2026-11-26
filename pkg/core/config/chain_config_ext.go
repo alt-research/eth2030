@@ -118,6 +118,13 @@ func (c *ChainConfig) Validate() error {
 		lastTimeName = f.name
 	}
 
+	// Optional EIPs are independent schedules, not additional named-fork order.
+	if c.EIP8250Time != nil && (c.HogotaTime == nil || *c.EIP8250Time < *c.HogotaTime) {
+		return errors.New("EIP8250 requires prior or simultaneous EIP-8141 activation")
+	}
+	if c.EIP8151Time != nil && (c.GlamsterdanTime == nil || *c.EIP8151Time < *c.GlamsterdanTime) {
+		return errors.New("EIP8151 requires prior or simultaneous EIP-8038 activation")
+	}
 	// EIP-7892 BPO schedules extend Prague and may interleave with later forks.
 	for _, bpo := range []struct {
 		name string

@@ -1,5 +1,15 @@
 # ETH2030 Frame paymaster v1
 
+The exact upstream PR-12041 proposal is separately available as
+`Runtime12041`/`Init12041`, selected with
+`--experimental-frame-paymaster-12041`. Its CC0 `contracts/pr12041.asm`
+reproduces the upstream 355-byte runtime and pinned hash in a native test.
+It uses empty PAY data, any protocol-verified signature scheme at index 1,
+slots 0/1/2/3 = signer/amount/unlock/new signer, a 24-hour delay, cancellation
+and rotation. It cannot be selected together with v1. See the full
+[source reconciliation](../../../docs/reviews/pr-170/CANONICAL_PAYMASTER.md).
+The remainder of this file describes the distinct historical local v1.
+
 This is ETH2030's experimental implementation of the EIP-8141 paymaster
 architecture at EIPs revision `dc5d5fa6`. It is a frozen local candidate;
 it does not assert that the upstream draft has standardized these bytecode bytes.

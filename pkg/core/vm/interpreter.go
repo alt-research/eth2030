@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
 	"github.com/eth2030/eth2030/rlp"
@@ -107,10 +108,14 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
-	Context      context.Context // optional cancellation for isolated RPC execution
-	Debug        bool
-	Tracer       EVMLogger
-	MaxCallDepth int
+	OnFrameLegacyNonceRead func(types.Address)                                  // optional nonce dependency instrumentation
+	OnFrameRecovery8151    func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
+	FrameObserver          FrameObserver                                        // optional bounded per-frame simulation observer
+	FramePaymasterProfile  framepay.Profile                                     // explicit local public-pool runtime recognition
+	Context                context.Context                                      // optional cancellation for isolated RPC execution
+	Debug                  bool
+	Tracer                 EVMLogger
+	MaxCallDepth           int
 }
 
 // EVM is the Ethereum Virtual Machine execution environment.
@@ -261,6 +266,8 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 // the correct jump table. The caller (processor) converts ChainConfig.Rules
 // into this struct to avoid a circular import.
 type ForkRules struct {
+	IsHogota         bool // selected latest EIP-8037/7610 creation composition
+	IsEIP8151        bool // raw-code restricted ecRecover
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
 	IsGlamsterdan    bool
 	IsLegacyFrames   bool
@@ -663,7 +670,7 @@ func (evm *EVM) Call(caller types.Address, addr types.Address, input []byte, gas
 
 	// Execute precompile or contract code.
 	if isPrecompile {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		if err != nil {
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
@@ -782,7 +789,7 @@ func (evm *EVM) CallCode(caller types.Address, addr types.Address, input []byte,
 		defer func() { evm.finishStateGasFrame(meter, &gasLeft, err) }()
 	}
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		return ret, gasLeft, err
 	}
 
@@ -845,7 +852,7 @@ func (evm *EVM) delegateCall(caller, executionAddr types.Address, value *big.Int
 		defer func() { evm.finishStateGasFrame(meter, &gasLeft, err) }()
 	}
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		return ret, gasLeft, err
 	}
 
@@ -921,7 +928,7 @@ func (evm *EVM) StaticCall(caller types.Address, addr types.Address, input []byt
 
 	// Check for precompiled contract.
 	if p, ok := evm.precompile(addr); ok {
-		ret, gasLeft, err := runPrecompile(p, input, gas)
+		ret, gasLeft, err := evm.runPrecompile(p, input, gas)
 		if err != nil {
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		}
@@ -1007,7 +1014,7 @@ func (evm *EVM) Create(caller types.Address, code []byte, gas uint64, value *big
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if value != nil && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
+	if value != nil && value.Sign() > 0 && evm.StateDB.GetBalance(caller).Cmp(value) < 0 {
 		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
 	// Compute the new contract address
@@ -1045,7 +1052,7 @@ func (evm *EVM) Create2(caller types.Address, code []byte, gas uint64, endowment
 		return nil, types.Address{}, gas, errors.New("no state database")
 	}
 
-	if endowment != nil && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
+	if endowment != nil && endowment.Sign() > 0 && evm.StateDB.GetBalance(caller).Cmp(endowment) < 0 {
 		return nil, types.Address{}, gas, ErrInsufficientBalance
 	}
 	nonce := evm.StateDB.GetNonce(caller)
@@ -1160,6 +1167,15 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 			evm.revertCreationSnapshot(snapshot, createdSnapshot)
 			return nil, types.Address{}, gas, ErrFrameStateGas
 		}
+	}
+	// The latest EIP-8037 composes EIP-7610. A storage-only destination
+	// still pays the conditional account charge above, then the child rollback
+	// restores it. In particular an underfunded charge halts the creator rather
+	// than being bypassed by an early collision return. Older pinned native
+	// fork profiles retain their historical nonce/code-only collision rule.
+	if (evm.forkRules.IsHogota || evm.frame8141 != nil) && HasNonEmptyStorage(evm.StateDB, contractAddr) {
+		evm.revertCreationSnapshot(snapshot, createdSnapshot)
+		return nil, types.Address{}, 0, ErrContractCreationCollision
 	}
 
 	// Reset an eligible existing account, retaining only its prefunding.

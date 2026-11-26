@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/eth2030/eth2030/core/state"
 	rpcbackend "github.com/eth2030/eth2030/rpc/backend"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"math/big"
 	"sync"
 
@@ -78,6 +79,8 @@ func (api *EthAPI) HandleRequest(req *Request) *Response {
 		return api.getTransactionByHash(req)
 	case "eth_getTransactionReceipt":
 		return api.getTransactionReceipt(req)
+	case "eth_simulateFrameV1":
+		return api.executionAPI(req).simulateFrame(req)
 	case "eth_simulateV1":
 		return api.executionAPI(req).simulateV1(req)
 	case "eth_call":
@@ -1238,11 +1241,14 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 
 	var (
 		blockHash   *types.Hash
+		blockNumber *uint64
+		txIndex     *uint64
 		blockTS     uint64
 		baseFee     *big.Int
 		blobBaseFee *big.Int
 	)
 	if blockNum > 0 {
+		blockNumber, txIndex = &blockNum, &index
 		header := api.backend.HeaderByNumber(BlockNumber(blockNum))
 		if header != nil {
 			h := header.Hash()
@@ -1253,7 +1259,7 @@ func (api *EthAPI) getTransactionByHash(req *Request) *Response {
 		}
 	}
 
-	return successResponse(req.ID, FormatTransaction(tx, blockHash, &blockNum, &index, blockTS, baseFee, blobBaseFee))
+	return successResponse(req.ID, FormatTransaction(tx, blockHash, blockNumber, txIndex, blockTS, baseFee, blobBaseFee))
 }
 
 // getTransactionReceipt returns a receipt for a transaction hash.
@@ -1309,7 +1315,10 @@ func (api *EthAPI) sendRawTransaction(req *Request) *Response {
 		return errorResponse(req.ID, ErrCodeInvalidParams, err.Error())
 	}
 
-	rawBytes := fromHexBytes(dataHex)
+	rawBytes, decodeErr := hexutil.Decode(dataHex)
+	if decodeErr != nil {
+		return errorResponse(req.ID, ErrCodeInvalidParams, "invalid transaction DATA: "+decodeErr.Error())
+	}
 	if len(rawBytes) == 0 {
 		return errorResponse(req.ID, ErrCodeInvalidParams, "empty transaction data")
 	}

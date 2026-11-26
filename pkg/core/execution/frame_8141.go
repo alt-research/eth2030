@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	corconfig "github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -20,21 +21,101 @@ func applyFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db st
 	return executeFrame8141(config, getHash, db, header, transaction, gp, tracker, nil, false, nil, tracing...)
 }
 
+// ValidateFrame8141Prefix retains the address-only interface for existing callers.
 func ValidateFrame8141Prefix(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int) (types.Address, error) {
-	frame, ok := tx.Inner().(*types.FrameTx8141)
-	if !ok {
-		return types.Address{}, errors.New("not a canonical Frame transaction")
-	}
-	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
-		return types.Address{}, err
-	}
-	copied := db.Dup()
-	copied.SetTxContext(tx.Hash(), 0)
-	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee)
+	result, err := ValidateFrame8141Dependencies(config, db, header, tx, blobBaseFee, false)
 	if err != nil {
 		return types.Address{}, err
 	}
-	return receipt.Payer, nil
+	return result.Payer, nil
+}
+
+// ValidateFrame8141Dependencies validates on an independent snapshot. The local
+// paymaster candidate is opt-in and is never identified as upstream bytecode.
+func ValidateFrame8141Dependencies(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, experimentalPaymasterV1 bool) (*FramePrefixValidation, error) {
+	profile, _ := framepay.SelectProfile(experimentalPaymasterV1, false)
+	return ValidateFrame8141DependenciesWithPaymaster(config, db, header, tx, blobBaseFee, profile)
+}
+
+// ValidateFrame8141DependenciesWithPaymaster pins an explicitly selected local
+// PAY runtime profile. Consensus always executes the actual deployed code.
+func ValidateFrame8141DependenciesWithPaymaster(config *corconfig.ChainConfig, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, paymasterProfile framepay.Profile) (*FramePrefixValidation, error) {
+	if !paymasterProfile.Valid() {
+		return nil, errors.New("invalid Frame paymaster profile")
+	}
+	frame, ok := tx.Inner().(*types.FrameTx8141)
+	if !ok || header == nil {
+		return nil, errors.New("not a canonical Frame validation context")
+	}
+	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
+		return nil, err
+	}
+	copied := &frameReadSet{StateDB: db.Dup(), sender: frame.Sender, reads: make(map[FrameDependency]struct{})}
+	copied.SetTxContext(tx.Hash(), 0)
+	for _, f := range frame.Frames {
+		target := frame.Sender
+		if f.Target != nil {
+			target = *f.Target
+		}
+		if f.Mode == types.ModeVerify && f.Flags == types.FrameApprovePayment && paymasterProfile.Matches(copied.GetCode(target)) {
+			if err := paymasterProfile.ValidatePayUsage(f); err != nil {
+				return nil, err
+			}
+		}
+	}
+	// Check exact code and complete age/storage predicates even when a malicious
+	// runtime would return without executing SLOTNUM or SLOAD.
+	for _, f := range frame.Frames {
+		if !f.IsRecentRootVerifier() {
+			continue
+		}
+		if header.SlotNumber == nil || string(copied.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+			return nil, errors.New("recent-root verifier requires exact runtime and slot")
+		}
+		refs, _ := types.DecodeRecentRootReferences(f.Data)
+		for _, ref := range refs {
+			if !ref.IsRecent(*header.SlotNumber) || copied.GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+				return nil, errors.New("recent-root dependency is not valid")
+			}
+		}
+	}
+	recoveries := make(map[FrameSignerRecovery8151]struct{})
+	canonicalHash := tx.SigningHash()
+	tracing := vm.Config{OnFrameRecovery8151: func(address types.Address, digest types.Hash, paymaster types.Address, pay bool) {
+		if address == frame.Sender {
+			return
+		}
+		if !pay {
+			paymaster = types.Address{}
+		}
+		recoveries[FrameSignerRecovery8151{Address: address, Canonical: digest == canonicalHash, Pay: pay, Paymaster: paymaster}] = struct{}{}
+	}, FramePaymasterProfile: paymasterProfile,
+		OnFrameLegacyNonceRead: func(addr types.Address) { copied.record(addr, FrameNonceDependency, types.Hash{}) }}
+	receipt, _, err := executeFrame8141(config, nil, copied, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, true, blobBaseFee, tracing)
+	if err != nil {
+		return nil, err
+	}
+	if err := copied.checkPublicBalances(frame.Sender, receipt.Payer); err != nil {
+		return nil, err
+	}
+	if paymasterProfile.Matches(copied.GetCode(receipt.Payer)) {
+		// The proposed layout explicitly tracks all four slots, including
+		// pending rotation. Values in the result are taken from the pre-state.
+		for slot := byte(0); slot < 4; slot++ {
+			copied.GetState(receipt.Payer, types.Hash{31: slot})
+		}
+	}
+	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
+	for recovery := range recoveries {
+		result.SignerRecoveries = append(result.SignerRecoveries, recovery)
+	}
+	for dep := range copied.reads {
+		result.Dependencies[dep] = dep.Value(db)
+	}
+	if err := errors.Join(state.ReadError(copied), state.ReadError(db)); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB,
@@ -47,6 +128,14 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	}
 	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
 		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
+	}
+	// Explicit research callers pass a profile; public callers must match the
+	// schema selected at this exact block timestamp. No fork-state installation.
+	if profile == nil {
+		profile = tx.NonceProfile8250()
+		if (profile != nil) != config.IsEIP8250(header.Time) {
+			return nil, 0, errors.New("Frame nonce schema does not match EIP-8250 activation")
+		}
 	}
 	var legacyNonce uint64
 	var budget types.FrameGasBudget
@@ -63,7 +152,11 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		if err := profile.Validate(); err != nil {
 			return nil, 0, err
 		}
-		legacyNonce = db.GetNonce(tx.Sender)
+		if reader, ok := db.(interface{ FrameLegacyNonce8250(types.Address) uint64 }); ok && len(profile.NonceKeys) > 0 {
+			legacyNonce = reader.FrameLegacyNonce8250(tx.Sender)
+		} else {
+			legacyNonce = db.GetNonce(tx.Sender)
+		}
 		if err := validateNonceSet8250(db, profile); err != nil {
 			return nil, 0, err
 		}
@@ -142,7 +235,11 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	ctx.PublicValidation = prefixOnly
 	prefixEnd := -1
 	if prefixOnly {
-		prefixEnd, err = tx.ValidationPrefix8141(header.Time)
+		if profile != nil {
+			prefixEnd, err = profile.ValidationPrefix8250(header.Time)
+		} else {
+			prefixEnd, err = tx.ValidationPrefix8141(header.Time)
+		}
 		if err != nil {
 			return nil, 0, err
 		}
@@ -205,11 +302,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 			}
 		}
 		if prefixOnly && i == prefixEnd {
-			deployIndex := 0
-			if tx.Frames[0].Target != nil && *tx.Frames[0].Target == types.FrameExpiryVerifier {
-				deployIndex++
-			}
-			if deployIndex < len(tx.Frames) && tx.Frames[deployIndex].Mode == types.ModeDefault && db.GetCodeSize(tx.Sender) == 0 {
+			if tx.ValidationDeployIndex8141() >= 0 && db.GetCodeSize(tx.Sender) == 0 {
 				return nil, 0, errors.New("Frame deploy did not install sender code")
 			}
 			payer, err := evm.CheckFrameApproval8141()
@@ -254,4 +347,14 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	receipt.Logs = db.GetLogs(txHash)
 	receipt.Bloom = types.LogsBloom(receipt.Logs)
 	return receipt, used, nil
+}
+
+// ReplayFrame8141 executes authenticated raw Frames using consensus semantics.
+// The caller owns the disposable state and any bounded observers/tracers.
+func ReplayFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db state.StateDB, header *types.Header, tx *types.Transaction, blobBaseFee *big.Int, tracing vm.Config) (*types.Receipt, uint64, error) {
+	if _, ok := tx.Inner().(*types.FrameTx8141); !ok {
+		return nil, 0, errors.New("canonical Frame required")
+	}
+	db.SetTxContext(tx.Hash(), 0)
+	return executeFrame8141(config, getHash, db, header, tx, new(gaspool.GasPool).AddGas(header.GasLimit), nil, nil, false, blobBaseFee, tracing)
 }

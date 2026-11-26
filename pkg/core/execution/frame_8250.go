@@ -12,11 +12,11 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 )
 
-// ExecuteFrame8250Delta executes the isolated nonce-only delta profile (D01).
-// The profile is deliberately absent from public decoders, fork configuration,
-// block import and pool admission. Callers must use a disposable research state,
-// with the ordinary NONCE_MANAGER deployment already included in its genesis.
-// The native frame loop, journals, gas settlement and BAL output are reused.
+// ExecuteFrame8250Delta is the independent nonce-rule oracle entry point.
+// It bypasses public schema selection and requires a disposable research state.
+// Production transactions use NewFrameTransaction8250 and the ordinary native
+// dispatcher, with explicit EIP8250Time activation and predeployed NONCE_MANAGER.
+// Both entry points reuse the same frame loop, journals, settlement and BAL.
 func ExecuteFrame8250Delta(cfg *config.ChainConfig, db state.StateDB, header *types.Header,
 	tx *types.FrameTx8250Delta, gp *gaspool.GasPool, tracker vm.BALTracker,
 ) (*types.Receipt, uint64, error) {
@@ -49,4 +49,50 @@ func validateNonceSet8250(db state.StateDB, tx *types.FrameTx8250Delta) error {
 		}
 	}
 	return nil
+}
+
+// ValidateFrame8250DeltaPrefix is an explicitly isolated policy consumer. It
+// creates no public decoding, activation, import or persistent database route.
+func ValidateFrame8250DeltaPrefix(cfg *config.ChainConfig, db state.StateDB, header *types.Header, tx *types.FrameTx8250Delta, blobFee *big.Int) (*FramePrefixValidation, error) {
+	if header == nil || tx == nil || db == nil {
+		return nil, errors.New("isolated keyed prefix requires complete context")
+	}
+	if _, err := tx.ValidationPrefix8250(header.Time); err != nil {
+		return nil, err
+	}
+	copied := &frameReadSet{StateDB: db.Dup(), sender: tx.Sender, reads: make(map[FrameDependency]struct{})}
+	if copied.GetNonce(types.NonceManager8250) == 0 || string(copied.GetCode(types.NonceManager8250)) != string(types.NonceManagerCode8250) {
+		return nil, errors.New("isolated EIP-8250 profile requires deployed nonce manager")
+	}
+	for _, f := range tx.Frames {
+		if f.IsRecentRootVerifier() {
+			if header.SlotNumber == nil || string(copied.GetCode(types.RecentRootAddress)) != string(types.RecentRootCode) {
+				return nil, errors.New("recent-root runtime or slot mismatch")
+			}
+			refs, _ := types.DecodeRecentRootReferences(f.Data)
+			for _, ref := range refs {
+				if !ref.IsRecent(*header.SlotNumber) || copied.GetState(types.RecentRootAddress, ref.StorageKey()) != ref.EntryHash() {
+					return nil, errors.New("recent-root dependency changed")
+				}
+			}
+		}
+	}
+	hash, _ := tx.Hash()
+	copied.SetTxContext(hash, 0)
+	tracing := vm.Config{OnFrameLegacyNonceRead: func(addr types.Address) { copied.record(addr, FrameNonceDependency, types.Hash{}) }}
+	receipt, _, err := executeFrame8141(cfg, nil, copied, header, types.NewTransaction(tx.ExecutionFields()), new(gaspool.GasPool).AddGas(header.GasLimit), nil, tx, true, blobFee, tracing)
+	if err != nil {
+		return nil, err
+	}
+	if err := copied.checkPublicBalances(tx.Sender, receipt.Payer); err != nil {
+		return nil, err
+	}
+	result := &FramePrefixValidation{Payer: receipt.Payer, Dependencies: make(map[FrameDependency]string, len(copied.reads))}
+	for dep := range copied.reads {
+		result.Dependencies[dep] = dep.Value(db)
+	}
+	if err := errors.Join(state.ReadError(db), state.ReadError(copied)); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

@@ -56,6 +56,21 @@ func TestParseFlags_Defaults(t *testing.T) {
 	}
 }
 
+func TestPR12041FlagSelection(t *testing.T) {
+	defaultCfg, exit, _ := parseFlags(nil)
+	if exit || defaultCfg.ExperimentalFramePaymaster12041 || defaultCfg.ExperimentalFramePaymasterV1 {
+		t.Fatal("experimental recognition enabled by default")
+	}
+	cfg, exit, _ := parseFlags([]string{"--experimental-frame-paymaster-12041"})
+	if exit || !cfg.ExperimentalFramePaymaster12041 || cfg.Validate() != nil {
+		t.Fatal("proposal CLI not connected to validated node configuration")
+	}
+	cfg.ExperimentalFramePaymasterV1 = true
+	if cfg.Validate() == nil {
+		t.Fatal("ambiguous runtime versions")
+	}
+}
+
 func TestParseFlags_AllOriginalFlags(t *testing.T) {
 	args := []string{
 		"-datadir", "/tmp/testdata",

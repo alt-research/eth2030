@@ -68,8 +68,8 @@ func TestForkScheduleLength(t *testing.T) {
 	schedule := cfg.ForkSchedule()
 
 	// Mainnet should have 24 forks (Homestead through SSZBlocks).
-	if len(schedule) != 24 {
-		t.Fatalf("expected 24 forks in schedule, got %d", len(schedule))
+	if len(schedule) != 26 {
+		t.Fatalf("expected 26 forks in schedule, got %d", len(schedule))
 	}
 
 	// First fork should be Homestead.

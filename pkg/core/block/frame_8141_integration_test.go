@@ -57,17 +57,30 @@ func signFrameBlock(t *testing.T, frame *types.FrameTx8141, keys ...int) *types.
 // Exercise the production builder, block validator, processor, canonical switch,
 // disk receipt decoder and startup replay using the exact signed envelope.
 func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
+	runFrameBuildImportReorgAndRestart(t, false)
+}
+func TestFrame8250BuildImportReorgAndRestart(t *testing.T) {
+	runFrameBuildImportReorgAndRestart(t, true)
+}
+func runFrameBuildImportReorgAndRestart(t *testing.T, keyed bool) {
 	for _, blobs := range []bool{false, true} {
 		t.Run(fmt.Sprintf("blob=%v", blobs), func(t *testing.T) {
 			cfg := *config.TestConfig
 			zero := uint64(0)
 			cfg.ChainID, cfg.HogotaTime, cfg.GlamsterdanTime, cfg.AmsterdamTime = big.NewInt(1337), &zero, &zero, &zero
+			if keyed {
+				cfg.EIP8250Time = &zero
+			}
 			senderKey, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", 1))
 			payerKey, _ := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", 2))
 			sender := types.Address(gethcrypto.PubkeyToAddress(senderKey.PublicKey))
 			payer := types.Address(gethcrypto.PubkeyToAddress(payerKey.PublicKey))
 			target, coinbase := types.Address{19: 0x90}, types.Address{19: 0xff}
 			alloc := newBuilderRequestTestState()
+			if keyed {
+				alloc.SetNonce(types.NonceManager8250, 1)
+				alloc.SetCode(types.NonceManager8250, types.NonceManagerCode8250)
+			}
 			alloc.AddBalance(sender, big.NewInt(100_000_000))
 			alloc.AddBalance(payer, big.NewInt(100_000_000))
 			alloc.SetCode(target, []byte{0x60, 1, 0x5f, 0x55, 0x5f, 0x5f, 0xa0, 0})
@@ -91,6 +104,10 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 					{Mode: types.ModeVerify, Flags: 1, Target: &payer, Limits: types.FrameGasLimits{Execution: 4000}},
 					{Mode: types.ModeSender, Target: &target, Limits: types.FrameGasLimits{Execution: 20000, State: 97920}},
 				}}
+			if keyed {
+				frame.Frames[1].Limits.State = types.KeyedNonceFirstUseStateGas8250
+				frame = types.NewFrameTransaction8250(&types.FrameTx8250Delta{ChainID: frame.ChainID, Sender: sender, NonceKeys: []*big.Int{big.NewInt(42)}, Frames: frame.Frames, Fees: frame.Fees}).Inner().(*types.FrameTx8141)
+			}
 			var sidecar *types.BlobSidecarData
 			if blobs {
 				sidecar = &types.BlobSidecarData{}
@@ -129,7 +146,11 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 				t.Fatalf("builder omitted Frame: %d txs", len(built.Transactions()))
 			}
 			receipt := receipts[0]
-			if built.GasUsed() != 97920 || receipt.GasUsed <= built.GasUsed() || receipt.Payer != payer || len(receipt.Logs) != 1 {
+			wantState := uint64(97920)
+			if keyed {
+				wantState *= 2
+			}
+			if built.GasUsed() != wantState || receipt.GasUsed <= built.GasUsed() || receipt.Payer != payer || len(receipt.Logs) != 1 {
 				t.Fatalf("split gas, payer or logs mismatch: header=%d receipt=%+v", built.GasUsed(), receipt)
 			}
 			if blobs && (built.Header().BlobGasUsed == nil || *built.Header().BlobGasUsed != 2*131072) {
@@ -171,7 +192,14 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			}
 			check := func() {
 				t.Helper()
-				if bc.CurrentBlock().Hash() != built.Hash() || bc.State().GetNonce(sender) != 1 || bc.State().GetState(target, types.Hash{}) != (types.Hash{31: 1}) {
+				wantNonce := uint64(1)
+				if keyed {
+					wantNonce = 0
+				}
+				if keyed && bc.State().GetState(types.NonceManager8250, types.NonceSlot8250(sender, big.NewInt(42))) != (types.Hash{31: 1}) {
+					t.Fatal("restart/reorg lost keyed nonce")
+				}
+				if bc.CurrentBlock().Hash() != built.Hash() || bc.State().GetNonce(sender) != wantNonce || bc.State().GetState(target, types.Hash{}) != (types.Hash{31: 1}) {
 					t.Fatal("canonical state was not recovered")
 				}
 				stored := bc.GetReceipts(built.Hash())
@@ -201,6 +229,9 @@ func TestCanonicalFrame8141BuildImportReorgAndRestart(t *testing.T) {
 			}
 			if err := bc.Reorg(side); err != nil {
 				t.Fatal(err)
+			}
+			if keyed && !bc.State().GetState(types.NonceManager8250, types.NonceSlot8250(sender, big.NewInt(42))).IsZero() {
+				t.Fatal("reorg retained orphaned keyed consumption")
 			}
 			if bc.State().GetNonce(sender) != 0 || bc.State().GetBalance(payer).Cmp(alloc.GetBalance(payer)) != 0 {
 				t.Fatal("reorg retained Frame settlement")

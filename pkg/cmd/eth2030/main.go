@@ -233,6 +233,8 @@ func newFlagSet(cfg *node.Config) *flagSet {
 
 	// --- EP-6 Block Building Pipeline ---
 	fs.StringVar(&cfg.MixnetMode, "mixnet", cfg.MixnetMode, "anonymous tx transport: simulated (default) | tor | nym (BB-1.1)")
+	fs.BoolVar(&cfg.ExperimentalFramePaymasterV1, "experimental-frame-paymaster-v1", cfg.ExperimentalFramePaymasterV1, "select ETH2030 local Frame paymaster v1 research template (not upstream canonical code)")
+	fs.BoolVar(&cfg.ExperimentalFramePaymaster12041, "experimental-frame-paymaster-12041", cfg.ExperimentalFramePaymaster12041, "select the pinned EIPs PR-12041 paymaster proposal at 4a98fce (unmerged; local pool policy)")
 	fs.BoolVar(&cfg.ExperimentalLocalTx, "experimental-local-tx", cfg.ExperimentalLocalTx, "enable type-0x08 local tx (proof-of-concept; enforces ScopeHint BAL check, BB-2.2)")
 	fs.BoolVar(&cfg.AllowAATx, "txpool.allow-aa", cfg.AllowAATx, "accept EIP-7701 AA transactions (type 0x05) in the txpool; default true on Glamsterdam+ networks")
 	fs.IntVar(&cfg.TxpoolPriceHistory, "txpool.price-history", cfg.TxpoolPriceHistory, "number of recent blocks the txpool gas-price suggestor uses for fee estimates (default 20)")

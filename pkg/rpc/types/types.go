@@ -172,7 +172,7 @@ type RPCAuthorization struct {
 // RPCTransaction is the JSON representation of a transaction.
 type RPCTransaction struct {
 	Hash        string  `json:"hash"`
-	Nonce       string  `json:"nonce"`
+	Nonce       string  `json:"nonce,omitempty"`
 	BlockHash   *string `json:"blockHash"`
 	BlockNumber *string `json:"blockNumber"`
 	// BlockTimestamp is a Geth extension: the timestamp of the block containing the tx.
@@ -200,6 +200,8 @@ type RPCTransaction struct {
 	BlobVersionedHashes []string                 `json:"blobVersionedHashes,omitempty"`
 	AuthorizationList   []RPCAuthorization       `json:"authorizationList,omitempty"`
 	Sender              *string                  `json:"sender,omitempty"`
+	NonceKeys           *[]string                `json:"nonceKeys,omitempty"`
+	NonceSeq            *string                  `json:"nonceSeq,omitempty"`
 	Frames              *[]RPCFrame8141          `json:"frames,omitempty"`
 	Signatures          *[]RPCFrameSignature8141 `json:"signatures,omitempty"`
 	Fees                *RPCFrameFees8141        `json:"fees,omitempty"`
@@ -807,6 +809,15 @@ func FormatTransaction(tx *types.Transaction, blockHash *types.Hash, blockNumber
 	}
 
 	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
+		if profile := frame.NonceProfile8250(); profile != nil {
+			keys := make([]string, len(profile.NonceKeys))
+			for i, key := range profile.NonceKeys {
+				keys[i] = EncodeBigInt(key)
+			}
+			seq := EncodeUint64(profile.NonceSeq)
+			rpcTx.NonceKeys, rpcTx.NonceSeq = &keys, &seq
+			rpcTx.Nonce = ""
+		}
 		rpcTx.From = EncodeAddress(frame.Sender)
 		sender := rpcTx.From
 		rpcTx.Sender = &sender
@@ -921,6 +932,13 @@ func FormatReceipt(receipt *types.Receipt, tx *types.Transaction, blockTimestamp
 	if receipt.Type == types.FrameTxType {
 		switch {
 		case receipt.FrameResults8141 != nil:
+			rpcReceipt.Status = EncodeUint64(types.ReceiptStatusSuccessful)
+			for _, frame := range receipt.FrameResults8141 {
+				if frame.Status == types.ReceiptStatusFailed {
+					rpcReceipt.Status = EncodeUint64(types.ReceiptStatusFailed)
+					break
+				}
+			}
 			payer := EncodeAddress(receipt.Payer)
 			rpcReceipt.Payer = &payer
 			frames := make([]RPCFrameResult, 0, len(receipt.FrameResults8141))

@@ -30,6 +30,7 @@ type options struct {
 	rpc, key, sponsor, sender, to, data, value, blob, paymaster string
 	execution, state                                            uint64
 	dry                                                         bool
+	paymaster12041                                              bool
 }
 
 func main() {
@@ -38,6 +39,7 @@ func main() {
 	flag.StringVar(&opts.key, "key", "", "Sender private key")
 	flag.StringVar(&opts.sponsor, "sponsor-key", "", "Optional funded sponsor or paymaster owner private key")
 	flag.StringVar(&opts.paymaster, "paymaster", "", "ETH2030 v1 paymaster instance (requires sponsor-key)")
+	flag.BoolVar(&opts.paymaster12041, "paymaster-12041", false, "use the pinned PR-12041 proposal's empty-data PAY interface (requires paymaster)")
 	flag.StringVar(&opts.sender, "sender", "", "Expected sender address (checked against key)")
 	flag.StringVar(&opts.to, "to", "", "Application target (defaults to sender)")
 	flag.StringVar(&opts.data, "data", "0x", "Application calldata")
@@ -108,6 +110,9 @@ func keyFromHex(text string) (*ecdsa.PrivateKey, error) {
 }
 
 func makeFrame(opts options, chainID *big.Int, nonce uint64, baseFee, blobFee *big.Int) (*types.Transaction, error) {
+	if opts.paymaster12041 && opts.paymaster == "" {
+		return nil, errors.New("paymaster-12041 requires paymaster")
+	}
 	if opts.paymaster != "" && opts.sponsor == "" {
 		return nil, errors.New("paymaster requires sponsor-key")
 	}
@@ -153,7 +158,9 @@ func makeFrame(opts options, chainID *big.Int, nonce uint64, baseFee, blobFee *b
 				return nil, errors.New("paymaster must be a 20-byte address")
 			}
 			copy(sponsor[:], address)
-			paymentData = framepay.ValidationData()
+			if !opts.paymaster12041 {
+				paymentData = framepay.ValidationData()
+			}
 			paymentGas = 10000
 		}
 		frame.Frames[0].Flags = 2
@@ -277,8 +284,9 @@ func run(opts options) error {
 			return err
 		}
 		decoded, err := hex.DecodeString(strings.TrimPrefix(code, "0x"))
-		if err != nil || !framepay.IsV1(decoded) {
-			return errors.New("paymaster does not match the frozen ETH2030 v1 runtime")
+		profile, _ := framepay.SelectProfile(!opts.paymaster12041, opts.paymaster12041)
+		if err != nil || !profile.Matches(decoded) {
+			return errors.New("paymaster does not match the selected frozen runtime")
 		}
 	}
 	raw, err := types.EncodePooledTransaction(tx)

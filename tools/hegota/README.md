@@ -42,3 +42,26 @@ incorrect conditional semantics. CI runs the source/acceptance checks and strict
 baseline before the normal Go checks; Go tests execute the native fixtures.
 
 Persisted differential reports are checked case by case against the pinned manifest and fixture state/log oracles, with exact coverage and native/reference gas agreement. The explicit gas/settlement acceptance criterion requires all five native budget/payment/settlement consumers; passing summary counters or arithmetic-only labels cannot replace them.
+
+Group C is registered in `specs/hegota/group-c.json` with ten tasks and forty
+clause/code/native-consumer criteria. Run `python3 tools/hegota/check_c.py` to
+verify committed source-bound evidence. To qualify an implementation revision,
+first complete `cd pkg && env -u GOROOT GOFLAGS=-p=4 go test -json ./... -count=1`
+and then supply its complete successful JSON event log with
+`python3 tools/hegota/check_c.py --write --log /absolute/path/to/full.jsonl`.
+`test_group_c.py` checks omission, stale-source and public-gate controls in both
+normal and optimized Python modes. CI verifies A, B and C independently.
+
+A green C result qualifies selected-profile consumers. It deliberately reports
+`public_complete: false`: upstream adoption and fork pinning of the canonical
+paymaster remain unresolved. The exact reproducible PR-12041 proposal runtime
+is implemented and explicitly selectable; its full native consumers are mandatory.
+D01 is resolved for the explicit EIP8250Time
+composition by merged delta/base history and preserved independent vectors;
+its native public consumers are mandatory, as are conditional EIP-8151 signer
+class/gas/share regressions.
+The local paymaster v1 and pinned PR-12041 proposal require separate, mutually
+exclusive experimental selections. See
+`docs/plans/hegota-c/PLAN.md` and `docs/plans/hegota-c/RPC_PROFILE.md` for exact
+scope and the authenticated simulation contract. No vector expectation or
+reference submodule is regenerated to obtain a green C result.

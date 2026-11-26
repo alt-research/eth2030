@@ -1,6 +1,6 @@
-// Package framepay freezes ETH2030's experimental EIP-8141 paymaster v1.
-// It preserves the draft's owner/timelock architecture and uses protocol signature
-// metadata to avoid a signature of frame calldata containing that same signature.
+// Package framepay provides explicit, versioned EIP-8141 paymaster artifacts.
+// Local v1 and the pinned upstream PR-12041 proposal have distinct recognition,
+// authorization and storage rules. Neither is enabled as a finalized standard.
 package framepay
 
 import (

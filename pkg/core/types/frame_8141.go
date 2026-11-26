@@ -14,8 +14,11 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-// FrameTx8141 uses the wire layout pinned at EIP-8141 revision dc5d5fa6.
+// FrameTx8141 holds the common Frame fields. The private nonce profile selects
+// the EIP-8250 replacement envelope; it is never encoded as an extra RLP field.
 type FrameTx8141 struct {
+	nonce8250           bool
+	nonceKeys8250       []*big.Int
 	ChainID             *big.Int
 	Nonce               uint64
 	Sender              Address
@@ -106,6 +109,10 @@ func (tx *FrameTx8141) gas() uint64 {
 
 func (tx *FrameTx8141) copy() TxData {
 	copied := *tx
+	copied.nonceKeys8250 = make([]*big.Int, len(tx.nonceKeys8250))
+	for i, key := range tx.nonceKeys8250 {
+		copied.nonceKeys8250[i] = copyBigInt(key)
+	}
 	copied.ChainID = copyBigInt(tx.ChainID)
 	copied.Fees.MaxFee = copyBigInt(tx.Fees.MaxFee)
 	copied.Fees.MaxPriorityFeePerGas = copyBigInt(tx.Fees.MaxPriorityFeePerGas)
@@ -129,6 +136,9 @@ func (tx *FrameTx8141) copy() TxData {
 
 // EncodeFrameTx8141 encodes the canonical EIP-2718 envelope.
 func EncodeFrameTx8141(tx *FrameTx8141) ([]byte, error) {
+	if profile := tx.NonceProfile8250(); profile != nil {
+		return profile.Encode()
+	}
 	payload, err := rlp.EncodeToBytes(tx)
 	if err != nil {
 		return nil, err
@@ -149,6 +159,9 @@ func DecodeFrameTx8141(payload []byte) (*FrameTx8141, error) {
 
 // SigningHash commits to the signature length for entries using this signing hash.
 func (tx *FrameTx8141) SigningHash() (Hash, error) {
+	if profile := tx.NonceProfile8250(); profile != nil {
+		return profile.SigningHash()
+	}
 	signatures := make([][]any, 0, len(tx.Signatures))
 	for _, sig := range tx.Signatures {
 		var witness any = sig.Signature
@@ -168,6 +181,9 @@ func (tx *FrameTx8141) SigningHash() (Hash, error) {
 
 // Validate checks the transaction's state-independent constraints and signatures.
 func (tx *FrameTx8141) Validate() error {
+	if profile := tx.NonceProfile8250(); profile != nil {
+		return profile.Validate()
+	}
 	if tx.Nonce == math.MaxUint64 {
 		return errors.New("EIP-8141 frame nonce cannot be incremented")
 	}
@@ -304,6 +320,9 @@ func (sig FrameSignature) validate(sender Address, signingHash Hash) error {
 
 // GasBudget implements the pinned intrinsic cost, calldata floor and exact execution/state reservations.
 func (tx *FrameTx8141) GasBudget() (FrameGasBudget, error) {
+	if profile := tx.NonceProfile8250(); profile != nil {
+		return profile.GasBudget()
+	}
 	// The input byte lengths are bounded before multiplication by the execution cap.
 	common := uint64(frame8141IntrinsicCost)
 	var intrinsicData, bytesForFloor uint64
@@ -395,6 +414,23 @@ func decodeFrameEnvelope(payload []byte) (*Transaction, error) {
 		}
 		return NewTransaction(tx), nil
 	case 8:
+		// The historical prototype has an integer nonce in the second field;
+		// EIP-8250 has a list. Never reinterpret a malformed keyed list as it.
+		_, _, tail, splitErr := rlp.Split(items)
+		if splitErr != nil {
+			return nil, splitErr
+		}
+		kind, _, _, splitErr := rlp.Split(tail)
+		if splitErr != nil {
+			return nil, splitErr
+		}
+		if kind == rlp.List {
+			profile, err := DecodeFrameTx8250Delta(payload)
+			if err != nil {
+				return nil, err
+			}
+			return NewFrameTransaction8250(profile), nil
+		}
 		tx, err := DecodeFrameTx(payload)
 		if err != nil {
 			return nil, err

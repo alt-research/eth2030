@@ -65,17 +65,32 @@
       "id": "D01",
       "problem": "8141、8250 的费用与 envelope 组合；8272 的 canonical frame 如何组合",
       "owner": "规范/EL；编码、哈希、RPC、gas",
-      "status": "open_for_combined_release",
-      "closure": "同一版本的组合 schema 与有效/无效向量固定",
-      "date": "2026-11-25",
-      "adopted_profile": "base-only or excluded until closure",
+      "status": "resolved_selected_native_composition",
+      "closure": "Pinned merged delta/base history, preserved independent valid/invalid vectors and qualified native public consumers",
+      "date": "2026-11-26",
+      "adopted_profile": "EIP-8141 + EIP-8250 nonce replacement; fees=[max_fee,max_priority_fee_per_gas]; explicit EIP8250Time",
       "affected_tasks": [
         "HGT-002",
         "HGT-007",
         "HGT-011",
         "HGT-017",
         "HGT-022"
-      ]
+      ],
+      "previous_decisions": [
+        {
+          "status": "open_for_combined_release",
+          "closure": "同一版本的组合 schema 与有效/无效向量固定",
+          "date": "2026-11-25",
+          "adopted_profile": "base-only or excluded until closure"
+        }
+      ],
+      "resolution_record": "docs/plans/hegota-c/COMPOSITION.md",
+      "authority": [
+        "https://github.com/ethereum/EIPs/pull/11968",
+        "https://github.com/ethereum/EIPs/pull/12414",
+        "https://github.com/ethereum/execution-specs/pull/3897"
+      ],
+      "corroborating_eels_revision": "6013c4eaed5c9cc1cbb8428541972d6976a8cabd"
     },
     {
       "id": "D02",

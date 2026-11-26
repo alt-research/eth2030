@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"math/big"
-	"sort"
 
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/config"
@@ -67,6 +66,9 @@ func NewBlockBuilder(config *config.ChainConfig, chain BlockchainReader, pool Tx
 // sortedTxLists separates and sorts pending transactions into regular and blob
 // transaction lists, each ordered by effective gas price descending.
 func sortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blobs []*types.Transaction) {
+	return sortedTxListsAt(pending, baseFee, big.NewInt(1))
+}
+func sortedTxListsAt(pending []*types.Transaction, baseFee, blobFee *big.Int) (regular, blobs []*types.Transaction) {
 	for _, tx := range pending {
 		if len(tx.BlobHashes()) > 0 {
 			blobs = append(blobs, tx)
@@ -74,15 +76,8 @@ func sortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blo
 			regular = append(regular, tx)
 		}
 	}
-	sortByPrice := func(txs []*types.Transaction) {
-		sort.Slice(txs, func(i, j int) bool {
-			pi := effectiveGasPrice(txs[i], baseFee)
-			pj := effectiveGasPrice(txs[j], baseFee)
-			return pi.Cmp(pj) > 0
-		})
-	}
-	sortByPrice(regular)
-	sortByPrice(blobs)
+	regular = orderTransactionsAt(regular, baseFee, blobFee)
+	blobs = orderTransactionsAt(blobs, baseFee, blobFee)
 	return regular, blobs
 }
 
@@ -369,18 +364,18 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		pendingTxs = b.txPool.Pending()
 	}
 
-	// Separate and sort: regular txs first, then blob txs.
+	// Check blob availability before ordering executable sender heads.
 	// Blob txs are only included when they carry sidecar data (blobs + KZG
 	// commitments + proofs). Without a sidecar the CL would see blob versioned
 	// hashes in the payload but receive an empty BlobsBundle — causing rejection.
-	regularTxs, blobTxs := sortedTxLists(pendingTxs, header.BaseFee)
+	regularTxs, blobTxs := sortedTxListsAt(pendingTxs, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 	var validBlobTxs []*types.Transaction
 	for _, tx := range blobTxs {
 		if types.HasFullBlobSidecar(tx) {
 			validBlobTxs = append(validBlobTxs, tx)
 		}
 	}
-	allSorted := append(regularTxs, validBlobTxs...)
+	allSorted := orderBuilderTransactions(append(regularTxs, validBlobTxs...), header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	// Partition transactions into non-conflicting groups for parallel execution
 	// observability (gigagas parallel path, M+ roadmap). The groups are not yet
@@ -434,6 +429,20 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 		}
 
+		// Public-pool candidates get the exact candidate state/slot context.
+		// Inclusion-list/private transactions use the independent consensus path.
+		if policy, ok := b.txPool.(interface {
+			ValidateFrameForBuild(*types.Transaction, state.StateDB, *types.Header) error
+			FrameBuildResult(types.Hash, bool)
+		}); ok {
+			if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
+				err := policy.ValidateFrameForBuild(tx, statedb, header)
+				policy.FrameBuildResult(tx.Hash(), err == nil)
+				if err != nil {
+					continue
+				}
+			}
+		}
 		// Set tx context so logs are keyed correctly.
 		statedb.SetTxContext(tx.Hash(), txIndex)
 
@@ -727,9 +736,8 @@ func (b *BlockBuilder) BuildBlockLegacy(parent *types.Header, txsByPrice []*type
 		gasUsed  uint64
 	)
 
-	// Sort transactions: separate regular and blob, each by price descending.
-	regularTxs, blobTxs := sortedTxLists(txsByPrice, header.BaseFee)
-	allSorted := append(regularTxs, blobTxs...)
+	// Apply the local class preference among executable sender heads.
+	allSorted := orderBuilderTransactions(txsByPrice, header.BaseFee, gas.BlobBaseFeeForHeader(b.config, header))
 
 	snapshot := statedb.Snapshot()
 
@@ -945,8 +953,11 @@ func SortedTxLists(pending []*types.Transaction, baseFee *big.Int) (regular, blo
 // effectiveGasPrice returns the effective gas price for a transaction
 // considering the base fee (EIP-1559).
 func effectiveGasPrice(tx *types.Transaction, baseFee *big.Int) *big.Int {
+	return effectiveGasPriceAt(tx, baseFee, big.NewInt(1))
+}
+func effectiveGasPriceAt(tx *types.Transaction, baseFee, blobFee *big.Int) *big.Int {
 	if frame, ok := tx.Inner().(*types.FrameTx8141); ok {
-		payment, err := frame.Payment(baseFee, big.NewInt(1))
+		payment, err := frame.Payment(baseFee, blobFee)
 		if err != nil {
 			return new(big.Int)
 		}

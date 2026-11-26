@@ -19,24 +19,6 @@ import (
 // EIP-7610) non-empty storage.
 var ErrContractCreationCollision = errors.New("contract creation collision: address already in use")
 
-// CommonStorageSlots is the set of well-known storage slots probed by
-// HasNonEmptyStorage. Slot 0 is the most commonly used slot in Solidity
-// (first declared state variable). Slots 1-9 cover additional low-index
-// variables and common proxy patterns (e.g. EIP-1967 slots are hashed, but
-// many contracts store data in low slots).
-var CommonStorageSlots = []types.Hash{
-	types.BytesToHash([]byte{0}),
-	types.BytesToHash([]byte{1}),
-	types.BytesToHash([]byte{2}),
-	types.BytesToHash([]byte{3}),
-	types.BytesToHash([]byte{4}),
-	types.BytesToHash([]byte{5}),
-	types.BytesToHash([]byte{6}),
-	types.BytesToHash([]byte{7}),
-	types.BytesToHash([]byte{8}),
-	types.BytesToHash([]byte{9}),
-}
-
 // CollisionCheck7610 performs EIP-7610 contract creation collision checks.
 type CollisionCheck7610 struct {
 	// Enabled controls whether the EIP-7610 storage check is active.
@@ -50,19 +32,17 @@ func NewCollisionCheck7610(enabled bool) *CollisionCheck7610 {
 	return &CollisionCheck7610{Enabled: enabled}
 }
 
-// HasNonEmptyStorage probes a set of common storage slots and returns true
-// if any of them contain a non-zero value. In a production implementation
-// this would consult the storage trie root, but for correctness a slot-
-// probing approach is used here.
+// HasNonEmptyStorage checks the complete current storage root, including dirty
+// writes. Probing slots cannot establish emptiness: storage keys span 256 bits.
+// All core/state.StateDB implementations expose StorageRoot. A VM-only adapter
+// without that capability must fail closed instead of permitting storage loss.
 func HasNonEmptyStorage(stateDB StateDB, addr types.Address) bool {
-	var zeroHash types.Hash
-	for _, slot := range CommonStorageSlots {
-		val := stateDB.GetState(addr, slot)
-		if val != zeroHash {
-			return true
-		}
+	if roots, ok := stateDB.(interface {
+		StorageRoot(types.Address) types.Hash
+	}); ok {
+		return roots.StorageRoot(addr) != types.EmptyRootHash
 	}
-	return false
+	return true
 }
 
 // CheckCreateCollision checks whether deploying a contract at addr would

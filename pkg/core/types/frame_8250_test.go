@@ -36,8 +36,15 @@ func TestFrame8250DeltaCodecAndSigningCommitments(t *testing.T) {
 	if !bytes.Equal(wire, again) {
 		t.Fatal("noncanonical round trip")
 	}
-	if _, err := DecodeTxRLP(wire); err == nil {
-		t.Fatal("experimental composition entered public decoder")
+	native, err := DecodeTxRLP(wire)
+	if err != nil {
+		t.Fatal(err)
+	}
+	public, err := native.EncodeRLP()
+	signing, _ := tx.SigningHash()
+	wantHash, _ := tx.Hash()
+	if err != nil || !bytes.Equal(public, wire) || native.Hash() != wantHash || native.SigningHash() != signing || native.Nonce() != tx.NonceSeq {
+		t.Fatal("public composition changed wire/hash/sequence")
 	}
 	hash, _ := tx.SigningHash()
 	tx.Signatures[0].Signature[0] ^= 255
@@ -171,6 +178,13 @@ func TestFrame8250DeltaIndependentWireGoldens(t *testing.T) {
 			}
 			hash, _ := tx.Hash()
 			signing, _ := tx.SigningHash()
+			native, err := DecodeTxRLP(wire)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if native.Hash() != hash || native.SigningHash() != signing {
+				t.Fatal("native consumer differs from independent digest")
+			}
 			if hash != HexToHash(v.Hash) || signing != HexToHash(v.SigningHash) || NonceKeysHash8250(tx.NonceKeys) != HexToHash(v.KeySetHash) {
 				t.Fatal("independent digest differs")
 			}
@@ -190,5 +204,23 @@ func TestFrame8141RejectsNoncanonicalIntegerRLP(t *testing.T) {
 		if _, err := DecodeFrameTx8141(wire); err == nil {
 			t.Fatalf("accepted noncanonical/overflow nonce %x", bad)
 		}
+	}
+}
+
+func TestFrame8250PublicCopyAndUint256ChainID(t *testing.T) {
+	profile := nonceProfile8250()
+	profile.ChainID = new(big.Int).Lsh(big.NewInt(1), 200)
+	tx := NewFrameTransaction8250(profile)
+	wire, _ := tx.EncodeRLP()
+	profile.NonceKeys[0].SetInt64(999)
+	profile.Frames[0].Data = []byte{9}
+	profile.ChainID.SetInt64(1)
+	again, _ := tx.EncodeRLP()
+	if !bytes.Equal(wire, again) {
+		t.Fatal("transaction aliases constructor input")
+	}
+	decoded, err := DecodeTxRLP(wire)
+	if err != nil || decoded.ChainId().BitLen() != 201 {
+		t.Fatal("uint256 chain ID narrowed", err)
 	}
 }

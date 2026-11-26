@@ -37,7 +37,11 @@ type ChainConfig struct {
 	AmsterdamTime   *uint64
 	GlamsterdanTime *uint64
 	HogotaTime      *uint64
-	IPlusTime       *uint64
+	// EIP8250Time opts into the keyed Frame envelope at/after EIP-8141.
+	EIP8250Time *uint64 `json:",omitempty"`
+	// EIP8151Time opts into account-code-restricted ecRecover.
+	EIP8151Time *uint64 `json:",omitempty"`
+	IPlusTime   *uint64
 	// SSZBlockTime activates EIP-7807 SSZ execution blocks: from this time
 	// the Engine API serves and accepts SSZ-encoded payloads with the
 	// SSZ block hash (hash_tree_root of the ExecutionBlockHeader).
@@ -205,7 +209,7 @@ func (c *ChainConfig) IsHogota(time uint64) bool {
 // IsLegacyFrameEnabled isolates the old prototype from canonical Hegotá networks.
 // A fork timestamp alone must never enable an incompatible transaction schema.
 func (c *ChainConfig) IsLegacyFrameEnabled(time uint64) bool {
-	return c != nil && c.IsMerge() && c.IsHogota(time) && c.ExperimentalLegacyFrames
+	return c != nil && c.IsMerge() && c.IsHogota(time) && !c.IsEIP8250(time) && c.ExperimentalLegacyFrames
 }
 
 // IsLegacyFrameEnabledAt also checks the block-based prerequisites. Timestamp
@@ -389,6 +393,8 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsEIP8037:        isMerge && c.IsGlamsterdan(timestamp),
 		IsEIP8038:        isMerge && c.IsGlamsterdan(timestamp),
 		IsHogota:         isMerge && c.IsHogota(timestamp),
+		IsEIP8250:        isMerge && c.IsEIP8250(timestamp),
+		IsEIP8151:        isMerge && c.IsEIP8151(timestamp),
 		IsEIP7999:        isMerge && c.IsHogota(timestamp),
 		IsIPlus:          isMerge && c.IsIPlus(timestamp),
 		LegacyNativeBLS:  isMerge && c.LegacyNativeBLSUntil != nil && timestamp < *c.LegacyNativeBLSUntil,
@@ -414,6 +420,7 @@ type Rules struct {
 	IsEIP7778, IsEIP2780, IsEIP7976, IsEIP7981              bool
 	IsEIP8037, IsEIP8038                                    bool
 	IsHogota, IsEIP7999                                     bool
+	IsEIP8250, IsEIP8151                                    bool
 	IsIPlus, IsEIP7885                                      bool
 	LegacyNativeBLS                                         bool
 }
@@ -624,4 +631,12 @@ var TestConfigBPO2 = &ChainConfig{
 	IPlusTime:               nil,
 	BPO1Time:                newUint64(0),
 	BPO2Time:                newUint64(0),
+}
+
+// IsEIP8250 requires the base Frame fork and an explicit composition schedule.
+func (c *ChainConfig) IsEIP8250(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsHogota(time) && isTimestampForked(c.EIP8250Time, time)
+}
+func (c *ChainConfig) IsEIP8151(time uint64) bool {
+	return c != nil && c.IsMerge() && c.IsGlamsterdan(time) && isTimestampForked(c.EIP8151Time, time)
 }

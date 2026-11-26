@@ -186,7 +186,7 @@ func (ch *CallHandler) HandleCall(params *CallHandlerParams) *CallHandlerResult 
 func (ch *CallHandler) runPrecompile(p PrecompiledContract, params *CallHandlerParams) *CallHandlerResult {
 	result := &CallHandlerResult{GasLeft: params.Gas}
 
-	output, gasLeft, err := runPrecompile(p, params.Input, params.Gas)
+	output, gasLeft, err := ch.evm.runPrecompile(p, params.Input, params.Gas)
 	result.ReturnData = output
 	result.GasLeft = gasLeft
 	result.GasUsed = params.Gas - gasLeft

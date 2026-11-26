@@ -19,3 +19,7 @@ Public transaction/receipt wire and storage schemas are unchanged. Research hist
 EIP-8250 D01 remains open: its three-fee example conflicts with its nonce-only replacement instruction and the current 8141 two-field total budget. HGT-017 is verified under the development plan's isolated state/vector allowance. No public composed decoder, activation, pool/import path or database migration is added. EIP-8272 uses the exact ordinary contract. Public-pool extensions remain Group C.
 
 [PR #169](https://github.com/alt-research/eth2030/pull/169) is the publication target. The previous head `c9f847e0` passed 10 checks but contains the two newly reproduced defects. All 10 triggered checks passed on corrected source head `46f57ce4` ([main CI](https://github.com/alt-research/eth2030/actions/runs/45693637673), [snap2](https://github.com/alt-research/eth2030/actions/runs/45693637672)). The evidence records that immutable tested head; final documentation-only descendant checks are reported separately on PR #169.
+
+## Fourth audit in progress
+
+A fresh review checks every Group B task directly against the development plan and normative clauses, including state lifecycle boundaries beyond the previous regression register. Previous passing runs are retained with their tested identities and are not proof of completeness.

@@ -36,3 +36,11 @@ Baseline: merged master `960baab3103e0d34435433be0f8314f127521052` (PR #168 merg
 - [x] Reproduce and correct concrete omissions with unit tests and independent expected values.
 - [x] Refresh affected source-bound evidence and complete local build, vet, full and focused race qualification.
 - [x] Commit and push only owned changes, update the English PR description, and verify all 10 checks at corrected source head `46f57ce4`; final documentation-only descendant checks are reported on PR #169.
+
+## Fourth independent clause audit, 2026-11-26
+
+- [ ] Recheck upstream source identity and all 12 tasks against the development plan, beyond the previous test register.
+- [ ] Audit state lifecycle, state-gas restoration, contract creation/deletion, returndata and signature/receipt boundaries against normative clauses.
+- [ ] Reproduce and repair any concrete omissions, with regression tests and independent expected values.
+- [ ] Requalify current sources, full/focused race checks, build/vet and affected A/B evidence.
+- [ ] Commit/push only owned changes, keep PR content English and verify the published head.

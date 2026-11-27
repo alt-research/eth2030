@@ -1,14 +1,18 @@
 # Selected Group E composition and release boundaries
 
 Baseline: master after PR #171, `cc31afffaa12919bbc08dc854c03af1e1928dc3c`.
-This implementation selects the exact Heze and Engine Bogotá revisions in
-[PLAN.md](PLAN.md), not the older inline CL/Engine sketch in EIP-7805. It adds
-no mainnet fork timestamp, committee parameter or EIP-8369 consensus rule.
+This implementation selects merged EIP-7805 PR #12470 at EIPs `fbc43ec3`,
+and the exact Heze/Engine Bogotá companions in [PLAN.md](PLAN.md). The merged
+pre-execution-only predicate supersedes earlier omission assumptions. See
+[the latest clause/discussion audit](../../reviews/pr-172/LATEST_7805.md).
+No mainnet fork timestamp, committee parameter or EIP-8369 consensus rule is added.
 
 ## Source and discussion audit
 
-The November 27 review followed EIP-7805 and EIP-8369, all eight current Heze
-companion documents and Engine Bogotá line by line. Verbatim snapshots and
+The November 27 review followed the selected EIPs, all eight Heze companion
+documents and Engine Bogotá line by line. The November 28 recheck read the
+complete merged EIP-7805 rebase and its review/discussion, and confirmed the
+selected companion revisions remain unchanged. Verbatim snapshots and
 blob/SHA-256 identities are in `specs/hegota/group-e.json`. EIP-7916 confirms
 ProgressiveList serialization and JSON mapping equal ordinary SSZ lists;
 only Merkleization changes. Empty list serialization is empty bytes, not a
@@ -64,8 +68,9 @@ backend; the alternate backend rejects those versions explicitly.
 EIP-7805's omission state is taken immediately after the last transaction,
 before withdrawals and request-system calls. Authenticated BAL post-phase
 metadata preserves the fast Profile 1 account path when its fields are
-unchanged; affected senders and full-state probes reconstruct the precise
-transaction prefix using the shared processor. Missing BAL data reconstructs,
+unchanged; affected senders and Frame preconditions reconstruct the precise
+transaction prefix using the shared processor. Only actual accepted payload
+transactions are replayed; omitted candidates never execute. Missing BAL data reconstructs,
 and corrupt commitments fail. The cache predicate version prevents old final-
 block-state verdicts from bypassing this correction: retained views are
 rechecked, while legacy compact records wait for exact CL view resubmission. BLOCKHASH uses the authenticated branch
@@ -78,8 +83,8 @@ and precondition-valid omitted witnesses retain the explicit composition gate.
 Native capacity includes ordinary state usage and Amsterdam gross execution;
 missing derived receipt counters reconstruct from the transaction prefix.
 Builder and import byte projections use the maximum consumed gas dimension.
-Version-2 metadata rechecks retained versions 0/1 and requires resubmission for
-legacy compact records. The native ingress commits an owned/pruned cache view
+Predicate version 3 rechecks retained versions 0–2 and requires exact CL view
+resubmission for old compact records without retained list bytes. The native ingress commits an owned/pruned cache view
 only after persistence and uses the exact clock already validated at arrival.
 
 ## AA-VOPS and PQ gates
@@ -93,8 +98,8 @@ use conservative full declared-frame accounting and are never admitted. This
 is not a complete Profile 2 eligibility/replay engine. Every enforcement request
 returns `ErrProfile2NotSpecified`; its thirteen prerequisites enumerate claims,
 canonical diffs, isolated replay, final bounds, vectors and post-reveal duties.
-The existing Group C full-state Frame omission consumer remains a separate
-explicit experimental profile; it does not certify partial-stateless replay.
+Historical full-state omission experiments do not select the native merged
+EIP-7805 predicate or certify partial-stateless replay.
 
 The PQ measurement uses real canonical EIP-8504 transaction bytes and uncached
 leanSPHINCS verification, then the signed SSZ/BLS/store/union pipeline. A 167-byte
@@ -109,28 +114,42 @@ authenticated local pool wrapper for building; exact transaction identity stays
 canonical and the included dependency union carries the witness. This is not an
 omitted-IL witness transport assignment.
 
-HGT-046 activation remains gated by D04. External Heze Gossipsub/reqresp framing,
-fork digests, independent CL/ePBS devnet and network latency qualification remain
-HGT-070/080 integration prerequisites. Completion of local native consumers
-does not mean those external duties or Profile 2 consensus are complete.
+HGT-046 activation remains gated by D04. Selected independent Heze two-pair
+network controls qualify signed gossip, inclusion/finality, native VALID/false
+fork choice/restart and bounded PQ-byte carriage at their recorded source.
+Final publication-head requalification is tracked separately in the English PR.
+Exhaustive beacon reqresp/fork-digest, mixed-client/ePBS and public-tail
+qualification remain HGT-070/080 prerequisites; no public activation is claimed.
 
-## Base FOCIL versus informational profile boundaries
+## Merged omission rules and builder validity
 
-The Profile 1 account predicate is an optimization, not authority to exclude
-other envelopes from base EIP-7805. Non-Profile-1 envelopes retain independent
-full-state append validation, including blob-gas capacity. Blob and Frame
-transactions outside the informational 8369 candidates do not automatically
-receive a new consensus omission excuse. Static-invalid Frame/proof envelopes
-are tolerated before any unavailable-witness gate. The executor's immutable
-fork/chain-ID and selected nonce-schema rules are shared by native import and
-building; a definitely invalid envelope needs no dependency witness. This
-does not establish validity or invent transport for a context-valid omitted
-PQ envelope.
+The Profile 1 account helper is an optimization, not authority to narrow base
+EIP-7805 to Informational 8369 candidates. Every decoded omitted transaction
+uses current-chain pre-execution validation. Type 3 is explicitly ignored.
+Canonical Frame context and static protocol signatures, sender nonce, aggregate
+fees, balance and intrinsic/reservation checks share actual executor helpers.
+Runtime VERIFY/body/storage failure does not excuse a statically valid omission.
+Each candidate uses the same immutable transaction-end state and capacity.
 
-A canonical IL blob can reuse its admitted pool sidecar. A valid blob without
-data aborts building instead of returning an unsatisfied payload or empty blob
-bundle. Completed failed IDs can be retried with the same exact attributes
-after availability changes; successful completed IDs remain immutable. The
-new native regression exercises real KZG admission, invalid signatures,
-execution-valid-but-unsatisfied import, missing-data failure, same-ID retry and
-the complete authenticated blob bundle.
+Ordinary execution reservation is `min(tx.gas, 2**24)` and state reservation is
+`tx.gas`, checked against the actual independent EIP-8037 pools. Header
+`gas_used` is the maximum used dimension and cannot reconstruct those pools.
+Canonical Frame reservations use its selected execution/state budget. Missing
+derived receipt counters may replay the accepted transaction prefix, never the
+candidate. Static-invalid envelopes and insufficient capacity are decidable
+before undefined omitted-dependency witness composition is considered.
+
+Actual builders execute candidate transactions and enforce EIP-7934 complete
+block RLP validity. Omission evaluation neither executes nor projects an append.
+EIPs #12723 proposes a distinct size exemption and remains unmerged/disabled;
+execution-specs #4041 is also unmerged. The real near-8-MiB native regression
+checks that an otherwise valid candidate is not excused by speculative size
+policy. High-gas size-limit composition remains an upstream release gate.
+
+Type-3 IL entries cannot stall a builder or cause it to require a sidecar.
+Authenticated normal pool blobs remain buildable with their actual sidecars.
+Canonical PQ entries may reuse an authenticated pool witness for actual builds;
+missing witness data fails that build and an identical owned payload ID can retry
+after admission. Successful completed IDs remain immutable. The current native
+consumers cover this retry, canonical GetIL blob exclusion, normal pool blob
+availability, pre-execution-only Frame/storage behavior and version-3 migration.

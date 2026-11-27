@@ -1,5 +1,11 @@
 # Group E complete-consumer runtime audit
 
+> Historical pre-rebase audit. Merged EIP-7805 PR #12470 supersedes candidate
+> execution, type-3 enforcement, size exemptions and cache-version assumptions
+> below. Use [LATEST_7805.md](LATEST_7805.md), the current criterion plan and
+> source-bound qualification for the active rules. Original findings/results
+> remain preserved with their recorded source identities.
+
 Date: November 27, 2026 (Asia/Shanghai). Published starting head:
 `15262949d2b4dbf0f41bf4919dd0a2d0d5550c7c`. Base remains merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. Independent Lean work, read-only

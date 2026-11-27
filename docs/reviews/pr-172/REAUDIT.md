@@ -1,5 +1,11 @@
 # Group E completion re-audit
 
+> Historical pre-rebase audit. Merged EIP-7805 PR #12470 supersedes candidate
+> execution, type-3 enforcement, size exemptions and cache-version assumptions
+> below. Use [LATEST_7805.md](LATEST_7805.md), the current criterion plan and
+> source-bound qualification for the active rules. Original findings/results
+> remain preserved with their recorded source identities.
+
 Date: November 27, 2026 (Asia/Shanghai). Baseline: merged PR #171 at
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. This audit starts from published
 PR #172 head `4663af699c4c9bbc48f59976dc26e00d805a78d6` in an independent

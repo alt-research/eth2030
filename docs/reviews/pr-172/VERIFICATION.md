@@ -1,5 +1,11 @@
 # Group E verification and scope
 
+> Historical pre-rebase audit. Merged EIP-7805 PR #12470 supersedes candidate
+> execution, type-3 enforcement, size exemptions and cache-version assumptions
+> below. Use [LATEST_7805.md](LATEST_7805.md), the current criterion plan and
+> source-bound qualification for the active rules. Original findings/results
+> remain preserved with their recorded source identities.
+
 Production source: `70facd01d15e8068cfc9839b3f0e352784765277`.
 Qualified Go source snapshot: `ee798638b27a186bf168ebb830de4c7f45e5a8e7`.
 Baseline: merged PR #171/master `cc31afffaa12919bbc08dc854c03af1e1928dc3c`.

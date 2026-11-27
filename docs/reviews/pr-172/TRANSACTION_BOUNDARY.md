@@ -1,5 +1,11 @@
 # Group E transaction-boundary completion audit
 
+> Historical pre-rebase audit. Merged EIP-7805 PR #12470 supersedes candidate
+> execution, type-3 enforcement, size exemptions and cache-version assumptions
+> below. Use [LATEST_7805.md](LATEST_7805.md), the current criterion plan and
+> source-bound qualification for the active rules. Original findings/results
+> remain preserved with their recorded source identities.
+
 Date: November 27, 2026 (Asia/Shanghai). Starts from published PR #172 head
 `63f85e737d8dd84c8913d6f6ef996179e5e373d5`, based on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. The independent Lean work in the

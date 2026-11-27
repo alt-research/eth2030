@@ -14,7 +14,9 @@ and desktop/mobile visual review also passed. Required consumers have no skips.
 See [LATEST_7805.md](LATEST_7805.md) and
 [LATEST_7805_QUALIFICATION.json](LATEST_7805_QUALIFICATION.json). Final exact-head
 hosted qualification is recorded separately in the English PR.
-The existing network/resource snapshots below identify their original source;
+The composition and tooling guides now match the merged predicate and current
+43-consumer/39-control register. Earlier audit narratives are explicitly marked
+as historical. The existing network/resource snapshots below identify their original source;
 they are not silently relabeled as tests of the updated predicate.
 
 ## Previous source-specific qualification

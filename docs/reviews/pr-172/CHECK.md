@@ -11,7 +11,7 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] HGT-041: implement normative IL types, storage, exact bytes, duplicate/equivocation/late/reorg/pruning behavior.
 - [x] HGT-042: implement selected Engine methods, versions, capabilities, schemas and unsupported-version rejection.
 - [x] HGT-043: implement builder updates/rebuild/cancellation/deadlines and sequential transaction validity without deadlocks.
-- [x] HGT-044: implement exact Profile 1 presence/validity/gas/byte rules, including EIP-7934 boundaries and invalid transactions.
+- [x] HGT-044: implement merged independent pre-execution presence/validity/reservation rules, type-3 exclusion and no candidate execution; enforce EIP-7934 on actual blocks.
 - [x] HGT-045: connect actual native node storage/build/import/results and document alternate backend behavior.
 - [x] HGT-046 (reference predicates and enforced D04 gate; activation is NOT complete): implement all defined AA-VOPS requirements and only activate a complete normative profile; preserve explicit D04 gates for undefined rules.
 - [x] HGT-047 (local native/CL adapter; external HGT-070/080 qualification remains open): qualify gossip-to-fork-choice consumers and all normative omission/full/invalid/late/branch exceptions.
@@ -74,3 +74,5 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Refresh source pins, all 43 consumers, 39 fresh compiled controls, evidence and website claims without editing read-only refs or independent expected oracles.
 - [x] Complete source-bound local qualification and prepare publication with exact-head hosted checks required by the English PR.
 - Final publication-head CI outcomes are recorded in the PR check runs and English description; this frozen local record does not pre-claim those outcomes.
+
+- [x] Final documentation audit: update the current composition/tooling guide to 43 consumers, 39 controls and merged rules; explicitly label pre-rebase audit narratives as historical.

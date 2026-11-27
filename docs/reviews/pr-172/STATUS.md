@@ -1,6 +1,6 @@
 # Group E status
 
-Production source: `d830d0b1c82373cd3b9f6ba135f27703405fe972`, based directly on merged PR #171/master
+Production source after re-audit: `4fcb2572`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 
@@ -10,7 +10,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 28 mandatory native consumers. Profile 1 checks
+The 36-criterion register names 30 mandatory native consumers. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.
@@ -42,7 +42,7 @@ Base EIP-7805 blob/other-envelope append validity remains enforced independently
 
 Append RLP sizing includes scalar/3D calldata usage and blob-gas header widths, including prior committed appends; exact serialization independently checks these boundaries.
 
-Final local qualification passed: full suite 244 packages / 24,234 named pass
+Previous pre-re-audit local qualification passed: full suite 244 packages / 24,234 named pass
 events (124 optional skips), selected race suite 76 packages / 12,080 named pass
 events (87 optional skips), native/wrapper builds, vet, 12/12 differential
 baselines, 109 Python checks in normal and optimized modes, and all A-E source

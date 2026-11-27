@@ -3,11 +3,11 @@ import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/dat
 
 export const hegotaGroupE = {
   reviewed: 'November 27, 2026',
-  revision: 'd830d0b1c82373cd3b9f6ba135f27703405fe972',
+  revision: '4fcb25727431acce11bde84692b3060aeb90f3fe',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
-    { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views, retained requests and strict Engine versions/capabilities.' },
-    { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding cascades, cancellation and deadlines, exact RLP capacity, Profile 1 account checks, two isolated native nodes and restart persistence.' },
+    { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views, retained requests, reauthenticated CL adapter replacement and strict Engine versions/capabilities.' },
+    { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding cascades, cancellation and deadlines, exact RLP capacity, Profile 1 account checks, two isolated native nodes, restart persistence and compact finalized verdicts for stale-head notifications.' },
     { id: 'HGT-046', title: 'AA-VOPS / Profile 2', status: 'Specification gate', detail: 'Informational EIP-8369 reference predicates are tested. Consensus activation stays disabled pending a Standards Track claims, state-diff, replay and ePBS specification.' },
     { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Native adapter qualified', detail: 'Authenticated IL ingress reaches Engine verdicts and Heze extension predicates. External beacon Gossipsub/reqresp, fork digests and CL/ePBS devnet qualification remain HGT-070/080 prerequisites.' },
     { id: 'HGT-048', title: 'Post-quantum IL resources', status: 'Bounded measurements', detail: 'Canonical direct-8504 bytes, real uncached verification and local signed SSZ/BLS/store pipeline. Omitted witness transport and network tail latency remain unqualified; limits are unchanged.' },

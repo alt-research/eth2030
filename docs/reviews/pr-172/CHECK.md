@@ -24,9 +24,9 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Completion re-audit — November 27, 2026
 
-- [ ] Confirm latest EIP/Heze/Bogotá source blobs and discussions against the frozen scope.
-- [ ] Recheck every HGT-040–048 clause against actual consumers; distinguish implementation from unresolved activation/external prerequisites.
-- [ ] Exercise untested validity, byte/gas, request, retention, fork-choice, replacement/cancellation and persistence boundaries.
-- [ ] Fix all reproducible specification deviations and add independent negative/positive regressions.
+- [x] Confirm latest EIP/Heze/Bogotá source blobs and discussions against the frozen scope.
+- [x] Recheck every HGT-040–048 clause against actual consumers; distinguish implementation from unresolved activation/external prerequisites.
+- [x] Exercise untested validity, byte/gas, request, retention, fork-choice, replacement/cancellation and persistence boundaries.
+- [x] Fix all reproducible specification deviations and add independent negative/positive regressions.
 - [ ] Refresh source-bound A–E evidence, website progress and scope limitations; preserve independent expected oracles.
 - [ ] Run appropriate build/vet/full/race checks, publish only owned changes to English PR #172 and follow exact-head CI.

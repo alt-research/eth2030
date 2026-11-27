@@ -41,7 +41,7 @@ remain available for honest builders and equivocation detection. Two conflicting
 messages exclude the member from both views. Request indices are committee
 positions; repeated committee members are deduplicated in responses. Retention
 keeps slot N through N+MIN_REQUEST_SLOTS+1 inclusive. Reopened stores first discard expired entries and reject future cache entries,
-then reverify retained signatures and ancestry; failure to obtain authenticated state blocks use.
+then reverify retained signatures and ancestry; failure to obtain authenticated state blocks use. Replacing a live CL adapter reauthenticates the in-memory snapshot under the replacement context before committing the switch; a failed replacement preserves the previous view and quota.
 
 The official Engine calls carry the caller's immutable list view. There is no
 new bare-IL update method: new attributes create a replacement payload ID,
@@ -54,7 +54,7 @@ growth, scalar/3D calldata and blob-gas header widths, withdrawals and the
 selected dependency-witness union.
 
 The native backend executes and durably retains accepted payload views across
-branches/restarts. Execution validity and IL satisfaction are separate; a valid
+branches/restarts. Below finality it releases IL bytes and unexecuted branches while retaining compact completed verdicts for inherited Paris stale-head notifications. Execution validity and IL satisfaction are separate; a valid
 omitting payload remains stored. `PayloadDecisions` supplies the Heze CL-side
 decision predicates without changing ancestors or re-evaluating known-valid
 decisions after pruning. An actual external CL must consume that verdict at

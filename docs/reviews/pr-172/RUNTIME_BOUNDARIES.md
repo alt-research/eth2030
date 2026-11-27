@@ -133,6 +133,14 @@ The existing durable file synchronization/rename protocol is preserved.
 | HGT-047 | Authenticated native ingress, optimistic transitions, ancestor stability, availability and bid-bit predicates reviewed; external CL/ePBS qualification remains HGT-070/080. |
 | HGT-048 | Actual bytes/verifier/local pipeline measurements remain bounded; definite invalidity is distinguished from undefined witness composition. |
 
+The first full run exposed a pre-existing D native fixture: its omitted generic
+proof transaction used the correct next nonce but an insufficient fee budget.
+That could only test the old unconditional witness gate. Its input now uses the
+already-included canonical account's next nonce and original adequate fee budget;
+the original missing-witness error assertion is unchanged. Independent expected
+goldens/oracles remain unchanged. The compiled failure and fresh final rerun are
+recorded separately rather than claiming the first run passed.
+
 Five additional mandatory consumers bring the register to 39. Existing
 consumers remain required. New compiled-removal controls cover preparation,
 state/gross accounting, predicate version, dimensional RLP, read failures,

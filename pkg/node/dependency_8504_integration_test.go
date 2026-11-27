@@ -150,7 +150,13 @@ func TestDependency8504ActualRPCSimulationEngineBodiesAndRestart(t *testing.T) {
 	if satisfied.Status != "VALID" || satisfied.InclusionListSatisfied == nil || !*satisfied.InclusionListSatisfied {
 		t.Fatal("included dependency IL", satisfied)
 	}
-	omitted := proof8504.Transaction(1)
+	// This case tests unavailable witness composition, so its deterministic
+	// preconditions must pass. The old generic fixture had the next nonce but
+	// an insufficient fee budget. Preserve the canonical account and fees.
+	omitted, _ := proof8504.CanonicalTransaction(false)
+	omittedFrame := omitted.Inner().(*types.FrameTx8141)
+	omittedFrame.Nonce = 1
+	omitted = types.NewTransaction(omittedFrame)
 	omittedRaw, _ := omitted.EncodeRLP()
 	if err := destination.invoke("engine_newPayloadV6", &satisfied, envelope.ExecutionPayload, []types.Hash{}, beacon, envelope.ExecutionRequests, []string{"0x" + hex.EncodeToString(omittedRaw)}); err == nil {
 		t.Fatal("omitted bare proof received a validity verdict without witness-bearing IL specification")

@@ -142,3 +142,9 @@ preparation, complete dimensional accounting/projection, version-2 migration and
 owned cache publication. Current upstream 8037 differs from read-only refs; its
 existing current C/D snapshot is reused. The register now requires 39 consumers
 across 22 normative files. Final qualification remains pending.
+
+The first fresh full run failed the older D native omitted-witness fixture: it
+used a generic transaction with correct next nonce but insufficient fees.
+Only that input is corrected to the canonical account's next nonce and adequate
+fee budget. Its original missing-witness error assertion and all independent
+expected goldens remain unchanged. A complete fresh rerun is required.

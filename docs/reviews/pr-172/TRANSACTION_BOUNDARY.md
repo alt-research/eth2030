@@ -76,6 +76,10 @@ requires a current, resolved verdict record; execution validity itself is unchan
   requires its original view to be resubmitted. Current-version compaction
   preserves the verdict and latest-view replacement behavior.
 
+The older native fork-activation test's manually supplied empty view now carries
+the current cache predicate version; its activation/reorg assertions are unchanged.
+Actual legacy migration is independently exercised by the native wire cases above.
+
 These cases add three mandatory consumers, bringing the register to 33. Seven
 additional compiled-removal controls cover state selection, prefix execution,
 pruned metadata, legacy live/compact migration and version-preserving compaction.

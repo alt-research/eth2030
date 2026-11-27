@@ -20,3 +20,13 @@ consumers; open specification questions must not become invented consensus.
 - [x] Inspect staged changes for conflict markers, duplicate work and baseline drift; preserve root trackers, refs and independent A/B/C oracles.
 - [x] Commit/push and publish [English PR #171](https://github.com/alt-research/eth2030/pull/171).
 - [x] Verify the hosted CI workflow and independent snap2 interoperability on exact source `335466499783ceed25de596e2ba0fb8b3e5fb67d`; retain the PR suite as authority for final-head reruns and actual proof acceptance.
+
+## Latest-EIP completeness re-audit
+
+- [ ] Recheck current EIP heads, every normative clause and discussion changes.
+- [ ] Audit witness transport, blob composition, payload/import/restart and all attachment-copy paths.
+- [ ] Audit adoption origins, nested creation/destruction, BAL consumers and migration/dependency invalidation.
+- [ ] Audit ASSERT trace completeness, cache lifetime, subtree/static boundaries and whole-body settlement.
+- [ ] Add native regression consumers for every reproduced gap and reconcile the complete criterion register.
+- [ ] Run current-source builds, vet, full/race and A/B/C/D evidence checks; preserve independent oracles.
+- [ ] Inspect conflicts/duplication, commit/push and update the English PR; follow final-head hosted checks.

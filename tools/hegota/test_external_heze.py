@@ -9,6 +9,15 @@ spec.loader.exec_module(external)
 
 
 class ExternalHezeTests(unittest.TestCase):
+    def test_private_profile_preserves_node_defaults_and_engine_authentication(self):
+        profile = external.private_profile()
+        self.assertEqual(profile.count('"--rpc.allow-insecure"'), 2)
+        self.assertNotIn("--authrpc.jwtsecret", profile)
+        self.assertNotIn("--engine.auth", profile)
+        self.assertIn("el_image: eth2030:frame-control", profile)
+        original = (external.SCRIPTS.parent / "configs/frame-heze-control.yaml").read_text()
+        self.assertNotIn("--rpc.allow-insecure", original)
+
     def test_unsatisfied_root_requires_independent_execution_validity(self):
         node = {"root": "beacon", "execution_status": {"Valid": "execution"}}
         snapshot = {"data": {"nodes": [{"V29": node}], "unsatisfied_inclusion_lists": ["beacon"]}}

@@ -41,6 +41,17 @@ def containers(enclave):
     return [values[name] for name in base.EL]
 
 
+def private_profile():
+    # ethereum-package requires unauthenticated admin_nodeInfo for its owned
+    # bridge-network health checks. Make that private-only compatibility choice
+    # explicit instead of weakening the native node's default guard or JWT.
+    profile = (SCRIPTS.parent / "configs/frame-heze-control.yaml").read_text()
+    marker = '"--rpc.rate_limit=0"'
+    if profile.count(marker) != 2:
+        raise ValueError("unexpected private-profile layout")
+    return profile.replace(marker, marker + ', "--rpc.allow-insecure"')
+
+
 def configure(ids, value):
     program = "import sys; from pathlib import Path; p=Path('/tmp/hegota-e-control.new'); p.write_bytes(sys.stdin.buffer.read()); p.replace('/tmp/hegota-e-control.json')"
     for identifier in ids:
@@ -398,6 +409,8 @@ def main():
     if base.enclave_networks():
         raise RuntimeError("another devnet enclave is active")
     output.mkdir(parents=True, exist_ok=False)
+    profile = output / "private-profile.yaml"
+    profile.write_text(private_profile())
     enclave = "hegota-e-" + uuid4().hex[:8]
     was_running = base.engine_running()
     signal.signal(signal.SIGTERM, base.interrupt)
@@ -411,8 +424,8 @@ def main():
             if actual != expected:
                 raise ValueError("image does not match the selected source: " + name)
         with (output / "launch.log").open("w") as log:
-            base.run_job(["bash", str(SCRIPTS / "run-devnet.sh"), "frame-heze-control", enclave], log, 600,
-                         env={**os.environ, "KURTOSIS_PACKAGE": str(package), "SKIP_EL_IMAGE_BUILD": "1"})
+            base.run_job(["kurtosis", "run", str(package), "--args-file", str(profile), "--enclave", enclave], log, 600,
+                         env=dict(os.environ))
         evidence["enclave_id"] = base.enclave_id("kt-" + enclave)
         evidence["nodes"] = base.collect_images(enclave)
         evidence["positive"] = focil.verify(enclave, 900, evidence_dir=output, fixture_tool=fixture)

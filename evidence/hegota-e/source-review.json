@@ -1,0 +1,39 @@
+{
+  "checked_at_utc": "2026-11-27 05:06:18 UTC",
+  "heads": {
+    "eips": "68db81b0a75edb0e16d8f181241f994875eba52d",
+    "consensus_specs": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "execution_apis": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d"
+  },
+  "unchanged_current_dependency_blobs": [
+    {
+      "eip": 7934,
+      "blob": "c18cb0def4fa9ef731f358912f228d30470a85cd",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8141,
+      "blob": "9bc38a368881fa52e1a1a9970274e6511874d13f",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8250,
+      "blob": "10bd1d84c9534c9db65f9ccbffcf8d5902b9c1ae",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8272,
+      "blob": "0acc21ad8359be83c0929c7cc70e45326be8acff",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    }
+  ],
+  "proof_8504": {
+    "pr": "https://github.com/ethereum/EIPs/pull/12672",
+    "state": "open",
+    "revision": "96da3c17047ad31608c40bfe75049db78dc4417d",
+    "head_repository": "lambdaclass/EIPs",
+    "updated_at": "2026-11-25T18:41:37Z",
+    "in_eips_master": false,
+    "scope": "Explicit optional direct research profile; no omitted-IL witness transport or public activation assignment."
+  }
+}

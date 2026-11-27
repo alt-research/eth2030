@@ -54,3 +54,12 @@ Hosted exact-head CI is tracked in the English PR record. These frozen local
 artifacts do not pre-claim its outcome.
 
 Published review: [PR #172](https://github.com/alt-research/eth2030/pull/172), targeting `alt-research/eth2030:master`. Exact-head hosted check outcomes are maintained in that English PR record, separately from the frozen local evidence.
+
+## Completion re-audit in progress
+
+A fresh independent worktree starts from published PR #172 head
+`4663af699c4c9bbc48f59976dc26e00d805a78d6`. Latest EIPs, consensus-specs and
+execution-apis heads still match the pinned Group E revisions. The review will
+recheck all nine tasks and their actual runtime consumers, rather than treating
+previous check counts as proof of completeness. Unrelated Lean work in the
+original worktree is preserved.

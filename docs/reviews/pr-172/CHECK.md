@@ -21,3 +21,12 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Update website/GitHub Pages roadmap and progress to match demonstrated results and actual release gates; build/check exports and UI.
 - [x] Inspect base drift, conflicts and duplicated work; commit/push and publish English PR #172.
 - Hosted exact-head results are tracked in [PR #172](https://github.com/alt-research/eth2030/pull/172) check runs and its English description.
+
+## Completion re-audit — November 27, 2026
+
+- [ ] Confirm latest EIP/Heze/Bogotá source blobs and discussions against the frozen scope.
+- [ ] Recheck every HGT-040–048 clause against actual consumers; distinguish implementation from unresolved activation/external prerequisites.
+- [ ] Exercise untested validity, byte/gas, request, retention, fork-choice, replacement/cancellation and persistence boundaries.
+- [ ] Fix all reproducible specification deviations and add independent negative/positive regressions.
+- [ ] Refresh source-bound A–E evidence, website progress and scope limitations; preserve independent expected oracles.
+- [ ] Run appropriate build/vet/full/race checks, publish only owned changes to English PR #172 and follow exact-head CI.

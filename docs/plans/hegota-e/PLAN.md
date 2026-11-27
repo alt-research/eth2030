@@ -53,6 +53,8 @@ withdrawals and post-execution request calls. Execution-validated EIP-7928
 phase n+1 metadata identifies whether final block state can serve that check;
 affected account/full-state probes require an exact transaction-prefix state.
 Missing metadata requires reconstruction, and corrupted metadata is an error.
+BLOCKHASH probes use authenticated branch headers independently of body
+availability; missing required headers propagate as errors.
 Cached verdicts must identify the predicate used; legacy records with retained
 views are recomputed, while legacy compact records require CL view resubmission.
 See `docs/reviews/pr-172/TRANSACTION_BOUNDARY.md` for the complete audit.

@@ -3,11 +3,11 @@ import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/dat
 
 export const hegotaGroupE = {
   reviewed: 'November 27, 2026',
-  revision: '347225abc242fb0a7fc24669c467b65ddc71fbc8',
+  revision: 'c6d8a0e2e557580e9194881467f439309486ce45',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
     { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views, retained requests, reauthenticated CL adapter replacement and strict Engine versions/capabilities.' },
-    { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding cascades, cancellation and deadlines, exact RLP capacity, Profile 1 account checks, two native nodes, transaction-end IL checks before withdrawals/request calls, and versioned retained/compact verdict migration.' },
+    { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding cascades, cancellation and deadlines, exact RLP capacity, Profile 1 account checks, two native nodes, transaction-end IL checks before withdrawals/request calls, versioned retained/compact verdict migration and authenticated header-only BLOCKHASH ancestry.' },
     { id: 'HGT-046', title: 'AA-VOPS / Profile 2', status: 'Specification gate', detail: 'Informational EIP-8369 reference predicates are tested. Consensus activation stays disabled pending a Standards Track claims, state-diff, replay and ePBS specification.' },
     { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Native adapter qualified', detail: 'Authenticated IL ingress reaches Engine verdicts and Heze extension predicates. External beacon Gossipsub/reqresp, fork digests and CL/ePBS devnet qualification remain HGT-070/080 prerequisites.' },
     { id: 'HGT-048', title: 'Post-quantum IL resources', status: 'Bounded measurements', detail: 'Canonical direct-8504 bytes, real uncached verification and local signed SSZ/BLS/store pipeline. Omitted witness transport and network tail latency remain unqualified; limits are unchanged.' },

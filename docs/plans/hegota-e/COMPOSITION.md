@@ -68,7 +68,9 @@ unchanged; affected senders and full-state probes reconstruct the precise
 transaction prefix using the shared processor. Missing BAL data reconstructs,
 and corrupt commitments fail. The cache predicate version prevents old final-
 block-state verdicts from bypassing this correction: retained views are
-rechecked, while legacy compact records wait for exact CL view resubmission.
+rechecked, while legacy compact records wait for exact CL view resubmission. BLOCKHASH uses the authenticated branch
+header window even when bodies are unavailable; missing/corrupt required headers
+propagate errors instead of changing the omission verdict.
 
 ## AA-VOPS and PQ gates
 

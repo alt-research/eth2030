@@ -1,11 +1,11 @@
 {
-  "source_revision": "7fff57e316bf141a951812792e535bdd79df6a27",
-  "production_source_revision": "70facd01d15e8068cfc9839b3f0e352784765277",
-  "reviewed_evidence_revision": "7315f0a6217a46e49ac195c2d695e5df440bbf6b",
+  "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+  "production_source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
+  "reviewed_evidence_revision": "8076e37b7b80ca9c29d67120f4dbd853022bafd5",
   "site_build_exit_code": 0,
   "static_export_checks_exit_code": 0,
   "eip_entries_checked": 149,
-  "roadmap_html_sha256": "fdb152f8ad9e0596c5e835255bd30fa3f417fcbded1e1b9d08038be03ee79cfc",
+  "roadmap_html_sha256": "7006452cc4b15e02cacce4b95ae2d12a4ebfddd5f6b80866d0bcf10bffc3b78c",
   "viewports": [
     {
       "name": "desktop",
@@ -16,22 +16,26 @@
       "links": [
         {
           "text": "Criterion register \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/7315f0a6217a46e49ac195c2d695e5df440bbf6b/docs/plans/hegota-e/PLAN.md"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/plans/hegota-e/PLAN.md"
         },
         {
           "text": "Reviewed native source \u2197",
-          "href": "https://github.com/alt-research/eth2030/tree/7315f0a6217a46e49ac195c2d695e5df440bbf6b/pkg/focil/heze"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/pkg/node/backend/engine_bogota.go"
         },
         {
           "text": "Independent network evidence \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/7315f0a6217a46e49ac195c2d695e5df440bbf6b/evidence/hegota-e/external-network.json"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/evidence/hegota-e/external-network.json"
+        },
+        {
+          "text": "Latest EIP-7805 audit \u2197",
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/reviews/pr-172/LATEST_7805.md"
         },
         {
           "text": "AA-VOPS specification boundary \u2197",
           "href": "https://eips.ethereum.org/EIPS/eip-8369"
         }
       ],
-      "review": "Fresh desktop/mobile image inspection: all selected-network results, explicit activation/release gates and four source links readable without clipping."
+      "review": "Fresh desktop/mobile visual inspection: pre-execution-only rules, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
     },
     {
       "name": "mobile",
@@ -42,33 +46,36 @@
       "links": [
         {
           "text": "Criterion register \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/7315f0a6217a46e49ac195c2d695e5df440bbf6b/docs/plans/hegota-e/PLAN.md"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/plans/hegota-e/PLAN.md"
         },
         {
           "text": "Reviewed native source \u2197",
-          "href": "https://github.com/alt-research/eth2030/tree/7315f0a6217a46e49ac195c2d695e5df440bbf6b/pkg/focil/heze"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/pkg/node/backend/engine_bogota.go"
         },
         {
           "text": "Independent network evidence \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/7315f0a6217a46e49ac195c2d695e5df440bbf6b/evidence/hegota-e/external-network.json"
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/evidence/hegota-e/external-network.json"
+        },
+        {
+          "text": "Latest EIP-7805 audit \u2197",
+          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/reviews/pr-172/LATEST_7805.md"
         },
         {
           "text": "AA-VOPS specification boundary \u2197",
           "href": "https://eips.ethereum.org/EIPS/eip-8369"
         }
       ],
-      "review": "Fresh desktop/mobile image inspection: all selected-network results, explicit activation/release gates and four source links readable without clipping."
+      "review": "Fresh desktop/mobile visual inspection: pre-execution-only rules, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
     }
   ],
   "browser_console": {
     "errors": 0,
     "warnings": 1,
-    "warning_scope": "Next static CSS preload notice; no browser errors."
+    "warning_scope": "Next CSS preload notice only"
   },
-  "scope": "Fresh local build, exported HTML, 149-entry tracker verification, Playwright DOM and desktop/mobile visual inspection. The selected independent network control is qualified; public activation and wider release gates remain explicit. GitHub Pages deploys after merge.",
   "capture_sha256": {
-    "desktop.png": "31f62b4b88ea8ad53cbaeff60eea7c4c41984d1b88c525bdaa2a251beec8f642",
-    "mobile.png": "bd7ee23b60bd2d78b6c4ecd7dbe968d44043828e3d460827cbcb8605589797d2"
+    "desktop.png": "07c63ec8e4ce0f4d7752fb0972ae37033b91041c786bb18d391dc87e4bd66b72",
+    "mobile.png": "83a2f2a616ee3e46c81271253fdcec7c268d330718dcd15b38e0d31d6742b109"
   },
-  "previous_qualification": "https://github.com/alt-research/eth2030/blob/ee98355ef294aecc2c18fcf2cf2921db6693d2c1/evidence/hegota-e/website.json"
+  "scope": "Fresh local build/export/tracker/Playwright review; final publication-head hosted results tracked in the English PR; Pages deploys after merge. Network measurements keep their source-specific historical identity."
 }

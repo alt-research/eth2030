@@ -69,7 +69,8 @@ current-source evidence; unresolved specifications do not become consensus.
 ## Late upstream EIP-7805 rebase review — November 28, 2026
 
 - [x] Detect latest EIPs head `fbc43ec3` and read the complete merged EIP-7805 rebase.
-- [ ] Review upstream PR #12470 history/discussion and all changed EL/CL clauses against the selected implementation.
-- [ ] Reproduce and correct any deviation from independent pre-execution-only omission checks and dimensional capacity rules; preserve builder execution separately.
-- [ ] Refresh source pins, criterion consumers, independent controls, evidence and website claims without editing read-only refs or expected historical oracles.
-- [ ] Complete proportionate local and exact-publication-head hosted qualification, then update the English PR.
+- [x] Review upstream PR #12470 history/discussion and all changed EL/CL clauses against the selected implementation.
+- [x] Reproduce and correct independent pre-execution-only omission checks, type-3 handling, dimensional capacities and predicate-version-3 migration; preserve actual builder execution.
+- [x] Refresh source pins, all 43 consumers, 39 fresh compiled controls, evidence and website claims without editing read-only refs or independent expected oracles.
+- [x] Complete source-bound local qualification and prepare publication with exact-head hosted checks required by the English PR.
+- Final publication-head CI outcomes are recorded in the PR check runs and English description; this frozen local record does not pre-claim those outcomes.

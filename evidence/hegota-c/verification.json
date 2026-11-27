@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+  "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -239,9 +239,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
+    "log_sha256": "c0fb070535914abd1fa86b8ed2d621b91629372b8c606d89ab453b7cf4df182f",
     "named": {
-      "pass": 24268,
+      "pass": 24275,
       "skip": 124
     },
     "packages": {
@@ -251,12 +251,13 @@
     "completed_packages": 245
   },
   "previous_qualification": {
-    "revision": "4aaaa365d057b4ac7dd9163bd15a56b87fe0f09b",
-    "verification": "https://github.com/alt-research/eth2030/blob/4aaaa365d057b4ac7dd9163bd15a56b87fe0f09b/evidence/hegota-c/verification.json",
-    "scope": "Original qualification preserved; expected independent oracles remain unchanged."
+    "revision": "6796dbc6820a60e6f3c326c8a7ec87799872af7d",
+    "verification": "https://github.com/alt-research/eth2030/blob/6796dbc6820a60e6f3c326c8a7ec87799872af7d/evidence/hegota-c/verification.json",
+    "scope": "Prior source preserved; independent expected oracles unchanged. Shared runtime now freshly qualified after EIP-7805 rebase."
   },
   "additional_qualification": {
-    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+    "record": "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json",
     "commands": [
       {
         "step": "full",
@@ -268,8 +269,8 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 196.002,
-        "log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
+        "seconds": 179.238,
+        "log_sha256": "c0fb070535914abd1fa86b8ed2d621b91629372b8c606d89ab453b7cf4df182f",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -290,12 +291,12 @@
           "./node",
           "./node/backend",
           "-run",
-          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEPostSystemCannotChangeFrameOmissionVerdict|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 48.823,
-        "log_sha256": "4750bd5fb9a220a0aa1c1c37241f02df652eaa7c6cca2f4f33308e5d3ef34dd3",
+        "seconds": 43.497,
+        "log_sha256": "dfe3024bd484c32a3a9e7bb48c707da66951062224cf2d5f7c09261fc4295922",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -311,9 +312,9 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 35.716,
+        "seconds": 45.699,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "stderr_sha256": "edeebe194f873b6ead292a89007b45a15b203bf50653415432eaaff3d708e88d"
+        "stderr_sha256": "d1ec724710fbec0e6fea26654f3db7c85fbf68d12e4c67317817601c9e340419"
       },
       {
         "step": "optimized-python",
@@ -329,9 +330,9 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 35.796,
+        "seconds": 47.4,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "stderr_sha256": "e989da4ccfc4e624bdbbde3960a062b15a9c7d45d8e71e66455c8a9098196e20"
+        "stderr_sha256": "f5873c9af1c67ffc66cf03b14905627b5f65ce803748925a39b887185a3a2c47"
       },
       {
         "step": "race",
@@ -370,8 +371,8 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 183.639,
-        "log_sha256": "4c8d0f22a2f89ef4e812386121fdbf5f1ae8ca6c4400d8b1fa06e9d209e684e6"
+        "seconds": 203.695,
+        "log_sha256": "a30176051ecdcee2622fbce662e9f06303d3f52e50410387dbf09447c2a15588"
       },
       {
         "step": "build",
@@ -381,7 +382,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 37.831,
+        "seconds": 15.557,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -390,11 +391,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-external2-native",
+          "/tmp/hegota-e-latest-7805-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 10.246,
+        "seconds": 10.317,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -403,11 +404,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-external2-geth",
+          "/tmp/hegota-e-latest-7805-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 4.732,
+        "seconds": 4.971,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -418,7 +419,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 5.071,
+        "seconds": 4.772,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -429,20 +430,20 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.053,
+        "seconds": 1.685,
         "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
       }
     ],
     "race": {
+      "log_sha256": "a30176051ecdcee2622fbce662e9f06303d3f52e50410387dbf09447c2a15588",
+      "named": {
+        "pass": 12121,
+        "skip": 87
+      },
       "packages": {
         "pass": 74,
         "skip": 3
       },
-      "named": {
-        "pass": 12114,
-        "skip": 87
-      },
-      "log_sha256": "4c8d0f22a2f89ef4e812386121fdbf5f1ae8ca6c4400d8b1fa06e9d209e684e6",
       "completed_packages": 77
     },
     "historical_baseline": {
@@ -451,18 +452,9 @@
       "failed": 0,
       "skipped": 0
     },
-    "required_native_consumer_skips": 0,
-    "python_regressions": 119,
-    "optimized_python_regressions": 119,
-    "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-    "local_record": "docs/reviews/pr-172/EXTERNAL_LOCAL_QUALIFICATION.json",
-    "superseded_environment_failure": {
-      "python": "3.9",
-      "suite": "devnet scripts",
-      "tests": 70,
-      "errors": 4,
-      "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
-    }
+    "python_regressions": 120,
+    "optimized_python_regressions": 120,
+    "required_native_consumer_skips": 0
   },
   "race_scope": {
     "mandatory_consumers_passed": [
@@ -570,6 +562,6 @@
       "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle"
     ],
     "outside_selected_race_packages": [],
-    "note": "All mandatory consumers passed full suite; fixture-only eftest is outside the selected runtime race packages."
+    "note": "Every mandatory full consumer passed; B fixture-only eftest is explicitly outside selected runtime race packages."
   }
 }

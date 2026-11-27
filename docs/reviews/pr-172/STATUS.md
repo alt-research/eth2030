@@ -6,8 +6,14 @@ The final upstream recheck found EIPs `fbc43ec3` / merged PR #12470.
 Its pre-execution-only predicate supersedes the earlier candidate-execution
 and speculative RLP omission behavior. Core corrections and predicate-version-3
 migration are implemented; the register now has 43 mandatory consumers.
-Fresh full/race, compiled controls, source-bound evidence and current-head hosted
-qualification are in progress. See [LATEST_7805.md](LATEST_7805.md).
+Fresh qualification passed: 245 full-suite packages (24,275 named passes),
+77 runtime race packages (12,121 named passes), all 43 mandatory consumers in
+full/focused/broad race runs, 39 compiled controls, builds/vet, the 12/12 baseline
+and 120 tooling tests in both modes. Site build/export, 149-entry tracker checks
+and desktop/mobile visual review also passed. Required consumers have no skips.
+See [LATEST_7805.md](LATEST_7805.md) and
+[LATEST_7805_QUALIFICATION.json](LATEST_7805_QUALIFICATION.json). Final exact-head
+hosted qualification is recorded separately in the English PR.
 The existing network/resource snapshots below identify their original source;
 they are not silently relabeled as tests of the updated predicate.
 

@@ -5,6 +5,7 @@ from pathlib import Path
 R=Path(__file__).resolve().parents[2]
 parser=argparse.ArgumentParser()
 parser.add_argument('--output',type=Path,required=True)
+parser.add_argument('--only',action='append',help='Run named controls when resuming a qualified unchanged-source batch')
 args=parser.parse_args()
 D=args.output.resolve();D.mkdir(parents=True,exist_ok=True)
 controls=[
@@ -13,15 +14,15 @@ controls=[
 ('nonce-cascade','pkg/core/block/inclusion_queue.go','if !c.inclusion {','if true {','./core/block','TestGroupEBuilderReverseNonceILCascade'),
 ('RLP-byte-cap','pkg/core/block/inclusion_size.go','size > MaxRLPBlockSize','size > MaxRLPBlockSize * 2','./core/block','TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback'),
 ('signature-budget','pkg/focil/vops_reference.go','r.Reason = "invalid protocol signature"','remaining += r.SignatureCost; r.Reason = "invalid protocol signature"','./focil','TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure'),
-('omission-verdict','pkg/node/backend/engine_bogota.go','maximum <= blockpkg.MaxRLPBlockSize {\n\t\t\treturn false, nil','maximum <= blockpkg.MaxRLPBlockSize {\n\t\t\treturn true, nil','./node','TestGroupEHezeGossipNativeEngineForkchoiceAndRestart'),
+('omission-verdict','pkg/node/backend/engine_bogota.go','// EIPs PR #12723 proposes a different size rule and remains unmerged.\n\t\treturn false, nil','// EIPs PR #12723 proposes a different size rule and remains unmerged.\n\t\treturn true, nil','./node','TestGroupEHezeGossipNativeEngineForkchoiceAndRestart'),
 ]
 controls.append(('pooled-IL-witness','pkg/node/backend/engine_backend.go','return r.pool.Get(hash)','return nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'))
 controls.append(('expired-cache-pruning','pkg/focil/heze/store.go','if e.First.Message.Slot < minimum {','if false && e.First.Message.Slot < minimum {','./focil/heze','TestGroupEHezeRequestsRetentionAndReauthenticatedRestart'))
 controls.extend([
-('base-7805-blob','pkg/node/backend/engine_bogota.go','if result.Kind == focil.Profile1Outside {','if false && result.Kind == focil.Profile1Outside {','./node','TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry'),
-('failed-id-retry','pkg/node/backend/engine_fcu.go','retry = existing.err != nil','retry = false','./node','TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry'),
-('blob-sidecar-priority','pkg/core/block/inclusion_queue.go','tx.HasDependencies8504() || len(tx.BlobHashes()) > 0','tx.HasDependencies8504()','./node','TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry'),
-('malformed-proof-tolerance','pkg/node/backend/engine_bogota.go','ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','false && ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
+('ignored-type3','pkg/node/backend/engine_bogota.go','if err != nil || tx.Type() == types.BlobTxType {','if err == nil && tx.Type() == types.BlobTxType { return false, nil }; if err != nil {','./node','TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability'),
+('failed-id-retry','pkg/node/backend/engine_fcu.go','retry = existing.err != nil','retry = false','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
+('IL-type3-cannot-stall-builder','pkg/core/block/inclusion_queue.go','if err != nil || tx.Type() == types.BlobTxType {','if err != nil {','./node','TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability'),
+('malformed-proof-tolerance','pkg/node/backend/engine_bogota.go','canonical && frame.ValidateWithExtensions(bc.Config().FrameExtensions(block.Time())) != nil','false && canonical && frame.ValidateWithExtensions(bc.Config().FrameExtensions(block.Time())) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ])
 controls.append(('append-header-metadata','pkg/core/types/block_append_size.go','if header.BlobGasUsed != nil {','if false && header.BlobGasUsed != nil {','./core/types','TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'))
 controls.extend([
@@ -31,7 +32,7 @@ controls.extend([
 
 controls.extend([
 ('transaction-end-accounts','pkg/node/backend/inclusion_state.go','return !e.replayed && (','return false && !e.replayed && (','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
-('transaction-end-storage','pkg/node/backend/inclusion_state.go','fullState && e.changed','fullState && false && e.changed','./node','TestGroupEPostSystemCannotChangeFrameOmissionVerdict'),
+('pre-execution-Frame-enforcement','pkg/node/backend/engine_bogota.go','if preconditionErr != nil {','if preconditionErr != nil || canonical {','./node','TestGroupELatest7805FramePreExecutionAndVersionMigration'),
 ('transaction-end-prefix','pkg/core/execution/processor.go','return p.processWithBAL(block, statedb, false)','return p.processWithBAL(block, statedb, true)','./core/execution','TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems'),
 ('pruned-BAL-boundary','pkg/node/backend/inclusion_state.go','if len(encoded) == 0 {','if len(encoded) == 0 { e.known = true;','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
 ('legacy-live-boundary','pkg/node/backend/engine_bogota.go','if record.SatisfactionVersion != chain.BogotaSatisfactionVersion {','if false && record.SatisfactionVersion != chain.BogotaSatisfactionVersion {','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
@@ -45,7 +46,7 @@ controls.extend([
 ])
 
 controls.extend([
-('foreign-context-omission','pkg/node/backend/engine_bogota.go','ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil','false && ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
+('foreign-context-omission','pkg/node/backend/engine_bogota.go','canonical && execution.ValidateFrameContext8141(bc.Config(), block.Header(), frame) != nil','false && canonical && execution.ValidateFrameContext8141(bc.Config(), block.Header(), frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ('foreign-context-build','pkg/core/block/builder.go','canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','false && canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ])
 
@@ -54,12 +55,18 @@ controls.extend([
 ('frame-preconditions-build','pkg/core/block/builder.go','if preconditionErr != nil {','if false && preconditionErr != nil {','./node','TestGroupEFramePreconditionsBeforeMissingWitness'),
 ('ordinary-state-capacity','pkg/core/types/receipt.go','state += receipt.StateGasUsed','state += 0','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
 ('Amsterdam-capacity-replay','pkg/node/backend/inclusion_state.go','|| e.bc.Config().IsAmsterdam(e.block.Time())','|| false && e.bc.Config().IsAmsterdam(e.block.Time())','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
-('predicate-version-two','pkg/core/chain/bogota_payload.go','const BogotaSatisfactionVersion uint8 = 2','const BogotaSatisfactionVersion uint8 = 1','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
+('predicate-version-three','pkg/core/chain/bogota_payload.go','const BogotaSatisfactionVersion uint8 = 3','const BogotaSatisfactionVersion uint8 = 2','./node','TestGroupELatest7805FramePreExecutionAndVersionMigration'),
 ('preconditions-read-only','pkg/core/execution/frame_preconditions_8141.go','if !gp.FitsFrame(prepared.budget.ExecutionReservation, prepared.budget.StateReservation) {','if gp.ReserveFrame(prepared.budget.ExecutionReservation, prepared.budget.StateReservation) != nil {','./core/execution','TestGroupEFramePreconditionsAreReadOnlyAndFailClosed'),
 ('preconditions-read-error','pkg/core/execution/frame_preconditions_8141.go','if readErr := state.ReadError(db); readErr != nil {','if readErr := state.ReadError(db); false && readErr != nil {','./core/execution','TestGroupEFramePreconditionsAreReadOnlyAndFailClosed'),
 ('dimensional-RLP','pkg/core/gaspool/gas_pool.go','return max(gasLimit-gp.execution, gasLimit-gp.state)','return gasLimit-gp.execution','./core/block','TestGroupEBuilderExactRLPIndependentGasPools'),
 ('ingress-publish-after-persist','pkg/node/heze_inclusion.go','store := n.hezeLists.Clone()','store := n.hezeLists; if store == nil { store = heze.NewStore() }','./node','TestGroupEHezeIngressCommitsAfterPersistence'),
 ('ingress-one-clock','pkg/node/heze_inclusion.go','clock, err := store.GossipWithClock(data, n.hezeView)','clock, err := store.GossipWithClock(data, n.hezeView); if err == nil { clock, err = n.hezeView.Clock() }','./node','TestGroupEHezeIngressCommitsAfterPersistence'),
+])
+
+controls.extend([
+('unmerged-size-exemption','pkg/node/backend/engine_bogota.go','// EIPs PR #12723 proposes a different size rule and remains unmerged.\n\t\treturn false, nil','// EIPs PR #12723 proposes a different size rule and remains unmerged.\n data, sizeErr := block.EncodeRLP(); if sizeErr == nil && len(data) + len(raw) + 8 > blockpkg.MaxRLPBlockSize { return true, nil }; return false, nil','./node/backend','TestGroupELatest7805SizeIsNotAnOmissionExcuse'),
+('independent-ordinary-reservation','pkg/focil/profile1.go','result.ExecutionReservation = min(tx.Gas(), vm.AmsterdamMaxExecutionGas)','result.ExecutionReservation = tx.Gas()','./focil','TestGroupELatest7805IndependentOrdinaryGasReservations'),
+('IL-generation-no-blob','pkg/core/eips/inclusion_list.go','if tx == nil || tx.Type() == types.BlobTxType || len(tx.BlobHashes()) > 0 {','if tx == nil {','./node','TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability'),
 ])
 
 # The shared preflight deliberately repeats cheap context/static checks before
@@ -68,6 +75,11 @@ controls.extend([
 # unchanged native consumers and counting only compiled behavioral failures.
 entry='func ValidateFramePreconditions8141(cfg *config.ChainConfig, db state.StateDB, header *types.Header, tx *types.FrameTx8141, gp *gaspool.GasPool) error {'
 extra_targets={name:[('pkg/core/execution/frame_preconditions_8141.go',entry,entry+'\n if gp != nil { return nil }')] for name in ['malformed-proof-tolerance','foreign-context-omission','foreign-context-build']}
+
+if args.only:
+ requested=set(args.only); known={c[0] for c in controls}
+ if not requested<=known:raise ValueError(('unknown control',sorted(requested-known)))
+ controls=[c for c in controls if c[0] in requested]
 
 for name,path,old,new,pkg,test in controls:
  replacements={}

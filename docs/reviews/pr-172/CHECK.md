@@ -65,3 +65,11 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Identify and pin the independent Heze CL source and executable network/test path.
 - [x] Implement and execute the selected specification-defined two-pair integration and bounded network resource controls in hosted CI.
 - [x] Inspect raw network consumers and recompute transport statistics; retain exact unavailable prerequisites and update repository progress and English review evidence.
+
+## Late upstream EIP-7805 rebase review — November 28, 2026
+
+- [x] Detect latest EIPs head `fbc43ec3` and read the complete merged EIP-7805 rebase.
+- [ ] Review upstream PR #12470 history/discussion and all changed EL/CL clauses against the selected implementation.
+- [ ] Reproduce and correct any deviation from independent pre-execution-only omission checks and dimensional capacity rules; preserve builder execution separately.
+- [ ] Refresh source pins, criterion consumers, independent controls, evidence and website claims without editing read-only refs or expected historical oracles.
+- [ ] Complete proportionate local and exact-publication-head hosted qualification, then update the English PR.

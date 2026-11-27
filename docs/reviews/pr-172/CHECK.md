@@ -58,3 +58,10 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Review all nine tasks across authenticated store/requests, wire, builds, omission evaluation and fork choice.
 - [x] Reproduce any new defined-rule gaps before fixing; retain existing expected oracles and explicit specification gates.
 - [x] Run proportionate source/native/build checks, update scoped status and publish owned changes with English PR evidence.
+
+## Remaining Group E delivery - November 28, 2026
+
+- [ ] Reconcile latest upstream changes with the remaining activation and integration prerequisites.
+- [ ] Identify and pin the independent Heze CL source and executable network/test path.
+- [ ] Implement the remaining specification-defined integration and resource acceptance work that can run in this environment or hosted CI.
+- [ ] Validate actual consumers, record unavailable prerequisites precisely, and update progress and English PR evidence.

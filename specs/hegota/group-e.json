@@ -882,6 +882,7 @@
     "tools/hegota/Dockerfile.interop",
     ".github/workflows/hegota-e-interop.yml",
     "docs/reviews/pr-172/EXTERNAL_HEZE.md",
-    "pkg/devnet/kurtosis/scripts/verify-heze-focil.py"
+    "pkg/devnet/kurtosis/scripts/verify-heze-focil.py",
+    "evidence/hegota-e/external-network.json"
   ]
 }

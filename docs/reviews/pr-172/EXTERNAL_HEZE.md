@@ -25,6 +25,16 @@ and the unsatisfied beacon root, and later bids not to extend that execution
 payload as FULL. The CL decision must also survive a real CL process restart.
 An empty-parent beacon child is permitted by the selected ePBS rules.
 
+Independent positive controls also require actual VALID/true decisions for
+malformed-envelope and future-nonce ILs. A capacity control includes a separate
+public-account-2 transfer, omits an otherwise valid near-block-limit candidate,
+and checks the actual imported blocks: the filler is present, the candidate is
+absent, and its declared gas exceeds the remaining gas. Both CLs must retain
+the same execution-valid, inclusion-satisfied root. The near-limit ordinary
+envelope remains valid under current EIP-8037; the native fixture consumer
+executes it successfully with full capacity and rejects its reservation after
+the independently executed filler.
+
 The positive control requires actual BLS-signed gossip between two independently
 run CLs, an isolated proposing EL that never received the transaction in its
 pool, a successful included transaction, and common finality on both pairs.
@@ -69,3 +79,12 @@ Failure is a failure, never a successful unsupported/skip result.
 The current local machine lacks Docker/Kurtosis and the sibling CL checkout.
 Hosted Linux execution is therefore required. Local unit/build checks qualify
 the tools and fixture only; network success is recorded after the actual job.
+
+The first complete launch attempt failed at the native RPC exposure guard,
+before network cases could run. The old shared profile had no explicit
+private-RPC compatibility choice. The new runner generates an owned profile
+with the documented private-devnet flag required by ethereum-package's
+admin_nodeInfo health checks; the native default guard and Engine JWT are
+unchanged. The failed attempt, exact artifact identity and verified removal
+of its enclave/containers/volumes are retained in
+`evidence/hegota-e/external-network.json`.

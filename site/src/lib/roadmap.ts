@@ -3,7 +3,7 @@ import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/dat
 
 export const hegotaGroupE = {
   reviewed: 'November 27, 2026',
-  revision: 'c6d8a0e2e557580e9194881467f439309486ce45',
+  revision: '6ea395d8b9a9f3d9dc66376cda0f87c998941573',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
     { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views, retained requests, reauthenticated CL adapter replacement and strict Engine versions/capabilities.' },

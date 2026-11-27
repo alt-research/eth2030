@@ -1,6 +1,6 @@
 # Group E status
 
-Production source after transaction-boundary audit: `c6d8a0e2e557580e9194881467f439309486ce45`, based directly on merged PR #171/master
+Production source after transaction-boundary audit: `6ea395d8b9a9f3d9dc66376cda0f87c998941573`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 

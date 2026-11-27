@@ -105,13 +105,25 @@ func TestGroupECanonicalPQILUsesAuthenticatedPoolWitness(t *testing.T) {
 			}
 		})
 	}
-	var submitted types.Hash
-	rpc.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(pooled))
 	list := []string{"0x" + hex.EncodeToString(canonical)}
+	requested := map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": list}
 	var fc payload.ForkchoiceUpdatedResult
-	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": list})
+	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, requested)
 	if fc.PayloadID == nil {
 		t.Fatal(fc)
+	}
+	firstID := *fc.PayloadID
+	if err := rpc.invoke("engine_getPayloadV6", new(bogotaIntegrationPayload), fc.PayloadID); err == nil {
+		t.Fatal("dependency candidate built without its authenticated witness")
+	}
+	var submitted types.Hash
+	rpc.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(pooled))
+	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, requested)
+	if fc.PayloadID == nil {
+		t.Fatal(fc)
+	}
+	if *fc.PayloadID != firstID {
+		t.Fatal("failed build did not retry the same owned request")
 	}
 	var built bogotaIntegrationPayload
 	rpc.call(t, "engine_getPayloadV6", &built, fc.PayloadID)

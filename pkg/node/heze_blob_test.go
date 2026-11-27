@@ -19,7 +19,7 @@ import (
 	"github.com/holiman/uint256"
 )
 
-func TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry(t *testing.T) {
+func TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability(t *testing.T) {
 	const token = "heze-base-blob"
 	key, _ := gethcrypto.HexToECDSA("0000000000000000000000000000000000000000000000000000000000000001")
 	var genesis map[string]any
@@ -74,8 +74,8 @@ func TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry(t *testing.T) {
 	rpc.call(t, "engine_getPayloadV6", &empty, fc.PayloadID)
 	var status bogotaIntegrationStatus
 	rpc.call(t, "engine_newPayloadV6", &status, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, list)
-	if status.Status != "VALID" || status.InclusionListSatisfied == nil || *status.InclusionListSatisfied {
-		t.Fatal("Informational 8369 incorrectly excused valid base-7805 blob omission", status)
+	if status.Status != "VALID" || status.InclusionListSatisfied == nil || !*status.InclusionListSatisfied {
+		t.Fatal("merged EIP-7805 did not ignore type-3 omission", status)
 	}
 	bad, err := tx.WithSignature(gethtypes.LatestSignerForChainID(tx.ChainId()), make([]byte, 65))
 	if err != nil {
@@ -91,13 +91,13 @@ func TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry(t *testing.T) {
 	if fc.PayloadID == nil {
 		t.Fatal(fc)
 	}
-	firstID := *fc.PayloadID
 	var built struct {
 		bogotaIntegrationPayload
 		BlobsBundle struct{ Blobs, Commitments, Proofs []json.RawMessage }
 	}
-	if err := rpc.invoke("engine_getPayloadV6", &built, fc.PayloadID); err == nil {
-		t.Fatal("valid blob published without sidecar")
+	rpc.call(t, "engine_getPayloadV6", &built, fc.PayloadID)
+	if len(built.ExecutionPayload.Transactions) != 0 || len(built.BlobsBundle.Blobs) != 0 {
+		t.Fatal("ignored IL type 3 forced unavailable data into a payload")
 	}
 	sidecar := &gethtypes.BlobTxSidecar{Version: gethtypes.BlobSidecarVersion1, Blobs: []gethkzg.Blob{gethkzg.Blob(blob)}, Commitments: []gethkzg.Commitment{gethkzg.Commitment(commitment)}}
 	for _, proof := range proofs {
@@ -109,9 +109,16 @@ func TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry(t *testing.T) {
 	}
 	var submitted types.Hash
 	rpc.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(pooled))
-	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, head, requested)
-	if fc.PayloadID == nil || *fc.PayloadID != firstID {
-		t.Fatal("failed ID not retried with identical owned attributes", fc)
+	var selected []string
+	rpc.call(t, "engine_getInclusionListV1", &selected)
+	if len(selected) != 0 {
+		t.Fatal("IL generation selected a type-3 transaction", selected)
+	}
+	// A separately requested normal-pool build can still include an authenticated
+	// blob; ignoring a type-3 IL does not disable normal blob transactions.
+	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, head, attrs("0x19", "0x2", list))
+	if fc.PayloadID == nil {
+		t.Fatal(fc)
 	}
 	rpc.call(t, "engine_getPayloadV6", &built, fc.PayloadID)
 	if len(built.ExecutionPayload.Transactions) != 1 || len(built.BlobsBundle.Blobs) != 1 || len(built.BlobsBundle.Commitments) != 1 || len(built.BlobsBundle.Proofs) != 128 {

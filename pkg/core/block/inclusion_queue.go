@@ -40,7 +40,7 @@ func newInclusionQueue(raw [][]byte, pending []*types.Transaction, pool TxPoolRe
 	}
 	for _, data := range raw {
 		tx, err := types.DecodeBlockTransaction(data)
-		if err != nil {
+		if err != nil || tx.Type() == types.BlobTxType {
 			continue
 		}
 		if tx.HasDependencies8504() || len(tx.BlobHashes()) > 0 {

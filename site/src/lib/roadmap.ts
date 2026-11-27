@@ -3,7 +3,7 @@ import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/dat
 
 export const hegotaGroupE = {
   reviewed: 'November 27, 2026',
-  revision: '64f42c6fe0a4456a4be5ee8a1951fc551056605c',
+  revision: '70facd01d15e8068cfc9839b3f0e352784765277',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
     { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views and retained requests. Native ingress uses one validated clock and publishes its cache after persistence; CL adapter replacement reauthenticates retained messages. Strict Engine versions/capabilities.' },

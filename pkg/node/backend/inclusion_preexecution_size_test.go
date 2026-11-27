@@ -59,7 +59,7 @@ func TestGroupELatest7805SizeIsNotAnOmissionExcuse(t *testing.T) {
 		if size <= 0 || size > 65536 {
 			t.Fatal("invalid size fixture", size)
 		}
-		signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: nonce, Gas: 1000000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &to, Data: make([]byte, size)}), gethtypes.LatestSignerForChainID(cfg.ChainID), key)
+		signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: nonce, Gas: 4000000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &to, Data: make([]byte, size)}), gethtypes.LatestSignerForChainID(cfg.ChainID), key)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -112,7 +112,7 @@ func TestGroupELatest7805SizeIsNotAnOmissionExcuse(t *testing.T) {
 		t.Fatal("large fixture did not validate/import", err)
 	}
 	target := gethcrypto.PubkeyToAddress(key.PublicKey)
-	signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: 1, Gas: 200000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &target, Data: make([]byte, 7800)}), gethtypes.LatestSignerForChainID(cfg.ChainID), other)
+	signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: 1, Gas: 500000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &target, Data: make([]byte, 7800)}), gethtypes.LatestSignerForChainID(cfg.ChainID), other)
 	if err != nil {
 		t.Fatal(err)
 	}

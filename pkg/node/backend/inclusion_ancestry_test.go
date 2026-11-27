@@ -14,7 +14,8 @@ import (
 )
 
 // A trusted snap pivot retains the BLOCKHASH header window before bodies are
-// downloaded. IL execution must use that authenticated ancestry without bodies.
+// downloaded. Reconstructing actual payload execution must use those headers;
+// candidate pre-execution checks must not run its BLOCKHASH-dependent code.
 func TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies(t *testing.T) {
 	cfg := config.TestConfigHogota
 	initial := state.NewMemoryStateDB()
@@ -125,8 +126,15 @@ func TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies(t *testing
 	if err := rawdb.DeleteHeader(db, blocks[2].NumberU64(), blocks[2].Hash()); err != nil {
 		t.Fatal(err)
 	}
-	if satisfied, err := backend.CheckPayloadInclusionList(child.Hash(), [][]byte{raw}); err == nil {
-		t.Fatalf("missing authenticated header became a verdict: %v", satisfied)
+	if satisfied, err := backend.CheckPayloadInclusionList(child.Hash(), [][]byte{raw}); err != nil || satisfied {
+		t.Fatalf("candidate runtime ancestry was consulted by pre-execution checks: %v %v", satisfied, err)
+	}
+	missing, err := newInclusionEndState(target, child)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if missing.getHash(1) != (types.Hash{}) || missing.readError(missing.state) == nil {
+		t.Fatal("actual payload-prefix reconstruction concealed missing authenticated ancestry")
 	}
 
 }

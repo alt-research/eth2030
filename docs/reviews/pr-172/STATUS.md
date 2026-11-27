@@ -1,5 +1,18 @@
 # Group E status
 
+## Current merged EIP-7805 rebase
+
+The final upstream recheck found EIPs `fbc43ec3` / merged PR #12470.
+Its pre-execution-only predicate supersedes the earlier candidate-execution
+and speculative RLP omission behavior. Core corrections and predicate-version-3
+migration are implemented; the register now has 43 mandatory consumers.
+Fresh full/race, compiled controls, source-bound evidence and current-head hosted
+qualification are in progress. See [LATEST_7805.md](LATEST_7805.md).
+The existing network/resource snapshots below identify their original source;
+they are not silently relabeled as tests of the updated predicate.
+
+## Previous source-specific qualification
+
 The independently pinned Lighthouse two-pair acceptance passed on November 28.
 Actual signed IL gossip forced inclusion by an EL with an isolated pool and
 reached common finality. Both native nodes returned VALID/false for one omitted

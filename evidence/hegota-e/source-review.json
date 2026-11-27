@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-11-27 05:06:18 UTC",
+  "checked_at_utc": "2026-11-27 06:54:49 UTC",
   "heads": {
     "eips": "68db81b0a75edb0e16d8f181241f994875eba52d",
     "consensus_specs": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
@@ -35,5 +35,32 @@
     "updated_at": "2026-11-25T18:41:37Z",
     "in_eips_master": false,
     "scope": "Explicit optional direct research profile; no omitted-IL witness transport or public activation assignment."
+  },
+  "completion_reaudit": {
+    "starts_from": "4663af699c4c9bbc48f59976dc26e00d805a78d6",
+    "record": "docs/reviews/pr-172/REAUDIT.md",
+    "source_heads_unchanged": true,
+    "discussions": [
+      {
+        "url": "https://ethereum-magicians.org/t/21578",
+        "posts": 17,
+        "last_posted_at": "2026-11-21T09:23:02.109Z",
+        "decision": "No replacement committee or incentive rule adopted."
+      },
+      {
+        "url": "https://ethereum-magicians.org/t/29298",
+        "posts": 4,
+        "last_posted_at": "2026-09-09T12:57:18.859Z",
+        "decision": "Claimed-index evaluation remains the default; fresh keyed nonces do not classify the entire transaction as position-stable."
+      },
+      {
+        "url": "https://github.com/ethereum/EIPs/pull/12110",
+        "decision": "Inline review retains the enforcing-extension, claims, code-load and final-budget prerequisites."
+      }
+    ],
+    "fixed_boundaries": [
+      "Completed finalized verdicts retained independently of live views",
+      "Live CL adapter replacement reauthenticates memory snapshots atomically"
+    ]
   }
 }

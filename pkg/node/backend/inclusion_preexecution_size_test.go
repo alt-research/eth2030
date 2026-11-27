@@ -21,7 +21,7 @@ import (
 // This is an actually built, imported EIP-7934-sized block, not padding in an
 // invalid header. PR #12723's proposed byte-budget omission excuse is unmerged.
 func TestGroupELatest7805SizeIsNotAnOmissionExcuse(t *testing.T) {
-	const limit = uint64(500000000)
+	const limit = uint64(1000000000)
 	cfg := *config.TestConfigHogota
 	cfg.ChainID = big.NewInt(1337)
 	key, err := gethcrypto.HexToECDSA("0000000000000000000000000000000000000000000000000000000000000001")
@@ -59,7 +59,7 @@ func TestGroupELatest7805SizeIsNotAnOmissionExcuse(t *testing.T) {
 		if size <= 0 || size > 65536 {
 			t.Fatal("invalid size fixture", size)
 		}
-		signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: nonce, Gas: 4000000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &to, Data: make([]byte, size)}), gethtypes.LatestSignerForChainID(cfg.ChainID), key)
+		signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: nonce, Gas: 5000000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &to, Data: make([]byte, size)}), gethtypes.LatestSignerForChainID(cfg.ChainID), key)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -112,7 +112,7 @@ func TestGroupELatest7805SizeIsNotAnOmissionExcuse(t *testing.T) {
 		t.Fatal("large fixture did not validate/import", err)
 	}
 	target := gethcrypto.PubkeyToAddress(key.PublicKey)
-	signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: 1, Gas: 500000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &target, Data: make([]byte, 7800)}), gethtypes.LatestSignerForChainID(cfg.ChainID), other)
+	signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Nonce: 1, Gas: 600000, GasFeeCap: big.NewInt(2000000000), GasTipCap: big.NewInt(1), To: &target, Data: make([]byte, 7800)}), gethtypes.LatestSignerForChainID(cfg.ChainID), other)
 	if err != nil {
 		t.Fatal(err)
 	}

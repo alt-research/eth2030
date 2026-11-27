@@ -45,7 +45,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E47.2': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions'],
              'E47.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership'],
              'E47.4': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions']},
- 'HGT-048': {'E48.1': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
+ 'HGT-048': {'E48.1': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline',
+                       'github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'],
              'E48.2': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
              'E48.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
              'E48.4': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline']}}

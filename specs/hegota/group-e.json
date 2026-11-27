@@ -694,10 +694,12 @@
             "pkg/focil/heze/forkchoice.go",
             "pkg/focil/heze/store.go",
             "pkg/focil/heze/types.go",
-            "pkg/focil/heze/validation.go"
+            "pkg/focil/heze/validation.go",
+            "pkg/node/backend/engine_backend.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline"
+            "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline",
+            "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
           ]
         },
         {

@@ -83,6 +83,10 @@ func (r *txPoolReader) Pending() []*types.Transaction {
 	return r.pool.PendingFlat()
 }
 
+// Get supplies an already authenticated local witness wrapper when a canonical
+// IL envelope also exists in the pool. Witnesses never alter IL identity.
+func (r *txPoolReader) Get(hash types.Hash) *types.Transaction { return r.pool.Get(hash) }
+
 func (r *txPoolReader) ValidateFrameForBuild(tx *types.Transaction, db state.StateDB, header *types.Header) error {
 	return r.pool.ValidateFrameForBuild(tx, db, header)
 }

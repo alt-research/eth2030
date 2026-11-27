@@ -10,8 +10,10 @@ import (
 
 // BogotaSatisfactionVersion identifies the EIP-7805 last-transaction state
 // predicate. Version 0 used final-block state; version 1 did not include ordinary
-// state gas in Frame capacity. Both require rechecking their exact retained view.
-const BogotaSatisfactionVersion uint8 = 2
+// state gas in Frame capacity. Version 2 replayed omitted candidates and applied
+// an unmerged RLP-size exemption. Version 3 uses the merged pre-execution-only
+// predicate. Every older version requires its exact retained view to be rechecked.
+const BogotaSatisfactionVersion uint8 = 3
 
 var bogotaPayloadPrefix = []byte("engine/bogota/")
 

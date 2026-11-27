@@ -188,8 +188,8 @@ func (b *EngineBackend) completeBogotaPayload(hash types.Hash, record *chain.Bog
 }
 
 // CheckPayloadInclusionList examines each omitted transaction independently in
-// the validated payload's own transaction-end state. An EVM revert still constitutes
-// a valid transaction if the transaction can be accepted and charged.
+// the validated payload's transaction-end state using pre-execution checks only.
+// Candidate execution and unmerged byte-size exemptions are not part of it.
 func (b *EngineBackend) CheckPayloadInclusionList(hash types.Hash, list [][]byte) (bool, error) {
 	if err := b.beginWork(); err != nil {
 		return false, err
@@ -225,217 +225,120 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		return true, nil
 	}
 	bc := b.node.Blockchain()
-	payload := bc.GetBlock(hash)
-	if payload == nil || !bc.HasValidatedBlock(hash) {
+	block := bc.GetBlock(hash)
+	if block == nil || !bc.HasValidatedBlock(hash) {
 		return false, fmt.Errorf("inclusion list check requires validated payload %s", hash)
 	}
-	remaining := payload.GasLimit() - payload.GasUsed()
-	included := make(map[string]struct{}, len(payload.Transactions()))
-	for _, tx := range payload.Transactions() {
+	included := make(map[string]bool, len(block.Transactions()))
+	for _, tx := range block.Transactions() {
 		raw, err := tx.EncodeRLP()
 		if err != nil {
 			return false, err
 		}
-		included[string(raw)] = struct{}{}
+		included[string(raw)] = true
 	}
-	var omitted []*types.Transaction
-	rawEnvelopes := make(map[*types.Transaction][]byte)
 	seen := make(map[string]bool)
+	var end *inclusionEndState
+	var capacity *gaspool.GasPool
 	for _, raw := range list {
-		if _, present := included[string(raw)]; present {
-			continue
-		}
-		if seen[string(raw)] {
+		if included[string(raw)] || seen[string(raw)] {
 			continue
 		}
 		seen[string(raw)] = true
 		tx, err := types.DecodeBlockTransaction(raw)
-		if err != nil {
+		// The merged EIP-7805 explicitly ignores type 3, regardless of witnesses.
+		if err != nil || tx.Type() == types.BlobTxType {
 			continue
 		}
-		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
+		frame, canonical := tx.Inner().(*types.FrameTx8141)
+		if canonical && execution.ValidateFrameContext8141(bc.Config(), block.Header(), frame) != nil {
 			continue
 		}
-		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil {
-			continue
-		}
-		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil {
+		if canonical && frame.ValidateWithExtensions(bc.Config().FrameExtensions(block.Time())) != nil {
 			continue
 		}
 		if len(tx.BlobHashes()) > 0 {
-			maximum := gas.MaxBlobsForBlock(bc.Config(), payload.Time()) * gas.GasPerBlob
+			maximum := gas.MaxBlobsForBlock(bc.Config(), block.Time()) * gas.GasPerBlob
 			used := uint64(0)
-			if value := payload.Header().BlobGasUsed; value != nil {
+			if value := block.Header().BlobGasUsed; value != nil {
 				used = *value
 			}
 			if used > maximum || tx.BlobGas() > maximum-used {
 				continue
 			}
 		}
-		if _, present := included[string(raw)]; !present {
-			omitted = append(omitted, tx)
-			rawEnvelopes[tx] = raw
+		if end == nil {
+			end, err = newInclusionEndState(bc, block)
+			if err != nil {
+				return false, err
+			}
 		}
-	}
-	if len(omitted) == 0 {
-		return true, nil
-	}
-	endState, err := newInclusionEndState(bc, payload)
-	if err != nil {
-		return false, err
-	}
-	getHash := endState.getHash
-	// Definite pre-execution failures require no dependency witness. Use the
-	// exact transaction-end state and the same dimensional capacity as execution.
-	var framePool *gaspool.GasPool
-	filtered := omitted[:0]
-	for _, tx := range omitted {
-		if frame, canonical := tx.Inner().(*types.FrameTx8141); canonical && tx.HasDependencies8504() {
-			if endState.needsReplay(types.Address{}, true) {
-				if err := endState.replay(); err != nil {
+		maximum := new(gaspool.GasPool).AddGas(block.GasLimit())
+		var ordinary focil.Profile1Result
+		if canonical {
+			// Reconstruct the accepted payload prefix when needed; never execute T.
+			if end.needsReplay(types.Address{}, true) {
+				if err := end.replay(); err != nil {
 					return false, err
 				}
 			}
-			// Exclude nonce/fee/global-cap failures without demanding historical
-			// receipts whose derived dimensions are unnecessary for that result.
-			maximumPool := new(gaspool.GasPool).AddGas(payload.GasLimit())
-			preconditionErr := execution.ValidateFramePreconditions8141(bc.Config(), endState.state, payload.Header(), frame, maximumPool)
-			if err := endState.readError(endState.state); err != nil {
+			preconditionErr := execution.ValidateFramePreconditions8141(bc.Config(), end.state, block.Header(), frame, maximum)
+			if err := end.readError(end.state); err != nil {
 				return false, err
 			}
 			if preconditionErr != nil {
 				continue
 			}
-			if framePool == nil {
-				framePool, err = endState.frameGasPool()
+		} else {
+			ordinary, err = focil.EvaluateProfile1WithCapacity(raw, bc.Config(), block.Header(), end.state, maximum)
+			if err != nil {
+				return false, err
+			}
+			if end.needsReplay(ordinary.Sender, false) {
+				if err := end.replay(); err != nil {
+					return false, err
+				}
+				ordinary, err = focil.EvaluateProfile1WithCapacity(raw, bc.Config(), block.Header(), end.state, maximum)
 				if err != nil {
 					return false, err
 				}
 			}
+			if ordinary.Kind == focil.Profile1Outside {
+				// Unknown future research envelopes cannot become an omission excuse.
+				if !bc.Config().Rules(block.Header().Number, bc.Config().IsMerge(), block.Time()).IsIPlus {
+					continue
+				}
+				return false, fmt.Errorf("pre-execution IL validation unavailable for transaction type %d", tx.Type())
+			}
+			if ordinary.Kind != focil.Profile1Enforceable {
+				continue
+			}
+		}
+		if capacity == nil {
+			capacity, err = end.frameGasPool()
+			if err != nil {
+				return false, err
+			}
+		}
+		executionReservation, stateReservation := ordinary.ExecutionReservation, ordinary.StateReservation
+		if canonical {
 			budget, err := frame.GasBudget()
 			if err != nil {
 				return false, err
 			}
-			if !framePool.FitsFrame(budget.ExecutionReservation, budget.StateReservation) {
-				continue
-			}
-			// Passing preconditions establishes neither proof validity nor a
-			// normative transport/composition; retain the explicit witness gate.
+			executionReservation, stateReservation = budget.ExecutionReservation, budget.StateReservation
+		}
+		if !capacity.FitsFrame(executionReservation, stateReservation) {
+			continue
+		}
+		// EIP-8504 remains a separately selected draft with no omitted-IL witness
+		// composition. This gate does not execute a candidate or excuse its omission.
+		if canonical && tx.HasDependencies8504() {
 			return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
 		}
-		filtered = append(filtered, tx)
-	}
-	omitted = filtered
-	if len(omitted) == 0 {
-		return true, nil
-	}
-	sizer, err := types.NewBlockAppendSizer(payload)
-	if err != nil {
-		return false, err
-	}
-	// Once transaction-end account fields are established, Profile 1 eligibility
-	// executes no candidate code. An RLP header-width boundary needs an exact probe.
-	var trials []*types.Transaction
-	for _, tx := range omitted {
-		if _, frame := tx.Inner().(*types.FrameTx8141); frame {
-			if endState.needsReplay(types.Address{}, true) {
-				if err := endState.replay(); err != nil {
-					return false, err
-				}
-			}
-			trials = append(trials, tx)
-			continue
-		}
-		result, err := focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), endState.state)
-		if err != nil {
-			return false, err
-		}
-		if endState.needsReplay(result.Sender, result.Kind == focil.Profile1Outside) {
-			if err := endState.replay(); err != nil {
-				return false, err
-			}
-			result, err = focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), endState.state)
-			if err != nil {
-				return false, err
-			}
-		}
-		if result.Kind != focil.Profile1Enforceable {
-			// Informational EIP-8369 cannot excuse a base EIP-7805 omission.
-			// Other envelope types retain independent full-state validation.
-			if result.Kind == focil.Profile1Outside {
-				trials = append(trials, tx)
-			}
-			continue
-		}
-		minimumGas := payload.GasUsed() + result.MinimumGas
-		if bc.Config().IsAmsterdam(payload.Time()) {
-			// Existing state usage may dominate while this append consumes the
-			// execution pool. The old header total is the safe lower bound.
-			minimumGas = payload.GasUsed()
-		}
-		minimum, err := sizer.Size(tx, minimumGas)
-		if err != nil {
-			return false, err
-		}
-		if bc.Config().IsOsaka(payload.Time()) && minimum > blockpkg.MaxRLPBlockSize {
-			continue
-		}
-		maximum, err := sizer.Size(tx, payload.GasUsed()+tx.Gas())
-		if err != nil {
-			return false, err
-		}
-		if !bc.Config().IsOsaka(payload.Time()) || maximum <= blockpkg.MaxRLPBlockSize {
-			return false, nil
-		}
-		trials = append(trials, tx)
-	}
-	omitted = trials
-	// A byte-boundary probe executes even ordinary sender code. It needs the
-	// complete transaction-end state, not just unchanged sender account fields.
-	if len(omitted) > 0 && endState.needsReplay(types.Address{}, true) {
-		if err := endState.replay(); err != nil {
-			return false, err
-		}
-	}
-	for _, tx := range omitted {
-		trial := endState.state.Dup()
-		trial.SetTxContext(tx.Hash(), len(payload.Transactions()))
-		gas := new(gaspool.GasPool).AddGas(remaining)
-		_, canonical := tx.Inner().(*types.FrameTx8141)
-		dimensional := canonical || bc.Config().IsAmsterdam(payload.Time())
-		if dimensional {
-			if framePool == nil {
-				framePool, err = endState.frameGasPool()
-				if err != nil {
-					return false, err
-				}
-			}
-			copied := *framePool
-			gas = &copied
-		}
-		receipt, _, applyErr := execution.ApplyTransactionWithBALGetHash(
-			bc.Config(), getHash, trial, payload.Header(), tx, gas, nil,
-		)
-		if err := endState.readError(trial); err != nil {
-			return false, err
-		}
-		if applyErr == nil {
-			used := receipt.GasUsed
-			if receipt.BlockGasUsed > 0 {
-				used = receipt.BlockGasUsed
-			}
-			projectedGasUsed := payload.GasUsed() + used
-			if dimensional {
-				projectedGasUsed = gas.BlockGasUsed(payload.GasLimit())
-			}
-			size, err := sizer.Size(tx, projectedGasUsed)
-			if err != nil {
-				return false, err
-			}
-			if !bc.Config().IsOsaka(payload.Time()) || size <= blockpkg.MaxRLPBlockSize {
-				return false, nil
-			}
-		}
+		// Do not run candidate code, consume nonce/gas, or add a byte-size exemption.
+		// EIPs PR #12723 proposes a different size rule and remains unmerged.
+		return false, nil
 	}
 	return true, nil
 }

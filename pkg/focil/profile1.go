@@ -7,6 +7,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/gas"
+	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -22,11 +23,13 @@ const (
 )
 
 type Profile1Result struct {
-	Kind        Profile1Kind
-	Transaction *types.Transaction
-	Sender      types.Address
-	MinimumGas  uint64
-	Reason      string
+	Kind                 Profile1Kind
+	Transaction          *types.Transaction
+	Sender               types.Address
+	MinimumGas           uint64
+	Reason               string
+	ExecutionReservation uint64
+	StateReservation     uint64
 }
 
 // EvaluateProfile1 implements the determinate EIP-8369 Profile 1 predicate at
@@ -34,6 +37,19 @@ type Profile1Result struct {
 // Sender), supports uint256 chain IDs/balances, and executes no EVM code.
 // It does not select or activate the informational Profile 2 extension.
 func EvaluateProfile1(raw []byte, cfg *config.ChainConfig, header *types.Header, db state.StateDB) (result Profile1Result, err error) {
+	return evaluateProfile1(raw, cfg, header, db, nil)
+}
+
+// EvaluateProfile1WithCapacity uses the actual independent EIP-8037 pools.
+// The header's maximum consumed dimension cannot reconstruct either pool.
+func EvaluateProfile1WithCapacity(raw []byte, cfg *config.ChainConfig, header *types.Header, db state.StateDB, capacity *gaspool.GasPool) (Profile1Result, error) {
+	if capacity == nil {
+		return Profile1Result{}, fmt.Errorf("Profile 1 requires independent gas capacity")
+	}
+	return evaluateProfile1(raw, cfg, header, db, capacity)
+}
+
+func evaluateProfile1(raw []byte, cfg *config.ChainConfig, header *types.Header, db state.StateDB, capacity *gaspool.GasPool) (result Profile1Result, err error) {
 	result.Kind = Profile1Exempt
 	tx, decodeErr := types.DecodeBlockTransaction(raw)
 	if decodeErr != nil {
@@ -58,7 +74,15 @@ func EvaluateProfile1(raw []byte, cfg *config.ChainConfig, header *types.Header,
 	if header.GasUsed > header.GasLimit {
 		return result, fmt.Errorf("invalid payload gas accounting")
 	}
-	if tx.Gas() > header.GasLimit-header.GasUsed {
+	result.ExecutionReservation = min(tx.Gas(), vm.AmsterdamMaxExecutionGas)
+	result.StateReservation = tx.Gas()
+	if capacity == nil {
+		capacity = new(gaspool.GasPool).AddGas(header.GasLimit - header.GasUsed)
+	}
+	if capacity.Gas() > header.GasLimit || capacity.StateGas() > header.GasLimit {
+		return result, fmt.Errorf("invalid independent payload gas capacity")
+	}
+	if !capacity.FitsFrame(result.ExecutionReservation, result.StateReservation) {
 		result.Reason = "declared gas does not fit"
 		return result, nil
 	}
@@ -68,6 +92,11 @@ func EvaluateProfile1(raw []byte, cfg *config.ChainConfig, header *types.Header,
 	}
 	if tx.Type() == types.SetCodeTxType && (!cfg.IsPrague(header.Time) || tx.To() == nil) {
 		result.Reason = "invalid set-code envelope"
+		return result, nil
+	}
+	rules := cfg.Rules(header.Number, cfg.IsMerge(), header.Time)
+	if tx.Type() == types.AccessListTxType && !rules.IsBerlin || tx.Type() == types.DynamicFeeTxType && !rules.IsLondon {
+		result.Reason = "transaction type is not active"
 		return result, nil
 	}
 	// Geth is used only for independent envelope/signature recovery, not execution.

@@ -69,6 +69,16 @@ the CL resubmits newPayloadV6 with its list. Current compact records retain the
 new version and correct Boolean. The execution-sync admission path likewise
 requires a current, resolved verdict record; execution validity itself is unchanged.
 
+The shared Frame executor now exposes its existing immutable fork, chain-ID
+and selected nonce-schema checks before either IL witness gate. A foreign-chain
+or inactive-schema dependency envelope is already invalid, so both import and
+building ignore it without demanding an unspecified witness. The executor uses
+the same helper, preserving independent explicit research-profile behavior.
+Actual native wire subtests reproduced both errors before this correction;
+existing valid-witness and malformed-signature assertions remain unchanged.
+This does not assign any transport or validity rule to a context-valid omitted
+PQ transaction whose required witness is unavailable.
+
 ## Native acceptance cases
 
 - A same-block withdrawal cannot fund an omitted transaction; the final block
@@ -82,6 +92,9 @@ requires a current, resolved verdict record; execution validity itself is unchan
   withdrawals/post-system writes, and leaves parent state unmodified.
 - Header-only authenticated snap ancestry supports a real BLOCKHASH-dependent
   omitted Frame after the pivot; removing a required header returns an error.
+- Wrong-chain and inactive nonce-schema PQ envelopes are ignored by native
+  import/build before witness requirements; actual valid pool witnesses still
+  support canonical inclusion.
 - Restart corrects a legacy retained wrong verdict. Legacy compact metadata
   requires its original view to be resubmitted. Current-version compaction
   preserves the verdict and latest-view replacement behavior.
@@ -90,11 +103,11 @@ The older native fork-activation test's manually supplied empty view now carries
 the current cache predicate version; its activation/reorg assertions are unchanged.
 Actual legacy migration is independently exercised by the native wire cases above.
 
-These cases add four mandatory consumers, bringing the register to 34. Nine
+These cases add four mandatory consumers, bringing the register to 34. Eleven
 additional compiled-removal controls cover state selection, prefix execution,
 pruned metadata, legacy live/compact migration, version-preserving compaction, header-only
-ancestry and missing-header error propagation.
-The complete control register contains 24 cases. Actual fresh execution results
+ancestry missing-header error propagation and both early immutable-context guards.
+The complete control register contains 26 cases. Actual fresh execution results
 are recorded in VERIFICATION.md and the source-bound evidence after qualification.
 
 ## Complete task review

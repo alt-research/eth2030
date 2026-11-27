@@ -44,6 +44,11 @@ controls.extend([
 ('missing-header-verdict','pkg/node/backend/inclusion_state.go','return e.ancestryErr','return nil','./node/backend','TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies'),
 ])
 
+controls.extend([
+('foreign-context-omission','pkg/node/backend/engine_bogota.go','ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil','false && ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
+('foreign-context-build','pkg/core/block/builder.go','canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','false && canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
+])
+
 for name,path,old,new,pkg,test in controls:
  s=(R/path).read_text()
  if old not in s and name=='strict-timeliness':

@@ -127,20 +127,15 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	profile *types.FrameTx8250Delta, prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
 	tx := transaction.Inner().(*types.FrameTx8141)
-	if config == nil || !config.IsMerge() || !config.IsHogota(header.Time) {
-		return nil, 0, errors.New("EIP-8141 requires Bogotá")
+	if err := validateFrameContext8141(config, header, tx, profile != nil); err != nil {
+		return nil, 0, err
 	}
-	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
-		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
-	}
-	// Explicit research callers pass a profile; public callers must match the
-	// schema selected at this exact block timestamp. No fork-state installation.
+	// Explicit research callers pass a profile; public callers use the schema
+	// already checked against this exact block context above.
 	if profile == nil {
 		profile = tx.NonceProfile8250()
-		if (profile != nil) != config.IsEIP8250(header.Time) {
-			return nil, 0, errors.New("Frame nonce schema does not match EIP-8250 activation")
-		}
 	}
+
 	var legacyNonce uint64
 	var budget types.FrameGasBudget
 	if profile == nil {

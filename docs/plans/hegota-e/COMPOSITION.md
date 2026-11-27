@@ -111,7 +111,11 @@ other envelopes from base EIP-7805. Non-Profile-1 envelopes retain independent
 full-state append validation, including blob-gas capacity. Blob and Frame
 transactions outside the informational 8369 candidates do not automatically
 receive a new consensus omission excuse. Static-invalid Frame/proof envelopes
-are tolerated before any unavailable-witness gate.
+are tolerated before any unavailable-witness gate. The executor's immutable
+fork/chain-ID and selected nonce-schema rules are shared by native import and
+building; a definitely invalid envelope needs no dependency witness. This
+does not establish validity or invent transport for a context-valid omitted
+PQ envelope.
 
 A canonical IL blob can reuse its admitted pool sidecar. A valid blob without
 data aborts building instead of returning an unsatisfied payload or empty blob

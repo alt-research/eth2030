@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"testing"
@@ -67,6 +69,41 @@ func TestGroupECanonicalPQILUsesAuthenticatedPoolWitness(t *testing.T) {
 	rpc.call(t, "engine_newPayloadV6", &invalidStatus, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, badList)
 	if invalidStatus.Status != "VALID" || invalidStatus.InclusionListSatisfied == nil || !*invalidStatus.InclusionListSatisfied {
 		t.Fatal("invalid proof signature treated as missing validity data", invalidStatus)
+	}
+	foreign, err := types.DecodeBlockTransaction(canonical)
+	if err != nil {
+		t.Fatal(err)
+	}
+	foreignFrame := foreign.Inner().(*types.FrameTx8141)
+	foreignFrame.ChainID = big.NewInt(1338)
+	foreign = types.NewTransaction(foreignFrame)
+	keyed, _ := proof8504.CanonicalTransaction(true)
+	for i, candidate := range []*types.Transaction{foreign, keyed} {
+		t.Run([]string{"foreign_chain", "inactive_nonce_schema"}[i], func(t *testing.T) {
+			raw, err := candidate.EncodeRLP()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !candidate.HasDependencies8504() {
+				t.Fatal("context-invalid fixture lost dependencies")
+			}
+			invalidList := []string{"0x" + hex.EncodeToString(raw)}
+			var status bogotaIntegrationStatus
+			rpc.call(t, "engine_newPayloadV6", &status, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, invalidList)
+			if status.Status != "VALID" || status.InclusionListSatisfied == nil || !*status.InclusionListSatisfied {
+				t.Fatal("known-invalid context required omitted witness", status)
+			}
+			var fc payload.ForkchoiceUpdatedResult
+			rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, map[string]any{"timestamp": fmt.Sprintf("0x%x", 7+i), "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": invalidList})
+			if fc.PayloadID == nil {
+				t.Fatal(fc)
+			}
+			var built bogotaIntegrationPayload
+			rpc.call(t, "engine_getPayloadV6", &built, fc.PayloadID)
+			if len(built.ExecutionPayload.Transactions) != 0 {
+				t.Fatal("context-invalid dependency tx built")
+			}
+		})
 	}
 	var submitted types.Hash
 	rpc.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(pooled))

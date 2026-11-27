@@ -55,6 +55,9 @@ affected account/full-state probes require an exact transaction-prefix state.
 Missing metadata requires reconstruction, and corrupted metadata is an error.
 BLOCKHASH probes use authenticated branch headers independently of body
 availability; missing required headers propagate as errors.
+Native import and building share the executor's immutable Frame context checks,
+so wrong-chain and inactive-schema envelopes are ignored before witness gates.
+Context-valid omitted PQ witness composition remains undefined.
 Cached verdicts must identify the predicate used; legacy records with retained
 views are recomputed, while legacy compact records require CL view resubmission.
 See `docs/reviews/pr-172/TRANSACTION_BOUNDARY.md` for the complete audit.

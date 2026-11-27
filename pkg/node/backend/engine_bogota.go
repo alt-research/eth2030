@@ -256,6 +256,9 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
 			continue
 		}
+		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && execution.ValidateFrameContext8141(bc.Config(), payload.Header(), frame) != nil {
+			continue
+		}
 		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil {
 			continue
 		}

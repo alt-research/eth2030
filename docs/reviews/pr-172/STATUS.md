@@ -100,3 +100,9 @@ Frame omission being excused when authenticated ancestor headers were available
 without bodies. IL callbacks now follow those headers and propagate missing
 header errors. A real post-pivot native backend regression passes after the fix.
 The register now requires 34 consumers across 21 sources and 24 removal controls.
+
+The PQ wire review also reproduced foreign-chain and inactive nonce-schema
+envelopes incorrectly reaching an undefined omitted-witness gate. Native
+import and building now share the executor's existing immutable-context checks.
+Both new subtests pass, while context-valid omitted witness composition remains
+explicitly unimplemented pending specification.

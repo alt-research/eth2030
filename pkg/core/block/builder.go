@@ -341,6 +341,9 @@ func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *
 			return nil, nil, err
 		}
 		tx := candidate.tx
+		if frame, canonical := tx.Inner().(*types.FrameTx8141); canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil {
+			continue
+		}
 		// Check if transaction meets base fee requirement.
 		if header.BaseFee != nil && tx.GasFeeCap() != nil {
 			if tx.GasFeeCap().Cmp(header.BaseFee) < 0 {

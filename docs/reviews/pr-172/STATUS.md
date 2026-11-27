@@ -1,5 +1,12 @@
 # Group E status
 
+Remaining delivery is now being exercised through an independently pinned
+Lighthouse two-pair network. The new acceptance job includes positive signed
+gossip/finality, an actual native VALID/false omission with CL fork-choice and
+restart observations, and bounded bidirectional PQ-byte transport measurements.
+See [EXTERNAL_HEZE.md](EXTERNAL_HEZE.md). These results are pending actual hosted
+execution; tool unit tests do not close the external integration gate.
+
 Production source after complete-consumer audit: `70facd01d15e8068cfc9839b3f0e352784765277`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.

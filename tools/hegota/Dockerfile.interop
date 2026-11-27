@@ -1,0 +1,16 @@
+FROM golang:1.26.11-bookworm AS build
+WORKDIR /source
+COPY pkg/go.mod pkg/go.sum ./
+RUN go mod download
+COPY pkg/ ./
+ARG SOURCE_REVISION
+RUN go build -p 2 -tags goethkzg -ldflags "-X main.commit=${SOURCE_REVISION}" -o /out/eth2030 ./cmd/eth2030
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends python3 ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=build /out/eth2030 /usr/local/bin/eth2030
+COPY tools/hegota/engine_fault_proxy.py /usr/local/lib/eth2030/engine_fault_proxy.py
+RUN printf '#!/bin/sh\nexec python3 /usr/local/lib/eth2030/engine_fault_proxy.py "$@"\n' > /usr/local/bin/geth && chmod +x /usr/local/bin/geth
+ARG SOURCE_REVISION
+LABEL commit="${SOURCE_REVISION}" qualification="private-hegota-e-fault-injection"
+ENTRYPOINT ["geth"]

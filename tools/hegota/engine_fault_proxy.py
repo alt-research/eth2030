@@ -94,6 +94,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         start = time.monotonic_ns()
+        unix = time.time_ns()
         try:
             body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             request = json.loads(body)
@@ -117,7 +118,7 @@ class Handler(BaseHTTPRequestHandler):
                 transaction_bytes(items)
                 result["result"] = items
                 injected = True
-            event = {"start_ns": start, "end_ns": time.monotonic_ns(), "method": method,
+            event = {"start_ns": start, "end_ns": time.monotonic_ns(), "unix_ns": unix, "method": method,
                      "build_view_changed": changed, "test_il_injected": injected, "http_status": status}
             if method == "engine_getInclusionListV1" and "result" in result:
                 event["transactions"] = result["result"]
@@ -161,9 +162,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--control", default="/tmp/hegota-e-control.json")
     parser.add_argument("--journal", default="/tmp/hegota-e-engine.jsonl")
-    parser.add_argument("native", nargs=argparse.REMAINDER)
-    args = parser.parse_args()
-    port, arguments = native_arguments(args.native)
+    args, native = parser.parse_known_args()
+    if native and native[0] == "--":
+        native = native[1:]
+    if any(value in ("init", "version", "--version", "help") for value in native):
+        os.execv("/usr/local/bin/eth2030", ["eth2030", *native])
+    port, arguments = native_arguments(native)
     server = Proxy(("0.0.0.0", port), ("127.0.0.1", 18551), args.control, args.journal)
     child = subprocess.Popen(["/usr/local/bin/eth2030", *arguments], start_new_session=True)
     def stop(signum, _frame):

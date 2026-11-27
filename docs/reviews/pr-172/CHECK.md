@@ -51,3 +51,10 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Refresh source-bound A–E evidence and website progress, preserving expected oracles and read-only refs.
 - [x] Complete local build/vet/full/race/control/website qualification and commit owned artifacts.
 - Publication and exact-head hosted results are tracked in the English PR description; this local snapshot does not pre-claim hosted outcomes.
+
+## Independent completion pass — November 27, 2026
+
+- [ ] Recheck upstream heads, source content and discussion updates against the published head.
+- [ ] Review all nine tasks across authenticated store/requests, wire, builds, omission evaluation and fork choice.
+- [ ] Reproduce any new defined-rule gaps before fixing; retain existing expected oracles and explicit specification gates.
+- [ ] Run proportionate source/native/build checks, update scoped status and publish owned changes with English PR evidence.

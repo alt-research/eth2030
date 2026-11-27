@@ -229,3 +229,10 @@ The broader required source refresh also passed 77 runtime race packages
 (12,114 named passes, 87 optional skips), both entrypoint builds, full vet
 and the 12/12 differential baseline. A/B/C/D/E source checks are refreshed
 against these actual logs and unchanged independent expected oracles.
+
+The expanded malformed/nonce/full-capacity external cases and owned-profile RPC
+compatibility fix passed the fresh 245-package full and 77-package runtime-race
+suites, all 40 mandatory consumers, builds/vet, the 12-case differential baseline,
+and 119 Hegota tooling tests in both interpreter modes. The actual failed hosted
+startup is retained in `evidence/hegota-e/external-network.json`; the fixed network
+run remains pending and is not represented as a pass.

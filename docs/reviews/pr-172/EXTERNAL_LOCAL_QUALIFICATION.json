@@ -1,7 +1,8 @@
 {
-  "qualified_source": "68cd1c03905e61fd4be53997017789cf08df55de",
-  "go_start_source": "77375645",
+  "qualified_source": "cdcad2a1921537d788454906bd81c4de4124f119",
+  "go_start_source": "f5947c1a",
   "go_files_unchanged_through_qualification": true,
+  "previous_qualification": "https://github.com/alt-research/eth2030/blob/ee98355ef294aecc2c18fcf2cf2921db6693d2c1/docs/reviews/pr-172/EXTERNAL_LOCAL_QUALIFICATION.json",
   "summary": {
     "full": {
       "packages": {
@@ -12,7 +13,7 @@
         "pass": 24268,
         "skip": 124
       },
-      "log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+      "log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
       "mandatory_consumers_passed": 40,
       "mandatory_skipped": 0
     },
@@ -23,7 +24,7 @@
       "named": {
         "pass": 97
       },
-      "log_sha256": "c520826e1ec9bd96fc91bf37c5dea47086c750d9179577b47019a8d38c0df5f3",
+      "log_sha256": "4750bd5fb9a220a0aa1c1c37241f02df652eaa7c6cca2f4f33308e5d3ef34dd3",
       "mandatory_consumers_passed": 40,
       "mandatory_skipped": 0
     }
@@ -39,8 +40,8 @@
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 167.78,
-      "log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+      "seconds": 196.002,
+      "log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -65,8 +66,8 @@
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 36.095,
-      "log_sha256": "c520826e1ec9bd96fc91bf37c5dea47086c750d9179577b47019a8d38c0df5f3",
+      "seconds": 48.823,
+      "log_sha256": "4750bd5fb9a220a0aa1c1c37241f02df652eaa7c6cca2f4f33308e5d3ef34dd3",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -82,9 +83,9 @@
         "test_*.py"
       ],
       "exit_code": 0,
-      "seconds": 35.962,
+      "seconds": 35.716,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "baace4b6d2ad9c615d3b37d504a78b88f307b96605db0d91dd47eef5b94c0e2a"
+      "stderr_sha256": "edeebe194f873b6ead292a89007b45a15b203bf50653415432eaaff3d708e88d"
     },
     {
       "step": "optimized-python",
@@ -100,9 +101,9 @@
         "test_*.py"
       ],
       "exit_code": 0,
-      "seconds": 35.725,
+      "seconds": 35.796,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "25540e29f3c8a7efd2e6f2d1ca6d64ac7f261bead3d6bad37a2dab88a617ea16"
+      "stderr_sha256": "e989da4ccfc4e624bdbbde3960a062b15a9c7d45d8e71e66455c8a9098196e20"
     },
     {
       "step": "devnet-tools",
@@ -145,8 +146,8 @@
     }
   ],
   "python_tests": {
-    "normal": 118,
-    "optimized": 118
+    "normal": 119,
+    "optimized": 119
   },
   "superseded_environment_failure": {
     "python": "3.9",
@@ -157,15 +158,15 @@
   },
   "external_network_status": "pending; actual hosted results required",
   "broad_runtime_race": {
-    "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d",
-    "named": {
-      "pass": 12114,
-      "skip": 87
-    },
     "packages": {
       "pass": 74,
       "skip": 3
     },
+    "named": {
+      "pass": 12114,
+      "skip": 87
+    },
+    "log_sha256": "4c8d0f22a2f89ef4e812386121fdbf5f1ae8ca6c4400d8b1fa06e9d209e684e6",
     "completed_packages": 77
   },
   "build_vet_baseline_commands": [
@@ -206,8 +207,8 @@
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 190.692,
-      "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d"
+      "seconds": 183.639,
+      "log_sha256": "4c8d0f22a2f89ef4e812386121fdbf5f1ae8ca6c4400d8b1fa06e9d209e684e6"
     },
     {
       "step": "build",
@@ -217,7 +218,7 @@
         "./..."
       ],
       "exit_code": 0,
-      "seconds": 14.132,
+      "seconds": 37.831,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -226,11 +227,11 @@
         "go",
         "build",
         "-o",
-        "/tmp/hegota-e-external-native",
+        "/tmp/hegota-e-external2-native",
         "./cmd/eth2030"
       ],
       "exit_code": 0,
-      "seconds": 5.555,
+      "seconds": 10.246,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -239,11 +240,11 @@
         "go",
         "build",
         "-o",
-        "/tmp/hegota-e-external-geth",
+        "/tmp/hegota-e-external2-geth",
         "./cmd/eth2030-geth"
       ],
       "exit_code": 0,
-      "seconds": 4.637,
+      "seconds": 4.732,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -254,7 +255,7 @@
         "./..."
       ],
       "exit_code": 0,
-      "seconds": 4.525,
+      "seconds": 5.071,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -265,13 +266,8 @@
         "./cmd/eth2030-baseline"
       ],
       "exit_code": 0,
-      "seconds": 1.05,
+      "seconds": 1.053,
       "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
     }
-  ],
-  "final_python_checks": {
-    "normal": 118,
-    "optimized": 118,
-    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887"
-  }
+  ]
 }

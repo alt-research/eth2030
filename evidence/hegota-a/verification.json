@@ -1,9 +1,9 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_base_commit": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
+  "source_base_commit": "cdcad2a1921537d788454906bd81c4de4124f119",
   "branch_baseline": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
-  "source_fingerprint_sha256": "19331602a435400c65e76f62c75fab2fb60c053261e44dfcf71df61e2b8cb782",
+  "source_fingerprint_sha256": "c3cc612c82263a4e6139acf439639732144137ccf06e0d8da9c9498a98a51974",
   "host": {
     "os": "Darwin",
     "architecture": "arm64",
@@ -19,7 +19,7 @@
   },
   "full_suite": {
     "command": "env -u GOROOT GOFLAGS=-p=4 go test -json ./... -count=1",
-    "log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+    "log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
     "named_test_or_subtest_events": {
       "pass": 24268,
       "fail": 0,
@@ -36,7 +36,7 @@
   },
   "race_suite": {
     "command": "env -u GOROOT GOFLAGS=-p=4 go test -race -json ./bal ./core/types ./core/config ./core/vm ./core/execution ./core/block ./core/chain ./core/state ./core/framepay ./core/frameproof ./core/rawdb ./crypto/leansphincs ./focil/... ./txpool/... ./eth ./node/... ./rpc/... ./engine/... ./p2p/ethproto ./sync/statesync ./sync/inserter ./proofs ./zkvm ./cmd/eth2030 ./cmd/send-frame ./eiptest ./cmd/hegota-e-fixture -count=1",
-    "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d",
+    "log_sha256": "4c8d0f22a2f89ef4e812386121fdbf5f1ae8ca6c4400d8b1fa06e9d209e684e6",
     "named_test_or_subtest_events": {
       "pass": 12114,
       "fail": 0,
@@ -61,8 +61,8 @@
   },
   "python_checks": {
     "source_admission": "72 proposals; 15 repository roles; 108 pinned files; 99 local normative hashes",
-    "checker_regressions": 118,
-    "log_sha256": "9e41189500e4cb89a083f22258a1110d4fd32664527291451fe9898d3bc2211c",
+    "checker_regressions": 119,
+    "log_sha256": "edeebe194f873b6ead292a89007b45a15b203bf50653415432eaaff3d708e88d",
     "codec_goldens": 7,
     "arithmetic_oracles": 5,
     "native_gas_cases": 5,
@@ -72,8 +72,8 @@
     "additional_boundary_vectors": 25,
     "unexecuted_latest_spec_seeds": 0,
     "optimized_mode": {
-      "checker_regressions": 118,
-      "log_sha256": "03dc779dc735d0af1436fdbcd1c950ab6d03db9cbed51d9f68be3151563e2012"
+      "checker_regressions": 119,
+      "log_sha256": "e989da4ccfc4e624bdbbde3960a062b15a9c7d45d8e71e66455c8a9098196e20"
     },
     "pending_recheck": false
   },
@@ -81,8 +81,8 @@
     "matrix": "specs/hegota/acceptance.json",
     "tasks": 7,
     "criteria": 26,
-    "source_fingerprint_sha256": "19331602a435400c65e76f62c75fab2fb60c053261e44dfcf71df61e2b8cb782",
-    "test_log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+    "source_fingerprint_sha256": "c3cc612c82263a4e6139acf439639732144137ccf06e0d8da9c9498a98a51974",
+    "test_log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
     "passed_tests": {
       "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart": "pass",
       "github.com/eth2030/eth2030/core/chain::TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody": "pass",
@@ -161,7 +161,7 @@
   ],
   "artifacts": {
     ".github/workflows/ci.yml": "987e54770440a79d932ad31f1b28ab5d434e09c0a57743b7464830eb81609582",
-    ".github/workflows/hegota-e-interop.yml": "e5a934bd02828344ef3d5cc39a80bbdf4035ecfbab9ac78e62b7f51e12b744f2",
+    ".github/workflows/hegota-e-interop.yml": "06c07719f275b4011f5b66f86eb63e6efbde64c1ec5e1bb3fe3a54cbc5aca490",
     "docs/plans/hegota-a/baseline-and-gaps.md": "a8210864f676ce7f2261f01f2b833a6c678592d9ccf5cdbf6f5ffb61c7a12a96",
     "docs/plans/hegota-a/runtime-and-activation.md": "b50c24043325a07c54ae0015c144a0f58e456766dfe6af836dd7c54e9ba8c15d",
     "docs/plans/hegota-a/semantic-adrs.md": "bf6cf254292afdc4e166f468aa1b870eb4b412e540567e3d0ed3a762d89bcd33",
@@ -178,19 +178,20 @@
     "docs/reviews/pr-168/CASE_LEVEL_AUDIT.md": "dfb255cff1c5046c2a66b81cc2d37b8dbf6023fedc6be321ccff2bdb4ba3c1e6",
     "docs/reviews/pr-168/CHECK.md": "e76885936e7ebee9161b0ce900b49e3adde3284d1b66f66276124baf11b36158",
     "docs/reviews/pr-168/STATUS.md": "a781be17bb534f131d05010a90cf49a550603185de817687cba883c9fa8e0176",
-    "docs/reviews/pr-172/EXTERNAL_HEZE.md": "ade96fee6cdc11c505a9e15602e571a1dd33d7a32af625d97bd1643bbedf4067",
+    "docs/reviews/pr-172/EXTERNAL_HEZE.md": "7e9cb67d30ea8d601f55d3c19fe814e0543fc1d01627cf597bba0f74fc12fce6",
     "docs/reviews/pr-172/REAUDIT.md": "4ad4ed0608b63f1703658a47cea906417998d340f1e155d9ea5b8e564637b261",
     "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "9385a04cb501fbd92c8b581f87dcc8479a43c7b73c5d2ed84e5f5db93ae7df3f",
     "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "3b34a2e336afcb284c9c52a4db6eda314eceed1256c4f03c0a295cacdd4528cc",
     "evidence/hegota-a/baseline.json": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b",
-    "evidence/hegota-a/runtime.json": "d79476352ef289c3559fbfbe2c37ccde10d6d7d16dbf4c0535de4525cdb637fc",
-    "evidence/hegota-a/skipped-tests.json": "38a42a6bdffe395c7a645e441c3b63d92125db8e31759c5d7cf13277d7fa0fb5",
-    "evidence/hegota-b/verification.json": "664de3aba72a22c270f56fcb6eeebb8f6d444c484078b84f4a408cb510753042",
-    "evidence/hegota-c/verification.json": "373ec64a42d314f21afebe0c42415639eb1b2b3b5c930b9d448fd0d049dca581",
-    "evidence/hegota-d/verification.json": "edcf0d81154bc6dbd27f01f716d57ca30139218777afc6b3b96859bc9eeba127",
+    "evidence/hegota-a/runtime.json": "881f1524ed069e4bdb526e8dfa28a67ce2064209b232c7ec8bcc4197762ec248",
+    "evidence/hegota-a/skipped-tests.json": "10b84fdedbc04148be8c811ee836da5c80211498ea46a6feabf72af374e14a32",
+    "evidence/hegota-b/verification.json": "533b4b15a2ab452e54aa79f41895afcf91083dc3112545e4fbd03f1e6b5c760f",
+    "evidence/hegota-c/verification.json": "fbf769fa0374b9972d213eb161cde789944d8976def5aee63db76ff04df9e5de",
+    "evidence/hegota-d/verification.json": "85cede59497b9f9f70e533f977a1cb76f9c1595f225404f6ab56591e7589db6b",
+    "evidence/hegota-e/external-network.json": "de76b191520e2b4c577d02b9abdf7f2974eeb0d1f4bb7dab26c71c5f13195110",
     "evidence/hegota-e/resources.json": "aac9257113952f1b6c51610cf12e92698cabfd0aace2c8b7641f5f244b2952ff",
     "evidence/hegota-e/source-review.json": "80838c3af2f74282be8fba49c5323f4e2b681ae772f229134f10a7950be774bc",
-    "evidence/hegota-e/verification.json": "bcbe331282d23bd890436d88ef6bcb0988ffd0e59fb7a2b3d31d8a46f81c34c2",
+    "evidence/hegota-e/verification.json": "7593c9bac467b6de6cc41b7626cdca634a53a7fd4ec1ec5c643356d11861fe00",
     "evidence/hegota-e/website.json": "a6f2c2efb0f66979849a5afad37260344a0c45070e52acfde1de21e4896ade2d",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
     "pkg/bal/code_adoption.go": "a6e2c16d3980b1ab6c1ba0488c55832943bcabaa312944dcd496352cb27f32cf",
@@ -204,8 +205,8 @@
     "pkg/cmd/eth2030-geth/node.go": "0136c6328aa34b21187ca1fc9c9662dffd44314fbdfb4126a9c58bee1878001f",
     "pkg/cmd/eth2030/main.go": "019095a89383321c095148ada159aa1fbf4e8f2718a2c999378aa1dd9c3107e2",
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
-    "pkg/cmd/hegota-e-fixture/main.go": "0bf18c58e1e898dbe95051d68925313d57a153d508200aa588e6fe0daaf31bf9",
-    "pkg/cmd/hegota-e-fixture/main_test.go": "62a7fa1629cb5a156c32de3f9a350d50270671e25632bc9a399aa26a2338eded",
+    "pkg/cmd/hegota-e-fixture/main.go": "17e9d4a4a04f8f094132bd3923245bd9e349f30ed20c5811ff0b64fc68d2af0d",
+    "pkg/cmd/hegota-e-fixture/main_test.go": "c162a364679649641b7c0d9bbc544904b3c3280a6e6f8ab0b1202b110d96a3e5",
     "pkg/cmd/send-frame/main.go": "f483efa608e564e258563fdebecc4f333dce8a25405c3c50ea983f626d4bf9eb",
     "pkg/cmd/send-frame/main_test.go": "013c2956f6d830e387a515e3d0f6c8f937e4c5da25a1489c555b8ba439414383",
     "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d",
@@ -529,7 +530,7 @@
     "specs/hegota/group-b.json": "c38ab4ed79f18d43368830961ff6a3298d04e480b5ae993c4b91caf2fe2c334d",
     "specs/hegota/group-c.json": "8a242d946b38f8f5ec17847a5e405cafff281fa0f03b92fd807dc28351d83493",
     "specs/hegota/group-d.json": "3e246ed5b97ba72664b6ee988e5012962f3270083cd74673828480f183e6565d",
-    "specs/hegota/group-e.json": "160c6871acf8a96f151acc3fd58af0d170ba99c85c439fc4a20252c429611d0f",
+    "specs/hegota/group-e.json": "b54dfc8884afdd2858123ff7a3fadf528f0d36a96d9a9762336d8d27033fbaed",
     "specs/hegota/profiles.json": "16cd980dcccfbda39a3be6c4b694931a40c9dfbb22ff85cffde0edccd49990f7",
     "specs/hegota/proposals/eip-8334.md": "658663a92ece46f24708d1e35a604de55cbdefc460d2a41ce15447432557ad29",
     "specs/hegota/proposals/eip-8341.md": "603597b516eececa1341944ee3d7bf20623aedc0e2575632d816efc45b14466d",
@@ -570,15 +571,15 @@
     "tools/hegota/check_e.py": "1ae2c1b583fd054b78e9aadcbb461290386ce08c728696c2d65122c2876d3f0e",
     "tools/hegota/codec_goldens.py": "b7a7d97a40d12b2a61b916eb12844309ef332adf478a23cf9fde4547a880c0c3",
     "tools/hegota/e_negative_controls.py": "30632dc82e24569ccd99044ac072d2751a75b580bb598cd8651fe906dfff80b8",
-    "tools/hegota/engine_fault_proxy.py": "a82bb652855997d8cc7562377c10d8e6c8654deb17e6249c7c25ecc6821f8cfa",
+    "tools/hegota/engine_fault_proxy.py": "428f816416a4737986261a4169e4de5f5806e3d84b704de914c61b58d56b0d2d",
     "tools/hegota/generate_d_pq_wallet.py": "57a9d1fa7fe1caf3c7a6fe73305d11ba76751f500e463a91b770b364e0d7ceab",
     "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
-    "tools/hegota/run_external_heze.py": "c9dbb376927588ea4fd3556a934be53af3b373f71465ccde280d03c14ada547a",
+    "tools/hegota/run_external_heze.py": "ea381dec8e2176040ddd22af33dd3c27016e58cad583b20883e23f27465c342d",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
-    "tools/hegota/test_engine_fault_proxy.py": "52ed7dd8dab6271d5b6295cc2ceab5fbf2380b78189bf57e317f67f24fb96d08",
-    "tools/hegota/test_external_heze.py": "0b3da82d5e18a2f06926b5f22938d85833b1243e2f63e7f72a3addebbd80cd22",
+    "tools/hegota/test_engine_fault_proxy.py": "64bc604d248cdec63d1fbc3c875059e2c21a70ea5bc0e1ffaba0ce0c42101ae0",
+    "tools/hegota/test_external_heze.py": "19e41e356ba77f7de20a478375040939c1b6ba2b2bb39909772e53baa9dcb1c5",
     "tools/hegota/test_group_b.py": "da76d39f9087cbcd79a91243c9b769dbaf44a2a246fc34997fccd2dd07ad0ef0",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3",
     "tools/hegota/test_group_d.py": "664dbc2a53664b2b2247b70c1e30bb5a3d73128d45b7e9894843bb9490fd202b",
@@ -586,14 +587,14 @@
     "tools/hegota/test_semantic_goldens.py": "bcb92d26c10e277f376433fa90c3a0047fc9be5746af4efd4f7506bc88f15d40"
   },
   "group_b_qualification": {
-    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
+    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
     "record": "evidence/hegota-b/verification.json",
     "tasks": 12,
     "criteria": 36,
     "scope": "Base 8141; independent 8250 nonce oracle; ordinary 8272 contract. Public integration is qualified separately in C; independent vectors unchanged."
   },
   "group_c_qualification": {
-    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
+    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
     "record": "evidence/hegota-c/verification.json",
     "tasks": 10,
     "criteria": 40,
@@ -601,7 +602,7 @@
     "scope": "Native public base/keyed and conditional EIP-8151 consumers; exact PR-12041 paymaster proposal implemented and qualified behind explicit selection. Upstream adoption/fork pin remains pending."
   },
   "group_d_qualification": {
-    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
+    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
     "record": "evidence/hegota-d/verification.json",
     "tasks": 8,
     "criteria": 32,
@@ -610,7 +611,7 @@
     "scope": "Pinned optional direct 8504, 8298 adoption and 7906 ASSERT profiles. Undefined aggregation, official assignments and omitted-IL/7807 composition remain explicit gates."
   },
   "group_e_qualification": {
-    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
+    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
     "record": "evidence/hegota-e/verification.json",
     "tasks": 9,
     "criteria": 36,

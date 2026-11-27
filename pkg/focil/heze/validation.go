@@ -105,8 +105,10 @@ func checkedClock(view ConsensusView) (Clock, error) {
 	return clock, nil
 }
 func timely(clock Clock, slot uint64) bool {
-	// Compute floor(duration * 7500 / 10000) without uint64 multiplication overflow.
-	due := clock.SlotDurationMS/10000*DueBasisPoints + clock.SlotDurationMS%10000*DueBasisPoints/10000
+	// Integer millisecond clocks compare against the rational deadline using
+	// its ceiling. This also handles configured durations not divisible by 4.
+	remainder := clock.SlotDurationMS % 10000 * DueBasisPoints
+	due := clock.SlotDurationMS/10000*DueBasisPoints + (remainder+9999)/10000
 	return clock.Slot == slot && clock.IntoSlotMS < due
 }
 

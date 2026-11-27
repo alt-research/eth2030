@@ -222,6 +222,11 @@ func TestGroupEHezeAuthenticatedGossipAndFailureAtomicity(t *testing.T) {
 	}
 }
 func TestGroupEHezeBranchTimelinessEquivocationAndOwnership(t *testing.T) {
+	t.Run("fractional-millisecond-deadline", func(t *testing.T) {
+		if !timely(Clock{Slot: 1, IntoSlotMS: 9, SlotDurationMS: 13}, 1) || timely(Clock{Slot: 1, IntoSlotMS: 10, SlotDurationMS: 13}, 1) {
+			t.Fatal("strict rational deadline rounded early")
+		}
+	})
 	v, s := fixture(t)
 	store := NewStore()
 	if err := store.Gossip(encoded(t, s), v); err != nil {
@@ -280,6 +285,32 @@ func TestGroupEHezeBranchTimelinessEquivocationAndOwnership(t *testing.T) {
 	}
 }
 func TestGroupEHezeRequestsRetentionAndReauthenticatedRestart(t *testing.T) {
+	t.Run("expired-cache-needs-no-pruned-state", func(t *testing.T) {
+		v, signed := fixture(t)
+		s := NewStore()
+		if err := s.Import(signed, v); err != nil {
+			t.Fatal(err)
+		}
+		data, err := s.MarshalBinary()
+		if err != nil {
+			t.Fatal(err)
+		}
+		v.clock.Slot += MinRequestSlots + 2
+		v.state.StateAvailable = false
+		restored, err := Restore(data, v)
+		if err != nil || len(restored.Transactions(key(signed.Message), false)) != 0 {
+			t.Fatal("expired cache blocked restart", err)
+		}
+		v.clock.Slot = signed.Message.Slot + MinRequestSlots + 1
+		if _, err := Restore(data, v); err == nil {
+			t.Fatal("required retained state unavailable but accepted")
+		}
+		v.clock.Slot = signed.Message.Slot - 1
+		v.state.StateAvailable = true
+		if _, err := Restore(data, v); err == nil {
+			t.Fatal("future persisted list accepted")
+		}
+	})
 	v, s := fixture(t)
 	store := NewStore()
 	if err := store.Import(s, v); err != nil {

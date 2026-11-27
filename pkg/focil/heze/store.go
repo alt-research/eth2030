@@ -214,8 +214,24 @@ func Restore(data []byte, view ConsensusView) (*Store, error) {
 	if d.Version != 1 {
 		return nil, errors.New("heze: unknown store version")
 	}
+	clock, err := checkedClock(view)
+	if err != nil {
+		return nil, err
+	}
+	minimum := uint64(0)
+	if clock.Slot > MinRequestSlots+1 {
+		minimum = clock.Slot - MinRequestSlots - 1
+	}
 	s := NewStore()
 	for _, e := range d.Entries {
+		// Expired cache entries have no remaining consumer. Do not require a
+		// CL to recover already-pruned historical state after a long shutdown.
+		if e.First.Message.Slot < minimum {
+			continue
+		}
+		if e.First.Message.Slot > clock.Slot {
+			return nil, errors.New("heze: future persisted inclusion list")
+		}
 		if e.GossipCount > 2 {
 			return nil, errors.New("heze: corrupt gossip count")
 		}

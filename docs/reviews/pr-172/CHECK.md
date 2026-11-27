@@ -19,4 +19,5 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Add positive/negative native unit/integration consumers and criterion-level immutable-source coverage for every task.
 - [x] Run local builds, vet, appropriate full/race tests, A/B/C/D regressions and source-bound E qualification.
 - [x] Update website/GitHub Pages roadmap and progress to match demonstrated results and actual release gates; build/check exports and UI.
-- [ ] Inspect base drift, conflicts and duplicated work; commit/push, publish an English PR and follow exact-head hosted checks.
+- [x] Inspect base drift, conflicts and duplicated work; commit/push and publish English PR #172.
+- Hosted exact-head results are tracked in [PR #172](https://github.com/alt-research/eth2030/pull/172) check runs and its English description.

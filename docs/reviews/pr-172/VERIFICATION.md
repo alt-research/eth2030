@@ -51,5 +51,5 @@ network qualification remain explicit upstream/HGT-070/080 gates. Local native
 qualification does not claim complete public activation, network tail latency,
 or live GitHub Pages deployment. The existing Pages workflow deploys after merge.
 
-Hosted exact-head CI results are recorded in the English PR after publication;
+Hosted exact-head CI results are recorded in [PR #172](https://github.com/alt-research/eth2030/pull/172);
 this local report does not predict them.

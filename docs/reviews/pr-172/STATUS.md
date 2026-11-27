@@ -52,3 +52,5 @@ All 13 compiled semantic removals fail their intended unchanged native consumers
 Site build, static-export checks and final desktop/mobile visual checks passed.
 Hosted exact-head CI is tracked in the English PR record. These frozen local
 artifacts do not pre-claim its outcome.
+
+Published review: [PR #172](https://github.com/alt-research/eth2030/pull/172), targeting `alt-research/eth2030:master`. Exact-head hosted check outcomes are maintained in that English PR record, separately from the frozen local evidence.

@@ -5,13 +5,66 @@ import (
 	"testing"
 
 	"github.com/eth2030/eth2030/core/config"
+	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/internal/testutil/proof8504"
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	gethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/holiman/uint256"
 )
+
+func TestGroupELatest7805IndependentOrdinaryGasReservations(t *testing.T) {
+	raw, cfg, h, db, sender := profile1Fixture(t, types.DynamicFeeTxType, big.NewInt(1337))
+	var original gethtypes.Transaction
+	if err := original.UnmarshalBinary(raw); err != nil {
+		t.Fatal(err)
+	}
+	key, err := gethcrypto.HexToECDSA("0000000000000000000000000000000000000000000000000000000000000001")
+	if err != nil {
+		t.Fatal(err)
+	}
+	signed, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.DynamicFeeTx{ChainID: cfg.ChainID, Gas: 25000000, GasFeeCap: big.NewInt(100), GasTipCap: big.NewInt(1), To: original.To(), Value: big.NewInt(1)}), gethtypes.LatestSignerForChainID(cfg.ChainID), key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err = signed.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	h.GasUsed = 8000000
+	for _, test := range []struct {
+		name                     string
+		executionUsed, stateUsed uint64
+		enforce                  bool
+	}{
+		{"header_total_is_not_execution_capacity", 8000000, 0, true},
+		{"exact_both_dimensions", h.GasLimit - vm.AmsterdamMaxExecutionGas, h.GasLimit - 25000000, true},
+		{"execution_one_over", h.GasLimit - vm.AmsterdamMaxExecutionGas + 1, 0, false},
+		{"state_one_over", 0, h.GasLimit - 25000000 + 1, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			pool := new(gaspool.GasPool).AddGas(h.GasLimit)
+			if err := pool.ReserveFrame(test.executionUsed, test.stateUsed); err != nil {
+				t.Fatal(err)
+			}
+			executionLeft, stateLeft := pool.Gas(), pool.StateGas()
+			for i := 0; i < 3; i++ {
+				result, err := EvaluateProfile1WithCapacity(raw, cfg, h, profile1AccountOnly{db}, pool)
+				if err != nil || (result.Kind == Profile1Enforceable) != test.enforce {
+					t.Fatal(result, err)
+				}
+				if result.ExecutionReservation != vm.AmsterdamMaxExecutionGas || result.StateReservation != 25000000 {
+					t.Fatal("wrong independent reservations", result)
+				}
+			}
+			if pool.Gas() != executionLeft || pool.StateGas() != stateLeft || db.GetNonce(sender) != 0 || db.AddressInAccessList(sender) {
+				t.Fatal("independent candidate checks consumed state or gas")
+			}
+		})
+	}
+}
 
 type profile1AccountOnly struct{ state.StateDB }
 

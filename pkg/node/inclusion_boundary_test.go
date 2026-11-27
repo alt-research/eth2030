@@ -165,10 +165,10 @@ func TestGroupEWithdrawalDoesNotFundSameBlockOmission(t *testing.T) {
 	}
 }
 
-// Post-execution EIP-7002 queue code may change storage read by a Frame.
-// Base FOCIL's full-state experimental path must use the same transaction-end
-// boundary in both directions; this does not activate Informational Profile 2.
-func TestGroupEPostSystemCannotChangeFrameOmissionVerdict(t *testing.T) {
+// The latest merged EIP-7805 never runs an omitted Frame's VERIFY code.
+// Runtime storage validity is therefore not an omission excuse; actual payload
+// building still performs full execution. This does not activate Profile 2.
+func TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission(t *testing.T) {
 	for _, before := range []byte{0, 1} {
 		t.Run(fmt.Sprintf("before_%d", before), func(t *testing.T) {
 			const token = "il-post-system-boundary"
@@ -228,7 +228,7 @@ func TestGroupEPostSystemCannotChangeFrameOmissionVerdict(t *testing.T) {
 			empty := build("0xc", []string{})
 			var verdict bogotaIntegrationStatus
 			destination.call(t, "engine_newPayloadV6", &verdict, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, list)
-			want := before != 0
+			want := false
 			if verdict.Status != "VALID" || verdict.InclusionListSatisfied == nil || *verdict.InclusionListSatisfied != want {
 				t.Fatalf("post-system storage changed omission: before=%d status=%+v want=%v", before, verdict, want)
 			}
@@ -245,8 +245,8 @@ func TestGroupEPostSystemCannotChangeFrameOmissionVerdict(t *testing.T) {
 				t.Fatalf("build/import boundary disagreement: %d transactions, want %d", len(built.ExecutionPayload.Transactions), count)
 			}
 			destination.call(t, "engine_newPayloadV6", &verdict, built.ExecutionPayload, []types.Hash{}, beacon, built.ExecutionRequests, list)
-			if verdict.Status != "VALID" || verdict.InclusionListSatisfied == nil || !*verdict.InclusionListSatisfied {
-				t.Fatal("builder produced unsatisfied payload", verdict)
+			if verdict.Status != "VALID" || verdict.InclusionListSatisfied == nil || *verdict.InclusionListSatisfied != (before == 0) {
+				t.Fatal("pre-execution omission check was replaced by runtime validation", verdict)
 			}
 		})
 	}

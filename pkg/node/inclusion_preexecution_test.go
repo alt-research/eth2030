@@ -68,6 +68,27 @@ func TestGroupELatest7805FramePreExecutionAndVersionMigration(t *testing.T) {
 	if restored.PayloadStatus.Status != "VALID" || restored.PayloadStatus.InclusionListSatisfied == nil || *restored.PayloadStatus.InclusionListSatisfied {
 		t.Fatalf("pre-rebase cache survived the changed predicate: %+v", restored)
 	}
+	if err := receiver.Blockchain().WriteBogotaPayload(hash, &chain.BogotaPayload{Number: envelope.ExecutionPayload.BlockNumber, InclusionList: [][]byte{raw}, Satisfied: true, SatisfactionVersion: 2}); err != nil {
+		t.Fatal(err)
+	}
+	if err := receiver.Blockchain().PruneBogotaPayloads(envelope.ExecutionPayload.BlockNumber + 1); err != nil {
+		t.Fatal(err)
+	}
+	destination.call(t, "engine_forkchoiceUpdatedV5", &restored, payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
+	if restored.PayloadStatus.Status != "SYNCING" || restored.PayloadStatus.InclusionListSatisfied != nil {
+		t.Fatal("compact pre-rebase verdict bypassed view resubmission", restored)
+	}
+	destination.call(t, "engine_newPayloadV6", &verdict, envelope.ExecutionPayload, []types.Hash{}, beacon, envelope.ExecutionRequests, list)
+	if verdict.Status != "VALID" || verdict.InclusionListSatisfied == nil || *verdict.InclusionListSatisfied {
+		t.Fatal(verdict)
+	}
+	if err := receiver.Blockchain().PruneBogotaPayloads(envelope.ExecutionPayload.BlockNumber + 1); err != nil {
+		t.Fatal(err)
+	}
+	destination.call(t, "engine_forkchoiceUpdatedV5", &restored, payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
+	if restored.PayloadStatus.Status != "VALID" || restored.PayloadStatus.InclusionListSatisfied == nil || *restored.PayloadStatus.InclusionListSatisfied {
+		t.Fatal("current compact pre-execution verdict lost", restored)
+	}
 	db, err := receiver.Blockchain().StateAtBlock(receiver.Blockchain().GetBlock(hash))
 	if err != nil {
 		t.Fatal(err)

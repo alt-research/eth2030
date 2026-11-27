@@ -178,7 +178,7 @@
     "scope": "Prior source preserved; independent expected oracles unchanged. Shared runtime now freshly qualified after EIP-7805 rebase."
   },
   "additional_qualification": {
-    "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+    "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
     "record": "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json",
     "commands": [
       {

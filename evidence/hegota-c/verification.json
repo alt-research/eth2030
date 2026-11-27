@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+  "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -128,12 +128,12 @@
     "specs/hegota/upstream/2026-11-27/eip-2780.md": "1c6b65ea16676301a01f277aa28875f34677cd65e4cc834b26c2802940329a3b",
     "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
     "specs/hegota/upstream/2026-11-27/eip-8038.md": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864",
-    "tools/hegota/README.md": "9a277fe65d0c7a481aec0db08ef8a9cca7f41cd191af1f6bf2464395ea799c2f",
+    "tools/hegota/README.md": "c9fc40fff4a3b01c82900cb3e59b05df92061b1c392c68702962e7c3e697d000",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
     "tools/hegota/check_c.py": "9aad746a0558b594fa07d04fa78e59f84cda3e997a0ac65f53a3ebde6697faee",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3"
   },
-  "source_fingerprint_sha256": "f5b86abbcc1bdacc7e1334d06d4dfa8ce32398b17c4dfe05f769cacd7a56ccd2",
+  "source_fingerprint_sha256": "f025a85ba2167d2b313aa28e4fecb5bede8b9c66366bae8054cd4740755fbc47",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -256,7 +256,7 @@
     "scope": "Prior source preserved; independent expected oracles unchanged. Shared runtime now freshly qualified after EIP-7805 rebase."
   },
   "additional_qualification": {
-    "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+    "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
     "record": "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json",
     "commands": [
       {

@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+  "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
   "tasks": 9,
   "criteria": 36,
   "selected_profile_consumers_passed": true,
@@ -16,14 +16,14 @@
   "artifacts": {
     ".github/workflows/ci.yml": "987e54770440a79d932ad31f1b28ab5d434e09c0a57743b7464830eb81609582",
     ".github/workflows/hegota-e-interop.yml": "06c07719f275b4011f5b66f86eb63e6efbde64c1ec5e1bb3fe3a54cbc5aca490",
-    "docs/plans/hegota-e/COMPOSITION.md": "0645158b92b7ecf754d20ed538a59300ea8fb58edf0355e6ac731c5c55f44b34",
+    "docs/plans/hegota-e/COMPOSITION.md": "da31c929b023fcfe00f1089ba6502938e32471527edacfcbdd93d68731d18762",
     "docs/plans/hegota-e/PLAN.md": "f72c88b146546553da61a8913dc92e1fc21ba5acdf517d0515c266c744dc0bda",
     "docs/reviews/pr-172/EXTERNAL_HEZE.md": "c86ef16498f6dd58f35a89066b7f17e643c7a5a36e1936fd33a2d7f580848942",
     "docs/reviews/pr-172/LATEST_7805.md": "cdf26f08f68e130140fef53a18601acf73765e040890b03e845191a339754aef",
-    "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json": "1ee37858a5b77ffa9792bc6dae5e35c5a7918be0974e71caee15c4e8a6af8fac",
-    "docs/reviews/pr-172/REAUDIT.md": "4ad4ed0608b63f1703658a47cea906417998d340f1e155d9ea5b8e564637b261",
-    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "9385a04cb501fbd92c8b581f87dcc8479a43c7b73c5d2ed84e5f5db93ae7df3f",
-    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "3b34a2e336afcb284c9c52a4db6eda314eceed1256c4f03c0a295cacdd4528cc",
+    "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json": "6b489a5ce17f5712a22077af5c6760e603253bd6914c1e8d2e6458ccbca7116c",
+    "docs/reviews/pr-172/REAUDIT.md": "742bd83bc1b7b8441c93e1a7fbbaf9838d5f8d8f0e37c1f73517c5b841d55fb6",
+    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "38d337de1c16a76203b065a7b98b6396ae4f3c33413f3e61dba34995bf3e6066",
+    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "04505e3342c468bd000e495a8c58cd07a5ebd5f88222a293bbfd363ca4775c1d",
     "evidence/hegota-e/external-network.json": "5ae9e6dbd84f345b6a5bd830ea302d58ea962beb688b8d869631fe34e6b7824b",
     "evidence/hegota-e/source-review.json": "3bd7264eab36fd4cd193df6275b33e271f75bfcb59eae28756751704d8cdb1bd",
     "pkg/cmd/hegota-e-fixture/main.go": "17e9d4a4a04f8f094132bd3923245bd9e349f30ed20c5811ff0b64fc68d2af0d",
@@ -130,7 +130,7 @@
     "tools/hegota/test_external_heze.py": "a8a15c159d4cdbf948faf1833ac046f6a38ef0ca35fd5bd5b6489c225e42d33e",
     "tools/hegota/test_group_e.py": "978aa3b0d2a63dc8db1d526daa54bd92b362b25c6617acd8e124101c90f3786b"
   },
-  "source_fingerprint_sha256": "e969744e5b39b08ec9bc2b39e9d68db31dc8dc4ba5a506c573ea580f09314b8d",
+  "source_fingerprint_sha256": "584d08982bda95ab8e2f6a507c7d998811f970269409921a3ad4ed95868e9422",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound": "pass",
     "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse": "pass",
@@ -273,8 +273,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/core/block/inclusion_size_test.go": "19f1da2346c00ef5ba07765e229c1678c2f1fe3852f76bc48fa027f08f144565",
-        "pkg/core/block/inclusion_size.go": "f97e5abbee5790896148f5f2d08341dcfa1137776682115267c2d122fc34d4bd"
+        "pkg/core/block/inclusion_size.go": "f97e5abbee5790896148f5f2d08341dcfa1137776682115267c2d122fc34d4bd",
+        "pkg/core/block/inclusion_size_test.go": "19f1da2346c00ef5ba07765e229c1678c2f1fe3852f76bc48fa027f08f144565"
       }
     },
     {
@@ -295,8 +295,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/focil/vops_reference.go": "e50a6400931becb5dd07bdcf01c0bcea92e9e34bdf7a8e457f60c6b67b75c042",
-        "pkg/focil/vops_reference_test.go": "86ddb8e2732ec1dd4acac3a7695de496460c44c2c0d8f334d6ba818555bdffc0"
+        "pkg/focil/vops_reference_test.go": "86ddb8e2732ec1dd4acac3a7695de496460c44c2c0d8f334d6ba818555bdffc0",
+        "pkg/focil/vops_reference.go": "e50a6400931becb5dd07bdcf01c0bcea92e9e34bdf7a8e457f60c6b67b75c042"
       }
     },
     {
@@ -361,8 +361,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef",
-        "pkg/focil/heze/store.go": "e22775cccf17daa16d3f920a71e3ef4d17499d7233009aaa73967af71337b91b"
+        "pkg/focil/heze/store.go": "e22775cccf17daa16d3f920a71e3ef4d17499d7233009aaa73967af71337b91b",
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef"
       }
     },
     {
@@ -383,8 +383,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1",
-        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e"
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
       }
     },
     {
@@ -427,8 +427,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1",
-        "pkg/core/block/inclusion_queue.go": "54fddaf23bb6b34003b879f31c5cd8dd7852a1118679ad6ae51ac2e5ae545682"
+        "pkg/core/block/inclusion_queue.go": "54fddaf23bb6b34003b879f31c5cd8dd7852a1118679ad6ae51ac2e5ae545682",
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
       }
     },
     {
@@ -450,9 +450,9 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
         "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
-        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59"
       }
     },
     {
@@ -495,8 +495,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/bogota_deferred_integration_test.go": "c4c86920c5bb73407b4b71fa4e130e5b889945bea267aec0d323d92caef59ab4",
-        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2"
+        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2",
+        "pkg/node/bogota_deferred_integration_test.go": "c4c86920c5bb73407b4b71fa4e130e5b889945bea267aec0d323d92caef59ab4"
       }
     },
     {
@@ -517,8 +517,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f",
-        "pkg/node/heze_reconfigure_test.go": "d44fc33529b566ed025100d27419dce41a617d5d621c31df959c4578b6581a2d"
+        "pkg/node/heze_reconfigure_test.go": "d44fc33529b566ed025100d27419dce41a617d5d621c31df959c4578b6581a2d",
+        "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f"
       }
     },
     {
@@ -561,8 +561,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34",
-        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e"
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34"
       }
     },
     {
@@ -738,9 +738,9 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
         "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
-        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59"
       }
     },
     {
@@ -762,8 +762,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
         "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
         "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d"
       }
     },
@@ -873,8 +873,8 @@
       },
       "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
       "production_and_consumer_files_unchanged_at_qualified_source": {
-        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34",
-        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2"
+        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2",
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34"
       }
     },
     {
@@ -1083,11 +1083,11 @@
   },
   "resources": {
     "path": "evidence/hegota-e/resources.json",
-    "sha256": "b33c3f19895a0da3a21a803d172e0eff0444b55544dcb8dbf20b94497d3e6aea"
+    "sha256": "367f043835fb1aec1af615bb244a525c75c1654567b3f32bcceb9dceb37865e7"
   },
   "website": {
     "path": "evidence/hegota-e/website.json",
-    "sha256": "0025262c2a38e19a3152decc2de46466bafdc289109f28724422db0e03494316"
+    "sha256": "97d4293258ce1621640826414fe30f936f2c8898ab0a1d02465bb592e08f92ea"
   },
   "external_network": {
     "record": "evidence/hegota-e/external-network.json",
@@ -1096,7 +1096,7 @@
     "public_complete": false
   },
   "additional_qualification": {
-    "source_revision": "3fdf32a6585a6c51991129dbd845f45a3a99c22f",
+    "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
     "record": "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json",
     "commands": [
       {

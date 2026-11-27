@@ -1,6 +1,19 @@
 import officialScope from '@/data/official-glamsterdam.json';
 import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/data/eips';
 
+export const hegotaGroupE = {
+  reviewed: 'November 27, 2026',
+  revision: 'd6e45a10',
+  plan: 'docs/plans/hegota-e/PLAN.md',
+  rows: [
+    { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views, retained requests and strict Engine versions/capabilities.' },
+    { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding cascades, cancellation and deadlines, exact RLP capacity, Profile 1 account checks, two isolated native nodes and restart persistence.' },
+    { id: 'HGT-046', title: 'AA-VOPS / Profile 2', status: 'Specification gate', detail: 'Informational EIP-8369 reference predicates are tested. Consensus activation stays disabled pending a Standards Track claims, state-diff, replay and ePBS specification.' },
+    { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Native adapter qualified', detail: 'Authenticated IL ingress reaches Engine verdicts and Heze extension predicates. External beacon Gossipsub/reqresp, fork digests and CL/ePBS devnet qualification remain HGT-070/080 prerequisites.' },
+    { id: 'HGT-048', title: 'Post-quantum IL resources', status: 'Bounded measurements', detail: 'Canonical direct-8504 bytes, real uncached verification and local signed SSZ/BLS/store pipeline. Omitted witness transport and network tail latency remain unqualified; limits are unchanged.' },
+  ],
+};
+
 export const roadmapStages: { id: ForkId; name: string; glyph: string; heading: string; description: string }[] = [
   { id: 'glamsterdam', name: 'Glamsterdam', glyph: 'G*', heading: 'Scale the execution layer', description: 'Scope follows the official EIP-7773 scheduled core list. ETH2030 implementation labels are counted against that list; networking, informational references and later proof proposals are separate.' },
   { id: 'hegota', name: 'Hegotá', glyph: 'H*', heading: 'Open the protocol', description: 'Inclusion lists, quick slots and programmable transactions.' },

@@ -18,6 +18,7 @@ on:
       - 'docs/plans/hegota-a/**'
       - 'docs/plans/hegota-c/**'
       - 'docs/plans/hegota-d/**'
+      - 'docs/plans/hegota-e/**'
   pull_request:
     branches: [master]
     paths:
@@ -35,6 +36,7 @@ on:
       - 'docs/plans/hegota-a/**'
       - 'docs/plans/hegota-c/**'
       - 'docs/plans/hegota-d/**'
+      - 'docs/plans/hegota-e/**'
   workflow_dispatch:
 
 permissions:
@@ -100,6 +102,7 @@ jobs:
           python3 tools/hegota/check_b.py
           python3 tools/hegota/check_c.py
           python3 tools/hegota/check_d.py
+          python3 tools/hegota/check_e.py
           python3 -m unittest discover -s tools/hegota -p 'test_*.py'
           python3 -O -m unittest discover -s tools/hegota -p 'test_*.py'
 

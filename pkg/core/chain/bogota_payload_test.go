@@ -34,6 +34,11 @@ func TestBogotaPayloadStorageRetainsFinalizedAndPendingViews(t *testing.T) {
 	if err := bc.PruneBogotaPayloads(11); err != nil {
 		t.Fatal(err)
 	}
+	// Repeated finalization is idempotent after moving completed records out
+	// of the live-view namespace.
+	if err := bc.PruneBogotaPayloads(11); err != nil {
+		t.Fatal(err)
+	}
 	if err := bc.db.Close(); err != nil {
 		t.Fatal(err)
 	}

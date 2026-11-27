@@ -32,8 +32,9 @@ remains open at `96da3c17047ad31608c40bfe75049db78dc4417d`.
    correct `inclusionListSatisfied` Boolean for a VALID head; its inherited
    Paris handling permits ignoring a stale canonical ancestor without rewinding
    execution finality. Deleting the completed record turned that known head
-   into SYNCING. Cleanup now compacts completed records, releasing old list
-   bytes while retaining both true and false verdicts. Unexecuted branches
+   into SYNCING. Cleanup atomically moves completed records to a separate
+   compact-verdict namespace, releasing old list bytes while retaining both
+   true and false verdicts. Subsequent cleanup does not rescan historical verdicts. Unexecuted branches
    below finality are deleted. Native wire tests finalize a descendant, restart,
    query the old dissatisfied head, verify VALID/false and unchanged finality,
    and require invalid checkpoint ancestry to remain `-38002`.

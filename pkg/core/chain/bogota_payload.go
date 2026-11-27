@@ -10,6 +10,10 @@ import (
 
 var bogotaPayloadPrefix = []byte("engine/bogota/")
 
+// Completed finalized verdicts use a separate namespace so later finalization
+// passes only scan live views, rather than the entire execution history.
+var bogotaVerdictPrefix = []byte("engine/bogota-verdict/")
+
 // BogotaPayload records the driving CL's list view. Block holds an accepted
 // block until execution has completed. An empty Block stores a known verdict.
 type BogotaPayload struct {
@@ -29,7 +33,11 @@ func (bc *Blockchain) ReadBogotaPayload(hash types.Hash) (*BogotaPayload, error)
 	}
 	data, err := bc.db.Get(bogotaPayloadKey(hash))
 	if errors.Is(err, rawdb.ErrNotFound) {
-		return nil, nil
+		key := append(append([]byte(nil), bogotaVerdictPrefix...), hash[:]...)
+		data, err = bc.db.Get(key)
+		if errors.Is(err, rawdb.ErrNotFound) {
+			return nil, nil
+		}
 	}
 	if err != nil {
 		return nil, err
@@ -72,19 +80,21 @@ func (bc *Blockchain) PruneBogotaPayloads(finalized uint64) error {
 			continue
 		}
 		key := append([]byte(nil), iter.Key()...)
-		if len(record.Block) > 0 {
-			if err := batch.Delete(key); err != nil {
-				return err
-			}
-		} else if len(record.InclusionList) > 0 {
-			record.InclusionList = nil
-			data, err := json.Marshal(&record)
+		if len(record.Block) == 0 {
+			data, err := json.Marshal(struct {
+				Number    uint64
+				Satisfied bool
+			}{record.Number, record.Satisfied})
 			if err != nil {
 				return err
 			}
-			if err := batch.Put(key, data); err != nil {
+			verdictKey := append(append([]byte(nil), bogotaVerdictPrefix...), key[len(bogotaPayloadPrefix):]...)
+			if err := batch.Put(verdictKey, data); err != nil {
 				return err
 			}
+		}
+		if err := batch.Delete(key); err != nil {
+			return err
 		}
 	}
 	if err := rawdb.ReadError(iter); err != nil {

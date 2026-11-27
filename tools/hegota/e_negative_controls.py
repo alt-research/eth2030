@@ -25,7 +25,7 @@ controls.extend([
 ])
 controls.append(('append-header-metadata','pkg/core/types/block_append_size.go','if header.BlobGasUsed != nil {','if false && header.BlobGasUsed != nil {','./core/types','TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'))
 controls.extend([
-('finalized-verdict','pkg/core/chain/bogota_payload.go','} else if len(record.InclusionList) > 0 {','} else if true { if err := batch.Delete(key); err != nil { return err }; continue;','./node','TestBogotaDeferredWireAcrossRestart'),
+('finalized-verdict','pkg/core/chain/bogota_payload.go','if len(record.Block) == 0 {','if false && len(record.Block) == 0 {','./node','TestBogotaDeferredWireAcrossRestart'),
 ('reconfigured-authentication','pkg/node/heze_inclusion.go','store, err = heze.Restore(data, view)\n\t\tif err != nil {','store = n.hezeLists\n\t\terr = nil\n\t\tif err != nil {','./node','TestGroupEHezeReconfigureReauthenticatesMemoryAtomically'),
 ])
 

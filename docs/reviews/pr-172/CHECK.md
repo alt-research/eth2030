@@ -64,4 +64,4 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Reconcile latest upstream changes with the remaining activation and integration prerequisites.
 - [x] Identify and pin the independent Heze CL source and executable network/test path.
 - [x] Implement and execute the selected specification-defined two-pair integration and bounded network resource controls in hosted CI.
-- [ ] Validate actual consumers, record unavailable prerequisites precisely, and update progress and English PR evidence.
+- [x] Inspect raw network consumers and recompute transport statistics; retain exact unavailable prerequisites and update repository progress and English review evidence.

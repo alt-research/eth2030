@@ -76,8 +76,7 @@ GATES = ['8369 is Informational; Profile 2 enforcement requires a Standards Trac
  '8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final '
  'slots/budgets and ePBS duties remain undefined',
  '8504 omitted-IL witness transport and validity composition remain unspecified',
- 'External Heze CL gossipsub/reqresp/fork-digest and ePBS devnet qualification belongs to '
- 'HGT-070/080; no public activation claimed']
+ 'Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed']
 SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
   'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
   '60fab81fff8126a0e0f019a3fa7439fdfafe9471'),

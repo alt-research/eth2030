@@ -6,7 +6,7 @@
     "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
     "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
     "8504 omitted-IL witness transport and validity composition remain unspecified",
-    "External Heze CL gossipsub/reqresp/fork-digest and ePBS devnet qualification belongs to HGT-070/080; no public activation claimed"
+    "Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed"
   ],
   "normative_sources": [
     {

@@ -38,5 +38,6 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Verify the EIP-7805 last-transaction state boundary against withdrawals and post-execution system calls.
 - [x] Reproduce and fix any import/build disagreement with independent native regressions.
 - [x] Recheck request, exact-byte, frame gas, RLP and authenticated cache boundaries for additional missing rules.
-- [ ] Refresh source-bound evidence and website progress; run required build/full/race/control checks.
-- [ ] Commit/push owned changes to the English review and verify current-head hosted results.
+- [x] Refresh source-bound evidence and website progress; run required build/full/race/control checks.
+- [x] Commit owned source and qualification artifacts; publish to the existing English review.
+- Publication and exact-head hosted CI are tracked in the English PR description; the frozen local snapshot does not pre-claim hosted outcomes.

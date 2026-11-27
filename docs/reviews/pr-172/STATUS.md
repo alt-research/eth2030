@@ -78,7 +78,7 @@ checks passed without horizontal overflow. Historical verdicts use an atomic
 separate compact namespace to avoid scanning the full history during cleanup.
 Exact-head hosted CI is tracked separately in the English PR description.
 
-## End-of-transaction state audit in progress
+## End-of-transaction state audit results
 
 A new review starts from published head `63f85e737d8dd84c8913d6f6ef996179e5e373d5`.
 Upstream EIPs, Heze and Bogotá revisions remain unchanged. This pass focuses on
@@ -92,17 +92,34 @@ The corrected evaluator reconstructs precisely that phase when authenticated
 BAL metadata shows relevant later changes or metadata is unavailable. Native
 Frame tests cover both post-system invalidation and post-system validation.
 Legacy live cache records are corrected across restart; legacy compact records
-wait for the exact CL view to be resubmitted. Focused regressions pass; final
-full/race/control and hosted qualification is pending.
+wait for the exact CL view to be resubmitted. Focused regressions and fresh final local qualification pass. Hosted exact-head
+qualification is tracked separately in the English PR description.
 
 The snap ancestry review additionally reproduced a valid BLOCKHASH-dependent
 Frame omission being excused when authenticated ancestor headers were available
 without bodies. IL callbacks now follow those headers and propagate missing
 header errors. A real post-pivot native backend regression passes after the fix.
-The register now requires 34 consumers across 21 sources and 24 removal controls.
+The register now requires 34 consumers across 21 sources; the final control register contains 26 removals.
 
 The PQ wire review also reproduced foreign-chain and inactive nonce-schema
 envelopes incorrectly reaching an undefined omitted-witness gate. Native
 import and building now share the executor's existing immutable-context checks.
 Both new subtests pass, while context-valid omitted witness composition remains
 explicitly unimplemented pending specification.
+
+Final local qualification at `70eddaad4f4460d10d75d0ff6baba3ab087151d6`: 244 full-suite packages and 24,245 named
+passes, 76 selected race packages and 12,091 named passes, zero failures. All
+34 mandatory E consumers pass without skips. All 26 compiled semantic removals
+fail their intended unchanged consumers. Builds, vet, 12/12 differential cases,
+109 Python checks in both modes, A62/B79/C102/D55/E34 source-bound checks, website
+path/build/export and desktop/mobile visual/DOM checks pass. The current source
+register pins 21 immutable normative files. Optional skips remain inventoried;
+the B fixture-only eftest consumer remains outside selected race packages.
+
+The site source and local export are updated; the existing GitHub Pages workflow
+publishes after merge. No Profile 2 consensus activation, context-valid omitted
+PQ witness composition, external CL/ePBS network acceptance or network-tail
+qualification is claimed. Current master remains the merged #171 baseline,
+with no conflicts; independent Lean work, read-only refs and A/B/C/D expected
+oracles remain unchanged. Source-bound snapshots qualify the source above;
+publication/check links belong to the English PR record.

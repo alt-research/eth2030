@@ -1,33 +1,63 @@
 {
-  "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
-  "production_source_revision": "2aa647a381dbf204aeb07a6c5547f4df1d1b9464",
+  "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
+  "production_source_revision": "01c1be41241f32c87b1ced2814debe02b15b7a05",
   "site_build_exit_code": 0,
   "static_export_checks_exit_code": 0,
-  "roadmap_html_sha256": "873b4a4c01ea3567dea461a63522040e927ab2881dfa23104957b1f712e1cb55",
+  "roadmap_html_sha256": "54d8d04fb6b3118c8643fe19e3a77681827c70265a2a7bbe250807ec4723e4f5",
   "viewports": [
     {
+      "name": "desktop",
       "width": 1440,
       "height": 1000,
-      "card_width": 1290.609375,
+      "card_width": 1296,
       "horizontal_overflow": false,
-      "review": "Two-column Group E card; corrected CL reauthentication and historical verdict boundaries, source links and all activation gates readable."
+      "links": [
+        {
+          "text": "Criterion register \u2197",
+          "href": "https://github.com/alt-research/eth2030/blob/01c1be41241f32c87b1ced2814debe02b15b7a05/docs/plans/hegota-e/PLAN.md"
+        },
+        {
+          "text": "Reviewed native source \u2197",
+          "href": "https://github.com/alt-research/eth2030/tree/01c1be41241f32c87b1ced2814debe02b15b7a05/pkg/focil/heze"
+        },
+        {
+          "text": "AA-VOPS specification boundary \u2197",
+          "href": "https://eips.ethereum.org/EIPS/eip-8369"
+        }
+      ],
+      "review": "Updated transaction-end, versioned migration, header-only ancestry and shared invalid-context checks, all activation gates and source links readable without clipping."
     },
     {
+      "name": "mobile",
       "width": 390,
       "height": 844,
-      "card_width": 345.609375,
+      "card_width": 351,
       "horizontal_overflow": false,
-      "review": "Single-column card; all updated task text and three links readable without clipping."
+      "links": [
+        {
+          "text": "Criterion register \u2197",
+          "href": "https://github.com/alt-research/eth2030/blob/01c1be41241f32c87b1ced2814debe02b15b7a05/docs/plans/hegota-e/PLAN.md"
+        },
+        {
+          "text": "Reviewed native source \u2197",
+          "href": "https://github.com/alt-research/eth2030/tree/01c1be41241f32c87b1ced2814debe02b15b7a05/pkg/focil/heze"
+        },
+        {
+          "text": "AA-VOPS specification boundary \u2197",
+          "href": "https://eips.ethereum.org/EIPS/eip-8369"
+        }
+      ],
+      "review": "Updated transaction-end, versioned migration, header-only ancestry and shared invalid-context checks, all activation gates and source links readable without clipping."
     }
   ],
   "browser_console": {
     "errors": 0,
-    "warnings": 4,
+    "warnings": 3,
     "warning_scope": "Next static CSS preload notices; no browser errors."
   },
   "scope": "Fresh local build, exported HTML, Playwright DOM and desktop/mobile visual inspection. Existing master-only GitHub Pages workflow deploys after merge.",
   "capture_sha256": {
-    "desktop.png": "88af6cb784f4cd3fbe3060e88b92fa2cf0736f2bd96ed1b3d6a815ceaa7da4a2",
-    "mobile.png": "bbd913a0fc6686d1cf36706e52bb961aff4d5735b3af49a6d34c3cc639de21b7"
+    "desktop.png": "beedbfed0ad32dac2496f270a5ad3e1e6d9c6f1642fe07cc5e6e1373212efafc",
+    "mobile.png": "2fb66d77e5f4fa253ff3e29586c949857db9c0dc7c826b7ea0b10bf94f3a890d"
   }
 }

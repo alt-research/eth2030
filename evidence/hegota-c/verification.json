@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
+  "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -21,7 +21,7 @@
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
     "pkg/cmd/send-frame/main.go": "f483efa608e564e258563fdebecc4f333dce8a25405c3c50ea983f626d4bf9eb",
     "pkg/cmd/send-frame/main_test.go": "013c2956f6d830e387a515e3d0f6c8f937e4c5da25a1489c555b8ba439414383",
-    "pkg/core/block/builder.go": "7721e963709169bd718ca31a8f08c67c86ca5012c6657b7b55c080eae5be6095",
+    "pkg/core/block/builder.go": "cc736a0d1d98967c927d33b195a5baf0b8f78e22160f5e6e07baf277243c31a2",
     "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
     "pkg/core/block/frame_mixed_ordering_test.go": "70aad6b139671a9108c2910e44bd8b01343ba639d2859170ed53be5e9fc3f9cf",
     "pkg/core/block/ordering.go": "c66578e753120f3807bd1e4f086348aadc474f8d3997ecabcdf6176d436ae406",
@@ -30,7 +30,7 @@
     "pkg/core/config/chain_config_ext.go": "f10f350220bdeba61157d0b64591a165d13feeac9830ed0f57d9cedc589a64f9",
     "pkg/core/config/chain_config_forks.go": "ac3ebfde025fe76374d2eed79fa7c1dfd7eafe73a93cbf772b801c2450ca0ad4",
     "pkg/core/config/frame_extensions_test.go": "eaa4225d92939b31139b7803b2c7ead3c39c8f73f39494bcbeb6e7eb0a3ef534",
-    "pkg/core/execution/frame_8141.go": "20a2ba7a58784893635e2714b79fd4d40d82b340ac03e7528913f17c97771d6a",
+    "pkg/core/execution/frame_8141.go": "5763fa7e03662054335bdae18931062d1c6fb7e8c22e90b9948d450fcfad3e2f",
     "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
     "pkg/core/execution/frame_8250_public_test.go": "30af5ece52623d42dad34db4475be904522e095fc35034bdf1be4f4198179bb9",
     "pkg/core/execution/frame_8250_test.go": "d564e126b3d1bc150334cd8416d106027911aaac0d257f50e93c932cbe7f029e",
@@ -133,7 +133,7 @@
     "tools/hegota/check_c.py": "9aad746a0558b594fa07d04fa78e59f84cda3e997a0ac65f53a3ebde6697faee",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3"
   },
-  "source_fingerprint_sha256": "026f891731b55aa4698b20a50dcb59a5f082f6461a77f11bdcbb7d71eaa75425",
+  "source_fingerprint_sha256": "9932eb1ec37a5c13955ebedaeed9c3a69db242ad3f588779d8a68fb203428e40",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -239,9 +239,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "5a71513141ef8a0e09017d3ca833260aeec890cdfae37e025002594937269372",
+    "log_sha256": "249b3f73bc1016a773629c11a53f19d44b89eb7d7ad08113796f5e0d11d85db4",
     "named": {
-      "pass": 24237,
+      "pass": 24245,
       "skip": 124
     },
     "packages": {
@@ -256,7 +256,7 @@
     "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
+    "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
     "commands": [
       {
         "step": "build",
@@ -266,7 +266,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 23.309
+        "seconds": 26.991
       },
       {
         "step": "native-build",
@@ -274,11 +274,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-reaudit-native",
+          "/tmp/hegota-e-boundary-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 26.927
+        "seconds": 29.87
       },
       {
         "step": "wrapper-build",
@@ -286,11 +286,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-reaudit-geth",
+          "/tmp/hegota-e-boundary-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 0.47
+        "seconds": 0.532
       },
       {
         "step": "vet",
@@ -300,7 +300,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 3.492
+        "seconds": 3.075
       },
       {
         "step": "baseline",
@@ -310,7 +310,7 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.548
+        "seconds": 1.514
       },
       {
         "step": "full",
@@ -322,7 +322,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 173.845
+        "seconds": 156.545
       },
       {
         "step": "race",
@@ -360,7 +360,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 196.223
+        "seconds": 200.169
       },
       {
         "step": "python",
@@ -375,7 +375,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 34.525
+        "seconds": 35.185
       },
       {
         "step": "python-optimized",
@@ -391,7 +391,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 33.631
+        "seconds": 33.984
       },
       {
         "step": "site-verify",
@@ -402,7 +402,7 @@
           "--files"
         ],
         "exit_code": 0,
-        "seconds": 0.419
+        "seconds": 0.303
       },
       {
         "step": "site-build",
@@ -412,7 +412,7 @@
           "build"
         ],
         "exit_code": 0,
-        "seconds": 20.32
+        "seconds": 26.132
       },
       {
         "step": "site-export",
@@ -422,13 +422,13 @@
           "scripts/check-export.mjs"
         ],
         "exit_code": 0,
-        "seconds": 0.26
+        "seconds": 1.706
       }
     ],
     "race": {
-      "log_sha256": "f486f8c4dd3a9923f03edf39ce48a7843e6f3ddaf9bb7864dd4304c3806bc3ce",
+      "log_sha256": "9a8248d3a3f09ea60bea7db6e7be5fd88212860c4567cb3cf3b36477dfc755fb",
       "named": {
-        "pass": 12083,
+        "pass": 12091,
         "skip": 87
       },
       "packages": {

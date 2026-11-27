@@ -23,6 +23,7 @@ controls.extend([
 ('blob-sidecar-priority','pkg/core/block/inclusion_queue.go','tx.HasDependencies8504() || len(tx.BlobHashes()) > 0','tx.HasDependencies8504()','./node','TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry'),
 ('malformed-proof-tolerance','pkg/node/backend/engine_bogota.go','ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','false && ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ])
+controls.append(('append-header-metadata','pkg/core/types/block_append_size.go','if header.BlobGasUsed != nil {','if false && header.BlobGasUsed != nil {','./core/types','TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'))
 for name,path,old,new,pkg,test in controls:
  s=(R/path).read_text()
  if old not in s and name=='strict-timeliness':

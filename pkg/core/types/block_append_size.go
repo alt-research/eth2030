@@ -10,10 +10,12 @@ import (
 // transaction checks. Existing block transactions are encoded once, not once
 // for every IL candidate. New gas-used values may change the header's RLP size.
 type BlockAppendSizer struct {
-	header           *Header
-	transactionBytes int
-	otherBytes       int
-	witnessBytes     int
+	header              *Header
+	transactionBytes    int
+	otherBytes          int
+	witnessBytes        int
+	appendedBlobGas     uint64
+	appendedCalldataGas uint64
 }
 
 func NewBlockAppendSizer(block *Block) (*BlockAppendSizer, error) {
@@ -70,6 +72,18 @@ func transactionBlockBytes(tx *Transaction) (int, error) {
 func (s *BlockAppendSizer) Size(tx *Transaction, gasUsed uint64) (int, error) {
 	header := s.header.Copy()
 	header.GasUsed = gasUsed
+	if header.BlobGasUsed != nil {
+		value := *header.BlobGasUsed + s.appendedBlobGas + tx.BlobGas()
+		header.BlobGasUsed = &value
+	}
+	if header.CalldataGasUsed != nil {
+		value := *header.CalldataGasUsed + s.appendedCalldataGas + tx.CalldataGas()
+		header.CalldataGasUsed = &value
+	}
+	if header.GasUsedVec != nil {
+		header.GasUsedVec[0] = gasUsed
+		header.GasUsedVec[2] += s.appendedCalldataGas + tx.CalldataGas()
+	}
 	return s.SizeWithHeader(tx, header, nil)
 }
 
@@ -100,5 +114,7 @@ func (s *BlockAppendSizer) CommitAppend(tx *Transaction) error {
 		return err
 	}
 	s.transactionBytes += n
+	s.appendedBlobGas += tx.BlobGas()
+	s.appendedCalldataGas += tx.CalldataGas()
 	return nil
 }

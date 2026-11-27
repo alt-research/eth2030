@@ -104,3 +104,8 @@ the existing current C/D snapshot, rather than editing stale read-only refs.
 All completion claims require named native tests, fresh pass events and source
 fingerprints. Prior A/B/C/D expected oracles are preserved. Website/GitHub Pages
 roadmap and progress must describe these exact results and remaining gates.
+
+The selected independent two-pair control passed on November 28, including
+common finality, real VALID/false CL fork-choice/restart, malformed/nonce/full
+exemptions and bounded signed PQ-byte carriage. Its exact observed scope and
+remaining release gates are recorded in `evidence/hegota-e/external-network.json`.

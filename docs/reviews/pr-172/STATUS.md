@@ -1,11 +1,19 @@
 # Group E status
 
-Remaining delivery is now being exercised through an independently pinned
-Lighthouse two-pair network. The new acceptance job includes positive signed
-gossip/finality, an actual native VALID/false omission with CL fork-choice and
-restart observations, and bounded bidirectional PQ-byte transport measurements.
-See [EXTERNAL_HEZE.md](EXTERNAL_HEZE.md). These results are pending actual hosted
-execution; tool unit tests do not close the external integration gate.
+The independently pinned Lighthouse two-pair acceptance passed on November 28.
+Actual signed IL gossip forced a transaction into an isolated proposer pool and
+reached common finality. Both native nodes returned VALID/false for one omitted
+payload; both CLs retained its execution-valid, unsatisfied root, did not extend
+its FULL branch, and retained the decision across a real CL restart. Malformed,
+future-nonce and actual filler-induced full-capacity exemptions passed on both
+pairs. Raw observations were independently inspected, including all payload
+hashes, CL roots, actual imported capacity blocks and complete owned cleanup.
+
+The 64 bidirectional PQ-byte samples carried 8,183 transaction bytes per list
+(8,531 signed-SSZ bytes). Docker-host p50/p95/p99 were 21.81/26.56/28.07 ms;
+these are bounded carriage observations, not public tails or PQ-validity claims.
+See [EXTERNAL_HEZE.md](EXTERNAL_HEZE.md) and the exact source, failed startup,
+artifact identities and qualified scope in `evidence/hegota-e/external-network.json`.
 
 Production source after complete-consumer audit: `70facd01d15e8068cfc9839b3f0e352784765277`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
@@ -25,11 +33,11 @@ unfinished builds; context cancellation rolls back trials and aborts publication
 HGT-046 is explicitly gated by D04: EIP-8369 remains Informational and does not
 define enough to activate Profile 2. Defined reference predicates and thirteen
 activation prerequisites are implemented, but no production partial-stateless
-replay or consensus claims encoding is asserted. HGT-047 qualifies local native
-and CL decision adapters; external beacon transport/CL/ePBS network acceptance
-remains HGT-070/080 work. HGT-048 measures real canonical direct-8504 bytes and
-verification/local pipeline cost; omitted witness transport and network tail
-latency remain unqualified. These gates prevent a claim that all Group E public
+replay or consensus claims encoding is asserted. HGT-047 qualifies the native adapters and the selected independent CL control
+above; exhaustive beacon request protocols, mixed-client and wider ePBS release
+qualification remain HGT-070/080 work. HGT-048 includes real canonical direct-8504
+bytes, verification/local pipeline cost and bounded signed network carriage;
+omitted witness transport and public network tails remain unqualified. These gates prevent a claim that all Group E public
 activation functionality is complete.
 
 The website homepage, roadmap and EIP-7805 progress now display this precise
@@ -242,3 +250,7 @@ cleanup, including when another service cannot be read. Its regression preserves
 the original acceptance outcome. All 120 tooling tests pass in normal and
 optimized modes. Native Go files are unchanged from the full/race qualification
 above; no network success is inferred from the diagnostic change.
+
+The successful selected-profile run supersedes the earlier pending-network
+notes as a network result, while preserving their original local/run identities.
+The private RPC startup failure remains recorded as a failed attempt.

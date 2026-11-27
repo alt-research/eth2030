@@ -88,3 +88,29 @@ admin_nodeInfo health checks; the native default guard and Engine JWT are
 unchanged. The failed attempt, exact artifact identity and verified removal
 of its enclave/containers/volumes are retained in
 `evidence/hegota-e/external-network.json`.
+
+## Actual qualified network result — November 28, 2026
+
+Run `46046204006`, job `140665984861`, passed all required observations at
+reviewed head `1bb691b46e388c519049915ce30fd712acdb5a01` and test merge
+`07f22780d2cdc6ab4250680d0c4695f26a2b1f7b`. Both CL/EL pairs reached common
+finality; native VALID/false, independent CL fork choice and CL restart all
+refer to the same payload/root. Malformed, future-nonce and actual full-capacity
+omission exemptions passed independently on both pairs.
+
+Artifact `15223042822` has SHA-256
+`901b776d990c0366de217dc3bff69d2fa3a0f6f5e527fafc053b89e0d1c77c51`.
+Raw Engine replies, CL snapshots and imported blocks were inspected. The
+64 matched signed-list samples (36/28 producer directions) were recomputed
+from raw peer observations and Engine clocks using genesis `1795802777` and
+three-second slots. Each list carried 49 canonical envelope occurrences,
+8,183 transaction bytes and 8,531 signed-SSZ bytes; p50/p95/p99/max were
+21.808181/26.560087/28.071195/28.071195 ms. The enclave, containers and volumes
+were removed. Exact source/image and result records are in
+`evidence/hegota-e/external-network.json`.
+
+This closes the selected two-pair network control, not the separate unresolved
+normative, omitted-witness, exhaustive request/mixed-client or public-tail gates.
+The runner now also retains service diagnostics before cleanup and explicit
+slot-clock inputs for direct replay; the successful first artifact's clock was
+recovered from its own launch record, rather than guessed from event timings.

@@ -1,6 +1,6 @@
 # Group E status
 
-Production source after re-audit: `2aa647a3`, based directly on merged PR #171/master
+Production source after transaction-boundary audit: `347225abc242fb0a7fc24669c467b65ddc71fbc8`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 
@@ -10,7 +10,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 30 mandatory native consumers. Profile 1 checks
+The 36-criterion register names 33 mandatory native consumers. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.

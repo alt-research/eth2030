@@ -24,9 +24,9 @@ func TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback(t *testing
 	length := MaxRLPBlockSize - 1000
 	for i := 0; i < 3; i++ {
 		tx := transaction(length)
-		h := *budget.header
+		h := budget.header.Copy()
 		h.GasUsed = 128
-		wire, e := types.NewBlock(&h, &types.Body{Transactions: []*types.Transaction{tx}, Withdrawals: []*types.Withdrawal{}}).EncodeRLP()
+		wire, e := types.NewBlock(h, &types.Body{Transactions: []*types.Transaction{tx}, Withdrawals: []*types.Withdrawal{}}).EncodeRLP()
 		if e != nil {
 			t.Fatal(e)
 		}

@@ -170,8 +170,6 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 		return api.handleExchangeCapabilities(params)
 	case "engine_getClientVersionV1":
 		return api.handleGetClientVersionV1(params)
-	case "engine_newInclusionListV1":
-		return api.handleNewInclusionListV1(params)
 	case "engine_getInclusionListV1":
 		return api.handleGetInclusionListV1(params)
 	case "engine_getPayloadBodiesByHashV1":

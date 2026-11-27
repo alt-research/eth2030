@@ -68,9 +68,9 @@ func transactionBlockBytes(tx *Transaction) (int, error) {
 	return rlp.EstimateStringSize(len(raw)), nil
 }
 func (s *BlockAppendSizer) Size(tx *Transaction, gasUsed uint64) (int, error) {
-	header := *s.header
+	header := s.header.Copy()
 	header.GasUsed = gasUsed
-	return s.SizeWithHeader(tx, &header, nil)
+	return s.SizeWithHeader(tx, header, nil)
 }
 
 // SizeWithHeader permits builders to supply the complete projected header and

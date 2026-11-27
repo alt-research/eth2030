@@ -18,7 +18,7 @@ func newBuilderRLPBudget(cfg *config.ChainConfig, header *types.Header, attrs *B
 	if cfg == nil || !cfg.IsOsaka(header.Time) {
 		return nil, nil
 	}
-	h := *header
+	h := header.Copy()
 	zero := types.Hash{}
 	withdrawals := attrs.Withdrawals
 	if cfg.IsShanghai(h.Time) {
@@ -49,18 +49,18 @@ func newBuilderRLPBudget(cfg *config.ChainConfig, header *types.Header, attrs *B
 		h.GasUsedVec = &usage
 		h.ExcessGasVec = &excess
 	}
-	sizer, err := types.NewBlockAppendSizer(types.NewBlock(&h, body))
+	sizer, err := types.NewBlockAppendSizer(types.NewBlock(h, body))
 	if err != nil {
 		return nil, err
 	}
-	return &builderRLPBudget{sizer: sizer, header: &h, witnesses: body.DependencyWitnesses}, nil
+	return &builderRLPBudget{sizer: sizer, header: h, witnesses: body.DependencyWitnesses}, nil
 }
 
 func (b *builderRLPBudget) append(txs []*types.Transaction, tx *types.Transaction, totalGas, blobGas uint64) (bool, error) {
 	if b == nil {
 		return true, nil
 	}
-	h := *b.header
+	h := b.header.Copy()
 	h.GasUsed = totalGas
 	if h.BlobGasUsed != nil {
 		h.BlobGasUsed = &blobGas
@@ -82,7 +82,7 @@ func (b *builderRLPBudget) append(txs []*types.Transaction, tx *types.Transactio
 			return false, err
 		}
 	}
-	size, err := b.sizer.SizeWithHeader(tx, &h, witnesses)
+	size, err := b.sizer.SizeWithHeader(tx, h, witnesses)
 	if err != nil || size > MaxRLPBlockSize {
 		return false, err
 	}

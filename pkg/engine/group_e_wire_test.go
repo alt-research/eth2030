@@ -47,6 +47,11 @@ func TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities(t *testing.T
 }
 
 func TestGroupEBogotaSatisfactionStatusNullability(t *testing.T) {
+	retired := NewEngineAPI(&bogotaTestBackend{}).HandleRequest([]byte(`{"jsonrpc":"2.0","id":1,"method":"engine_newInclusionListV1","params":[]}`))
+	var reply struct{ Error *jsonrpcError }
+	if err := json.Unmarshal(retired, &reply); err != nil || reply.Error == nil || reply.Error.Code != -32601 {
+		t.Fatalf("nonstandard legacy update method remained reachable: %s", retired)
+	}
 	for _, status := range []string{StatusValid, StatusInvalid, StatusSyncing, StatusAccepted, StatusInvalidBlockHash} {
 		result := payloadStatusV2(PayloadStatusV1{Status: status}, true)
 		raw, _ := json.Marshal(result)

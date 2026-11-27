@@ -26,11 +26,11 @@ func TestGroupEExactAppendRLPAllPrefixAndGasBoundaries(t *testing.T) {
 				if e != nil {
 					t.Fatal(e)
 				}
-				h := *header
+				h := header.Copy()
 				h.GasUsed = used
 				b := *body
 				b.Transactions = []*Transaction{tx}
-				actual, e := NewBlock(&h, &b).EncodeRLP()
+				actual, e := NewBlock(h, &b).EncodeRLP()
 				if e != nil || size != len(actual) {
 					t.Fatal(length, typed, used, size, len(actual), e)
 				}
@@ -42,11 +42,11 @@ func TestGroupEExactAppendRLPAllPrefixAndGasBoundaries(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			h := *header
+			h := header.Copy()
 			h.GasUsed = 256
 			b := *body
 			b.Transactions = []*Transaction{tx, tx}
-			actual, e := NewBlock(&h, &b).EncodeRLP()
+			actual, e := NewBlock(h, &b).EncodeRLP()
 			if e != nil || size != len(actual) {
 				t.Fatal("committed transaction list", size, len(actual), e)
 			}

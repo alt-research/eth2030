@@ -28,5 +28,6 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Recheck every HGT-040–048 clause against actual consumers; distinguish implementation from unresolved activation/external prerequisites.
 - [x] Exercise untested validity, byte/gas, request, retention, fork-choice, replacement/cancellation and persistence boundaries.
 - [x] Fix all reproducible specification deviations and add independent negative/positive regressions.
-- [ ] Refresh source-bound A–E evidence, website progress and scope limitations; preserve independent expected oracles.
-- [ ] Run appropriate build/vet/full/race checks, publish only owned changes to English PR #172 and follow exact-head CI.
+- [x] Refresh source-bound A–E evidence, website progress and scope limitations; preserve independent expected oracles.
+- [x] Run appropriate local build/vet/full/race, source-bound, compiled-removal and website checks.
+- Publication and exact-head hosted CI are tracked in the English PR #172 description; frozen local artifacts do not pre-claim hosted outcomes.

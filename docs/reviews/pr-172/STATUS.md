@@ -55,13 +55,12 @@ artifacts do not pre-claim its outcome.
 
 Published review: [PR #172](https://github.com/alt-research/eth2030/pull/172), targeting `alt-research/eth2030:master`. Exact-head hosted check outcomes are maintained in that English PR record, separately from the frozen local evidence.
 
-## Completion re-audit in progress
+## Completion re-audit results
 
 A fresh independent worktree starts from published PR #172 head
 `4663af699c4c9bbc48f59976dc26e00d805a78d6`. Latest EIPs, consensus-specs and
-execution-apis heads still match the pinned Group E revisions. The review will
-recheck all nine tasks and their actual runtime consumers, rather than treating
-previous check counts as proof of completeness. Unrelated Lean work in the
+execution-apis heads still match the pinned Group E revisions. The review rechecked all nine tasks and their actual runtime consumers, rather
+than treating previous check counts as proof of completeness. Unrelated Lean work in the
 original worktree is preserved.
 
 Re-audit found and reproduced two missing boundaries. Finalization deleted
@@ -70,4 +69,11 @@ completed verdicts now survive as compact records while obsolete IL bytes and
 unexecuted branches are released. Replacing an in-memory CL adapter skipped
 reauthentication; live snapshots now pass the same ancestry/key/signature checks
 as disk restores before an atomic replacement. Regression tests failed before
-these fixes and pass afterward. Final full/race/source-bound evidence is pending.
+these fixes and pass afterward. Fresh final qualification passed: 244 full-suite packages / 24,237 named passes,
+76 race packages / 12,083 named passes, 109 Python checks in each mode, 12/12
+differential cases and all A-E source-bound checkers. All 30 required E consumers
+pass without skips. All 15 compiled semantic removals fail their intended
+unchanged consumers. Fresh website build/export and desktop/mobile visual/DOM
+checks passed without horizontal overflow. Historical verdicts use an atomic
+separate compact namespace to avoid scanning the full history during cleanup.
+Exact-head hosted CI is tracked separately in the English PR description.

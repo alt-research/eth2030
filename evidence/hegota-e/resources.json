@@ -1,6 +1,6 @@
 {
-  "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
-  "log_sha256": "094417df9082676fa1883ae9ec487adf62a4b69ca0c1fc76d4d1d8a69de88028",
+  "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
+  "log_sha256": "5a71513141ef8a0e09017d3ca833260aeec890cdfae37e025002594937269372",
   "measurements": [
     {
       "arch": "arm64",
@@ -10,14 +10,14 @@
       "cpus": 10,
       "external_witness_bytes": 7740,
       "go": "go1.26.8",
-      "local_sign_encode_BLS_auth_store_union_ns": 23632958,
+      "local_sign_encode_BLS_auth_store_union_ns": 23003209,
       "max_transaction_bytes": 8192,
       "network_latency_measured": false,
       "os": "darwin",
       "profile": "direct8504 research; omitted witness transport unspecified",
       "public_conformance": false,
       "transaction_bytes": 167,
-      "verify_uncached_mean_ns": 164041
+      "verify_uncached_mean_ns": 160856
     }
   ],
   "scope": "Byte capacity and actual local crypto/SSZ/BLS/store pipeline only; no network-tail or omitted-witness conformance claim"

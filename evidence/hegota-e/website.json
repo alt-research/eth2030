@@ -1,29 +1,33 @@
 {
-  "source_revision": "d830d0b1c82373cd3b9f6ba135f27703405fe972",
+  "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
+  "production_source_revision": "2aa647a381dbf204aeb07a6c5547f4df1d1b9464",
   "site_build_exit_code": 0,
   "static_export_checks_exit_code": 0,
-  "roadmap_html_sha256": "be0139fd9955537d63ca1dd3a02758a261d5b090d736cd5ee1d800e11a4aa405",
+  "roadmap_html_sha256": "873b4a4c01ea3567dea461a63522040e927ab2881dfa23104957b1f712e1cb55",
   "viewports": [
     {
       "width": 1440,
       "height": 1000,
-      "review": "Two-column Group E card, readable implementation/gate rows and source links."
+      "card_width": 1290.609375,
+      "horizontal_overflow": false,
+      "review": "Two-column Group E card; corrected CL reauthentication and historical verdict boundaries, source links and all activation gates readable."
     },
     {
       "width": 390,
       "height": 844,
       "card_width": 345.609375,
       "horizontal_overflow": false,
-      "review": "Single-column readable Group E card; no clipped content or links."
+      "review": "Single-column card; all updated task text and three links readable without clipping."
     }
   ],
   "browser_console": {
     "errors": 0,
-    "warnings": 1
+    "warnings": 4,
+    "warning_scope": "Next static CSS preload notices; no browser errors."
   },
-  "scope": "Local static build visual/DOM inspection; deployment runs through existing GitHub Pages master workflow after merge.",
+  "scope": "Fresh local build, exported HTML, Playwright DOM and desktop/mobile visual inspection. Existing master-only GitHub Pages workflow deploys after merge.",
   "capture_sha256": {
-    "hegota-e-desktop.png": "3cce24a677228c3f0cb1d44392dffee8c12d9629ca1eaed32ae123eb82a9e99e",
-    "hegota-e-mobile.png": "45e07061917beb757edfa9fe06172131520461da36fa0d4d868760f0eb33537b"
+    "desktop.png": "88af6cb784f4cd3fbe3060e88b92fa2cf0736f2bd96ed1b3d6a815ceaa7da4a2",
+    "mobile.png": "bbd913a0fc6686d1cf36706e52bb961aff4d5735b3af49a6d34c3cc639de21b7"
   }
 }

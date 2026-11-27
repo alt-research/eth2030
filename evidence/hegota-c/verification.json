@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
+  "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -239,9 +239,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "094417df9082676fa1883ae9ec487adf62a4b69ca0c1fc76d4d1d8a69de88028",
+    "log_sha256": "5a71513141ef8a0e09017d3ca833260aeec890cdfae37e025002594937269372",
     "named": {
-      "pass": 24234,
+      "pass": 24237,
       "skip": 124
     },
     "packages": {
@@ -256,7 +256,7 @@
     "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
+    "source_revision": "5b21852b12d60231aea976776350a3f54bf90404",
     "commands": [
       {
         "step": "build",
@@ -266,7 +266,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 21.64
+        "seconds": 23.309
       },
       {
         "step": "native-build",
@@ -274,11 +274,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-final-native",
+          "/tmp/hegota-e-reaudit-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 12.336
+        "seconds": 26.927
       },
       {
         "step": "wrapper-build",
@@ -286,11 +286,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-final-geth",
+          "/tmp/hegota-e-reaudit-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 5.433
+        "seconds": 0.47
       },
       {
         "step": "vet",
@@ -300,7 +300,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 7.533
+        "seconds": 3.492
       },
       {
         "step": "baseline",
@@ -310,7 +310,7 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.609
+        "seconds": 1.548
       },
       {
         "step": "full",
@@ -322,7 +322,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 181.697
+        "seconds": 173.845
       },
       {
         "step": "race",
@@ -360,7 +360,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 192.225
+        "seconds": 196.223
       },
       {
         "step": "python",
@@ -375,7 +375,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 33.791
+        "seconds": 34.525
       },
       {
         "step": "python-optimized",
@@ -391,7 +391,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 33.014
+        "seconds": 33.631
       },
       {
         "step": "site-verify",
@@ -402,7 +402,7 @@
           "--files"
         ],
         "exit_code": 0,
-        "seconds": 0.496
+        "seconds": 0.419
       },
       {
         "step": "site-build",
@@ -412,7 +412,7 @@
           "build"
         ],
         "exit_code": 0,
-        "seconds": 63.903
+        "seconds": 20.32
       },
       {
         "step": "site-export",
@@ -422,13 +422,13 @@
           "scripts/check-export.mjs"
         ],
         "exit_code": 0,
-        "seconds": 0.293
+        "seconds": 0.26
       }
     ],
     "race": {
-      "log_sha256": "dbb63adef540dd8bce3c754b7e70659aaf11bafdd28c94d73e2367b13f6631b1",
+      "log_sha256": "f486f8c4dd3a9923f03edf39ce48a7843e6f3ddaf9bb7864dd4304c3806bc3ce",
       "named": {
-        "pass": 12080,
+        "pass": 12083,
         "skip": 87
       },
       "packages": {

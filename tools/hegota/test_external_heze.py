@@ -76,6 +76,7 @@ class ExternalHezeTests(unittest.TestCase):
         result = external.network_measurements(observations, events, ["0xab"], 0, 1)
         self.assertEqual(result["samples"], 32)
         self.assertEqual(result["producer_directions"], [16, 16])
+        self.assertEqual((result["genesis_time"], result["seconds_per_slot"]), (0, 1))
         self.assertEqual(result["latency_ms"]["p99"], 2)
         self.assertEqual(result["signed_ssz_bytes"], 157)
         self.assertFalse(result["public_network_tail_qualified"])

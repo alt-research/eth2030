@@ -355,6 +355,7 @@ def network_measurements(observations, engine_events, transactions, genesis, dur
     if size > 8192:
         raise ValueError("measurement exceeded the normative IL bound")
     return {"samples": len(latencies), "producer_directions": directions,
+            "genesis_time": genesis, "seconds_per_slot": duration,
             "transaction_occurrences": len(transactions), "transaction_bytes": size,
             "signed_ssz_bytes": 152 + 4 * len(transactions) + size,
             "latency_ms": {"p50": percentile(latencies, .5), "p95": percentile(latencies, .95),

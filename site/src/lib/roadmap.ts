@@ -2,15 +2,15 @@ import officialScope from '@/data/official-glamsterdam.json';
 import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/data/eips';
 
 export const hegotaGroupE = {
-  reviewed: 'November 27, 2026',
-  revision: '70facd01d15e8068cfc9839b3f0e352784765277',
+  reviewed: 'November 28, 2026',
+  revision: '7315f0a6217a46e49ac195c2d695e5df440bbf6b',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
     { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Pinned SSZ/domain, authenticated branch-keyed storage, timely/late/equivocation views and retained requests. Native ingress uses one validated clock and publishes its cache after persistence; CL adapter replacement reauthenticates retained messages. Strict Engine versions/capabilities.' },
     { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Nonce/funding retries and cancellable builds share Frame preconditions before witness handling. Native import checks both gas dimensions, exact RLP capacity and transaction-end state; version-2 verdict migration and authenticated header-only ancestry are tested.' },
     { id: 'HGT-046', title: 'AA-VOPS / Profile 2', status: 'Specification gate', detail: 'Informational EIP-8369 reference predicates are tested. Consensus activation stays disabled pending a Standards Track claims, state-diff, replay and ePBS specification.' },
-    { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Native adapter qualified', detail: 'Authenticated IL ingress reaches Engine verdicts and Heze extension predicates. External beacon Gossipsub/reqresp, fork digests and CL/ePBS devnet qualification remain HGT-070/080 prerequisites.' },
-    { id: 'HGT-048', title: 'Post-quantum IL resources', status: 'Bounded measurements', detail: 'Canonical direct-8504 bytes, real uncached verification and local signed SSZ/BLS/store pipeline. Omitted witness transport and network tail latency remain unqualified; limits are unchanged.' },
+    { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Independent CL control passed', detail: 'Two pinned Lighthouse/native-EL pairs verified signed inclusion and common finality, real VALID/false omission, CL fork choice and restart. Malformed, nonce and actual full-capacity exemptions passed. Exhaustive request protocols and mixed-client release coverage remain HGT-070/080 work.' },
+    { id: 'HGT-048', title: 'Post-quantum IL resources', status: 'Bounded network measurements', detail: 'Real verification and local SSZ/BLS checks are joined by 64 matched signed network samples: 8,183 transaction bytes per IL, within the unchanged 8 KiB limit. Docker-host carriage does not qualify PQ validity/replay, omitted witness transport or public network tails.' },
   ],
 };
 

@@ -1,7 +1,7 @@
 # Group E status
 
 The independently pinned Lighthouse two-pair acceptance passed on November 28.
-Actual signed IL gossip forced a transaction into an isolated proposer pool and
+Actual signed IL gossip forced inclusion by an EL with an isolated pool and
 reached common finality. Both native nodes returned VALID/false for one omitted
 payload; both CLs retained its execution-valid, unsatisfied root, did not extend
 its FULL branch, and retained the decision across a real CL restart. Malformed,

@@ -1,0 +1,159 @@
+{
+  "qualified_source": "68cd1c03905e61fd4be53997017789cf08df55de",
+  "go_start_source": "77375645",
+  "go_files_unchanged_through_qualification": true,
+  "summary": {
+    "full": {
+      "packages": {
+        "pass": 225,
+        "skip": 20
+      },
+      "named": {
+        "pass": 24268,
+        "skip": 124
+      },
+      "log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+      "mandatory_consumers_passed": 40,
+      "mandatory_skipped": 0
+    },
+    "race": {
+      "packages": {
+        "pass": 10
+      },
+      "named": {
+        "pass": 97
+      },
+      "log_sha256": "c520826e1ec9bd96fc91bf37c5dea47086c750d9179577b47019a8d38c0df5f3",
+      "mandatory_consumers_passed": 40,
+      "mandatory_skipped": 0
+    }
+  },
+  "commands": [
+    {
+      "step": "full",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 167.78,
+      "log_sha256": "358e7cd3240015ae6c6bc6d9a07cf5e76b4770091946310b1427cedd8f96bb3e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./cmd/hegota-e-fixture",
+        "./core/block",
+        "./core/chain",
+        "./core/execution",
+        "./core/types",
+        "./engine",
+        "./focil",
+        "./focil/heze",
+        "./node",
+        "./node/backend",
+        "-run",
+        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEPostSystemCannotChangeFrameOmissionVerdict|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 36.095,
+      "log_sha256": "c520826e1ec9bd96fc91bf37c5dea47086c750d9179577b47019a8d38c0df5f3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/hegota",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "seconds": 35.962,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "baace4b6d2ad9c615d3b37d504a78b88f307b96605db0d91dd47eef5b94c0e2a"
+    },
+    {
+      "step": "optimized-python",
+      "command": [
+        "python3",
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/hegota",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "seconds": 35.725,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "25540e29f3c8a7efd2e6f2d1ca6d64ac7f261bead3d6bad37a2dab88a617ea16"
+    },
+    {
+      "step": "devnet-tools",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "pkg/devnet/kurtosis/scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 1,
+      "seconds": 2.619,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "b184ab8ff9941e0532414c4018fbbaaa1f2e8c79d96a045cb0405beec7e6ff76"
+    },
+    {
+      "step": "devnet-tools-python314",
+      "command": [
+        "uv",
+        "run",
+        "--no-project",
+        "--python",
+        "3.14",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "pkg/devnet/kurtosis/scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "python_version": "3.14.7",
+      "exit_code": 0,
+      "tests_passed": 70,
+      "stderr_sha256": "71382684f6e7bfecba82b4b0f6b1a03fdfb9d027045d0a91993abf5186a2124c"
+    }
+  ],
+  "python_tests": {
+    "normal": 118,
+    "optimized": 118
+  },
+  "superseded_environment_failure": {
+    "python": "3.9",
+    "suite": "devnet scripts",
+    "tests": 70,
+    "errors": 4,
+    "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
+  },
+  "external_network_status": "pending; actual hosted results required"
+}

@@ -17,7 +17,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 39 mandatory native consumers. Profile 1 checks
+The current 36-criterion register names 40 mandatory native consumers, including the executable external-network fixture. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.
@@ -208,3 +208,19 @@ identified as that source's results; they are not relabeled as newly executed.
 The website already displays the accurate implementation/gate split and needs
 no further progress change. Full public Group E activation is still not complete.
 New publication-head CI outcomes are recorded separately in the English PR.
+
+## Remaining-delivery local qualification
+
+The current 40 required consumers passed without skips in a fresh 245-package
+full run (24,268 named passes, 124 optional skips) and a ten-package selected
+race run (97 named passes, zero skips). Full builds and fixture vet passed.
+The 118 Hegota tooling tests pass in both normal and optimized modes. All
+70 devnet-script tests pass with task-local Python 3.14.7. An initial run under
+the host's Python 3.9 failed four unrelated modern-runtime checks; that failure
+and the complete modern-interpreter rerun are retained. No assertion was
+weakened. See [EXTERNAL_LOCAL_QUALIFICATION.json](EXTERNAL_LOCAL_QUALIFICATION.json).
+
+The previous 36 compiled removals retain their original run identities. Every
+production and consumer hash used by them was rechecked unchanged. They are
+not represented as newly executed controls for the added proxy or fixture.
+Actual external Heze network acceptance remains pending the hosted build/run.

@@ -35,6 +35,7 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E43.4': ['github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse']},
  'HGT-044': {'E44.1': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1AuthenticatedAccountsWithoutExecution'],
              'E44.2': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources',
+                       'github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound',
                        'github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems',
                        'github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission',
                        'github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict',

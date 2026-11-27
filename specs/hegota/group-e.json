@@ -485,7 +485,8 @@
             "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems",
             "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
             "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict",
-            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas",
+            "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound"
           ]
         },
         {
@@ -872,6 +873,15 @@
     "tools/hegota/e_negative_controls.py",
     "docs/reviews/pr-172/REAUDIT.md",
     "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md",
-    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md"
+    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md",
+    "pkg/cmd/hegota-e-fixture/main.go",
+    "tools/hegota/engine_fault_proxy.py",
+    "tools/hegota/run_external_heze.py",
+    "tools/hegota/test_engine_fault_proxy.py",
+    "tools/hegota/test_external_heze.py",
+    "tools/hegota/Dockerfile.interop",
+    ".github/workflows/hegota-e-interop.yml",
+    "docs/reviews/pr-172/EXTERNAL_HEZE.md",
+    "pkg/devnet/kurtosis/scripts/verify-heze-focil.py"
   ]
 }

@@ -80,3 +80,11 @@ legacy helper retirement, Profile 2 activation prerequisites, and PQ/external
 CL boundaries. The informational AA-VOPS reference helper is never a production
 eligibility decision. The website retains those gates separately from historical
 Glamsterdam completion.
+
+`python3 tools/hegota/e_negative_controls.py --output /tmp/hegota-e-controls`
+executes twelve isolated compiled semantic removals. It writes overlays and
+Go JSON logs only to that explicit output directory; production files and tests
+remain unchanged. Each intended native consumer must fail, with no build failure.
+These controls cover BLS, timing, retry closure, byte limits, signature budgets,
+omission verdicts, retained cache, PQ/blob wrappers, base-7805 blob validity,
+failed-ID recovery and invalid proof tolerance.

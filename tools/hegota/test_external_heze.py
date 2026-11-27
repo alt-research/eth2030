@@ -1,7 +1,10 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("external_heze", Path(__file__).with_name("run_external_heze.py"))
 external = importlib.util.module_from_spec(spec)
@@ -9,6 +12,20 @@ spec.loader.exec_module(external)
 
 
 class ExternalHezeTests(unittest.TestCase):
+    def test_peer_diagnostics_survive_one_unavailable_service(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            with patch.object(external.base, "run", side_effect=[
+                    subprocess.TimeoutExpired("kurtosis", 20), "actual CL fork-choice diagnostic"]) as run:
+                errors = external.retain_service_logs("owned", ["el-1", "cl-1"], output)
+            self.assertEqual(list(errors), ["cl-1"])
+            self.assertIn("TimeoutExpired", errors["cl-1"])
+            self.assertEqual((output / "el-1.log").read_text(), "actual CL fork-choice diagnostic\n")
+            self.assertEqual(run.call_count, 2)
+            for call in run.call_args_list:
+                self.assertEqual(call.args[:5], ("kurtosis", "service", "logs", "--all", "owned"))
+                self.assertEqual(call.kwargs["timeout"], 20)
+
     def test_private_profile_preserves_node_defaults_and_engine_authentication(self):
         profile = external.private_profile()
         self.assertEqual(profile.count('"--rpc.allow-insecure"'), 2)

@@ -64,6 +64,19 @@ def journals(ids):
              "cat", "/tmp/hegota-e-engine.jsonl").splitlines()] for identifier in ids]
 
 
+def retain_service_logs(enclave, services, output):
+    """Keep actual peer diagnostics before cleanup, without masking acceptance."""
+    errors = {}
+    for name in sorted(services):
+        try:
+            text = base.run("kurtosis", "service", "logs", "--all", enclave, name,
+                            timeout=20, stderr=subprocess.STDOUT)
+            (output / (name + ".log")).write_text(text + "\n")
+        except (OSError, subprocess.SubprocessError) as error:
+            errors[name] = type(error).__name__ + ": " + str(error)
+    return errors
+
+
 def nodes(value):
     if isinstance(value, dict):
         if "root" in value and "execution_status" in value:
@@ -440,6 +453,7 @@ def main():
         raise
     finally:
         try:
+            evidence["service_log_errors"] = retain_service_logs(enclave, evidence.get("nodes", {}), output)
             if "enclave_id" in evidence:
                 for i, records in enumerate(journals(containers(enclave))):
                     (output / f"engine-{i}.json").write_text(json.dumps(records) + "\n")

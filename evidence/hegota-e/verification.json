@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+  "source_revision": "e95789566c0018cc440305c731fb652f0599bccb",
   "tasks": 9,
   "criteria": 36,
   "selected_profile_consumers_passed": true,
@@ -10,18 +10,18 @@
     "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
     "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
     "8504 omitted-IL witness transport and validity composition remain unspecified",
-    "External Heze CL gossipsub/reqresp/fork-digest and ePBS devnet qualification belongs to HGT-070/080; no public activation claimed"
+    "Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed"
   ],
   "artifacts": {
     ".github/workflows/ci.yml": "987e54770440a79d932ad31f1b28ab5d434e09c0a57743b7464830eb81609582",
     ".github/workflows/hegota-e-interop.yml": "06c07719f275b4011f5b66f86eb63e6efbde64c1ec5e1bb3fe3a54cbc5aca490",
     "docs/plans/hegota-e/COMPOSITION.md": "0645158b92b7ecf754d20ed538a59300ea8fb58edf0355e6ac731c5c55f44b34",
-    "docs/plans/hegota-e/PLAN.md": "dbd7640af41a89cb0bd52f30534180737f9f208fe637ca2d2724c809aafaa564",
-    "docs/reviews/pr-172/EXTERNAL_HEZE.md": "7e9cb67d30ea8d601f55d3c19fe814e0543fc1d01627cf597bba0f74fc12fce6",
+    "docs/plans/hegota-e/PLAN.md": "41b2e5cdddead4073f19d28ffbd0be2431d85b3fae75a15fadbf4ac8182af951",
+    "docs/reviews/pr-172/EXTERNAL_HEZE.md": "c86ef16498f6dd58f35a89066b7f17e643c7a5a36e1936fd33a2d7f580848942",
     "docs/reviews/pr-172/REAUDIT.md": "4ad4ed0608b63f1703658a47cea906417998d340f1e155d9ea5b8e564637b261",
     "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "9385a04cb501fbd92c8b581f87dcc8479a43c7b73c5d2ed84e5f5db93ae7df3f",
     "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "3b34a2e336afcb284c9c52a4db6eda314eceed1256c4f03c0a295cacdd4528cc",
-    "evidence/hegota-e/external-network.json": "de76b191520e2b4c577d02b9abdf7f2974eeb0d1f4bb7dab26c71c5f13195110",
+    "evidence/hegota-e/external-network.json": "5ae9e6dbd84f345b6a5bd830ea302d58ea962beb688b8d869631fe34e6b7824b",
     "evidence/hegota-e/source-review.json": "80838c3af2f74282be8fba49c5323f4e2b681ae772f229134f10a7950be774bc",
     "pkg/cmd/hegota-e-fixture/main.go": "17e9d4a4a04f8f094132bd3923245bd9e349f30ed20c5811ff0b64fc68d2af0d",
     "pkg/cmd/hegota-e-fixture/main_test.go": "c162a364679649641b7c0d9bbc544904b3c3280a6e6f8ab0b1202b110d96a3e5",
@@ -95,12 +95,12 @@
     "site/scripts/check-export.mjs": "bf78c8fed5afae278f0aa20a2abe7cf4043ee8d60902e5796f374c1f90fbc1b2",
     "site/src/app/roadmap/page.tsx": "c6c335c2d85347d85b8fe591c83fb1bff366d4e90414f577319905fc20e10063",
     "site/src/components/DevelopmentProgress.tsx": "d8cf933fefd0d71f7b8651d1d47dfe9958e64c4edf5ccc191e4a7b8902527724",
-    "site/src/components/HegotaProgress.tsx": "1526d092b46face168421c57aa3e8b17003bb902311bce79525d4d4556699375",
+    "site/src/components/HegotaProgress.tsx": "440f6ab77beb617857742a6d48afb01f2bf9e9e3a89d14a141e11ddf9a4f83b5",
     "site/src/components/RoadmapTimeline.tsx": "2d100423c9b07be21f30c24c31605c03b90714989cd285d48eef614da1df373c",
     "site/src/data/eips.ts": "758b15147be01ef6db3519dcd3c08933e8a7d99395f10463f3bd7b3005bed724",
-    "site/src/lib/data.ts": "2500ca31217ffa3f4a4678f251630ed30305885085c58bf083d6d0811c8c9937",
-    "site/src/lib/roadmap.ts": "8524bd913a3862eba7e38bbafef1764848cf4f2b5a9547f9048a9a75b34af93a",
-    "specs/hegota/group-e.json": "b54dfc8884afdd2858123ff7a3fadf528f0d36a96d9a9762336d8d27033fbaed",
+    "site/src/lib/data.ts": "4b813f4201c7cf3db2f8ac4e16cfd78e585d66eb2f47d7fc45cf74e286489646",
+    "site/src/lib/roadmap.ts": "e928d920509db0a09296f2b462a27c76fc083e2de390dbdeb3e21d137d965104",
+    "specs/hegota/group-e.json": "910d5a89a2d5d159bb0c44ac7ef7c33b88676995f4d42dd94e6832a8d7374db0",
     "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
     "specs/hegota/upstream/2026-11-27/group-d/eip-8504.md": "c2e898c21ecc94342e4fbe3490591c01027b91852dabfc1cbaf0c50ae02d976b",
     "specs/hegota/upstream/2026-11-27/group-e/eip-7805.md": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
@@ -116,16 +116,16 @@
     "specs/hegota/upstream/2026-11-27/group-e/heze/p2p-interface.md": "4e5d6b58b352abbbdf992174ea5cb71bc03c9d9a2ab0df16957dbef66cc75da1",
     "specs/hegota/upstream/2026-11-27/group-e/heze/validator.md": "d9a04de954a0082d6e8825638c79f69ebfdaa1632133a79363c7e4a4448fe5d7",
     "tools/hegota/Dockerfile.interop": "de7bed5bbf8d8584388e00c8456eb37483e0b3b585e34e41de446b3d851eb161",
-    "tools/hegota/check_e.py": "1ae2c1b583fd054b78e9aadcbb461290386ce08c728696c2d65122c2876d3f0e",
+    "tools/hegota/check_e.py": "42d281770d59fa99d786a0b825aeb6565a6276edb4f1d5869971edee149f312b",
     "tools/hegota/e_negative_controls.py": "30632dc82e24569ccd99044ac072d2751a75b580bb598cd8651fe906dfff80b8",
     "tools/hegota/engine_fault_proxy.py": "428f816416a4737986261a4169e4de5f5806e3d84b704de914c61b58d56b0d2d",
     "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
-    "tools/hegota/run_external_heze.py": "33433aaa4591fa7b06aea1c43b169a9cdd86a21175799913cc46eb0edb650ba3",
+    "tools/hegota/run_external_heze.py": "cba252a8c35a6f82dd381b4518235b64449540e7c6fa8acee0a812d7cd72f7ee",
     "tools/hegota/test_engine_fault_proxy.py": "64bc604d248cdec63d1fbc3c875059e2c21a70ea5bc0e1ffaba0ce0c42101ae0",
-    "tools/hegota/test_external_heze.py": "b608587c6d25211ac5c31151484cbcc63223ed144d010382d4a7bdea3ac410ab",
+    "tools/hegota/test_external_heze.py": "a8a15c159d4cdbf948faf1833ac046f6a38ef0ca35fd5bd5b6489c225e42d33e",
     "tools/hegota/test_group_e.py": "978aa3b0d2a63dc8db1d526daa54bd92b362b25c6617acd8e124101c90f3786b"
   },
-  "source_fingerprint_sha256": "09908de78a0fa676e1fbd26dd815ba745d702b0f62a62ec3c00f381b80860cd2",
+  "source_fingerprint_sha256": "b6be25147775e0396b331d51efc1d9cddfa50578011d307eb22ba2d4db1dcf44",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound": "pass",
     "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse": "pass",
@@ -994,7 +994,7 @@
   },
   "website": {
     "path": "evidence/hegota-e/website.json",
-    "sha256": "a6f2c2efb0f66979849a5afad37260344a0c45070e52acfde1de21e4896ade2d"
+    "sha256": "649111ac4ba9294a19ab50299d4d853e5439333bd76d33ca9e5052a98d8e78a7"
   },
   "reproduced_failures": [
     {
@@ -1043,9 +1043,10 @@
     "scope": "Original compiled semantic controls retained only for unchanged production/consumer bytes; fresh full/race suites cover the expanded fixture."
   },
   "external_network": {
-    "status": "pending",
+    "status": "qualified-selected-profile",
     "record": "evidence/hegota-e/external-network.json",
-    "sha256": "de76b191520e2b4c577d02b9abdf7f2974eeb0d1f4bb7dab26c71c5f13195110",
+    "sha256": "5ae9e6dbd84f345b6a5bd830ea302d58ea962beb688b8d869631fe34e6b7824b",
+    "qualified_source_head": "1bb691b46e388c519049915ce30fd712acdb5a01",
     "public_complete": false
   },
   "additional_qualification": {
@@ -1257,11 +1258,11 @@
       "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
     },
     "latest_tool_qualification": {
-      "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+      "source_revision": "e95789566c0018cc440305c731fb652f0599bccb",
       "normal": 120,
       "optimized": 120,
-      "normal_log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
-      "optimized_log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e",
+      "normal_log_sha256": "6c11fb6d73e9c841f1cf3dca702da5f8f3d7c765d5335d3a56b377f41d34e30d",
+      "optimized_log_sha256": "697877a52eac046e0f3071e35d6396f127ac5633a9e5a3cab79e69c336cb830a",
       "go_source_unchanged_since": "cdcad2a1921537d788454906bd81c4de4124f119",
       "scope": "Fresh tool tests cover bounded service-log retention before owned cleanup; the prior full/race/build/vet/baseline byte-equivalent Go qualification is preserved."
     }

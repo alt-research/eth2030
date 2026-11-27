@@ -254,3 +254,13 @@ above; no network success is inferred from the diagnostic change.
 The successful selected-profile run supersedes the earlier pending-network
 notes as a network result, while preserving their original local/run identities.
 The private RPC startup failure remains recorded as a failed attempt.
+
+The selected remaining-delivery checklist is complete. Fresh 120-case tooling
+checks passed in both interpreter modes after the final clock/gate changes.
+The site build/export, 149-entry tracker check and desktop/mobile visual review
+passed, with no horizontal overflow or browser errors. All A–E source checks
+pass. Native Go source is byte-identical to the preserved 245-package full and
+77-package runtime-race qualification. Final publication-head CI and English
+review evidence are tracked in PR #172, independently of the first qualified
+network source recorded above. Unspecified consensus rules remain explicit
+release prerequisites rather than completed public activation.

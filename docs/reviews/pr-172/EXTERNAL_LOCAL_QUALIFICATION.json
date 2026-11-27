@@ -156,7 +156,7 @@
     "errors": 4,
     "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
   },
-  "external_network_status": "pending; actual hosted results required",
+  "external_network_status": "qualified-selected-profile at 1bb691b46e388c519049915ce30fd712acdb5a01; final publication-head results are tracked separately",
   "broad_runtime_race": {
     "packages": {
       "pass": 74,
@@ -271,12 +271,13 @@
     }
   ],
   "latest_tool_qualification": {
-    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+    "source_revision": "e95789566c0018cc440305c731fb652f0599bccb",
     "normal": 120,
     "optimized": 120,
-    "normal_log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
-    "optimized_log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e",
+    "normal_log_sha256": "6c11fb6d73e9c841f1cf3dca702da5f8f3d7c765d5335d3a56b377f41d34e30d",
+    "optimized_log_sha256": "697877a52eac046e0f3071e35d6396f127ac5633a9e5a3cab79e69c336cb830a",
     "go_source_unchanged_since": "cdcad2a1921537d788454906bd81c4de4124f119",
     "scope": "Fresh tool tests cover bounded service-log retention before owned cleanup; the prior full/race/build/vet/baseline byte-equivalent Go qualification is preserved."
-  }
+  },
+  "external_network_record": "evidence/hegota-e/external-network.json"
 }

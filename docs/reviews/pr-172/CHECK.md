@@ -54,7 +54,7 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Independent completion pass — November 27, 2026
 
-- [ ] Recheck upstream heads, source content and discussion updates against the published head.
-- [ ] Review all nine tasks across authenticated store/requests, wire, builds, omission evaluation and fork choice.
-- [ ] Reproduce any new defined-rule gaps before fixing; retain existing expected oracles and explicit specification gates.
-- [ ] Run proportionate source/native/build checks, update scoped status and publish owned changes with English PR evidence.
+- [x] Recheck upstream heads, source content and discussion updates against the published head.
+- [x] Review all nine tasks across authenticated store/requests, wire, builds, omission evaluation and fork choice.
+- [x] Reproduce any new defined-rule gaps before fixing; retain existing expected oracles and explicit specification gates.
+- [x] Run proportionate source/native/build checks, update scoped status and publish owned changes with English PR evidence.

@@ -1,0 +1,125 @@
+{
+  "checked_at_utc": "2026-11-27T15:07:16.825701+00:00",
+  "published_source": "9b4884be05f34ef09c6407166ce668974bc2e277",
+  "qualified_snapshot": "3f27dcef2a484d93144ff68714aca45192c370b9",
+  "production_and_existing_qualification_unchanged": true,
+  "unchanged_scope": [
+    "pkg",
+    "tools",
+    "specs",
+    "evidence",
+    "site",
+    ".github",
+    "refs",
+    "formal"
+  ],
+  "upstream_heads": {
+    "eips": "68db81b0a75edb0e16d8f181241f994875eba52d",
+    "consensus_specs": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "execution_apis": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d"
+  },
+  "tasks": 9,
+  "criteria": 36,
+  "new_functional_gaps_found": [],
+  "commands": [
+    {
+      "mode": "native",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./core/block",
+        "./core/chain",
+        "./core/execution",
+        "./core/types",
+        "./engine",
+        "./focil",
+        "./focil/heze",
+        "./node",
+        "./node/backend",
+        "-run",
+        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEPostSystemCannotChangeFrameOmissionVerdict|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "required": 39,
+      "required_passed": 39,
+      "missing": [],
+      "failures_or_required_skips": [],
+      "seconds": 30.155
+    },
+    {
+      "mode": "race",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-race",
+        "./core/block",
+        "./core/chain",
+        "./core/execution",
+        "./core/types",
+        "./engine",
+        "./focil",
+        "./focil/heze",
+        "./node",
+        "./node/backend",
+        "-run",
+        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEPostSystemCannotChangeFrameOmissionVerdict|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "required": 39,
+      "required_passed": 39,
+      "missing": [],
+      "failures_or_required_skips": [],
+      "seconds": 37.639
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 18.55
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 3.764
+    }
+  ],
+  "source_checks": {
+    "A": "pass",
+    "B": "pass",
+    "C": "pass",
+    "D": "pass",
+    "E": "pass"
+  },
+  "logs": {
+    "native": {
+      "sha256": "8564eb66e7f2bbfcfcf921f188cf9edf3567e1db234e19c905b5b4061864473a",
+      "required_passed": 39,
+      "required_failed": 0,
+      "required_skipped": 0
+    },
+    "race": {
+      "sha256": "bd1791f9d5f422d8779fed95978c2dacc67566df219e9e3d0556acb79f6420f3",
+      "required_passed": 39,
+      "required_failed": 0,
+      "required_skipped": 0
+    }
+  },
+  "public_complete": false,
+  "public_gates": [
+    "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
+    "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
+    "8504 omitted-IL witness transport and validity composition remain unspecified",
+    "External Heze CL gossipsub/reqresp/fork-digest and ePBS devnet qualification belongs to HGT-070/080; no public activation claimed"
+  ]
+}

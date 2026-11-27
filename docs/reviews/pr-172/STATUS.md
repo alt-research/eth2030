@@ -166,3 +166,38 @@ is updated; Pages deploys after merge through the existing master workflow.
 Read-only refs and independent expected oracles are unchanged. Publication and
 hosted results belong to the current English PR record, with no earlier head's
 CI results counted as qualification for this source.
+
+## Independent completion pass on published head 9b4884be
+
+The latest EIPs, consensus-specs and execution-apis heads still match all pinned
+Group E sources. The 7805 discussion remains at 17 posts (last November 21),
+and 8369 at four (last September 9). EIPs PR #12110 remains merged, while
+optional direct-proof PR #12672 remains open at the selected revision. No new
+binding rule or omitted-witness composition has been published.
+
+| Task | Independent review outcome |
+|---|---|
+| HGT-040 | Source precedence, fork selection and execution/satisfaction separation remain correct. |
+| HGT-041 | SSZ, BLS context, exact bytes, first-arrival timing, equivocation, committee-position requests and retention reviewed. |
+| HGT-042 | Required Bogota fields, malformed transaction tolerance, capabilities, fork versions and Boolean/null responses reviewed. |
+| HGT-043 | Sender-indexed and dynamic retries, trial rollback, immutable builds, cancellation, dimensional reservations and exact RLP reviewed. |
+| HGT-044 | Account-only Profile 1 agrees with selected ordinary validity; non-Profile-1 full-state paths and transaction-end boundaries remain distinct. |
+| HGT-045 | Actual native builds/imports, accepted views, branch/restart/finality decisions and version-2 migration reviewed. |
+| HGT-046 | Defined reference predicates remain implemented; enforcing Profile 2 is still blocked by the upstream Standards Track extension. |
+| HGT-047 | Local authenticated ingress and CL decision predicates reviewed; external beacon transport/CL/ePBS acceptance remains HGT-070/080. |
+| HGT-048 | Real direct-8504 byte/verification evidence remains bounded; omitted witness composition and network tail latency remain unqualified. |
+
+No additional defined-rule functional gap was found in this pass. All 39 mandatory
+E consumers were freshly executed in normal and race modes: 39/39 passed in each,
+zero failures and zero required skips. Fresh `go build ./...`, `go vet ./...` and
+all A-E source/hash checks passed. Commands, exact log identities and source
+equivalence are recorded in [INDEPENDENT_QUALIFICATION.json](INDEPENDENT_QUALIFICATION.json).
+
+This pass changes only scoped audit records. Production code, tests, reference
+pins, independent oracles, qualification tools and website files are byte-identical
+to published head `9b4884be`. Its 244-package full/76-package runtime-race
+qualification, 36 compiled controls and 16 successful hosted checks remain
+identified as that source's results; they are not relabeled as newly executed.
+The website already displays the accurate implementation/gate split and needs
+no further progress change. Full public Group E activation is still not complete.
+New publication-head CI outcomes are recorded separately in the English PR.

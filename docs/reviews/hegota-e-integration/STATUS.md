@@ -1,6 +1,6 @@
 # Group E status
 
-Production source: `f328d938`, based directly on merged PR #171/master
+Production source: `63d673ed216d08058c56404ee1daa06c19ad1d73`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 
@@ -35,3 +35,5 @@ one-second native commit-barrier timeout. A separate full run passed without
 changing that test. Header-copy vet findings were fixed before final reruns.
 
 Final path audit also added authenticated pooled-witness retrieval for canonical PQ IL builds; a native RPC/Engine regression detects its removal.
+
+Restart restores only the still-required retention window, rejecting future cached lists and requiring authenticated state for retained lists; long shutdowns no longer require obsolete beacon state.

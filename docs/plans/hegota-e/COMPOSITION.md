@@ -40,8 +40,8 @@ timeliness; the exact deadline is strictly before 7500 basis points. Late lists
 remain available for honest builders and equivocation detection. Two conflicting
 messages exclude the member from both views. Request indices are committee
 positions; repeated committee members are deduplicated in responses. Retention
-keeps slot N through N+MIN_REQUEST_SLOTS+1 inclusive. Reopened stores reverify
-signatures and ancestry; failure to obtain authenticated state blocks use.
+keeps slot N through N+MIN_REQUEST_SLOTS+1 inclusive. Reopened stores first discard expired entries and reject future cache entries,
+then reverify retained signatures and ancestry; failure to obtain authenticated state blocks use.
 
 The official Engine calls carry the caller's immutable list view. There is no
 new bare-IL update method: new attributes create a replacement payload ID,

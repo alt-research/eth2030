@@ -132,29 +132,39 @@ func (s *Store) Import(il SignedInclusionList, view ConsensusView) error {
 // member, key, branch, domain or signature check is optional. Failed validation
 // never consumes the two-message allowance or changes an attester's view.
 func (s *Store) Gossip(raw []byte, view ConsensusView) error {
+	_, err := s.GossipWithClock(raw, view)
+	return err
+}
+
+// GossipWithClock returns the exact validated arrival clock so native adapters
+// can prune/commit without another fallible clock lookup after store mutation.
+func (s *Store) GossipWithClock(raw []byte, view ConsensusView) (Clock, error) {
 	var il SignedInclusionList
 	if err := il.UnmarshalSSZ(raw); err != nil {
-		return &ValidationError{Reject, err.Error()}
+		return Clock{}, &ValidationError{Reject, err.Error()}
 	}
 	if s.gossipCount(il.Message) >= 2 {
-		return &ValidationError{Ignore, "already seen two valid inclusion lists"}
+		return Clock{}, &ValidationError{Ignore, "already seen two valid inclusion lists"}
 	}
 	clock, err := checkedClock(view)
 	if err != nil {
-		return err
+		return Clock{}, err
 	}
 	if il.Message.Slot != clock.Slot {
-		return &ValidationError{Ignore, "IL not for current slot"}
+		return Clock{}, &ValidationError{Ignore, "IL not for current slot"}
 	}
 	total := 0
 	for _, tx := range il.Message.Transactions {
 		total += len(tx)
 	}
 	if total == 0 {
-		return &ValidationError{Ignore, "empty IL"}
+		return Clock{}, &ValidationError{Ignore, "empty IL"}
 	}
 	if _, err := authenticate(il, view); err != nil {
-		return err
+		return Clock{}, err
 	}
-	return s.process(il, timely(clock, il.Message.Slot), true)
+	if err := s.process(il, timely(clock, il.Message.Slot), true); err != nil {
+		return Clock{}, err
+	}
+	return clock, nil
 }

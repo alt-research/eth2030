@@ -388,11 +388,15 @@ func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *
 			}
 		}
 		if tx.HasDependencies8504() {
+			preconditionErr := execution.ValidateFramePreconditions8141(b.config, statedb, header, tx.Inner().(*types.FrameTx8141), gp)
+			if err := state.ReadError(statedb); err != nil {
+				return nil, nil, err
+			}
+			if preconditionErr != nil {
+				queue.block(candidate)
+				continue
+			}
 			if candidate.inclusion && len(tx.DependencyWitnesses8504()) == 0 {
-				frame := tx.Inner().(*types.FrameTx8141)
-				if frame.ValidateWithExtensions(b.config.FrameExtensions(header.Time)) != nil {
-					continue
-				}
 				return nil, nil, fmt.Errorf("IL dependency witness unavailable; omitted EIP-8504 witness composition is unspecified")
 			}
 			if err := frameproof.VerifyTransaction(tx, b.config.FrameExtensions(header.Time), false); err != nil {
@@ -450,15 +454,11 @@ func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *
 			*gp = gpBefore
 			continue
 		}
-		nextGas := used
-		if (glamActive || balActive) && receipt.BlockGasUsed > 0 {
-			nextGas = receipt.BlockGasUsed
-		}
 		nextBlob := blobGasUsed
 		if cancunActive {
 			nextBlob += tx.BlobGas()
 		}
-		fitsBytes, sizeErr := byteBudget.append(txs, tx, gasUsed+nextGas, nextBlob)
+		fitsBytes, sizeErr := byteBudget.appendWithPools(txs, tx, gp, header.GasLimit, nextBlob)
 		if sizeErr != nil {
 			return nil, nil, sizeErr
 		}

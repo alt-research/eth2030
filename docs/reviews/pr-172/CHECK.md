@@ -44,9 +44,9 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Pre-execution validity and complete-consumer audit — November 27, 2026
 
-- [ ] Reconfirm all current normative sources/discussions and the nine-task register.
-- [ ] Audit pre-execution Frame nonce, aggregate fee and gas checks before unavailable-witness handling, including build/import agreement.
-- [ ] Review all remaining Heze wire/store/request, Engine, builder, omission and CL decision boundaries for missing defined rules.
-- [ ] Reproduce confirmed gaps before correction; share existing execution rules and add positive/negative native consumers.
+- [x] Reconfirm all current normative sources/discussions and the nine-task register.
+- [x] Audit pre-execution Frame nonce, aggregate fee and gas checks before unavailable-witness handling, including build/import agreement.
+- [x] Review all remaining Heze wire/store/request, Engine, builder, omission and CL decision boundaries for missing defined rules.
+- [x] Reproduce confirmed gaps before correction; share existing execution rules and add positive/negative native consumers.
 - [ ] Refresh source-bound A–E evidence and website progress, preserving expected oracles and read-only refs.
 - [ ] Complete local build/vet/full/race/control/website qualification, commit/push and verify exact-head hosted results in the English PR.

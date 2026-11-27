@@ -25,7 +25,32 @@ type Store struct {
 	entries map[Key]map[uint64]*member
 }
 
-func NewStore() *Store        { return &Store{entries: make(map[Key]map[uint64]*member)} }
+func NewStore() *Store { return &Store{entries: make(map[Key]map[uint64]*member)} }
+
+// Clone owns every retained byte slice and equivocation message. A native
+// adapter can validate and persist a tentative update before publishing it.
+func (s *Store) Clone() *Store {
+	out := NewStore()
+	if s == nil {
+		return out
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for key, members := range s.entries {
+		copied := make(map[uint64]*member, len(members))
+		for index, entry := range members {
+			var second *SignedInclusionList
+			if entry.Second != nil {
+				v := entry.Second.Clone()
+				second = &v
+			}
+			copied[index] = &member{First: entry.First.Clone(), Second: second, Timely: entry.Timely, GossipCount: entry.GossipCount}
+		}
+		out.entries[key] = copied
+	}
+	return out
+}
+
 func key(m InclusionList) Key { return Key{m.Slot, m.DependentRoot} }
 func equal(a, b InclusionList) bool {
 	if a.Slot != b.Slot || a.DependentRoot != b.DependentRoot || a.ValidatorIndex != b.ValidatorIndex || len(a.Transactions) != len(b.Transactions) {

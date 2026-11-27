@@ -4,6 +4,7 @@ import (
 	"github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
+	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/types"
 )
 
@@ -92,4 +93,13 @@ func (b *builderRLPBudget) append(txs []*types.Transaction, tx *types.Transactio
 	b.calldataUsed = calldata
 	b.witnesses = witnesses
 	return true, nil
+}
+
+// appendWithPools projects the same gas_used integer as final block accounting,
+// including state-dominated prefixes and refunds. Failed appends commit nothing.
+func (b *builderRLPBudget) appendWithPools(txs []*types.Transaction, tx *types.Transaction, gp *gaspool.GasPool, gasLimit, blobGas uint64) (bool, error) {
+	if b == nil {
+		return true, nil
+	}
+	return b.append(txs, tx, gp.BlockGasUsed(gasLimit), blobGas)
 }

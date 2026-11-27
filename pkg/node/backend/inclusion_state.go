@@ -6,6 +6,7 @@ import (
 	"github.com/eth2030/eth2030/bal"
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/core/vm"
@@ -131,4 +132,30 @@ func (e *inclusionEndState) readError(db state.StateDB) error {
 		return err
 	}
 	return e.ancestryErr
+}
+
+func (e *inclusionEndState) frameGasPool() (*gaspool.GasPool, error) {
+	receipts := e.bc.GetReceipts(e.block.Hash())
+	if e.replayed {
+		receipts = e.receipts
+	}
+	preRefund := e.bc.Config().IsGlamsterdan(e.block.Time()) || e.bc.Config().IsAmsterdam(e.block.Time())
+	replay := len(receipts) != len(e.block.Transactions())
+	for _, receipt := range receipts {
+		if receipt == nil || (preRefund || receipt.FrameResults8141 != nil) && receipt.BlockGasUsed == 0 {
+			replay = true
+		}
+	}
+	if replay {
+		if err := e.replay(); err != nil {
+			return nil, err
+		}
+		receipts = e.receipts
+	}
+	executionUsed, stateUsed := types.BlockGasDimensions(receipts, preRefund)
+	pool := new(gaspool.GasPool).AddGas(e.block.GasLimit())
+	if err := pool.ReserveFrame(executionUsed, stateUsed); err != nil {
+		return nil, err
+	}
+	return pool, nil
 }

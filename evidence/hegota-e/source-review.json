@@ -89,5 +89,27 @@
         "blob": "60fab81fff8126a0e0f019a3fa7439fdfafe9471"
       }
     ]
+  },
+  "runtime_boundary_audit": {
+    "starts_from": "15262949d2b4dbf0f41bf4919dd0a2d0d5550c7c",
+    "checked_at_utc": "2026-11-27T11:26:36.063233+00:00",
+    "record": "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md",
+    "current_heads_unchanged": true,
+    "current_8037_source": {
+      "path": "specs/hegota/upstream/2026-11-27/eip-8037.md",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+      "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc",
+      "read_only_local_ref_differs": true,
+      "scope": "Reuse existing current C/D snapshot; dual-dimension rules unchanged; local reference collision/system-call/rationale clarifications differ."
+    },
+    "discussion_records_unchanged": true,
+    "proof_12672_head_unchanged": true,
+    "fixed_boundaries": [
+      "Shared nonmutating pre-frame nonce/fee/gas checks before unknown witness handling",
+      "Ordinary state usage and Amsterdam gross execution in native capacity",
+      "Both gas pools in complete RLP header projection",
+      "Version-2 retained/compact verdict migration",
+      "Native cache publication and pruning after persistence; one validated clock"
+    ]
   }
 }

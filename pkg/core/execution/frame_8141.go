@@ -8,7 +8,6 @@ import (
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/frameproof"
-	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -127,57 +126,12 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	profile *types.FrameTx8250Delta, prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
 	tx := transaction.Inner().(*types.FrameTx8141)
-	if err := validateFrameContext8141(config, header, tx, profile != nil); err != nil {
-		return nil, 0, err
-	}
-	// Explicit research callers pass a profile; public callers use the schema
-	// already checked against this exact block context above.
-	if profile == nil {
-		profile = tx.NonceProfile8250()
-	}
-
-	var legacyNonce uint64
-	var budget types.FrameGasBudget
-	if profile == nil {
-		if err := tx.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
-			return nil, 0, err
-		}
-		legacyNonce = db.GetNonce(tx.Sender)
-		if legacyNonce != tx.Nonce {
-			return nil, 0, errors.New("EIP-8141 nonce mismatch")
-		}
-		budget, err = tx.GasBudget()
-	} else {
-		if err := profile.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
-			return nil, 0, err
-		}
-		if reader, ok := db.(interface{ FrameLegacyNonce8250(types.Address) uint64 }); ok && len(profile.NonceKeys) > 0 {
-			legacyNonce = reader.FrameLegacyNonce8250(tx.Sender)
-		} else {
-			legacyNonce = db.GetNonce(tx.Sender)
-		}
-		if err := validateNonceSet8250(db, profile); err != nil {
-			return nil, 0, err
-		}
-		budget, err = profile.GasBudget()
-	}
+	prepared, err := prepareFrame8141(config, db, header, tx, profile, blobBaseFee)
 	if err != nil {
 		return nil, 0, err
 	}
-	blobFee := big.NewInt(1)
-	if header.ExcessBlobGas != nil {
-		blobFee = gas.BlobBaseFeeForHeader(config, header)
-	}
-	if blobBaseFee != nil {
-		blobFee = new(big.Int).Set(blobBaseFee)
-	}
-	payment, err := tx.Payment(header.BaseFee, blobFee)
-	if profile != nil {
-		payment, err = profile.Payment(header.BaseFee, blobFee)
-	}
-	if err != nil {
-		return nil, 0, err
-	}
+	profile = prepared.profile
+	legacyNonce, budget, payment, blobFee := prepared.legacyNonce, prepared.budget, prepared.payment, prepared.blobFee
 	if err := gp.ReserveFrame(budget.ExecutionReservation, budget.StateReservation); err != nil {
 		return nil, 0, err
 	}

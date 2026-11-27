@@ -10,7 +10,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 34 mandatory native consumers. Profile 1 checks
+The 36-criterion register names 39 mandatory native consumers. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.
@@ -131,3 +131,14 @@ All three upstream source heads remain unchanged. The review will recheck all
 nine tasks and explicitly investigate the boundary between definitely invalid
 Frame preconditions and the unspecified omitted-witness composition. Independent
 Lean work and all read-only references remain preserved.
+
+The new raw Engine cases reproduced definite pre-frame nonce/fee/capacity failures
+being treated as unknown witness validity. Actual ordinary SSTORE usage also
+reproduced wrong Frame reservation verdicts and version-1 cache reuse. Complete
+RLP serialization reproduced a state-dominated width underestimate. Native cache
+creation/rename failures and a redundant clock lookup reproduced partial ingress
+publication. All focused native/core regressions now pass after shared executor
+preparation, complete dimensional accounting/projection, version-2 migration and
+owned cache publication. Current upstream 8037 differs from read-only refs; its
+existing current C/D snapshot is reused. The register now requires 39 consumers
+across 22 normative files. Final qualification remains pending.

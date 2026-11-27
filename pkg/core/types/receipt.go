@@ -101,7 +101,14 @@ func DeriveReceiptFields(receipts []*Receipt, blockHash Hash, blockNumber uint64
 // BlockGasTotal applies EIP-7778 gross execution accounting and EIP-8037's
 // independent state dimension, including explicit EIP-8141 frame state usage.
 func BlockGasTotal(receipts []*Receipt, preRefund bool) uint64 {
-	var execution, state uint64
+	execution, state := BlockGasDimensions(receipts, preRefund)
+	return max(execution, state)
+}
+
+// BlockGasDimensions returns the same two independent totals used by block
+// validity. Ordinary EIP-8037 state usage and explicit Frame state usage both
+// consume the shared block state pool.
+func BlockGasDimensions(receipts []*Receipt, preRefund bool) (execution, state uint64) {
 	for _, receipt := range receipts {
 		if (preRefund || receipt.FrameResults8141 != nil) && receipt.BlockGasUsed != 0 {
 			execution += receipt.BlockGasUsed
@@ -113,5 +120,5 @@ func BlockGasTotal(receipts []*Receipt, preRefund bool) uint64 {
 			state += frame.GasUsed.State
 		}
 	}
-	return max(execution, state)
+	return execution, state
 }

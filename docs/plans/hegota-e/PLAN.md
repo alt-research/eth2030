@@ -62,6 +62,24 @@ Cached verdicts must identify the predicate used; legacy records with retained
 views are recomputed, while legacy compact records require CL view resubmission.
 See `docs/reviews/pr-172/TRANSACTION_BOUNDARY.md` for the complete audit.
 
+## Pre-execution validity and gas dimensions
+
+Native dependency candidates share the actual executor's nonmutating nonce,
+aggregate fee (including blobs) and reservation rules before witness handling.
+Passing those rules does not establish proof validity or define omitted-witness
+transport. State read failures remain errors. Both ordinary and Frame usage
+contribute to independent capacities; missing derived receipt counters are
+reconstructed from the authenticated transaction prefix. RLP projection uses
+the maximum consumed dimension, including state-dominated prefixes. Internal
+predicate version 2 migrates retained version-0/1 views; compact legacy records
+require their exact CL view to be resubmitted.
+
+Native Heze ingress uses one validated arrival clock and publishes an owned
+view only after cache persistence. Failed writes cannot consume a live quota
+or prune previously retained messages. The complete nine-task audit is in
+`docs/reviews/pr-172/RUNTIME_BOUNDARIES.md`. Current EIP-8037 is pinned by reusing
+the existing current C/D snapshot, rather than editing stale read-only refs.
+
 ## Complete acceptance register
 
 | Task | Criteria |

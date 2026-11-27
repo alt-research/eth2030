@@ -72,6 +72,16 @@ rechecked, while legacy compact records wait for exact CL view resubmission. BLO
 header window even when bodies are unavailable; missing/corrupt required headers
 propagate errors instead of changing the omission verdict.
 
+Pre-frame nonce, aggregate fee and gas checks are now shared with execution.
+Definite failures need no dependency witness. State access errors remain errors,
+and precondition-valid omitted witnesses retain the explicit composition gate.
+Native capacity includes ordinary state usage and Amsterdam gross execution;
+missing derived receipt counters reconstruct from the transaction prefix.
+Builder and import byte projections use the maximum consumed gas dimension.
+Version-2 metadata rechecks retained versions 0/1 and requires resubmission for
+legacy compact records. The native ingress commits an owned/pruned cache view
+only after persistence and uses the exact clock already validated at arrival.
+
 ## AA-VOPS and PQ gates
 
 EIP-8369 is Informational. `vops_reference.go` implements explicit-parameter

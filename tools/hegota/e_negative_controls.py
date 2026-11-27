@@ -49,13 +49,36 @@ controls.extend([
 ('foreign-context-build','pkg/core/block/builder.go','canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','false && canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ])
 
+controls.extend([
+('frame-preconditions-omission','pkg/node/backend/engine_bogota.go','if preconditionErr != nil {','if false && preconditionErr != nil {','./node','TestGroupEFramePreconditionsBeforeMissingWitness'),
+('frame-preconditions-build','pkg/core/block/builder.go','if preconditionErr != nil {','if false && preconditionErr != nil {','./node','TestGroupEFramePreconditionsBeforeMissingWitness'),
+('ordinary-state-capacity','pkg/core/types/receipt.go','state += receipt.StateGasUsed','state += 0','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
+('Amsterdam-capacity-replay','pkg/node/backend/inclusion_state.go','|| e.bc.Config().IsAmsterdam(e.block.Time())','|| false && e.bc.Config().IsAmsterdam(e.block.Time())','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
+('predicate-version-two','pkg/core/chain/bogota_payload.go','const BogotaSatisfactionVersion uint8 = 2','const BogotaSatisfactionVersion uint8 = 1','./node','TestGroupEFrameCapacityIncludesOrdinaryStateGas'),
+('preconditions-read-only','pkg/core/execution/frame_preconditions_8141.go','if !gp.FitsFrame(prepared.budget.ExecutionReservation, prepared.budget.StateReservation) {','if gp.ReserveFrame(prepared.budget.ExecutionReservation, prepared.budget.StateReservation) != nil {','./core/execution','TestGroupEFramePreconditionsAreReadOnlyAndFailClosed'),
+('preconditions-read-error','pkg/core/execution/frame_preconditions_8141.go','if readErr := state.ReadError(db); readErr != nil {','if readErr := state.ReadError(db); false && readErr != nil {','./core/execution','TestGroupEFramePreconditionsAreReadOnlyAndFailClosed'),
+('dimensional-RLP','pkg/core/gaspool/gas_pool.go','return max(gasLimit-gp.execution, gasLimit-gp.state)','return gasLimit-gp.execution','./core/block','TestGroupEBuilderExactRLPIndependentGasPools'),
+('ingress-publish-after-persist','pkg/node/heze_inclusion.go','store := n.hezeLists.Clone()','store := n.hezeLists; if store == nil { store = heze.NewStore() }','./node','TestGroupEHezeIngressCommitsAfterPersistence'),
+('ingress-one-clock','pkg/node/heze_inclusion.go','clock, err := store.GossipWithClock(data, n.hezeView)','clock, err := store.GossipWithClock(data, n.hezeView); if err == nil { clock, err = n.hezeView.Clock() }','./node','TestGroupEHezeIngressCommitsAfterPersistence'),
+])
+
+# The shared preflight deliberately repeats cheap context/static checks before
+# witness handling. Removing an early fast filter alone is now redundant; these
+# historical semantic removals disable both protections, keeping their original
+# unchanged native consumers and counting only compiled behavioral failures.
+entry='func ValidateFramePreconditions8141(cfg *config.ChainConfig, db state.StateDB, header *types.Header, tx *types.FrameTx8141, gp *gaspool.GasPool) error {'
+extra_targets={name:[('pkg/core/execution/frame_preconditions_8141.go',entry,entry+'\n if gp != nil { return nil }')] for name in ['malformed-proof-tolerance','foreign-context-omission','foreign-context-build']}
+
 for name,path,old,new,pkg,test in controls:
- s=(R/path).read_text()
- if old not in s and name=='strict-timeliness':
-  import re
-  old=re.search(r'DueBasisPoints\s*= 7500',s).group();new=old.replace('7500','7501')
- if s.count(old)!=1:raise ValueError(('control target must be unique',name,s.count(old)))
- replacement=D/(name+'.go');replacement.write_text(s.replace(old,new));overlay=D/(name+'.json');overlay.write_text(json.dumps({'Replace':{str(R/path):str(replacement)}}))
+ replacements={}
+ for index,(target,before,after) in enumerate([(path,old,new)]+extra_targets.get(name,[])):
+  source=(R/target).read_text()
+  if before not in source and name=='strict-timeliness':
+   import re
+   before=re.search(r'DueBasisPoints\s*= 7500',source).group();after=before.replace('7500','7501')
+  if source.count(before)!=1:raise ValueError(('control target must be unique',name,target,source.count(before)))
+  replacement=D/(name+('-extra'+str(index) if index else '')+'.go');replacement.write_text(source.replace(before,after));replacements[str(R/target)]=str(replacement)
+ overlay=D/(name+'.json');overlay.write_text(json.dumps({'Replace':replacements}))
  log=D/(name+'.jsonl')
  with log.open('w')as f:
   result=subprocess.run(['env','-u','GOROOT','GOFLAGS=-p=4','go','test','-json','-overlay',str(overlay),pkg,'-run','^'+test+'$','-count=1'],cwd=R/'pkg',stdout=f,stderr=subprocess.STDOUT)

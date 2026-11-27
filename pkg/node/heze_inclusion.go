@@ -65,24 +65,28 @@ func (n *Node) HandleHezeInclusionList(data []byte) error {
 	if n.hezeView == nil {
 		return heze.ErrContextUnavailable
 	}
-	if n.hezeLists == nil {
-		n.hezeLists = heze.NewStore()
-	}
-	if err := n.hezeLists.Gossip(data, n.hezeView); err != nil {
-		return err
-	}
-	clock, err := n.hezeView.Clock()
+	// Publish memory only after authentication, pruning and persistence succeed.
+	// A failed write must not consume a gossip allowance or prune the live view.
+	store := n.hezeLists.Clone()
+	clock, err := store.GossipWithClock(data, n.hezeView)
 	if err != nil {
 		return err
 	}
-	n.hezeLists.Prune(clock.Slot)
-	if n.config.DataDir == "" {
-		return nil
+	store.Prune(clock.Slot)
+	if n.config.DataDir != "" {
+		snapshot, err := store.MarshalBinary()
+		if err != nil {
+			return err
+		}
+		if err := n.persistHezeInclusionLists(snapshot); err != nil {
+			return err
+		}
 	}
-	snapshot, err := n.hezeLists.MarshalBinary()
-	if err != nil {
-		return err
-	}
+	n.hezeLists = store
+	return nil
+}
+
+func (n *Node) persistHezeInclusionLists(snapshot []byte) error {
 	path := filepath.Join(n.config.DataDir, "heze-inclusion-lists.json")
 	file, err := os.CreateTemp(n.config.DataDir, ".heze-il-*")
 	if err != nil {

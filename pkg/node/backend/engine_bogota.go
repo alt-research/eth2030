@@ -273,14 +273,6 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			}
 		}
 		if _, present := included[string(raw)]; !present {
-			// The IL API carries canonical transaction bytes, not witnesses.
-			// EIP-8504 only defines witnesses for the included dependency union;
-			// adding an omitted candidate's witness there would make that block
-			// invalid. Neither local pool contents nor PROOF-frame execution may
-			// supply a consensus validity verdict for this unspecified composition.
-			if tx.HasDependencies8504() {
-				return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
-			}
 			omitted = append(omitted, tx)
 			rawEnvelopes[tx] = raw
 		}
@@ -293,6 +285,50 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		return false, err
 	}
 	getHash := endState.getHash
+	// Definite pre-execution failures require no dependency witness. Use the
+	// exact transaction-end state and the same dimensional capacity as execution.
+	var framePool *gaspool.GasPool
+	filtered := omitted[:0]
+	for _, tx := range omitted {
+		if frame, canonical := tx.Inner().(*types.FrameTx8141); canonical && tx.HasDependencies8504() {
+			if endState.needsReplay(types.Address{}, true) {
+				if err := endState.replay(); err != nil {
+					return false, err
+				}
+			}
+			// Exclude nonce/fee/global-cap failures without demanding historical
+			// receipts whose derived dimensions are unnecessary for that result.
+			maximumPool := new(gaspool.GasPool).AddGas(payload.GasLimit())
+			preconditionErr := execution.ValidateFramePreconditions8141(bc.Config(), endState.state, payload.Header(), frame, maximumPool)
+			if err := endState.readError(endState.state); err != nil {
+				return false, err
+			}
+			if preconditionErr != nil {
+				continue
+			}
+			if framePool == nil {
+				framePool, err = endState.frameGasPool()
+				if err != nil {
+					return false, err
+				}
+			}
+			budget, err := frame.GasBudget()
+			if err != nil {
+				return false, err
+			}
+			if !framePool.FitsFrame(budget.ExecutionReservation, budget.StateReservation) {
+				continue
+			}
+			// Passing preconditions establishes neither proof validity nor a
+			// normative transport/composition; retain the explicit witness gate.
+			return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
+		}
+		filtered = append(filtered, tx)
+	}
+	omitted = filtered
+	if len(omitted) == 0 {
+		return true, nil
+	}
 	sizer, err := types.NewBlockAppendSizer(payload)
 	if err != nil {
 		return false, err
@@ -331,7 +367,13 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			}
 			continue
 		}
-		minimum, err := sizer.Size(tx, payload.GasUsed()+result.MinimumGas)
+		minimumGas := payload.GasUsed() + result.MinimumGas
+		if bc.Config().IsAmsterdam(payload.Time()) {
+			// Existing state usage may dominate while this append consumes the
+			// execution pool. The old header total is the safe lower bound.
+			minimumGas = payload.GasUsed()
+		}
+		minimum, err := sizer.Size(tx, minimumGas)
 		if err != nil {
 			return false, err
 		}
@@ -355,49 +397,19 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			return false, err
 		}
 	}
-	var framePool *gaspool.GasPool
-	for _, tx := range omitted {
-		if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical {
-			continue
-		}
-		receipts := bc.GetReceipts(hash)
-		if endState.replayed {
-			receipts = endState.receipts
-		}
-		replay := len(receipts) != len(payload.Transactions())
-		for _, receipt := range receipts {
-			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed == 0 {
-				replay = true
-			}
-		}
-		if replay {
-			if err := endState.replay(); err != nil {
-				return false, err
-			}
-			receipts = endState.receipts
-		}
-		var executionUsed, stateUsed uint64
-		for _, receipt := range receipts {
-			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed != 0 {
-				executionUsed += receipt.BlockGasUsed
-			} else {
-				executionUsed += receipt.GasUsed
-			}
-			for _, frame := range receipt.FrameResults8141 {
-				stateUsed += frame.GasUsed.State
-			}
-		}
-		framePool = new(gaspool.GasPool).AddGas(payload.GasLimit())
-		if err := framePool.ReserveFrame(executionUsed, stateUsed); err != nil {
-			return false, err
-		}
-		break
-	}
 	for _, tx := range omitted {
 		trial := endState.state.Dup()
 		trial.SetTxContext(tx.Hash(), len(payload.Transactions()))
 		gas := new(gaspool.GasPool).AddGas(remaining)
-		if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
+		_, canonical := tx.Inner().(*types.FrameTx8141)
+		dimensional := canonical || bc.Config().IsAmsterdam(payload.Time())
+		if dimensional {
+			if framePool == nil {
+				framePool, err = endState.frameGasPool()
+				if err != nil {
+					return false, err
+				}
+			}
 			copied := *framePool
 			gas = &copied
 		}
@@ -412,7 +424,11 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			if receipt.BlockGasUsed > 0 {
 				used = receipt.BlockGasUsed
 			}
-			size, err := sizer.Size(tx, payload.GasUsed()+used)
+			projectedGasUsed := payload.GasUsed() + used
+			if dimensional {
+				projectedGasUsed = gas.BlockGasUsed(payload.GasLimit())
+			}
+			size, err := sizer.Size(tx, projectedGasUsed)
 			if err != nil {
 				return false, err
 			}

@@ -57,3 +57,10 @@ func (gp *GasPool) RefundFrame(execution, state uint64) {
 	gp.execution += execution
 	gp.state += state
 }
+
+// BlockGasUsed is the EIP-8037 header total after execution with this block's
+// initialized independent pools. Returning the larger used dimension avoids
+// charging existing state usage again as execution when sizing an append.
+func (gp *GasPool) BlockGasUsed(gasLimit uint64) uint64 {
+	return max(gasLimit-gp.execution, gasLimit-gp.state)
+}

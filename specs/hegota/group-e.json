@@ -134,6 +134,12 @@
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "3237f773d610420fb50438e690c9317e0f13244cb29f8f8dc357d179f1f89103",
       "blob": "60fab81fff8126a0e0f019a3fa7439fdfafe9471"
+    },
+    {
+      "path": "specs/hegota/upstream/2026-11-27/eip-8037.md",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+      "sha256": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
+      "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc"
     }
   ],
   "tasks": [
@@ -232,16 +238,19 @@
           "id": "E41.2",
           "statement": "branch-keyed exact-byte store/deep copies/dedup",
           "clauses": [
-            "Heze inclusion-list process/on_inclusion_list; p2p gossip and inclusion_lists_by_indices; SSZ EIP-7916"
+            "Heze inclusion-list process/on_inclusion_list; p2p gossip and inclusion_lists_by_indices; SSZ EIP-7916",
+            "Heze on_inclusion_list exception atomicity; publish only after persistence; one validated arrival clock"
           ],
           "files": [
             "pkg/focil/heze/forkchoice.go",
             "pkg/focil/heze/store.go",
             "pkg/focil/heze/types.go",
-            "pkg/focil/heze/validation.go"
+            "pkg/focil/heze/validation.go",
+            "pkg/node/heze_inclusion.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership"
+            "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership",
+            "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
           ]
         },
         {
@@ -264,7 +273,8 @@
           "id": "E41.4",
           "statement": "retention/pruning/reorg/restart",
           "clauses": [
-            "Heze inclusion-list process/on_inclusion_list; p2p gossip and inclusion_lists_by_indices; SSZ EIP-7916"
+            "Heze inclusion-list process/on_inclusion_list; p2p gossip and inclusion_lists_by_indices; SSZ EIP-7916",
+            "Heze retained bytes/timeliness/gossip quota and pruning survive failed persistence"
           ],
           "files": [
             "pkg/focil/heze/forkchoice.go",
@@ -277,7 +287,8 @@
             "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeRequestsRetentionAndReauthenticatedRestart",
             "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeSizeAndOffsetBoundaries",
             "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeConcurrentQuotaAndCommittee",
-            "github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically"
+            "github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically",
+            "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
           ]
         }
       ]
@@ -381,16 +392,21 @@
           "id": "E43.2",
           "statement": "duplicate/invalid trial rollback and exact gas accounting",
           "clauses": [
-            "EIP-7805 construction; Bogota immutable payload attributes; EIP-7778 block gas; EIP-7934 size"
+            "EIP-7805 construction; Bogota immutable payload attributes; EIP-7778 block gas; EIP-7934 size",
+            "EIP-8141 pre-frame nonce/fee/reservations; EIP-8037 independent dimensions and exact header projection"
           ],
           "files": [
             "pkg/core/block/builder.go",
             "pkg/core/block/inclusion_queue.go",
             "pkg/core/block/inclusion_size.go",
-            "pkg/core/execution/processor.go"
+            "pkg/core/execution/processor.go",
+            "pkg/core/execution/frame_preconditions_8141.go",
+            "pkg/core/gaspool/gas_pool.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderPoolFundingReopensILAndDeduplicates"
+            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderPoolFundingReopensILAndDeduplicates",
+            "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed",
+            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools"
           ]
         },
         {
@@ -450,7 +466,8 @@
           "statement": "nonce/256-bit balance/fee/code checks without EVM replay for Profile 1",
           "clauses": [
             "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
-            "EIP-7805 S after last transaction; EIP-4895 post-transaction withdrawals; EIP-7002 post-execution requests; EIP-7928 phase n+1"
+            "EIP-7805 S after last transaction; EIP-4895 post-transaction withdrawals; EIP-7002 post-execution requests; EIP-7928 phase n+1",
+            "EIP-8037 ordinary state gas and Amsterdam gross execution consume independent capacities"
           ],
           "files": [
             "pkg/core/chain/bogota_payload.go",
@@ -460,26 +477,36 @@
             "pkg/focil/vops_reference.go",
             "pkg/node/backend/engine_bogota.go",
             "pkg/node/backend/inclusion_state.go",
-            "pkg/node/sync_runtime.go"
+            "pkg/node/sync_runtime.go",
+            "pkg/core/types/receipt.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources",
             "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems",
             "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
-            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict"
+            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict",
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
           ]
         },
         {
           "id": "E44.3",
           "statement": "declared gas and exact appended RLP size including prefix changes",
           "clauses": [
-            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size"
+            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
+            "EIP-8037 header gas_used is max(execution,state); EIP-7934 projected integer width and safe lower bound"
           ],
           "files": [
-            "pkg/core/types/block_append_size.go"
+            "pkg/core/types/block_append_size.go",
+            "pkg/core/types/receipt.go",
+            "pkg/core/gaspool/gas_pool.go",
+            "pkg/node/backend/inclusion_state.go",
+            "pkg/node/backend/engine_bogota.go",
+            "pkg/core/block/inclusion_size.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries"
+            "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries",
+            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools",
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
           ]
         },
         {
@@ -488,7 +515,8 @@
           "clauses": [
             "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
             "EIP-2935 unchanged BLOCKHASH window; authenticated header-only ancestry and unavailable-context error",
-            "EIP-8141 chain-ID validity; selected EIP-8250 nonce schema checked before undefined omitted-witness handling"
+            "EIP-8141 chain-ID validity; selected EIP-8250 nonce schema checked before undefined omitted-witness handling",
+            "EIP-8141/8250 definite nonce, aggregate fee and reservation failures precede unavailable-witness handling; no state mutation"
           ],
           "files": [
             "pkg/core/block/builder.go",
@@ -503,14 +531,19 @@
             "pkg/node/backend/inclusion_state.go",
             "pkg/core/chain/header_access.go",
             "pkg/core/execution/frame_context_8141.go",
-            "pkg/core/execution/frame_8141.go"
+            "pkg/core/execution/frame_8141.go",
+            "pkg/core/execution/frame_preconditions_8141.go",
+            "pkg/core/execution/frame_8250.go",
+            "pkg/core/types/receipt.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext",
             "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback",
             "github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry",
             "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies",
-            "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+            "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness",
+            "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness",
+            "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed"
           ]
         }
       ]
@@ -524,16 +557,20 @@
           "id": "E45.1",
           "statement": "actual native Engine build from nonempty IL",
           "clauses": [
-            "Engine Bogota deferred validation/FCU; native Node and core/chain retained views"
+            "Engine Bogota deferred validation/FCU; native Node and core/chain retained views",
+            "Heze handler failures do not change live bytes/pruning/quota"
           ],
           "files": [
             "pkg/core/chain/bogota_payload.go",
             "pkg/node/backend/engine_bogota.go",
             "pkg/node/heze_inclusion.go",
-            "pkg/node/node.go"
+            "pkg/node/node.go",
+            "pkg/focil/heze/store.go",
+            "pkg/focil/heze/validation.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart"
+            "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart",
+            "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
           ]
         },
         {
@@ -556,7 +593,8 @@
           "id": "E45.3",
           "statement": "accepted branch/restart/finalization persistence",
           "clauses": [
-            "Engine Bogota deferred validation/FCU; native Node and core/chain retained views"
+            "Engine Bogota deferred validation/FCU; native Node and core/chain retained views",
+            "Internal predicate version 2 rechecks version-0/1 retained views; legacy compact records require exact CL resubmission"
           ],
           "files": [
             "pkg/core/chain/bogota_payload.go",
@@ -565,13 +603,15 @@
             "pkg/node/backend/inclusion_state.go",
             "pkg/node/heze_inclusion.go",
             "pkg/node/node.go",
-            "pkg/node/sync_runtime.go"
+            "pkg/node/sync_runtime.go",
+            "pkg/core/types/receipt.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart",
             "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews",
             "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
-            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict"
+            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict",
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
           ]
         },
         {
@@ -741,7 +781,8 @@
           "statement": "actual canonical PQ transaction/witness sizes and 8KiB capacity",
           "clauses": [
             "EIP-7805 byte bound; EIP-8504 direct profile; EIP-8369 full-pipeline benchmark prerequisites",
-            "EIP-8141 chain-ID validity; selected EIP-8250 nonce schema checked before undefined omitted-witness handling"
+            "EIP-8141 chain-ID validity; selected EIP-8250 nonce schema checked before undefined omitted-witness handling",
+            "Precondition-valid omitted PQ witnesses retain the explicit unspecified-composition gate"
           ],
           "files": [
             "pkg/focil/heze/forkchoice.go",
@@ -752,11 +793,13 @@
             "pkg/core/execution/frame_context_8141.go",
             "pkg/core/execution/frame_8141.go",
             "pkg/core/block/builder.go",
-            "pkg/node/backend/engine_bogota.go"
+            "pkg/node/backend/engine_bogota.go",
+            "pkg/core/execution/frame_preconditions_8141.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline",
-            "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+            "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness",
+            "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness"
           ]
         },
         {
@@ -828,6 +871,7 @@
     "evidence/hegota-e/source-review.json",
     "tools/hegota/e_negative_controls.py",
     "docs/reviews/pr-172/REAUDIT.md",
-    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md"
+    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md",
+    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md"
   ]
 }

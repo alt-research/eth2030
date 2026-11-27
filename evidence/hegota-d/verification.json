@@ -1,7 +1,7 @@
 {
   "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
-  "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
+  "source_revision": "ee798638b27a186bf168ebb830de4c7f45e5a8e7",
   "tasks": 8,
   "criteria": 32,
   "selected_profile_consumers_passed": true,
@@ -24,7 +24,7 @@
     "pkg/bal/hash.go": "6658c957ff35ad1c41077fc448b322a836efd791f9c36f8f622d0287e355e81b",
     "pkg/bal/tracker.go": "4852187e93e1dbd5e3b91bb59818e0ebd6a3e00cc48e509d8ac504fb0afabadd",
     "pkg/bal/types.go": "16c7a2213ad164df9b54837d2d604f891f86253469ea5ff7dec18b96cb11e769",
-    "pkg/core/block/builder.go": "cc736a0d1d98967c927d33b195a5baf0b8f78e22160f5e6e07baf277243c31a2",
+    "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d",
     "pkg/core/block/dependency_8504_integration_test.go": "70fd339c18b77febded8e7a2a96b53cd35965f3ceb1163ced3c04792cea0b509",
     "pkg/core/block/validator.go": "6934a49da3e9f5311d0cab4ee7bcaa5b2e9476c1d4d4979d0aa46e15fd6e2c09",
     "pkg/core/chain/blockchain.go": "d8b892317c2f954ae439d13294b911d9aca19bc91ac29ff677ce0b72f7bea445",
@@ -41,7 +41,7 @@
     "pkg/core/execution/assertion_events_7906_test.go": "45a2678fb7435446ea2bec424b2cc42d75cca2e176c44aa2185f87fa21174edc",
     "pkg/core/execution/assertion_paymaster_7906_test.go": "57f587d4f04fe533fa33ac0266328c63709ca2c096cde991d66090582077a71b",
     "pkg/core/execution/dependency_wallet_8504_test.go": "49f50f63ee01db900307fc0ebb2e3260b67f460b41677b8573c4d75ee3db79e4",
-    "pkg/core/execution/frame_8141.go": "5763fa7e03662054335bdae18931062d1c6fb7e8c22e90b9948d450fcfad3e2f",
+    "pkg/core/execution/frame_8141.go": "82fc7e92877ff6679c94ad656c7e28bc7e56c940ef960b3f49f4726637b28a3d",
     "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
     "pkg/core/execution/migration_8298_test.go": "71411db40fc8db3aad3ed81c8db642401160e0aa4f6cc4c6aa9458594f87fe65",
     "pkg/core/execution/parallel.go": "8fead9573846e7e9e1537f0d95c991204d881177e9462ff97d72f6fe92ee1737",
@@ -103,10 +103,10 @@
     "pkg/internal/testutil/proof8504/fixture.go": "781915816c2b49b572f15f814c95af0a7ed007e141e96ed552e93c3e52444b14",
     "pkg/internal/testutil/proof8504/vector.json": "e5822582b12064e019110d9ac78e4c31fcf97252b8f0957bb9e92d630359f1f8",
     "pkg/node/backend/engine_backend.go": "dab6a9e4c7af2a6c97b793618b3ae35a6bbe8fc4535cff5c82cb51225010ebcf",
-    "pkg/node/backend/engine_bogota.go": "3e30de0241a7f819801db0ca70b7e51457b8116407a293127c51d5e042e605f3",
+    "pkg/node/backend/engine_bogota.go": "d182cec5f56d2810e80c51da457e470c74143a42d4c7e083b13c3bfa0050e340",
     "pkg/node/backend/engine_payload.go": "71dc4bc6b4cff6858a457dbf6a457a1c865aeea42c4beda9c58de41718bfbb6a",
     "pkg/node/backend/frame_simulation.go": "8352e4b6630a8d07d36acf84f971061d0769ac3737abc341980e5a6401577f60",
-    "pkg/node/dependency_8504_integration_test.go": "d83c758ec28e4980fc0982cf1703952ef7603a8ff2f204ed4226f355dfc9baed",
+    "pkg/node/dependency_8504_integration_test.go": "dec2958384a4739232f44f4bacbdf6525ab7cb465a17ef7a51cf4507d9309623",
     "pkg/node/genesis_loader.go": "64b0f3a0a6794233f46e936ffd41813e62556e89f695883eac69420089bf3e8f",
     "pkg/node/node.go": "1e854f162896ed53f64836d880f76de0dc76fba5b69d97608baf179521e8ed9c",
     "pkg/node/persisted_chain_config.go": "940ba6c263203f6b2f1317334f47fdd1337e6bcf8ca5fbe989de5e32279c3582",
@@ -155,7 +155,7 @@
     "tools/hegota/generate_d_pq_wallet.py": "57a9d1fa7fe1caf3c7a6fe73305d11ba76751f500e463a91b770b364e0d7ceab",
     "tools/hegota/test_group_d.py": "664dbc2a53664b2b2247b70c1e30bb5a3d73128d45b7e9894843bb9490fd202b"
   },
-  "source_fingerprint_sha256": "511960249beaa4824e9e67323825663071145e214b0629451056bf76eb98fcd6",
+  "source_fingerprint_sha256": "f7124259ff1bbb67dae4df883f50859ce407c2ad320d425912e4c007a3be7ccc",
   "passed_tests": {
     "github.com/eth2030/eth2030/bal::TestCodeAdoption8298CanonicalWireAndAvailability": "pass",
     "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart": "pass",
@@ -214,9 +214,9 @@
     "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs": "pass"
   },
   "run": {
-    "log_sha256": "249b3f73bc1016a773629c11a53f19d44b89eb7d7ad08113796f5e0d11d85db4",
+    "log_sha256": "e5fad36c1de2a4623b649965dba2152c9953eb534497fcefb43fe13c92a9c7fe",
     "named": {
-      "pass": 24245,
+      "pass": 24267,
       "skip": 124
     },
     "packages": {
@@ -231,7 +231,7 @@
     "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
+    "source_revision": "ee798638b27a186bf168ebb830de4c7f45e5a8e7",
     "commands": [
       {
         "step": "build",
@@ -241,7 +241,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 26.991
+        "seconds": 12.206
       },
       {
         "step": "native-build",
@@ -249,11 +249,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-boundary-native",
+          "/tmp/hegota-e-runtime-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 29.87
+        "seconds": 0.442
       },
       {
         "step": "wrapper-build",
@@ -261,11 +261,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-boundary-geth",
+          "/tmp/hegota-e-runtime-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 0.532
+        "seconds": 0.462
       },
       {
         "step": "vet",
@@ -275,7 +275,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 3.075
+        "seconds": 2.763
       },
       {
         "step": "baseline",
@@ -285,7 +285,7 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.514
+        "seconds": 1.08
       },
       {
         "step": "full",
@@ -297,7 +297,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 156.545
+        "seconds": 164.81
       },
       {
         "step": "race",
@@ -335,7 +335,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 200.169
+        "seconds": 204.514
       },
       {
         "step": "python",
@@ -350,7 +350,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 35.185
+        "seconds": 34.397
       },
       {
         "step": "python-optimized",
@@ -366,7 +366,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 33.984
+        "seconds": 33.816
       },
       {
         "step": "site-verify",
@@ -377,7 +377,7 @@
           "--files"
         ],
         "exit_code": 0,
-        "seconds": 0.303
+        "seconds": 0.548
       },
       {
         "step": "site-build",
@@ -387,7 +387,7 @@
           "build"
         ],
         "exit_code": 0,
-        "seconds": 26.132
+        "seconds": 10.815
       },
       {
         "step": "site-export",
@@ -397,13 +397,13 @@
           "scripts/check-export.mjs"
         ],
         "exit_code": 0,
-        "seconds": 1.706
+        "seconds": 0.325
       }
     ],
     "race": {
-      "log_sha256": "9a8248d3a3f09ea60bea7db6e7be5fd88212860c4567cb3cf3b36477dfc755fb",
+      "log_sha256": "fae5ecdd8d99a98378258c11c192f6be5e8210ea8b27bb5db1bb30df0dd97f24",
       "named": {
-        "pass": 12091,
+        "pass": 12113,
         "skip": 87
       },
       "packages": {

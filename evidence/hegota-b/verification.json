@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "249b3f73bc1016a773629c11a53f19d44b89eb7d7ad08113796f5e0d11d85db4",
+    "log_sha256": "e5fad36c1de2a4623b649965dba2152c9953eb534497fcefb43fe13c92a9c7fe",
     "named": {
-      "pass": 24245,
+      "pass": 24267,
       "skip": 124
     },
     "packages": {
@@ -15,12 +15,12 @@
     },
     "completed_packages": 244
   },
-  "source_fingerprint_sha256": "62e01338f01b9e608362593f811b2df453657ed8b1fcabb24e932d28f825d9cc",
+  "source_fingerprint_sha256": "ad6b147e044f316350a13ba8f86e2f561d7730daff467ef0e5fb2cf868b21521",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
     "pkg/bal/spec_test.go": "8401db90680311863c2065e488271a4670b4cb63d811e2ddc3895ec713ad13f1",
-    "pkg/core/block/builder.go": "cc736a0d1d98967c927d33b195a5baf0b8f78e22160f5e6e07baf277243c31a2",
+    "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d",
     "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
     "pkg/core/block/frame_prefunded_creation_test.go": "907fe4f3183d83fa617d31e505be06ccbe78b0f77a85c2b9d7354af74a1dfa2a",
     "pkg/core/block/frame_size_conformance_test.go": "6b291a196a5246bebf62a039fc449b7631ccfe72f34a373a30e51c01d1eb5bab",
@@ -32,7 +32,7 @@
     "pkg/core/chain/transaction_readback.go": "49bd254fbeae2ca8e253e4ac9ee9d999aae4a4a2249f6b64544a51b79004fedb",
     "pkg/core/eftest/hegota_goldens_test.go": "eec2d755e42b6239c867f4270014c0490e196d3d276d2a3f99e26f13395681f7",
     "pkg/core/execution/amsterdam_system_gas_test.go": "0e0aa523c92cb6e80e30a227e6fb1bbbce09236f6c5e2a5044e49b4bba2ac337",
-    "pkg/core/execution/frame_8141.go": "5763fa7e03662054335bdae18931062d1c6fb7e8c22e90b9948d450fcfad3e2f",
+    "pkg/core/execution/frame_8141.go": "82fc7e92877ff6679c94ad656c7e28bc7e56c940ef960b3f49f4726637b28a3d",
     "pkg/core/execution/frame_8141_conformance_test.go": "681e49d1f66f2cdbb6de28c98bcc7e7281abad8c331070122612d6e4236a0abe",
     "pkg/core/execution/frame_8141_test.go": "c506e0de2054c4bc9b221c8a70fc00b5869fb081520078aa4a8e8538dc64f99b",
     "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
@@ -180,7 +180,7 @@
     "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "70eddaad4f4460d10d75d0ff6baba3ab087151d6",
+    "source_revision": "ee798638b27a186bf168ebb830de4c7f45e5a8e7",
     "commands": [
       {
         "step": "build",
@@ -190,7 +190,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 26.991
+        "seconds": 12.206
       },
       {
         "step": "native-build",
@@ -198,11 +198,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-boundary-native",
+          "/tmp/hegota-e-runtime-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 29.87
+        "seconds": 0.442
       },
       {
         "step": "wrapper-build",
@@ -210,11 +210,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-boundary-geth",
+          "/tmp/hegota-e-runtime-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 0.532
+        "seconds": 0.462
       },
       {
         "step": "vet",
@@ -224,7 +224,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 3.075
+        "seconds": 2.763
       },
       {
         "step": "baseline",
@@ -234,7 +234,7 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.514
+        "seconds": 1.08
       },
       {
         "step": "full",
@@ -246,7 +246,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 156.545
+        "seconds": 164.81
       },
       {
         "step": "race",
@@ -284,7 +284,7 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 200.169
+        "seconds": 204.514
       },
       {
         "step": "python",
@@ -299,7 +299,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 35.185
+        "seconds": 34.397
       },
       {
         "step": "python-optimized",
@@ -315,7 +315,7 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 33.984
+        "seconds": 33.816
       },
       {
         "step": "site-verify",
@@ -326,7 +326,7 @@
           "--files"
         ],
         "exit_code": 0,
-        "seconds": 0.303
+        "seconds": 0.548
       },
       {
         "step": "site-build",
@@ -336,7 +336,7 @@
           "build"
         ],
         "exit_code": 0,
-        "seconds": 26.132
+        "seconds": 10.815
       },
       {
         "step": "site-export",
@@ -346,13 +346,13 @@
           "scripts/check-export.mjs"
         ],
         "exit_code": 0,
-        "seconds": 1.706
+        "seconds": 0.325
       }
     ],
     "race": {
-      "log_sha256": "9a8248d3a3f09ea60bea7db6e7be5fd88212860c4567cb3cf3b36477dfc755fb",
+      "log_sha256": "fae5ecdd8d99a98378258c11c192f6be5e8210ea8b27bb5db1bb30df0dd97f24",
       "named": {
-        "pass": 12091,
+        "pass": 12113,
         "skip": 87
       },
       "packages": {

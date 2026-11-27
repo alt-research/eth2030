@@ -124,7 +124,7 @@ with no conflicts; independent Lean work, read-only refs and A/B/C/D expected
 oracles remain unchanged. Source-bound snapshots qualify the source above;
 publication/check links belong to the English PR record.
 
-## Pre-execution validity and complete-consumer audit in progress
+## Pre-execution validity and complete-consumer audit results
 
 This pass starts from published head `15262949d2b4dbf0f41bf4919dd0a2d0d5550c7c`.
 All three upstream source heads remain unchanged. The review will recheck all
@@ -141,10 +141,28 @@ publication. All focused native/core regressions now pass after shared executor
 preparation, complete dimensional accounting/projection, version-2 migration and
 owned cache publication. Current upstream 8037 differs from read-only refs; its
 existing current C/D snapshot is reused. The register now requires 39 consumers
-across 22 normative files. Final qualification remains pending.
+across 22 normative files. Fresh final local qualification passed; exact-head hosted results are tracked
+separately in the English PR description.
 
 The first fresh full run failed the older D native omitted-witness fixture: it
 used a generic transaction with correct next nonce but insufficient fees.
 Only that input is corrected to the canonical account's next nonce and adequate
 fee budget. Its original missing-witness error assertion and all independent
 expected goldens remain unchanged. A complete fresh rerun is required.
+
+Final local qualification at `ee798638b27a186bf168ebb830de4c7f45e5a8e7` passed: 244 completed full-suite
+packages / 24,267 named passes (124 optional skips), 76 selected race
+packages / 12,113 named passes (87 optional skips), zero failures. All
+39 required E consumers pass without skips. All 36 semantic-removal controls
+compile and fail their intended unchanged consumers. Native/wrapper builds,
+vet, 12/12 differential cases, 109 Python checks in both modes, A62/B79/C102/D55/E39
+source-bound checks and fresh website build/export/desktop/mobile checks pass.
+The B fixture-only eftest consumer remains outside selected race packages.
+
+All nine tasks remain tied to defined normative consumers. Profile 2 enforcing
+rules, precondition-valid omitted PQ witness composition, external CL/ePBS
+acceptance and network tail latency retain their explicit gates. Website source
+is updated; Pages deploys after merge through the existing master workflow.
+Read-only refs and independent expected oracles are unchanged. Publication and
+hosted results belong to the current English PR record, with no earlier head's
+CI results counted as qualification for this source.

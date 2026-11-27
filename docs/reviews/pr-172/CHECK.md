@@ -48,5 +48,6 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Audit pre-execution Frame nonce, aggregate fee and gas checks before unavailable-witness handling, including build/import agreement.
 - [x] Review all remaining Heze wire/store/request, Engine, builder, omission and CL decision boundaries for missing defined rules.
 - [x] Reproduce confirmed gaps before correction; share existing execution rules and add positive/negative native consumers.
-- [ ] Refresh source-bound A–E evidence and website progress, preserving expected oracles and read-only refs.
-- [ ] Complete local build/vet/full/race/control/website qualification, commit/push and verify exact-head hosted results in the English PR.
+- [x] Refresh source-bound A–E evidence and website progress, preserving expected oracles and read-only refs.
+- [x] Complete local build/vet/full/race/control/website qualification and commit owned artifacts.
+- Publication and exact-head hosted results are tracked in the English PR description; this local snapshot does not pre-claim hosted outcomes.

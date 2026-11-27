@@ -1,12 +1,21 @@
 # Group D latest-EIP completeness re-audit
 
 Rechecked on 2026-11-27 (Asia/Shanghai), starting from PR #171 head
-`00ca827fd8d55a21b367adc8e8f3a92334eae36e`. EIPs master remains
+`00ca827fd8d55a21b367adc8e8f3a92334eae36e`. The initial EIPs master check resolved to
 `c7cc5197513cd062a0fa0dc81cb66e5760228ac6`; EIP-8504/#12672 remains
 `96da3c17047ad31608c40bfe75049db78dc4417d`. The latest EIP-8298,
 7906, 8151 and 8288 blobs match the immutable normative register. The latest
 8504 PR comments still distinguish #12714 as an alternative requiring an ACD
 decision. No new normative wire assignment or aggregation parameter was found.
+
+The final freshness check resolved EIPs master to
+`68db81b0a75edb0e16d8f181241f994875eba52d`. Its four added drafts
+(8367, 8442, 8476 and 8488, plus 8442 reference assets) do not change any
+pinned Group D normative file. EIP-8476 explicitly identifies a prospective
+8151 eligibility exception and says that the two specifications must agree
+before composition; it also forecloses the 8298 migration route for its proposed
+opt-out marker. This draft is outside the selected Group D profiles. No marker
+exception is added to current 8151, and no 8476/8151/8298 composition is claimed.
 
 ## Reproduced gaps and corrections
 
@@ -15,7 +24,6 @@ decision. No new normative wire assignment or aggregation parameter was found.
 | ASSERT trace lifetime | EIP-7906 Gas Cost: reuse an index while the diff is unchanged; per-read work is constant after indexing | Sixteen caught static child reverts caused 17 whole-slot-table reads. Observable-mutation generations now distinguish state/log writes from unchanged snapshots. Read-only reverts and zero-value account touches retain the index. Mutating/body reverts invalidate it. Ordered snapshot lookup/suffix truncation avoids scanning all earlier calls on every revert. |
 | CL witness commitment | EIP-8504 Consensus Layer and Block Header | SSZ decoding retained witness bytes but omitted the execution-header witness commitment. The 20-field schema now reconstructs it, including active-empty witnesses. Encoding rejects an active header whose witness field is missing or inconsistent. Existing independent SSZ bytes and roots are unchanged. |
 | Legacy research proof boundaries | EIP-8504 Execution Does Not Verify Witnesses: a stateful/stateless/proof validity backend must enforce dependency checks or reject the block | Legacy synthetic trace/BAL generators, the old hash-only guest and both STF witness/input paths accepted dependency blocks without authenticating witnesses. They now reject the unsupported profile before returning a result or consuming the guest context. This includes valid, missing, tampered, bare and active-empty forms. The STF encoding retains transaction hashes rather than complete proof declarations/witnesses, so both synthetic and real-RV32IM STF paths reject the unsupported input before prover setup. These helpers are not promoted to actual EVM proof backends; native import still verifies witnesses before execution. |
-
 | Generic sync delegation | EIP-8504 Block Validity and Execution Does Not Verify Witnesses | The queued, sequential and batch sync pipelines could delegate a missing/invalid witness block to a root-only executor and writer. They now enforce the independent declared-witness predicate before either side effect. The chain validator/executor still owns fork activation and ordinary validity; field presence never schedules a fork. |
 
 The trace journal also invalidates on later observable writes/logs, preventing

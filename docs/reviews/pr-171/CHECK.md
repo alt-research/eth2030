@@ -23,10 +23,16 @@ consumers; open specification questions must not become invented consensus.
 
 ## Latest-EIP completeness re-audit
 
-- [ ] Recheck current EIP heads, every normative clause and discussion changes.
-- [ ] Audit witness transport, blob composition, payload/import/restart and all attachment-copy paths.
-- [ ] Audit adoption origins, nested creation/destruction, BAL consumers and migration/dependency invalidation.
-- [ ] Audit ASSERT trace completeness, cache lifetime, subtree/static boundaries and whole-body settlement.
-- [ ] Add native regression consumers for every reproduced gap and reconcile the complete criterion register.
-- [ ] Run current-source builds, vet, full/race and A/B/C/D evidence checks; preserve independent oracles.
-- [ ] Inspect conflicts/duplication, commit/push and update the English PR; follow final-head hosted checks.
+- [x] Recheck current EIP heads, every normative clause and discussion changes.
+- [x] Audit witness transport, blob composition, payload/import/restart and all attachment-copy paths.
+- [x] Audit adoption origins, nested creation/destruction, BAL consumers and migration/dependency invalidation.
+- [x] Audit ASSERT trace completeness, cache lifetime, subtree/static boundaries and whole-body settlement.
+- [x] Add native regression consumers for every reproduced gap and reconcile the complete criterion register.
+- [x] Run current-source builds, vet, full/race and A/B/C/D evidence checks; preserve independent oracles.
+- [x] Inspect conflicts/duplication and prepare committed source-bound evidence for the existing English PR; record final-head hosted checks in the live PR after this offline freeze.
+
+Final local qualification: source `d7fa00f0`; A/B/C/D mandatory consumers
+62/79/102/55, full 24,176 and affected race 11,535 named passes; nine compiled
+semantic-removal controls fail as intended. Exact-head hosted publication/results
+are authoritative in [PR #171](https://github.com/alt-research/eth2030/pull/171),
+not inferred from predecessor workflow runs.

@@ -1,60 +1,53 @@
 # Group D status — PR #171
 
 HGT-030–037 is implemented and locally qualified for the explicitly selected
-native profiles. All 8 tasks, 32 criteria and 45 mandatory consumers pass,
-including the affected race run. Source implementation commit:
-`c449112d2e455eef15546ff46418431cd170daaa`.
+native profiles. The latest-EIP re-audit covers all 8 tasks, 32 criteria and
+55 mandatory native consumers. Production implementation commit:
+`d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151`.
 
 The branch starts directly from merged PR #170 at master
-`81e63f586642a1406d56db9fa7cbf00941feb7bf`; fetched master still matches that
-baseline. No merged Group C commits were replayed. Root trackers, read-only
-refs and independent A/B/C expected vectors remain unchanged. The existing
-8151 implementation and canonical paymaster are reused.
+`81e63f586642a1406d56db9fa7cbf00941feb7bf`; the final remote check still
+matches that baseline. No merged Group C commits were replayed. Root trackers,
+read-only refs and independent A/B/C expected vectors remain unchanged. Existing
+8151 and canonical-paymaster implementations are reused.
 
-The [normative plan](../../plans/hegota-d/PLAN.md),
-[composition/admission report](../../plans/hegota-d/COMPOSITION.md) and
-[verification record](VERIFICATION.md) map the complete work to sources,
-production consumers and positive/negative evidence. Machine-readable coverage
-and source-bound evidence live in `specs/hegota/group-d.json` and
+The [plan](../../plans/hegota-d/PLAN.md),
+[composition report](../../plans/hegota-d/COMPOSITION.md),
+[re-audit findings](../../plans/hegota-d/REAUDIT.md) and
+[verification record](VERIFICATION.md) map every criterion to normative sources,
+production consumers and positive/negative evidence. The fixed mandatory
+register and source-bound evidence are in `specs/hegota/group-d.json` and
 `evidence/hegota-d/verification.json`.
 
-Local validation: full build/vet/gofmt; 243 full-suite packages, 24,166 named
-passes; 68 affected race packages, 10,801 named passes; 102 Python regressions
-in normal and optimized mode; 12/12 independent historical baseline cases;
-A/B/C/D mandatory consumers 62/79/102/45, zero mandatory skips. Optional skips
-are inventoried separately, and all three isolated semantic-removal controls
-fail as intended. See the verification record for exact commands and hashes.
+The re-audit fixed four reproduced boundary failures: ASSERT trace cache
+amplification/stale mutation indexes; CL witness/header commitment loss;
+unsupported synthetic proof, hash-only guest and STF input acceptance; and
+queued/sequential/batch sync delegation before witness validation. Additional
+native tests cover real blob/KZG composition, creation/adoption/destruction,
+actual LOG3/event copying and paid body rollback. Nine isolated semantic-removal
+controls compile and fail the intended unchanged native tests.
 
-These profiles do not schedule a public fork. 8504 provisional constants and
+Current-source validation passed: full build/vet/gofmt; 243 full-suite packages,
+24,176 named passes; 71 affected race packages, 11,535 named passes; 102 Python
+regressions in normal and optimized mode; 12/12 unchanged independent historical
+baseline cases; A/B/C/D mandatory consumers 62/79/102/55, zero mandatory skips.
+Optional skips are separately inventoried. The original 45-consumer/c449112d
+qualification and earlier hosted results are immutable predecessor provenance,
+not substituted for these fresh runs.
+
+The final EIPs master check is `68db81b0a75edb0e16d8f181241f994875eba52d`;
+its four newly added drafts change no pinned Group D normative file.
+EIP-8504/#12672 remains at the pinned proposal head. Prospective EIP-8476
+composition with 8151/8298 requires upstream agreement and is not activated.
+
+These profiles do not schedule a public fork. Provisional 8504 constants and
 official wire/Engine/CL assignments, incomplete 8288 aggregation, 7807 and
-omitted-proof IL composition, ecosystem qualification and the existing canonical
-paymaster upstream-adoption gate remain explicit. Native hgtp/1 and the pinned
-Gloas CL codec are identified experiments, not official multi-client devnet
-qualification. No automatic token compensation is invented.
+omitted-proof IL composition, external ecosystem qualification and canonical
+paymaster upstream adoption remain explicit release gates. Native hgtp/1 and
+the pinned Gloas codec are identified experiments. No automatic token
+compensation or unsupported validity proof is invented.
 
 Published as [PR #171](https://github.com/alt-research/eth2030/pull/171).
-Hosted exact-head checks are tracked by the PR's live check suite; offline source evidence does not assert a hosted result.
-
-Hosted qualification of source-identical head
-`335466499783ceed25de596e2ba0fb8b3e5fb67d`: the complete nine-job
-[CI workflow](https://github.com/alt-research/eth2030/actions/runs/45895680692)
-and [independent snap2 interoperability](https://github.com/alt-research/eth2030/actions/runs/45895680579)
-passed. This final review-record update changes documentation only. Subsequent
-exact-head reruns and the actual canonical-proof families remain visible in the
-live PR suite; their result is not inferred from these earlier passes.
-
-## Latest-EIP completeness re-audit in progress
-
-The EIPs master and EIP-8504 proposal heads/discussion are unchanged. New native
-regressions reproduced three implementation gaps: trace cache reconstruction
-after read-only child reverts (17 index reads instead of one), missing CL
-witness/header reconstruction, and unsupported legacy research proof helpers
-accepting dependency blocks. These paths are fixed; real blob/KZG composition,
-actual LOG3/event-copy rollback and created/destroyed adopter traces also pass.
-Full current-source qualification is pending; predecessor evidence above is not
-claimed for the modified source. Coverage now requires 55 native consumers.
-
-The re-audit also closes all four STF witness/transition input boundaries and
-the generic queued/sequential/batch sync delegation boundary. Independent witness
-validity is checked before delegated execution/persistence, while unsupported
-STF schemas reject before backend setup. Activation remains the chain validator’s responsibility. Full qualification is still pending.
+The English PR description and exact-head check suite record final hosted
+results after this offline evidence freeze. This record claims the local runs
+above; it does not infer hosted success from an earlier commit.

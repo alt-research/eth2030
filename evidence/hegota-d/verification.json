@@ -1,7 +1,7 @@
 {
   "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
-  "source_revision": "c449112d2e455eef15546ff46418431cd170daaa",
+  "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
   "tasks": 8,
   "criteria": 32,
   "selected_profile_consumers_passed": true,
@@ -15,8 +15,9 @@
     "8504 omitted inclusion-list dependency validity requires an upstream witness-bearing IL composition"
   ],
   "artifacts": {
-    "docs/plans/hegota-d/COMPOSITION.md": "cf0d64f14c425429888acf4b11f330de5d3ec15697276caa65c844c785a2ca9b",
+    "docs/plans/hegota-d/COMPOSITION.md": "8dc8023a04ea80723419e21f16b747a0701c02b8e358cb7027c1ff11bf61f8a4",
     "docs/plans/hegota-d/PLAN.md": "67c09ef581092cdbc10ea56922791aea9651fbf296d8f69d7d41187af93a6d5e",
+    "docs/plans/hegota-d/REAUDIT.md": "a2e541a0338884bd3826142d0550a78a4fd94d4a9acf048b51fad03eb075f88a",
     "pkg/bal/code_adoption.go": "a6e2c16d3980b1ab6c1ba0488c55832943bcabaa312944dcd496352cb27f32cf",
     "pkg/bal/code_adoption_test.go": "b57cbd03771059a3c8d56847728adee7fe42d6c0643e952fb8bc40b7eefd78c9",
     "pkg/bal/decode.go": "6f40767c6235c1ca2b82f68edd832a8572e8c0bc48fe2f7d6b27dc3ab03f6bed",
@@ -33,8 +34,11 @@
     "pkg/core/config/chain_config_forks_test.go": "a500822ed29d31dfd46c5c273a4691a5aedc9eeb8081247b35b498db6e108caf",
     "pkg/core/config/genesis.go": "72b74a7b3c26e1adde48a5b3198919a80a4b2abdf730890203721551210e6029",
     "pkg/core/config/group_d_extensions_test.go": "78f65aa34f26e4d981767dfd8ecce44b5709bbcf6e4d226befe58e5250c4c4b6",
-    "pkg/core/execution/assertion_7906.go": "5a52a63f0662c0f1ea6f7dd1c83cb16d7b45637793d516061390d01ba76d159d",
+    "pkg/core/execution/assertion_7906.go": "c10d7cef9dc1588dca02a81713357c7698b0cded00028bb6bc410ac2aefabf66",
     "pkg/core/execution/assertion_7906_test.go": "926454f9677a0190b474805ec47e7315dc7a5cdda3eb035f19313fdca49e190f",
+    "pkg/core/execution/assertion_adoption_7906_test.go": "6388164511c786be47e3de12ec838009c2de6d49984f5a7465d00a6be4166ac1",
+    "pkg/core/execution/assertion_cache_7906_test.go": "9b3520ca670d1becedf7dd7513d87193d4a68ce09629b815b4f3fd23f301da6d",
+    "pkg/core/execution/assertion_events_7906_test.go": "45a2678fb7435446ea2bec424b2cc42d75cca2e176c44aa2185f87fa21174edc",
     "pkg/core/execution/assertion_paymaster_7906_test.go": "57f587d4f04fe533fa33ac0266328c63709ca2c096cde991d66090582077a71b",
     "pkg/core/execution/dependency_wallet_8504_test.go": "49f50f63ee01db900307fc0ebb2e3260b67f460b41677b8573c4d75ee3db79e4",
     "pkg/core/execution/frame_8141.go": "20a2ba7a58784893635e2714b79fd4d40d82b340ac03e7528913f17c97771d6a",
@@ -42,15 +46,16 @@
     "pkg/core/execution/migration_8298_test.go": "71411db40fc8db3aad3ed81c8db642401160e0aa4f6cc4c6aa9458594f87fe65",
     "pkg/core/execution/parallel.go": "8fead9573846e7e9e1537f0d95c991204d881177e9462ff97d72f6fe92ee1737",
     "pkg/core/execution/processor.go": "550806ff6991e47bf9ed72d33fa32a4984d8e216fd19df39793c8331582843a1",
-    "pkg/core/frameproof/verify.go": "9979b0272baa3e3b2c4be0e1f84d6a60a735703f9690f104e99fb38053a20701",
+    "pkg/core/frameproof/verify.go": "cedc28690575ab3f9981817e4a567f26bd50f3714e280f3e723f96f5bf963acc",
     "pkg/core/frameproof/verify_test.go": "2103c787acc6b560af7ca96b76fc35968b2878c33c097ebe0e6416adfadf0482",
     "pkg/core/rawdb/chaindb.go": "de681e4a673f06ae4e77ae2c12c5bed25b5a7bc34d1a0b4776085084f4c8f9ab",
     "pkg/core/types/block.go": "d260911bcbf1fa6165a7fdff507cb7776868efdb247eb7a4f5a0d9e0a64a0f3d",
     "pkg/core/types/block_rlp.go": "11bdeb0993f255ef897fd514d8bb7af19e6b7ad2001f83a178f854eadbd50e14",
     "pkg/core/types/block_ssz.go": "c57a94742d02d4ada086ecd90ab2d4f56bd9b0968ca4ae49f55b9883f1bac2f5",
-    "pkg/core/types/consensus_payload_8504.go": "d4838cb76978a6b550cb829c166a91bf821ff5eb151936487cb6e8cf6a8474ac",
+    "pkg/core/types/consensus_payload_8504.go": "6174f34d80522c792bf577c5246e13d12a038670c1d480b0a2546b1a27496de8",
+    "pkg/core/types/consensus_payload_8504_commitment_test.go": "6ab1e80fd5d6eb167dca7145d916895ef1c8f3963a330e07f45b2fa762f786ab",
     "pkg/core/types/consensus_payload_8504_test.go": "bc8db5a5a52cc59bb2dfbf2d0bc147175ce52e3c6faa257824b413cc99a18ba9",
-    "pkg/core/types/dependency_8504.go": "e2bb85a55134a87704dc6c3bd5dcbc30a533d8623d63ae35b40cb5663158f7ba",
+    "pkg/core/types/dependency_8504.go": "2993fbb9cf398e949d7e6fe768d3276c10d1805b6214172188353b71e9b18fcc",
     "pkg/core/types/frame_8141.go": "34c5b1dc0b467cac216b63af61c04824291792bb2ea738bf715bb49d679f0b20",
     "pkg/core/types/frame_8141_network.go": "d36e69673cfa8f6e276845b3e2cebb69eeb47d3cdca6edfcac42e1edbd7baa93",
     "pkg/core/types/frame_8141_pool.go": "f70708698aa0f8d717930eebc5a773db71fe7ed0606eb17cc2b48ab1a7a84da1",
@@ -95,7 +100,7 @@
     "pkg/eth/sparse_relay.go": "3d5ae122c40f1d4bb765f8291c084452cbef154dcf2663ca13f9a43b809752af",
     "pkg/eth/sync_fetch.go": "0cb050dd094dd3294e77d3f568e0213abed05879910c7f8fceaa73be6d5ef2b6",
     "pkg/internal/testutil/proof8504/canonical-wallet.json": "3d135211dd28feba6c4703dba3dae14d048638619fe271b9490c33d89331291f",
-    "pkg/internal/testutil/proof8504/fixture.go": "ca40bca5a14073d3ef964d3fc02e6ab2842d9dab41817482a7cc4e612241c005",
+    "pkg/internal/testutil/proof8504/fixture.go": "781915816c2b49b572f15f814c95af0a7ed007e141e96ed552e93c3e52444b14",
     "pkg/internal/testutil/proof8504/vector.json": "e5822582b12064e019110d9ac78e4c31fcf97252b8f0957bb9e92d630359f1f8",
     "pkg/node/backend/engine_backend.go": "c9bd08f712f672092eee4dfb836ad4ff4e0a567df1394f8c7c2f1997c82fff33",
     "pkg/node/backend/engine_bogota.go": "29adcea7f2c9028d1171b1f6bfac34866c9cc331fc2a47724f259858a3873d76",
@@ -109,15 +114,26 @@
     "pkg/p2p/ethproto/protocol.go": "ebf92646e1d4cd2b3e75e3e59fcebdcbd7d812ca54862f476386b351ca672d6c",
     "pkg/p2p/ethproto/receipt_tx_codec.go": "6ccb215c4ec8f38b9cad6b230c3c41912d37f81e9cd57f28dc71a8ef41a543be",
     "pkg/p2p/ethproto/sync_codec.go": "526c39ca9b5f9552b85b292fa87e119deec6bec68b8a7c8ae575b6e2e36b03e2",
+    "pkg/proofs/README.md": "8dd74b0bc3c98f5a1995aa47fa3015b4b382018533b7a360c10a87c4666afb46",
+    "pkg/proofs/dependency_8504_test.go": "ed01422c7853fe0fe34ff093d6546c8f3cdc0001e1e9c1544a552fcd30339392",
+    "pkg/proofs/execution_proof.go": "8b517885701e871f42c7f43de15710e944e4aef61271d7db68689456e5962cd6",
     "pkg/rpc/types/types.go": "5df44082ace59f957f367cf24b7c264eaaa8027916c10b3fbb04c7d3f89b3d92",
+    "pkg/sync/inserter/block_processor.go": "669814b7460ceaad838c03f1e4860ce64e705353e75079a9342f70e7cbd5840c",
+    "pkg/sync/inserter/chain_inserter.go": "fde9bffda78b11da691f63928845359ce77462b5642f9ea31c1701ddd4387b8f",
+    "pkg/sync/inserter/dependency_8504_test.go": "31d77e230a9e50f4588cb3ba975b2ddd7305596583975a11296602dbc8a6bd84",
     "pkg/sync/statesync/pivot_rebase.go": "169565c9b5b69820f24e6e3d0ba65ff195586d90ad40a746c310b9a7452e7f27",
     "pkg/txpool/dependency_8504.go": "de738d3e49f6adc108a38d4ffa72e92aad7da225382242c8ce1d7cef45be42cf",
     "pkg/txpool/dependency_8504_test.go": "ed1c0a68c2f891d469ffb9e7230fd9ad6c4275f3e9c7855815381147218a6572",
+    "pkg/txpool/dependency_blob_8504_test.go": "2c9656d23f8cf5ce4214c51b4ba323c9744c89cd6d1dadd0ea28352ceea27a5c",
     "pkg/txpool/frame_8141.go": "4a98ddbf5b61cb93d8d7b711e5163d80ad92268c49bff825867bc68695ccf391",
     "pkg/txpool/frame_expiry.go": "d05f13f026dd4a19fe57e1a661cc49dbbe8213a5203a072b9c555ebab3a1b313",
     "pkg/txpool/migration_8298.go": "647c76dd8462d7537b9ffcbdef5c9f3c8880fefec441b541b65b6cd2f0f2c17e",
     "pkg/txpool/migration_8298_test.go": "839d37f1a898ddd7974abc8b014b8f5f37c9e2f1a9cd5ef5adef3d1799568a77",
     "pkg/txpool/txpool.go": "44fcd87aec46b2fed95c5299998c584706ed25071b19d106dced9d78d64d7406",
+    "pkg/zkvm/dependency_8504_test.go": "41beac2e240287bb5485c987de0741316873faf809f455dc43340e1a28517e2c",
+    "pkg/zkvm/guest.go": "6547800575ced680f1a3321d871d19684511d8f8fb51c922f9bf5d8c50a47171",
+    "pkg/zkvm/stf.go": "a449b53f4783aa7c26e011a47bcb8293a45ec5c7b4a614b958fae4827701c9a0",
+    "pkg/zkvm/stf_executor.go": "634f4013c77148441d6805c23d328af43000fffffb7b12f7830d1fee28fcba48",
     "refs/EIPs/EIPS/eip-3541.md": "dff418f1ed441352ee656eb5ba1d96c12acdefc788251e4d63149cfb442fba07",
     "refs/EIPs/EIPS/eip-3607.md": "2c3789bcbb7fd59f03db7d2f179e185f3debcf8c58180ac0db62cb77af738fc7",
     "refs/EIPs/EIPS/eip-6780.md": "3941eed8379cc93abb7342c5b186bd883e8b1518b0025d94a49be068f8ea2101",
@@ -129,26 +145,30 @@
     "refs/EIPs/EIPS/eip-8151.md": "1e3e93955e86fb29b729385f1a8925663a5f016fd5e9f7d7a78ce481b3a65c80",
     "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
     "refs/EIPs/EIPS/eip-8298.md": "9c05ea1f17f5726b793388e7d61e38a6a2af1adc7ff134f2c80de5b399214d13",
-    "specs/hegota/group-d.json": "0204175838c4cf875713d85625027ac1abf533e8588f7b2f38af51ba91143746",
+    "specs/hegota/group-d.json": "3e246ed5b97ba72664b6ee988e5012962f3270083cd74673828480f183e6565d",
     "specs/hegota/profiles.json": "16cd980dcccfbda39a3be6c4b694931a40c9dfbb22ff85cffde0edccd49990f7",
     "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
     "specs/hegota/upstream/2026-11-27/eip-8038.md": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864",
     "specs/hegota/upstream/2026-11-27/group-d/eip-8288.md": "4dd6e8ebc8abd64e615b4ff8e59ab4e09a13a2e3d18b090f9d3ea24735031c8f",
     "specs/hegota/upstream/2026-11-27/group-d/eip-8504.md": "c2e898c21ecc94342e4fbe3490591c01027b91852dabfc1cbaf0c50ae02d976b",
-    "tools/hegota/check_d.py": "c994809defefdc9c187fc618de1d4c7f60ba55c8d80e645c369ff0dea8ca6d50",
+    "tools/hegota/check_d.py": "2384ae1a08226d6bbfd31923f66c9896d918695dcd65212968dc79719ebb5737",
     "tools/hegota/generate_d_pq_wallet.py": "57a9d1fa7fe1caf3c7a6fe73305d11ba76751f500e463a91b770b364e0d7ceab",
-    "tools/hegota/test_group_d.py": "d96e7fb9bc6b7eaf25db3f610cf5502351f7c40342b16cfef492a1a41b9b44f9"
+    "tools/hegota/test_group_d.py": "664dbc2a53664b2b2247b70c1e30bb5a3d73128d45b7e9894843bb9490fd202b"
   },
-  "source_fingerprint_sha256": "f2d9934e7a87887bf2c8fa6cee3073f2fe6fd411e37c8344089539f37d1d4d8b",
+  "source_fingerprint_sha256": "f0dd6f85c01cdc6e0f3180eafdbb678a6803c40dc5295501c344ca993aba0738",
   "passed_tests": {
     "github.com/eth2030/eth2030/bal::TestCodeAdoption8298CanonicalWireAndAvailability": "pass",
     "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart": "pass",
     "github.com/eth2030/eth2030/core/config::TestFrameDOptionalActivationAndCompatibility": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906ActualEscrowAndPrefixPrestateTrace": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestAssertion7906AdoptionCreationDestructionAndBodyRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906CaughtChildApprovalIsOrdinaryStaticFailure": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906FailureWithoutPayerInvalidatesTransaction": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestAssertion7906NativeLogTopicsDataCopyAndRollback": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906PaymasterTokenFalseReturnRetryAndAtomic": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906PrestateNetDiffSortedAndLazy": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheSurvivesReadOnlyReverts": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheTracksObservableMutations": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceOpcodesExecuteAgainstPaidPrefix": "pass",
     "github.com/eth2030/eth2030/core/execution::TestAssertion7906WholeBodyRollbackAndPrefixSettlement": "pass",
     "github.com/eth2030/eth2030/core/execution::TestDependency8504CanonicalSigningHashWalletBaseAndKeyed": "pass",
@@ -156,6 +176,7 @@
     "github.com/eth2030/eth2030/core/frameproof::TestDependency8504EmptyBlockCommitment": "pass",
     "github.com/eth2030/eth2030/core/frameproof::TestDependency8504IndependentSubmissionWrapperAndBlock": "pass",
     "github.com/eth2030/eth2030/core/frameproof::TestDependency8504MissingTamperedAndWrapperControls": "pass",
+    "github.com/eth2030/eth2030/core/types::TestDependency8504GloasReconstructsAndChecksWitnessCommitment": "pass",
     "github.com/eth2030/eth2030/core/types::TestDependency8504IndependentGloasProgressivePayload": "pass",
     "github.com/eth2030/eth2030/core/types::TestFrameDDependenciesSortDeduplicateAndUnion": "pass",
     "github.com/eth2030/eth2030/core/types::TestFrameDIndependentProofFrameWireHashAndGas": "pass",
@@ -179,18 +200,23 @@
     "github.com/eth2030/eth2030/eth::TestDependency8504PeerRejectsWrongProfileAndUnsolicitedResponse": "pass",
     "github.com/eth2030/eth2030/node::TestDependency8504ActualRPCSimulationEngineBodiesAndRestart": "pass",
     "github.com/eth2030/eth2030/p2p/ethproto::TestDependency8504BlockBodiesPreserveActiveEmptyAndBytes": "pass",
+    "github.com/eth2030/eth2030/proofs::TestDependency8504LegacyProofHelpersRejectUnsupportedBlocks": "pass",
+    "github.com/eth2030/eth2030/sync/inserter::TestDependency8504SyncPipelinesCheckWitnessesBeforeDelegation": "pass",
+    "github.com/eth2030/eth2030/txpool::TestDependency8504BlobSubmissionWrapperAdmissionAndLookup": "pass",
     "github.com/eth2030/eth2030/txpool::TestDependency8504ExpiryAndActualWrapperByteBudget": "pass",
     "github.com/eth2030/eth2030/txpool::TestDependency8504PoolAdmissionLifecycleAndBytes": "pass",
     "github.com/eth2030/eth2030/txpool::TestDependency8504PoolRejectsBodyWitnessBeforeSimulation": "pass",
     "github.com/eth2030/eth2030/txpool::TestDependency8504ReplacementWrapperAtomicAccounting": "pass",
     "github.com/eth2030/eth2030/txpool::TestMigration8298AssertionJournalsPreserve8151SignerClass": "pass",
     "github.com/eth2030/eth2030/txpool::TestMigration8298PoolEvictsRetiredOriginsAndAllowsFrames": "pass",
-    "github.com/eth2030/eth2030/txpool::TestMigration8298ProxyDependencyLimitReplacementEvictionAndReorg": "pass"
+    "github.com/eth2030/eth2030/txpool::TestMigration8298ProxyDependencyLimitReplacementEvictionAndReorg": "pass",
+    "github.com/eth2030/eth2030/zkvm::TestDependency8504LegacyGuestRejectsUnsupportedBlockBeforeExecution": "pass",
+    "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs": "pass"
   },
   "run": {
-    "log_sha256": "f132771a58c1ea31e7691c33a29ed264269747e4f32f6ca5e59c32a04d864f39",
+    "log_sha256": "06ac652704e94673ddc69aba8aac185aa49eeee383ecd6fbc0e3238cba5a2aae",
     "named": {
-      "pass": 24166,
+      "pass": 24176,
       "skip": 124
     },
     "packages": {
@@ -200,20 +226,20 @@
     "completed_packages": 243
   },
   "additional_qualification": {
-    "source_revision": "c449112d2e455eef15546ff46418431cd170daaa",
+    "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
     "build": "go build ./... and native/wrapper binaries, exit 0",
     "vet": "go vet ./..., exit 0",
     "race": {
-      "log_sha256": "6ad6a177cd17e2ca3eb5ce728225b275a10c7f96c01ba8b8b86b0d2fdf2cf3ac",
+      "log_sha256": "0fa9560bbfe49d074f447bfd2b3e878ad31e61f30e227b413c4ca89bbe7a36da",
       "named": {
-        "pass": 10801,
-        "skip": 78
+        "pass": 11535,
+        "skip": 87
       },
       "packages": {
-        "pass": 65,
+        "pass": 68,
         "skip": 3
       },
-      "completed_packages": 68
+      "completed_packages": 71
     },
     "historical_baseline": {
       "expected": 12,
@@ -226,41 +252,165 @@
     "optimized_python_regressions": 102,
     "skip_inventory": "evidence/hegota-a/skipped-tests.json"
   },
+  "previous_qualification": {
+    "revision": "00ca827fd8d55a21b367adc8e8f3a92334eae36e",
+    "verification": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-d/verification.json",
+    "scope": "Immutable predecessor only. Previous extended/negative controls are not re-claimed as current-source executions."
+  },
   "negative_controls": [
     {
-      "name": "proof-verification",
-      "control_kind": "single isolated semantic removal; test sources unchanged",
-      "expected_exit_code": 1,
-      "log_sha256": "79ac07704a69ac119fe0cffd602787d317c3cd4bf565a775e5347d8ea4c6d280",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/frameproof::TestDependency8504MissingTamperedAndWrapperControls"
-      ],
-      "overlay_files": {
-        "pkg/core/frameproof/verify.go": "5425ff4eb6a6dfaa1b61a4b12dc3679689352a70b15f0fddaa4db838064e3cd9"
-      }
-    },
-    {
       "name": "assert-body-rollback",
-      "control_kind": "single isolated semantic removal; test sources unchanged",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
       "expected_exit_code": 1,
-      "log_sha256": "f311e78ba623e4d24807b7bd607a533fbac56aacd72c876bee5b568f24c392c5",
+      "observed_exit_code": 1,
+      "log_sha256": "dc9ffeba925d025c7b40c932bf7e4aa1df1092d4a762da64401a96107c5a4e2c",
+      "overlay_manifest_sha256": "8a2b09d354567b66595266db40c549cbfa05c849766e808cf6f51495d38029a1",
       "failed_consumers": [
         "github.com/eth2030/eth2030/core/execution::TestAssertion7906WholeBodyRollbackAndPrefixSettlement"
       ],
       "overlay_files": {
-        "pkg/core/execution/frame_8141.go": "70beb4445517b4f77ec4535e827d62699631450c43059fdb89a0ae158e67a298"
+        "pkg/core/execution/frame_8141.go": "42a5ad290ab4e0028d868356e0d60cd51dc815fbbd40eeb53efb8f543bef764f"
+      },
+      "unchanged_test_files": {
+        "pkg/core/execution/assertion_7906_test.go": "926454f9677a0190b474805ec47e7315dc7a5cdda3eb035f19313fdca49e190f"
+      }
+    },
+    {
+      "name": "cl-commitment",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "c39aabb1a960e9677a0d688ed1dd3977e419c903084ba3819c4dcc1e17688a47",
+      "overlay_manifest_sha256": "c075ea1cd9352c5e837296530ab0bf670db5a6d6409312a7dd1b9bf7875a3dbd",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/types::TestDependency8504GloasReconstructsAndChecksWitnessCommitment"
+      ],
+      "overlay_files": {
+        "pkg/core/types/consensus_payload_8504.go": "ba782d4c1e0a92e024668503a6dfd9f4ee9bd3d6add303f76b76ccebcdcc08ea"
+      },
+      "unchanged_test_files": {
+        "pkg/core/types/consensus_payload_8504_commitment_test.go": "6ab1e80fd5d6eb167dca7145d916895ef1c8f3963a330e07f45b2fa762f786ab"
       }
     },
     {
       "name": "code-adoption",
-      "control_kind": "single isolated semantic removal; test sources unchanged",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
       "expected_exit_code": 1,
-      "log_sha256": "72c2939888b8d9fb60aa1502417a4cc1343c3d16404e942c2d3ccf5c17d8d92b",
+      "observed_exit_code": 1,
+      "log_sha256": "eabc4281f533a46d8161ac078814c34262a148ad2fbbdbbd8098a32f4cadd4aa",
+      "overlay_manifest_sha256": "1c217bdaa77b13794f3f75cfac94690ca839ae5eb7df8e57736a1107e7d57e62",
       "failed_consumers": [
         "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback"
       ],
       "overlay_files": {
-        "pkg/core/vm/setcodefrom_8298.go": "34bc12b654b30df67a20bbe79adb28cf91ed30d338491e8da8cb2c48d4211517"
+        "pkg/core/vm/setcodefrom_8298.go": "685cacf5c845bd4b5b2170be4a3e6388383b663e8613b0610816cd98c33cca49"
+      },
+      "unchanged_test_files": {
+        "pkg/core/vm/setcodefrom_8298_test.go": "148a2a6a47e394653bc2a2e4a609196ea741e04a4cd0ece44e55bf7fab37d5bc"
+      }
+    },
+    {
+      "name": "legacy-guest",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "04e3de2214030e39a79e08ae94ff50e8bb5757a3a684193225bebf5dd7ebaec7",
+      "overlay_manifest_sha256": "2e6ae5ac7868b4f7cdb81f2510bca603bb3938188b2a1a9dae66c3b0fb6f9cb8",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/zkvm::TestDependency8504LegacyGuestRejectsUnsupportedBlockBeforeExecution"
+      ],
+      "overlay_files": {
+        "pkg/zkvm/guest.go": "a76c00b685f2e4b5057e5a308aabc7ea02a026e556cd9332ab0befc0e74b0edf"
+      },
+      "unchanged_test_files": {
+        "pkg/zkvm/dependency_8504_test.go": "41beac2e240287bb5485c987de0741316873faf809f455dc43340e1a28517e2c"
+      }
+    },
+    {
+      "name": "legacy-proof",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "811cd26266d37b73510be318c104660b56b0d7e7f0821a98347dbaf8ee2d4b81",
+      "overlay_manifest_sha256": "d1770e7ba71f35e4efaf54865c0db95fc3ba230d3819bd822c9528d97e0c51d1",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/proofs::TestDependency8504LegacyProofHelpersRejectUnsupportedBlocks"
+      ],
+      "overlay_files": {
+        "pkg/proofs/execution_proof.go": "75883b0efff14e6e3a995cddd9004cfbe4ca071a24ce37e16498f08c9e694a0a"
+      },
+      "unchanged_test_files": {
+        "pkg/proofs/dependency_8504_test.go": "ed01422c7853fe0fe34ff093d6546c8f3cdc0001e1e9c1544a552fcd30339392"
+      }
+    },
+    {
+      "name": "stf-schema",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "b226ca9dc555c0dab624997d43960254f83c958bf872d9dbc5e920ea35ebda47",
+      "overlay_manifest_sha256": "e520b7e453bb5f1450fdb0f3383ea3638ebec9ec9254c78b206f367cc53cf2f9",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs"
+      ],
+      "overlay_files": {
+        "pkg/zkvm/stf.go": "5499f69c1ce62835ed9496d059892ddc948d356cd82c1e09760b7782598246e4",
+        "pkg/zkvm/stf_executor.go": "a4259021115f16cfe8c33663136e62145fce2b0cf81a1af621b58dcef2727f9b"
+      },
+      "unchanged_test_files": {
+        "pkg/zkvm/dependency_8504_test.go": "41beac2e240287bb5485c987de0741316873faf809f455dc43340e1a28517e2c"
+      }
+    },
+    {
+      "name": "sync-delegation",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "b60c413f284f42b578d1b50db68d23411df1bd518648e30ad9568d20b4e838e0",
+      "overlay_manifest_sha256": "e29afe132ddb924e50d3c2ff1a3f0921579f1756acd3b2255c5e7b9b8ae62151",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/sync/inserter::TestDependency8504SyncPipelinesCheckWitnessesBeforeDelegation"
+      ],
+      "overlay_files": {
+        "pkg/sync/inserter/block_processor.go": "969d16322d9ed9ce4d83f1165eba7dec6ddcf0b2d3845f5daf3000332c834cc5",
+        "pkg/sync/inserter/chain_inserter.go": "2ba7383ddd63909f78c9b2dc9a1848da8de9e9ca0c2509604740a5a781d9bebb"
+      },
+      "unchanged_test_files": {
+        "pkg/sync/inserter/dependency_8504_test.go": "31d77e230a9e50f4588cb3ba975b2ddd7305596583975a11296602dbc8a6bd84"
+      }
+    },
+    {
+      "name": "trace-cache",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "879d04af5f532008cf1565df1a0f03357f2d1b5a5d85202f6aa8cd9995d2989b",
+      "overlay_manifest_sha256": "1b652241821fdf002efa927980bc0fc7f22c074770bc3705acc2f6a2ace57f6e",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheSurvivesReadOnlyReverts"
+      ],
+      "overlay_files": {
+        "pkg/core/execution/assertion_7906.go": "db1662e0cf52a8d27600faf16622a08badb739b46b3c58a04bcdf6eadfbd1b3c"
+      },
+      "unchanged_test_files": {
+        "pkg/core/execution/assertion_cache_7906_test.go": "9b3520ca670d1becedf7dd7513d87193d4a68ce09629b815b4f3fd23f301da6d"
+      }
+    },
+    {
+      "name": "witness-verification",
+      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "9311a6af3d8cb56c964de712e44bb1e7ff576f4ccf09cf26da8cdc909c0ffb8f",
+      "overlay_manifest_sha256": "77af7fc52198a37441c7d2a7901bc96c7488b132e465a2254ba70a7d9f459e47",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/frameproof::TestDependency8504MissingTamperedAndWrapperControls"
+      ],
+      "overlay_files": {
+        "pkg/core/frameproof/verify.go": "fd09541b101d41c1f9c0fcd90b2e576e47abdcab614b24ee906136a4d3bbf7e8"
+      },
+      "unchanged_test_files": {
+        "pkg/core/frameproof/verify_test.go": "2103c787acc6b560af7ca96b76fc35968b2878c33c097ebe0e6416adfadf0482"
       }
     }
   ]

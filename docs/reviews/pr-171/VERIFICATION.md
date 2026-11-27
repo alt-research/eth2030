@@ -2,7 +2,7 @@
 
 ## Identity and scope
 
-Implementation: `c449112d2e455eef15546ff46418431cd170daaa`.
+Implementation: `d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151`.
 Baseline: `81e63f586642a1406d56db9fa7cbf00941feb7bf` (merged PR #170).
 Reviewed on 2026-11-27, Asia/Shanghai. The final source/fixture fingerprints are
 checked by `tools/hegota/check.py`, `check_b.py`, `check_c.py` and `check_d.py`.
@@ -11,7 +11,10 @@ Review tracker renames and evidence-only commits do not change the tested code.
 The [plan](../../plans/hegota-d/PLAN.md) and
 [composition report](../../plans/hegota-d/COMPOSITION.md) define all eight tasks
 and their 32 criteria. Source references are immutable; the EIPs master and
-EIP-8504 PR heads were rechecked and still match the pinned revisions.
+EIP-8504 proposal head still matches the pinned revision. The final EIPs master
+check advanced to `68db81b0a75edb0e16d8f181241f994875eba52d` through four
+new drafts; no Group D normative file changed. The re-audit records the
+unselected EIP-8476/8151/8298 composition issue explicitly.
 
 ## Executed qualification
 
@@ -23,16 +26,17 @@ All Go commands use `env -u GOROOT GOFLAGS=-p=4`.
 | `go vet ./...` | Exit 0 |
 | `gofmt -l .` | No unformatted files |
 | Native and geth wrapper host builds plus `--version` | Exit 0; actual commit and binary hashes in runtime manifest |
-| `go test -json ./... -count=1` | 243/243 packages completed; 24,166 named pass, 0 fail, 124 optional skips |
-| Affected `go test -race -json ... -count=1` | 68/68 packages completed; 10,801 named pass, 0 fail, 78 optional skips |
+| `go test -json ./... -count=1` | 243/243 packages completed; 24,176 named pass, 0 fail, 124 optional skips |
+| Affected `go test -race -json ... -count=1` | 71/71 packages completed; 11,535 named pass, 0 fail, 87 optional skips |
 | `go run ./cmd/eth2030-baseline` | 12 executed, 12 pass, 0 fail, 0 skip against unchanged Geth v1.17.10 |
 | Python `unittest discover -s tools/hegota -p 'test_*.py'` | 102 pass in normal and optimized mode |
 | Fixed-source and A/B/C/D checks, codec/semantic/keyed goldens | All pass; independent expected values unchanged |
-| Mandatory native consumers A / B / C / D | 62 / 79 / 102 / 45; zero omissions or skips |
+| Mandatory native consumers A / B / C / D | 62 / 79 / 102 / 55; zero omissions or skips |
 
 The race command covers bal, core/{types,config,vm,execution,block,chain,state,
 framepay,frameproof,rawdb}, crypto/leansphincs, txpool/..., eth, node/..., rpc/...,
-engine/..., p2p/ethproto, sync/statesync, cmd/{eth2030,send-frame} and eiptest.
+engine/..., p2p/ethproto, sync/{statesync,inserter}, proofs, zkvm,
+cmd/{eth2030,send-frame} and eiptest.
 Every D mandatory consumer appears as an actual pass in both full and race logs.
 Optional skip reasons are in `evidence/hegota-a/skipped-tests.json`; missing
 optional corpora are never reported as executed native passes.
@@ -62,9 +66,11 @@ optional corpora are never reported as executed native passes.
   static subtree approval, paid/unpaid failure, entire-body rollback, BAL read
   retention and exact PR-12041 paymaster/token false-return/retry/atomic cases.
 
-Three Go overlays independently remove witness verification, ASSERT body
-restoration or code adoption while leaving tests unchanged. Each compiles and
-fails its intended native consumer. Their log and overlay identities are in
+Nine Go overlays independently remove witness verification, ASSERT body
+restoration, code adoption, unchanged-diff trace caching, CL commitment
+reconstruction, legacy proof rejection, legacy guest rejection, STF schema
+rejection or pre-delegation sync verification. Each leaves the production and
+test files unchanged, compiles, and fails its intended mandatory native consumer. Their log and overlay identities are in
 `evidence/hegota-d/verification.json`. Earlier A/B/C extended controls remain
 immutable predecessor provenance, not newly claimed D executions.
 
@@ -81,7 +87,7 @@ verdict. Existing A/B/C release gates remain in force.
 The PR's exact-head hosted checks are the live CI authority; this offline record
 claims the local runs above, not an unobserved hosted result.
 
-## Hosted observation
+## Historical hosted observation (predecessor only)
 
 On head `335466499783ceed25de596e2ba0fb8b3e5fb67d`, all nine
 [CI jobs](https://github.com/alt-research/eth2030/actions/runs/45895680692)
@@ -92,3 +98,13 @@ consensus/control fixtures, frozen paymaster rebuild, fixed-source checks,
 full Go tests and all four build variants. Actual canonical-proof acceptance
 and any final documentation-head reruns are separately reported by the live
 PR suite. No pending or canceled run is counted as a pass.
+
+## Re-audit completion
+
+All 55 mandatory D consumers pass in both fresh full and affected race logs.
+The four reproduced boundary failures and three additional production scenarios
+are documented in [REAUDIT.md](../../plans/hegota-d/REAUDIT.md). Source-bound
+A/B/C/D reports were regenerated without changing independent expected values.
+Final-head hosted CI, independent snap2 interoperability and actual proof-family
+results are recorded in the English PR after publication; this offline record
+does not count pending runs as passes.

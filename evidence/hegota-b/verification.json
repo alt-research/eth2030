@@ -4,9 +4,9 @@
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "f132771a58c1ea31e7691c33a29ed264269747e4f32f6ca5e59c32a04d864f39",
+    "log_sha256": "06ac652704e94673ddc69aba8aac185aa49eeee383ecd6fbc0e3238cba5a2aae",
     "named": {
-      "pass": 24166,
+      "pass": 24176,
       "skip": 124
     },
     "packages": {
@@ -172,51 +172,21 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
-  "previous_qualification": {
-    "revision": "81e63f586642a1406d56db9fa7cbf00941feb7bf",
-    "verification": "https://github.com/alt-research/eth2030/blob/81e63f586642a1406d56db9fa7cbf00941feb7bf/evidence/hegota-b/verification.json",
-    "scope": "Immutable merged PR #170 provenance. Historical extended runs/negative controls below are not represented as current-source executions. Current source-bound mandatory consumers are recorded above.",
-    "historical_extensions": {
-      "source_revision": "79b82283303cb48aafec37713f4acaab815d1519",
-      "additional_qualification": {
-        "build": "full native/wrapper builds, exit 0",
-        "vet": "full vet, exit 0",
-        "build_vet_commands_sha256": "2927328e5863bc9969425e054fddd23a624de624527dfb9e4d040fb99064c39c",
-        "race_log_sha256": "898140ad3cc1957b40a0972825ee0b579559ebeb67f77ad25224b512ff6f39b1",
-        "race_command_sha256": "0e640348768e46cd067a0dd8691c9572526ffff4ae865ca8d1517b805c3f1011",
-        "race_named_pass": 9786,
-        "race_named_fail": 0,
-        "race_named_skip": 74,
-        "race_completed_packages": 58,
-        "required_native_consumer_skips": 0,
-        "historical_baseline": {
-          "cases": 12,
-          "passed": 12,
-          "failed": 0,
-          "skipped": 0
-        },
-        "skip_inventory": "evidence/hegota-a/skipped-tests.json",
-        "python_regressions": 94,
-        "python_log_sha256": "8785231a290c6ff9eb35e8b7b7d60aef2d5a431a30af1da5c1cbf742e74b8bd0",
-        "optimized_python_log_sha256": "8bd8deb3b459f4a4f577a7b5805323f062c707026a740e499a6eb7c8ce90e4a1"
-      }
-    }
-  },
   "additional_qualification": {
-    "source_revision": "c449112d2e455eef15546ff46418431cd170daaa",
+    "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
     "build": "go build ./... and native/wrapper binaries, exit 0",
     "vet": "go vet ./..., exit 0",
     "race": {
-      "log_sha256": "6ad6a177cd17e2ca3eb5ce728225b275a10c7f96c01ba8b8b86b0d2fdf2cf3ac",
+      "log_sha256": "0fa9560bbfe49d074f447bfd2b3e878ad31e61f30e227b413c4ca89bbe7a36da",
       "named": {
-        "pass": 10801,
-        "skip": 78
+        "pass": 11535,
+        "skip": 87
       },
       "packages": {
-        "pass": 65,
+        "pass": 68,
         "skip": 3
       },
-      "completed_packages": 68
+      "completed_packages": 71
     },
     "historical_baseline": {
       "expected": 12,
@@ -228,5 +198,10 @@
     "python_regressions": 102,
     "optimized_python_regressions": 102,
     "skip_inventory": "evidence/hegota-a/skipped-tests.json"
+  },
+  "previous_qualification": {
+    "revision": "00ca827fd8d55a21b367adc8e8f3a92334eae36e",
+    "verification": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-b/verification.json",
+    "scope": "Immutable predecessor only. Previous extended/negative controls are not re-claimed as current-source executions."
   }
 }

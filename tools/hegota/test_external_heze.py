@@ -47,6 +47,9 @@ class ExternalHezeTests(unittest.TestCase):
         self.assertEqual(result["latency_ms"]["p99"], 2)
         self.assertEqual(result["signed_ssz_bytes"], 157)
         self.assertFalse(result["public_network_tail_qualified"])
+        delayed = [(peer, at + 9000000, signed) for peer, at, signed in observations]
+        repeated = external.network_measurements(observations + delayed, events, ["0xab"], 0, 1)
+        self.assertEqual(repeated["latency_ms"], result["latency_ms"])
         with self.assertRaisesRegex(ValueError, "did not reach"):
             external.network_measurements(observations[:-1], events, ["0xab"], 0, 1)
         changed = json.loads(json.dumps(observations))

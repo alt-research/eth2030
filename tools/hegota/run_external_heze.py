@@ -186,7 +186,11 @@ def network_measurements(observations, engine_events, transactions, genesis, dur
         if [tx.lower() for tx in message["transactions"]] != expected:
             continue
         key = (int(message["slot"]), message["dependent_root"], int(message["validator_index"]))
-        received.setdefault(key, {})[peer] = (at, signed)
+        peers = received.setdefault(key, {})
+        if peer in peers and peers[peer][1] != signed:
+            raise ValueError("conflicting signed IL in transport fixture")
+        if peer not in peers or at < peers[peer][0]:
+            peers[peer] = (at, signed)
     latencies = []
     directions = [0, 0]
     for key, peers in received.items():

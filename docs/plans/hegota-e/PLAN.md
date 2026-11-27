@@ -46,6 +46,17 @@ capacity and resource measurements therefore remain bounded research evidence;
 no committee/IL limit is increased and no unsupported omission is certified.
 Heze/ePBS external-network qualification remains shared with HGT-070/080.
 
+## Transaction-end state boundary
+
+EIP-7805 evaluates omissions after the last transaction, before EIP-4895
+withdrawals and post-execution request calls. Execution-validated EIP-7928
+phase n+1 metadata identifies whether final block state can serve that check;
+affected account/full-state probes require an exact transaction-prefix state.
+Missing metadata requires reconstruction, and corrupted metadata is an error.
+Cached verdicts must identify the predicate used; legacy records with retained
+views are recomputed, while legacy compact records require CL view resubmission.
+See `docs/reviews/pr-172/TRANSACTION_BOUNDARY.md` for the complete audit.
+
 ## Complete acceptance register
 
 | Task | Criteria |

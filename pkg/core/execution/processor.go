@@ -243,6 +243,18 @@ func (p *StateProcessor) Process(block *types.Block, statedb state.StateDB) ([]*
 // along with the computed Block Access List (EIP-7928). The BAL is populated
 // only when the Amsterdam fork is active; otherwise it is nil.
 func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateDB) (*ProcessResult, error) {
+	return p.processWithBAL(block, statedb, true)
+}
+
+// ProcessTransactionsWithBAL reconstructs EIP-7805's state immediately after
+// the last transaction, including pre-execution systems. It excludes EIP-4895
+// withdrawals and post-execution request calls. Its BAL is a prefix, not a
+// whole-block commitment, and Requests is unset. Use only with a validated block.
+func (p *StateProcessor) ProcessTransactionsWithBAL(block *types.Block, statedb state.StateDB) (*ProcessResult, error) {
+	return p.processWithBAL(block, statedb, false)
+}
+
+func (p *StateProcessor) processWithBAL(block *types.Block, statedb state.StateDB, finalize bool) (*ProcessResult, error) {
 	if p.ctx != nil {
 		state.SetReadContext(statedb, p.ctx)
 	}
@@ -534,12 +546,18 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		}
 	}
 
-	requests, err := FinalizeBlockExecution(p.config, p.getHash, statedb, header, block.Withdrawals(), receipts, blockBAL, EVMOverrides{Context: p.ctx})
-	if cancelled := p.contextError(); cancelled != nil {
-		return nil, cancelled
-	}
-	if err != nil {
-		return nil, err
+	var requests types.Requests
+	if finalize {
+		var err error
+		requests, err = FinalizeBlockExecution(p.config, p.getHash, statedb, header, block.Withdrawals(), receipts, blockBAL, EVMOverrides{Context: p.ctx})
+		if cancelled := p.contextError(); cancelled != nil {
+			return nil, cancelled
+		}
+		if err != nil {
+			return nil, err
+		}
+	} else if blockBAL != nil {
+		blockBAL.Sort()
 	}
 
 	execLog.Debug("block_process_done",

@@ -61,6 +61,15 @@ decisions after pruning. An actual external CL must consume that verdict at
 its fork-choice boundary. Bogotá methods are advertised only with a capable
 backend; the alternate backend rejects those versions explicitly.
 
+EIP-7805's omission state is taken immediately after the last transaction,
+before withdrawals and request-system calls. Authenticated BAL post-phase
+metadata preserves the fast Profile 1 account path when its fields are
+unchanged; affected senders and full-state probes reconstruct the precise
+transaction prefix using the shared processor. Missing BAL data reconstructs,
+and corrupt commitments fail. The cache predicate version prevents old final-
+block-state verdicts from bypassing this correction: retained views are
+rechecked, while legacy compact records wait for exact CL view resubmission.
+
 ## AA-VOPS and PQ gates
 
 EIP-8369 is Informational. `vops_reference.go` implements explicit-parameter

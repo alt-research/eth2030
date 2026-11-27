@@ -62,5 +62,27 @@
       "Completed finalized verdicts retained independently of live views",
       "Live CL adapter replacement reauthenticates memory snapshots atomically"
     ]
+  },
+  "transaction_boundary_audit": {
+    "starts_from": "63f85e737d8dd84c8913d6f6ef996179e5e373d5",
+    "record": "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md",
+    "current_sources_unchanged": true,
+    "latest_dependency_content_comparison": [
+      {
+        "eip": 4895,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "81af3b60b632bc9c03513d1d137f25410e3f4d34"
+      },
+      {
+        "eip": 7002,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "31863eaebb637084d7e706f6e96e7e2ec53b7716"
+      },
+      {
+        "eip": 7928,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
+      }
+    ]
   }
 }

@@ -29,6 +29,16 @@ controls.extend([
 ('reconfigured-authentication','pkg/node/heze_inclusion.go','store, err = heze.Restore(data, view)\n\t\tif err != nil {','_ = data\n\t\tstore = n.hezeLists\n\t\terr = nil\n\t\tif err != nil {','./node','TestGroupEHezeReconfigureReauthenticatesMemoryAtomically'),
 ])
 
+controls.extend([
+('transaction-end-accounts','pkg/node/backend/inclusion_state.go','return !e.replayed && (','return false && !e.replayed && (','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
+('transaction-end-storage','pkg/node/backend/inclusion_state.go','fullState && e.changed','fullState && false && e.changed','./node','TestGroupEPostSystemCannotChangeFrameOmissionVerdict'),
+('transaction-end-prefix','pkg/core/execution/processor.go','return p.processWithBAL(block, statedb, false)','return p.processWithBAL(block, statedb, true)','./core/execution','TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems'),
+('pruned-BAL-boundary','pkg/node/backend/inclusion_state.go','if len(encoded) == 0 {','if len(encoded) == 0 { e.known = true;','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
+('legacy-live-boundary','pkg/node/backend/engine_bogota.go','if record.SatisfactionVersion != chain.BogotaSatisfactionVersion {','if false && record.SatisfactionVersion != chain.BogotaSatisfactionVersion {','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
+('legacy-compact-boundary','pkg/node/backend/engine_bogota.go','if !record.HasInclusionListView() {','if false && !record.HasInclusionListView() {','./node','TestGroupEWithdrawalDoesNotFundSameBlockOmission'),
+('compact-boundary-version','pkg/core/chain/bogota_payload.go','}{record.Number, record.Satisfied, record.SatisfactionVersion})','}{record.Number, record.Satisfied, 0})','./core/chain','TestBogotaPayloadStorageRetainsFinalizedAndPendingViews'),
+])
+
 for name,path,old,new,pkg,test in controls:
  s=(R/path).read_text()
  if old not in s and name=='strict-timeliness':

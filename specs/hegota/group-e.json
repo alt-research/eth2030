@@ -110,6 +110,24 @@
       "revision": "96da3c17047ad31608c40bfe75049db78dc4417d",
       "sha256": "c2e898c21ecc94342e4fbe3490591c01027b91852dabfc1cbaf0c50ae02d976b",
       "blob": "d5b17df22eaa7a1b705985e76d41378ed12ec712"
+    },
+    {
+      "path": "refs/EIPs/EIPS/eip-4895.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "f7766f0bd9bb14f76479c01e77388fd1a8823cb17c2919a317d51038a9e1be69",
+      "blob": "81af3b60b632bc9c03513d1d137f25410e3f4d34"
+    },
+    {
+      "path": "refs/EIPs/EIPS/eip-7002.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "33c151fb3589f3e09fa7f3dcf6fe897f982c7c0e95fc17baa00e14776986b1ee",
+      "blob": "31863eaebb637084d7e706f6e96e7e2ec53b7716"
+    },
+    {
+      "path": "refs/EIPs/EIPS/eip-7928.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
+      "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
     }
   ],
   "tasks": [
@@ -425,15 +443,24 @@
           "id": "E44.2",
           "statement": "nonce/256-bit balance/fee/code checks without EVM replay for Profile 1",
           "clauses": [
-            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size"
+            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
+            "EIP-7805 S after last transaction; EIP-4895 post-transaction withdrawals; EIP-7002 post-execution requests; EIP-7928 phase n+1"
           ],
           "files": [
+            "pkg/core/chain/bogota_payload.go",
+            "pkg/core/execution/processor.go",
             "pkg/core/types/frame_8141.go",
             "pkg/focil/profile1.go",
-            "pkg/focil/vops_reference.go"
+            "pkg/focil/vops_reference.go",
+            "pkg/node/backend/engine_bogota.go",
+            "pkg/node/backend/inclusion_state.go",
+            "pkg/node/sync_runtime.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources"
+            "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources",
+            "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems",
+            "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
+            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict"
           ]
         },
         {
@@ -519,13 +546,18 @@
           ],
           "files": [
             "pkg/core/chain/bogota_payload.go",
+            "pkg/core/execution/processor.go",
             "pkg/node/backend/engine_bogota.go",
+            "pkg/node/backend/inclusion_state.go",
             "pkg/node/heze_inclusion.go",
-            "pkg/node/node.go"
+            "pkg/node/node.go",
+            "pkg/node/sync_runtime.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart",
-            "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews"
+            "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews",
+            "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
+            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict"
           ]
         },
         {
@@ -776,6 +808,7 @@
     "site/scripts/check-export.mjs",
     "evidence/hegota-e/source-review.json",
     "tools/hegota/e_negative_controls.py",
-    "docs/reviews/pr-172/REAUDIT.md"
+    "docs/reviews/pr-172/REAUDIT.md",
+    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md"
   ]
 }

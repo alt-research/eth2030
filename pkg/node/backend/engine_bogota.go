@@ -34,7 +34,7 @@ func (b *EngineBackend) ProcessBlockV6(
 	defer b.bogotaMu.Unlock()
 
 	bc := b.node.Blockchain()
-	record := &chain.BogotaPayload{Number: p.BlockNumber, InclusionList: list}
+	record := &chain.BogotaPayload{Number: p.BlockNumber, InclusionList: list, SatisfactionVersion: chain.BogotaSatisfactionVersion}
 	status, err := b.processBlockV5(p, root, requests, func(block *types.Block) (bool, error) {
 		parent := bc.GetBlock(block.ParentHash())
 		if parent == nil || parent.NumberU64()+1 != block.NumberU64() {
@@ -102,6 +102,9 @@ func (b *EngineBackend) ForkchoiceUpdatedBogota(
 			PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing},
 		}, false, nil
 	}
+	if record.SatisfactionVersion > chain.BogotaSatisfactionVersion {
+		return payload.ForkchoiceUpdatedResult{}, false, fmt.Errorf("unsupported Bogotá satisfaction cache version %d", record.SatisfactionVersion)
+	}
 	if len(record.Block) > 0 {
 		status, err := b.completeBogotaPayload(state.HeadBlockHash, record)
 		if err != nil || status.Status != engine.StatusValid {
@@ -109,6 +112,25 @@ func (b *EngineBackend) ForkchoiceUpdatedBogota(
 				return b.requestForkchoiceSync(state), false, nil
 			}
 			return payload.ForkchoiceUpdatedResult{PayloadStatus: status}, false, err
+		}
+	}
+
+	if record.SatisfactionVersion != chain.BogotaSatisfactionVersion {
+		// Legacy verdicts used final-block state. A live view can be corrected;
+		// a legacy compact verdict needs the CL to resubmit the exact list.
+		if !record.HasInclusionListView() {
+			return payload.ForkchoiceUpdatedResult{PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing}}, false, nil
+		}
+		if head == nil || !bc.HasValidatedBlock(state.HeadBlockHash) {
+			return b.requestForkchoiceSync(state), false, nil
+		}
+		satisfied, err := b.checkPayloadInclusionList(state.HeadBlockHash, record.InclusionList)
+		if err != nil {
+			return payload.ForkchoiceUpdatedResult{}, false, err
+		}
+		record.Satisfied, record.SatisfactionVersion = satisfied, chain.BogotaSatisfactionVersion
+		if err := bc.WriteBogotaPayload(state.HeadBlockHash, record); err != nil {
+			return payload.ForkchoiceUpdatedResult{}, false, err
 		}
 	}
 	result, err := b.ForkchoiceUpdatedV4(state, attrs)
@@ -159,6 +181,7 @@ func (b *EngineBackend) completeBogotaPayload(hash types.Hash, record *chain.Bog
 	}
 	record.Block = nil
 	record.Satisfied = satisfied
+	record.SatisfactionVersion = chain.BogotaSatisfactionVersion
 	if err := bc.WriteBogotaPayload(hash, record); err != nil {
 		return payload.PayloadStatusV1{}, err
 	}
@@ -166,7 +189,7 @@ func (b *EngineBackend) completeBogotaPayload(hash types.Hash, record *chain.Bog
 }
 
 // CheckPayloadInclusionList examines each omitted transaction independently in
-// the validated payload's own post-state. An EVM revert still constitutes
+// the validated payload's own transaction-end state. An EVM revert still constitutes
 // a valid transaction if the transaction can be accepted and charged.
 func (b *EngineBackend) CheckPayloadInclusionList(hash types.Hash, list [][]byte) (bool, error) {
 	if err := b.beginWork(); err != nil {
@@ -263,25 +286,40 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 	if len(omitted) == 0 {
 		return true, nil
 	}
-	postState, err := bc.StateAtBlock(payload)
+	endState, err := newInclusionEndState(bc, payload)
 	if err != nil {
-		return false, fmt.Errorf("read payload post-state: %w", err)
+		return false, err
 	}
+	getHash := endState.getHash
 	sizer, err := types.NewBlockAppendSizer(payload)
 	if err != nil {
 		return false, err
 	}
-	// Most Profile 1 omissions are decided from authenticated account fields
-	// alone. Only an RLP header-width boundary needs an exact execution probe.
+	// Once transaction-end account fields are established, Profile 1 eligibility
+	// executes no candidate code. An RLP header-width boundary needs an exact probe.
 	var trials []*types.Transaction
 	for _, tx := range omitted {
 		if _, frame := tx.Inner().(*types.FrameTx8141); frame {
+			if endState.needsReplay(types.Address{}, true) {
+				if err := endState.replay(); err != nil {
+					return false, err
+				}
+			}
 			trials = append(trials, tx)
 			continue
 		}
-		result, err := focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), postState)
+		result, err := focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), endState.state)
 		if err != nil {
 			return false, err
+		}
+		if endState.needsReplay(result.Sender, result.Kind == focil.Profile1Outside) {
+			if err := endState.replay(); err != nil {
+				return false, err
+			}
+			result, err = focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), endState.state)
+			if err != nil {
+				return false, err
+			}
 		}
 		if result.Kind != focil.Profile1Enforceable {
 			// Informational EIP-8369 cannot excuse a base EIP-7805 omission.
@@ -308,18 +346,12 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		trials = append(trials, tx)
 	}
 	omitted = trials
-	// BLOCKHASH for an omitted transaction must read this payload's ancestry.
-	// The canonical head can point to a competing branch.
-	getHash := func(number uint64) types.Hash {
-		if number >= payload.NumberU64() || payload.NumberU64()-number > 256 {
-			return types.Hash{}
+	// A byte-boundary probe executes even ordinary sender code. It needs the
+	// complete transaction-end state, not just unchanged sender account fields.
+	if len(omitted) > 0 && endState.needsReplay(types.Address{}, true) {
+		if err := endState.replay(); err != nil {
+			return false, err
 		}
-		for parent := bc.GetBlock(payload.ParentHash()); parent != nil; parent = bc.GetBlock(parent.ParentHash()) {
-			if parent.NumberU64() == number {
-				return parent.Hash()
-			}
-		}
-		return types.Hash{}
 	}
 	var framePool *gaspool.GasPool
 	for _, tx := range omitted {
@@ -327,6 +359,9 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			continue
 		}
 		receipts := bc.GetReceipts(hash)
+		if endState.replayed {
+			receipts = endState.receipts
+		}
 		replay := len(receipts) != len(payload.Transactions())
 		for _, receipt := range receipts {
 			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed == 0 {
@@ -334,20 +369,10 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			}
 		}
 		if replay {
-			parent := bc.GetBlock(payload.ParentHash())
-			if parent == nil {
-				return false, fmt.Errorf("missing parent for inclusion gas accounting")
-			}
-			before, err := bc.StateAtBlock(parent)
-			if err != nil {
+			if err := endState.replay(); err != nil {
 				return false, err
 			}
-			processor := execution.NewStateProcessor(bc.Config()).WithGetHash(getHash)
-			result, err := processor.ProcessWithBAL(payload, before)
-			if err != nil {
-				return false, err
-			}
-			receipts = result.Receipts
+			receipts = endState.receipts
 		}
 		var executionUsed, stateUsed uint64
 		for _, receipt := range receipts {
@@ -367,7 +392,7 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		break
 	}
 	for _, tx := range omitted {
-		trial := postState.Dup()
+		trial := endState.state.Dup()
 		trial.SetTxContext(tx.Hash(), len(payload.Transactions()))
 		gas := new(gaspool.GasPool).AddGas(remaining)
 		if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {

@@ -30,7 +30,7 @@ type Profile1Result struct {
 }
 
 // EvaluateProfile1 implements the determinate EIP-8369 Profile 1 predicate at
-// a payload's post-state. It authenticates the actual envelope (never a cached
+// the payload's transaction-end state before withdrawals/post-execution systems. It authenticates the actual envelope (never a cached
 // Sender), supports uint256 chain IDs/balances, and executes no EVM code.
 // It does not select or activate the informational Profile 2 extension.
 func EvaluateProfile1(raw []byte, cfg *config.ChainConfig, header *types.Header, db state.StateDB) (result Profile1Result, err error) {

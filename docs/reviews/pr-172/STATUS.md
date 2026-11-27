@@ -85,3 +85,12 @@ Upstream EIPs, Heze and Bogotá revisions remain unchanged. This pass focuses on
 the precise EIP-7805 state after the last transaction, including the separation
 from withdrawals and post-execution system calls. The independent Lean worktree
 and read-only references remain untouched.
+
+The raw Engine withdrawal regression reproduced a VALID/false error for an
+unfunded transaction that only becomes funded after the transaction phase.
+The corrected evaluator reconstructs precisely that phase when authenticated
+BAL metadata shows relevant later changes or metadata is unavailable. Native
+Frame tests cover both post-system invalidation and post-system validation.
+Legacy live cache records are corrected across restart; legacy compact records
+wait for the exact CL view to be resubmitted. Focused regressions pass; final
+full/race/control and hosted qualification is pending.

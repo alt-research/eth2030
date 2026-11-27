@@ -8,6 +8,10 @@ import (
 	"github.com/eth2030/eth2030/core/types"
 )
 
+// BogotaSatisfactionVersion identifies the EIP-7805 last-transaction state
+// predicate. Earlier records used the final block state and require rechecking.
+const BogotaSatisfactionVersion uint8 = 1
+
 var bogotaPayloadPrefix = []byte("engine/bogota/")
 
 // Completed finalized verdicts use a separate namespace so later finalization
@@ -17,11 +21,17 @@ var bogotaVerdictPrefix = []byte("engine/bogota-verdict/")
 // BogotaPayload records the driving CL's list view. Block holds an accepted
 // block until execution has completed. An empty Block stores a known verdict.
 type BogotaPayload struct {
-	Number        uint64
-	Block         []byte
-	InclusionList [][]byte
-	Satisfied     bool
+	Number              uint64
+	Block               []byte
+	InclusionList       [][]byte
+	Satisfied           bool
+	SatisfactionVersion uint8
+	compacted           bool
 }
+
+// HasInclusionListView distinguishes a retained (possibly empty) CL view from
+// a compact verdict whose original transaction bytes have been released.
+func (p *BogotaPayload) HasInclusionListView() bool { return p != nil && !p.compacted }
 
 func bogotaPayloadKey(hash types.Hash) []byte {
 	return append(append([]byte(nil), bogotaPayloadPrefix...), hash[:]...)
@@ -31,8 +41,10 @@ func (bc *Blockchain) ReadBogotaPayload(hash types.Hash) (*BogotaPayload, error)
 	if bc.db == nil {
 		return nil, errors.New("Bogotá payload storage unavailable")
 	}
+	compacted := false
 	data, err := bc.db.Get(bogotaPayloadKey(hash))
 	if errors.Is(err, rawdb.ErrNotFound) {
+		compacted = true
 		key := append(append([]byte(nil), bogotaVerdictPrefix...), hash[:]...)
 		data, err = bc.db.Get(key)
 		if errors.Is(err, rawdb.ErrNotFound) {
@@ -46,6 +58,7 @@ func (bc *Blockchain) ReadBogotaPayload(hash types.Hash) (*BogotaPayload, error)
 	if err := json.Unmarshal(data, &record); err != nil {
 		return nil, err
 	}
+	record.compacted = compacted
 	return &record, nil
 }
 
@@ -82,9 +95,10 @@ func (bc *Blockchain) PruneBogotaPayloads(finalized uint64) error {
 		key := append([]byte(nil), iter.Key()...)
 		if len(record.Block) == 0 {
 			data, err := json.Marshal(struct {
-				Number    uint64
-				Satisfied bool
-			}{record.Number, record.Satisfied})
+				Number              uint64
+				Satisfied           bool
+				SatisfactionVersion uint8
+			}{record.Number, record.Satisfied, record.SatisfactionVersion})
 			if err != nil {
 				return err
 			}

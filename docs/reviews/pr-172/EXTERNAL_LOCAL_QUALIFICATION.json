@@ -155,5 +155,123 @@
     "errors": 4,
     "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
   },
-  "external_network_status": "pending; actual hosted results required"
+  "external_network_status": "pending; actual hosted results required",
+  "broad_runtime_race": {
+    "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d",
+    "named": {
+      "pass": 12114,
+      "skip": 87
+    },
+    "packages": {
+      "pass": 74,
+      "skip": 3
+    },
+    "completed_packages": 77
+  },
+  "build_vet_baseline_commands": [
+    {
+      "step": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./bal",
+        "./core/types",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./core/block",
+        "./core/chain",
+        "./core/state",
+        "./core/framepay",
+        "./core/frameproof",
+        "./core/rawdb",
+        "./crypto/leansphincs",
+        "./focil/...",
+        "./txpool/...",
+        "./eth",
+        "./node/...",
+        "./rpc/...",
+        "./engine/...",
+        "./p2p/ethproto",
+        "./sync/statesync",
+        "./sync/inserter",
+        "./proofs",
+        "./zkvm",
+        "./cmd/eth2030",
+        "./cmd/send-frame",
+        "./eiptest",
+        "./cmd/hegota-e-fixture",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 190.692,
+      "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d"
+    },
+    {
+      "step": "build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 14.132,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "native-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/hegota-e-external-native",
+        "./cmd/eth2030"
+      ],
+      "exit_code": 0,
+      "seconds": 5.555,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "wrapper-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/hegota-e-external-geth",
+        "./cmd/eth2030-geth"
+      ],
+      "exit_code": 0,
+      "seconds": 4.637,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 4.525,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "baseline",
+      "command": [
+        "go",
+        "run",
+        "./cmd/eth2030-baseline"
+      ],
+      "exit_code": 0,
+      "seconds": 1.05,
+      "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
+    }
+  ],
+  "final_python_checks": {
+    "normal": 118,
+    "optimized": 118,
+    "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887"
+  }
 }

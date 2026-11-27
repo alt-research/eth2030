@@ -224,3 +224,8 @@ The previous 36 compiled removals retain their original run identities. Every
 production and consumer hash used by them was rechecked unchanged. They are
 not represented as newly executed controls for the added proxy or fixture.
 Actual external Heze network acceptance remains pending the hosted build/run.
+
+The broader required source refresh also passed 77 runtime race packages
+(12,114 named passes, 87 optional skips), both entrypoint builds, full vet
+and the 12/12 differential baseline. A/B/C/D/E source checks are refreshed
+against these actual logs and unchanged independent expected oracles.

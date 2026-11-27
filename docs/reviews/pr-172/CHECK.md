@@ -61,7 +61,7 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Remaining Group E delivery - November 28, 2026
 
-- [ ] Reconcile latest upstream changes with the remaining activation and integration prerequisites.
-- [ ] Identify and pin the independent Heze CL source and executable network/test path.
+- [x] Reconcile latest upstream changes with the remaining activation and integration prerequisites.
+- [x] Identify and pin the independent Heze CL source and executable network/test path.
 - [ ] Implement the remaining specification-defined integration and resource acceptance work that can run in this environment or hosted CI.
 - [ ] Validate actual consumers, record unavailable prerequisites precisely, and update progress and English PR evidence.

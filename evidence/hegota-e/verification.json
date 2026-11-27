@@ -1,7 +1,7 @@
 {
-  "date": "2026-11-27",
+  "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "68cd1c03905e61fd4be53997017789cf08df55de",
+  "source_revision": "cdef5d42e2e0afe65bbda0f8853b94c4aee67887",
   "tasks": 9,
   "criteria": 36,
   "selected_profile_consumers_passed": true,
@@ -119,12 +119,12 @@
     "tools/hegota/e_negative_controls.py": "30632dc82e24569ccd99044ac072d2751a75b580bb598cd8651fe906dfff80b8",
     "tools/hegota/engine_fault_proxy.py": "a82bb652855997d8cc7562377c10d8e6c8654deb17e6249c7c25ecc6821f8cfa",
     "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
-    "tools/hegota/run_external_heze.py": "114649e92f0fa7c04d5d2a435228cca1ef428a359d869f268c1847bd0497e651",
+    "tools/hegota/run_external_heze.py": "c9dbb376927588ea4fd3556a934be53af3b373f71465ccde280d03c14ada547a",
     "tools/hegota/test_engine_fault_proxy.py": "52ed7dd8dab6271d5b6295cc2ceab5fbf2380b78189bf57e317f67f24fb96d08",
-    "tools/hegota/test_external_heze.py": "170891572b3c8ee86cc055593637399f147c6c6a82d8221842be9fd083f7ba98",
+    "tools/hegota/test_external_heze.py": "0b3da82d5e18a2f06926b5f22938d85833b1243e2f63e7f72a3addebbd80cd22",
     "tools/hegota/test_group_e.py": "978aa3b0d2a63dc8db1d526daa54bd92b362b25c6617acd8e124101c90f3786b"
   },
-  "source_fingerprint_sha256": "9ae7927def96e2dab439be134dffd9819472110759d57bc8ff5c9fde658b0d2c",
+  "source_fingerprint_sha256": "68042ff0d650ece11f003b2d852c3ea50c8f0c0753f43f28f1ebfce4cf3c6536",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound": "pass",
     "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse": "pass",
@@ -1080,6 +1080,125 @@
       "python": "3.14.7",
       "passed": 70
     },
-    "note": "Historical Python 3.9 devnet-tool environment errors are recorded, not hidden. No independent oracle changed."
+    "note": "Historical Python 3.9 devnet-tool environment errors are recorded, not hidden. No independent oracle changed.",
+    "broad_runtime_race": {
+      "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d",
+      "named": {
+        "pass": 12114,
+        "skip": 87
+      },
+      "packages": {
+        "pass": 74,
+        "skip": 3
+      },
+      "mandatory_consumers_passed": 40,
+      "mandatory_skipped": 0
+    },
+    "build_vet_baseline_commands": [
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./bal",
+          "./core/types",
+          "./core/config",
+          "./core/vm",
+          "./core/execution",
+          "./core/block",
+          "./core/chain",
+          "./core/state",
+          "./core/framepay",
+          "./core/frameproof",
+          "./core/rawdb",
+          "./crypto/leansphincs",
+          "./focil/...",
+          "./txpool/...",
+          "./eth",
+          "./node/...",
+          "./rpc/...",
+          "./engine/...",
+          "./p2p/ethproto",
+          "./sync/statesync",
+          "./sync/inserter",
+          "./proofs",
+          "./zkvm",
+          "./cmd/eth2030",
+          "./cmd/send-frame",
+          "./eiptest",
+          "./cmd/hegota-e-fixture",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 190.692,
+        "log_sha256": "1412998d93fc739cdb4a4b7b363bbdb4f439e120ab10a9af50a43a8f867afc4d"
+      },
+      {
+        "step": "build",
+        "command": [
+          "go",
+          "build",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 14.132,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "native-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-external-native",
+          "./cmd/eth2030"
+        ],
+        "exit_code": 0,
+        "seconds": 5.555,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "wrapper-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-external-geth",
+          "./cmd/eth2030-geth"
+        ],
+        "exit_code": 0,
+        "seconds": 4.637,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 4.525,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "baseline",
+        "command": [
+          "go",
+          "run",
+          "./cmd/eth2030-baseline"
+        ],
+        "exit_code": 0,
+        "seconds": 1.05,
+        "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
+      }
+    ]
+  },
+  "race_scope": {
+    "mandatory_consumers_passed": 40,
+    "outside_selected_race_packages": [],
+    "note": "All current mandatory E consumers passed the fresh broad runtime race run, including the executable external fixture."
   }
 }

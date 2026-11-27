@@ -1,6 +1,6 @@
 # Group E status
 
-Production source: `812e440bb6ff2173e567cb02adc837264237573b`, based directly on merged PR #171/master
+Production source: `d830d0b1c82373cd3b9f6ba135f27703405fe972`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 
@@ -39,3 +39,5 @@ Final path audit also added authenticated pooled-witness retrieval for canonical
 Restart restores only the still-required retention window, rejecting future cached lists and requiring authenticated state for retained lists; long shutdowns no longer require obsolete beacon state.
 
 Base EIP-7805 blob/other-envelope append validity remains enforced independently of the nonbinding 8369 profile boundary. Valid IL blobs require available authenticated sidecars; failed IDs retry after availability recovery. Static-invalid proof transactions remain tolerated instead of becoming missing-witness errors.
+
+Append RLP sizing includes scalar/3D calldata usage and blob-gas header widths, including prior committed appends; exact serialization independently checks these boundaries.

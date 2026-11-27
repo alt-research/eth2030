@@ -50,7 +50,8 @@ Context deadlines are local build policy (8 seconds), not a new consensus slot
 constant. Invalid trials restore state and gas. Sender-indexed retries revisit
 IL nonce and funding cascades; dynamic full-state Frame candidates retry after
 state transitions. Exact appended block RLP sizing includes headers, list prefix
-growth, withdrawals and the selected dependency-witness union.
+growth, scalar/3D calldata and blob-gas header widths, withdrawals and the
+selected dependency-witness union.
 
 The native backend executes and durably retains accepted payload views across
 branches/restarts. Execution validity and IL satisfaction are separate; a valid

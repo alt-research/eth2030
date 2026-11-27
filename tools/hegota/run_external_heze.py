@@ -78,11 +78,12 @@ def unsatisfied_valid_root(snapshot, execution_hash):
     return None
 
 
-def native_omissions(events, raw):
+def native_omissions(events, raw, execution_hash=None):
     return [event for event in events if event.get("method") == "engine_newPayloadV6"
             and raw in event.get("inclusion_list", [])
             and isinstance(event.get("result"), dict)
             and event["result"].get("status") == "VALID"
+            and (execution_hash is None or event.get("block_hash") == execution_hash)
             and event["result"].get("inclusionListSatisfied") is False]
 
 
@@ -133,9 +134,10 @@ def omission(enclave, fixture, output):
             execution_hash = event["block_hash"]
             snapshots = [focil.fetch(cl + "/lighthouse/proto_array") for cl in cls]
             roots = [unsatisfied_valid_root(snapshot, execution_hash) for snapshot in snapshots]
-            if all(roots) and roots[0] == roots[1]:
+            responses = [native_omissions(events, selected["raw"], execution_hash) for events in records]
+            if all(roots) and roots[0] == roots[1] and all(responses):
                 return {"execution_hash": execution_hash, "beacon_root": roots[0],
-                        "native_responses": [native_omissions(events, selected["raw"]) for events in records],
+                        "native_responses": responses,
                         "cl_snapshots": snapshots}
         return None
 

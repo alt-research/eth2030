@@ -91,3 +91,20 @@ HGT-046 activation remains gated by D04. External Heze Gossipsub/reqresp framing
 fork digests, independent CL/ePBS devnet and network latency qualification remain
 HGT-070/080 integration prerequisites. Completion of local native consumers
 does not mean those external duties or Profile 2 consensus are complete.
+
+## Base FOCIL versus informational profile boundaries
+
+The Profile 1 account predicate is an optimization, not authority to exclude
+other envelopes from base EIP-7805. Non-Profile-1 envelopes retain independent
+full-state append validation, including blob-gas capacity. Blob and Frame
+transactions outside the informational 8369 candidates do not automatically
+receive a new consensus omission excuse. Static-invalid Frame/proof envelopes
+are tolerated before any unavailable-witness gate.
+
+A canonical IL blob can reuse its admitted pool sidecar. A valid blob without
+data aborts building instead of returning an unsatisfied payload or empty blob
+bundle. Completed failed IDs can be retried with the same exact attributes
+after availability changes; successful completed IDs remain immutable. The
+new native regression exercises real KZG admission, invalid signatures,
+execution-valid-but-unsatisfied import, missing-data failure, same-ID retry and
+the complete authenticated blob bundle.

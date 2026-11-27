@@ -1,7 +1,7 @@
-// execution_proof.go implements execution proof generation and verification
-// for the mandatory 3-of-5 block proof requirement (K+ spec). An execution
-// proof captures the full trace of block execution including all state accesses,
-// transaction results, and merkle proofs for accessed storage.
+// execution_proof.go contains legacy research trace commitments. Their
+// consistency checks are not cryptographic proofs of Ethereum block validity.
+// EIP-8504 blocks are rejected because these helpers cannot authenticate the
+// separate dependency-witness validity predicate.
 package proofs
 
 import (
@@ -16,11 +16,12 @@ import (
 
 // Execution proof errors.
 var (
-	ErrExecProofNilBlock     = errors.New("execution_proof: nil block")
-	ErrExecProofNoTxTraces   = errors.New("execution_proof: no transaction traces")
-	ErrExecProofStateRootNil = errors.New("execution_proof: state root is zero")
-	ErrExecProofTampered     = errors.New("execution_proof: proof commitment mismatch")
-	ErrExecProofAccessEmpty  = errors.New("execution_proof: state access log is empty")
+	ErrExecProofNilBlock       = errors.New("execution_proof: nil block")
+	ErrExecProofNoTxTraces     = errors.New("execution_proof: no transaction traces")
+	ErrExecProofStateRootNil   = errors.New("execution_proof: state root is zero")
+	ErrExecProofTampered       = errors.New("execution_proof: proof commitment mismatch")
+	ErrExecProofAccessEmpty    = errors.New("execution_proof: state access log is empty")
+	ErrExecProofDependency8504 = errors.New("execution_proof: legacy trace helpers do not prove EIP-8504 dependency validity")
 )
 
 // BlockExecutionProof represents a complete execution proof for a block.
@@ -179,6 +180,9 @@ func GenerateExecutionProof(block *types.Block, stateRoot types.Hash) (*BlockExe
 	if block == nil {
 		return nil, ErrExecProofNilBlock
 	}
+	if block.RequiresDependencyVerification8504() {
+		return nil, ErrExecProofDependency8504
+	}
 	if stateRoot.IsZero() {
 		return nil, ErrExecProofStateRootNil
 	}
@@ -233,8 +237,9 @@ func GenerateExecutionProof(block *types.Block, stateRoot types.Hash) (*BlockExe
 	}, nil
 }
 
-// VerifyExecutionProof verifies that an execution proof is valid for the
-// given state root. Verification checks:
+// VerifyExecutionProof checks internal legacy trace consistency for the
+// given root. It does not establish EVM execution or block/dependency validity;
+// consensus consumers must use an authenticated execution backend. Checks:
 // 1. The access log is non-empty and internally consistent.
 // 2. The merkle proofs are valid for each accessed account.
 // 3. The proof commitment matches the recomputed commitment.
@@ -495,6 +500,9 @@ func GenerateExecutionProofWithBAL(
 ) (*BlockExecutionProof, error) {
 	if block == nil {
 		return nil, ErrExecProofNilBlock
+	}
+	if block.RequiresDependencyVerification8504() {
+		return nil, ErrExecProofDependency8504
 	}
 	if preStateRoot.IsZero() {
 		return nil, ErrExecProofStateRootNil

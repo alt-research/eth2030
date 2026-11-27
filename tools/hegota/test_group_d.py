@@ -9,7 +9,7 @@ class GroupDIntegrityTests(unittest.TestCase):
     def test_all_tasks_criteria_and_native_boundaries_present(self):
         tests, artifacts = validate_manifest(ROOT, self.manifest)
         self.assertEqual(sum(map(len, REQUIRED.values())), 32)
-        self.assertGreaterEqual(len(tests), 45)
+        self.assertGreaterEqual(len(tests), 55)
         self.assertIn('pkg/node/dependency_8504_integration_test.go', artifacts)
     def test_each_task_required(self):
         for i in range(8):

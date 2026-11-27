@@ -82,6 +82,17 @@ func VerifyTransaction(tx *types.Transaction, extensions types.FrameExtensions, 
 	return publicCache.Verify(deps, w)
 }
 
+// VerifyDeclaredBlock checks the independent witness predicate before generic
+// sync pipelines delegate to an execution backend. Presence/declarations select
+// only this content check, never a fork schedule: the chain's ordinary validator
+// and executor must still enforce activation and all other block validity rules.
+func VerifyDeclaredBlock(block *types.Block) error {
+	if !block.RequiresDependencyVerification8504() {
+		return nil
+	}
+	return VerifyBlock(block, true, types.FrameExtensions{Proof8504: true, Assert7906: true})
+}
+
 // VerifyBlock authenticates the exact canonical union and witness commitment
 // before execution or system calls. Proof-frame success alone proves nothing.
 func VerifyBlock(block *types.Block, active bool, extensions types.FrameExtensions) error {

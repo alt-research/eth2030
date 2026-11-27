@@ -104,3 +104,13 @@ func CanonicalWalletCode() []byte {
 	}
 	return code
 }
+
+// Block carries a statelessly valid direct witness. Consumers still need to
+// enforce ordinary execution validity; this fixture supplies no account state.
+func Block() *types.Block {
+	tx := Transaction(0)
+	w := tx.DependencyWitnesses8504()
+	hash := types.DependencyWitnessesHash8504(w)
+	slot := uint64(1)
+	return types.NewBlock(&types.Header{Number: big.NewInt(1), GasLimit: 30_000_000, SlotNumber: &slot, DependencyWitnessesHash: &hash}, &types.Body{Transactions: []*types.Transaction{tx}, Withdrawals: []*types.Withdrawal{}, DependencyWitnesses: w})
+}

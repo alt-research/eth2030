@@ -141,3 +141,11 @@ parameters, official transport/Engine assignments, CL field/limit finalization,
 8288 aggregation details, 7807/omitted-IL composition and ecosystem compatibility remain
 explicit release gates. The general Hegota release profile stays inactive.
 Groups E–J and official cross-client/devnet/release qualification are separate.
+
+## Completeness re-audit
+
+The [latest-source re-audit](REAUDIT.md) closes trace cache invalidation under
+caught static reverts, CL witness/header reconstruction and unsupported legacy
+proof/STF entry points and sync delegation. It adds real blob/witness composition, actual EVM event
+copying and creation/adoption/destruction/ASSERT consumers. Pinned independent
+expected bytes and existing A/B/C oracles are unchanged.

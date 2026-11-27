@@ -39,6 +39,14 @@ func (p *ConsensusPayload8504) parts() ([][]byte, []int, error) {
 	if h == nil || h.Number == nil || !h.Number.IsUint64() || h.BaseFee == nil || h.BlobGasUsed == nil || h.ExcessBlobGas == nil || h.SlotNumber == nil || len(h.Extra) > 32 {
 		return nil, nil, fmt.Errorf("incomplete Gloas payload")
 	}
+	if h.DependencyWitnessesHash != nil {
+		if p.DependencyWitnesses == nil {
+			return nil, nil, fmt.Errorf("active EIP-8504 payload is missing its witness field")
+		}
+		if DependencyWitnessesHash8504(p.DependencyWitnesses) != *h.DependencyWitnessesHash {
+			return nil, nil, fmt.Errorf("Gloas witness field does not match its execution header commitment")
+		}
+	}
 	fee, err := sszUint256(h.BaseFee)
 	if err != nil {
 		return nil, nil, err
@@ -127,6 +135,8 @@ func (p *ConsensusPayload8504) UnmarshalSSZ(data []byte) error {
 		if witnesses == nil {
 			witnesses = make([][]byte, 0)
 		}
+		hash := DependencyWitnessesHash8504(witnesses)
+		h.DependencyWitnessesHash = &hash
 	}
 	*p = ConsensusPayload8504{Header: h, BlockHash: BytesToHash(f[12]), Transactions: cloneWitnesses8504(txs), Withdrawals: withdrawals, BlockAccessList: bytes.Clone(f[17]), DependencyWitnesses: cloneWitnesses8504(witnesses)}
 	return nil

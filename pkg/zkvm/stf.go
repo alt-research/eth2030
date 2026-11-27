@@ -33,6 +33,7 @@ var (
 	ErrSTFProofTooLarge      = errors.New("stf: proof exceeds maximum size")
 	ErrSTFInvalidProofSystem = errors.New("stf: invalid proof system")
 	ErrSTFNilBlock           = errors.New("stf: nil block header")
+	ErrSTFDependency8504     = errors.New("stf: input schema does not authenticate EIP-8504 dependency witnesses")
 )
 
 // Valid proof systems.
@@ -85,6 +86,21 @@ type STFInput struct {
 	Witnesses [][]byte
 }
 
+// The current STF encoding contains transaction hashes and execution witnesses,
+// not canonical proof declarations and their separately committed witnesses.
+// It cannot establish EIP-8504 validity, even with a real RV32IM receipt.
+func (input STFInput) rejectDependency8504() error {
+	if input.BlockHeader != nil && input.BlockHeader.DependencyWitnessesHash != nil {
+		return ErrSTFDependency8504
+	}
+	for _, tx := range input.Transactions {
+		if tx.HasDependencies8504() {
+			return ErrSTFDependency8504
+		}
+	}
+	return nil
+}
+
 // STFOutput holds the result of an STF validation.
 type STFOutput struct {
 	// Valid indicates whether the state transition is correct.
@@ -119,6 +135,9 @@ func NewSTFExecutor(config STFConfig) *STFExecutor {
 func (e *STFExecutor) ValidateTransition(input STFInput) (*STFOutput, error) {
 	if input.BlockHeader == nil {
 		return nil, ErrSTFNilBlock
+	}
+	if err := input.rejectDependency8504(); err != nil {
+		return nil, err
 	}
 	if len(input.Transactions) == 0 {
 		return nil, ErrSTFEmptyTransactions
@@ -174,6 +193,9 @@ func (e *STFExecutor) ValidateTransition(input STFInput) (*STFOutput, error) {
 func (e *STFExecutor) GenerateWitness(preState types.Hash, block *types.Block) (*STFInput, error) {
 	if block == nil {
 		return nil, ErrSTFNilBlock
+	}
+	if block.RequiresDependencyVerification8504() {
+		return nil, ErrSTFDependency8504
 	}
 
 	header := block.Header()

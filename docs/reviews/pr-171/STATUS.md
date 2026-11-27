@@ -42,3 +42,19 @@ and [independent snap2 interoperability](https://github.com/alt-research/eth2030
 passed. This final review-record update changes documentation only. Subsequent
 exact-head reruns and the actual canonical-proof families remain visible in the
 live PR suite; their result is not inferred from these earlier passes.
+
+## Latest-EIP completeness re-audit in progress
+
+The EIPs master and EIP-8504 proposal heads/discussion are unchanged. New native
+regressions reproduced three implementation gaps: trace cache reconstruction
+after read-only child reverts (17 index reads instead of one), missing CL
+witness/header reconstruction, and unsupported legacy research proof helpers
+accepting dependency blocks. These paths are fixed; real blob/KZG composition,
+actual LOG3/event-copy rollback and created/destroyed adopter traces also pass.
+Full current-source qualification is pending; predecessor evidence above is not
+claimed for the modified source. Coverage now requires 55 native consumers.
+
+The re-audit also closes all four STF witness/transition input boundaries and
+the generic queued/sequential/batch sync delegation boundary. Independent witness
+validity is checked before delegated execution/persistence, while unsupported
+STF schemas reject before backend setup. Activation remains the chain validator’s responsibility. Full qualification is still pending.

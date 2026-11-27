@@ -42,6 +42,22 @@ func (tx *Transaction) HasDependencies8504() bool {
 	return ok && f.HasProofFrames8504()
 }
 
+// RequiresDependencyVerification8504 detects both the active block schema
+// (including an empty witness list) and bare proof declarations. Execution or
+// proof backends that cannot enforce the separate witness validity predicate
+// must reject these blocks; successful EVM execution is insufficient.
+func (b *Block) RequiresDependencyVerification8504() bool {
+	if (b.header != nil && b.header.DependencyWitnessesHash != nil) || b.body.DependencyWitnesses != nil {
+		return true
+	}
+	for _, tx := range b.body.Transactions {
+		if tx.HasDependencies8504() {
+			return true
+		}
+	}
+	return false
+}
+
 type dependencyContent8504 struct {
 	Dependencies [][]byte
 	Witnesses    [][]byte

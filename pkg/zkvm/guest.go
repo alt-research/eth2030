@@ -9,9 +9,10 @@ import (
 
 // Guest execution errors.
 var (
-	ErrNilGuestContext = errors.New("zkvm: nil guest context")
-	ErrEmptyBlockData  = errors.New("zkvm: empty block data")
-	ErrGuestPanicked   = errors.New("zkvm: guest execution panicked")
+	ErrNilGuestContext     = errors.New("zkvm: nil guest context")
+	ErrEmptyBlockData      = errors.New("zkvm: empty block data")
+	ErrGuestPanicked       = errors.New("zkvm: guest execution panicked")
+	ErrGuestDependency8504 = errors.New("zkvm: legacy hash-only guest does not verify EIP-8504 dependency witnesses")
 )
 
 // GuestContext provides a restricted execution environment for the zkVM guest.
@@ -87,6 +88,9 @@ func ExecuteBlock(ctx *GuestContext, blockData []byte) (types.Hash, error) {
 	}
 	if ctx.executed {
 		return types.Hash{}, errors.New("zkvm: context already executed")
+	}
+	if block, err := types.DecodeBlockRLP(blockData); err == nil && block.RequiresDependencyVerification8504() {
+		return types.Hash{}, ErrGuestDependency8504
 	}
 
 	ctx.executed = true

@@ -48,6 +48,20 @@ Two aggregator implementations are provided:
 
 `BatchAggregator.VerifyBatch` also requires `SetExecutionProofVerifier` to validate each proof and its public statement. The legacy recursive STARK composition interface has no complete public statement and therefore returns an error instead of treating a digest as a proof. These interfaces do not implement an EIP-8025 proof system or configure a provider by themselves.
 
+### Legacy block trace helpers
+
+`GenerateExecutionProof`, `GenerateExecutionProofWithBAL` and
+`VerifyExecutionProof` in `execution_proof.go` are legacy research consistency
+helpers, not cryptographic Ethereum execution-validity proofs. They are not
+called by the native import/consensus path. Both generators explicitly reject
+EIP-8504 block fields or proof declarations, including missing-witness bare
+transactions, because they cannot prove the separate dependency predicate.
+Likewise, the old hash-only `zkvm.ExecuteBlock` helper rejects such decoded
+blocks before consuming its context. Both STF generators and transition entry
+points reject the unsupported dependency schema, including when using a real
+RV32IM prover: machine execution alone does not prove external signatures. Native block processing verifies the exact
+witness union before execution; the real RV32IM proof backend remains separate.
+
 ### Mandatory 3-of-5 Proof System
 
 `MandatoryProofSystem` enforces block-level proof coverage:

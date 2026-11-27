@@ -272,7 +272,8 @@
             "pkg/core/types/frame_8141_network.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504IndependentSubmissionWrapperAndBlock"
+            "github.com/eth2030/eth2030/core/frameproof::TestDependency8504IndependentSubmissionWrapperAndBlock",
+            "github.com/eth2030/eth2030/txpool::TestDependency8504BlobSubmissionWrapperAdmissionAndLookup"
           ]
         },
         {
@@ -506,7 +507,8 @@
           "id": "D34.3",
           "statement": "Build/import enforce all witness checks, gas/size bounds and ordinary validity; invalid payloads cannot contaminate state.",
           "clauses": [
-            "Block validity and EIP7934 size"
+            "Block validity and EIP7934 size",
+            "Independent witness validity before generic sync execution and persistence delegation"
           ],
           "files": [
             "pkg/core/block/builder.go",
@@ -520,17 +522,21 @@
             "pkg/engine/backend.go",
             "pkg/node/backend/engine_backend.go",
             "pkg/engine/payload/json.go",
-            "pkg/core/types/consensus_payload_8504.go"
+            "pkg/core/types/consensus_payload_8504.go",
+            "pkg/sync/inserter/block_processor.go",
+            "pkg/sync/inserter/chain_inserter.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart"
+            "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart",
+            "github.com/eth2030/eth2030/sync/inserter::TestDependency8504SyncPipelinesCheckWitnessesBeforeDelegation"
           ]
         },
         {
           "id": "D34.4",
           "statement": "Native independent payload consumers and wrong/missing/extra witness/hash/key/scheme controls; no recursive-proof claim.",
           "clauses": [
-            "Consensus Layer progressive payload"
+            "Consensus Layer progressive payload",
+            "Execution Does Not Verify Witnesses: stateless/execution-proof consumers must enforce or reject dependency validity"
           ],
           "files": [
             "pkg/core/block/builder.go",
@@ -544,10 +550,19 @@
             "pkg/engine/backend.go",
             "pkg/node/backend/engine_backend.go",
             "pkg/engine/payload/json.go",
-            "pkg/core/types/consensus_payload_8504.go"
+            "pkg/core/types/consensus_payload_8504.go",
+            "pkg/proofs/execution_proof.go",
+            "pkg/zkvm/guest.go",
+            "pkg/proofs/README.md",
+            "pkg/zkvm/stf.go",
+            "pkg/zkvm/stf_executor.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/types::TestDependency8504IndependentGloasProgressivePayload"
+            "github.com/eth2030/eth2030/core/types::TestDependency8504IndependentGloasProgressivePayload",
+            "github.com/eth2030/eth2030/core/types::TestDependency8504GloasReconstructsAndChecksWitnessCommitment",
+            "github.com/eth2030/eth2030/proofs::TestDependency8504LegacyProofHelpersRejectUnsupportedBlocks",
+            "github.com/eth2030/eth2030/zkvm::TestDependency8504LegacyGuestRejectsUnsupportedBlockBeforeExecution",
+            "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs"
           ]
         }
       ]
@@ -612,7 +627,8 @@
             "pkg/sync/statesync/pivot_rebase.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback"
+            "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906AdoptionCreationDestructionAndBodyRollback"
           ]
         },
         {
@@ -746,7 +762,8 @@
           "id": "D37.2",
           "statement": "Exact net pre/current balance/storage/code/nonce/event trace, ordering, pre-charge/payer and complete 256-bit checks.",
           "clauses": [
-            "Transaction Trace Opcode and State Difference Semantics"
+            "Transaction Trace Opcode and State Difference Semantics",
+            "Gas Cost: immutable trace index reuse during ASSERT and caught static reverts"
           ],
           "files": [
             "pkg/core/vm/assertion_7906.go",
@@ -756,7 +773,10 @@
           "tests": [
             "github.com/eth2030/eth2030/core/vm::TestAssertion7906AllSelectorsAndFullWidthBounds",
             "github.com/eth2030/eth2030/core/execution::TestAssertion7906PrestateNetDiffSortedAndLazy",
-            "github.com/eth2030/eth2030/core/execution::TestAssertion7906ActualEscrowAndPrefixPrestateTrace"
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906ActualEscrowAndPrefixPrestateTrace",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheSurvivesReadOnlyReverts",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheTracksObservableMutations",
+            "github.com/eth2030/eth2030/core/execution::TestAssertion7906NativeLogTopicsDataCopyAndRollback"
           ]
         },
         {
@@ -796,6 +816,7 @@
   "additional_artifacts": [
     "docs/plans/hegota-d/COMPOSITION.md",
     "docs/plans/hegota-d/PLAN.md",
+    "docs/plans/hegota-d/REAUDIT.md",
     "pkg/bal/code_adoption.go",
     "pkg/bal/code_adoption_test.go",
     "pkg/bal/decode.go",

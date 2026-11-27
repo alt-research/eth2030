@@ -15,21 +15,52 @@ type assertionSlot7906 struct {
 	key     types.Hash
 }
 
+type assertionSnapshot7906 struct {
+	id      int
+	version uint64
+}
+
 // assertionState7906 retains pre-values before the first transaction write.
 // Its observations survive child reverts; net changes are materialized only on
 // the first ASSERT read. Storage wipes do not enumerate untouched slots.
 type assertionState7906 struct {
 	state.StateDB
-	balances map[types.Address]*big.Int
-	nonces   map[types.Address]uint64
-	codes    map[types.Address]types.Hash
-	slots    map[assertionSlot7906]types.Hash
-	trace    *vm.AssertionTrace7906
-	txHash   types.Hash
+	balances  map[types.Address]*big.Int
+	nonces    map[types.Address]uint64
+	codes     map[types.Address]types.Hash
+	slots     map[assertionSlot7906]types.Hash
+	trace     *vm.AssertionTrace7906
+	txHash    types.Hash
+	version   uint64
+	snapshots []assertionSnapshot7906
 }
 
 func newAssertionState7906(db state.StateDB, hash types.Hash) *assertionState7906 {
 	return &assertionState7906{StateDB: db, balances: make(map[types.Address]*big.Int), nonces: make(map[types.Address]uint64), codes: make(map[types.Address]types.Hash), slots: make(map[assertionSlot7906]types.Hash), txHash: hash}
+}
+
+func (s *assertionState7906) changed() { s.version++; s.trace = nil }
+
+func (s *assertionState7906) Snapshot() int {
+	id := s.StateDB.Snapshot()
+	s.snapshots = append(s.snapshots, assertionSnapshot7906{id, s.version})
+	return id
+}
+
+func (s *assertionState7906) RevertToSnapshot(id int) {
+	// Native journals issue ordered revision IDs. Binary lookup and suffix
+	// truncation avoid scanning every successful earlier call on each revert.
+	at := sort.Search(len(s.snapshots), func(i int) bool { return s.snapshots[i].id >= id })
+	unchanged := at < len(s.snapshots) && s.snapshots[at].id == id && s.snapshots[at].version == s.version
+	s.StateDB.RevertToSnapshot(id)
+	// ASSERT subcalls cannot write the observable diff. Catching a child
+	// revert must retain the index: otherwise a flat-priced TXTRACE loop can
+	// repeatedly rebuild every touched account, slot and log. Body rollback
+	// and snapshots predating this journal still invalidate conservatively.
+	if !unchanged {
+		s.changed()
+	}
+	s.snapshots = s.snapshots[:at]
 }
 func (s *assertionState7906) balance(a types.Address) {
 	if _, ok := s.balances[a]; !ok {
@@ -54,26 +85,47 @@ func (s *assertionState7906) code(a types.Address) {
 	}
 }
 func (s *assertionState7906) AddBalance(a types.Address, v *big.Int) {
+	if v.Sign() != 0 {
+		s.changed()
+	}
 	s.balance(a)
 	s.StateDB.AddBalance(a, v)
 }
 func (s *assertionState7906) SubBalance(a types.Address, v *big.Int) {
+	if v.Sign() != 0 {
+		s.changed()
+	}
 	s.balance(a)
 	s.StateDB.SubBalance(a, v)
 }
 func (s *assertionState7906) SetNonce(a types.Address, v uint64) {
+	s.changed()
 	s.nonce(a)
 	s.StateDB.SetNonce(a, v)
 }
-func (s *assertionState7906) SetCode(a types.Address, v []byte) { s.code(a); s.StateDB.SetCode(a, v) }
+func (s *assertionState7906) SetCode(a types.Address, v []byte) {
+	s.changed()
+	s.code(a)
+	s.StateDB.SetCode(a, v)
+}
 func (s *assertionState7906) CreateAccount(a types.Address) {
+	s.changed()
 	s.balance(a)
 	s.nonce(a)
 	s.code(a)
 	s.StateDB.CreateAccount(a)
 }
-func (s *assertionState7906) SelfDestruct(a types.Address) { s.balance(a); s.StateDB.SelfDestruct(a) }
+func (s *assertionState7906) SelfDestruct(a types.Address) {
+	s.changed()
+	s.balance(a)
+	s.StateDB.SelfDestruct(a)
+}
+func (s *assertionState7906) AddLog(log *types.Log) {
+	s.changed()
+	s.StateDB.AddLog(log)
+}
 func (s *assertionState7906) SetState(a types.Address, k, v types.Hash) {
+	s.changed()
 	key := assertionSlot7906{a, k}
 	if _, ok := s.slots[key]; !ok {
 		s.slots[key] = s.StateDB.GetState(a, k)
@@ -86,8 +138,6 @@ func (s *assertionState7906) FinalizePreState() {
 		db.FinalizePreState()
 	}
 }
-func (s *assertionState7906) RevertToSnapshot(id int) { s.StateDB.RevertToSnapshot(id); s.trace = nil }
-
 func (s *assertionState7906) index() *vm.AssertionTrace7906 {
 	if s.trace != nil {
 		return s.trace

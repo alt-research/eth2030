@@ -1,6 +1,6 @@
 # Group E status
 
-Production source after re-audit: `4fcb2572`, based directly on merged PR #171/master
+Production source after re-audit: `2aa647a3`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 

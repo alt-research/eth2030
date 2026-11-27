@@ -60,4 +60,19 @@ func TestBogotaPayloadStorageRetainsFinalizedAndPendingViews(t *testing.T) {
 		!bytes.Equal(view.InclusionList[0], []byte{3}) {
 		t.Fatalf("accepted payload view %+v, %v", view, err)
 	}
+	// A new explicit CL view must override a compact historical verdict, both
+	// immediately and after that view is compacted by a later cleanup pass.
+	if err := bc.WriteBogotaPayload(older, &BogotaPayload{Number: 10, Satisfied: false, InclusionList: [][]byte{{4}}}); err != nil {
+		t.Fatal(err)
+	}
+	if view, err := bc.ReadBogotaPayload(older); err != nil || view == nil || view.Satisfied || len(view.InclusionList) != 1 {
+		t.Fatalf("replacement view lost behind compact verdict %+v, %v", view, err)
+	}
+	if err := bc.PruneBogotaPayloads(11); err != nil {
+		t.Fatal(err)
+	}
+	if view, err := bc.ReadBogotaPayload(older); err != nil || view == nil || view.Satisfied || len(view.InclusionList) != 0 {
+		t.Fatalf("replacement compact verdict %+v, %v", view, err)
+	}
+
 }

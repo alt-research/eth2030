@@ -199,14 +199,31 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Idempotency check.
 	b.mu.Lock()
 	if existing, ok := b.payloads[payloadID]; ok && existing != nil {
-		b.mu.Unlock()
-		slog.Debug("engine_forkchoiceUpdated: payload already building, reusing slot",
-			"payloadID", payloadID,
-		)
-		return payload.ForkchoiceUpdatedResult{
-			PayloadStatus: payloadStatus,
-			PayloadID:     &payloadID,
-		}, nil
+		retry := false
+		select {
+		case <-existing.done:
+			retry = existing.err != nil
+		default:
+		}
+		if retry {
+			delete(b.payloads, payloadID)
+			order := b.payloadOrder[:0]
+			for _, id := range b.payloadOrder {
+				if id != payloadID {
+					order = append(order, id)
+				}
+			}
+			b.payloadOrder = order
+		} else {
+			b.mu.Unlock()
+			slog.Debug("engine_forkchoiceUpdated: payload already building, reusing slot",
+				"payloadID", payloadID,
+			)
+			return payload.ForkchoiceUpdatedResult{
+				PayloadStatus: payloadStatus,
+				PayloadID:     &payloadID,
+			}, nil
+		}
 	}
 
 	// Register in-progress slot.

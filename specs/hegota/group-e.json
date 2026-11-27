@@ -1,7 +1,7 @@
 {
   "version": 1,
   "baseline": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
-  "selected_profile": "Heze 36888ee8 / Bogota 9e85b16c; informational 8369 reference predicates only",
+  "selected_profile": "Heze 36888ee8 / Bogota 9e85b16c; informational 8369 reference predicates only; base 7805 non-Profile-1 envelopes retain full-state append validation",
   "public_gates": [
     "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
     "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
@@ -460,11 +460,14 @@
             "pkg/core/execution/processor.go",
             "pkg/core/types/frame_8141.go",
             "pkg/focil/profile1.go",
-            "pkg/focil/vops_reference.go"
+            "pkg/focil/vops_reference.go",
+            "pkg/node/backend/engine_bogota.go",
+            "pkg/node/backend/engine_fcu.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext",
-            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback"
+            "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback",
+            "github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry"
           ]
         }
       ]

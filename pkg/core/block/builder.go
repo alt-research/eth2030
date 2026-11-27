@@ -385,6 +385,13 @@ func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *
 			}
 		}
 		if tx.HasDependencies8504() {
+			if candidate.inclusion && len(tx.DependencyWitnesses8504()) == 0 {
+				frame := tx.Inner().(*types.FrameTx8141)
+				if frame.ValidateWithExtensions(b.config.FrameExtensions(header.Time)) != nil {
+					continue
+				}
+				return nil, nil, fmt.Errorf("IL dependency witness unavailable; omitted EIP-8504 witness composition is unspecified")
+			}
 			if err := frameproof.VerifyTransaction(tx, b.config.FrameExtensions(header.Time), false); err != nil {
 				continue
 			}
@@ -422,6 +429,16 @@ func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *
 			continue
 		}
 
+		// A valid IL blob cannot be silently dropped because its data is
+		// unavailable, or published with an empty builder blob bundle.
+		if len(tx.BlobHashes()) > 0 && !types.HasFullBlobSidecar(tx) {
+			statedb.RevertToSnapshot(snap)
+			*gp = gpBefore
+			if candidate.inclusion {
+				return nil, nil, fmt.Errorf("valid IL blob sidecar unavailable")
+			}
+			continue
+		}
 		// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 		if glamActive && !vm.CheckDimStorageCap(blockDimStorageUsed, receipt.DimStorageGas) {
 			statedb.RevertToSnapshot(snap)

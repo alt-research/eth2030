@@ -10,7 +10,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 27 mandatory native consumers. Profile 1 checks
+The 36-criterion register names 28 mandatory native consumers. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.

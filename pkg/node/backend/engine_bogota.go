@@ -8,6 +8,7 @@ import (
 	blockpkg "github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -233,6 +234,19 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
 			continue
 		}
+		if frame, ok := tx.Inner().(*types.FrameTx8141); ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil {
+			continue
+		}
+		if len(tx.BlobHashes()) > 0 {
+			maximum := gas.MaxBlobsForBlock(bc.Config(), payload.Time()) * gas.GasPerBlob
+			used := uint64(0)
+			if value := payload.Header().BlobGasUsed; value != nil {
+				used = *value
+			}
+			if used > maximum || tx.BlobGas() > maximum-used {
+				continue
+			}
+		}
 		if _, present := included[string(raw)]; !present {
 			// The IL API carries canonical transaction bytes, not witnesses.
 			// EIP-8504 only defines witnesses for the included dependency union;
@@ -270,6 +284,11 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			return false, err
 		}
 		if result.Kind != focil.Profile1Enforceable {
+			// Informational EIP-8369 cannot excuse a base EIP-7805 omission.
+			// Other envelope types retain independent full-state validation.
+			if result.Kind == focil.Profile1Outside {
+				trials = append(trials, tx)
+			}
 			continue
 		}
 		minimum, err := sizer.Size(tx, payload.GasUsed()+result.MinimumGas)

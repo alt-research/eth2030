@@ -43,7 +43,7 @@ func newInclusionQueue(raw [][]byte, pending []*types.Transaction, pool TxPoolRe
 		if err != nil {
 			continue
 		}
-		if tx.HasDependencies8504() {
+		if tx.HasDependencies8504() || len(tx.BlobHashes()) > 0 {
 			if source, ok := pool.(interface {
 				Get(types.Hash) *types.Transaction
 			}); ok {

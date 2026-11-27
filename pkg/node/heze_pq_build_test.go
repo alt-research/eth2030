@@ -40,9 +40,36 @@ func TestGroupECanonicalPQILUsesAuthenticatedPoolWitness(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	beacon := types.Hash{31: 1}
+	bad, err := types.DecodeBlockTransaction(canonical)
+	if err != nil {
+		t.Fatal(err)
+	}
+	badFrame := bad.Inner().(*types.FrameTx8141)
+	badFrame.Signatures = []types.FrameSignature{{Scheme: types.FrameSignatureSecp256k1, Signature: make([]byte, 65)}}
+	bad = types.NewTransaction(badFrame)
+	if !bad.HasDependencies8504() {
+		t.Fatal("invalid-signature proof fixture lost dependency shape")
+	}
+	badRaw, err := bad.EncodeRLP()
+	if err != nil {
+		t.Fatal(err)
+	}
+	badList := []string{"0x" + hex.EncodeToString(badRaw)}
+	var emptyFC payload.ForkchoiceUpdatedResult
+	rpc.call(t, "engine_forkchoiceUpdatedV5", &emptyFC, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, map[string]any{"timestamp": "0x6", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": badList})
+	if emptyFC.PayloadID == nil {
+		t.Fatal(emptyFC)
+	}
+	var empty bogotaIntegrationPayload
+	rpc.call(t, "engine_getPayloadV6", &empty, emptyFC.PayloadID)
+	var invalidStatus bogotaIntegrationStatus
+	rpc.call(t, "engine_newPayloadV6", &invalidStatus, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, badList)
+	if invalidStatus.Status != "VALID" || invalidStatus.InclusionListSatisfied == nil || !*invalidStatus.InclusionListSatisfied {
+		t.Fatal("invalid proof signature treated as missing validity data", invalidStatus)
+	}
 	var submitted types.Hash
 	rpc.call(t, "eth_sendRawTransaction", &submitted, "0x"+hex.EncodeToString(pooled))
-	beacon := types.Hash{31: 1}
 	list := []string{"0x" + hex.EncodeToString(canonical)}
 	var fc payload.ForkchoiceUpdatedResult
 	rpc.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: n.Blockchain().Genesis().Hash()}, map[string]any{"timestamp": "0xc", "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": list})

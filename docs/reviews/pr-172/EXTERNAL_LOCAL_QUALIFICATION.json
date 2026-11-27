@@ -269,5 +269,14 @@
       "seconds": 1.053,
       "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
     }
-  ]
+  ],
+  "latest_tool_qualification": {
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+    "normal": 120,
+    "optimized": 120,
+    "normal_log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
+    "optimized_log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e",
+    "go_source_unchanged_since": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "scope": "Fresh tool tests cover bounded service-log retention before owned cleanup; the prior full/race/build/vet/baseline byte-equivalent Go qualification is preserved."
+  }
 }

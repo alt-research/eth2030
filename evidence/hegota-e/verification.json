@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+  "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
   "tasks": 9,
   "criteria": 36,
   "selected_profile_consumers_passed": true,
@@ -120,12 +120,12 @@
     "tools/hegota/e_negative_controls.py": "30632dc82e24569ccd99044ac072d2751a75b580bb598cd8651fe906dfff80b8",
     "tools/hegota/engine_fault_proxy.py": "428f816416a4737986261a4169e4de5f5806e3d84b704de914c61b58d56b0d2d",
     "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
-    "tools/hegota/run_external_heze.py": "ea381dec8e2176040ddd22af33dd3c27016e58cad583b20883e23f27465c342d",
+    "tools/hegota/run_external_heze.py": "33433aaa4591fa7b06aea1c43b169a9cdd86a21175799913cc46eb0edb650ba3",
     "tools/hegota/test_engine_fault_proxy.py": "64bc604d248cdec63d1fbc3c875059e2c21a70ea5bc0e1ffaba0ce0c42101ae0",
-    "tools/hegota/test_external_heze.py": "19e41e356ba77f7de20a478375040939c1b6ba2b2bb39909772e53baa9dcb1c5",
+    "tools/hegota/test_external_heze.py": "b608587c6d25211ac5c31151484cbcc63223ed144d010382d4a7bdea3ac410ab",
     "tools/hegota/test_group_e.py": "978aa3b0d2a63dc8db1d526daa54bd92b362b25c6617acd8e124101c90f3786b"
   },
-  "source_fingerprint_sha256": "b68973c01fdb25fa3a3effd81d944e310dbb6816defb2d4e10ab979da2f7b481",
+  "source_fingerprint_sha256": "09908de78a0fa676e1fbd26dd815ba745d702b0f62a62ec3c00f381b80860cd2",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound": "pass",
     "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse": "pass",
@@ -1255,6 +1255,15 @@
       "tests": 70,
       "errors": 4,
       "reason": "Unavailable hashlib.file_digest/zstd support and old HTTPError close behavior; original logs retained. No test assertion changed."
+    },
+    "latest_tool_qualification": {
+      "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+      "normal": 120,
+      "optimized": 120,
+      "normal_log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
+      "optimized_log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e",
+      "go_source_unchanged_since": "cdcad2a1921537d788454906bd81c4de4124f119",
+      "scope": "Fresh tool tests cover bounded service-log retention before owned cleanup; the prior full/race/build/vet/baseline byte-equivalent Go qualification is preserved."
     }
   },
   "race_scope": {

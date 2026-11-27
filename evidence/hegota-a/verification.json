@@ -1,9 +1,9 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_base_commit": "cdcad2a1921537d788454906bd81c4de4124f119",
+  "source_base_commit": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
   "branch_baseline": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
-  "source_fingerprint_sha256": "c3cc612c82263a4e6139acf439639732144137ccf06e0d8da9c9498a98a51974",
+  "source_fingerprint_sha256": "950089bf60b6feefed419c3b6467721b055bc8ae793b6fb26d78151df76aed5a",
   "host": {
     "os": "Darwin",
     "architecture": "arm64",
@@ -61,8 +61,8 @@
   },
   "python_checks": {
     "source_admission": "72 proposals; 15 repository roles; 108 pinned files; 99 local normative hashes",
-    "checker_regressions": 119,
-    "log_sha256": "edeebe194f873b6ead292a89007b45a15b203bf50653415432eaaff3d708e88d",
+    "checker_regressions": 120,
+    "log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
     "codec_goldens": 7,
     "arithmetic_oracles": 5,
     "native_gas_cases": 5,
@@ -72,8 +72,8 @@
     "additional_boundary_vectors": 25,
     "unexecuted_latest_spec_seeds": 0,
     "optimized_mode": {
-      "checker_regressions": 119,
-      "log_sha256": "e989da4ccfc4e624bdbbde3960a062b15a9c7d45d8e71e66455c8a9098196e20"
+      "checker_regressions": 120,
+      "log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e"
     },
     "pending_recheck": false
   },
@@ -81,7 +81,7 @@
     "matrix": "specs/hegota/acceptance.json",
     "tasks": 7,
     "criteria": 26,
-    "source_fingerprint_sha256": "c3cc612c82263a4e6139acf439639732144137ccf06e0d8da9c9498a98a51974",
+    "source_fingerprint_sha256": "950089bf60b6feefed419c3b6467721b055bc8ae793b6fb26d78151df76aed5a",
     "test_log_sha256": "6cfa8e03f92828f2ddd77f3d53fedb2c36c5201c544a26b061e99c2c47a5e659",
     "passed_tests": {
       "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart": "pass",
@@ -183,7 +183,7 @@
     "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "9385a04cb501fbd92c8b581f87dcc8479a43c7b73c5d2ed84e5f5db93ae7df3f",
     "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "3b34a2e336afcb284c9c52a4db6eda314eceed1256c4f03c0a295cacdd4528cc",
     "evidence/hegota-a/baseline.json": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b",
-    "evidence/hegota-a/runtime.json": "881f1524ed069e4bdb526e8dfa28a67ce2064209b232c7ec8bcc4197762ec248",
+    "evidence/hegota-a/runtime.json": "e9cc5b21d92f617337560d7dc0b14d889912b03c2e86cc191f2f570f063b22ee",
     "evidence/hegota-a/skipped-tests.json": "10b84fdedbc04148be8c811ee836da5c80211498ea46a6feabf72af374e14a32",
     "evidence/hegota-b/verification.json": "533b4b15a2ab452e54aa79f41895afcf91083dc3112545e4fbd03f1e6b5c760f",
     "evidence/hegota-c/verification.json": "fbf769fa0374b9972d213eb161cde789944d8976def5aee63db76ff04df9e5de",
@@ -191,7 +191,7 @@
     "evidence/hegota-e/external-network.json": "de76b191520e2b4c577d02b9abdf7f2974eeb0d1f4bb7dab26c71c5f13195110",
     "evidence/hegota-e/resources.json": "aac9257113952f1b6c51610cf12e92698cabfd0aace2c8b7641f5f244b2952ff",
     "evidence/hegota-e/source-review.json": "80838c3af2f74282be8fba49c5323f4e2b681ae772f229134f10a7950be774bc",
-    "evidence/hegota-e/verification.json": "7593c9bac467b6de6cc41b7626cdca634a53a7fd4ec1ec5c643356d11861fe00",
+    "evidence/hegota-e/verification.json": "2fc35a7de79889edb3a633d4fd0f3a223070630ce562f6ef7e94d4f1ff9d6520",
     "evidence/hegota-e/website.json": "a6f2c2efb0f66979849a5afad37260344a0c45070e52acfde1de21e4896ade2d",
     "pkg/Dockerfile": "99c7a9f02d810797f8517b449abc554017bbafb83d7819bb15152a9785a102b2",
     "pkg/bal/code_adoption.go": "a6e2c16d3980b1ab6c1ba0488c55832943bcabaa312944dcd496352cb27f32cf",
@@ -574,12 +574,12 @@
     "tools/hegota/engine_fault_proxy.py": "428f816416a4737986261a4169e4de5f5806e3d84b704de914c61b58d56b0d2d",
     "tools/hegota/generate_d_pq_wallet.py": "57a9d1fa7fe1caf3c7a6fe73305d11ba76751f500e463a91b770b364e0d7ceab",
     "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
-    "tools/hegota/run_external_heze.py": "ea381dec8e2176040ddd22af33dd3c27016e58cad583b20883e23f27465c342d",
+    "tools/hegota/run_external_heze.py": "33433aaa4591fa7b06aea1c43b169a9cdd86a21175799913cc46eb0edb650ba3",
     "tools/hegota/semantic_goldens.py": "333354afcc092dbeae79a71498952f88d8d1025de0594285870fee71ed533a6e",
     "tools/hegota/test_acceptance.py": "1c4ff3a94bbae9515a58a65e1c95a3525476fbafd82e26db6f2d666390903faf",
     "tools/hegota/test_check.py": "b732fec4fa61b9bf0bb0e6f19b78e674cd30e4e6bace009e4485eba58652b53b",
     "tools/hegota/test_engine_fault_proxy.py": "64bc604d248cdec63d1fbc3c875059e2c21a70ea5bc0e1ffaba0ce0c42101ae0",
-    "tools/hegota/test_external_heze.py": "19e41e356ba77f7de20a478375040939c1b6ba2b2bb39909772e53baa9dcb1c5",
+    "tools/hegota/test_external_heze.py": "b608587c6d25211ac5c31151484cbcc63223ed144d010382d4a7bdea3ac410ab",
     "tools/hegota/test_group_b.py": "da76d39f9087cbcd79a91243c9b769dbaf44a2a246fc34997fccd2dd07ad0ef0",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3",
     "tools/hegota/test_group_d.py": "664dbc2a53664b2b2247b70c1e30bb5a3d73128d45b7e9894843bb9490fd202b",
@@ -587,14 +587,14 @@
     "tools/hegota/test_semantic_goldens.py": "bcb92d26c10e277f376433fa90c3a0047fc9be5746af4efd4f7506bc88f15d40"
   },
   "group_b_qualification": {
-    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
     "record": "evidence/hegota-b/verification.json",
     "tasks": 12,
     "criteria": 36,
     "scope": "Base 8141; independent 8250 nonce oracle; ordinary 8272 contract. Public integration is qualified separately in C; independent vectors unchanged."
   },
   "group_c_qualification": {
-    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
     "record": "evidence/hegota-c/verification.json",
     "tasks": 10,
     "criteria": 40,
@@ -602,7 +602,7 @@
     "scope": "Native public base/keyed and conditional EIP-8151 consumers; exact PR-12041 paymaster proposal implemented and qualified behind explicit selection. Upstream adoption/fork pin remains pending."
   },
   "group_d_qualification": {
-    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
     "record": "evidence/hegota-d/verification.json",
     "tasks": 8,
     "criteria": 32,
@@ -611,7 +611,7 @@
     "scope": "Pinned optional direct 8504, 8298 adoption and 7906 ASSERT profiles. Undefined aggregation, official assignments and omitted-IL/7807 composition remain explicit gates."
   },
   "group_e_qualification": {
-    "source_revision": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
     "record": "evidence/hegota-e/verification.json",
     "tasks": 9,
     "criteria": 36,
@@ -619,5 +619,14 @@
     "public_complete": false,
     "scope": "Native Heze/Bogota and external-tool fixture qualification; actual external network outcomes are separately recorded."
   },
-  "qualification_scope": "Fresh 245-package full and 77-package race checks, builds/vet/baseline; all independent expected oracles preserved."
+  "qualification_scope": "Fresh 120-case tool qualification; native Go bytes unchanged from the preserved 245-package full/77-package race builds/vet/baseline. Independent expected oracles preserved.",
+  "tool_qualification": {
+    "source_revision": "3ee1eaa6d4c1515d5845e6b175b857b6c37d7f64",
+    "normal": 120,
+    "optimized": 120,
+    "normal_log_sha256": "693e37e9f7ce6f349d9070ea075f75a2e91432d39018fb8092d03f3369f9b9ba",
+    "optimized_log_sha256": "0546b1ae947f58bd3e5d5ba09c0dc4e7f17d267327fc93f0804db9298189a77e",
+    "go_source_unchanged_since": "cdcad2a1921537d788454906bd81c4de4124f119",
+    "scope": "Fresh tool tests cover bounded service-log retention before owned cleanup; the prior full/race/build/vet/baseline byte-equivalent Go qualification is preserved."
+  }
 }

@@ -236,3 +236,9 @@ suites, all 40 mandatory consumers, builds/vet, the 12-case differential baselin
 and 119 Hegota tooling tests in both interpreter modes. The actual failed hosted
 startup is retained in `evidence/hegota-e/external-network.json`; the fixed network
 run remains pending and is not represented as a pass.
+
+The acceptance runner now retains bounded EL/CL/VC service logs before owned
+cleanup, including when another service cannot be read. Its regression preserves
+the original acceptance outcome. All 120 tooling tests pass in normal and
+optimized modes. Native Go files are unchanged from the full/race qualification
+above; no network success is inferred from the diagnostic change.

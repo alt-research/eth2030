@@ -82,7 +82,10 @@ witness is external to the canonical transaction. Measurements report host,
 runtime and exact scope. They include no network tail-latency claim. Omitted-IL
 witness composition remains unspecified; the native backend returns an explicit
 error instead of treating missing witnesses as an omission excuse. Committee
-size and IL bounds are unchanged.
+size and IL bounds are unchanged. Canonical PQ IL envelopes reuse an already
+authenticated local pool wrapper for building; exact transaction identity stays
+canonical and the included dependency union carries the witness. This is not an
+omitted-IL witness transport assignment.
 
 HGT-046 activation remains gated by D04. External Heze Gossipsub/reqresp framing,
 fork digests, independent CL/ePBS devnet and network latency qualification remain

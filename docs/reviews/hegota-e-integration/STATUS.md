@@ -1,6 +1,6 @@
 # Group E status
 
-Production source: `d6e45a10`, based directly on merged PR #171/master
+Production source: `f328d938`, based directly on merged PR #171/master
 `cc31afffaa12919bbc08dc854c03af1e1928dc3c`. No base conflicts or changes to
 read-only refs or independent A/B/C/D expected oracles.
 
@@ -33,3 +33,5 @@ Verification and final English PR/check links will be recorded after the exact
 source runs complete. The first concurrent full/race attempt hit the existing
 one-second native commit-barrier timeout. A separate full run passed without
 changing that test. Header-copy vet findings were fixed before final reruns.
+
+Final path audit also added authenticated pooled-witness retrieval for canonical PQ IL builds; a native RPC/Engine regression detects its removal.

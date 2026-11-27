@@ -113,7 +113,9 @@ class Handler(BaseHTTPRequestHandler):
             finally:
                 connection.close()
             injected = False
-            if method == "engine_getInclusionListV1" and control.get("mode") == "inject" and "error" not in result:
+            if method == "engine_getInclusionListV1" and control.get("mode") in ("inject", "omit") and "transactions" in control and "error" not in result:
+                if not isinstance(result.get("result"), list):
+                    raise ValueError("native IL response is not an array")
                 items = control["transactions"]
                 transaction_bytes(items)
                 result["result"] = items

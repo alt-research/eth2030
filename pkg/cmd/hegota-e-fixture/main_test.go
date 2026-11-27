@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"errors"
 	"math/big"
 	"testing"
 
@@ -61,5 +62,44 @@ func TestGroupEExternalFixtureIsCanonicalAndDomainBound(t *testing.T) {
 	decoded, err := types.DecodeBlockTransaction(encoded)
 	if err != nil || !decoded.HasDependencies8504() {
 		t.Fatal("sample is not the canonical dependency envelope", err)
+	}
+	// The full-capacity control uses the second already-funded public account
+	// and a distinct new recipient, without depending on the first sender's nonce.
+	filler, err := ordinaryWithBudget(0, 1, 250000, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fillerRaw, _ := hex.DecodeString(filler["raw"].(string)[2:])
+	fillerTx, err := types.DecodeBlockTransaction(fillerRaw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fillerSender := types.HexToAddress(filler["sender"].(string))
+	db.AddBalance(fillerSender, big.NewInt(1000000000000000000))
+	remaining := new(gaspool.GasPool).AddGas(header.GasLimit)
+	filled, _, err := execution.ApplyTransaction(&cfg, db, header, fillerTx, remaining)
+	if err != nil || filled.Status != types.ReceiptStatusSuccessful || filled.StateGasUsed != 183600 || fillerSender == account || *fillerTx.To() == *ordinaryTx.To() {
+		t.Fatal("full-capacity filler is not independently executable", filled, err)
+	}
+	nearLimit, err := ordinaryWithBudget(db.GetNonce(account), 1, header.GasLimit-32768, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nearRaw, _ := hex.DecodeString(nearLimit["raw"].(string)[2:])
+	nearTx, err := types.DecodeBlockTransaction(nearRaw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := execution.ApplyTransaction(&cfg, db.Dup(), header, nearTx, remaining); !errors.Is(err, gaspool.ErrGasPoolExhausted) {
+		t.Fatal("the filler did not make the declared reservation unavailable", err)
+	}
+	accepted, _, err := execution.ApplyTransaction(&cfg, db.Dup(), header, nearTx, new(gaspool.GasPool).AddGas(header.GasLimit))
+	if err != nil || accepted.Status != types.ReceiptStatusSuccessful {
+		t.Fatal("capacity fixture must otherwise be a valid current-fork transaction", accepted, err)
+	}
+	for _, params := range [][2]uint64{{250000, 3}, {1 << 32, 1}} {
+		if _, err := ordinaryWithBudget(0, 1, params[0], params[1]); err == nil {
+			t.Fatal("fixture escaped its account or total-gas domain")
+		}
 	}
 }

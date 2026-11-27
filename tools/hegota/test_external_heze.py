@@ -19,6 +19,7 @@ class ExternalHezeTests(unittest.TestCase):
             self.assertIsNone(external.unsatisfied_valid_root(candidate, "execution"))
         snapshot["data"]["unsatisfied_inclusion_lists"] = []
         self.assertIsNone(external.unsatisfied_valid_root(snapshot, "execution"))
+        self.assertEqual(external.valid_root(snapshot, "execution", True), "beacon")
 
     def test_only_actual_native_valid_false_with_the_fixture_counts(self):
         record = {"method": "engine_newPayloadV6", "block_hash": "payload", "inclusion_list": ["0x01"], "result": {"status": "VALID", "inclusionListSatisfied": False}}
@@ -30,6 +31,9 @@ class ExternalHezeTests(unittest.TestCase):
             self.assertEqual(external.native_omissions([changed], "0x01"), [])
         self.assertEqual(external.native_omissions([{**record, "result": None}], "0x01"), [])
         self.assertEqual(external.native_omissions([record], "0x02"), [])
+        satisfied = {**record, "result": {"status": "VALID", "inclusionListSatisfied": True}}
+        self.assertEqual(external.native_verdicts([satisfied], "0x01", True, "payload"), [satisfied])
+        self.assertEqual(external.native_omissions([satisfied], "0x01"), [])
 
     def observations(self):
         events, observations = [[], []], []

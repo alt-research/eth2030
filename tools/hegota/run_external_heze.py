@@ -68,23 +68,140 @@ def valid_execution(value):
     return isinstance(value, dict) and len(value) == 1 and next(iter(value)).lower() == "valid"
 
 
-def unsatisfied_valid_root(snapshot, execution_hash):
+def valid_root(snapshot, execution_hash, satisfied):
     view = snapshot["data"]
     unsatisfied = set(view["unsatisfied_inclusion_lists"])
     for node in nodes(view["nodes"]):
         status = node["execution_status"]
-        if valid_execution(status) and next(iter(status.values())) == execution_hash and node["root"] in unsatisfied:
+        if valid_execution(status) and next(iter(status.values())) == execution_hash and (node["root"] not in unsatisfied) == satisfied:
             return node["root"]
     return None
 
 
-def native_omissions(events, raw, execution_hash=None):
+def unsatisfied_valid_root(snapshot, execution_hash):
+    return valid_root(snapshot, execution_hash, False)
+
+
+def native_verdicts(events, raw, satisfied, execution_hash=None):
     return [event for event in events if event.get("method") == "engine_newPayloadV6"
             and raw in event.get("inclusion_list", [])
             and isinstance(event.get("result"), dict)
             and event["result"].get("status") == "VALID"
             and (execution_hash is None or event.get("block_hash") == execution_hash)
-            and event["result"].get("inclusionListSatisfied") is False]
+            and event["result"].get("inclusionListSatisfied") is satisfied]
+
+
+def native_omissions(events, raw, execution_hash=None):
+    return native_verdicts(events, raw, False, execution_hash)
+
+
+def matching_satisfied(enclave, ids, raw, predicate=None):
+    cls = [base.endpoint(enclave, service, "http") for service in base.CL]
+    records = journals(ids)
+    for event in native_verdicts(records[0], raw, True):
+        execution_hash = event["block_hash"]
+        matches = [native_verdicts(events, raw, True, execution_hash) for events in records]
+        if not all(matches):
+            continue
+        if predicate is not None and not predicate(execution_hash):
+            continue
+        snapshots = [focil.fetch(cl + "/lighthouse/proto_array") for cl in cls]
+        roots = [valid_root(snapshot, execution_hash, True) for snapshot in snapshots]
+        if all(roots) and roots[0] == roots[1]:
+            return {"execution_hash": execution_hash, "beacon_root": roots[0],
+                    "native_responses": matches, "cl_snapshots": snapshots}
+    return None
+
+
+def invalid_exemptions(enclave, fixture, output):
+    ids = containers(enclave)
+    el = base.endpoint(enclave, base.EL[0], "rpc")
+    sender = json.loads(base.run(str(fixture)))["sender"]
+    nonce = int(focil.rpc(el, "eth_getTransactionCount", sender, "latest"), 16)
+    future = json.loads(base.run(str(fixture), "--nonce", str(nonce + 100)))
+    results = {}
+    for name, raw in (("malformed", "0xff"), ("nonce", future["raw"])):
+        configure(ids, {"mode": "inject", "transactions": [raw]})
+        try:
+            result = base.wait_for(lambda: matching_satisfied(enclave, ids, raw), 90,
+                                   "invalid IL was not tolerated independently by both CL/EL pairs")
+        finally:
+            configure(ids, {"mode": "off"})
+        result["inclusion_transaction"] = raw
+        results[name] = result
+    (output / "invalid-exemptions.json").write_text(json.dumps(results, indent=2) + "\n")
+    return {"malformed": True, "nonce": True, "both_execution_valid": True,
+            "both_inclusion_satisfied": True}
+
+
+def full_exemption(enclave, fixture, output):
+    ids = containers(enclave)
+    els = [base.endpoint(enclave, service, "rpc") for service in base.EL]
+    cls = [base.endpoint(enclave, service, "http") for service in base.CL]
+    spec = focil.fetch(cls[0] + "/eth/v1/config/spec")["data"]
+    duration, epoch_length = int(spec["SECONDS_PER_SLOT"]), int(spec["SLOTS_PER_EPOCH"])
+    genesis = int(focil.fetch(cls[0] + "/eth/v1/beacon/genesis")["data"]["genesis_time"])
+    accounts = [json.loads(base.run(str(fixture), "--account", str(i)))["sender"] for i in (1, 2)]
+    deadline = time.time() + 240
+    selected = None
+    while time.time() < deadline:
+        slot = int((time.time() - genesis) // duration)
+        if slot % epoch_length == epoch_length-1 or time.time() - genesis - slot * duration > duration / 5:
+            time.sleep(.05)
+            continue
+        epoch = slot // epoch_length
+        duties = focil.fetch(cls[0] + f"/eth/v1/validator/duties/proposer/{epoch}")["data"]
+        proposers = {int(d["slot"]): int(d["validator_index"]) // 128 for d in duties}
+        target, origin = proposers[slot+1], 1-proposers[slot+1]
+        committee = focil.fetch(cls[origin] + f"/eth/v1/validator/duties/inclusion_list/{epoch}",
+                                 [str(i) for i in range(256)])["data"]
+        if proposers[slot] != target or not any(int(d["slot"]) == slot and int(d["validator_index"]) // 128 == origin for d in committee):
+            time.sleep(duration / 2)
+            continue
+        head = focil.fetch(cls[target] + "/eth/v2/beacon/blocks/head")["data"]["message"]
+        header = focil.rpc(els[target], "eth_getBlockByNumber", "latest", False)
+        if int(head["slot"]) != slot or head["body"]["signed_execution_payload_bid"]["message"]["block_hash"] != header["hash"]:
+            continue
+        gas_limit = int(header["gasLimit"], 16) - 32768
+        if gas_limit < 250000:
+            raise ValueError("full-capacity fixture requires the pinned large-gas private profile")
+        nonce = int(focil.rpc(els[origin], "eth_getTransactionCount", accounts[0], "latest"), 16)
+        filler_nonce = int(focil.rpc(els[target], "eth_getTransactionCount", accounts[1], "latest"), 16)
+        candidate = json.loads(base.run(str(fixture), "--nonce", str(nonce), "--gas-limit", str(gas_limit)))
+        filler = json.loads(base.run(str(fixture), "--account", "2", "--nonce", str(filler_nonce)))
+        if any(int(focil.rpc(el, "net_peerCount"), 16) != 0 for el in els):
+            raise ValueError("full-capacity control requires isolated EL pools")
+        configure([ids[origin]], {"mode": "omit", "transaction": candidate["raw"], "transactions": [candidate["raw"]]})
+        configure([ids[target]], {"mode": "omit", "transaction": candidate["raw"]})
+        if focil.rpc(els[target], "eth_getTransactionByHash", candidate["transaction"]) is not None:
+            raise ValueError("full-capacity candidate already in proposing pool")
+        if focil.rpc(els[target], "eth_sendRawTransaction", filler["raw"]) != filler["transaction"]:
+            raise ValueError("full-capacity filler hash changed")
+        if focil.rpc(els[origin], "eth_sendRawTransaction", candidate["raw"]) != candidate["transaction"]:
+            raise ValueError("full-capacity candidate hash changed")
+        selected = {"slot": slot, "origin": origin, "target": target,
+                    "gas_limit": gas_limit, "candidate": candidate, "filler": filler}
+        break
+    if selected is None:
+        raise TimeoutError("no full-capacity includer/proposer opportunity")
+
+    def capacity(execution_hash):
+        blocks = [focil.rpc(el, "eth_getBlockByHash", execution_hash, False) for el in els]
+        return all(block and selected["filler"]["transaction"] in block["transactions"]
+                   and selected["candidate"]["transaction"] not in block["transactions"]
+                   and selected["gas_limit"] > int(block["gasLimit"], 16) - int(block["gasUsed"], 16)
+                   for block in blocks)
+    try:
+        result = base.wait_for(lambda: matching_satisfied(enclave, ids, selected["candidate"]["raw"], capacity),
+                               90, "no actual full-capacity omission accepted by both CL/EL pairs")
+    finally:
+        configure(ids, {"mode": "off"})
+    result["fixture"] = selected
+    result["blocks"] = [focil.rpc(el, "eth_getBlockByHash", result["execution_hash"], False) for el in els]
+    (output / "full-exemption.json").write_text(json.dumps(result, indent=2) + "\n")
+    return {"both_execution_valid": True, "both_inclusion_satisfied": True,
+            "actual_declared_gas_does_not_fit": True, "candidate_omitted": True,
+            "filler_included": True, "execution_hash": result["execution_hash"]}
 
 
 def omission(enclave, fixture, output):
@@ -300,6 +417,8 @@ def main():
         evidence["nodes"] = base.collect_images(enclave)
         evidence["positive"] = focil.verify(enclave, 900, evidence_dir=output, fixture_tool=fixture)
         evidence["negative"] = omission(enclave, fixture, output)
+        evidence["invalid_exemptions"] = invalid_exemptions(enclave, fixture, output)
+        evidence["full_exemption"] = full_exemption(enclave, fixture, output)
         evidence["pq_transport"] = resources(enclave, fixture, output)
         evidence["result"] = "pass"
     except BaseException as error:

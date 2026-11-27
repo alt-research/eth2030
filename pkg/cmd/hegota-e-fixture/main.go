@@ -19,14 +19,24 @@ import (
 const fixtureChain = 3151908
 
 func ordinary(nonce, value uint64) (map[string]any, error) {
-	key, err := gethcrypto.HexToECDSA("0000000000000000000000000000000000000000000000000000000000000001")
+	return ordinaryWithBudget(nonce, value, 250000, 1)
+}
+
+func ordinaryWithBudget(nonce, value, limit, account uint64) (map[string]any, error) {
+	if account != 1 && account != 2 || limit > 1<<32-1 {
+		return nil, fmt.Errorf("fixture requires public account 1/2 and uint32 total gas")
+	}
+	key, err := gethcrypto.HexToECDSA(fmt.Sprintf("%064x", account))
 	if err != nil {
 		return nil, err
 	}
 	to := common.HexToAddress("0x0000000000000000000000000000000000000801")
+	if account == 2 {
+		to = common.HexToAddress("0x0000000000000000000000000000000000000802")
+	}
 	// EIP-8037 charges a fresh recipient's account creation at runtime. The
 	// historical 21,000-gas fixture cannot cover that state cost.
-	tx, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.LegacyTx{Nonce: nonce, To: &to, Value: new(big.Int).SetUint64(value), Gas: 250000, GasPrice: big.NewInt(10000000000)}), gethtypes.LatestSignerForChainID(big.NewInt(fixtureChain)), key)
+	tx, err := gethtypes.SignTx(gethtypes.NewTx(&gethtypes.LegacyTx{Nonce: nonce, To: &to, Value: new(big.Int).SetUint64(value), Gas: limit, GasPrice: big.NewInt(10000000000)}), gethtypes.LatestSignerForChainID(big.NewInt(fixtureChain)), key)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +54,14 @@ func main() {
 	kind := flag.String("kind", "ordinary", "ordinary or pq-transport")
 	nonce := flag.Uint64("nonce", 0, "public fixture account nonce")
 	value := flag.Uint64("value", 1, "fixture transfer value in wei")
+	limit := flag.Uint64("gas-limit", 250000, "declared gas for the isolated fixture")
+	account := flag.Uint64("account", 1, "public fixture account 1 or 2")
 	flag.Parse()
 	var result map[string]any
 	var err error
 	switch *kind {
 	case "ordinary":
-		result, err = ordinary(*nonce, *value)
+		result, err = ordinaryWithBudget(*nonce, *value, *limit, *account)
 	case "pq-transport":
 		result, err = sample()
 	default:

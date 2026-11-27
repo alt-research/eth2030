@@ -61,7 +61,8 @@ class FaultProxyTests(unittest.TestCase):
             def do_POST(self):
                 message = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
                 observed.append((message, self.headers.get("Authorization")))
-                encoded = json.dumps({"jsonrpc": "2.0", "id": message["id"], "result": native_result}).encode()
+                result = [] if message["method"] == "engine_getInclusionListV1" else native_result
+                encoded = json.dumps({"jsonrpc": "2.0", "id": message["id"], "result": result}).encode()
                 self.send_response(200)
                 self.send_header("Content-Length", str(len(encoded)))
                 self.end_headers()
@@ -86,6 +87,13 @@ class FaultProxyTests(unittest.TestCase):
                 self.assertEqual(event["inclusion_list"], ["0x0102"])
                 self.assertNotIn("public-test-sentinel", journal.read_text())
                 self.assertLessEqual(event["start_ns"], event["end_ns"])
+                config.write_text(json.dumps({"mode": "omit", "transaction": "0x0102", "transactions": ["0x0102"]}))
+                request = Request("http://127.0.0.1:" + str(server.server_port), data=json.dumps({"jsonrpc": "2.0", "id": 8, "method": "engine_getInclusionListV1", "params": []}).encode())
+                with urlopen(request) as response:
+                    self.assertEqual(json.load(response)["result"], ["0x0102"])
+                events = [json.loads(line) for line in journal.read_text().splitlines()]
+                self.assertTrue(events[-1]["test_il_injected"])
+                self.assertEqual(events[0]["result"], native_result)
             finally:
                 for endpoint in (server, native):
                     endpoint.shutdown()

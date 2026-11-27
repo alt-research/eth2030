@@ -99,6 +99,8 @@ jobs:
           assert result['result']=='pass' and result['enclave_removed'] is True
           assert result['positive']['finalized_on_both_pairs'] is True
           assert all(result['negative'][key] is True for key in ('both_execution_valid','both_inclusion_unsatisfied','not_extended_full','cl_restart_retained'))
+          assert all(result['invalid_exemptions'][key] is True for key in ('malformed','nonce','both_execution_valid','both_inclusion_satisfied'))
+          assert all(result['full_exemption'][key] is True for key in ('both_execution_valid','both_inclusion_satisfied','actual_declared_gas_does_not_fit','candidate_omitted','filler_included'))
           assert result['pq_transport']['samples']>=32
           assert result['pq_transport']['transaction_bytes']<=8192
           assert result['public_complete'] is False

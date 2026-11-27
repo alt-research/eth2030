@@ -128,5 +128,20 @@
     },
     "network_package_revision": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
     "decision": "EIP-8425 recovery proof changes do not supply Profile 2 enforcement or omitted-PQ witness transport; test defined Heze/Engine duties with an actual independent CL."
+  },
+  "latest_7805_rebase": {
+    "checked_at_utc": "2026-11-27T19:20:51.778754+00:00",
+    "eips_head": "fbc43ec3a187f0b3dd448e995a041227f4baa7b1",
+    "eip_7805_blob": "0ff894bb4136c6973c1f91a4598e8d5426f8b237",
+    "merged_pr": 12470,
+    "merged_pr_head": "f5c454d5cd33eda5cff0724feb6b8faf3f2e750f",
+    "all_review_comments_read": true,
+    "all_issue_comments_read": true,
+    "selected_heze_head": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "engine_head": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d",
+    "open_byte_policy_pr": 12723,
+    "byte_policy_pr_head": "bd8d6b7ddf6251473d817d4f4944c9858586b50b",
+    "byte_policy_activated": false,
+    "decision": "Apply pre-execution checks only, skip type 3, use independent 8037 reservations, remove speculative byte exemptions and candidate EVM replay. Keep actual builder execution/7934 validity and independent draft-8504 composition gates. Earlier unchanged-source reviews are historical."
   }
 }

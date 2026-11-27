@@ -1,19 +1,20 @@
 {
   "version": 1,
   "baseline": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
-  "selected_profile": "Heze 36888ee8 / Bogota 9e85b16c; informational 8369 reference predicates only; base 7805 non-Profile-1 envelopes retain full-state append validation",
+  "selected_profile": "Merged EIP-7805 fbc43ec3 pre-execution-only predicate; Heze 36888ee8 / Bogota 9e85b16c; informational 8369 reference predicates and explicit draft-8504 omitted-witness gate",
   "public_gates": [
     "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
     "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
     "8504 omitted-IL witness transport and validity composition remain unspecified",
-    "Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed"
+    "Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed",
+    "EIPs PR 12723 byte-budget omission policy remains unmerged; no RLP or proposed payload-size exemption is activated; high-gas release composition requires upstream resolution"
   ],
   "normative_sources": [
     {
-      "path": "specs/hegota/upstream/2026-11-27/group-e/eip-7805.md",
-      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
-      "sha256": "81096dd37cab86a5007e50d9357f0230f2f3dcbdf4df16b9afd44da6c74098a1",
-      "blob": "0a3955d9e8772b7666f560402b2d81ae032a3d06"
+      "path": "specs/hegota/upstream/2026-11-28/group-e/eip-7805.md",
+      "revision": "fbc43ec3a187f0b3dd448e995a041227f4baa7b1",
+      "sha256": "41a3a3860768acbec2589acd9cd2b3f5780b73fa5f3507681c932104e7464666",
+      "blob": "0ff894bb4136c6973c1f91a4598e8d5426f8b237"
     },
     {
       "path": "specs/hegota/upstream/2026-11-27/group-e/eip-7916.md",
@@ -362,7 +363,8 @@
             "pkg/node/node.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart"
+            "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart",
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
           ]
         }
       ]
@@ -478,20 +480,22 @@
             "pkg/node/backend/engine_bogota.go",
             "pkg/node/backend/inclusion_state.go",
             "pkg/node/sync_runtime.go",
-            "pkg/core/types/receipt.go"
+            "pkg/core/types/receipt.go",
+            "pkg/node/inclusion_preexecution_test.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources",
             "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems",
             "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
-            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict",
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission",
             "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas",
-            "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound"
+            "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound",
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
           ]
         },
         {
           "id": "E44.3",
-          "statement": "declared gas and exact appended RLP size including prefix changes",
+          "statement": "independent declared execution/state reservations; no unmerged omission size excuse; exact RLP limits remain builder/block validity",
           "clauses": [
             "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
             "EIP-8037 header gas_used is max(execution,state); EIP-7934 projected integer width and safe lower bound"
@@ -502,17 +506,21 @@
             "pkg/core/gaspool/gas_pool.go",
             "pkg/node/backend/inclusion_state.go",
             "pkg/node/backend/engine_bogota.go",
-            "pkg/core/block/inclusion_size.go"
+            "pkg/core/block/inclusion_size.go",
+            "pkg/node/backend/inclusion_preexecution_size_test.go",
+            "pkg/focil/profile1.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries",
             "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools",
-            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas",
+            "github.com/eth2030/eth2030/focil::TestGroupELatest7805IndependentOrdinaryGasReservations",
+            "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse"
           ]
         },
         {
           "id": "E44.4",
-          "statement": "malformed/blob/Frame/unknown/incomplete-context distinctions",
+          "statement": "malformed bytes and type-3 entries ignored; Frame pre-execution constraints and explicit undefined-composition errors",
           "clauses": [
             "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
             "EIP-2935 unchanged BLOCKHASH window; authenticated header-only ancestry and unavailable-context error",
@@ -540,7 +548,7 @@
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext",
             "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback",
-            "github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry",
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability",
             "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies",
             "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness",
             "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness",
@@ -611,8 +619,9 @@
             "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart",
             "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews",
             "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission",
-            "github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict",
-            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission",
+            "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas",
+            "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
           ]
         },
         {
@@ -883,6 +892,7 @@
     ".github/workflows/hegota-e-interop.yml",
     "docs/reviews/pr-172/EXTERNAL_HEZE.md",
     "pkg/devnet/kurtosis/scripts/verify-heze-focil.py",
-    "evidence/hegota-e/external-network.json"
+    "evidence/hegota-e/external-network.json",
+    "docs/reviews/pr-172/LATEST_7805.md"
   ]
 }

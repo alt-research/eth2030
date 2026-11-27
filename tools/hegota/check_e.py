@@ -26,7 +26,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
  'HGT-042': {'E42.1': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities'],
              'E42.2': ['github.com/eth2030/eth2030/engine::TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets'],
              'E42.3': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaSatisfactionStatusNullability'],
-             'E42.4': ['github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart']},
+             'E42.4': ['github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration']},
  'HGT-043': {'E43.1': ['github.com/eth2030/eth2030/core/block::TestGroupEBuilderReverseNonceILCascade'],
              'E43.2': ['github.com/eth2030/eth2030/core/block::TestGroupEBuilderPoolFundingReopensILAndDeduplicates',
                        'github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed',
@@ -35,18 +36,22 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E43.4': ['github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse']},
  'HGT-044': {'E44.1': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1AuthenticatedAccountsWithoutExecution'],
              'E44.2': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources',
-                       'github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound',
                        'github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems',
                        'github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission',
-                       'github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict',
-                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas'],
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission',
+                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas',
+                       'github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration'],
              'E44.3': ['github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries',
                        'github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools',
-                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas'],
+                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas',
+                       'github.com/eth2030/eth2030/focil::TestGroupELatest7805IndependentOrdinaryGasReservations',
+                       'github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse'],
              'E44.4': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext',
                        'github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback',
-                       'github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability',
                        'github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies',
+                       'github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness',
                        'github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness',
                        'github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed']},
  'HGT-045': {'E45.1': ['github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart',
@@ -55,8 +60,9 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E45.3': ['github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart',
                        'github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews',
                        'github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission',
-                       'github.com/eth2030/eth2030/node::TestGroupEPostSystemCannotChangeFrameOmissionVerdict',
-                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas'],
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission',
+                       'github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration'],
              'E45.4': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities']},
  'HGT-046': {'E46.1': ['github.com/eth2030/eth2030/focil::TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling'],
              'E46.2': ['github.com/eth2030/eth2030/focil::TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure'],
@@ -73,10 +79,14 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E48.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
              'E48.4': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline']}}
 GATES = ['8369 is Informational; Profile 2 enforcement requires a Standards Track extension',
- '8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final '
- 'slots/budgets and ePBS duties remain undefined',
+ '8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets '
+ 'and ePBS duties remain undefined',
  '8504 omitted-IL witness transport and validity composition remain unspecified',
- 'Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed']
+ 'Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and '
+ 'public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public '
+ 'activation claimed',
+ 'EIPs PR 12723 byte-budget omission policy remains unmerged; no RLP or proposed payload-size exemption '
+ 'is activated; high-gas release composition requires upstream resolution']
 SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
   'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
   '60fab81fff8126a0e0f019a3fa7439fdfafe9471'),
@@ -107,9 +117,6 @@ SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
  ('specs/hegota/upstream/2026-11-27/group-d/eip-8504.md',
   '96da3c17047ad31608c40bfe75049db78dc4417d',
   'd5b17df22eaa7a1b705985e76d41378ed12ec712'),
- ('specs/hegota/upstream/2026-11-27/group-e/eip-7805.md',
-  '68db81b0a75edb0e16d8f181241f994875eba52d',
-  '0a3955d9e8772b7666f560402b2d81ae032a3d06'),
  ('specs/hegota/upstream/2026-11-27/group-e/eip-7916.md',
   '68db81b0a75edb0e16d8f181241f994875eba52d',
   '8c6869b3b516f895a3b1bfde7196d5ae4096a49e'),
@@ -142,8 +149,10 @@ SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
   '1f543491bfc9489be35bd6b341f903b8831821c1'),
  ('specs/hegota/upstream/2026-11-27/group-e/heze/validator.md',
   '36888ee87b0faa6ad7804b017a0184e8e6e6a1c6',
-  '40b66dbf5a4c03da89eb75b0b07db4b792acc4ad')]
-
+  '40b66dbf5a4c03da89eb75b0b07db4b792acc4ad'),
+ ('specs/hegota/upstream/2026-11-28/group-e/eip-7805.md',
+  'fbc43ec3a187f0b3dd448e995a041227f4baa7b1',
+  '0ff894bb4136c6973c1f91a4598e8d5426f8b237')]
 
 def validate_manifest(root, manifest):
     need(manifest['version'] == 1, 'unknown E manifest version')

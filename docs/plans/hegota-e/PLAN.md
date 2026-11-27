@@ -1,111 +1,56 @@
-# Group E: normative implementation and acceptance
+# Group E: current normative implementation and acceptance
 
 Baseline: merged PR #171 (`cc31afffaa12919bbc08dc854c03af1e1928dc3c`).
-Scope: HGT-040–048, nine tasks and 36 criteria below. References are captured
-verbatim outside read-only refs in `specs/hegota/upstream/2026-11-27/group-e`.
-EIPs master: `68db81b0a75edb0e16d8f181241f994875eba52d`;
-consensus-specs: `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6`;
-execution-apis: `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d`.
+Scope: HGT-040–048, nine tasks, 36 criteria and 43 mandatory consumers.
+Current EIP-7805: EIPs `fbc43ec3a187f0b3dd448e995a041227f4baa7b1`, merged PR #12470;
+Heze: `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6`;
+Engine Bogotá: `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d`.
+The latest EIP snapshot is outside read-only refs under `upstream/2026-11-28`.
+Other selected source blobs and independent SSZ/BLS oracles remain unchanged.
 
-The November 28 continuation observed EIPs master
-`4e55e80d16745730f55bb7976449b9100a1e26b4`. Its sole changed EIP is 8425;
-the selected Group E source files retain the exact pinned content above.
-Heze and Engine heads are unchanged. Independent network acceptance now uses
-the pinned Lighthouse source and complete procedure in
-`docs/reviews/pr-172/EXTERNAL_HEZE.md`; no unavailable enforcing rule is invented.
+The merged rebase supersedes earlier inline-CL/full-state omission assumptions.
+See [the complete clause and discussion audit](../../reviews/pr-172/LATEST_7805.md).
 
-## Specification decisions
+## Required implementation
 
-EIP-7805 states the base inclusion contract, but its inline CL containers,
-domain and Engine status describe an older companion revision. The selected
-native companion is current pinned Heze plus Engine Bogotá: `(slot,
-dependent_root)` identity, SSZ/progressive transaction roots, domain
-`0x10000000`, 8192 transaction bytes, committee size 16, and independent
-`PayloadStatusV2.inclusionListSatisfied`. IL dissatisfaction never makes a
-valid execution payload invalid. Old committee-root/Keccak/RLP helper types,
-16-transaction/2M-gas caps and percentage-based compliance scores are legacy
-research APIs and are not the selected Heze protocol.
+- Canonical progressive SSZ, domain `0x10000000`, 8192 transaction bytes and 16 committee members; authenticated CL committees, dependent roots and fork context.
+- Current-slot gossip, first timely messages, late storage/forwarding, branch-scoped equivocation, committee-position requests, bounded retention and authenticated restore/reconfiguration.
+- Exact `getInclusionListV1`, `forkchoiceUpdatedV5`, `newPayloadV6`, capabilities and VALID Boolean/non-VALID null satisfaction. Execution validity remains independent from satisfaction.
+- Owned/cancellable builds, nonce/funding cascades, rollback, actual execution/sidecars/witnesses and EIP-7934 complete-block RLP validity.
+- Omission checks at transaction-end state before withdrawals/post-execution calls: malformed/type-3 entries ignored; current-chain pre-execution validation; independent EIP-8037 reservations; no candidate execution or capacity consumption.
+- No unmerged RLP or payload-size omission excuse. EIPs #12723 remains a separately reviewed, disabled proposal.
+- Predicate-version-3 migration: versions 0–2 require reevaluation of retained views; old compact results require exact CL view resubmission.
+- Native ingress commits only after persistence and one authenticated arrival clock; failed writes preserve views, quotas and pruning.
 
-Heze gossip accepts only the current slot; the import handler and request
-protocol also support the specified retention window. Timely means strictly
-before 75% of the slot. Late but validated ILs remain available to builders and
-can prove equivocation; they do not expand an attester's timely view. Signed
-messages require complete consensus context and BLS verification. An EL cannot
-invent beacon committees, shuffling ancestry, validator keys or fork versions.
+## Explicit prerequisites
 
-The selected Engine contract is `getInclusionListV1`, `forkchoiceUpdatedV5`
-and `newPayloadV6`. `engine_newInclusionListV1` is an older nonstandard extension,
-not a substitute for the official request's exact transaction view. Capability
-advertising must agree with actual backend support. Per-payload accepted views
-must survive deferred validation, branches and restart.
+EIP-8369 is Informational. Defined reference predicates and closed activation
+checks are implemented, but enforcing Profile 2 still requires its Standards
+Track claims/commitment, canonical state diffs, access/replay/code bounds, final
+parameters/vectors and ePBS duties. No whole-transaction position stability is
+inferred from one fresh keyed nonce.
 
-EIP-8369 is Informational and explicitly requires an enforcing Standards Track
-extension before Profile 2 activation. Claims encoding/commitment/limits,
-canonical diffs, code-load limits, final slot/budget constants and post-reveal
-duties remain undefined. Implement the determinate reference predicates and
-negative controls with explicit supplied research parameters; do not assign
-wire fields or activate AA-VOPS by choosing candidate numbers. Existing native
-full-state Frame omission replay is a separate selected experimental consumer
-from Group C, not evidence of Profile 2 or partial-stateless enforcement.
+The direct EIP-8504 profile has real byte/verifier/pool consumers. Omitted-IL
+witness transport/composition remains unspecified. No extra field, excuse,
+committee size or IL limit is invented. The high-gas size-limit composition
+identified in #12723 remains an upstream release prerequisite.
 
-EIP-8504 does not define omitted-IL witness transport or verification. PQ IL
-capacity and resource measurements therefore remain bounded research evidence;
-no committee/IL limit is increased and no unsupported omission is certified.
-Heze/ePBS external-network qualification remains shared with HGT-070/080.
-
-## Transaction-end state boundary
-
-EIP-7805 evaluates omissions after the last transaction, before EIP-4895
-withdrawals and post-execution request calls. Execution-validated EIP-7928
-phase n+1 metadata identifies whether final block state can serve that check;
-affected account/full-state probes require an exact transaction-prefix state.
-Missing metadata requires reconstruction, and corrupted metadata is an error.
-BLOCKHASH probes use authenticated branch headers independently of body
-availability; missing required headers propagate as errors.
-Native import and building share the executor's immutable Frame context checks,
-so wrong-chain and inactive-schema envelopes are ignored before witness gates.
-Context-valid omitted PQ witness composition remains undefined.
-Cached verdicts must identify the predicate used; legacy records with retained
-views are recomputed, while legacy compact records require CL view resubmission.
-See `docs/reviews/pr-172/TRANSACTION_BOUNDARY.md` for the complete audit.
-
-## Pre-execution validity and gas dimensions
-
-Native dependency candidates share the actual executor's nonmutating nonce,
-aggregate fee (including blobs) and reservation rules before witness handling.
-Passing those rules does not establish proof validity or define omitted-witness
-transport. State read failures remain errors. Both ordinary and Frame usage
-contribute to independent capacities; missing derived receipt counters are
-reconstructed from the authenticated transaction prefix. RLP projection uses
-the maximum consumed dimension, including state-dominated prefixes. Internal
-predicate version 2 migrates retained version-0/1 views; compact legacy records
-require their exact CL view to be resubmitted.
-
-Native Heze ingress uses one validated arrival clock and publishes an owned
-view only after cache persistence. Failed writes cannot consume a live quota
-or prune previously retained messages. The complete nine-task audit is in
-`docs/reviews/pr-172/RUNTIME_BOUNDARIES.md`. Current EIP-8037 is pinned by reusing
-the existing current C/D snapshot, rather than editing stale read-only refs.
+Selected independent Lighthouse two-pair controls passed at their exact recorded
+source: signed inclusion/common finality, same-payload VALID/false with CL fork
+choice/restart, invalid/full exemptions and bounded canonical PQ-byte carriage.
+Current publication-head requalification is separately required. Exhaustive
+beacon requests/fork digests, mixed-client/ePBS release coverage and public tails
+remain HGT-070/080 work. No complete public activation is claimed.
 
 ## Complete acceptance register
 
-| Task | Criteria |
-|---|---|
-| HGT-040 | 1: immutable current sources/discussions and precedence; 2: explicit timings/branch identity; 3: execution validity separate from satisfaction; 4: Profile 2/PQ/external activation gates enforced and disclosed |
-| HGT-041 | 1: canonical SSZ and independently frozen roots/domains; 2: branch-keyed exact-byte store/deep copies/dedup; 3: timely/late/equivocation/request behavior; 4: retention/pruning/reorg/restart |
-| HGT-042 | 1: exact Bogotá methods/required fields/capabilities; 2: malformed IL transaction tolerance and strict DATA wire; 3: VALID Boolean versus other-status null; 4: fork/version/backend rejection and retained-view FCU |
-| HGT-043 | 1: all IL and pool funding/nonce cascades reach a fixed point; 2: duplicate/invalid trial rollback and exact gas accounting; 3: request ownership/build-ID/rebuild isolation; 4: concurrent update/cancellation/deadline behavior without deadlocks |
-| HGT-044 | 1: exact envelope presence and type/signature/chain validity; 2: nonce/256-bit balance/fee/code checks without EVM replay for Profile 1; 3: declared gas and exact appended RLP size including prefix changes; 4: malformed/blob/Frame/unknown/incomplete-context distinctions |
-| HGT-045 | 1: actual native Engine build from nonempty IL; 2: import retains execution validity and separate satisfaction; 3: accepted branch/restart/finalization persistence; 4: two actual nodes and explicit alternate-backend behavior |
-| HGT-046 | 1: exact static shapes/expiry/batch rules; 2: occurrence-before-dedup signature/prefix budget debits; 3: code-hash/state/access/replay requirements and claimed-index default semantics; 4: exhaustive enforcement prerequisites reject incomplete activation |
-| HGT-047 | 1: authenticated gossip-to-store-to-Engine consumer; 2: omission blocks extension while valid payload remains stored; 3: timely/late/equivocation/branch/full/invalid exceptions; 4: optimistic transition/ancestor/pruning stability and bid-bit inclusivity |
-| HGT-048 | 1: actual canonical PQ transaction/witness sizes and 8KiB capacity; 2: real verifier resource measurements; 3: bounded propagation/validation pipeline measurements with declared environment; 4: unchanged limits and explicit unsupported PQ omission/CL deployment |
-
-All completion claims require named native tests, fresh pass events and source
-fingerprints. Prior A/B/C/D expected oracles are preserved. Website/GitHub Pages
-roadmap and progress must describe these exact results and remaining gates.
-
-The selected independent two-pair control passed on November 28, including
-common finality, real VALID/false CL fork-choice/restart, malformed/nonce/full
-exemptions and bounded signed PQ-byte carriage. Its exact observed scope and
-remaining release gates are recorded in `evidence/hegota-e/external-network.json`.
+The executable clause/file/native-consumer mapping is
+`specs/hegota/group-e.json`, checked independently by `tools/hegota/check_e.py`.
+Its nine tasks each retain four criteria. HGT-040–042 cover source/CL/Engine;
+043 covers building; 044 the merged pre-execution predicate; 045 native
+integration/persistence; 046 informational reference/activation checks; 047
+native and selected independent CL decisions; 048 bounded PQ resources.
+Fresh pass events, source fingerprints, compiled controls and explicit skip
+inventories are required. Prior A/B/C/D expected oracles remain unchanged.
+Website/GitHub Pages roadmap and progress must show the qualified scope and
+these exact remaining gates.

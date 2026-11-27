@@ -7,6 +7,13 @@ EIPs master: `68db81b0a75edb0e16d8f181241f994875eba52d`;
 consensus-specs: `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6`;
 execution-apis: `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d`.
 
+The November 28 continuation observed EIPs master
+`4e55e80d16745730f55bb7976449b9100a1e26b4`. Its sole changed EIP is 8425;
+the selected Group E source files retain the exact pinned content above.
+Heze and Engine heads are unchanged. Independent network acceptance now uses
+the pinned Lighthouse source and complete procedure in
+`docs/reviews/pr-172/EXTERNAL_HEZE.md`; no unavailable enforcing rule is invented.
+
 ## Specification decisions
 
 EIP-7805 states the base inclusion contract, but its inline CL containers,

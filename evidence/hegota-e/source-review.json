@@ -111,5 +111,22 @@
       "Version-2 retained/compact verdict migration",
       "Native cache publication and pruning after persistence; one validated clock"
     ]
+  },
+  "external_delivery_review": {
+    "checked_at_utc": "2026-11-27T17:23:27.105710+00:00",
+    "observed_eips_head": "4e55e80d16745730f55bb7976449b9100a1e26b4",
+    "previous_eips_head": "68db81b0a75edb0e16d8f181241f994875eba52d",
+    "changed_eips": [
+      "EIP-8425"
+    ],
+    "selected_group_e_source_content_unchanged": true,
+    "consensus_specs_head": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "engine_api_head": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d",
+    "independent_cl": {
+      "repository": "jiayaoqijia/lighthouse",
+      "revision": "bc56927fdb0c31f908286ec39013e4452864dc18"
+    },
+    "network_package_revision": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
+    "decision": "EIP-8425 recovery proof changes do not supply Profile 2 enforcement or omitted-PQ witness transport; test defined Heze/Engine duties with an actual independent CL."
   }
 }

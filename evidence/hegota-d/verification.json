@@ -1,7 +1,7 @@
 {
   "date": "2026-11-27",
   "timezone": "Asia/Shanghai",
-  "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
+  "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
   "tasks": 8,
   "criteria": 32,
   "selected_profile_consumers_passed": true,
@@ -24,7 +24,7 @@
     "pkg/bal/hash.go": "6658c957ff35ad1c41077fc448b322a836efd791f9c36f8f622d0287e355e81b",
     "pkg/bal/tracker.go": "4852187e93e1dbd5e3b91bb59818e0ebd6a3e00cc48e509d8ac504fb0afabadd",
     "pkg/bal/types.go": "16c7a2213ad164df9b54837d2d604f891f86253469ea5ff7dec18b96cb11e769",
-    "pkg/core/block/builder.go": "73528b61faea1f926702978c9ce8d2ed1db9400ae0a60fa4ff1725c9d1a8bf64",
+    "pkg/core/block/builder.go": "7721e963709169bd718ca31a8f08c67c86ca5012c6657b7b55c080eae5be6095",
     "pkg/core/block/dependency_8504_integration_test.go": "70fd339c18b77febded8e7a2a96b53cd35965f3ceb1163ced3c04792cea0b509",
     "pkg/core/block/validator.go": "6934a49da3e9f5311d0cab4ee7bcaa5b2e9476c1d4d4979d0aa46e15fd6e2c09",
     "pkg/core/chain/blockchain.go": "d8b892317c2f954ae439d13294b911d9aca19bc91ac29ff677ce0b72f7bea445",
@@ -45,7 +45,7 @@
     "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
     "pkg/core/execution/migration_8298_test.go": "71411db40fc8db3aad3ed81c8db642401160e0aa4f6cc4c6aa9458594f87fe65",
     "pkg/core/execution/parallel.go": "8fead9573846e7e9e1537f0d95c991204d881177e9462ff97d72f6fe92ee1737",
-    "pkg/core/execution/processor.go": "550806ff6991e47bf9ed72d33fa32a4984d8e216fd19df39793c8331582843a1",
+    "pkg/core/execution/processor.go": "97d21fdf21f9fad99d17f6708193732083a98d763b5d027439ab1cfe1d7ad2bd",
     "pkg/core/frameproof/verify.go": "cedc28690575ab3f9981817e4a567f26bd50f3714e280f3e723f96f5bf963acc",
     "pkg/core/frameproof/verify_test.go": "2103c787acc6b560af7ca96b76fc35968b2878c33c097ebe0e6416adfadf0482",
     "pkg/core/rawdb/chaindb.go": "de681e4a673f06ae4e77ae2c12c5bed25b5a7bc34d1a0b4776085084f4c8f9ab",
@@ -56,13 +56,13 @@
     "pkg/core/types/consensus_payload_8504_commitment_test.go": "6ab1e80fd5d6eb167dca7145d916895ef1c8f3963a330e07f45b2fa762f786ab",
     "pkg/core/types/consensus_payload_8504_test.go": "bc8db5a5a52cc59bb2dfbf2d0bc147175ce52e3c6faa257824b413cc99a18ba9",
     "pkg/core/types/dependency_8504.go": "2993fbb9cf398e949d7e6fe768d3276c10d1805b6214172188353b71e9b18fcc",
-    "pkg/core/types/frame_8141.go": "34c5b1dc0b467cac216b63af61c04824291792bb2ea738bf715bb49d679f0b20",
+    "pkg/core/types/frame_8141.go": "a5d26316dc51315ebdc2bdcb08198a1a10e744263991f750745824b229fc7db1",
     "pkg/core/types/frame_8141_network.go": "d36e69673cfa8f6e276845b3e2cebb69eeb47d3cdca6edfcac42e1edbd7baa93",
     "pkg/core/types/frame_8141_pool.go": "f70708698aa0f8d717930eebc5a773db71fe7ed0606eb17cc2b48ab1a7a84da1",
     "pkg/core/types/frame_8250.go": "1af10e8816e8fcaed72607505e25f17276a4963d66f5768bc1e0a16549334e21",
     "pkg/core/types/frame_extensions_d.go": "35955e26ab4e2bc2fe2d92ec8d7a8929bb1524c228c5c821d5e6f1ee1512fc67",
     "pkg/core/types/frame_extensions_d_test.go": "483ace78f92325515b126e043ba9833392045cdf1dcbef43f014b20d27b6e9c8",
-    "pkg/core/types/header.go": "0ca87bdaad1fa7c7656acb751c84917f06246ac037d6a268cea448c4293067b0",
+    "pkg/core/types/header.go": "7adead67e100dbee6bce96c7bd1265bd816ca0473e6e0509b00ce264686f000b",
     "pkg/core/types/header_rlp.go": "f2efb61f61757b650d1670d01aee137490363c6311219be84432775682a114bb",
     "pkg/core/types/testdata/dependency_ssz/generate.py": "48f01f1441749efbbb1bb4d5e6df246354035581fdd85f0c3d578dec26e09140",
     "pkg/core/types/testdata/dependency_ssz/vectors.json": "9e6daa98df12b469759d45718261811b546ffe20e76ed3333cd56b4c4e7590c4",
@@ -102,13 +102,13 @@
     "pkg/internal/testutil/proof8504/canonical-wallet.json": "3d135211dd28feba6c4703dba3dae14d048638619fe271b9490c33d89331291f",
     "pkg/internal/testutil/proof8504/fixture.go": "781915816c2b49b572f15f814c95af0a7ed007e141e96ed552e93c3e52444b14",
     "pkg/internal/testutil/proof8504/vector.json": "e5822582b12064e019110d9ac78e4c31fcf97252b8f0957bb9e92d630359f1f8",
-    "pkg/node/backend/engine_backend.go": "c9bd08f712f672092eee4dfb836ad4ff4e0a567df1394f8c7c2f1997c82fff33",
-    "pkg/node/backend/engine_bogota.go": "29adcea7f2c9028d1171b1f6bfac34866c9cc331fc2a47724f259858a3873d76",
+    "pkg/node/backend/engine_backend.go": "dab6a9e4c7af2a6c97b793618b3ae35a6bbe8fc4535cff5c82cb51225010ebcf",
+    "pkg/node/backend/engine_bogota.go": "0de807c6a2e46abc141ea5d83cd1696af372c5ff4ee86b3c2ddc7f77d8fb31d8",
     "pkg/node/backend/engine_payload.go": "71dc4bc6b4cff6858a457dbf6a457a1c865aeea42c4beda9c58de41718bfbb6a",
     "pkg/node/backend/frame_simulation.go": "8352e4b6630a8d07d36acf84f971061d0769ac3737abc341980e5a6401577f60",
     "pkg/node/dependency_8504_integration_test.go": "d83c758ec28e4980fc0982cf1703952ef7603a8ff2f204ed4226f355dfc9baed",
     "pkg/node/genesis_loader.go": "64b0f3a0a6794233f46e936ffd41813e62556e89f695883eac69420089bf3e8f",
-    "pkg/node/node.go": "a3b726c0ab33318046e96c88a8cc2604572eefde0640ebb825f1d04baea9e7d9",
+    "pkg/node/node.go": "1e854f162896ed53f64836d880f76de0dc76fba5b69d97608baf179521e8ed9c",
     "pkg/node/persisted_chain_config.go": "940ba6c263203f6b2f1317334f47fdd1337e6bcf8ca5fbe989de5e32279c3582",
     "pkg/p2p/ethproto/dependency_8504_test.go": "561f6bebe4bfa1a2a0fb0d2e3de276725ef1e80badd0a017cacd86e59baf0b3b",
     "pkg/p2p/ethproto/protocol.go": "ebf92646e1d4cd2b3e75e3e59fcebdcbd7d812ca54862f476386b351ca672d6c",
@@ -155,7 +155,7 @@
     "tools/hegota/generate_d_pq_wallet.py": "57a9d1fa7fe1caf3c7a6fe73305d11ba76751f500e463a91b770b364e0d7ceab",
     "tools/hegota/test_group_d.py": "664dbc2a53664b2b2247b70c1e30bb5a3d73128d45b7e9894843bb9490fd202b"
   },
-  "source_fingerprint_sha256": "f0dd6f85c01cdc6e0f3180eafdbb678a6803c40dc5295501c344ca993aba0738",
+  "source_fingerprint_sha256": "dcb727480a2623ddf05e24184104aaac4b0359b468f704efc7601db3cdbd8a02",
   "passed_tests": {
     "github.com/eth2030/eth2030/bal::TestCodeAdoption8298CanonicalWireAndAvailability": "pass",
     "github.com/eth2030/eth2030/core/block::TestDependency8504NativeBuildImportInvalidControlsAndRestart": "pass",
@@ -214,32 +214,203 @@
     "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs": "pass"
   },
   "run": {
-    "log_sha256": "06ac652704e94673ddc69aba8aac185aa49eeee383ecd6fbc0e3238cba5a2aae",
+    "log_sha256": "094417df9082676fa1883ae9ec487adf62a4b69ca0c1fc76d4d1d8a69de88028",
     "named": {
-      "pass": 24176,
+      "pass": 24234,
       "skip": 124
     },
     "packages": {
-      "pass": 223,
+      "pass": 224,
       "skip": 20
     },
-    "completed_packages": 243
+    "completed_packages": 244
+  },
+  "race_scope": {
+    "mandatory_consumers_passed": 55,
+    "outside_selected_race_packages": [],
+    "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
-    "build": "go build ./... and native/wrapper binaries, exit 0",
-    "vet": "go vet ./..., exit 0",
+    "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
+    "commands": [
+      {
+        "step": "build",
+        "command": [
+          "go",
+          "build",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 21.64
+      },
+      {
+        "step": "native-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-final-native",
+          "./cmd/eth2030"
+        ],
+        "exit_code": 0,
+        "seconds": 12.336
+      },
+      {
+        "step": "wrapper-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-final-geth",
+          "./cmd/eth2030-geth"
+        ],
+        "exit_code": 0,
+        "seconds": 5.433
+      },
+      {
+        "step": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 7.533
+      },
+      {
+        "step": "baseline",
+        "command": [
+          "go",
+          "run",
+          "./cmd/eth2030-baseline"
+        ],
+        "exit_code": 0,
+        "seconds": 1.609
+      },
+      {
+        "step": "full",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 181.697
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./bal",
+          "./core/types",
+          "./core/config",
+          "./core/vm",
+          "./core/execution",
+          "./core/block",
+          "./core/chain",
+          "./core/state",
+          "./core/framepay",
+          "./core/frameproof",
+          "./core/rawdb",
+          "./crypto/leansphincs",
+          "./focil/...",
+          "./txpool/...",
+          "./eth",
+          "./node/...",
+          "./rpc/...",
+          "./engine/...",
+          "./p2p/ethproto",
+          "./sync/statesync",
+          "./sync/inserter",
+          "./proofs",
+          "./zkvm",
+          "./cmd/eth2030",
+          "./cmd/send-frame",
+          "./eiptest",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 192.225
+      },
+      {
+        "step": "python",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 33.791
+      },
+      {
+        "step": "python-optimized",
+        "command": [
+          "python3",
+          "-O",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 33.014
+      },
+      {
+        "step": "site-verify",
+        "command": [
+          "node",
+          "--experimental-strip-types",
+          "scripts/verify-eips.ts",
+          "--files"
+        ],
+        "exit_code": 0,
+        "seconds": 0.496
+      },
+      {
+        "step": "site-build",
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "exit_code": 0,
+        "seconds": 63.903
+      },
+      {
+        "step": "site-export",
+        "command": [
+          "node",
+          "--experimental-strip-types",
+          "scripts/check-export.mjs"
+        ],
+        "exit_code": 0,
+        "seconds": 0.293
+      }
+    ],
     "race": {
-      "log_sha256": "0fa9560bbfe49d074f447bfd2b3e878ad31e61f30e227b413c4ca89bbe7a36da",
+      "log_sha256": "dbb63adef540dd8bce3c754b7e70659aaf11bafdd28c94d73e2367b13f6631b1",
       "named": {
-        "pass": 11535,
+        "pass": 12080,
         "skip": 87
       },
       "packages": {
-        "pass": 68,
+        "pass": 73,
         "skip": 3
       },
-      "completed_packages": 71
+      "completed_packages": 76
     },
     "historical_baseline": {
       "expected": 12,
@@ -248,170 +419,13 @@
       "skipped": 0
     },
     "required_native_consumer_skips": 0,
-    "python_regressions": 102,
-    "optimized_python_regressions": 102,
+    "python_regressions": 109,
+    "optimized_python_regressions": 109,
     "skip_inventory": "evidence/hegota-a/skipped-tests.json"
   },
   "previous_qualification": {
-    "revision": "00ca827fd8d55a21b367adc8e8f3a92334eae36e",
-    "verification": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-d/verification.json",
-    "scope": "Immutable predecessor only. Previous extended/negative controls are not re-claimed as current-source executions."
-  },
-  "negative_controls": [
-    {
-      "name": "assert-body-rollback",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "dc9ffeba925d025c7b40c932bf7e4aa1df1092d4a762da64401a96107c5a4e2c",
-      "overlay_manifest_sha256": "8a2b09d354567b66595266db40c549cbfa05c849766e808cf6f51495d38029a1",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/execution::TestAssertion7906WholeBodyRollbackAndPrefixSettlement"
-      ],
-      "overlay_files": {
-        "pkg/core/execution/frame_8141.go": "42a5ad290ab4e0028d868356e0d60cd51dc815fbbd40eeb53efb8f543bef764f"
-      },
-      "unchanged_test_files": {
-        "pkg/core/execution/assertion_7906_test.go": "926454f9677a0190b474805ec47e7315dc7a5cdda3eb035f19313fdca49e190f"
-      }
-    },
-    {
-      "name": "cl-commitment",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "c39aabb1a960e9677a0d688ed1dd3977e419c903084ba3819c4dcc1e17688a47",
-      "overlay_manifest_sha256": "c075ea1cd9352c5e837296530ab0bf670db5a6d6409312a7dd1b9bf7875a3dbd",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/types::TestDependency8504GloasReconstructsAndChecksWitnessCommitment"
-      ],
-      "overlay_files": {
-        "pkg/core/types/consensus_payload_8504.go": "ba782d4c1e0a92e024668503a6dfd9f4ee9bd3d6add303f76b76ccebcdcc08ea"
-      },
-      "unchanged_test_files": {
-        "pkg/core/types/consensus_payload_8504_commitment_test.go": "6ab1e80fd5d6eb167dca7145d916895ef1c8f3963a330e07f45b2fa762f786ab"
-      }
-    },
-    {
-      "name": "code-adoption",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "eabc4281f533a46d8161ac078814c34262a148ad2fbbdbbd8098a32f4cadd4aa",
-      "overlay_manifest_sha256": "1c217bdaa77b13794f3f75cfac94690ca839ae5eb7df8e57736a1107e7d57e62",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/vm::TestSetCodeFrom8298ContextsCreationAndRollback"
-      ],
-      "overlay_files": {
-        "pkg/core/vm/setcodefrom_8298.go": "685cacf5c845bd4b5b2170be4a3e6388383b663e8613b0610816cd98c33cca49"
-      },
-      "unchanged_test_files": {
-        "pkg/core/vm/setcodefrom_8298_test.go": "148a2a6a47e394653bc2a2e4a609196ea741e04a4cd0ece44e55bf7fab37d5bc"
-      }
-    },
-    {
-      "name": "legacy-guest",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "04e3de2214030e39a79e08ae94ff50e8bb5757a3a684193225bebf5dd7ebaec7",
-      "overlay_manifest_sha256": "2e6ae5ac7868b4f7cdb81f2510bca603bb3938188b2a1a9dae66c3b0fb6f9cb8",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/zkvm::TestDependency8504LegacyGuestRejectsUnsupportedBlockBeforeExecution"
-      ],
-      "overlay_files": {
-        "pkg/zkvm/guest.go": "a76c00b685f2e4b5057e5a308aabc7ea02a026e556cd9332ab0befc0e74b0edf"
-      },
-      "unchanged_test_files": {
-        "pkg/zkvm/dependency_8504_test.go": "41beac2e240287bb5485c987de0741316873faf809f455dc43340e1a28517e2c"
-      }
-    },
-    {
-      "name": "legacy-proof",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "811cd26266d37b73510be318c104660b56b0d7e7f0821a98347dbaf8ee2d4b81",
-      "overlay_manifest_sha256": "d1770e7ba71f35e4efaf54865c0db95fc3ba230d3819bd822c9528d97e0c51d1",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/proofs::TestDependency8504LegacyProofHelpersRejectUnsupportedBlocks"
-      ],
-      "overlay_files": {
-        "pkg/proofs/execution_proof.go": "75883b0efff14e6e3a995cddd9004cfbe4ca071a24ce37e16498f08c9e694a0a"
-      },
-      "unchanged_test_files": {
-        "pkg/proofs/dependency_8504_test.go": "ed01422c7853fe0fe34ff093d6546c8f3cdc0001e1e9c1544a552fcd30339392"
-      }
-    },
-    {
-      "name": "stf-schema",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "b226ca9dc555c0dab624997d43960254f83c958bf872d9dbc5e920ea35ebda47",
-      "overlay_manifest_sha256": "e520b7e453bb5f1450fdb0f3383ea3638ebec9ec9254c78b206f367cc53cf2f9",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/zkvm::TestDependency8504STFBoundariesRejectUnsupportedInputs"
-      ],
-      "overlay_files": {
-        "pkg/zkvm/stf.go": "5499f69c1ce62835ed9496d059892ddc948d356cd82c1e09760b7782598246e4",
-        "pkg/zkvm/stf_executor.go": "a4259021115f16cfe8c33663136e62145fce2b0cf81a1af621b58dcef2727f9b"
-      },
-      "unchanged_test_files": {
-        "pkg/zkvm/dependency_8504_test.go": "41beac2e240287bb5485c987de0741316873faf809f455dc43340e1a28517e2c"
-      }
-    },
-    {
-      "name": "sync-delegation",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "b60c413f284f42b578d1b50db68d23411df1bd518648e30ad9568d20b4e838e0",
-      "overlay_manifest_sha256": "e29afe132ddb924e50d3c2ff1a3f0921579f1756acd3b2255c5e7b9b8ae62151",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/sync/inserter::TestDependency8504SyncPipelinesCheckWitnessesBeforeDelegation"
-      ],
-      "overlay_files": {
-        "pkg/sync/inserter/block_processor.go": "969d16322d9ed9ce4d83f1165eba7dec6ddcf0b2d3845f5daf3000332c834cc5",
-        "pkg/sync/inserter/chain_inserter.go": "2ba7383ddd63909f78c9b2dc9a1848da8de9e9ca0c2509604740a5a781d9bebb"
-      },
-      "unchanged_test_files": {
-        "pkg/sync/inserter/dependency_8504_test.go": "31d77e230a9e50f4588cb3ba975b2ddd7305596583975a11296602dbc8a6bd84"
-      }
-    },
-    {
-      "name": "trace-cache",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "879d04af5f532008cf1565df1a0f03357f2d1b5a5d85202f6aa8cd9995d2989b",
-      "overlay_manifest_sha256": "1b652241821fdf002efa927980bc0fc7f22c074770bc3705acc2f6a2ace57f6e",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/execution::TestAssertion7906TraceCacheSurvivesReadOnlyReverts"
-      ],
-      "overlay_files": {
-        "pkg/core/execution/assertion_7906.go": "db1662e0cf52a8d27600faf16622a08badb739b46b3c58a04bcdf6eadfbd1b3c"
-      },
-      "unchanged_test_files": {
-        "pkg/core/execution/assertion_cache_7906_test.go": "9b3520ca670d1becedf7dd7513d87193d4a68ce09629b815b4f3fd23f301da6d"
-      }
-    },
-    {
-      "name": "witness-verification",
-      "control_kind": "isolated semantic removal; production/test files unchanged; replacement compiles and intended native consumer fails",
-      "expected_exit_code": 1,
-      "observed_exit_code": 1,
-      "log_sha256": "9311a6af3d8cb56c964de712e44bb1e7ff576f4ccf09cf26da8cdc909c0ffb8f",
-      "overlay_manifest_sha256": "77af7fc52198a37441c7d2a7901bc96c7488b132e465a2254ba70a7d9f459e47",
-      "failed_consumers": [
-        "github.com/eth2030/eth2030/core/frameproof::TestDependency8504MissingTamperedAndWrapperControls"
-      ],
-      "overlay_files": {
-        "pkg/core/frameproof/verify.go": "fd09541b101d41c1f9c0fcd90b2e576e47abdcab614b24ee906136a4d3bbf7e8"
-      },
-      "unchanged_test_files": {
-        "pkg/core/frameproof/verify_test.go": "2103c787acc6b560af7ca96b76fc35968b2878c33c097ebe0e6416adfadf0482"
-      }
-    }
-  ]
+    "revision": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
+    "verification": "https://github.com/alt-research/eth2030/blob/cc31afffaa12919bbc08dc854c03af1e1928dc3c/evidence/hegota-d/verification.json",
+    "scope": "Merged PR #171 predecessor; historical extended/negative controls are not re-claimed as current-source runs."
+  }
 }

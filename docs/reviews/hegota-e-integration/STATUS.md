@@ -41,3 +41,14 @@ Restart restores only the still-required retention window, rejecting future cach
 Base EIP-7805 blob/other-envelope append validity remains enforced independently of the nonbinding 8369 profile boundary. Valid IL blobs require available authenticated sidecars; failed IDs retry after availability recovery. Static-invalid proof transactions remain tolerated instead of becoming missing-witness errors.
 
 Append RLP sizing includes scalar/3D calldata usage and blob-gas header widths, including prior committed appends; exact serialization independently checks these boundaries.
+
+Final local qualification passed: full suite 244 packages / 24,234 named pass
+events (124 optional skips), selected race suite 76 packages / 12,080 named pass
+events (87 optional skips), native/wrapper builds, vet, 12/12 differential
+baselines, 109 Python checks in normal and optimized modes, and all A-E source
+checkers. All mandatory full-suite consumers pass without skips. The B fixture-only
+eftest encoding consumer is outside selected race packages, explicitly recorded.
+All 13 compiled semantic removals fail their intended unchanged native consumers.
+Site build, static-export checks and final desktop/mobile visual checks passed.
+Hosted exact-head CI is tracked in the English PR record. These frozen local
+artifacts do not pre-claim its outcome.

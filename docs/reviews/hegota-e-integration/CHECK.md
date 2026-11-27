@@ -17,6 +17,6 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] HGT-047 (local native/CL adapter; external HGT-070/080 qualification remains open): qualify gossip-to-fork-choice consumers and all normative omission/full/invalid/late/branch exceptions.
 - [x] HGT-048 (bounded local measurements; network tail latency and omitted witnesses remain unqualified): measure selected PQ IL capacity/propagation/verification budgets without inventing protocol limits or proof propagation.
 - [x] Add positive/negative native unit/integration consumers and criterion-level immutable-source coverage for every task.
-- [ ] Run local builds, vet, appropriate full/race tests, A/B/C/D regressions and source-bound E qualification.
-- [ ] Update website/GitHub Pages roadmap and progress to match demonstrated results and actual release gates; build/check exports and UI.
+- [x] Run local builds, vet, appropriate full/race tests, A/B/C/D regressions and source-bound E qualification.
+- [x] Update website/GitHub Pages roadmap and progress to match demonstrated results and actual release gates; build/check exports and UI.
 - [ ] Inspect base drift, conflicts and duplicated work; commit/push, publish an English PR and follow exact-head hosted checks.

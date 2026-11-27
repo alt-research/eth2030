@@ -1,0 +1,29 @@
+{
+  "source_revision": "d830d0b1c82373cd3b9f6ba135f27703405fe972",
+  "site_build_exit_code": 0,
+  "static_export_checks_exit_code": 0,
+  "roadmap_html_sha256": "be0139fd9955537d63ca1dd3a02758a261d5b090d736cd5ee1d800e11a4aa405",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "review": "Two-column Group E card, readable implementation/gate rows and source links."
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "card_width": 345.609375,
+      "horizontal_overflow": false,
+      "review": "Single-column readable Group E card; no clipped content or links."
+    }
+  ],
+  "browser_console": {
+    "errors": 0,
+    "warnings": 1
+  },
+  "scope": "Local static build visual/DOM inspection; deployment runs through existing GitHub Pages master workflow after merge.",
+  "capture_sha256": {
+    "hegota-e-desktop.png": "3cce24a677228c3f0cb1d44392dffee8c12d9629ca1eaed32ae123eb82a9e99e",
+    "hegota-e-mobile.png": "45e07061917beb757edfa9fe06172131520461da36fa0d4d868760f0eb33537b"
+  }
+}

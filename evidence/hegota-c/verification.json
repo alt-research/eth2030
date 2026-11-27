@@ -1,7 +1,7 @@
 {
   "date": "2026-11-26",
   "timezone": "Asia/Shanghai",
-  "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
+  "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -10,7 +10,7 @@
     "PAYMASTER-CODE": "Upstream standardization/fork pin: exact PR-12041 proposal is implemented and explicitly selectable, but remains unmerged."
   },
   "artifacts": {
-    ".github/workflows/ci.yml": "e2911910d96ee5f7a100dbe2863b4f10df3d9de3563198bc812415495ac90ce0",
+    ".github/workflows/ci.yml": "987e54770440a79d932ad31f1b28ab5d434e09c0a57743b7464830eb81609582",
     "docs/plans/hegota-c/COMPOSITION.md": "d13beb21fe8338b34b96252c1075588a5a20a8fa0ccc025e8a620c0e26c95824",
     "docs/plans/hegota-c/PLAN.md": "1ebdc69aeba807a0bbf87c75af8dedbe47e38d5f843862468f60ff40601302e9",
     "docs/plans/hegota-c/RPC_PROFILE.md": "a3a5058e25333a3457af0d071e94251d866645eaa8a1a45b65f7274e5f4b1da0",
@@ -21,7 +21,7 @@
     "pkg/cmd/eth2030/main_test.go": "e88b5eba89a0f6d94001bc45b8b17f2869a82b67eb476297493fa5490c42e1c5",
     "pkg/cmd/send-frame/main.go": "f483efa608e564e258563fdebecc4f333dce8a25405c3c50ea983f626d4bf9eb",
     "pkg/cmd/send-frame/main_test.go": "013c2956f6d830e387a515e3d0f6c8f937e4c5da25a1489c555b8ba439414383",
-    "pkg/core/block/builder.go": "73528b61faea1f926702978c9ce8d2ed1db9400ae0a60fa4ff1725c9d1a8bf64",
+    "pkg/core/block/builder.go": "7721e963709169bd718ca31a8f08c67c86ca5012c6657b7b55c080eae5be6095",
     "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
     "pkg/core/block/frame_mixed_ordering_test.go": "70aad6b139671a9108c2910e44bd8b01343ba639d2859170ed53be5e9fc3f9cf",
     "pkg/core/block/ordering.go": "c66578e753120f3807bd1e4f086348aadc474f8d3997ecabcdf6176d436ae406",
@@ -50,7 +50,7 @@
     "pkg/core/framepay/paymaster.go": "71a38170cdcd2d5bf928cab6148e2d819a7bd9291f6468fa18698e70b3ca2473",
     "pkg/core/framepay/paymaster_12041.go": "9b979bf861f59403914df55011e469da94eb11ce5f13ce9ce71a01ab1763f009",
     "pkg/core/framepay/paymaster_12041_test.go": "dd107db2feccb9f62112fb30ae3c89cd6068ddaa4bdb8c5476005badd962e37e",
-    "pkg/core/types/frame_8141.go": "34c5b1dc0b467cac216b63af61c04824291792bb2ea738bf715bb49d679f0b20",
+    "pkg/core/types/frame_8141.go": "a5d26316dc51315ebdc2bdcb08198a1a10e744263991f750745824b229fc7db1",
     "pkg/core/types/frame_8141_network.go": "d36e69673cfa8f6e276845b3e2cebb69eeb47d3cdca6edfcac42e1edbd7baa93",
     "pkg/core/types/frame_8141_pool.go": "f70708698aa0f8d717930eebc5a773db71fe7ed0606eb17cc2b48ab1a7a84da1",
     "pkg/core/types/frame_8141_pool_test.go": "e3a2117673c142155c7eb4de657fd4b192e906b3bfb610cdec7bf1ceb8009b01",
@@ -70,8 +70,8 @@
     "pkg/eth/frame_c_protocol_test.go": "5493b5a2172013dfc208307973d3304d79ade082244a6ee8abe6264a5dfef16b",
     "pkg/eth/handler.go": "aecfd1b2216321685e94b43bdf3ff799dd1fa9ee6fec9675f7c0f9e76ffbe637",
     "pkg/eth/sparse_relay.go": "3d5ae122c40f1d4bb765f8291c084452cbef154dcf2663ca13f9a43b809752af",
-    "pkg/node/backend/engine_backend.go": "c9bd08f712f672092eee4dfb836ad4ff4e0a567df1394f8c7c2f1997c82fff33",
-    "pkg/node/backend/engine_fcu.go": "5e5cbcad74cd207e8d11298899f3c320764dbb7106a6b95daf87e07aef5e0380",
+    "pkg/node/backend/engine_backend.go": "dab6a9e4c7af2a6c97b793618b3ae35a6bbe8fc4535cff5c82cb51225010ebcf",
+    "pkg/node/backend/engine_fcu.go": "56e18652869b34bb4856e436f341ab1c60589d525fd82c34671a392ca7d84ffd",
     "pkg/node/backend/frame_simulation.go": "8352e4b6630a8d07d36acf84f971061d0769ac3737abc341980e5a6401577f60",
     "pkg/node/backend/frame_simulation_rpc_test.go": "9b69315d9c15f9ae108fc35ca702ca346bfb831bec2b07f0021852477f515b2d",
     "pkg/node/backend/frame_simulation_test.go": "7f344cece45dd0b7d486f29d6c50af568ec79a8ea8cf4fafc97d47f26ae95cf3",
@@ -83,7 +83,7 @@
     "pkg/node/frame_c_integration_test.go": "81b6b837feaa783dd3c2066ab257325988d225e0c3eaa579fb26bd0011808295",
     "pkg/node/genesis_loader.go": "64b0f3a0a6794233f46e936ffd41813e62556e89f695883eac69420089bf3e8f",
     "pkg/node/genesis_loader_test.go": "940da6454489acad794f08c87328189b72336849e8054264d910be1d3dd688fb",
-    "pkg/node/node.go": "a3b726c0ab33318046e96c88a8cc2604572eefde0640ebb825f1d04baea9e7d9",
+    "pkg/node/node.go": "1e854f162896ed53f64836d880f76de0dc76fba5b69d97608baf179521e8ed9c",
     "pkg/node/persisted_chain_config.go": "940ba6c263203f6b2f1317334f47fdd1337e6bcf8ca5fbe989de5e32279c3582",
     "pkg/p2p/ethproto/frame_8141_codec_test.go": "fbcb436346991cba1061d50b4713173273ef74c7486b8b7886aa46fec7db3d3e",
     "pkg/p2p/ethproto/receipt_tx_codec.go": "6ccb215c4ec8f38b9cad6b230c3c41912d37f81e9cd57f28dc71a8ef41a543be",
@@ -128,12 +128,12 @@
     "specs/hegota/upstream/2026-11-27/eip-2780.md": "1c6b65ea16676301a01f277aa28875f34677cd65e4cc834b26c2802940329a3b",
     "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
     "specs/hegota/upstream/2026-11-27/eip-8038.md": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864",
-    "tools/hegota/README.md": "bf596c9698470ab5bf8752f872bf55062dd1f00eb90a56f9cd139ad0c5bb9c45",
+    "tools/hegota/README.md": "9a277fe65d0c7a481aec0db08ef8a9cca7f41cd191af1f6bf2464395ea799c2f",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
     "tools/hegota/check_c.py": "9aad746a0558b594fa07d04fa78e59f84cda3e997a0ac65f53a3ebde6697faee",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3"
   },
-  "source_fingerprint_sha256": "0893951857ebab59392bec248de7e3cdb6d9a2d81361aafb9d8bfd9ecf9de1e9",
+  "source_fingerprint_sha256": "026f891731b55aa4698b20a50dcb59a5f082f6461a77f11bdcbb7d71eaa75425",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -239,32 +239,203 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "06ac652704e94673ddc69aba8aac185aa49eeee383ecd6fbc0e3238cba5a2aae",
+    "log_sha256": "094417df9082676fa1883ae9ec487adf62a4b69ca0c1fc76d4d1d8a69de88028",
     "named": {
-      "pass": 24176,
+      "pass": 24234,
       "skip": 124
     },
     "packages": {
-      "pass": 223,
+      "pass": 224,
       "skip": 20
     },
-    "completed_packages": 243
+    "completed_packages": 244
+  },
+  "race_scope": {
+    "mandatory_consumers_passed": 102,
+    "outside_selected_race_packages": [],
+    "note": "All mandatory consumers pass the full suite. Fixture-only eftest consumers are outside the selected concurrent runtime race packages; they are not skipped tests."
   },
   "additional_qualification": {
-    "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
-    "build": "go build ./... and native/wrapper binaries, exit 0",
-    "vet": "go vet ./..., exit 0",
+    "source_revision": "296b6fe3f2bc009898756f84dfae0c19ca7dbfe4",
+    "commands": [
+      {
+        "step": "build",
+        "command": [
+          "go",
+          "build",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 21.64
+      },
+      {
+        "step": "native-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-final-native",
+          "./cmd/eth2030"
+        ],
+        "exit_code": 0,
+        "seconds": 12.336
+      },
+      {
+        "step": "wrapper-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-final-geth",
+          "./cmd/eth2030-geth"
+        ],
+        "exit_code": 0,
+        "seconds": 5.433
+      },
+      {
+        "step": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 7.533
+      },
+      {
+        "step": "baseline",
+        "command": [
+          "go",
+          "run",
+          "./cmd/eth2030-baseline"
+        ],
+        "exit_code": 0,
+        "seconds": 1.609
+      },
+      {
+        "step": "full",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 181.697
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./bal",
+          "./core/types",
+          "./core/config",
+          "./core/vm",
+          "./core/execution",
+          "./core/block",
+          "./core/chain",
+          "./core/state",
+          "./core/framepay",
+          "./core/frameproof",
+          "./core/rawdb",
+          "./crypto/leansphincs",
+          "./focil/...",
+          "./txpool/...",
+          "./eth",
+          "./node/...",
+          "./rpc/...",
+          "./engine/...",
+          "./p2p/ethproto",
+          "./sync/statesync",
+          "./sync/inserter",
+          "./proofs",
+          "./zkvm",
+          "./cmd/eth2030",
+          "./cmd/send-frame",
+          "./eiptest",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 192.225
+      },
+      {
+        "step": "python",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 33.791
+      },
+      {
+        "step": "python-optimized",
+        "command": [
+          "python3",
+          "-O",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 33.014
+      },
+      {
+        "step": "site-verify",
+        "command": [
+          "node",
+          "--experimental-strip-types",
+          "scripts/verify-eips.ts",
+          "--files"
+        ],
+        "exit_code": 0,
+        "seconds": 0.496
+      },
+      {
+        "step": "site-build",
+        "command": [
+          "npm",
+          "run",
+          "build"
+        ],
+        "exit_code": 0,
+        "seconds": 63.903
+      },
+      {
+        "step": "site-export",
+        "command": [
+          "node",
+          "--experimental-strip-types",
+          "scripts/check-export.mjs"
+        ],
+        "exit_code": 0,
+        "seconds": 0.293
+      }
+    ],
     "race": {
-      "log_sha256": "0fa9560bbfe49d074f447bfd2b3e878ad31e61f30e227b413c4ca89bbe7a36da",
+      "log_sha256": "dbb63adef540dd8bce3c754b7e70659aaf11bafdd28c94d73e2367b13f6631b1",
       "named": {
-        "pass": 11535,
+        "pass": 12080,
         "skip": 87
       },
       "packages": {
-        "pass": 68,
+        "pass": 73,
         "skip": 3
       },
-      "completed_packages": 71
+      "completed_packages": 76
     },
     "historical_baseline": {
       "expected": 12,
@@ -273,13 +444,13 @@
       "skipped": 0
     },
     "required_native_consumer_skips": 0,
-    "python_regressions": 102,
-    "optimized_python_regressions": 102,
+    "python_regressions": 109,
+    "optimized_python_regressions": 109,
     "skip_inventory": "evidence/hegota-a/skipped-tests.json"
   },
   "previous_qualification": {
-    "revision": "00ca827fd8d55a21b367adc8e8f3a92334eae36e",
-    "verification": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-c/verification.json",
-    "scope": "Immutable predecessor only. Previous extended/negative controls are not re-claimed as current-source executions."
+    "revision": "cc31afffaa12919bbc08dc854c03af1e1928dc3c",
+    "verification": "https://github.com/alt-research/eth2030/blob/cc31afffaa12919bbc08dc854c03af1e1928dc3c/evidence/hegota-c/verification.json",
+    "scope": "Merged PR #171 predecessor; historical extended/negative controls are not re-claimed as current-source runs."
   }
 }

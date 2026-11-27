@@ -123,3 +123,11 @@ qualification is claimed. Current master remains the merged #171 baseline,
 with no conflicts; independent Lean work, read-only refs and A/B/C/D expected
 oracles remain unchanged. Source-bound snapshots qualify the source above;
 publication/check links belong to the English PR record.
+
+## Pre-execution validity and complete-consumer audit in progress
+
+This pass starts from published head `15262949d2b4dbf0f41bf4919dd0a2d0d5550c7c`.
+All three upstream source heads remain unchanged. The review will recheck all
+nine tasks and explicitly investigate the boundary between definitely invalid
+Frame preconditions and the unspecified omitted-witness composition. Independent
+Lean work and all read-only references remain preserved.

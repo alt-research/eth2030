@@ -10,7 +10,6 @@ import (
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
-	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/payload"
@@ -402,7 +401,7 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		receipt, _, applyErr := execution.ApplyTransactionWithBALGetHash(
 			bc.Config(), getHash, trial, payload.Header(), tx, gas, nil,
 		)
-		if err := state.ReadError(trial); err != nil {
+		if err := endState.readError(trial); err != nil {
 			return false, err
 		}
 		if applyErr == nil {

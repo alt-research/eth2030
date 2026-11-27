@@ -37,7 +37,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E44.3': ['github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'],
              'E44.4': ['github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext',
                        'github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback',
-                       'github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry']},
+                       'github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry',
+                       'github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies']},
  'HGT-045': {'E45.1': ['github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart'],
              'E45.2': ['github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart'],
              'E45.3': ['github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart',
@@ -64,7 +65,10 @@ GATES = ['8369 is Informational; Profile 2 enforcement requires a Standards Trac
  '8504 omitted-IL witness transport and validity composition remain unspecified',
  'External Heze CL gossipsub/reqresp/fork-digest and ePBS devnet qualification belongs to '
  'HGT-070/080; no public activation claimed']
-SOURCE_PINS = [('refs/EIPs/EIPS/eip-4895.md',
+SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
+  'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
+  '60fab81fff8126a0e0f019a3fa7439fdfafe9471'),
+ ('refs/EIPs/EIPS/eip-4895.md',
   'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
   '81af3b60b632bc9c03513d1d137f25410e3f4d34'),
  ('refs/EIPs/EIPS/eip-7002.md',

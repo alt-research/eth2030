@@ -128,6 +128,12 @@
       "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
       "sha256": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
       "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
+    },
+    {
+      "path": "refs/EIPs/EIPS/eip-2935.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "3237f773d610420fb50438e690c9317e0f13244cb29f8f8dc357d179f1f89103",
+      "blob": "60fab81fff8126a0e0f019a3fa7439fdfafe9471"
     }
   ],
   "tasks": [
@@ -480,7 +486,8 @@
           "id": "E44.4",
           "statement": "malformed/blob/Frame/unknown/incomplete-context distinctions",
           "clauses": [
-            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size"
+            "EIP-7805 inclusion satisfaction; EIP-8369 Profile 1; EIP-7934 complete RLP size",
+            "EIP-2935 unchanged BLOCKHASH window; authenticated header-only ancestry and unavailable-context error"
           ],
           "files": [
             "pkg/core/block/builder.go",
@@ -491,12 +498,15 @@
             "pkg/focil/profile1.go",
             "pkg/focil/vops_reference.go",
             "pkg/node/backend/engine_bogota.go",
-            "pkg/node/backend/engine_fcu.go"
+            "pkg/node/backend/engine_fcu.go",
+            "pkg/node/backend/inclusion_state.go",
+            "pkg/core/chain/header_access.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext",
             "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback",
-            "github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry"
+            "github.com/eth2030/eth2030/node::TestGroupEBaseFOCILBlobValidityAvailabilityAndSameIDRetry",
+            "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies"
           ]
         }
       ]

@@ -23,6 +23,7 @@ type inclusionEndState struct {
 	known, changed, replayed bool
 	accounts                 map[types.Address]bool
 	receipts                 []*types.Receipt
+	ancestryErr              error
 }
 
 func newInclusionEndState(bc *chain.Blockchain, block *types.Block) (*inclusionEndState, error) {
@@ -36,12 +37,17 @@ func newInclusionEndState(bc *chain.Blockchain, block *types.Block) (*inclusionE
 		if number >= block.NumberU64() || block.NumberU64()-number > 256 {
 			return types.Hash{}
 		}
-		for parent := bc.GetBlock(block.ParentHash()); parent != nil; parent = bc.GetBlock(parent.ParentHash()) {
-			if parent.NumberU64() == number {
-				return parent.Hash()
+		for hash, expected := block.ParentHash(), block.NumberU64()-1; ; {
+			header := bc.GetHeaderByHash(hash)
+			if header == nil || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != expected {
+				e.ancestryErr = fmt.Errorf("authenticated BLOCKHASH ancestor %s at %d unavailable", hash, expected)
+				return types.Hash{}
 			}
+			if expected == number {
+				return hash
+			}
+			hash, expected = header.ParentHash, expected-1
 		}
-		return types.Hash{}
 	}
 	encoded, err := bc.BlockAccessList(block.Hash())
 	if err != nil {
@@ -97,9 +103,21 @@ func (e *inclusionEndState) replay() error {
 	}
 	processor := execution.NewStateProcessor(e.bc.Config()).WithGetHash(e.getHash)
 	result, err := processor.ProcessTransactionsWithBAL(e.block, before)
+	if readErr := e.readError(before); readErr != nil {
+		return readErr
+	}
 	if err != nil {
 		return fmt.Errorf("reconstruct IL transaction-end state: %w", err)
 	}
 	e.state, e.receipts, e.replayed = before, result.Receipts, true
 	return nil
+}
+
+// A missing authenticated header must not turn a real BLOCKHASH into zero and
+// make a Frame look invalid. EVM's callback cannot return errors directly.
+func (e *inclusionEndState) readError(db state.StateDB) error {
+	if err := state.ReadError(db); err != nil {
+		return err
+	}
+	return e.ancestryErr
 }

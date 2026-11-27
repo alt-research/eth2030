@@ -10,7 +10,7 @@ views and detects equivocation. Native Bogotá builds private IL transactions,
 retries nonce/funding cascades, enforces gas/complete-block RLP capacity and
 retains execution/satisfaction decisions across branch selection and restart.
 
-The 36-criterion register names 33 mandatory native consumers. Profile 1 checks
+The 36-criterion register names 34 mandatory native consumers. Profile 1 checks
 actual signatures and full-width account state without EVM execution. Payload
 execution validity remains independent from IL satisfaction. Replacements cancel
 unfinished builds; context cancellation rolls back trials and aborts publication.
@@ -94,3 +94,9 @@ Frame tests cover both post-system invalidation and post-system validation.
 Legacy live cache records are corrected across restart; legacy compact records
 wait for the exact CL view to be resubmitted. Focused regressions pass; final
 full/race/control and hosted qualification is pending.
+
+The snap ancestry review additionally reproduced a valid BLOCKHASH-dependent
+Frame omission being excused when authenticated ancestor headers were available
+without bodies. IL callbacks now follow those headers and propagate missing
+header errors. A real post-pivot native backend regression passes after the fix.
+The register now requires 34 consumers across 21 sources and 24 removal controls.

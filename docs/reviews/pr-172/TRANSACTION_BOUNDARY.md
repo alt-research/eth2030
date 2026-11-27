@@ -18,8 +18,8 @@ validity of a Frame evaluated at the transaction-end boundary.
 EIPs master `68db81b0a75edb0e16d8f181241f994875eba52d`, Heze
 `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6` and Engine Bogotá
 `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d` remain current. The additional
-4895/7002/7928 files in read-only refs were byte-compared with that current
-EIPs revision; their immutable hashes join the E register (20 sources total).
+2935/4895/7002/7928 files in read-only refs were byte-compared with that current
+EIPs revision; their immutable hashes join the E register (21 sources total).
 The 7805 discussion still has 17 posts, last posted November 21; the 8369
 discussion still has four, last posted September 9. Their previous decisions,
 including the author retaining claimed-index evaluation, remain unchanged.
@@ -39,7 +39,13 @@ alone would leave earlier wrong satisfaction decisions usable by FCU.
 The existing state processor now exposes a transaction-prefix entry point
 sharing the same transaction execution loop. It includes actual pre-execution
 systems, transactions and their receipt/gas accounting, and stops before
-withdrawals and request collection. The ordinary full-block entry point retains
+withdrawals and request collection. EIP-2935 leaves BLOCKHASH's 256-block semantics unchanged. Native IL execution
+now follows the authenticated header chain even when snap history has no bodies.
+Missing/corrupt required headers propagate callback errors instead of providing
+a fabricated zero hash that could make a valid Frame appear omittable. A native
+snap-pivot regression reproduced that wrong satisfaction verdict before the fix.
+
+The ordinary full-block entry point retains
 all original finalization behavior. A prefix BAL is not a whole-block commitment.
 
 Native omission checks authenticate the stored, execution-validated BAL and use
@@ -72,6 +78,8 @@ requires a current, resolved verdict record; execution validity itself is unchan
   agree with both import verdicts and leave final block state unchanged by probes.
 - Prefix processing includes actual pre-system storage writes, excludes
   withdrawals/post-system writes, and leaves parent state unmodified.
+- Header-only authenticated snap ancestry supports a real BLOCKHASH-dependent
+  omitted Frame after the pivot; removing a required header returns an error.
 - Restart corrects a legacy retained wrong verdict. Legacy compact metadata
   requires its original view to be resubmitted. Current-version compaction
   preserves the verdict and latest-view replacement behavior.
@@ -80,10 +88,11 @@ The older native fork-activation test's manually supplied empty view now carries
 the current cache predicate version; its activation/reorg assertions are unchanged.
 Actual legacy migration is independently exercised by the native wire cases above.
 
-These cases add three mandatory consumers, bringing the register to 33. Seven
+These cases add four mandatory consumers, bringing the register to 34. Nine
 additional compiled-removal controls cover state selection, prefix execution,
-pruned metadata, legacy live/compact migration and version-preserving compaction.
-The complete control register contains 22 cases. Actual fresh execution results
+pruned metadata, legacy live/compact migration, version-preserving compaction, header-only
+ancestry and missing-header error propagation.
+The complete control register contains 24 cases. Actual fresh execution results
 are recorded in VERIFICATION.md and the source-bound evidence after qualification.
 
 ## Complete task review

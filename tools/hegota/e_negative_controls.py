@@ -39,6 +39,11 @@ controls.extend([
 ('compact-boundary-version','pkg/core/chain/bogota_payload.go','}{record.Number, record.Satisfied, record.SatisfactionVersion})','}{record.Number, record.Satisfied, 0})','./core/chain','TestBogotaPayloadStorageRetainsFinalizedAndPendingViews'),
 ])
 
+controls.extend([
+('header-only-ancestry','pkg/node/backend/inclusion_state.go','header := bc.GetHeaderByHash(hash)','var header *types.Header; if body := bc.GetBlock(hash); body != nil { header = body.Header() }','./node/backend','TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies'),
+('missing-header-verdict','pkg/node/backend/inclusion_state.go','return e.ancestryErr','return nil','./node/backend','TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies'),
+])
+
 for name,path,old,new,pkg,test in controls:
  s=(R/path).read_text()
  if old not in s and name=='strict-timeliness':

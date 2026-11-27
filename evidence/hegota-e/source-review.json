@@ -82,6 +82,11 @@
         "eip": 7928,
         "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
         "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
+      },
+      {
+        "eip": 2935,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "60fab81fff8126a0e0f019a3fa7439fdfafe9471"
       }
     ]
   }

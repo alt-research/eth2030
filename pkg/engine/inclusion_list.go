@@ -201,6 +201,16 @@ func (api *EngineAPI) GetInclusionListV1() (GetInclusionListResponseV1, error) {
 	}
 
 	il := ilBackend.GetInclusionList()
+	if il == nil {
+		return nil, fmt.Errorf("inclusion-list backend returned nil")
+	}
+	total := 0
+	for _, tx := range il.Transactions {
+		if len(tx) == 0 || len(tx) > 8192-total {
+			return nil, fmt.Errorf("inclusion-list backend violated nonempty/8192-byte contract")
+		}
+		total += len(tx)
+	}
 	// Convert transactions to hex-encoded strings with 0x prefix
 	txs := make(GetInclusionListResponseV1, len(il.Transactions))
 	for i, tx := range il.Transactions {

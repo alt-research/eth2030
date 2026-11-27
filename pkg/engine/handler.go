@@ -140,6 +140,11 @@ func (api *EngineAPI) dispatch(method string, params []json.RawMessage) (any, *j
 	case "engine_newPayloadV5":
 		return api.handleNewPayloadV5(params)
 	case "engine_newPayloadV6":
+		if len(params) == 5 {
+			if err := validateNewPayloadWire(params, true); err != nil {
+				return nil, &jsonrpcError{Code: InvalidParamsCode, Message: err.Error()}
+			}
+		}
 		return api.handleNewPayloadV6(params)
 	case "engine_forkchoiceUpdatedV3":
 		return api.handleForkchoiceUpdatedV3(params)
@@ -631,6 +636,9 @@ func (api *EngineAPI) handleAmsterdamForkchoice(params []json.RawMessage, bogota
 }
 
 func (api *EngineAPI) handleForkchoiceUpdatedV5(params []json.RawMessage) (any, *jsonrpcError) {
+	if _, supported := api.backend.(bogotaBackend); !supported {
+		return nil, engineErrorToRPC(ErrUnsupportedFork)
+	}
 	return api.handleAmsterdamForkchoice(params, true)
 }
 

@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -8,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
@@ -26,6 +28,7 @@ import (
 
 // pendingPayload stores a built payload for later retrieval.
 type pendingPayload struct {
+	cancel   context.CancelFunc
 	block    *types.Block
 	receipts []*types.Receipt
 	result   *execution.ProcessResult
@@ -41,7 +44,10 @@ var errInclusionListStorageUnsupported = errors.New("inclusion list storage not 
 
 // EngineBackend adapts NodeDeps to the engine.Backend interface.
 type EngineBackend struct {
-	node NodeDeps
+	buildContext context.Context
+	cancelBuilds context.CancelFunc
+	buildTimeout time.Duration
+	node         NodeDeps
 
 	mu           sync.Mutex
 	payloads     map[payload.PayloadID]*pendingPayload
@@ -86,6 +92,7 @@ func (r *txPoolReader) FrameBuildResult(hash types.Hash, approved bool) {
 
 // NewEngineBackend creates and starts the engine backend.
 func NewEngineBackend(node NodeDeps) *EngineBackend {
+	buildContext, cancelBuilds := context.WithCancel(context.Background())
 	pool := &txPoolReader{pool: node.TxPool(), mevConfig: node.MEVConfig()}
 	builder := block.NewBlockBuilder(node.Blockchain().Config(), node.Blockchain(), pool)
 	maxPayloads := node.Config().CacheEnginePayloads
@@ -93,6 +100,7 @@ func NewEngineBackend(node NodeDeps) *EngineBackend {
 		maxPayloads = defaultMaxPayloads
 	}
 	b := &EngineBackend{
+		buildContext: buildContext, cancelBuilds: cancelBuilds, buildTimeout: 8 * time.Second,
 		node:             node,
 		payloads:         make(map[payload.PayloadID]*pendingPayload),
 		maxPayloads:      maxPayloads,
@@ -122,6 +130,9 @@ func (b *EngineBackend) launch(fn func()) bool {
 func (b *EngineBackend) Close() {
 	b.workMu.Lock()
 	b.closed = true
+	if b.cancelBuilds != nil {
+		b.cancelBuilds()
+	}
 	b.workMu.Unlock()
 	b.workers.Wait()
 }

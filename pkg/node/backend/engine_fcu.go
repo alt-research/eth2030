@@ -1,9 +1,11 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
@@ -13,6 +15,7 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/focil/heze"
 )
 
 func (b *EngineBackend) requestForkchoiceSync(fcState payload.ForkchoiceStateV1) payload.ForkchoiceUpdatedResult {
@@ -41,6 +44,25 @@ func (b *EngineBackend) forkchoiceUpdated(
 	slotNumber *uint64,
 	targetGasLimit uint64,
 ) (payload.ForkchoiceUpdatedResult, error) {
+	// Accepted attributes own their exact view before background work starts.
+	if attrs != nil {
+		owned := *attrs
+		if attrs.Withdrawals != nil {
+			owned.Withdrawals = make([]*payload.Withdrawal, len(attrs.Withdrawals))
+			for i, withdrawal := range attrs.Withdrawals {
+				if withdrawal != nil {
+					value := *withdrawal
+					owned.Withdrawals[i] = &value
+				}
+			}
+		}
+		attrs = &owned
+	}
+	inclusionListTxs = heze.CloneTransactions(inclusionListTxs)
+	if slotNumber != nil {
+		value := *slotNumber
+		slotNumber = &value
+	}
 	bc := b.node.Blockchain()
 
 	slog.Debug("engine_forkchoiceUpdated",
@@ -188,12 +210,35 @@ func (b *EngineBackend) forkchoiceUpdated(
 	}
 
 	// Register in-progress slot.
-	pp := &pendingPayload{done: make(chan struct{}), slot: slot}
+	parentContext := b.buildContext
+	if parentContext == nil {
+		parentContext = context.Background()
+	}
+	timeout := b.buildTimeout
+	if timeout <= 0 {
+		timeout = 8 * time.Second
+	}
+	buildContext, cancel := context.WithTimeout(parentContext, timeout)
+	// A new immutable attribute view supersedes unfinished earlier builds.
+	// Completed payload IDs retain their result until ordinary cache eviction.
+	for _, old := range b.payloads {
+		select {
+		case <-old.done:
+		default:
+			if old.cancel != nil {
+				old.cancel()
+			}
+		}
+	}
+	pp := &pendingPayload{done: make(chan struct{}), slot: slot, cancel: cancel}
 	b.payloads[payloadID] = pp
 	b.payloadOrder = append(b.payloadOrder, payloadID)
 	for len(b.payloads) > b.maxPayloads && len(b.payloadOrder) > 0 {
 		oldest := b.payloadOrder[0]
 		b.payloadOrder = b.payloadOrder[1:]
+		if old := b.payloads[oldest]; old != nil && old.cancel != nil {
+			old.cancel()
+		}
 		delete(b.payloads, oldest)
 	}
 	b.mu.Unlock()
@@ -201,6 +246,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Build the block in the background.
 	if !b.launch(func() {
 		defer close(pp.done)
+		defer cancel()
 		parentBlock := b.node.Blockchain().GetBlock(parentHeader.Hash())
 		var statedb state.StateDB
 		if parentBlock != nil {
@@ -231,7 +277,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"parentNum", parentHeader.Number,
 			"parentHash", parentHeader.Hash(),
 		)
-		builtBlock, receipts, err := b.builder.BuildBlock(parentHeader, buildAttrs)
+		builtBlock, builtResult, err := b.builder.BuildBlockWithResultContext(buildContext, parentHeader, buildAttrs)
 		if err != nil {
 			slog.Warn("engine_forkchoiceUpdated: build block failed",
 				"parentNum", parentHeader.Number,
@@ -240,6 +286,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			pp.err = fmt.Errorf("build block: %w", err)
 			return
 		}
+		receipts := builtResult.Receipts
 
 		// Replace VERIFY frame calldata with STARK proof when enabled.
 		if prover := b.node.StarkFrameProver(); prover != nil {
@@ -278,6 +325,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"txCount", len(builtBlock.Transactions()),
 		)
 	}) {
+		cancel()
 		pp.err = fmt.Errorf("engine backend closed")
 		close(pp.done)
 		return payload.ForkchoiceUpdatedResult{}, pp.err

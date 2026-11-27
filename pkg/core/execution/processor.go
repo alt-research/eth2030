@@ -825,6 +825,13 @@ func ApplyTransactionWithBALGetHash(config *corconfig.ChainConfig, getHash vm.Ge
 	return applyTransactionWithBAL(config, getHash, statedb, header, tx, gp, tracker)
 }
 
+// ApplyTransactionWithBALContext preserves consensus rules and BAL hooks while
+// allowing a local builder to cancel EVM work. Cancellation is never a validity
+// verdict and must abort the build rather than excuse an IL omission.
+func ApplyTransactionWithBALContext(ctx context.Context, config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool, tracker vm.BALTracker) (*types.Receipt, uint64, error) {
+	return applyTransactionInternal(config, getHash, statedb, header, tx, gp, tracker, nil, vm.Config{Context: ctx})
+}
+
 // applyTransaction is the internal implementation that accepts an optional GetHash function.
 func applyTransaction(config *corconfig.ChainConfig, getHash vm.GetHashFunc, statedb state.StateDB, header *types.Header, tx *types.Transaction, gp *gaspool.GasPool) (*types.Receipt, uint64, error) {
 	return applyTransactionInternal(config, getHash, statedb, header, tx, gp, nil, nil)

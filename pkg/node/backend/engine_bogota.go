@@ -9,9 +9,11 @@ import (
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/execution"
 	"github.com/eth2030/eth2030/core/gaspool"
+	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/focil"
 )
 
 func (b *EngineBackend) IsHogota(timestamp uint64) bool {
@@ -205,12 +207,25 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		return false, fmt.Errorf("inclusion list check requires validated payload %s", hash)
 	}
 	remaining := payload.GasLimit() - payload.GasUsed()
-	included := make(map[types.Hash]struct{}, len(payload.Transactions()))
+	included := make(map[string]struct{}, len(payload.Transactions()))
 	for _, tx := range payload.Transactions() {
-		included[tx.Hash()] = struct{}{}
+		raw, err := tx.EncodeRLP()
+		if err != nil {
+			return false, err
+		}
+		included[string(raw)] = struct{}{}
 	}
 	var omitted []*types.Transaction
+	rawEnvelopes := make(map[*types.Transaction][]byte)
+	seen := make(map[string]bool)
 	for _, raw := range list {
+		if _, present := included[string(raw)]; present {
+			continue
+		}
+		if seen[string(raw)] {
+			continue
+		}
+		seen[string(raw)] = true
 		tx, err := types.DecodeBlockTransaction(raw)
 		if err != nil {
 			continue
@@ -218,7 +233,7 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
 			continue
 		}
-		if _, present := included[tx.Hash()]; !present {
+		if _, present := included[string(raw)]; !present {
 			// The IL API carries canonical transaction bytes, not witnesses.
 			// EIP-8504 only defines witnesses for the included dependency union;
 			// adding an omitted candidate's witness there would make that block
@@ -228,6 +243,7 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 				return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
 			}
 			omitted = append(omitted, tx)
+			rawEnvelopes[tx] = raw
 		}
 	}
 	if len(omitted) == 0 {
@@ -237,6 +253,42 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 	if err != nil {
 		return false, fmt.Errorf("read payload post-state: %w", err)
 	}
+	sizer, err := types.NewBlockAppendSizer(payload)
+	if err != nil {
+		return false, err
+	}
+	// Most Profile 1 omissions are decided from authenticated account fields
+	// alone. Only an RLP header-width boundary needs an exact execution probe.
+	var trials []*types.Transaction
+	for _, tx := range omitted {
+		if _, frame := tx.Inner().(*types.FrameTx8141); frame {
+			trials = append(trials, tx)
+			continue
+		}
+		result, err := focil.EvaluateProfile1(rawEnvelopes[tx], bc.Config(), payload.Header(), postState)
+		if err != nil {
+			return false, err
+		}
+		if result.Kind != focil.Profile1Enforceable {
+			continue
+		}
+		minimum, err := sizer.Size(tx, payload.GasUsed()+result.MinimumGas)
+		if err != nil {
+			return false, err
+		}
+		if bc.Config().IsOsaka(payload.Time()) && minimum > blockpkg.MaxRLPBlockSize {
+			continue
+		}
+		maximum, err := sizer.Size(tx, payload.GasUsed()+tx.Gas())
+		if err != nil {
+			return false, err
+		}
+		if !bc.Config().IsOsaka(payload.Time()) || maximum <= blockpkg.MaxRLPBlockSize {
+			return false, nil
+		}
+		trials = append(trials, tx)
+	}
+	omitted = trials
 	// BLOCKHASH for an omitted transaction must read this payload's ancestry.
 	// The canonical head can point to a competing branch.
 	getHash := func(number uint64) types.Hash {
@@ -303,10 +355,24 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 			copied := *framePool
 			gas = &copied
 		}
-		if _, _, err := execution.ApplyTransactionWithBALGetHash(
+		receipt, _, applyErr := execution.ApplyTransactionWithBALGetHash(
 			bc.Config(), getHash, trial, payload.Header(), tx, gas, nil,
-		); err == nil {
-			return false, nil
+		)
+		if err := state.ReadError(trial); err != nil {
+			return false, err
+		}
+		if applyErr == nil {
+			used := receipt.GasUsed
+			if receipt.BlockGasUsed > 0 {
+				used = receipt.BlockGasUsed
+			}
+			size, err := sizer.Size(tx, payload.GasUsed()+used)
+			if err != nil {
+				return false, err
+			}
+			if !bc.Config().IsOsaka(payload.Time()) || size <= blockpkg.MaxRLPBlockSize {
+				return false, nil
+			}
 		}
 	}
 	return true, nil

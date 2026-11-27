@@ -26,6 +26,7 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/focil/heze"
 )
 
 // withdrawalFromLighthouse converts a lighthouse-shaped withdrawal.
@@ -151,13 +152,36 @@ func parseLighthousePayloadAttrs(raw []byte) (*payload.PayloadAttributesV4, erro
 		}
 		attrs.SlotNumber = slot
 	}
+	if la.TargetGasLimit != nil {
+		value, err := parseHexU64(*la.TargetGasLimit)
+		if err != nil {
+			return nil, fmt.Errorf("invalid target_gas_limit: %w", err)
+		}
+		attrs.TargetGasLimit = value
+	}
 
 	if len(la.InclusionListTransactions) > 0 && string(la.InclusionListTransactions) != "null" {
-		// TODO(engine): decode lighthouse's EIP-7916 progressive list hex
-		// (prog_list_of_hex_prog_var_list) into [][]byte and populate
-		// InclusionListTransactions. Until then payloads are built without
-		// IL transactions; IL tx delivery is exercised via engine_getInclusionListV1.
-		attrs.InclusionListTransactions = nil
+		var encoded string
+		if err := json.Unmarshal(la.InclusionListTransactions, &encoded); err == nil {
+			if err := wireData(la.InclusionListTransactions, -1); err != nil {
+				return nil, err
+			}
+			data, err := hex.DecodeString(encoded[2:])
+			if err != nil {
+				return nil, err
+			}
+			transactions, err := heze.DecodeTransactions(data)
+			if err != nil {
+				return nil, err
+			}
+			attrs.InclusionListTransactions = transactions
+		} else {
+			transactions, err := parseExecutionRequests(la.InclusionListTransactions)
+			if err != nil {
+				return nil, err
+			}
+			attrs.InclusionListTransactions = transactions
+		}
 	}
 
 	return attrs, nil

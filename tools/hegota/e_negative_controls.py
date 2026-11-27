@@ -26,7 +26,7 @@ controls.extend([
 controls.append(('append-header-metadata','pkg/core/types/block_append_size.go','if header.BlobGasUsed != nil {','if false && header.BlobGasUsed != nil {','./core/types','TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'))
 controls.extend([
 ('finalized-verdict','pkg/core/chain/bogota_payload.go','if len(record.Block) == 0 {','if false && len(record.Block) == 0 {','./node','TestBogotaDeferredWireAcrossRestart'),
-('reconfigured-authentication','pkg/node/heze_inclusion.go','store, err = heze.Restore(data, view)\n\t\tif err != nil {','store = n.hezeLists\n\t\terr = nil\n\t\tif err != nil {','./node','TestGroupEHezeReconfigureReauthenticatesMemoryAtomically'),
+('reconfigured-authentication','pkg/node/heze_inclusion.go','store, err = heze.Restore(data, view)\n\t\tif err != nil {','_ = data\n\t\tstore = n.hezeLists\n\t\terr = nil\n\t\tif err != nil {','./node','TestGroupEHezeReconfigureReauthenticatesMemoryAtomically'),
 ])
 
 for name,path,old,new,pkg,test in controls:

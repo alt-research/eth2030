@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/eth2030/eth2030/core/types"
+	"github.com/eth2030/eth2030/crypto"
 )
 
 // addrKey is used as a map key for addresses.
@@ -252,8 +253,32 @@ func (t *AccessTracker) Reconcile(db interface {
 	}
 	for address, change := range t.codeChanges {
 		change.NewCode = bytes.Clone(db.GetCode(address))
+		if change.NewCodeHash != nil && crypto.Keccak256Hash(change.NewCode) != *change.NewCodeHash {
+			change.NewCodeHash = nil
+		}
 		if bytes.Equal(change.OldCode, change.NewCode) {
 			delete(t.codeChanges, address)
+		}
+	}
+}
+
+// RecordCodeAdoption preserves the original pre-value and emits only the hash.
+func (t *AccessTracker) RecordCodeAdoption(addr types.Address, old []byte, hash types.Hash) {
+	if previous, ok := t.codeChanges[addr]; ok {
+		old = previous.OldCode
+	}
+	t.codeChanges[addr] = &CodeChange{OldCode: bytes.Clone(old), NewCodeHash: &hash}
+	t.touchedAddrs[addr] = struct{}{}
+}
+
+// ReconcileCodeOrigins8298 uses the same snapshot journal as EVM state. A
+// reverted child adoption must not change the origin of an earlier installation.
+func (t *AccessTracker) ReconcileCodeOrigins8298(origins map[types.Address]types.Hash) {
+	for address, change := range t.codeChanges {
+		if hash, adopted := origins[address]; adopted {
+			change.NewCodeHash = &hash
+		} else {
+			change.NewCodeHash = nil
 		}
 	}
 }

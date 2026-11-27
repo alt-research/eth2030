@@ -31,11 +31,12 @@ type BlobSidecarData struct {
 
 // Transaction represents an Ethereum transaction.
 type Transaction struct {
-	inner   TxData
-	hash    atomic.Pointer[Hash]
-	size    atomic.Uint64
-	from    atomic.Pointer[Address] // cached sender address
-	sidecar *BlobSidecarData        // EIP-4844: blob sidecar (nil for non-blob txs)
+	dependencyWitnesses *dependencyWitnesses8504
+	inner               TxData
+	hash                atomic.Pointer[Hash]
+	size                atomic.Uint64
+	from                atomic.Pointer[Address] // cached sender address
+	sidecar             *BlobSidecarData        // EIP-4844: blob sidecar (nil for non-blob txs)
 }
 
 // SetBlobSidecar attaches KZG blob sidecar data to the transaction.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "date": "2026-11-25",
+  "date": "2026-11-27",
   "profiles": [
     {
       "id": "native-history-v1",
@@ -58,6 +58,39 @@
       ],
       "oracle": "not selected until decisions and prerequisite conformance close",
       "excludes": "no public release or official devnet claim"
+    },
+    {
+      "id": "8504-direct-native-20261127",
+      "activation": "explicit EIP8504Time after Hogota; nil by default",
+      "status": "selected_native_profile_implemented_public_release_gated",
+      "eips": [
+        8141,
+        8504
+      ],
+      "oracle": "Pinned EthLib/leanVM vectors; independent RLP and remerkleable payload vectors",
+      "excludes": "Official wire assignment, recursive 8288 aggregation, unspecified 7807 composition and official cross-client/devnet qualification"
+    },
+    {
+      "id": "8298-native-20261127",
+      "activation": "explicit EIP8298Time after Amsterdam; nil by default",
+      "status": "selected_native_profile_implemented_public_release_gated",
+      "eips": [
+        8298,
+        8151
+      ],
+      "oracle": "Latest EIP8298 and existing Group C EIP8151; native migration/code/BAL/compatibility consumers",
+      "excludes": "Automatic 8151 activation or certification of all deployed authorization/rollup applications"
+    },
+    {
+      "id": "7906-assert-native-20261127",
+      "activation": "explicit EIP7906Time after Hogota; nil by default",
+      "status": "selected_native_profile_implemented_public_release_gated",
+      "eips": [
+        7906,
+        8141
+      ],
+      "oracle": "Current EIP7906 selectors/static suffix/body rollback; real PR12041 runtime and token/retry consumers",
+      "excludes": "Automatic token compensation or obsolete POST_TX/TXDIFF semantics"
     }
   ],
   "decisions": [
@@ -94,18 +127,36 @@
     },
     {
       "id": "D02",
-      "problem": "signature list / proof frame / witness 与未来 8288 的接口",
-      "owner": "规范/PQ；types、P2P、区块承诺",
-      "status": "open_for_combined_release",
-      "closure": "PR/规范冻结到可实现程度；未采用的变体不混入主路径",
-      "date": "2026-11-25",
-      "adopted_profile": "base-only or excluded until closure",
+      "problem": "Proof declaration, signature-list and witness/aggregation composition",
+      "owner": "Specifications/PQ, types, P2P and execution",
+      "status": "selected_profile_implemented_release_gated",
+      "closure": "Native direct profile pinned and implemented; 8288 aggregate key/hash, official wire assignments and provisional parameter finalization remain public release gates.",
+      "date": "2026-11-27",
+      "adopted_profile": "8504-direct-native-20261127",
       "affected_tasks": [
         "HGT-019",
         "HGT-030",
         "HGT-031",
         "HGT-032"
-      ]
+      ],
+      "history": [
+        {
+          "id": "D02",
+          "problem": "signature list / proof frame / witness 与未来 8288 的接口",
+          "owner": "规范/PQ；types、P2P、区块承诺",
+          "status": "open_for_combined_release",
+          "closure": "PR/规范冻结到可实现程度；未采用的变体不混入主路径",
+          "date": "2026-11-25",
+          "adopted_profile": "base-only or excluded until closure",
+          "affected_tasks": [
+            "HGT-019",
+            "HGT-030",
+            "HGT-031",
+            "HGT-032"
+          ]
+        }
+      ],
+      "record": "docs/plans/hegota-d/COMPOSITION.md"
     },
     {
       "id": "D03",
@@ -138,30 +189,63 @@
     },
     {
       "id": "D05",
-      "problem": "8298 code adoption 生效时机及 8151 兼容性",
-      "owner": "VM/生态；旧授权与 fault proof",
-      "status": "open_for_combined_release",
-      "closure": "固定语义、实际应用回放、风险与准入结论",
-      "date": "2026-11-25",
-      "adopted_profile": "base-only or excluded until closure",
+      "problem": "Immediate code adoption and account-restricted recovery compatibility",
+      "owner": "VM/state/txpool and ecosystem integration",
+      "status": "selected_profile_implemented_release_gated",
+      "closure": "Immediate runtime/initcode adoption, exact BAL and migration are implemented; deployed application/rollup qualification remains a public release gate.",
+      "date": "2026-11-27",
+      "adopted_profile": "8298-native-20261127 with independently optional 8151",
       "affected_tasks": [
         "HGT-021",
         "HGT-035",
         "HGT-036"
-      ]
+      ],
+      "history": [
+        {
+          "id": "D05",
+          "problem": "8298 code adoption 生效时机及 8151 兼容性",
+          "owner": "VM/生态；旧授权与 fault proof",
+          "status": "open_for_combined_release",
+          "closure": "固定语义、实际应用回放、风险与准入结论",
+          "date": "2026-11-25",
+          "adopted_profile": "base-only or excluded until closure",
+          "affected_tasks": [
+            "HGT-021",
+            "HGT-035",
+            "HGT-036"
+          ]
+        }
+      ],
+      "record": "docs/plans/hegota-d/COMPOSITION.md"
     },
     {
       "id": "D06",
-      "problem": "7906 回滚执行体与 paymaster 补偿",
-      "owner": "VM/txpool；交易断言",
-      "status": "open_for_combined_release",
-      "closure": "补偿/费用/nonce/日志回滚边界有规范和测试",
-      "date": "2026-11-25",
-      "adopted_profile": "base-only or excluded until closure",
+      "problem": "Transaction assertion rollback, fees and paymaster compensation",
+      "owner": "VM/execution/txpool",
+      "status": "selected_profile_implemented_release_gated",
+      "closure": "ASSERT static suffix and full-body rollback retain prefix nonce/payment. No automatic token compensation is specified or invented; false-return, retry and atomic behavior are tested.",
+      "date": "2026-11-27",
+      "adopted_profile": "7906-assert-native-20261127",
       "affected_tasks": [
         "HGT-012",
         "HGT-037"
-      ]
+      ],
+      "history": [
+        {
+          "id": "D06",
+          "problem": "7906 回滚执行体与 paymaster 补偿",
+          "owner": "VM/txpool；交易断言",
+          "status": "open_for_combined_release",
+          "closure": "补偿/费用/nonce/日志回滚边界有规范和测试",
+          "date": "2026-11-25",
+          "adopted_profile": "base-only or excluded until closure",
+          "affected_tasks": [
+            "HGT-012",
+            "HGT-037"
+          ]
+        }
+      ],
+      "record": "docs/plans/hegota-d/COMPOSITION.md"
     },
     {
       "id": "D07",

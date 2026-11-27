@@ -145,6 +145,9 @@ func (re *RealSTFExecutor) ExecuteSTF(input *STFInput) (*RealSTFOutput, error) {
 	if input.BlockHeader == nil {
 		return nil, ErrRealSTFNilBlock
 	}
+	if err := input.rejectDependency8504(); err != nil {
+		return nil, err
+	}
 	if len(input.Transactions) == 0 {
 		return nil, ErrRealSTFEmptyTx
 	}
@@ -332,6 +335,9 @@ func ComputeSTFCommitment(preRoot, postRoot types.Hash, blockHash types.Hash) [3
 func (re *RealSTFExecutor) GenerateSTFWitness(preState types.Hash, block *types.Block) (*STFInput, error) {
 	if block == nil {
 		return nil, ErrRealSTFNilBlock
+	}
+	if block.RequiresDependencyVerification8504() {
+		return nil, ErrSTFDependency8504
 	}
 
 	header := block.Header()

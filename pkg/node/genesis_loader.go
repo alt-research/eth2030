@@ -57,6 +57,9 @@ type chainConfigJSON struct {
 	GlamsterdanTime        *uint64                        `json:"glamsterdanTime"`
 	EIP8250Time            *uint64                        `json:"eip8250Time"`
 	EIP8151Time            *uint64                        `json:"eip8151Time"`
+	EIP8298Time            *uint64                        `json:"eip8298Time"`
+	EIP7906Time            *uint64                        `json:"eip7906Time"`
+	EIP8504Time            *uint64                        `json:"eip8504Time"`
 	HogotaTime             *uint64                        `json:"hogotaTime"`
 	BogotaTime             *uint64                        `json:"bogotaTime"`
 	SSZBlockTime           *uint64                        `json:"sszBlockTime"`
@@ -283,6 +286,7 @@ func loadGenesisFile(cfg *Config) (*coreconfig.Genesis, error) {
 		return nil, err
 	}
 	chainCfg.EIP8250Time, chainCfg.EIP8151Time = gj.Config.EIP8250Time, gj.Config.EIP8151Time
+	chainCfg.EIP8298Time, chainCfg.EIP7906Time, chainCfg.EIP8504Time = gj.Config.EIP8298Time, gj.Config.EIP7906Time, gj.Config.EIP8504Time
 	chainCfg.HogotaTime, err = resolveForkAliases("bogota", gj.Config.BogotaTime, gj.Config.HegotaTime, gj.Config.HogotaTime)
 	if err != nil {
 		return nil, err

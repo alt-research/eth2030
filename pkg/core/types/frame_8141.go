@@ -181,9 +181,17 @@ func (tx *FrameTx8141) SigningHash() (Hash, error) {
 
 // Validate checks the transaction's state-independent constraints and signatures.
 func (tx *FrameTx8141) Validate() error {
+	return tx.ValidateWithExtensions(FrameExtensions{})
+}
+
+func (tx *FrameTx8141) ValidateWithExtensions(extensions FrameExtensions) error {
 	if profile := tx.NonceProfile8250(); profile != nil {
-		return profile.Validate()
+		return profile.ValidateWithExtensions(extensions)
 	}
+	return tx.validateFrameFields(extensions, nil)
+}
+
+func (tx *FrameTx8141) validateFrameFields(extensions FrameExtensions, signingHashOverride *Hash) error {
 	if tx.Nonce == math.MaxUint64 {
 		return errors.New("EIP-8141 frame nonce cannot be incremented")
 	}
@@ -201,12 +209,17 @@ func (tx *FrameTx8141) Validate() error {
 			return fmt.Errorf("EIP-8141 frame blob %d has invalid version", i)
 		}
 	}
+	assertionSeen := false
 	for i, frame := range tx.Frames {
-		if err := tx.validateFrame(i, frame); err != nil {
+		if assertionSeen && frame.Mode != ModeAssert7906 {
+			return errors.New("EIP-7906 ASSERT frames must form a trailing suffix")
+		}
+		assertionSeen = assertionSeen || frame.Mode == ModeAssert7906
+		if err := tx.validateFrame(i, frame, extensions); err != nil {
 			return fmt.Errorf("EIP-8141 frame %d: %w", i, err)
 		}
 	}
-	if _, err := tx.GasBudget(); err != nil {
+	if _, err := tx.frameGasBudget(signingHashOverride); err != nil {
 		return err
 	}
 	signingHash, err := tx.SigningHash()
@@ -225,7 +238,7 @@ func frameUint256(value *big.Int) bool {
 	return value == nil || (value.Sign() >= 0 && value.BitLen() <= 256)
 }
 
-func (tx *FrameTx8141) validateFrame(i int, frame Frame8141) error {
+func (tx *FrameTx8141) validateFrame(i int, frame Frame8141, extensions FrameExtensions) error {
 	if frame.Target != nil && *frame.Target == FrameExpiryVerifier && frame.Mode == ModeVerify {
 		if frame.Flags != 0 || frame.Limits.State != 0 || len(frame.Data) != 8 {
 			return errors.New("EIP-8141 invalid expiry verifier frame")
@@ -237,8 +250,21 @@ func (tx *FrameTx8141) validateFrame(i int, frame Frame8141) error {
 		}
 	}
 	const approval = FrameApproveExecution | FrameApprovePayment
-	if frame.Mode > ModeSender || frame.Flags >= 8 {
+	validMode := frame.Mode <= ModeSender || (frame.Mode == ModeAssert7906 && extensions.Assert7906) || (frame.Mode == ModeProof8504 && extensions.Proof8504)
+	if !validMode || frame.Flags >= 8 {
 		return errors.New("invalid mode or flags")
+	}
+	if frame.Mode == ModeProof8504 {
+		deps, err := ParseDependencies8504(frame.Data)
+		if err != nil {
+			return err
+		}
+		if frame.Target != nil || bigOrZero(frame.Value).Sign() != 0 || frame.Flags != 0 || frame.Limits.State != 0 || frame.Limits.Execution != uint64(len(deps))*DependencyVerificationGas8504 || (i > 0 && tx.Frames[i-1].Flags&FrameAtomicBatch != 0) {
+			return errors.New("EIP-8504 invalid proof-frame fields or atomic membership")
+		}
+	}
+	if frame.Mode == ModeAssert7906 && (frame.Flags&FrameAtomicBatch != 0 || (i > 0 && tx.Frames[i-1].Flags&FrameAtomicBatch != 0)) {
+		return errors.New("EIP-7906 ASSERT cannot belong to an atomic batch")
 	}
 	if !frameUint256(frame.Value) || (frame.Mode != ModeSender && bigOrZero(frame.Value).Sign() != 0) {
 		return errors.New("invalid value")
@@ -247,7 +273,7 @@ func (tx *FrameTx8141) validateFrame(i int, frame Frame8141) error {
 		return errors.New("only the sender can approve execution")
 	}
 	if frame.Flags&FrameAtomicBatch != 0 {
-		if frame.Mode == ModeVerify || i+1 == len(tx.Frames) || tx.Frames[i+1].Mode == ModeVerify {
+		if frame.Mode != ModeDefault && frame.Mode != ModeSender || i+1 == len(tx.Frames) || tx.Frames[i+1].Mode == ModeVerify || tx.Frames[i+1].Mode == ModeAssert7906 || tx.Frames[i+1].Mode == ModeProof8504 {
 			return errors.New("atomic batch needs a following non-VERIFY frame")
 		}
 	}
@@ -323,6 +349,10 @@ func (tx *FrameTx8141) GasBudget() (FrameGasBudget, error) {
 	if profile := tx.NonceProfile8250(); profile != nil {
 		return profile.GasBudget()
 	}
+	return tx.frameGasBudget(nil)
+}
+
+func (tx *FrameTx8141) frameGasBudget(signingHash *Hash) (FrameGasBudget, error) {
 	// The input byte lengths are bounded before multiplication by the execution cap.
 	common := uint64(frame8141IntrinsicCost)
 	var intrinsicData, bytesForFloor uint64
@@ -378,8 +408,26 @@ func (tx *FrameTx8141) GasBudget() (FrameGasBudget, error) {
 		}
 	}
 
-	intrinsic := common + intrinsicData
-	floor := common + bytesForFloor*64
+	var witnessCost uint64
+	if tx.HasProofFrames8504() {
+		var digest Hash
+		if signingHash != nil {
+			digest = *signingHash
+		} else {
+			var err error
+			digest, err = tx.SigningHash()
+			if err != nil {
+				return FrameGasBudget{}, err
+			}
+		}
+		deps, err := tx.dependencies8504(digest)
+		if err != nil {
+			return FrameGasBudget{}, err
+		}
+		witnessCost = uint64(len(deps)) * DependencyWitnessGas8504
+	}
+	intrinsic := common + intrinsicData + witnessCost
+	floor := common + bytesForFloor*64 + witnessCost
 	reservation := max(intrinsic+exec, floor)
 	if reservation > frame8141ExecutionGasCap {
 		return FrameGasBudget{}, errors.New("EIP-8141 frame execution reservation exceeds transaction cap")

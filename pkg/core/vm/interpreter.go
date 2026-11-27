@@ -108,6 +108,7 @@ type StateDB interface {
 
 // Config holds EVM configuration options.
 type Config struct {
+	FrameAssertionTrace    func() *AssertionTrace7906
 	OnFrameLegacyNonceRead func(types.Address)                                  // optional nonce dependency instrumentation
 	OnFrameRecovery8151    func(types.Address, types.Hash, types.Address, bool) // paid public-prefix recovery
 	FrameObserver          FrameObserver                                        // optional bounded per-frame simulation observer
@@ -120,6 +121,8 @@ type Config struct {
 
 // EVM is the Ethereum Virtual Machine execution environment.
 type EVM struct {
+	codeAdoptions        *codeAdoptionJournal
+	systemContracts8298  map[types.Address]bool
 	createdContracts     map[types.Address]bool
 	createdOrder         []types.Address
 	Context              BlockContext
@@ -188,6 +191,10 @@ func (evm *EVM) SetGuestRegistry(r *zkvm.GuestRegistry) {
 // SetForkRules sets the active fork rules for this EVM instance.
 func (evm *EVM) SetForkRules(rules ForkRules) {
 	evm.forkRules = rules
+	evm.installCodeAdoptionJournal()
+	if rules.IsEIP8298 {
+		evm.jumpTable[SETCODEFROM] = &operation{execute: opSetCodeFrom8298, dynamicGas: gasSetCodeFrom8298, minStack: 1, maxStack: 1024, writes: true}
+	}
 }
 
 // GetForkRules returns the active fork rules.
@@ -266,6 +273,9 @@ func runPrecompile(p PrecompiledContract, input []byte, gas uint64) ([]byte, uin
 // the correct jump table. The caller (processor) converts ChainConfig.Rules
 // into this struct to avoid a circular import.
 type ForkRules struct {
+	IsEIP8298        bool
+	IsEIP7906        bool
+	IsEIP8504        bool
 	IsHogota         bool // selected latest EIP-8037/7610 creation composition
 	IsEIP8151        bool // raw-code restricted ecRecover
 	IsVerkle         bool // EIP-4762: statelessness gas cost changes
@@ -332,6 +342,9 @@ func SelectJumpTable(rules ForkRules) JumpTable {
 	table := selectBaseJumpTable(rules)
 	if rules.IsLegacyFrames {
 		table = enableLegacyFrameOpcodes(table)
+	}
+	if rules.IsEIP8298 {
+		table[SETCODEFROM] = &operation{execute: opSetCodeFrom8298, dynamicGas: gasSetCodeFrom8298, minStack: 1, maxStack: 1024, writes: true}
 	}
 	return table
 }
@@ -426,6 +439,9 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 		if debug {
 			tracePC, traceOp, traceGas, traceReservoir, traceLogged = pc, op, contract.Gas, contract.StateGasReservoir, false
 		}
+		if op == SETCODEFROM && !evm.forkRules.IsEIP8298 {
+			return nil, ErrInvalidOpCode
+		}
 		operation := evm.jumpTable[op]
 		if operation == nil || operation.execute == nil {
 			return nil, ErrInvalidOpCode
@@ -443,6 +459,14 @@ func (evm *EVM) Run(contract *Contract, input []byte) (result []byte, runError e
 		if err := evm.checkFrameValidation(op, contract, stack, pc); err != nil {
 			evm.frameValidationErr = err
 			return nil, err
+		}
+
+		if op == SETCODEFROM && evm.systemContracts8298[contract.Address] {
+			return nil, ErrWriteProtection
+		}
+
+		if op == APPROVE && evm.frame8141 != nil && evm.frame8141.Tx.Frames[evm.frame8141.Index].Mode == types.ModeAssert7906 {
+			return nil, ErrWriteProtection
 		}
 
 		// EIP-214 forbids the write before memory/access/state metering. CALLCODE
@@ -1173,7 +1197,7 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 	// restores it. In particular an underfunded charge halts the creator rather
 	// than being bypassed by an early collision return. Older pinned native
 	// fork profiles retain their historical nonce/code-only collision rule.
-	if (evm.forkRules.IsHogota || evm.frame8141 != nil) && HasNonEmptyStorage(evm.StateDB, contractAddr) {
+	if (evm.forkRules.IsHogota || evm.forkRules.IsEIP8298 || evm.frame8141 != nil) && HasNonEmptyStorage(evm.StateDB, contractAddr) {
 		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		return nil, types.Address{}, 0, ErrContractCreationCollision
 	}
@@ -1235,6 +1259,9 @@ func (evm *EVM) create(caller types.Address, code []byte, gas uint64, value *big
 		return ret, types.Address{}, contract.Gas, err
 	}
 	gas = contract.Gas
+	if adopted, ok := evm.adoptedCreationCode(contractAddr); ok {
+		return adopted, contractAddr, gas, nil
+	}
 	if evm.forkRules.IsLondon && len(ret) > 0 && ret[0] == 0xef {
 		evm.revertCreationSnapshot(snapshot, createdSnapshot)
 		return nil, types.Address{}, 0, errors.New("invalid code prefix")

@@ -74,6 +74,9 @@ func NewExecutionPayloadSSZ(block *Block, receipts []*Receipt, ctx ExecutionSSZC
 		return nil, fmt.Errorf("EIP-7807: missing block")
 	}
 	h := block.Header()
+	if h.DependencyWitnessesHash != nil {
+		return nil, fmt.Errorf("EIP-8504 uses the pinned Gloas payload; EIP-7807 composition is not specified")
+	}
 	if h.Number == nil || !h.Number.IsUint64() || h.BaseFee == nil ||
 		h.BlobGasUsed == nil || h.ExcessBlobGas == nil || h.ParentBeaconRoot == nil ||
 		ctx.BlobBaseFee == nil || len(ctx.BlockAccessList) == 0 || len(block.Uncles()) != 0 {
@@ -349,6 +352,9 @@ func ExecutionRequestsSSZRoot(requests Requests) (Hash, error) {
 // roots, and the SSZ block hash binds them through the header hash tree.
 // Blob gas amounts and the slot number come from the execution context.
 func NewExecutionHeaderSSZ(h *Header, ctx ExecutionSSZContext) (*ExecutionHeaderSSZ, error) {
+	if h != nil && h.DependencyWitnessesHash != nil {
+		return nil, fmt.Errorf("EIP-7807/8504 execution header composition is not specified")
+	}
 	if h == nil || h.Number == nil || !h.Number.IsUint64() || h.BaseFee == nil ||
 		h.BlobGasUsed == nil || h.ExcessBlobGas == nil || h.ParentBeaconRoot == nil {
 		return nil, fmt.Errorf("EIP-7807: missing post-merge execution header fields")

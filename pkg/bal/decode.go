@@ -8,7 +8,6 @@ import (
 
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/crypto"
-	"github.com/eth2030/eth2030/rlp"
 )
 
 // DecodeForHeader authenticates and decodes the account-grouped EIP-7928
@@ -50,7 +49,7 @@ func validIndices[T any](changes []IndexedChange[T]) bool {
 // DecodeRLP validates canonical structure/order before any state consumer uses it.
 func DecodeRLP(encoded []byte) ([]AccountChanges, error) {
 	var accounts []AccountChanges
-	if err := rlp.DecodeBytes(encoded, &accounts); err != nil {
+	if err := decodeAccountChanges(encoded, &accounts); err != nil {
 		return nil, err
 	}
 	for i, account := range accounts {

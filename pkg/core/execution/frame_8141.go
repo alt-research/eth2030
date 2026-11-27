@@ -7,6 +7,7 @@ import (
 
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/framepay"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -47,7 +48,10 @@ func ValidateFrame8141DependenciesWithPaymaster(config *corconfig.ChainConfig, d
 	if !ok || header == nil {
 		return nil, errors.New("not a canonical Frame validation context")
 	}
-	if _, err := frame.ValidationPrefix8141(header.Time); err != nil {
+	if err := frameproof.VerifyTransaction(tx, config.FrameExtensions(header.Time), true); err != nil {
+		return nil, err
+	}
+	if _, err := frame.ValidationPrefix8141WithExtensions(header.Time, config.FrameExtensions(header.Time)); err != nil {
 		return nil, err
 	}
 	copied := &frameReadSet{StateDB: db.Dup(), sender: frame.Sender, reads: make(map[FrameDependency]struct{})}
@@ -140,7 +144,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	var legacyNonce uint64
 	var budget types.FrameGasBudget
 	if profile == nil {
-		if err := tx.Validate(); err != nil {
+		if err := tx.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
 			return nil, 0, err
 		}
 		legacyNonce = db.GetNonce(tx.Sender)
@@ -149,7 +153,7 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 		}
 		budget, err = tx.GasBudget()
 	} else {
-		if err := profile.Validate(); err != nil {
+		if err := profile.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
 			return nil, 0, err
 		}
 		if reader, ok := db.(interface{ FrameLegacyNonce8250(types.Address) uint64 }); ok && len(profile.NonceKeys) > 0 {
@@ -217,6 +221,10 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	if len(tracing) > 0 {
 		vmConfig = tracing[0]
 	}
+	if config.IsEIP7906(header.Time) {
+		journal := newAssertionState7906(db, txHash)
+		db, vmConfig.FrameAssertionTrace = journal, journal.index
+	}
 	evm := vm.NewEVMWithState(blockCtx, vm.TxContext{
 		GasPrice: payment.GasPrice(), BlobHashes: tx.BlobVersionedHashes,
 	}, vmConfig, db)
@@ -236,14 +244,15 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	prefixEnd := -1
 	if prefixOnly {
 		if profile != nil {
-			prefixEnd, err = profile.ValidationPrefix8250(header.Time)
+			prefixEnd, err = profile.ValidationPrefix8250WithExtensions(header.Time, config.FrameExtensions(header.Time))
 		} else {
-			prefixEnd, err = tx.ValidationPrefix8141(header.Time)
+			prefixEnd, err = tx.ValidationPrefix8141WithExtensions(header.Time, config.FrameExtensions(header.Time))
 		}
 		if err != nil {
 			return nil, 0, err
 		}
 	}
+	bodySnapshot, bodyStart := -1, 0
 	batchSnapshot, batchStart := -1, 0
 	var batchExecution []types.FrameGasLimits
 	for i := 0; i < len(tx.Frames); i++ {
@@ -280,6 +289,20 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 			}
 		}
 		ctx.Results[i] = result
+		if config.IsEIP7906(header.Time) && frame.Mode == types.ModeAssert7906 && frameErr != nil {
+			if bodySnapshot < 0 {
+				return nil, 0, errors.New("ASSERT failed before payment approval")
+			}
+			retained := append([]types.FrameResult8141(nil), ctx.Results...)
+			evm.StateDB.RevertToSnapshot(bodySnapshot)
+			for j := bodyStart; j <= i; j++ {
+				ctx.Results[j] = types.FrameResult8141{Status: retained[j].Status, GasUsed: types.FrameGasLimits{Execution: retained[j].GasUsed.Execution}}
+			}
+			for j := i + 1; j < len(tx.Frames); j++ {
+				ctx.Results[j] = types.FrameResult8141{Status: types.FrameStatusSkipped}
+			}
+			break
+		}
 		if batchSnapshot >= 0 {
 			batchExecution = append(batchExecution, result.GasUsed)
 			if frameErr != nil {
@@ -300,6 +323,12 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 			} else if frame.Flags&types.FrameAtomicBatch == 0 {
 				batchSnapshot = -1
 			}
+		}
+		if bodySnapshot < 0 && ctx.Payer != nil && config.IsEIP7906(header.Time) {
+			bodyStart, bodySnapshot = i+1, evm.StateDB.Snapshot()
+		}
+		if ctx.Payer == nil {
+			bodySnapshot = -1
 		}
 		if prefixOnly && i == prefixEnd {
 			if tx.ValidationDeployIndex8141() >= 0 && db.GetCodeSize(tx.Sender) == 0 {

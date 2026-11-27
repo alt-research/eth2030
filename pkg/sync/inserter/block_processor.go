@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/metrics"
 )
@@ -271,6 +272,11 @@ func (bp *BlockProcessor) validateBlock(qb *queuedBlock) error {
 		if err := bp.verifyUncles(block); err != nil {
 			return err
 		}
+	}
+
+	// External execution/root checks do not establish witness validity.
+	if err := frameproof.VerifyDeclaredBlock(block); err != nil {
+		return err
 	}
 
 	// 3. State execution and state root verification.

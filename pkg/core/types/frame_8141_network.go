@@ -61,6 +61,12 @@ func ValidateFrameSidecar8141(tx *Transaction) error {
 // EncodePooledTransaction preserves ordinary and canonical Frame blob sidecars.
 // Block bodies and hashes continue to use Transaction.EncodeRLP.
 func EncodePooledTransaction(tx *Transaction) ([]byte, error) {
+	if tx.HasDependencies8504() {
+		return EncodeDependencySubmission8504(tx)
+	}
+	return encodePooledTransactionBase(tx)
+}
+func encodePooledTransactionBase(tx *Transaction) ([]byte, error) {
 	plain, err := tx.EncodeRLP()
 	if err != nil {
 		return nil, err
@@ -83,6 +89,18 @@ func EncodePooledTransaction(tx *Transaction) ([]byte, error) {
 }
 
 func DecodePooledTransaction(raw []byte) (*Transaction, error) {
+	if len(raw) > 0 && raw[0] == FrameTxType {
+		var fields []rlp.RawValue
+		if err := rlp.DecodeBytes(raw[1:], &fields); err != nil {
+			return nil, err
+		}
+		if len(fields) == 2 || len(fields) == 6 {
+			return decodeDependencySubmission8504(raw, fields)
+		}
+	}
+	return decodePooledTransactionBase(raw)
+}
+func decodePooledTransactionBase(raw []byte) (*Transaction, error) {
 	if len(raw) == 0 || raw[0] != FrameTxType {
 		return DecodeTxRLP(raw)
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/eth2030/eth2030/bal"
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/eips"
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
@@ -263,6 +264,10 @@ func (p *StateProcessor) ProcessWithBAL(block *types.Block, statedb state.StateD
 		"baseFee", header.BaseFee,
 		"timestamp", header.Time,
 	)
+
+	if err := frameproof.VerifyBlock(block, p.config.IsEIP8504(header.Time), p.config.FrameExtensions(header.Time)); err != nil {
+		return nil, err
+	}
 
 	// Determine if BAL tracking is active for this block.
 	balActive := p.config != nil && p.config.IsAmsterdam(header.Time)
@@ -734,6 +739,9 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		}
 		rules := config.Rules(header.Number, config.IsMerge(), header.Time)
 		forkRules := vm.ForkRules{
+			IsEIP8298:        config.IsEIP8298(header.Time),
+			IsEIP7906:        config.IsEIP7906(header.Time),
+			IsEIP8504:        config.IsEIP8504(header.Time),
 			IsHogota:         rules.IsHogota,
 			IsEIP8151:        config.IsEIP8151(header.Time),
 			IsGlamsterdan:    rules.IsGlamsterdan,
@@ -759,6 +767,19 @@ func ConfigureBlockEVM(config *corconfig.ChainConfig, header *types.Header, evm 
 		evm.SetJumpTable(vm.SelectJumpTable(forkRules))
 		precompileAddrs = vm.SelectPrecompiles(forkRules)
 		evm.SetForkRules(forkRules)
+		if forkRules.IsEIP8298 {
+			var systems []types.Address
+			if rules.IsCancun {
+				systems = append(systems, eips.BeaconRootAddress)
+			}
+			if rules.IsPrague {
+				systems = append(systems, eips.HistoryStorageAddress, types.WithdrawalRequestAddress, types.ConsolidationRequestAddress)
+			}
+			if rules.IsAmsterdam {
+				systems = append(systems, types.BuilderDepositRequestAddress, types.BuilderExitRequestAddress)
+			}
+			evm.SetSystemContracts8298(systems)
+		}
 		if pq := config.PQDraft; pq != nil && pq.Time != nil && header.Time >= *pq.Time {
 			if !rules.IsBerlin {
 				return nil, errors.New("PQ draft activation requires Berlin account access accounting")

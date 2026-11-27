@@ -96,9 +96,10 @@ type GetBlockBodiesPacket struct {
 
 // BlockBody represents the body of a single block in a response.
 type BlockBody struct {
-	Transactions []*types.Transaction
-	Uncles       []*types.Header
-	Withdrawals  []*types.Withdrawal
+	DependencyWitnesses [][]byte
+	Transactions        []*types.Transaction
+	Uncles              []*types.Header
+	Withdrawals         []*types.Withdrawal
 }
 
 // BlockBodiesPacket is the response to GetBlockBodiesRequest.

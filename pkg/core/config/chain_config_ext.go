@@ -118,12 +118,28 @@ func (c *ChainConfig) Validate() error {
 		lastTimeName = f.name
 	}
 
+	if c.EIP8504Time != nil && c.SSZBlockTime != nil {
+		return errors.New("EIP-8504 Gloas witnesses and EIP-7807 SSZ block identity require a specified composition")
+	}
+
 	// Optional EIPs are independent schedules, not additional named-fork order.
 	if c.EIP8250Time != nil && (c.HogotaTime == nil || *c.EIP8250Time < *c.HogotaTime) {
 		return errors.New("EIP8250 requires prior or simultaneous EIP-8141 activation")
 	}
 	if c.EIP8151Time != nil && (c.GlamsterdanTime == nil || *c.EIP8151Time < *c.GlamsterdanTime) {
 		return errors.New("EIP8151 requires prior or simultaneous EIP-8038 activation")
+	}
+	for _, extension := range []struct {
+		name               string
+		time, prerequisite *uint64
+	}{
+		{"EIP8298", c.EIP8298Time, c.AmsterdamTime},
+		{"EIP7906", c.EIP7906Time, c.HogotaTime},
+		{"EIP8504", c.EIP8504Time, c.HogotaTime},
+	} {
+		if extension.time != nil && (extension.prerequisite == nil || *extension.time < *extension.prerequisite) {
+			return fmt.Errorf("%s requires prior or simultaneous prerequisite activation", extension.name)
+		}
 	}
 	// EIP-7892 BPO schedules extend Prague and may interleave with later forks.
 	for _, bpo := range []struct {

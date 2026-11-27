@@ -402,7 +402,11 @@ func (b *EngineBackend) processBlockInternal(
 
 	header.BlockAccessListHash = balHash
 	header.SlotNumber = slotNumber
-	block := types.NewBlock(header, &types.Body{Transactions: txs, Withdrawals: withdrawals})
+	if p.DependencyWitnesses != nil {
+		hash := types.DependencyWitnessesHash8504(p.DependencyWitnesses)
+		header.DependencyWitnessesHash = &hash
+	}
+	block := types.NewBlock(header, &types.Body{Transactions: txs, Withdrawals: withdrawals, DependencyWitnesses: p.DependencyWitnesses})
 	if block.Hash() != p.BlockHash {
 		message := "payload block hash does not match reconstructed header"
 		return payload.PayloadStatusV1{Status: engine.StatusInvalid, ValidationError: &message}, nil

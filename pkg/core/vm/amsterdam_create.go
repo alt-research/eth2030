@@ -19,7 +19,7 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 	existent := !evm.StateDB.Empty(address)
 	hash := evm.StateDB.GetCodeHash(address)
 	collision := evm.StateDB.GetNonce(address) != 0 || (hash != (types.Hash{}) && hash != types.EmptyCodeHash)
-	if !collision && evm.forkRules.IsHogota {
+	if !collision && (evm.forkRules.IsHogota || evm.forkRules.IsEIP8298) {
 		collision = HasNonEmptyStorage(evm.StateDB, address)
 	}
 	evm.StateDB.AddAddressToAccessList(address)
@@ -95,6 +95,9 @@ func (evm *EVM) createAmsterdam(caller types.Address, code []byte, gas uint64, v
 	ret, err = evm.Run(frame, nil)
 	evm.depth--
 	if err == nil {
+		if adopted, ok := evm.adoptedCreationCode(address); ok {
+			return adopted, address, frame.Gas, nil
+		}
 		if len(ret) > MaxCodeSizeForFork(evm.forkRules) {
 			err = errors.New("max code size exceeded")
 		} else if len(ret) > 0 && ret[0] == 0xef {

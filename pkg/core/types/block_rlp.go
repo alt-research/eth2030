@@ -66,6 +66,16 @@ func (b *Block) EncodeRLP() ([]byte, error) {
 		blockPayload = append(blockPayload, rlp.WrapList(wPayload)...)
 	}
 
+	if b.body.DependencyWitnesses != nil {
+		if b.body.Withdrawals == nil {
+			return nil, fmt.Errorf("dependency witnesses require withdrawals position")
+		}
+		encoded, err := rlp.EncodeToBytes(b.body.DependencyWitnesses)
+		if err != nil {
+			return nil, err
+		}
+		blockPayload = append(blockPayload, encoded...)
+	}
 	return rlp.WrapList(blockPayload), nil
 }
 
@@ -100,6 +110,16 @@ func (b *Block) RLPEncodedSize() (int, error) {
 			withdrawalBytes += len(EncodeWithdrawal(w))
 		}
 		size += rlp.EstimateListSize(withdrawalBytes)
+	}
+	if b.body.DependencyWitnesses != nil {
+		if b.body.Withdrawals == nil {
+			return 0, fmt.Errorf("dependency witnesses require withdrawals position")
+		}
+		witnessBytes := 0
+		for _, w := range b.body.DependencyWitnesses {
+			witnessBytes += rlp.EstimateStringSize(len(w))
+		}
+		size += rlp.EstimateListSize(witnessBytes)
 	}
 	return rlp.EstimateListSize(size), nil
 }
@@ -204,6 +224,18 @@ func DecodeBlockRLP(data []byte) (*Block, error) {
 		block.body.Withdrawals = withdrawals
 	}
 
+	if !s.AtListEnd() {
+		raw, err := s.RawItem()
+		if err != nil {
+			return nil, err
+		}
+		if err := rlp.DecodeBytes(raw, &block.body.DependencyWitnesses); err != nil {
+			return nil, err
+		}
+		if block.body.DependencyWitnesses == nil {
+			block.body.DependencyWitnesses = make([][]byte, 0)
+		}
+	}
 	if err := s.ListEnd(); err != nil {
 		return nil, fmt.Errorf("closing block list: %w", err)
 	}

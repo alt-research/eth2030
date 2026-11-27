@@ -130,6 +130,7 @@ func BlockToPayload(block *types.Block, prevRandao types.Hash, withdrawals []*Wi
 
 	return &ExecutionPayloadV4{
 		ExecutionPayloadV3: ExecutionPayloadV3{
+			DependencyWitnesses: block.DependencyWitnesses8504(),
 			ExecutionPayloadV2: ExecutionPayloadV2{
 				ExecutionPayloadV1: ExecutionPayloadV1{
 					ParentHash:    header.ParentHash,

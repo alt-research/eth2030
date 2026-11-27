@@ -7,6 +7,7 @@ package rawdb
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"math/big"
 	"sync"
 
@@ -486,6 +487,16 @@ func encodeBlockBody(block *types.Block) ([]byte, error) {
 		payload = append(payload, rlp.WrapList(wPayload)...)
 	}
 
+	if witnesses := block.DependencyWitnesses8504(); witnesses != nil {
+		if block.Withdrawals() == nil {
+			return nil, fmt.Errorf("dependency witnesses require withdrawals position")
+		}
+		encoded, err := rlp.EncodeToBytes(witnesses)
+		if err != nil {
+			return nil, err
+		}
+		payload = append(payload, encoded...)
+	}
 	return rlp.WrapList(payload), nil
 }
 
@@ -570,6 +581,19 @@ func decodeBlockBody(data []byte) (*types.Body, error) {
 		}
 		if err := s.ListEnd(); err != nil {
 			return nil, err
+		}
+	}
+
+	if !s.AtListEnd() {
+		raw, err := s.RawItem()
+		if err != nil {
+			return nil, err
+		}
+		if err := rlp.DecodeBytes(raw, &body.DependencyWitnesses); err != nil {
+			return nil, err
+		}
+		if body.DependencyWitnesses == nil {
+			body.DependencyWitnesses = make([][]byte, 0)
 		}
 	}
 

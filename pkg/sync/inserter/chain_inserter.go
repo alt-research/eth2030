@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/eth2030/eth2030/core/frameproof"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/metrics"
 )
@@ -316,6 +317,10 @@ func (ci *ChainInserter) validateBlock(block *types.Block) error {
 				ErrCIParentMismatch, block.NumberU64(),
 				block.ParentHash().Hex(), current.Hash().Hex())
 		}
+	}
+
+	if err := frameproof.VerifyDeclaredBlock(block); err != nil {
+		return err
 	}
 
 	// Execute block and validate results if executor is available.

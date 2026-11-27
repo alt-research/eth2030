@@ -124,6 +124,10 @@ func (evm *EVM) SetFrameTransaction(tx *types.FrameTx8141, payment *types.FrameP
 		evm.balTracker = ctx.bal
 	}
 	evm.frame8141 = ctx
+	if evm.forkRules.IsEIP7906 {
+		evm.jumpTable[TXTRACE] = &operation{execute: opTxTrace7906, constantGas: 100, minStack: 2, maxStack: 1024}
+		evm.jumpTable[EVENTDATACOPY] = &operation{execute: opEventDataCopy7906, constantGas: 3, dynamicGas: gasEventData7906, memorySize: memoryEventData7906, minStack: 4, maxStack: 1024}
+	}
 	evm.forkRules.IsEIP7708 = true
 	evm.StateDB = &frameJournalState{StateDB: evm.StateDB, frame: ctx, snapshots: make(map[int]FrameStateGas)}
 	evm.jumpTable[APPROVE] = &operation{execute: opApprove8141, minStack: 3, maxStack: 1024,
@@ -200,6 +204,9 @@ func (evm *EVM) approve8141(target types.Address, scope uint64) error {
 }
 
 func opApprove8141(_ *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	if evm.frame8141.Tx.Frames[evm.frame8141.Index].Mode == types.ModeAssert7906 {
+		return nil, ErrWriteProtection
+	}
 	offset, length, scope := stack.Pop(), stack.Pop(), stack.Pop()
 	ctx := evm.frame8141
 	target := ctx.Tx.Sender
@@ -232,6 +239,14 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 		}()
 	}
 	evm.returnData = nil
+	if frame.Mode == types.ModeProof8504 {
+		if !evm.forkRules.IsEIP8504 {
+			return 0, errors.New("proof frame before EIP-8504 activation")
+		}
+		// Witness verification belongs to block/admission validation. This frame
+		// performs no call, destination access, warming, state change or log.
+		return 0, nil
+	}
 	snapshot := evm.StateDB.Snapshot()
 	gasLeft = frame.Limits.Execution
 	defer func() {
@@ -260,6 +275,9 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	if evm.balTracker != nil {
 		evm.balTracker.RecordAddressTouch(target)
 	}
+	if ctx.PublicValidation && evm.forkRules.IsEIP8298 && target != ctx.Tx.Sender && HasOpcode8298(evm.StateDB.GetCode(target), SETCODEFROM) {
+		return gasLeft, errors.New("Frame public target has mutable SETCODEFROM code")
+	}
 	caller := types.EntryPointAddress
 	if frame.Mode == types.ModeSender {
 		if !ctx.Approved {
@@ -281,7 +299,7 @@ func (evm *EVM) RunFrame8141(index int) (gasLeft uint64, err error) {
 	}
 	evm.TxContext.Origin = caller
 	previousStatic := evm.readOnly
-	evm.readOnly = frame.Mode == types.ModeVerify
+	evm.readOnly = frame.Mode == types.ModeVerify || frame.Mode == types.ModeAssert7906
 	defer func() { evm.readOnly = previousStatic }()
 	if _, precompile := evm.precompile(target); !precompile && len(evm.StateDB.GetCode(target)) == 0 {
 		if frame.Mode == types.ModeVerify {
@@ -657,6 +675,9 @@ func gasFrameCall8141(op OpCode, evm *EVM, contract *Contract, stack *Stack, mem
 // checkFrameValidation applies the public prefix trace rules at every call depth.
 func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack, pc uint64) error {
 	f := evm.frame8141
+	if f != nil && f.PublicValidation && op == SETCODEFROM {
+		return errors.New("Frame public validation executed SETCODEFROM")
+	}
 	if f == nil || !f.PublicValidation {
 		return nil
 	}
@@ -695,7 +716,11 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 			return errors.New("Frame SLOTNUM outside top-level recent-root verifier")
 		}
 	case TIMESTAMP:
-		if f.Index != 0 || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
+		first := 0
+		for first < len(f.Tx.Frames) && f.Tx.Frames[first].Mode == types.ModeProof8504 {
+			first++
+		}
+		if f.Index != first || target != types.FrameExpiryVerifier || frame.Mode != types.ModeVerify || frame.Flags != 0 || evm.depth != 1 || contract.Address != types.FrameExpiryVerifier ||
 			string(contract.Code) != string(types.FrameExpiryCode) {
 			return errors.New("Frame public validation timestamp is not the expiry verifier")
 		}
@@ -742,7 +767,7 @@ func (evm *EVM) checkFrameValidation(op OpCode, contract *Contract, stack *Stack
 		if address == f.Tx.Sender && len(code) == 0 {
 			return nil
 		} // explicit sender default-code exception
-		if len(code) == 0 || types.HasDelegationPrefix(code) {
+		if len(code) == 0 || types.HasDelegationPrefix(code) || (evm.forkRules.IsEIP8298 && HasOpcode8298(code, SETCODEFROM)) {
 			return errors.New("Frame public validation called an empty or delegated third-party account")
 		}
 	}

@@ -1,5 +1,5 @@
 {
-  "note": "Current Group C full/focused-race optional skips are separately inventoried. All mandatory A/B/C consumers and the differential baseline have zero skips.",
+  "note": "Current Group D full/focused-race optional skips are separately inventoried. All mandatory A/B/C/D consumers and the differential baseline have zero skips.",
   "full_suite": [
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
@@ -195,10 +195,34 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCodeCopyTest",
+      "test": "TestEF_stMemoryTest",
       "reason": [
-        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
-        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
+        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
+        "--- SKIP: TestEF_stMemoryTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stCallCodes",
+      "reason": [
+        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
+        "--- SKIP: TestEF_stCallCodes (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stRevertTest",
+      "reason": [
+        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
+        "--- SKIP: TestEF_stRevertTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stEIP1559",
+      "reason": [
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "--- SKIP: TestEF_stEIP1559 (0.00s)"
       ]
     },
     {
@@ -219,10 +243,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCallCodes",
+      "test": "TestEF_stMemoryStressTest",
       "reason": [
-        "fixture_loader_test.go:318: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCallCodes",
-        "--- SKIP: TestEF_stCallCodes (0.00s)"
+        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
+        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
       ]
     },
     {
@@ -243,26 +267,18 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryStressTest",
+      "test": "TestEF_stZeroCallsRevert",
       "reason": [
-        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
-        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
+        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
+        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
       ]
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stRevertTest",
+      "test": "TestEF_stCodeCopyTest",
       "reason": [
-        "fixture_loader_test.go:323: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stRevertTest",
-        "--- SKIP: TestEF_stRevertTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryTest",
-      "reason": [
-        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
-        "--- SKIP: TestEF_stMemoryTest (0.00s)"
+        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
+        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
       ]
     },
     {
@@ -275,14 +291,6 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP1559",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
-        "--- SKIP: TestEF_stEIP1559 (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stStaticCall",
       "reason": [
         "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
@@ -290,19 +298,11 @@
       ]
     },
     {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stZeroCallsRevert",
-      "reason": [
-        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
-        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
-      ]
-    },
-    {
       "package": "github.com/eth2030/eth2030/core/rawdb",
       "test": "TestNewAncientStore_ReadOnlyFlag",
       "reason": [
         "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
-        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.04s)"
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.02s)"
       ]
     },
     {
@@ -326,7 +326,7 @@
       "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
       "reason": [
         "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
-        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.01s)"
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.00s)"
       ]
     },
     {
@@ -614,7 +614,7 @@
       "test": "TestJsonAllOpcodes/SAR",
       "reason": [
         "json_vectors_test.go:199: skipping JSON vector test: fixture testdata/testcases_sar.json is not present in this checkout",
-        "--- SKIP: TestJsonAllOpcodes/SAR (0.00s)"
+        "--- SKIP: TestJsonAllOpcodes/SAR (0.08s)"
       ]
     },
     {
@@ -1540,6 +1540,38 @@
       ]
     },
     {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestNewAncientStore_ReadOnlyFlag",
+      "reason": [
+        "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestAncientStore_PruneTail_ReadOnly",
+      "reason": [
+        "ancient_store_test.go:307: read-only store creation failed",
+        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestAncientStore_Compact_ReadOnly",
+      "reason": [
+        "ancient_store_test.go:323: read-only store creation failed",
+        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/rawdb",
+      "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
+      "reason": [
+        "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.02s)"
+      ]
+    },
+    {
       "package": "github.com/eth2030/eth2030/node",
       "test": "TestLoadGenesisFile_Kurtosis",
       "reason": [
@@ -1561,6 +1593,78 @@
       "reason": [
         "genesis_loader_test.go:401: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
         "--- SKIP: TestNodeWithGenesisFile_Kurtosis (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ExecuteAndProve",
+      "reason": [
+        "canonical_executor_test.go:178: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_ExecuteAndProve (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProof",
+      "reason": [
+        "canonical_executor_test.go:211: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_VerifyGuestProof (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_VerifyGuestProofTampered",
+      "reason": [
+        "canonical_executor_test.go:236: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_VerifyGuestProofTampered (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestCanonExec_ProofStatementConsistency",
+      "reason": [
+        "canonical_executor_test.go:337: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestCanonExec_ProofStatementConsistency (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTF",
+      "reason": [
+        "stf_executor_test.go:103: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_ExecuteSTF (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_ExecuteSTFMismatch",
+      "reason": [
+        "stf_executor_test.go:145: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_ExecuteSTFMismatch (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_VerifySTFProof",
+      "reason": [
+        "stf_executor_test.go:212: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_VerifySTFProof (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestRealSTFExec_FullRoundTrip",
+      "reason": [
+        "stf_executor_test.go:354: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestRealSTFExec_FullRoundTrip (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/zkvm",
+      "test": "TestZKISABridge_ExecuteZKISA",
+      "reason": [
+        "zkisa_bridge_test.go:104: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
+        "--- SKIP: TestZKISABridge_ExecuteZKISA (0.00s)"
       ]
     },
     {
@@ -1588,5 +1692,5 @@
       ]
     }
   ],
-  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/53904476515cbd8c6e324bea38a75c1557c173df/evidence/hegota-a/skipped-tests.json"
+  "previous_snapshot": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-a/skipped-tests.json"
 }

@@ -16,9 +16,10 @@ type Withdrawal struct {
 
 // Body contains the transactions and auxiliary data of a block.
 type Body struct {
-	Transactions []*Transaction
-	Uncles       []*Header
-	Withdrawals  []*Withdrawal
+	DependencyWitnesses [][]byte
+	Transactions        []*Transaction
+	Uncles              []*Header
+	Withdrawals         []*Withdrawal
 }
 
 // Block represents an Ethereum block.
@@ -35,6 +36,7 @@ type Block struct {
 func NewBlock(header *Header, body *Body) *Block {
 	b := &Block{header: copyHeader(header)}
 	if body != nil {
+		b.body.DependencyWitnesses = cloneWitnesses8504(body.DependencyWitnesses)
 		b.body.Transactions = make([]*Transaction, len(body.Transactions))
 		copy(b.body.Transactions, body.Transactions)
 
@@ -60,9 +62,10 @@ func (b *Block) Header() *Header { return copyHeader(b.header) }
 // Body returns the block body.
 func (b *Block) Body() *Body {
 	return &Body{
-		Transactions: b.body.Transactions,
-		Uncles:       b.body.Uncles,
-		Withdrawals:  b.body.Withdrawals,
+		DependencyWitnesses: cloneWitnesses8504(b.body.DependencyWitnesses),
+		Transactions:        b.body.Transactions,
+		Uncles:              b.body.Uncles,
+		Withdrawals:         b.body.Withdrawals,
 	}
 }
 
@@ -74,6 +77,10 @@ func (b *Block) Uncles() []*Header { return b.body.Uncles }
 
 // Withdrawals returns the block's withdrawals (nil if pre-Shanghai).
 func (b *Block) Withdrawals() []*Withdrawal { return b.body.Withdrawals }
+
+func (b *Block) DependencyWitnesses8504() [][]byte {
+	return cloneWitnesses8504(b.body.DependencyWitnesses)
+}
 
 // Number returns the block number.
 func (b *Block) Number() *big.Int {
@@ -224,6 +231,10 @@ func copyHeader(h *Header) *Header {
 	if h.RequestsHash != nil {
 		rh := *h.RequestsHash
 		cpy.RequestsHash = &rh
+	}
+	if h.DependencyWitnessesHash != nil {
+		hash := *h.DependencyWitnessesHash
+		cpy.DependencyWitnessesHash = &hash
 	}
 	if h.BlockAccessListHash != nil {
 		bah := *h.BlockAccessListHash

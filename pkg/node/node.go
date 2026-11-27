@@ -634,6 +634,7 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 	// Initialize negotiated ETH/68-71 block and transaction exchange.
 	n.ethHandler = eth.NewHandler(bc, n.txPool, config.NetworkID)
 	n.ethHandler.SetForkchoiceControlled(true)
+	n.ethHandler.EnableDependencyProtocol8504(bc.Config().EIP8504Time != nil)
 
 	// Reset the tx pool after P2P block insertion to evict confirmed txs.
 	n.ethHandler.SetOnBlockInserted(func() {

@@ -239,23 +239,24 @@ func (b *BlobsBundleV2) UnmarshalJSON(data []byte) error {
 // ── ExecutionPayloadV3 (covers V1 + V2 + V3 fields) ─────────────────────────
 
 type executionPayloadV3JSON struct {
-	ParentHash    types.Hash    `json:"parentHash"`
-	FeeRecipient  types.Address `json:"feeRecipient"`
-	StateRoot     types.Hash    `json:"stateRoot"`
-	ReceiptsRoot  types.Hash    `json:"receiptsRoot"`
-	LogsBloom     types.Bloom   `json:"logsBloom"`
-	PrevRandao    types.Hash    `json:"prevRandao"`
-	BlockNumber   hexUint64     `json:"blockNumber"`
-	GasLimit      hexUint64     `json:"gasLimit"`
-	GasUsed       hexUint64     `json:"gasUsed"`
-	Timestamp     hexUint64     `json:"timestamp"`
-	ExtraData     hexBytes      `json:"extraData"`
-	BaseFeePerGas *hexBig       `json:"baseFeePerGas"`
-	BlockHash     types.Hash    `json:"blockHash"`
-	Transactions  []hexBytes    `json:"transactions"`
-	Withdrawals   []*Withdrawal `json:"withdrawals"`
-	BlobGasUsed   hexUint64     `json:"blobGasUsed"`
-	ExcessBlobGas hexUint64     `json:"excessBlobGas"`
+	DependencyWitnesses *[]hexBytes   `json:"dependencyWitnesses,omitempty"`
+	ParentHash          types.Hash    `json:"parentHash"`
+	FeeRecipient        types.Address `json:"feeRecipient"`
+	StateRoot           types.Hash    `json:"stateRoot"`
+	ReceiptsRoot        types.Hash    `json:"receiptsRoot"`
+	LogsBloom           types.Bloom   `json:"logsBloom"`
+	PrevRandao          types.Hash    `json:"prevRandao"`
+	BlockNumber         hexUint64     `json:"blockNumber"`
+	GasLimit            hexUint64     `json:"gasLimit"`
+	GasUsed             hexUint64     `json:"gasUsed"`
+	Timestamp           hexUint64     `json:"timestamp"`
+	ExtraData           hexBytes      `json:"extraData"`
+	BaseFeePerGas       *hexBig       `json:"baseFeePerGas"`
+	BlockHash           types.Hash    `json:"blockHash"`
+	Transactions        []hexBytes    `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
+	BlobGasUsed         hexUint64     `json:"blobGasUsed"`
+	ExcessBlobGas       hexUint64     `json:"excessBlobGas"`
 }
 
 // ToV3JSON builds the shadow struct for a V3 payload. Used by V4/V5 too.
@@ -266,28 +267,30 @@ func (p *ExecutionPayloadV3) ToV3JSON() executionPayloadV3JSON {
 		withdrawals = []*Withdrawal{}
 	}
 	return executionPayloadV3JSON{
-		ParentHash:    p.ParentHash,
-		FeeRecipient:  p.FeeRecipient,
-		StateRoot:     p.StateRoot,
-		ReceiptsRoot:  p.ReceiptsRoot,
-		LogsBloom:     p.LogsBloom,
-		PrevRandao:    p.PrevRandao,
-		BlockNumber:   hexUint64(p.BlockNumber),
-		GasLimit:      hexUint64(p.GasLimit),
-		GasUsed:       hexUint64(p.GasUsed),
-		Timestamp:     hexUint64(p.Timestamp),
-		ExtraData:     hexBytes(p.ExtraData),
-		BaseFeePerGas: newHexBig(p.BaseFeePerGas),
-		BlockHash:     p.BlockHash,
-		Transactions:  toHexBytesSlice(p.Transactions),
-		Withdrawals:   withdrawals,
-		BlobGasUsed:   hexUint64(p.BlobGasUsed),
-		ExcessBlobGas: hexUint64(p.ExcessBlobGas),
+		DependencyWitnesses: optionalDependencyHex8504(p.DependencyWitnesses),
+		ParentHash:          p.ParentHash,
+		FeeRecipient:        p.FeeRecipient,
+		StateRoot:           p.StateRoot,
+		ReceiptsRoot:        p.ReceiptsRoot,
+		LogsBloom:           p.LogsBloom,
+		PrevRandao:          p.PrevRandao,
+		BlockNumber:         hexUint64(p.BlockNumber),
+		GasLimit:            hexUint64(p.GasLimit),
+		GasUsed:             hexUint64(p.GasUsed),
+		Timestamp:           hexUint64(p.Timestamp),
+		ExtraData:           hexBytes(p.ExtraData),
+		BaseFeePerGas:       newHexBig(p.BaseFeePerGas),
+		BlockHash:           p.BlockHash,
+		Transactions:        toHexBytesSlice(p.Transactions),
+		Withdrawals:         withdrawals,
+		BlobGasUsed:         hexUint64(p.BlobGasUsed),
+		ExcessBlobGas:       hexUint64(p.ExcessBlobGas),
 	}
 }
 
 // ApplyV3JSON populates a V3 payload from its shadow struct.
 func (p *ExecutionPayloadV3) ApplyV3JSON(j executionPayloadV3JSON) {
+	p.DependencyWitnesses = dependencyBytes8504(j.DependencyWitnesses)
 	p.ParentHash = j.ParentHash
 	p.FeeRecipient = j.FeeRecipient
 	p.StateRoot = j.StateRoot
@@ -596,26 +599,27 @@ func (r *GetPayloadResponse) UnmarshalJSON(data []byte) error {
 // ── ExecutionPayloadV7 ───────────────────────────────────────────────────────
 
 type executionPayloadV7JSON struct {
-	ParentHash       types.Hash    `json:"parentHash"`
-	FeeRecipient     types.Address `json:"feeRecipient"`
-	StateRoot        types.Hash    `json:"stateRoot"`
-	ReceiptsRoot     types.Hash    `json:"receiptsRoot"`
-	LogsBloom        types.Bloom   `json:"logsBloom"`
-	PrevRandao       types.Hash    `json:"prevRandao"`
-	BlockNumber      hexUint64     `json:"blockNumber"`
-	GasLimit         hexUint64     `json:"gasLimit"`
-	GasUsed          hexUint64     `json:"gasUsed"`
-	Timestamp        hexUint64     `json:"timestamp"`
-	ExtraData        hexBytes      `json:"extraData"`
-	BaseFeePerGas    *hexBig       `json:"baseFeePerGas"`
-	BlockHash        types.Hash    `json:"blockHash"`
-	Transactions     []hexBytes    `json:"transactions"`
-	Withdrawals      []*Withdrawal `json:"withdrawals"`
-	BlobGasUsed      hexUint64     `json:"blobGasUsed"`
-	ExcessBlobGas    hexUint64     `json:"excessBlobGas"`
-	BlobCommitments  []types.Hash  `json:"blobCommitments"`
-	ProofSubmissions []hexBytes    `json:"proofSubmissions"`
-	ShieldedResults  []types.Hash  `json:"shieldedResults"`
+	DependencyWitnesses *[]hexBytes   `json:"dependencyWitnesses,omitempty"`
+	ParentHash          types.Hash    `json:"parentHash"`
+	FeeRecipient        types.Address `json:"feeRecipient"`
+	StateRoot           types.Hash    `json:"stateRoot"`
+	ReceiptsRoot        types.Hash    `json:"receiptsRoot"`
+	LogsBloom           types.Bloom   `json:"logsBloom"`
+	PrevRandao          types.Hash    `json:"prevRandao"`
+	BlockNumber         hexUint64     `json:"blockNumber"`
+	GasLimit            hexUint64     `json:"gasLimit"`
+	GasUsed             hexUint64     `json:"gasUsed"`
+	Timestamp           hexUint64     `json:"timestamp"`
+	ExtraData           hexBytes      `json:"extraData"`
+	BaseFeePerGas       *hexBig       `json:"baseFeePerGas"`
+	BlockHash           types.Hash    `json:"blockHash"`
+	Transactions        []hexBytes    `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
+	BlobGasUsed         hexUint64     `json:"blobGasUsed"`
+	ExcessBlobGas       hexUint64     `json:"excessBlobGas"`
+	BlobCommitments     []types.Hash  `json:"blobCommitments"`
+	ProofSubmissions    []hexBytes    `json:"proofSubmissions"`
+	ShieldedResults     []types.Hash  `json:"shieldedResults"`
 }
 
 // MarshalJSON implements json.Marshaler for ExecutionPayloadV7.
@@ -625,26 +629,27 @@ func (p ExecutionPayloadV7) MarshalJSON() ([]byte, error) {
 		withdrawals = []*Withdrawal{}
 	}
 	return json.Marshal(executionPayloadV7JSON{
-		ParentHash:       p.ParentHash,
-		FeeRecipient:     p.FeeRecipient,
-		StateRoot:        p.StateRoot,
-		ReceiptsRoot:     p.ReceiptsRoot,
-		LogsBloom:        p.LogsBloom,
-		PrevRandao:       p.PrevRandao,
-		BlockNumber:      hexUint64(p.BlockNumber),
-		GasLimit:         hexUint64(p.GasLimit),
-		GasUsed:          hexUint64(p.GasUsed),
-		Timestamp:        hexUint64(p.Timestamp),
-		ExtraData:        hexBytes(p.ExtraData),
-		BaseFeePerGas:    newHexBig(p.BaseFeePerGas),
-		BlockHash:        p.BlockHash,
-		Transactions:     toHexBytesSlice(p.Transactions),
-		Withdrawals:      withdrawals,
-		BlobGasUsed:      hexUint64(p.BlobGasUsed),
-		ExcessBlobGas:    hexUint64(p.ExcessBlobGas),
-		BlobCommitments:  p.BlobCommitments,
-		ProofSubmissions: toHexBytesSlice(p.ProofSubmissions),
-		ShieldedResults:  p.ShieldedResults,
+		DependencyWitnesses: optionalDependencyHex8504(p.DependencyWitnesses),
+		ParentHash:          p.ParentHash,
+		FeeRecipient:        p.FeeRecipient,
+		StateRoot:           p.StateRoot,
+		ReceiptsRoot:        p.ReceiptsRoot,
+		LogsBloom:           p.LogsBloom,
+		PrevRandao:          p.PrevRandao,
+		BlockNumber:         hexUint64(p.BlockNumber),
+		GasLimit:            hexUint64(p.GasLimit),
+		GasUsed:             hexUint64(p.GasUsed),
+		Timestamp:           hexUint64(p.Timestamp),
+		ExtraData:           hexBytes(p.ExtraData),
+		BaseFeePerGas:       newHexBig(p.BaseFeePerGas),
+		BlockHash:           p.BlockHash,
+		Transactions:        toHexBytesSlice(p.Transactions),
+		Withdrawals:         withdrawals,
+		BlobGasUsed:         hexUint64(p.BlobGasUsed),
+		ExcessBlobGas:       hexUint64(p.ExcessBlobGas),
+		BlobCommitments:     p.BlobCommitments,
+		ProofSubmissions:    toHexBytesSlice(p.ProofSubmissions),
+		ShieldedResults:     p.ShieldedResults,
 	})
 }
 
@@ -654,6 +659,7 @@ func (p *ExecutionPayloadV7) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &j); err != nil {
 		return err
 	}
+	p.DependencyWitnesses = dependencyBytes8504(j.DependencyWitnesses)
 	p.ParentHash = j.ParentHash
 	p.FeeRecipient = j.FeeRecipient
 	p.StateRoot = j.StateRoot
@@ -824,12 +830,13 @@ func (b *BlobAndProofV2) UnmarshalJSON(data []byte) error {
 }
 
 type payloadBodyJSON struct {
-	Transactions []hexBytes    `json:"transactions"`
-	Withdrawals  []*Withdrawal `json:"withdrawals"`
+	DependencyWitnesses *[]hexBytes   `json:"dependencyWitnesses,omitempty"`
+	Transactions        []hexBytes    `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
 }
 
 func (b ExecutionPayloadBodyV1) MarshalJSON() ([]byte, error) {
-	return json.Marshal(payloadBodyJSON{toHexBytesSlice(b.Transactions), b.Withdrawals})
+	return json.Marshal(payloadBodyJSON{optionalDependencyHex8504(b.DependencyWitnesses), toHexBytesSlice(b.Transactions), b.Withdrawals})
 }
 
 func (b *ExecutionPayloadBodyV1) UnmarshalJSON(data []byte) error {
@@ -837,14 +844,16 @@ func (b *ExecutionPayloadBodyV1) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &wire); err != nil {
 		return err
 	}
+	b.DependencyWitnesses = dependencyBytes8504(wire.DependencyWitnesses)
 	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
 	return nil
 }
 
 type payloadBodyV2JSON struct {
-	Transactions    []hexBytes    `json:"transactions"`
-	Withdrawals     []*Withdrawal `json:"withdrawals"`
-	BlockAccessList *hexBytes     `json:"blockAccessList"`
+	DependencyWitnesses *[]hexBytes   `json:"dependencyWitnesses,omitempty"`
+	Transactions        []hexBytes    `json:"transactions"`
+	Withdrawals         []*Withdrawal `json:"withdrawals"`
+	BlockAccessList     *hexBytes     `json:"blockAccessList"`
 }
 
 func (b ExecutionPayloadBodyV2) MarshalJSON() ([]byte, error) {
@@ -853,7 +862,7 @@ func (b ExecutionPayloadBodyV2) MarshalJSON() ([]byte, error) {
 		value := hexBytes(b.BlockAccessList)
 		blockAccessList = &value
 	}
-	return json.Marshal(payloadBodyV2JSON{toHexBytesSlice(b.Transactions), b.Withdrawals, blockAccessList})
+	return json.Marshal(payloadBodyV2JSON{optionalDependencyHex8504(b.DependencyWitnesses), toHexBytesSlice(b.Transactions), b.Withdrawals, blockAccessList})
 }
 
 func (b *ExecutionPayloadBodyV2) UnmarshalJSON(data []byte) error {
@@ -861,10 +870,32 @@ func (b *ExecutionPayloadBodyV2) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &wire); err != nil {
 		return err
 	}
+	b.DependencyWitnesses = dependencyBytes8504(wire.DependencyWitnesses)
 	b.Transactions, b.Withdrawals = fromHexBytesSlice(wire.Transactions), wire.Withdrawals
 	b.BlockAccessList = nil
 	if wire.BlockAccessList != nil {
 		b.BlockAccessList = []byte(*wire.BlockAccessList)
 	}
 	return nil
+}
+
+func optionalDependencyHex8504(w [][]byte) *[]hexBytes {
+	if w == nil {
+		return nil
+	}
+	out := make([]hexBytes, len(w))
+	for i := range w {
+		out[i] = hexBytes(w[i])
+	}
+	return &out
+}
+func dependencyBytes8504(w *[]hexBytes) [][]byte {
+	if w == nil {
+		return nil
+	}
+	out := make([][]byte, len(*w))
+	for i := range *w {
+		out[i] = append([]byte(nil), (*w)[i]...)
+	}
+	return out
 }

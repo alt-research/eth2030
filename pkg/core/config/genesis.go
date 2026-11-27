@@ -133,6 +133,11 @@ func (g *Genesis) ToBlock() *types.Block {
 		head.CalldataExcessGas = &zero2
 	}
 
+	if g.Config.IsEIP8504(g.Timestamp) {
+		empty := types.DependencyWitnessesHash8504([][]byte{})
+		head.DependencyWitnessesHash = &empty
+		return types.NewBlock(head, &types.Body{Withdrawals: []*types.Withdrawal{}, DependencyWitnesses: [][]byte{}})
+	}
 	return types.NewBlock(head, nil)
 }
 

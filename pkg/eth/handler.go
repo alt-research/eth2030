@@ -35,10 +35,13 @@ type SyncNotifier interface {
 // Handler implements the eth protocol message handling. It connects
 // incoming P2P messages to the blockchain and transaction pool.
 type Handler struct {
-	chain     Blockchain
-	txPool    TxPool
-	networkID uint64
-	peers     *p2p.PeerSet
+	dependencyEnabled8504 bool
+	dependencyMu8504      sync.RWMutex
+	dependencyPeers8504   map[string]*dependencyPeer8504
+	chain                 Blockchain
+	txPool                TxPool
+	networkID             uint64
+	peers                 *p2p.PeerSet
 
 	ethPeersMu           sync.RWMutex
 	ethPeers             map[string]*EthPeer // peer ID → EthPeer, for tx broadcast
@@ -127,6 +130,7 @@ func (h *Handler) BroadcastTransactions(txs []*types.Transaction) {
 // transactions to all connected peers, excluding the peer with id excludeID
 // (to avoid echoing a tx back to the peer that originally sent it).
 func (h *Handler) announceTransactions(txs []*types.Transaction, excludeID string) {
+	h.announceDependencies8504(txs, excludeID)
 	if len(txs) == 0 {
 		return
 	}
@@ -153,7 +157,11 @@ func (h *Handler) Protocol() p2p.Protocol { return h.protocol(ETH72) }
 // Protocols advertises all compatible wire versions; the P2P server chooses
 // the highest common version before any version-specific status is sent.
 func (h *Handler) Protocols() []p2p.Protocol {
-	return []p2p.Protocol{h.protocol(ETH72), h.protocol(ETH71), h.protocol(ETH70), h.protocol(ETH69), h.protocol(ETH68)}
+	protocols := []p2p.Protocol{h.protocol(ETH72), h.protocol(ETH71), h.protocol(ETH70), h.protocol(ETH69), h.protocol(ETH68)}
+	if h.dependencyEnabled8504 {
+		protocols = append(protocols, h.dependencyProtocol8504())
+	}
+	return protocols
 }
 func (h *Handler) protocol(version uint32) p2p.Protocol {
 	length := uint64(17)
@@ -494,9 +502,10 @@ func (h *Handler) handleGetBlockBodies(ep *EthPeer, msg p2p.Msg) error {
 			continue
 		}
 		bodies = append(bodies, &p2p.BlockBody{
-			Transactions: block.Transactions(),
-			Uncles:       block.Uncles(),
-			Withdrawals:  block.Withdrawals(),
+			DependencyWitnesses: block.DependencyWitnesses8504(),
+			Transactions:        block.Transactions(),
+			Uncles:              block.Uncles(),
+			Withdrawals:         block.Withdrawals(),
 		})
 	}
 	return ep.SendBlockBodies(req.RequestID, bodies)
@@ -648,6 +657,9 @@ func (h *Handler) handleGetPooledTransactions(ep *EthPeer, msg p2p.Msg) error {
 		}
 		seen[hash] = true
 		if tx := h.txPool.Get(hash); tx != nil {
+			if tx.HasDependencies8504() {
+				continue
+			}
 			raw, err := types.EncodePooledTransaction(tx)
 			if err != nil {
 				return err

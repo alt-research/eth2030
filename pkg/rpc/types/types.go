@@ -148,8 +148,9 @@ type RPCBlock struct {
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
 
 	// Amsterdam header commitments.
-	SlotNumber          *string `json:"slotNumber,omitempty"`
-	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
+	SlotNumber              *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash     *string `json:"blockAccessListHash,omitempty"`
+	DependencyWitnessesHash *string `json:"dependencyWitnessesHash,omitempty"`
 }
 
 // RPCAccessTuple is the JSON representation of an EIP-2930 access list entry.
@@ -353,8 +354,9 @@ type RPCBlockWithTxs struct {
 	Withdrawals *[]*RPCWithdrawal `json:"withdrawals,omitempty"`
 
 	// Amsterdam header commitments.
-	SlotNumber          *string `json:"slotNumber,omitempty"`
-	BlockAccessListHash *string `json:"blockAccessListHash,omitempty"`
+	SlotNumber              *string `json:"slotNumber,omitempty"`
+	BlockAccessListHash     *string `json:"blockAccessListHash,omitempty"`
+	DependencyWitnessesHash *string `json:"dependencyWitnessesHash,omitempty"`
 }
 
 // RPCWithdrawal is the JSON representation of a beacon-chain withdrawal.
@@ -595,6 +597,10 @@ func FormatBlock(block *types.Block, fullTx bool, blobFees ...*big.Int) interfac
 		slot := EncodeUint64(*header.SlotNumber)
 		result.SlotNumber = &slot
 	}
+	if header.DependencyWitnessesHash != nil {
+		hash := EncodeHash(*header.DependencyWitnessesHash)
+		result.DependencyWitnessesHash = &hash
+	}
 	if header.BlockAccessListHash != nil {
 		hash := EncodeHash(*header.BlockAccessListHash)
 		result.BlockAccessListHash = &hash
@@ -686,6 +692,10 @@ func FormatHeader(h *types.Header) *RPCBlock {
 	if h.SlotNumber != nil {
 		slot := EncodeUint64(*h.SlotNumber)
 		block.SlotNumber = &slot
+	}
+	if h.DependencyWitnessesHash != nil {
+		hash := EncodeHash(*h.DependencyWitnessesHash)
+		block.DependencyWitnessesHash = &hash
 	}
 	if h.BlockAccessListHash != nil {
 		hash := EncodeHash(*h.BlockAccessListHash)

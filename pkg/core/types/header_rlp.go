@@ -108,7 +108,7 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 
 	// anyFrom[i] is true when any optional field at or after position i is set.
 	// This mirrors go-ethereum's generated encoder logic.
-	anyFromSlot := h.SlotNumber != nil
+	anyFromSlot := h.SlotNumber != nil || h.DependencyWitnessesHash != nil
 	anyFromCalldataExcess := hasCalldataExcess || (EIP7706HashFields && anyFromSlot)
 	anyFromCalldataUsed := hasCalldataUsed || anyFromCalldataExcess
 	anyFromBAL := hasBALHash || anyFromCalldataUsed || anyFromSlot
@@ -223,7 +223,16 @@ func (h *Header) EncodeRLP() ([]byte, error) {
 	}
 	// EIP-7843: append the slot even when its value is zero.
 	if anyFromSlot {
-		if err := appendItem(*h.SlotNumber); err != nil {
+		slot := uint64(0)
+		if h.SlotNumber != nil {
+			slot = *h.SlotNumber
+		}
+		if err := appendItem(slot); err != nil {
+			return nil, err
+		}
+	}
+	if h.DependencyWitnessesHash != nil {
+		if err := appendItem(*h.DependencyWitnessesHash); err != nil {
 			return nil, err
 		}
 	}
@@ -415,6 +424,17 @@ func DecodeHeaderRLP(data []byte) (*Header, error) {
 			return nil, err
 		}
 		h.SlotNumber = &slot
+	}
+	if !s.AtListEnd() {
+		value, err := s.Bytes()
+		if err != nil {
+			return nil, err
+		}
+		if len(value) != HashLength {
+			return nil, fmt.Errorf("invalid dependency witness hash width")
+		}
+		hash := BytesToHash(value)
+		h.DependencyWitnessesHash = &hash
 	}
 
 	return finishHeader(s, h)

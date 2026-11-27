@@ -133,7 +133,7 @@ func (h *Handler) fetchPeerBlock(ctx context.Context, ep *EthPeer, hash types.Ha
 		return nil, fmt.Errorf("eth: missing body for %s", hash)
 	}
 	body := bodies.bodies[0]
-	block := types.NewBlock(headers.headers[0], &types.Body{Transactions: body.Transactions, Uncles: body.Uncles, Withdrawals: body.Withdrawals})
+	block := types.NewBlock(headers.headers[0], &types.Body{DependencyWitnesses: body.DependencyWitnesses, Transactions: body.Transactions, Uncles: body.Uncles, Withdrawals: body.Withdrawals})
 	if err := coreblock.NewBlockValidator(nil).ValidateBody(block); err != nil {
 		return nil, err
 	}

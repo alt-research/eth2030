@@ -52,8 +52,10 @@ func (bc *Blockchain) WriteBogotaPayload(hash types.Hash, record *BogotaPayload)
 	return bc.db.Put(bogotaPayloadKey(hash), data)
 }
 
-// PruneBogotaPayloads releases views below the finalized checkpoint. The
-// checkpoint's own verdict is retained for fork-choice updates with no head advance.
+// PruneBogotaPayloads releases list bytes below the finalized checkpoint.
+// Completed verdicts remain available for inherited Paris stale-head handling:
+// Bogota FCU must still return the correct Boolean for a known VALID payload.
+// Unexecuted branches below finality can no longer be selected and are removed.
 func (bc *Blockchain) PruneBogotaPayloads(finalized uint64) error {
 	if bc.db == nil {
 		return nil
@@ -66,8 +68,21 @@ func (bc *Blockchain) PruneBogotaPayloads(finalized uint64) error {
 		if err := json.Unmarshal(iter.Value(), &record); err != nil {
 			return err
 		}
-		if record.Number < finalized {
-			if err := batch.Delete(append([]byte(nil), iter.Key()...)); err != nil {
+		if record.Number >= finalized {
+			continue
+		}
+		key := append([]byte(nil), iter.Key()...)
+		if len(record.Block) > 0 {
+			if err := batch.Delete(key); err != nil {
+				return err
+			}
+		} else if len(record.InclusionList) > 0 {
+			record.InclusionList = nil
+			data, err := json.Marshal(&record)
+			if err != nil {
+				return err
+			}
+			if err := batch.Put(key, data); err != nil {
 				return err
 			}
 		}

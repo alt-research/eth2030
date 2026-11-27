@@ -241,4 +241,36 @@ func TestBogotaDeferredWireAcrossRestart(t *testing.T) {
 	unsynced.call(t, "engine_forkchoiceUpdatedV5", &unresolved, payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
 	assertStatus(unresolved.PayloadStatus, "VALID", new(bool))
 
+	// Bogotá FCU inherits Paris ancestor-skip handling. Finalization may
+	// release the old list bytes, but must retain its completed verdict.
+	assertStatus(newPayload(receiver, list), "VALID", new(bool))
+	newPayload(source, []string{})
+	var sourceHead struct{ PayloadStatus bogotaIntegrationStatus }
+	source.call(t, "engine_forkchoiceUpdatedV5", &sourceHead, payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
+	assertStatus(sourceHead.PayloadStatus, "VALID", &satisfied)
+	child := build(hash, 72)
+	var childStatus bogotaIntegrationStatus
+	receiver.call(t, "engine_newPayloadV6", &childStatus, child.ExecutionPayload, []types.Hash{}, beacon, child.ExecutionRequests, []string{})
+	if childStatus.Status != "VALID" {
+		t.Fatalf("child import: %+v", childStatus)
+	}
+	childHash := child.ExecutionPayload.BlockHash
+	var finalized struct{ PayloadStatus bogotaIntegrationStatus }
+	receiver.call(t, "engine_forkchoiceUpdatedV5", &finalized, payload.ForkchoiceStateV1{HeadBlockHash: childHash, SafeBlockHash: childHash, FinalizedBlockHash: childHash}, nil)
+	if finalized.PayloadStatus.Status != "VALID" {
+		t.Fatalf("finalize child: %+v", finalized)
+	}
+	restart()
+	var stale struct{ PayloadStatus bogotaIntegrationStatus }
+	receiver.call(t, "engine_forkchoiceUpdatedV5", &stale, payload.ForkchoiceStateV1{HeadBlockHash: hash}, nil)
+	assertStatus(stale.PayloadStatus, "VALID", new(bool))
+	if receiverNode.Blockchain().CurrentBlock().Hash() != childHash || receiverNode.Blockchain().CurrentFinalBlock().Hash() != childHash {
+		t.Fatal("stale notification rewound finalized execution history")
+	}
+	// Invalid checkpoint ancestry still takes the ordinary inherited error path.
+	err = receiver.invoke("engine_forkchoiceUpdatedV5", &stale, payload.ForkchoiceStateV1{HeadBlockHash: hash, SafeBlockHash: canonical.ExecutionPayload.BlockHash}, nil)
+	if !errors.As(err, &rpcErr) || rpcErr.Code != -38002 {
+		t.Fatalf("invalid stale checkpoint: %v", err)
+	}
+
 }

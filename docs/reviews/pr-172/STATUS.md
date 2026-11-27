@@ -63,3 +63,11 @@ execution-apis heads still match the pinned Group E revisions. The review will
 recheck all nine tasks and their actual runtime consumers, rather than treating
 previous check counts as proof of completeness. Unrelated Lean work in the
 original worktree is preserved.
+
+Re-audit found and reproduced two missing boundaries. Finalization deleted
+completed Bogotá verdicts, causing a known stale VALID head to become SYNCING;
+completed verdicts now survive as compact records while obsolete IL bytes and
+unexecuted branches are released. Replacing an in-memory CL adapter skipped
+reauthentication; live snapshots now pass the same ancestry/key/signature checks
+as disk restores before an atomic replacement. Regression tests failed before
+these fixes and pass afterward. Final full/race/source-bound evidence is pending.

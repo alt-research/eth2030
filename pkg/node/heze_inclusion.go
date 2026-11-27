@@ -24,11 +24,20 @@ func (n *Node) ConfigureHezeConsensus(view heze.ConsensusView) error {
 	}
 	n.hezeMu.Lock()
 	defer n.hezeMu.Unlock()
-	store := n.hezeLists
-	if store == nil {
-		store = heze.NewStore()
-	}
-	if n.config.DataDir != "" {
+	var store *heze.Store
+	if n.hezeView != nil && n.hezeLists != nil {
+		// Replacing the CL adapter changes the authentication boundary even
+		// without a restart. Reverify the live snapshot before installing it;
+		// a failure must preserve the prior adapter and store atomically.
+		data, err := n.hezeLists.MarshalBinary()
+		if err != nil {
+			return err
+		}
+		store, err = heze.Restore(data, view)
+		if err != nil {
+			return err
+		}
+	} else if n.config.DataDir != "" {
 		data, err := os.ReadFile(filepath.Join(n.config.DataDir, "heze-inclusion-lists.json"))
 		if err == nil {
 			store, err = heze.Restore(data, view)
@@ -38,6 +47,9 @@ func (n *Node) ConfigureHezeConsensus(view heze.ConsensusView) error {
 		} else if !errors.Is(err, os.ErrNotExist) {
 			return err
 		}
+	}
+	if store == nil {
+		store = heze.NewStore()
 	}
 	store.Prune(clock.Slot)
 	n.hezeView, n.hezeLists = view, store

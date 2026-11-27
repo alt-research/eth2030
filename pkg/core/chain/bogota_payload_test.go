@@ -19,9 +19,11 @@ func TestBogotaPayloadStorageRetainsFinalizedAndPendingViews(t *testing.T) {
 		return &Blockchain{db: db}
 	}
 	bc := open()
-	older, checkpoint, pending := types.Hash{31: 1}, types.Hash{31: 2}, types.Hash{31: 3}
+	older, omitted, abandoned, checkpoint, pending := types.Hash{31: 1}, types.Hash{31: 4}, types.Hash{31: 5}, types.Hash{31: 2}, types.Hash{31: 3}
 	for hash, view := range map[types.Hash]*BogotaPayload{
-		older:      {Number: 10, Satisfied: true},
+		older:      {Number: 10, Satisfied: true, InclusionList: [][]byte{{9}}},
+		omitted:    {Number: 10, Satisfied: false, InclusionList: [][]byte{{8}}},
+		abandoned:  {Number: 10, Block: []byte{7}, InclusionList: [][]byte{{6}}},
 		checkpoint: {Number: 11, Satisfied: false},
 		pending:    {Number: 12, Block: []byte{1, 2}, InclusionList: [][]byte{{3}}},
 	} {
@@ -37,8 +39,13 @@ func TestBogotaPayloadStorageRetainsFinalizedAndPendingViews(t *testing.T) {
 	}
 	bc = open()
 	t.Cleanup(func() { _ = bc.db.Close() })
-	if view, err := bc.ReadBogotaPayload(older); err != nil || view != nil {
-		t.Fatalf("pruned view %+v, %v", view, err)
+	for hash, satisfied := range map[types.Hash]bool{older: true, omitted: false} {
+		if view, err := bc.ReadBogotaPayload(hash); err != nil || view == nil || view.Satisfied != satisfied || len(view.Block) != 0 || len(view.InclusionList) != 0 {
+			t.Fatalf("compacted verdict %+v, %v (want %v)", view, err, satisfied)
+		}
+	}
+	if view, err := bc.ReadBogotaPayload(abandoned); err != nil || view != nil {
+		t.Fatalf("abandoned accepted view %+v, %v", view, err)
 	}
 	if view, err := bc.ReadBogotaPayload(checkpoint); err != nil || view == nil || view.Satisfied || len(view.Block) != 0 {
 		t.Fatalf("checkpoint verdict %+v, %v", view, err)

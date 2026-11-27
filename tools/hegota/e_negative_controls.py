@@ -24,6 +24,11 @@ controls.extend([
 ('malformed-proof-tolerance','pkg/node/backend/engine_bogota.go','ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','false && ok && frame.ValidateWithExtensions(bc.Config().FrameExtensions(payload.Time())) != nil','./node','TestGroupECanonicalPQILUsesAuthenticatedPoolWitness'),
 ])
 controls.append(('append-header-metadata','pkg/core/types/block_append_size.go','if header.BlobGasUsed != nil {','if false && header.BlobGasUsed != nil {','./core/types','TestGroupEExactAppendRLPAllPrefixAndGasBoundaries'))
+controls.extend([
+('finalized-verdict','pkg/core/chain/bogota_payload.go','} else if len(record.InclusionList) > 0 {','} else if true { if err := batch.Delete(key); err != nil { return err }; continue;','./node','TestBogotaDeferredWireAcrossRestart'),
+('reconfigured-authentication','pkg/node/heze_inclusion.go','store, err = heze.Restore(data, view)\n\t\tif err != nil {','store = n.hezeLists\n\t\terr = nil\n\t\tif err != nil {','./node','TestGroupEHezeReconfigureReauthenticatesMemoryAtomically'),
+])
+
 for name,path,old,new,pkg,test in controls:
  s=(R/path).read_text()
  if old not in s and name=='strict-timeliness':

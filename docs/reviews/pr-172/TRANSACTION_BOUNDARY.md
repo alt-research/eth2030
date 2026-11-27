@@ -41,7 +41,9 @@ sharing the same transaction execution loop. It includes actual pre-execution
 systems, transactions and their receipt/gas accounting, and stops before
 withdrawals and request collection. EIP-2935 leaves BLOCKHASH's 256-block semantics unchanged. Native IL execution
 now follows the authenticated header chain even when snap history has no bodies.
-Missing/corrupt required headers propagate callback errors instead of providing
+Each link authenticates its parent hash, so the queried header itself is not
+required. The bounded per-evaluation hash window is cached. Missing/corrupt
+required intermediate headers propagate callback errors instead of providing
 a fabricated zero hash that could make a valid Frame appear omittable. A native
 snap-pivot regression reproduced that wrong satisfaction verdict before the fix.
 

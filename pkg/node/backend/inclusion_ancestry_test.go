@@ -116,6 +116,15 @@ func TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies(t *testing
 	if err := rawdb.DeleteHeader(db, blocks[1].NumberU64(), blocks[1].Hash()); err != nil {
 		t.Fatal(err)
 	}
+	// Header 2 already authenticates block 1's hash. Removing the queried
+	// header itself does not remove the hash data needed for BLOCKHASH(1).
+	if satisfied, err := backend.CheckPayloadInclusionList(child.Hash(), [][]byte{raw}); err != nil || satisfied {
+		t.Fatalf("queried header unnecessarily required: %v %v", satisfied, err)
+	}
+	// Removing an intermediate link really does make that branch unavailable.
+	if err := rawdb.DeleteHeader(db, blocks[2].NumberU64(), blocks[2].Hash()); err != nil {
+		t.Fatal(err)
+	}
 	if satisfied, err := backend.CheckPayloadInclusionList(child.Hash(), [][]byte{raw}); err == nil {
 		t.Fatalf("missing authenticated header became a verdict: %v", satisfied)
 	}

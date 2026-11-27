@@ -33,21 +33,32 @@ func newInclusionEndState(bc *chain.Blockchain, block *types.Block) (*inclusionE
 	}
 	e := &inclusionEndState{bc: bc, block: block, state: db, accounts: make(map[types.Address]bool)}
 	// BLOCKHASH must follow the submitted payload, including off-canonical branches.
+	// Each link authenticates its parent's hash; the queried header itself is
+	// unnecessary. Cache the bounded window so repeated opcodes do not reread it.
+	hashes := make(map[uint64]types.Hash)
+	oldest := uint64(0)
+	if block.NumberU64() > 0 {
+		oldest = block.NumberU64() - 1
+		hashes[oldest] = block.ParentHash()
+	}
 	e.getHash = func(number uint64) types.Hash {
 		if number >= block.NumberU64() || block.NumberU64()-number > 256 {
 			return types.Hash{}
 		}
-		for hash, expected := block.ParentHash(), block.NumberU64()-1; ; {
+		if hash, ok := hashes[number]; ok {
+			return hash
+		}
+		for oldest > number {
+			hash := hashes[oldest]
 			header := bc.GetHeaderByHash(hash)
-			if header == nil || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != expected {
-				e.ancestryErr = fmt.Errorf("authenticated BLOCKHASH ancestor %s at %d unavailable", hash, expected)
+			if header == nil || header.Number == nil || !header.Number.IsUint64() || header.Number.Uint64() != oldest {
+				e.ancestryErr = fmt.Errorf("authenticated BLOCKHASH ancestor %s at %d unavailable", hash, oldest)
 				return types.Hash{}
 			}
-			if expected == number {
-				return hash
-			}
-			hash, expected = header.ParentHash, expected-1
+			oldest--
+			hashes[oldest] = header.ParentHash
 		}
+		return hashes[number]
 	}
 	encoded, err := bc.BlockAccessList(block.Hash())
 	if err != nil {

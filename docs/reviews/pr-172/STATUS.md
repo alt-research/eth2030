@@ -77,3 +77,11 @@ unchanged consumers. Fresh website build/export and desktop/mobile visual/DOM
 checks passed without horizontal overflow. Historical verdicts use an atomic
 separate compact namespace to avoid scanning the full history during cleanup.
 Exact-head hosted CI is tracked separately in the English PR description.
+
+## End-of-transaction state audit in progress
+
+A new review starts from published head `63f85e737d8dd84c8913d6f6ef996179e5e373d5`.
+Upstream EIPs, Heze and Bogotá revisions remain unchanged. This pass focuses on
+the precise EIP-7805 state after the last transaction, including the separation
+from withdrawals and post-execution system calls. The independent Lean worktree
+and read-only references remain untouched.

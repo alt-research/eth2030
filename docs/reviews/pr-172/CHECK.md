@@ -31,3 +31,12 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Refresh source-bound A–E evidence, website progress and scope limitations; preserve independent expected oracles.
 - [x] Run appropriate local build/vet/full/race, source-bound, compiled-removal and website checks.
 - Publication and exact-head hosted CI are tracked in the English PR #172 description; frozen local artifacts do not pre-claim hosted outcomes.
+
+## End-of-transaction state audit — November 27, 2026
+
+- [ ] Reconfirm current source revisions/discussions and every Group E clause.
+- [ ] Verify the EIP-7805 last-transaction state boundary against withdrawals and post-execution system calls.
+- [ ] Reproduce and fix any import/build disagreement with independent native regressions.
+- [ ] Recheck request, exact-byte, frame gas, RLP and authenticated cache boundaries for additional missing rules.
+- [ ] Refresh source-bound evidence and website progress; run required build/full/race/control checks.
+- [ ] Commit/push owned changes to the English review and verify current-head hosted results.

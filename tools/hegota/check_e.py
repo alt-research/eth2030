@@ -14,7 +14,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E40.2': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership'],
              'E40.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions'],
              'E40.4': ['github.com/eth2030/eth2030/focil::TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate']},
- 'HGT-041': {'E41.1': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain'],
+ 'HGT-041': {'E41.1': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget'],
              'E41.2': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership',
                        'github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence'],
              'E41.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezeAuthenticatedGossipAndFailureAtomicity'],
@@ -23,7 +24,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
                        'github.com/eth2030/eth2030/focil/heze::TestGroupEHezeConcurrentQuotaAndCommittee',
                        'github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically',
                        'github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence']},
- 'HGT-042': {'E42.1': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities'],
+ 'HGT-042': {'E42.1': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget'],
              'E42.2': ['github.com/eth2030/eth2030/engine::TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets'],
              'E42.3': ['github.com/eth2030/eth2030/engine::TestGroupEBogotaSatisfactionStatusNullability'],
              'E42.4': ['github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart',
@@ -74,7 +76,8 @@ REQUIRED = {'HGT-040': {'E40.1': ['github.com/eth2030/eth2030/focil/heze::TestGr
              'E47.4': ['github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions']},
  'HGT-048': {'E48.1': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline',
                        'github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness',
-                       'github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness'],
+                       'github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness',
+                       'github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget'],
              'E48.2': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
              'E48.3': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline'],
              'E48.4': ['github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline']}}
@@ -87,7 +90,10 @@ GATES = ['8369 is Informational; Profile 2 enforcement requires a Standards Trac
  'activation claimed',
  'EIPs PR 12723 byte-budget omission policy remains unmerged; no RLP or proposed payload-size exemption '
  'is activated; high-gas release composition requires upstream resolution']
-SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
+SOURCE_PINS = [('refs/EIPs/EIPS/eip-2718.md',
+  'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
+  '83a19b0fa865dc31b483cd97f35c417928792d7c'),
+ ('refs/EIPs/EIPS/eip-2935.md',
   'ade9e9cab7e148bba4cd293f916a4a189cd7a8aa',
   '60fab81fff8126a0e0f019a3fa7439fdfafe9471'),
  ('refs/EIPs/EIPS/eip-4895.md',
@@ -150,9 +156,11 @@ SOURCE_PINS = [('refs/EIPs/EIPS/eip-2935.md',
  ('specs/hegota/upstream/2026-11-27/group-e/heze/validator.md',
   '36888ee87b0faa6ad7804b017a0184e8e6e6a1c6',
   '40b66dbf5a4c03da89eb75b0b07db4b792acc4ad'),
- ('specs/hegota/upstream/2026-11-28/group-e/eip-7805.md',
-  'fbc43ec3a187f0b3dd448e995a041227f4baa7b1',
-  '0ff894bb4136c6973c1f91a4598e8d5426f8b237')]
+ ('specs/hegota/upstream/2026-11-28/group-e/2718-update/eip-7805.md',
+  'c24e33014288b5e712da2629c185c91327c24c69',
+  'de1d4c69ea5dc83561434d3a8c27e6a1b16b6bbf')]
+
+REQUIRED_ENCODING_FILES = ('pkg/core/eips/inclusion_list.go', 'pkg/core/types/transaction_rlp.go', 'pkg/core/types/frame_8141_network.go')
 
 def validate_manifest(root, manifest):
     need(manifest['version'] == 1, 'unknown E manifest version')
@@ -186,6 +194,7 @@ def validate_manifest(root, manifest):
                 artifacts.update(str(p.relative_to(root)) for p in owners)
                 tests.add(name)
     artifacts.update(manifest['additional_artifacts'])
+    need(set(REQUIRED_ENCODING_FILES) <= artifacts, 'E canonical encoding production source omitted')
     need(all((root/p).is_file() for p in artifacts), 'E artifact missing')
     return tests, artifacts
 

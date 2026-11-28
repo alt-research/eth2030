@@ -11,10 +11,10 @@
   ],
   "normative_sources": [
     {
-      "path": "specs/hegota/upstream/2026-11-28/group-e/eip-7805.md",
-      "revision": "fbc43ec3a187f0b3dd448e995a041227f4baa7b1",
-      "sha256": "41a3a3860768acbec2589acd9cd2b3f5780b73fa5f3507681c932104e7464666",
-      "blob": "0ff894bb4136c6973c1f91a4598e8d5426f8b237"
+      "path": "specs/hegota/upstream/2026-11-28/group-e/2718-update/eip-7805.md",
+      "revision": "c24e33014288b5e712da2629c185c91327c24c69",
+      "sha256": "eb5b0b72001278ba3476d4cdb8ef01f8d8662110ed2fe4f6372e01abbfdbd0b1",
+      "blob": "de1d4c69ea5dc83561434d3a8c27e6a1b16b6bbf"
     },
     {
       "path": "specs/hegota/upstream/2026-11-27/group-e/eip-7916.md",
@@ -141,6 +141,12 @@
       "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
       "sha256": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
       "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc"
+    },
+    {
+      "path": "refs/EIPs/EIPS/eip-2718.md",
+      "revision": "ade9e9cab7e148bba4cd293f916a4a189cd7a8aa",
+      "sha256": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
+      "blob": "83a19b0fa865dc31b483cd97f35c417928792d7c"
     }
   ],
   "tasks": [
@@ -232,7 +238,8 @@
             "pkg/focil/heze/validation.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain"
+            "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain",
+            "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
           ]
         },
         {
@@ -301,19 +308,25 @@
       "criteria": [
         {
           "id": "E42.1",
-          "statement": "exact Bogot\u00e1 methods/required fields/capabilities",
+          "statement": "exact Bogota methods/required fields/capabilities and EIP-2718 canonical 8192-byte GetIL accounting",
           "clauses": [
-            "Engine Bogota NewPayloadV6; ForkchoiceUpdatedV5; GetInclusionListV1; PayloadStatusV2"
+            "Engine Bogota NewPayloadV6; ForkchoiceUpdatedV5; GetInclusionListV1; PayloadStatusV2",
+            "EIP-7805 IL Building after PR 12702; EIP-2718 Transactions; Bogota getInclusionListV1 Response/Specification"
           ],
           "files": [
             "pkg/engine/bogota.go",
             "pkg/engine/handler.go",
             "pkg/engine/inclusion_list.go",
             "pkg/engine/lighthouse_compat.go",
-            "pkg/engine/server.go"
+            "pkg/engine/server.go",
+            "pkg/core/eips/inclusion_list.go",
+            "pkg/core/types/transaction_rlp.go",
+            "pkg/core/types/frame_8141_network.go",
+            "pkg/node/backend/engine_backend.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities"
+            "github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities",
+            "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
           ]
         },
         {
@@ -809,7 +822,8 @@
           "tests": [
             "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline",
             "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness",
-            "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness"
+            "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness",
+            "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
           ]
         },
         {
@@ -894,6 +908,7 @@
     "pkg/devnet/kurtosis/scripts/verify-heze-focil.py",
     "evidence/hegota-e/external-network.json",
     "docs/reviews/pr-172/LATEST_7805.md",
-    "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json"
+    "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json",
+    "docs/reviews/pr-172/LATEST_2718.md"
   ]
 }

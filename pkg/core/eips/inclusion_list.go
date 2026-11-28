@@ -27,7 +27,7 @@ var (
 // validity in the next slot. Per EIP-7547.
 const BaseFeeBufferPercent = 1125 // 112.5% expressed as 1125/1000
 
-// MaxBytesPerInclusionList is the maximum total RLP-encoded size of
+// MaxBytesPerInclusionList is the maximum total EIP-2718-encoded size of
 // transactions returned by engine_getInclusionListV1.
 const MaxBytesPerInclusionList = 8192
 
@@ -435,7 +435,9 @@ func GetInclusionListFromPool(
 }
 
 // SelectTransactionsForInclusionList encodes and selects pending transactions
-// up to maxBytes total size. Transactions that fail RLP encoding or individually
+// up to maxBytes total EIP-2718 bytes. EncodeRLP returns type || payload for
+// typed transactions, without a block RLP string wrapper or pooled witnesses.
+// Transactions that fail canonical encoding or individually
 // exceed the remaining byte budget are skipped so later transactions can still
 // be considered.
 func SelectTransactionsForInclusionList(pending []*types.Transaction, maxBytes int) (selected [][]byte, totalSize int) {

@@ -2,7 +2,7 @@
 import copy
 import json
 import unittest
-from check_e import ROOT, REQUIRED, validate_manifest, verify_report
+from check_e import ROOT, REQUIRED, REQUIRED_ENCODING_FILES, validate_manifest, verify_report
 from check_b import fingerprint
 
 
@@ -36,6 +36,15 @@ class GroupEAcceptanceTests(unittest.TestCase):
     def test_source_digest_tampering(self):
         self.manifest['normative_sources'][0]['sha256'] = '0'*64
         with self.assertRaises(ValueError): validate_manifest(ROOT, self.manifest)
+
+    def test_canonical_encoding_source_cannot_be_omitted(self):
+        for path in REQUIRED_ENCODING_FILES:
+            manifest = copy.deepcopy(self.manifest)
+            for task in manifest['tasks']:
+                for criterion in task['criteria']:
+                    criterion['files'] = [p for p in criterion['files'] if p != path]
+            manifest['additional_artifacts'] = [p for p in manifest['additional_artifacts'] if p != path]
+            with self.assertRaises(ValueError): validate_manifest(ROOT, manifest)
 
     def test_report_cannot_claim_public_completion_or_skip_consumer(self):
         tests, artifacts = validate_manifest(ROOT, self.manifest)

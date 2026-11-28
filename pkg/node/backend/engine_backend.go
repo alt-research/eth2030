@@ -563,7 +563,8 @@ func (b *EngineBackend) cacheBlobsFromBlock(blk *types.Block) {
 
 // GetInclusionList generates an inclusion list from the mempool.
 // Implements InclusionListBackend for EIP-7805 (FOCIL).
-// Selects transactions up to MAX_BYTES_PER_INCLUSION_LIST (8 KiB).
+// Selects up to 8 KiB of EIP-2718 transaction bytes, excluding block/SSZ
+// framing and external pooled witnesses (EIP-7805 PR #12702).
 func (b *EngineBackend) GetInclusionList() *types.InclusionList {
 	pool := b.node.TxPool()
 	if pool == nil {

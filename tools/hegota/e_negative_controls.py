@@ -69,6 +69,12 @@ controls.extend([
 ('IL-generation-no-blob','pkg/core/eips/inclusion_list.go','if tx == nil || tx.Type() == types.BlobTxType || len(tx.BlobHashes()) > 0 {','if tx == nil {','./node','TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability'),
 ])
 
+controls.extend([
+('EIP2718-no-block-wrapper-budget','pkg/core/eips/inclusion_list.go','if totalSize+len(encoded) > maxBytes {','overhead := 0; if tx.Type() != types.LegacyTxType { overhead = 3 }; if totalSize+len(encoded)+overhead > maxBytes {','./node','TestGroupELatest2718ExactEnvelopeBudget'),
+('EIP2718-canonical-not-pooled','pkg/core/eips/inclusion_list.go','encoded, err := tx.EncodeRLP()\n\t\tif err != nil {\n\t\t\tcontinue\n\t\t}\n\t\tif totalSize+len(encoded) > maxBytes {','encoded, err := types.EncodePooledTransaction(tx)\n\t\tif err != nil {\n\t\t\tcontinue\n\t\t}\n\t\tif totalSize+len(encoded) > maxBytes {','./node','TestGroupELatest2718ExactEnvelopeBudget'),
+('EIP2718-one-over-rejected','pkg/core/eips/inclusion_list.go','if totalSize+len(encoded) > maxBytes {','if totalSize+len(encoded) > maxBytes+1 {','./node','TestGroupELatest2718ExactEnvelopeBudget'),
+])
+
 # The shared preflight deliberately repeats cheap context/static checks before
 # witness handling. Removing an early fast filter alone is now redundant; these
 # historical semantic removals disable both protections, keeping their original

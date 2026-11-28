@@ -1,5 +1,10 @@
 # Merged EIP-7805 rebase qualification
 
+The subsequent merged EIP-2718 byte-accounting clarification and current
+completeness review are recorded in [LATEST_2718.md](LATEST_2718.md). The
+pre-execution corrections below remain applicable; their original source and
+qualification identities are preserved.
+
 The final upstream recheck observed EIPs master
 `fbc43ec3a187f0b3dd448e995a041227f4baa7b1`, merging PR #12470. The complete
 EIP, review comments and discussion were read. The immutable new snapshot is

@@ -1,7 +1,7 @@
 # Selected Group E composition and release boundaries
 
 Baseline: master after PR #171, `cc31afffaa12919bbc08dc854c03af1e1928dc3c`.
-This implementation selects merged EIP-7805 PR #12470 at EIPs `fbc43ec3`,
+This implementation selects merged EIP-7805 PRs #12470/#12702 at EIPs `c24e3301`,
 and the exact Heze/Engine Bogotá companions in [PLAN.md](PLAN.md). The merged
 pre-execution-only predicate supersedes earlier omission assumptions. See
 [the latest clause/discussion audit](../../reviews/pr-172/LATEST_7805.md).
@@ -153,3 +153,8 @@ missing witness data fails that build and an identical owned payload ID can retr
 after admission. Successful completed IDs remain immutable. The current native
 consumers cover this retry, canonical GetIL blob exclusion, normal pool blob
 availability, pre-execution-only Frame/storage behavior and version-3 migration.
+
+The latest #12702 clarification counts EIP-2718 canonical transaction bytes.
+Exactly 8192 bytes are allowed; block RLP/SSZ framing and external witnesses are
+not part of this budget. The native boundary consumer and source checker lock
+this contract. See [LATEST_2718.md](../../reviews/pr-172/LATEST_2718.md).

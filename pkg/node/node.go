@@ -40,6 +40,7 @@ import (
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/eth"
 	"github.com/eth2030/eth2030/focil"
+	"github.com/eth2030/eth2030/focil/heze"
 	"github.com/eth2030/eth2030/light"
 	"github.com/eth2030/eth2030/metrics"
 	nodebackend "github.com/eth2030/eth2030/node/backend"
@@ -261,6 +262,9 @@ type Node struct {
 	topicMgr         *p2p.TopicManager
 	focilILs         *focil.ILStore
 	focilGossip      *focil.GossipValidator
+	hezeMu           sync.Mutex
+	hezeLists        *heze.Store
+	hezeView         heze.ConsensusView
 	starkAgg         *txpool.STARKAggregator
 	starkFrameProver proofs.ValidationFrameProver // non-nil when StarkValidationFrames=true
 	currentSlot      atomic.Uint64                // updated on each FCU; used for peer-tick TTL eviction
@@ -554,23 +558,16 @@ func newWithDatabase(config *Config, open func(string) (rawdb.Database, error)) 
 		slog.Warn("stark mempool tick subscribe failed", "err", err)
 	}
 
-	// EIP-7805 FOCIL: subscribe the inclusion_list gossip topic. Received
-	// signed ILs go through the spec CL P2P validation rules before entering
-	// the node's IL store. The EL-side context cannot hold the beacon
-	// committee, so rules 2 and 5 and the public-key lookup are resolved by
-	// the injectable hooks when a committee source is configured; slot and
-	// size caps plus the anti-equivocation store always apply.
+	// The selected Heze bridge requires authenticated beacon context. An EL
+	// without a configured consensus source cannot accept unsigned/unverified
+	// IL gossip. Older focil helpers remain local research APIs only.
 	n.focilILs = focil.NewILStore()
 	n.focilGossip = focil.NewGossipValidator(n.focilILs, &focil.GossipContext{
 		CurrentSlot: func() uint64 { return n.currentSlot.Load() },
 	})
+	n.hezeLists = heze.NewStore()
 	if err := n.topicMgr.Subscribe(p2p.InclusionList, func(_ p2p.GossipTopic, _ p2p.MessageID, data []byte) {
-		var signed focil.SignedInclusionList
-		if err := signed.UnmarshalBinary(data); err != nil {
-			slog.Debug("inclusion list gossip decode error", "err", err)
-			return
-		}
-		if _, err := n.focilGossip.Validate(&signed); err != nil {
+		if err := n.HandleHezeInclusionList(data); err != nil {
 			slog.Debug("inclusion list gossip rejected", "err", err)
 			return
 		}

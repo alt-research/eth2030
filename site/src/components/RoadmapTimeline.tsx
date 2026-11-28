@@ -4,6 +4,7 @@ import SectionHeading from '@/components/ui/SectionHeading';
 import OfficialGlamsterdamScope from '@/components/OfficialGlamsterdamScope';
 import LaterProofWork from '@/components/LaterProofWork';
 import DevelopmentProgress from '@/components/DevelopmentProgress';
+import HegotaProgress from '@/components/HegotaProgress';
 import { roadmapStages, roadmapProgress, roadmapStatusNames } from '@/lib/roadmap';
 import styles from './RoadmapTimeline.module.css';
 
@@ -38,6 +39,7 @@ export default function RoadmapTimeline() {
           </Link>;
         })}
       </div>
+      <HegotaProgress />
       <LaterProofWork />
       <details className="my-6 rounded-xl border border-eth-teal/30 p-4"><summary className="cursor-pointer text-sm font-bold text-eth-teal">Merged development progress</summary><DevelopmentProgress /></details>
       <p className={styles.note}>Glamsterdam counts reviewed ETH2030 Complete labels against officially scheduled core EIPs. Later stages use project-planning entries; they are not independent conformance or production-readiness measurements. Unmapped EF nodes are excluded. I*–L* are placeholder names. <a href="https://strawmap.org/" target="_blank" rel="noreferrer">View the EF original ↗</a></p>

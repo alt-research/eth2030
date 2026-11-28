@@ -8,10 +8,12 @@ import (
 	blockpkg "github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
 	"github.com/eth2030/eth2030/core/execution"
+	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/types"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/focil"
 )
 
 func (b *EngineBackend) IsHogota(timestamp uint64) bool {
@@ -31,7 +33,7 @@ func (b *EngineBackend) ProcessBlockV6(
 	defer b.bogotaMu.Unlock()
 
 	bc := b.node.Blockchain()
-	record := &chain.BogotaPayload{Number: p.BlockNumber, InclusionList: list}
+	record := &chain.BogotaPayload{Number: p.BlockNumber, InclusionList: list, SatisfactionVersion: chain.BogotaSatisfactionVersion}
 	status, err := b.processBlockV5(p, root, requests, func(block *types.Block) (bool, error) {
 		parent := bc.GetBlock(block.ParentHash())
 		if parent == nil || parent.NumberU64()+1 != block.NumberU64() {
@@ -99,6 +101,9 @@ func (b *EngineBackend) ForkchoiceUpdatedBogota(
 			PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing},
 		}, false, nil
 	}
+	if record.SatisfactionVersion > chain.BogotaSatisfactionVersion {
+		return payload.ForkchoiceUpdatedResult{}, false, fmt.Errorf("unsupported Bogotá satisfaction cache version %d", record.SatisfactionVersion)
+	}
 	if len(record.Block) > 0 {
 		status, err := b.completeBogotaPayload(state.HeadBlockHash, record)
 		if err != nil || status.Status != engine.StatusValid {
@@ -106,6 +111,25 @@ func (b *EngineBackend) ForkchoiceUpdatedBogota(
 				return b.requestForkchoiceSync(state), false, nil
 			}
 			return payload.ForkchoiceUpdatedResult{PayloadStatus: status}, false, err
+		}
+	}
+
+	if record.SatisfactionVersion != chain.BogotaSatisfactionVersion {
+		// Legacy verdicts used final-block state. A live view can be corrected;
+		// a legacy compact verdict needs the CL to resubmit the exact list.
+		if !record.HasInclusionListView() {
+			return payload.ForkchoiceUpdatedResult{PayloadStatus: payload.PayloadStatusV1{Status: engine.StatusSyncing}}, false, nil
+		}
+		if head == nil || !bc.HasValidatedBlock(state.HeadBlockHash) {
+			return b.requestForkchoiceSync(state), false, nil
+		}
+		satisfied, err := b.checkPayloadInclusionList(state.HeadBlockHash, record.InclusionList)
+		if err != nil {
+			return payload.ForkchoiceUpdatedResult{}, false, err
+		}
+		record.Satisfied, record.SatisfactionVersion = satisfied, chain.BogotaSatisfactionVersion
+		if err := bc.WriteBogotaPayload(state.HeadBlockHash, record); err != nil {
+			return payload.ForkchoiceUpdatedResult{}, false, err
 		}
 	}
 	result, err := b.ForkchoiceUpdatedV4(state, attrs)
@@ -156,6 +180,7 @@ func (b *EngineBackend) completeBogotaPayload(hash types.Hash, record *chain.Bog
 	}
 	record.Block = nil
 	record.Satisfied = satisfied
+	record.SatisfactionVersion = chain.BogotaSatisfactionVersion
 	if err := bc.WriteBogotaPayload(hash, record); err != nil {
 		return payload.PayloadStatusV1{}, err
 	}
@@ -163,8 +188,8 @@ func (b *EngineBackend) completeBogotaPayload(hash types.Hash, record *chain.Bog
 }
 
 // CheckPayloadInclusionList examines each omitted transaction independently in
-// the validated payload's own post-state. An EVM revert still constitutes
-// a valid transaction if the transaction can be accepted and charged.
+// the validated payload's transaction-end state using pre-execution checks only.
+// Candidate execution and unmerged byte-size exemptions are not part of it.
 func (b *EngineBackend) CheckPayloadInclusionList(hash types.Hash, list [][]byte) (bool, error) {
 	if err := b.beginWork(); err != nil {
 		return false, err
@@ -200,114 +225,120 @@ func (b *EngineBackend) checkPayloadInclusionList(hash types.Hash, list [][]byte
 		return true, nil
 	}
 	bc := b.node.Blockchain()
-	payload := bc.GetBlock(hash)
-	if payload == nil || !bc.HasValidatedBlock(hash) {
+	block := bc.GetBlock(hash)
+	if block == nil || !bc.HasValidatedBlock(hash) {
 		return false, fmt.Errorf("inclusion list check requires validated payload %s", hash)
 	}
-	remaining := payload.GasLimit() - payload.GasUsed()
-	included := make(map[types.Hash]struct{}, len(payload.Transactions()))
-	for _, tx := range payload.Transactions() {
-		included[tx.Hash()] = struct{}{}
-	}
-	var omitted []*types.Transaction
-	for _, raw := range list {
-		tx, err := types.DecodeBlockTransaction(raw)
+	included := make(map[string]bool, len(block.Transactions()))
+	for _, tx := range block.Transactions() {
+		raw, err := tx.EncodeRLP()
 		if err != nil {
-			continue
-		}
-		if _, frame := tx.Inner().(*types.FrameTx8141); !frame && tx.Gas() > remaining {
-			continue
-		}
-		if _, present := included[tx.Hash()]; !present {
-			// The IL API carries canonical transaction bytes, not witnesses.
-			// EIP-8504 only defines witnesses for the included dependency union;
-			// adding an omitted candidate's witness there would make that block
-			// invalid. Neither local pool contents nor PROOF-frame execution may
-			// supply a consensus validity verdict for this unspecified composition.
-			if tx.HasDependencies8504() {
-				return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
-			}
-			omitted = append(omitted, tx)
-		}
-	}
-	if len(omitted) == 0 {
-		return true, nil
-	}
-	postState, err := bc.StateAtBlock(payload)
-	if err != nil {
-		return false, fmt.Errorf("read payload post-state: %w", err)
-	}
-	// BLOCKHASH for an omitted transaction must read this payload's ancestry.
-	// The canonical head can point to a competing branch.
-	getHash := func(number uint64) types.Hash {
-		if number >= payload.NumberU64() || payload.NumberU64()-number > 256 {
-			return types.Hash{}
-		}
-		for parent := bc.GetBlock(payload.ParentHash()); parent != nil; parent = bc.GetBlock(parent.ParentHash()) {
-			if parent.NumberU64() == number {
-				return parent.Hash()
-			}
-		}
-		return types.Hash{}
-	}
-	var framePool *gaspool.GasPool
-	for _, tx := range omitted {
-		if _, canonical := tx.Inner().(*types.FrameTx8141); !canonical {
-			continue
-		}
-		receipts := bc.GetReceipts(hash)
-		replay := len(receipts) != len(payload.Transactions())
-		for _, receipt := range receipts {
-			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed == 0 {
-				replay = true
-			}
-		}
-		if replay {
-			parent := bc.GetBlock(payload.ParentHash())
-			if parent == nil {
-				return false, fmt.Errorf("missing parent for inclusion gas accounting")
-			}
-			before, err := bc.StateAtBlock(parent)
-			if err != nil {
-				return false, err
-			}
-			processor := execution.NewStateProcessor(bc.Config()).WithGetHash(getHash)
-			result, err := processor.ProcessWithBAL(payload, before)
-			if err != nil {
-				return false, err
-			}
-			receipts = result.Receipts
-		}
-		var executionUsed, stateUsed uint64
-		for _, receipt := range receipts {
-			if (receipt.FrameResults8141 != nil || bc.Config().IsGlamsterdan(payload.Time())) && receipt.BlockGasUsed != 0 {
-				executionUsed += receipt.BlockGasUsed
-			} else {
-				executionUsed += receipt.GasUsed
-			}
-			for _, frame := range receipt.FrameResults8141 {
-				stateUsed += frame.GasUsed.State
-			}
-		}
-		framePool = new(gaspool.GasPool).AddGas(payload.GasLimit())
-		if err := framePool.ReserveFrame(executionUsed, stateUsed); err != nil {
 			return false, err
 		}
-		break
+		included[string(raw)] = true
 	}
-	for _, tx := range omitted {
-		trial := postState.Dup()
-		trial.SetTxContext(tx.Hash(), len(payload.Transactions()))
-		gas := new(gaspool.GasPool).AddGas(remaining)
-		if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
-			copied := *framePool
-			gas = &copied
+	seen := make(map[string]bool)
+	var end *inclusionEndState
+	var capacity *gaspool.GasPool
+	for _, raw := range list {
+		if included[string(raw)] || seen[string(raw)] {
+			continue
 		}
-		if _, _, err := execution.ApplyTransactionWithBALGetHash(
-			bc.Config(), getHash, trial, payload.Header(), tx, gas, nil,
-		); err == nil {
-			return false, nil
+		seen[string(raw)] = true
+		tx, err := types.DecodeBlockTransaction(raw)
+		// The merged EIP-7805 explicitly ignores type 3, regardless of witnesses.
+		if err != nil || tx.Type() == types.BlobTxType {
+			continue
 		}
+		frame, canonical := tx.Inner().(*types.FrameTx8141)
+		if canonical && execution.ValidateFrameContext8141(bc.Config(), block.Header(), frame) != nil {
+			continue
+		}
+		if canonical && frame.ValidateWithExtensions(bc.Config().FrameExtensions(block.Time())) != nil {
+			continue
+		}
+		if len(tx.BlobHashes()) > 0 {
+			maximum := gas.MaxBlobsForBlock(bc.Config(), block.Time()) * gas.GasPerBlob
+			used := uint64(0)
+			if value := block.Header().BlobGasUsed; value != nil {
+				used = *value
+			}
+			if used > maximum || tx.BlobGas() > maximum-used {
+				continue
+			}
+		}
+		if end == nil {
+			end, err = newInclusionEndState(bc, block)
+			if err != nil {
+				return false, err
+			}
+		}
+		maximum := new(gaspool.GasPool).AddGas(block.GasLimit())
+		var ordinary focil.Profile1Result
+		if canonical {
+			// Reconstruct the accepted payload prefix when needed; never execute T.
+			if end.needsReplay(types.Address{}, true) {
+				if err := end.replay(); err != nil {
+					return false, err
+				}
+			}
+			preconditionErr := execution.ValidateFramePreconditions8141(bc.Config(), end.state, block.Header(), frame, maximum)
+			if err := end.readError(end.state); err != nil {
+				return false, err
+			}
+			if preconditionErr != nil {
+				continue
+			}
+		} else {
+			ordinary, err = focil.EvaluateProfile1WithCapacity(raw, bc.Config(), block.Header(), end.state, maximum)
+			if err != nil {
+				return false, err
+			}
+			if end.needsReplay(ordinary.Sender, false) {
+				if err := end.replay(); err != nil {
+					return false, err
+				}
+				ordinary, err = focil.EvaluateProfile1WithCapacity(raw, bc.Config(), block.Header(), end.state, maximum)
+				if err != nil {
+					return false, err
+				}
+			}
+			if ordinary.Kind == focil.Profile1Outside {
+				// Unknown future research envelopes cannot become an omission excuse.
+				if !bc.Config().Rules(block.Header().Number, bc.Config().IsMerge(), block.Time()).IsIPlus {
+					continue
+				}
+				return false, fmt.Errorf("pre-execution IL validation unavailable for transaction type %d", tx.Type())
+			}
+			if ordinary.Kind != focil.Profile1Enforceable {
+				continue
+			}
+		}
+		if capacity == nil {
+			capacity, err = end.frameGasPool()
+			if err != nil {
+				return false, err
+			}
+		}
+		executionReservation, stateReservation := ordinary.ExecutionReservation, ordinary.StateReservation
+		if canonical {
+			budget, err := frame.GasBudget()
+			if err != nil {
+				return false, err
+			}
+			executionReservation, stateReservation = budget.ExecutionReservation, budget.StateReservation
+		}
+		if !capacity.FitsFrame(executionReservation, stateReservation) {
+			continue
+		}
+		// EIP-8504 remains a separately selected draft with no omitted-IL witness
+		// composition. This gate does not execute a candidate or excuse its omission.
+		if canonical && tx.HasDependencies8504() {
+			return false, fmt.Errorf("EIP-8504 omitted inclusion-list dependency validity unavailable: witness-bearing IL composition is unspecified")
+		}
+		// Do not run candidate code, consume nonce/gas, or add a byte-size exemption.
+		// EIPs PR #12723 proposes a different size rule and remains unmerged.
+		return false, nil
 	}
 	return true, nil
 }

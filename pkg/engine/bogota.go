@@ -97,21 +97,38 @@ func (api *EngineAPI) handleNewPayloadV6(params []json.RawMessage) (any, *jsonrp
 }
 
 func validateBogotaAttributes(raw json.RawMessage) error {
+	if err := validateAttributesWire(raw, true); err != nil {
+		return err
+	}
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &fields); err != nil {
 		return err
 	}
-	for _, field := range []string{
-		"timestamp", "prevRandao", "suggestedFeeRecipient", "withdrawals",
-		"parentBeaconBlockRoot", "slotNumber", "targetGasLimit", "inclusionListTransactions",
-	} {
-		if value := fields[field]; len(value) == 0 || string(value) == "null" {
-			return fmt.Errorf("missing %s", field)
+	name := "inclusionListTransactions"
+	if _, snake := fields["prev_randao"]; snake {
+		name = "inclusion_list_transactions"
+	}
+	value, ok := fields[name]
+	if !ok || isNullWire(value) {
+		return fmt.Errorf("missing %s", name)
+	}
+	if name == "inclusion_list_transactions" && len(value) > 0 && value[0] == '"' {
+		if err := wireData(value, -1); err != nil {
+			return err
+		}
+		_, err := parsePayloadAttributes(raw)
+		return err
+	}
+	items, err := wireArray(value)
+	if err != nil {
+		return err
+	}
+	for _, item := range items {
+		if err := wireData(item, -1); err != nil {
+			return err
 		}
 	}
-	var typed PayloadAttributesV4
-	err := json.Unmarshal(raw, &typed)
-	return err
+	return nil
 }
 
 func (api *EngineAPI) forkchoiceUpdatedBogota(

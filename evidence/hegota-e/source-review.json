@@ -1,0 +1,178 @@
+{
+  "checked_at_utc": "2026-11-27 06:54:49 UTC",
+  "heads": {
+    "eips": "68db81b0a75edb0e16d8f181241f994875eba52d",
+    "consensus_specs": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "execution_apis": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d"
+  },
+  "unchanged_current_dependency_blobs": [
+    {
+      "eip": 7934,
+      "blob": "c18cb0def4fa9ef731f358912f228d30470a85cd",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8141,
+      "blob": "9bc38a368881fa52e1a1a9970274e6511874d13f",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8250,
+      "blob": "10bd1d84c9534c9db65f9ccbffcf8d5902b9c1ae",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    },
+    {
+      "eip": 8272,
+      "blob": "0acc21ad8359be83c0929c7cc70e45326be8acff",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d"
+    }
+  ],
+  "proof_8504": {
+    "pr": "https://github.com/ethereum/EIPs/pull/12672",
+    "state": "open",
+    "revision": "96da3c17047ad31608c40bfe75049db78dc4417d",
+    "head_repository": "lambdaclass/EIPs",
+    "updated_at": "2026-11-25T18:41:37Z",
+    "in_eips_master": false,
+    "scope": "Explicit optional direct research profile; no omitted-IL witness transport or public activation assignment."
+  },
+  "completion_reaudit": {
+    "starts_from": "4663af699c4c9bbc48f59976dc26e00d805a78d6",
+    "record": "docs/reviews/pr-172/REAUDIT.md",
+    "source_heads_unchanged": true,
+    "discussions": [
+      {
+        "url": "https://ethereum-magicians.org/t/21578",
+        "posts": 17,
+        "last_posted_at": "2026-11-21T09:23:02.109Z",
+        "decision": "No replacement committee or incentive rule adopted."
+      },
+      {
+        "url": "https://ethereum-magicians.org/t/29298",
+        "posts": 4,
+        "last_posted_at": "2026-09-09T12:57:18.859Z",
+        "decision": "Claimed-index evaluation remains the default; fresh keyed nonces do not classify the entire transaction as position-stable."
+      },
+      {
+        "url": "https://github.com/ethereum/EIPs/pull/12110",
+        "decision": "Inline review retains the enforcing-extension, claims, code-load and final-budget prerequisites."
+      }
+    ],
+    "fixed_boundaries": [
+      "Completed finalized verdicts retained independently of live views",
+      "Live CL adapter replacement reauthenticates memory snapshots atomically"
+    ]
+  },
+  "transaction_boundary_audit": {
+    "starts_from": "63f85e737d8dd84c8913d6f6ef996179e5e373d5",
+    "record": "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md",
+    "current_sources_unchanged": true,
+    "latest_dependency_content_comparison": [
+      {
+        "eip": 4895,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "81af3b60b632bc9c03513d1d137f25410e3f4d34"
+      },
+      {
+        "eip": 7002,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "31863eaebb637084d7e706f6e96e7e2ec53b7716"
+      },
+      {
+        "eip": 7928,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "3c4d4ad300e4946303db45710bba02cfb836f9eb"
+      },
+      {
+        "eip": 2935,
+        "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+        "blob": "60fab81fff8126a0e0f019a3fa7439fdfafe9471"
+      }
+    ]
+  },
+  "runtime_boundary_audit": {
+    "starts_from": "15262949d2b4dbf0f41bf4919dd0a2d0d5550c7c",
+    "checked_at_utc": "2026-11-27T11:26:36.063233+00:00",
+    "record": "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md",
+    "current_heads_unchanged": true,
+    "current_8037_source": {
+      "path": "specs/hegota/upstream/2026-11-27/eip-8037.md",
+      "revision": "68db81b0a75edb0e16d8f181241f994875eba52d",
+      "blob": "43cb2b4fb8c72a66d42a06e21a75b70f0539ccbc",
+      "read_only_local_ref_differs": true,
+      "scope": "Reuse existing current C/D snapshot; dual-dimension rules unchanged; local reference collision/system-call/rationale clarifications differ."
+    },
+    "discussion_records_unchanged": true,
+    "proof_12672_head_unchanged": true,
+    "fixed_boundaries": [
+      "Shared nonmutating pre-frame nonce/fee/gas checks before unknown witness handling",
+      "Ordinary state usage and Amsterdam gross execution in native capacity",
+      "Both gas pools in complete RLP header projection",
+      "Version-2 retained/compact verdict migration",
+      "Native cache publication and pruning after persistence; one validated clock"
+    ]
+  },
+  "external_delivery_review": {
+    "checked_at_utc": "2026-11-27T17:23:27.105710+00:00",
+    "observed_eips_head": "4e55e80d16745730f55bb7976449b9100a1e26b4",
+    "previous_eips_head": "68db81b0a75edb0e16d8f181241f994875eba52d",
+    "changed_eips": [
+      "EIP-8425"
+    ],
+    "selected_group_e_source_content_unchanged": true,
+    "consensus_specs_head": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "engine_api_head": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d",
+    "independent_cl": {
+      "repository": "jiayaoqijia/lighthouse",
+      "revision": "bc56927fdb0c31f908286ec39013e4452864dc18"
+    },
+    "network_package_revision": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
+    "decision": "EIP-8425 recovery proof changes do not supply Profile 2 enforcement or omitted-PQ witness transport; test defined Heze/Engine duties with an actual independent CL."
+  },
+  "latest_7805_rebase": {
+    "checked_at_utc": "2026-11-27T19:20:51.778754+00:00",
+    "eips_head": "fbc43ec3a187f0b3dd448e995a041227f4baa7b1",
+    "eip_7805_blob": "0ff894bb4136c6973c1f91a4598e8d5426f8b237",
+    "merged_pr": 12470,
+    "merged_pr_head": "f5c454d5cd33eda5cff0724feb6b8faf3f2e750f",
+    "all_review_comments_read": true,
+    "all_issue_comments_read": true,
+    "selected_heze_head": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "engine_head": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d",
+    "open_byte_policy_pr": 12723,
+    "byte_policy_pr_head": "bd8d6b7ddf6251473d817d4f4944c9858586b50b",
+    "byte_policy_activated": false,
+    "decision": "Apply pre-execution checks only, skip type 3, use independent 8037 reservations, remove speculative byte exemptions and candidate EVM replay. Keep actual builder execution/7934 validity and independent draft-8504 composition gates. Earlier unchanged-source reviews are historical."
+  },
+  "latest_2718_review": {
+    "eips_head": "c24e33014288b5e712da2629c185c91327c24c69",
+    "merged_pr": 12702,
+    "merged_commit": "d2be3735b2f894e1e35f54de408159b5c7e14a94",
+    "reviewed_pr_head": "1d90773fd107e392e4e56140a790f8d8b8669d4a",
+    "eip7805_blob": "de1d4c69ea5dc83561434d3a8c27e6a1b16b6bbf",
+    "complete_eip_and_review_discussion_read": true,
+    "2718_reference_matches_current_upstream": true,
+    "heze_revision": "36888ee87b0faa6ad7804b017a0184e8e6e6a1c6",
+    "engine_revision": "9e85b16c7fb54a838c9a612842c138c2bdf9bc8d",
+    "unmerged_size_policy": {
+      "pr": 12723,
+      "head": "a65df9312dce24cbf00d6da46778edaa1e5e21a0",
+      "merged": false,
+      "new_body_diff_and_review_replies_read": true,
+      "disposition": "Disabled; updated rationale does not assign consensus rules to the merged EIP."
+    },
+    "findings": [
+      "Existing canonical selection implements the clarified encoding.",
+      "Missing native exact-boundary and pooled-wrapper consumers are added.",
+      "Critical selector/canonical/pooled files were missing from the E source lock and are now mandatory."
+    ],
+    "read_only_refs_and_expected_oracles_changed": false
+  },
+  "builder_publication_review": {
+    "specification": "Bogota Payload building MUST satisfy its own requested immutable IL",
+    "reproduced_source": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "consumer": "TestGroupEBuilderRejectsUnsatisfiedViewAndRetries",
+    "fix": "Completed native build is checked before publishing block/receipts/result; execution-valid unsatisfied imports remain valid and failed IDs retry after a real pool state transition",
+    "predicate_version_unchanged": 3
+  }
+}

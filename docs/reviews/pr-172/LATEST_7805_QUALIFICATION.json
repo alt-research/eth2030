@@ -1,0 +1,455 @@
+{
+  "qualified_source": "e76e3f0c0769292fb3055f711369c9ef0276e743",
+  "go_run_start_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
+  "go_files_unchanged_through_qualification": true,
+  "upstream_eips_head": "fbc43ec3a187f0b3dd448e995a041227f4baa7b1",
+  "summary": {
+    "full": {
+      "log_sha256": "c0fb070535914abd1fa86b8ed2d621b91629372b8c606d89ab453b7cf4df182f",
+      "named": {
+        "pass": 24275,
+        "skip": 124
+      },
+      "packages": {
+        "pass": 225,
+        "skip": 20
+      },
+      "completed_packages": 245
+    },
+    "focused_race": {
+      "log_sha256": "dfe3024bd484c32a3a9e7bb48c707da66951062224cf2d5f7c09261fc4295922",
+      "named": {
+        "pass": 104
+      },
+      "packages": {
+        "pass": 10
+      },
+      "completed_packages": 10
+    },
+    "broad_race": {
+      "log_sha256": "a30176051ecdcee2622fbce662e9f06303d3f52e50410387dbf09447c2a15588",
+      "named": {
+        "pass": 12121,
+        "skip": 87
+      },
+      "packages": {
+        "pass": 74,
+        "skip": 3
+      },
+      "completed_packages": 77
+    }
+  },
+  "required_native_consumers": 43,
+  "required_skipped": 0,
+  "commands": [
+    {
+      "step": "full",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 179.238,
+      "log_sha256": "c0fb070535914abd1fa86b8ed2d621b91629372b8c606d89ab453b7cf4df182f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./cmd/hegota-e-fixture",
+        "./core/block",
+        "./core/chain",
+        "./core/execution",
+        "./core/types",
+        "./engine",
+        "./focil",
+        "./focil/heze",
+        "./node",
+        "./node/backend",
+        "-run",
+        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 43.497,
+      "log_sha256": "dfe3024bd484c32a3a9e7bb48c707da66951062224cf2d5f7c09261fc4295922",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/hegota",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "seconds": 45.699,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d1ec724710fbec0e6fea26654f3db7c85fbf68d12e4c67317817601c9e340419"
+    },
+    {
+      "step": "optimized-python",
+      "command": [
+        "python3",
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/hegota",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "seconds": 47.4,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "f5873c9af1c67ffc66cf03b14905627b5f65ce803748925a39b887185a3a2c47"
+    },
+    {
+      "step": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-json",
+        "./bal",
+        "./core/types",
+        "./core/config",
+        "./core/vm",
+        "./core/execution",
+        "./core/block",
+        "./core/chain",
+        "./core/state",
+        "./core/framepay",
+        "./core/frameproof",
+        "./core/rawdb",
+        "./crypto/leansphincs",
+        "./focil/...",
+        "./txpool/...",
+        "./eth",
+        "./node/...",
+        "./rpc/...",
+        "./engine/...",
+        "./p2p/ethproto",
+        "./sync/statesync",
+        "./sync/inserter",
+        "./proofs",
+        "./zkvm",
+        "./cmd/eth2030",
+        "./cmd/send-frame",
+        "./eiptest",
+        "./cmd/hegota-e-fixture",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "seconds": 203.695,
+      "log_sha256": "a30176051ecdcee2622fbce662e9f06303d3f52e50410387dbf09447c2a15588"
+    },
+    {
+      "step": "build",
+      "command": [
+        "go",
+        "build",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 15.557,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "native-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/hegota-e-latest-7805-native",
+        "./cmd/eth2030"
+      ],
+      "exit_code": 0,
+      "seconds": 10.317,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "wrapper-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/hegota-e-latest-7805-geth",
+        "./cmd/eth2030-geth"
+      ],
+      "exit_code": 0,
+      "seconds": 4.971,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "seconds": 4.772,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "baseline",
+      "command": [
+        "go",
+        "run",
+        "./cmd/eth2030-baseline"
+      ],
+      "exit_code": 0,
+      "seconds": 1.685,
+      "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
+    }
+  ],
+  "python_tests": {
+    "normal": 120,
+    "optimized": 120
+  },
+  "differential_baseline": {
+    "version": 1,
+    "native_backend": "native/core/execution.ApplyTransaction",
+    "reference_backend": "upstream/go-ethereum@v1.17.10/tests.StateTest.RunNoVerify",
+    "expected": 12,
+    "executed": 12,
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0,
+    "results": [
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "Byzantium",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "Constantinople",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "ConstantinopleFix",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "EIP150",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "EIP158",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "Frontier",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "legacy-add11.json",
+        "name": "add11",
+        "fork": "Homestead",
+        "index": 0,
+        "native_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "reference_root": "0x17454a767e5f04461256f3812ffca930443c04a47d05ce3f38940c4a14b8c479",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 41012,
+        "reference_gas": 41012,
+        "passed": true
+      },
+      {
+        "path": "cancun-add11.json",
+        "name": "add11",
+        "fork": "Berlin",
+        "index": 0,
+        "native_root": "0xcd39e0cdd18f8f811911222ae6779341663d0293e1a3d9501da7ac2f4da9b277",
+        "reference_root": "0xcd39e0cdd18f8f811911222ae6779341663d0293e1a3d9501da7ac2f4da9b277",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 43112,
+        "reference_gas": 43112,
+        "passed": true
+      },
+      {
+        "path": "cancun-add11.json",
+        "name": "add11",
+        "fork": "Cancun",
+        "index": 0,
+        "native_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "reference_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 43112,
+        "reference_gas": 43112,
+        "passed": true
+      },
+      {
+        "path": "cancun-add11.json",
+        "name": "add11",
+        "fork": "London",
+        "index": 0,
+        "native_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "reference_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 43112,
+        "reference_gas": 43112,
+        "passed": true
+      },
+      {
+        "path": "cancun-add11.json",
+        "name": "add11",
+        "fork": "Paris",
+        "index": 0,
+        "native_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "reference_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 43112,
+        "reference_gas": 43112,
+        "passed": true
+      },
+      {
+        "path": "cancun-add11.json",
+        "name": "add11",
+        "fork": "Shanghai",
+        "index": 0,
+        "native_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "reference_root": "0xe8010ce590f401c9d61fef8ab05bea9bcec24281b795e5868809bc4e515aa530",
+        "native_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "reference_logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "native_gas": 43112,
+        "reference_gas": 43112,
+        "passed": true
+      }
+    ]
+  },
+  "compiled_controls": {
+    "count": 39,
+    "names": [
+      "BLS-authentication",
+      "strict-timeliness",
+      "nonce-cascade",
+      "RLP-byte-cap",
+      "signature-budget",
+      "omission-verdict",
+      "pooled-IL-witness",
+      "expired-cache-pruning",
+      "ignored-type3",
+      "failed-id-retry",
+      "IL-type3-cannot-stall-builder",
+      "malformed-proof-tolerance",
+      "append-header-metadata",
+      "finalized-verdict",
+      "reconfigured-authentication",
+      "transaction-end-accounts",
+      "pre-execution-Frame-enforcement",
+      "transaction-end-prefix",
+      "pruned-BAL-boundary",
+      "legacy-live-boundary",
+      "legacy-compact-boundary",
+      "compact-boundary-version",
+      "header-only-ancestry",
+      "missing-header-verdict",
+      "foreign-context-omission",
+      "foreign-context-build",
+      "frame-preconditions-omission",
+      "frame-preconditions-build",
+      "ordinary-state-capacity",
+      "Amsterdam-capacity-replay",
+      "predicate-version-three",
+      "preconditions-read-only",
+      "preconditions-read-error",
+      "dimensional-RLP",
+      "ingress-publish-after-persist",
+      "ingress-one-clock",
+      "unmerged-size-exemption",
+      "independent-ordinary-reservation",
+      "IL-generation-no-blob"
+    ],
+    "log_sha256": "9748ad37449a21acb49de326865215614507badce90a05a288fede132ae47781",
+    "source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7"
+  },
+  "reproductions": [
+    {
+      "published_predicate_source": "6796dbc6820a60e6f3c326c8a7ec87799872af7d",
+      "scope": "Published predicate isolated by a Go source overlay on the current native consumers; both compile and fail before the corrected predicate is restored",
+      "overlay_source_sha256": "d182cec5f56d2810e80c51da457e470c74143a42d4c7e083b13c3bfa0050e340",
+      "overlay_manifest_sha256": "40cbcce71965131c430fd559fde45de4b73ddc0876884d4fec83d0de58f63d68",
+      "log_sha256": "6fbfc61629352997fcb2a2208da6422c1fa9b3ca936b4b76ebd5beeb243bf70f",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse",
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
+      ],
+      "observed_exit_code": 1
+    }
+  ],
+  "website": "evidence/hegota-e/website.json",
+  "network_scope": "Earlier two-pair records are immutable pre-rebase source-specific measurements. Final current publication-head network/proof runs are separately required in the English PR.",
+  "previous_qualification": "https://github.com/alt-research/eth2030/blob/6796dbc6820a60e6f3c326c8a7ec87799872af7d/evidence/hegota-e/verification.json"
+}

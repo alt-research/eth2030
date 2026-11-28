@@ -83,7 +83,7 @@ func TestRecordedQualifiedEngineTrafficRemainsAdvertised(t *testing.T) {
 		t.Fatal(err)
 	}
 	supported := map[string]bool{}
-	for _, method := range NewEngineAPI(nil).ExchangeCapabilities(nil) {
+	for _, method := range NewEngineAPI(&bogotaTestBackend{}).ExchangeCapabilities(nil) {
 		supported[method] = true
 	}
 	if len(record.Methods) < 4 {

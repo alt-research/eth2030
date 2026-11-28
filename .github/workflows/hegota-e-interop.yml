@@ -1,0 +1,115 @@
+name: Hegota E independent Heze interop
+
+on:
+  pull_request:
+    branches: [master]
+    paths: ['pkg/**', 'tools/hegota/**', '.github/workflows/hegota-e-interop.yml']
+  push:
+    branches: [master]
+    paths: ['pkg/**', 'tools/hegota/**', '.github/workflows/hegota-e-interop.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hegota-e-interop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  external-heze:
+    name: Native EL and independent Heze CL acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.11'
+          cache-dependency-path: pkg/go.sum
+      - name: Retain capacity for the isolated CL build and two-pair devnet
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h
+          free -h
+          nproc
+      - name: Check out the exact independent CL
+        uses: actions/checkout@v4
+        with:
+          repository: jiayaoqijia/lighthouse
+          ref: bc56927fdb0c31f908286ec39013e4452864dc18
+          path: .interop-lighthouse
+          persist-credentials: false
+      - name: Check out the exact network package
+        uses: actions/checkout@v4
+        with:
+          repository: ethpandaops/ethereum-package
+          ref: c4a8e15d40f0965f3728f776d72f1954440ad96b
+          path: .interop-package
+          persist-credentials: false
+      - name: Install pinned Kurtosis CLI
+        run: |
+          curl --fail --location --retry 3 https://github.com/kurtosis-tech/kurtosis-cli-release-artifacts/releases/download/1.23.0/kurtosis-cli_1.23.0_linux_amd64.tar.gz -o "$RUNNER_TEMP/kurtosis.tar.gz"
+          echo '985bffafb6c76e6a6ed12c37a6b2d52b12fe0ccea659f93be4af1e9852b9bd4c  '"$RUNNER_TEMP/kurtosis.tar.gz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/kurtosis-bin"
+          tar -xzf "$RUNNER_TEMP/kurtosis.tar.gz" -C "$RUNNER_TEMP/kurtosis-bin"
+          sudo install "$RUNNER_TEMP/kurtosis-bin/kurtosis" /usr/local/bin/kurtosis
+          kurtosis version
+      - name: Restore the exact independent CL runtime image
+        id: cl-image
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/hegota-e-cl-image.tar
+          key: hegota-e-cl-linux-amd64-bc56927fdb0c31f908286ec39013e4452864dc18-v1
+      - name: Build the independent CL without changing its source
+        if: steps.cl-image.outputs.cache-hit != 'true'
+        run: |
+          test "$(git -C .interop-lighthouse rev-parse HEAD)" = bc56927fdb0c31f908286ec39013e4452864dc18
+          docker build --build-arg CARGO_USE_GIT_CLI=true --label source_commit=bc56927fdb0c31f908286ec39013e4452864dc18 -t eth2030cl:frame-control .interop-lighthouse
+          docker save eth2030cl:frame-control -o "$RUNNER_TEMP/hegota-e-cl-image.tar"
+      - name: Retain the exact CL image independently of network-test outcomes
+        if: steps.cl-image.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/hegota-e-cl-image.tar
+          key: hegota-e-cl-linux-amd64-bc56927fdb0c31f908286ec39013e4452864dc18-v1
+      - name: Load the exact cached CL runtime image
+        if: steps.cl-image.outputs.cache-hit == 'true'
+        run: docker load -i "$RUNNER_TEMP/hegota-e-cl-image.tar"
+      - name: Build the actual native EL and qualification-only proxy
+        run: |
+          docker build -f tools/hegota/Dockerfile.interop --build-arg SOURCE_REVISION="$(git rev-parse HEAD)" -t eth2030:frame-control .
+          cd pkg
+          go build -o "$RUNNER_TEMP/hegota-e-fixture" ./cmd/hegota-e-fixture
+      - name: Run actual signed gossip, omission, fork choice, restart and PQ transport measurements
+        run: |
+          mkdir -p "$RUNNER_TEMP/hegota-e"
+          nproc > "$RUNNER_TEMP/hegota-e/cpus.txt"
+          free -h > "$RUNNER_TEMP/hegota-e/memory.txt"
+          docker version > "$RUNNER_TEMP/hegota-e/docker.txt"
+          python3 tools/hegota/run_external_heze.py --package .interop-package --fixture-tool "$RUNNER_TEMP/hegota-e-fixture" --output "$RUNNER_TEMP/hegota-e/network"
+      - name: Require actual complete acceptance and owned-resource cleanup
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          result=json.loads((Path(os.environ['RUNNER_TEMP'])/'hegota-e/network/evidence.json').read_text())
+          assert result['source']==os.environ['GITHUB_SHA']
+          assert result['consensus_source']=='bc56927fdb0c31f908286ec39013e4452864dc18'
+          assert result['result']=='pass' and result['enclave_removed'] is True
+          assert result['positive']['finalized_on_both_pairs'] is True
+          assert all(result['negative'][key] is True for key in ('both_execution_valid','both_inclusion_unsatisfied','not_extended_full','cl_restart_retained'))
+          assert all(result['invalid_exemptions'][key] is True for key in ('malformed','nonce','both_execution_valid','both_inclusion_satisfied'))
+          assert all(result['full_exemption'][key] is True for key in ('both_execution_valid','both_inclusion_satisfied','actual_declared_gas_does_not_fit','candidate_omitted','filler_included'))
+          assert result['pq_transport']['samples']>=32
+          assert result['pq_transport']['transaction_bytes']<=8192
+          assert result['public_complete'] is False
+          PY
+      - name: Retain complete results and exact source identities
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hegota-e-independent-heze-${{ github.sha }}
+          path: ${{ runner.temp }}/hegota-e
+          if-no-files-found: error
+          retention-days: 90

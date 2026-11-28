@@ -1,6 +1,7 @@
 package block
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -42,7 +43,7 @@ type BuildBlockAttributes struct {
 
 	// InclusionListTxs contains RLP-encoded transactions from inclusion lists
 	// that MUST be included in this block (EIP-7547/7805 FOCIL).
-	// These transactions are applied before pool transactions.
+	// Candidates are retried when later IL/pool transactions change eligibility.
 	InclusionListTxs [][]byte
 }
 
@@ -141,6 +142,16 @@ func (b *BlockBuilder) BuildBlock(parent *types.Header, attrs *BuildBlockAttribu
 
 // BuildBlockWithResult returns the receipts, requests, and BAL from the build.
 func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBlockAttributes) (*types.Block, *execution.ProcessResult, error) {
+	return b.BuildBlockWithResultContext(context.Background(), parent, attrs)
+}
+
+func (b *BlockBuilder) BuildBlockWithResultContext(ctx context.Context, parent *types.Header, attrs *BuildBlockAttributes) (*types.Block, *execution.ProcessResult, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
+	if parent == nil || attrs == nil {
+		return nil, nil, fmt.Errorf("missing build context")
+	}
 	getHash := b.getHashFnForParent(parent)
 	// Determine gas limit: use attributes if provided, otherwise derive from parent.
 	gasLimit := attrs.GasLimit
@@ -237,6 +248,13 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		return nil, nil, err
 	}
 
+	buildSnapshot := statedb.Snapshot()
+	completed := false
+	defer func() {
+		if !completed {
+			statedb.RevertToSnapshot(buildSnapshot)
+		}
+	}()
 	gp := new(gaspool.GasPool).AddGas(header.GasLimit)
 
 	// Determine if BAL tracking is active for this block.
@@ -273,105 +291,11 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 
 	txIndex := 0
 
-	// EIP-7547/7805 FOCIL: process inclusion list transactions first.
-	// These MUST be included before any pool transactions.
-	ilTxHashes := make(map[types.Hash]struct{})
-	if len(attrs.InclusionListTxs) > 0 {
-		for _, ilTxBytes := range attrs.InclusionListTxs {
-			ilTx, err := types.DecodeTxRLP(ilTxBytes)
-			if err != nil {
-				continue
-			}
-			ilTxHashes[ilTx.Hash()] = struct{}{}
-
-			// EIP-7825 caps individual transactions at Osaka.
-			if !fitsTransaction(b.config, header.Time, gp, ilTx) || exceedsTxGasCap(b.config, header.Time, ilTx) {
-				continue
-			}
-			// Check base fee.
-			if header.BaseFee != nil && ilTx.GasFeeCap() != nil {
-				if ilTx.GasFeeCap().Cmp(header.BaseFee) < 0 {
-					continue
-				}
-			}
-
-			if cancunActive && len(ilTx.BlobHashes()) > 0 {
-				if ilTx.BlobGas() > gas.MaxBlobsForBlock(b.config, header.Time)*gas.GasPerBlob-blobGasUsed || validateBlobHashes(ilTx.BlobHashes()) != nil {
-					continue
-				}
-			}
-			if ilTx.HasDependencies8504() {
-				// Inclusion lists carry canonical bytes, not witnesses. Recover
-				// the admitted wrapper when available; never build a proof tx
-				// from a missing-witness bare IL declaration.
-				if source, ok := b.txPool.(interface {
-					Get(types.Hash) *types.Transaction
-				}); ok {
-					if pooled := source.Get(ilTx.Hash()); pooled != nil {
-						ilTx = pooled
-					}
-				}
-				if err := frameproof.VerifyTransaction(ilTx, b.config.FrameExtensions(header.Time), false); err != nil {
-					continue
-				}
-			}
-			statedb.SetTxContext(ilTx.Hash(), txIndex)
-
-			// EIP-7928: create per-transaction BAL tracker before execution.
-			var (
-				preBalances map[types.Address]*big.Int
-				preNonces   map[types.Address]uint64
-			)
-			var tracker *bal.AccessTracker
-			if balActive {
-				tracker = bal.NewTracker()
-				preBalances, preNonces = execution.CapturePreState(b.config, statedb, ilTx, header.Coinbase)
-			}
-
-			snap := statedb.Snapshot()
-			gpBefore := *gp
-			receipt, used, applyErr := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, ilTx, gp, execution.BalTrackerOrNil(tracker))
-			if applyErr != nil {
-				statedb.RevertToSnapshot(snap)
-				continue
-			}
-
-			// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
-			if glamActive && !vm.CheckDimStorageCap(blockDimStorageUsed, receipt.DimStorageGas) {
-				statedb.RevertToSnapshot(snap)
-				*gp = gpBefore
-				continue
-			}
-			blockDimStorageUsed += receipt.DimStorageGas
-			// EIP-7701: nonce increment must happen for all AA txs regardless of BAL status.
-			aaInfo := execution.ApplyAAPostExecution(statedb, ilTx, receipt, used, nil)
-			if balActive {
-				logBuilderAAPostExecution(header, ilTx, txIndex, used, aaInfo, false)
-			}
-
-			txs = append(txs, ilTx)
-			receipts = append(receipts, receipt)
-			// EIP-7778: Under Glamsterdam, header.GasUsed uses pre-refund gas (BlockGasUsed).
-			if glamActive && receipt.BlockGasUsed > 0 {
-				gasUsed += receipt.BlockGasUsed
-			} else {
-				gasUsed += used
-			}
-
-			if len(ilTx.BlobHashes()) > 0 && cancunActive {
-				blobGasUsed += ilTx.BlobGas()
-			}
-
-			if balActive {
-				execution.PopulateTracker(tracker, statedb, preBalances, preNonces)
-				txBAL := tracker.Build(uint64(txIndex + 1))
-				for _, entry := range txBAL.Entries {
-					blockBAL.AddEntry(entry)
-				}
-			}
-
-			txIndex++
-		}
+	// A single execution loop serves IL and pool candidates. Sender-indexed
+	// retries close funding/nonce cascades without duplicating execution paths.
+	byteBudget, err := newBuilderRLPBudget(b.config, header, attrs)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	// Collect pending transactions from pool.
@@ -411,9 +335,13 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 	// receipt trie root) alongside the inline receipt accumulator below.
 	recGen := execution.NewReceiptGenerator(execution.DefaultReceiptGeneratorConfig())
 
-	for _, tx := range allSorted {
-		// Skip transactions already included from the inclusion list.
-		if _, isIL := ilTxHashes[tx.Hash()]; isIL {
+	queue := newInclusionQueue(attrs.InclusionListTxs, allSorted, b.txPool)
+	for candidate, ok := queue.next(); ok; candidate, ok = queue.next() {
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
+		tx := candidate.tx
+		if frame, canonical := tx.Inner().(*types.FrameTx8141); canonical && execution.ValidateFrameContext8141(b.config, header, frame) != nil {
 			continue
 		}
 		// Check if transaction meets base fee requirement.
@@ -450,7 +378,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		if policy, ok := b.txPool.(interface {
 			ValidateFrameForBuild(*types.Transaction, state.StateDB, *types.Header) error
 			FrameBuildResult(types.Hash, bool)
-		}); ok {
+		}); ok && !candidate.inclusion {
 			if _, canonical := tx.Inner().(*types.FrameTx8141); canonical {
 				err := policy.ValidateFrameForBuild(tx, statedb, header)
 				policy.FrameBuildResult(tx.Hash(), err == nil)
@@ -460,6 +388,17 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			}
 		}
 		if tx.HasDependencies8504() {
+			preconditionErr := execution.ValidateFramePreconditions8141(b.config, statedb, header, tx.Inner().(*types.FrameTx8141), gp)
+			if err := state.ReadError(statedb); err != nil {
+				return nil, nil, err
+			}
+			if preconditionErr != nil {
+				queue.block(candidate)
+				continue
+			}
+			if candidate.inclusion && len(tx.DependencyWitnesses8504()) == 0 {
+				return nil, nil, fmt.Errorf("IL dependency witness unavailable; omitted EIP-8504 witness composition is unspecified")
+			}
 			if err := frameproof.VerifyTransaction(tx, b.config.FrameExtensions(header.Time), false); err != nil {
 				continue
 			}
@@ -481,19 +420,50 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		// Try to apply the transaction.
 		snap := statedb.Snapshot()
 		gpBefore := *gp
-		receipt, used, err := execution.ApplyTransactionWithBALGetHash(b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
+		receipt, used, err := execution.ApplyTransactionWithBALContext(ctx, b.config, getHash, statedb, header, tx, gp, execution.BalTrackerOrNil(tracker))
 		if err != nil {
 			// Transaction failed: revert and skip it.
 			statedb.RevertToSnapshot(snap)
+			*gp = gpBefore
+			if contextErr := ctx.Err(); contextErr != nil {
+				return nil, nil, contextErr
+			}
+			if readErr := state.ReadError(statedb); readErr != nil {
+				return nil, nil, readErr
+			}
+			queue.block(candidate)
 			slog.Debug("builder: skipped tx", "hash", tx.Hash(), "err", err)
 			continue
 		}
 
+		// A valid IL blob cannot be silently dropped because its data is
+		// unavailable, or published with an empty builder blob bundle.
+		if len(tx.BlobHashes()) > 0 && !types.HasFullBlobSidecar(tx) {
+			statedb.RevertToSnapshot(snap)
+			*gp = gpBefore
+			if candidate.inclusion {
+				return nil, nil, fmt.Errorf("valid IL blob sidecar unavailable")
+			}
+			continue
+		}
 		// GAP-2.2: enforce per-block DimStorage gas cap at Glamsterdam+.
 		if glamActive && !vm.CheckDimStorageCap(blockDimStorageUsed, receipt.DimStorageGas) {
 			statedb.RevertToSnapshot(snap)
 			// Restore the exact amount debited from the pool (EIP-7778 uses
 			// pre-refund gas for pool accounting, which may differ from used).
+			*gp = gpBefore
+			continue
+		}
+		nextBlob := blobGasUsed
+		if cancunActive {
+			nextBlob += tx.BlobGas()
+		}
+		fitsBytes, sizeErr := byteBudget.appendWithPools(txs, tx, gp, header.GasLimit, nextBlob)
+		if sizeErr != nil {
+			return nil, nil, sizeErr
+		}
+		if !fitsBytes {
+			statedb.RevertToSnapshot(snap)
 			*gp = gpBefore
 			continue
 		}
@@ -507,7 +477,7 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 		txs = append(txs, tx)
 		receipts = append(receipts, receipt)
 		// EIP-7778: Under Glamsterdam, header.GasUsed uses pre-refund gas (BlockGasUsed).
-		if glamActive && receipt.BlockGasUsed > 0 {
+		if (glamActive || balActive) && receipt.BlockGasUsed > 0 {
 			gasUsed += receipt.BlockGasUsed
 		} else {
 			gasUsed += used
@@ -559,11 +529,19 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 			for _, entry := range txBAL.Entries {
 				blockBAL.AddEntry(entry)
 			}
+			candidate.included = true
+			queue.wake(statedb, txBAL)
+		} else {
+			candidate.included = true
+			queue.wake(statedb, nil)
 		}
 
 		txIndex++
 	}
 
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
 	header.GasUsed = types.BlockGasTotal(receipts, b.config != nil && (b.config.IsGlamsterdan(header.Time) || b.config.IsAmsterdam(header.Time)))
 
 	// EIP-4844: set blob gas used in header.
@@ -667,6 +645,10 @@ func (b *BlockBuilder) BuildBlockWithResult(parent *types.Header, attrs *BuildBl
 	if err := validateRLPBlockSize(b.config, block); err != nil {
 		return nil, nil, err
 	}
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
+	completed = true
 	return block, &execution.ProcessResult{Receipts: receipts, Requests: requests, BlockAccessList: blockBAL}, nil
 }
 

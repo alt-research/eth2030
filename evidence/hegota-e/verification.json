@@ -1,0 +1,1447 @@
+{
+  "date": "2026-11-28",
+  "timezone": "Asia/Shanghai",
+  "source_revision": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
+  "tasks": 9,
+  "criteria": 36,
+  "selected_profile_consumers_passed": true,
+  "public_complete": false,
+  "public_gates": [
+    "8369 is Informational; Profile 2 enforcement requires a Standards Track extension",
+    "8369 claim encoding/commitment/limits, canonical diffs, replay/code-load bounds, final slots/budgets and ePBS duties remain undefined",
+    "8504 omitted-IL witness transport and validity composition remain unspecified",
+    "Exhaustive external Heze reqresp/fork-digest, mixed-client/ePBS release qualification and public-network tails remain HGT-070/080 work; selected two-pair control is qualified, no public activation claimed",
+    "EIPs PR 12723 byte-budget omission policy remains unmerged; no RLP or proposed payload-size exemption is activated; high-gas release composition requires upstream resolution"
+  ],
+  "artifacts": {
+    ".github/workflows/ci.yml": "987e54770440a79d932ad31f1b28ab5d434e09c0a57743b7464830eb81609582",
+    ".github/workflows/hegota-e-interop.yml": "06c07719f275b4011f5b66f86eb63e6efbde64c1ec5e1bb3fe3a54cbc5aca490",
+    "docs/plans/hegota-e/COMPOSITION.md": "aede46f0b130fbc8eecab5279eacc597ea5a71406556dfce34cc81ef722e04a9",
+    "docs/plans/hegota-e/PLAN.md": "d6c5ac0f5b889b13cc4e11d04d8917e2fb216872bb2ba3193699cd4ee0b0ef7d",
+    "docs/reviews/pr-172/EXTERNAL_HEZE.md": "c86ef16498f6dd58f35a89066b7f17e643c7a5a36e1936fd33a2d7f580848942",
+    "docs/reviews/pr-172/LATEST_2718.md": "a9ddb36c360fad0529eb989d6b21095152fd0921c6341084d1a7e109e2594679",
+    "docs/reviews/pr-172/LATEST_2718_QUALIFICATION.json": "46a9f73cc38e6833781029a2f32f0d8f36f03e03c4c75cbb6d3c24a6d086adee",
+    "docs/reviews/pr-172/LATEST_7805.md": "bfba787145f34c79bdfed105ad8719dc2422781ca3f72b6b6134a0c541f3033e",
+    "docs/reviews/pr-172/LATEST_7805_QUALIFICATION.json": "6b489a5ce17f5712a22077af5c6760e603253bd6914c1e8d2e6458ccbca7116c",
+    "docs/reviews/pr-172/REAUDIT.md": "742bd83bc1b7b8441c93e1a7fbbaf9838d5f8d8f0e37c1f73517c5b841d55fb6",
+    "docs/reviews/pr-172/RUNTIME_BOUNDARIES.md": "38d337de1c16a76203b065a7b98b6396ae4f3c33413f3e61dba34995bf3e6066",
+    "docs/reviews/pr-172/TRANSACTION_BOUNDARY.md": "04505e3342c468bd000e495a8c58cd07a5ebd5f88222a293bbfd363ca4775c1d",
+    "evidence/hegota-e/external-network.json": "5ae9e6dbd84f345b6a5bd830ea302d58ea962beb688b8d869631fe34e6b7824b",
+    "evidence/hegota-e/source-review.json": "5f2c61613fe9ccdbcf9f11ea6650912376301e4695c824279caeeb2fc8a060f1",
+    "pkg/cmd/hegota-e-fixture/main.go": "17e9d4a4a04f8f094132bd3923245bd9e349f30ed20c5811ff0b64fc68d2af0d",
+    "pkg/cmd/hegota-e-fixture/main_test.go": "c162a364679649641b7c0d9bbc544904b3c3280a6e6f8ab0b1202b110d96a3e5",
+    "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d",
+    "pkg/core/block/inclusion_cascade_test.go": "792ebe58d08ee11f8722801396cb90f82bbcd58134dd6d37ffcd14a3a8c3cb36",
+    "pkg/core/block/inclusion_dimensions_test.go": "0b37c0f5eedcc68af1f2511ea3497b2dbf1f04b8cea09e67dd697e470cc1fc1c",
+    "pkg/core/block/inclusion_queue.go": "54fddaf23bb6b34003b879f31c5cd8dd7852a1118679ad6ae51ac2e5ae545682",
+    "pkg/core/block/inclusion_size.go": "f97e5abbee5790896148f5f2d08341dcfa1137776682115267c2d122fc34d4bd",
+    "pkg/core/block/inclusion_size_test.go": "19f1da2346c00ef5ba07765e229c1678c2f1fe3852f76bc48fa027f08f144565",
+    "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2",
+    "pkg/core/chain/bogota_payload_test.go": "b326148a8e9431d7d163152f18bf51dde2dfe2d3e7ac5cbadf62660f4cc5ad3b",
+    "pkg/core/chain/header_access.go": "5e6893d8662a7ae6ee1d959ce311c61cdecfb2099996271eb5ce02a3459a2ee9",
+    "pkg/core/eips/inclusion_list.go": "7db116f735dc9a487c10ab6e5932c701e44b4f25f08e7e0aeb0e1df65062d5df",
+    "pkg/core/execution/frame_8141.go": "82fc7e92877ff6679c94ad656c7e28bc7e56c940ef960b3f49f4726637b28a3d",
+    "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
+    "pkg/core/execution/frame_context_8141.go": "d395bcc32d488c858079a5cd45d396024324355039294d6c0f19d09a2b490a4e",
+    "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
+    "pkg/core/execution/frame_preconditions_8141_test.go": "92957110d2657b9723847967cd3c6091cc52f95b64d519a4283adb65ab636536",
+    "pkg/core/execution/inclusion_boundary_test.go": "da9fe7807fb2900133e242acb2e93008a01101e29bffa50b812cbdae8d6c5c92",
+    "pkg/core/execution/processor.go": "34015a09d9249ca660ff7cdbf2c1090dad8eb40902e6feb6d21ce1ab17b844c7",
+    "pkg/core/gaspool/gas_pool.go": "0febd92ce67c640fa720033f605e74232ddf37e8a318a902f0184daa09b7ece6",
+    "pkg/core/types/block_append_size.go": "d4630edf4ff8c37e33cc0999f110c6a6a79a954767c36be18d9fdb2e1dfb00b9",
+    "pkg/core/types/block_append_size_test.go": "65fba47907f27537bc1e143d3e1303ead0b3c3957e028ad2263385f2f10fcf19",
+    "pkg/core/types/frame_8141.go": "a5d26316dc51315ebdc2bdcb08198a1a10e744263991f750745824b229fc7db1",
+    "pkg/core/types/frame_8141_network.go": "d36e69673cfa8f6e276845b3e2cebb69eeb47d3cdca6edfcac42e1edbd7baa93",
+    "pkg/core/types/header.go": "7adead67e100dbee6bce96c7bd1265bd816ca0473e6e0509b00ce264686f000b",
+    "pkg/core/types/receipt.go": "86ca053d1d7c25da0aa512ccdec2bcb9dab53317ad0f10a329e43acbe7d05ca1",
+    "pkg/core/types/transaction_rlp.go": "b1da5af2e11933afd134ae03234679d229a0eee5096c2733aa9cc304c5baf856",
+    "pkg/devnet/kurtosis/scripts/verify-heze-focil.py": "1234ab58e06035f0646851891e90cd5c212c54ebf64e649a971d5800431995eb",
+    "pkg/engine/bogota.go": "fca550076d3ded352f0740726f5578a7523d77f7f5ed542d6bf372b3cf482c77",
+    "pkg/engine/group_e_wire_test.go": "c68bb6ea75a5df861e0e6a24894ce5b77e04b518452c95f8f013ade34f013748",
+    "pkg/engine/handler.go": "f3b21082509cfaa846943f8daab76ba67e24b6ee77c433841f2b029e60c3107b",
+    "pkg/engine/inclusion_list.go": "4ad1eaa0746e8d4f73fb786f91ec7d2eeb485f7e9f6041a78dc13e496c897eb9",
+    "pkg/engine/lighthouse_compat.go": "e0ecf985b5adbac4d7105b30f170ebde743469c3e7bf8adb12e98e659e116b0e",
+    "pkg/engine/server.go": "4933d102f4766898c34d4b661dde4b750167cb53c58fca420c652b9a135c63e1",
+    "pkg/focil/heze/forkchoice.go": "d4277a4f9b009906ec320ef4653a208312c4c62c5446ccb8cd3a895549a66238",
+    "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef",
+    "pkg/focil/heze/pq_capacity_test.go": "afb486b141a2f34221a7603fa4fa46308167432ac18949dbe82a2a29cc069948",
+    "pkg/focil/heze/store.go": "e22775cccf17daa16d3f920a71e3ef4d17499d7233009aaa73967af71337b91b",
+    "pkg/focil/heze/testdata/ssz.json": "974ee1285905316e32913293b0adc51bdac1080818668aa000edd6e81c4e23a7",
+    "pkg/focil/heze/types.go": "6b3bea156e5b5370d137523d83d2b82ef19fd76d5d5c9a5c99732acabd6bca40",
+    "pkg/focil/heze/validation.go": "caa4071a91436ac7a6278cb9b1554b124e13d16070168adfb9c4a62b30e5a87e",
+    "pkg/focil/profile1.go": "705a4a9ce2515e5344467a3e12b751eccc7ccdccfee74f3f1c88c33808520bbf",
+    "pkg/focil/profile1_test.go": "7d999cbc9f9160c9f82815f7b2b6278c25d9a429b90d19be1df15352e4d0d751",
+    "pkg/focil/vops_reference.go": "e50a6400931becb5dd07bdcf01c0bcea92e9e34bdf7a8e457f60c6b67b75c042",
+    "pkg/focil/vops_reference_test.go": "86ddb8e2732ec1dd4acac3a7695de496460c44c2c0d8f334d6ba818555bdffc0",
+    "pkg/node/backend/engine_backend.go": "f7c571c889c71125b28fa9cbbab0bb662e541a005303503bfbb69ceb7a16c883",
+    "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+    "pkg/node/backend/engine_fcu.go": "68a4e218fa1bef2093d12e7bdee876b2e93cbe406505f53c25ee7a514b5bf035",
+    "pkg/node/backend/inclusion_ancestry_test.go": "b5ecddf4e105d795321b9b08fcffffacac4709021be60bc0076ffefa5fd447a3",
+    "pkg/node/backend/inclusion_build_lifecycle_test.go": "df6a5c2d3195d7587cec1131e71eec8d2ede34727e34810d33f609b232a772cf",
+    "pkg/node/backend/inclusion_preexecution_size_test.go": "987944a3ed16a88b4e7c3c847b6737eb413f01c1b5c8225c1270d5591162f19a",
+    "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+    "pkg/node/bogota_deferred_integration_test.go": "c4c86920c5bb73407b4b71fa4e130e5b889945bea267aec0d323d92caef59ab4",
+    "pkg/node/frame_8141_integration_test.go": "9e6703a73a041fca3d375200b30864115894ae2f3d9a5c93ffc7e59556091650",
+    "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1",
+    "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f",
+    "pkg/node/heze_ingress_atomic_test.go": "0960515e6bf4eec4bb9c2bf5bda335bfd37ec304ce664fc841e84704e35f1347",
+    "pkg/node/heze_integration_test.go": "2d71ee0f6fe2a6c21c1d1d471725995b1b2eff12fdeb41c3161309df5ef00b26",
+    "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+    "pkg/node/heze_preconditions_test.go": "95bc37c4ea82fe95c6313c4db8fe411dd6093063a49e387b84c9aaddd172223b",
+    "pkg/node/heze_reconfigure_test.go": "d44fc33529b566ed025100d27419dce41a617d5d621c31df959c4578b6581a2d",
+    "pkg/node/heze_state_capacity_test.go": "d2fb16e3f386614ac506ccb4f75575495391315dda79d9d40e1b65c12bf597b0",
+    "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163",
+    "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864",
+    "pkg/node/inclusion_build_satisfaction_test.go": "5857450242806b3b57ac71a86b30b70dcda6df1fbcb6013e72d2113239942d1f",
+    "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34",
+    "pkg/node/node.go": "1e854f162896ed53f64836d880f76de0dc76fba5b69d97608baf179521e8ed9c",
+    "pkg/node/sync_runtime.go": "336365d4c0fb4fc2282f27a58c58ea6c513ac90888b2192993bb5df2722c4be9",
+    "refs/EIPs/EIPS/eip-2718.md": "876de14066ad67c9a1c0a87dc3bd18695325dcfc7d4b8326734de0bc174e4bf4",
+    "refs/EIPs/EIPS/eip-2935.md": "3237f773d610420fb50438e690c9317e0f13244cb29f8f8dc357d179f1f89103",
+    "refs/EIPs/EIPS/eip-4895.md": "f7766f0bd9bb14f76479c01e77388fd1a8823cb17c2919a317d51038a9e1be69",
+    "refs/EIPs/EIPS/eip-7002.md": "33c151fb3589f3e09fa7f3dcf6fe897f982c7c0e95fc17baa00e14776986b1ee",
+    "refs/EIPs/EIPS/eip-7928.md": "cec42cbb8ee1f492f3b81bc70ed9f45949e8f87ba193a38d242889ba9467ef72",
+    "refs/EIPs/EIPS/eip-7934.md": "99528dc7d4af27ac450b6d845f5617f395036a98222bc523e1af88255dcd62a9",
+    "refs/EIPs/EIPS/eip-8141.md": "1c0fe44b0829f587a20c2e7575b55498f579a17b92d683bb73be94395ea16639",
+    "refs/EIPs/EIPS/eip-8250.md": "70f7f2d6153e27a109c755a601dbf2e1193063cfb3105a2a5fd0601ecf5a9dc9",
+    "refs/EIPs/EIPS/eip-8272.md": "fb5856ab7b99fdc5fb8f22aed5b1a0aad61e5fcbab26c5779ea857d41c8a10ae",
+    "site/scripts/check-export.mjs": "bf78c8fed5afae278f0aa20a2abe7cf4043ee8d60902e5796f374c1f90fbc1b2",
+    "site/src/app/roadmap/page.tsx": "c6c335c2d85347d85b8fe591c83fb1bff366d4e90414f577319905fc20e10063",
+    "site/src/components/DevelopmentProgress.tsx": "d8cf933fefd0d71f7b8651d1d47dfe9958e64c4edf5ccc191e4a7b8902527724",
+    "site/src/components/HegotaProgress.tsx": "a00fe4129721b86a400e8765c042a338fc2c1198fa9df47d32429fe4a33d12d3",
+    "site/src/components/RoadmapTimeline.tsx": "2d100423c9b07be21f30c24c31605c03b90714989cd285d48eef614da1df373c",
+    "site/src/data/eips.ts": "758b15147be01ef6db3519dcd3c08933e8a7d99395f10463f3bd7b3005bed724",
+    "site/src/lib/data.ts": "0f19477906e3c555d1b1ea86b61bae8879d7841f22c266475c5a0071a74f0ce7",
+    "site/src/lib/roadmap.ts": "2ead2ce0874a5c01b5be35a53b06cfe8a5e73c9a3d7f8d26661d9d9f84b5dfd6",
+    "specs/hegota/group-e.json": "bcfe3c4d105d07f999c5c01786b922f8749f7622a5a9bd20d16ac32454a42461",
+    "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
+    "specs/hegota/upstream/2026-11-27/group-d/eip-8504.md": "c2e898c21ecc94342e4fbe3490591c01027b91852dabfc1cbaf0c50ae02d976b",
+    "specs/hegota/upstream/2026-11-27/group-e/eip-7916.md": "5d6f3ba288a13ae5e82c18feac8110ce00a94ef788c83ec1e9984d4a01f04295",
+    "specs/hegota/upstream/2026-11-27/group-e/eip-8369.md": "d599b45c5a5d7a40d7d2f81b3440ea75b6d30658e678f061a9a56267c2c7404d",
+    "specs/hegota/upstream/2026-11-27/group-e/engine-bogota.md": "73630fb0545468653293c6cab6c96e00c9262b07c2991cd7c56fef21c1982ab7",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/beacon-chain.md": "2df221334fe269189cb0c78433f169e97fae21655b2dfd3862ee6fa174356a58",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/builder.md": "221fb097e1d1e9acc92e2777be0f137826dd83ad879af3b1e797c2f8a8123fd5",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/fork-choice.md": "029bf4c8e3a9301ea169c03a9c3158ed5cadf5e871e253171472486fc12b7985",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/fork.md": "c174c34afbbf755be04ba29edebaf2d6605a1b8b26aa05d80428c3c221ca2485",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/inclusion-list.md": "7a5e2e5f33ad528a4f12a3a949e4b7ca28a03c8d5818d4e7c9d3fdde8ed20d35",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/optimistic-sync.md": "67c06ab8b380e28309ee6bbc5918f533823a2c9276ce2ec251cfb021ffb08303",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/p2p-interface.md": "4e5d6b58b352abbbdf992174ea5cb71bc03c9d9a2ab0df16957dbef66cc75da1",
+    "specs/hegota/upstream/2026-11-27/group-e/heze/validator.md": "d9a04de954a0082d6e8825638c79f69ebfdaa1632133a79363c7e4a4448fe5d7",
+    "specs/hegota/upstream/2026-11-28/group-e/2718-update/eip-7805.md": "eb5b0b72001278ba3476d4cdb8ef01f8d8662110ed2fe4f6372e01abbfdbd0b1",
+    "tools/hegota/Dockerfile.interop": "de7bed5bbf8d8584388e00c8456eb37483e0b3b585e34e41de446b3d851eb161",
+    "tools/hegota/check_e.py": "2b2e3cc6a793ccd4927bfa3324192b2eac4e76a819fea381274757c3eb86bf43",
+    "tools/hegota/e_negative_controls.py": "2ce5e4f9e3613c520a974da0c4e1aad7c46a1eb347f6864e7d220919802a25ba",
+    "tools/hegota/engine_fault_proxy.py": "428f816416a4737986261a4169e4de5f5806e3d84b704de914c61b58d56b0d2d",
+    "tools/hegota/generate_e_heze_vectors.py": "95599517d86a2740676239a5b138c28940054b08bd9e67d2f7ef3abf35ba3d57",
+    "tools/hegota/run_external_heze.py": "cba252a8c35a6f82dd381b4518235b64449540e7c6fa8acee0a812d7cd72f7ee",
+    "tools/hegota/test_engine_fault_proxy.py": "64bc604d248cdec63d1fbc3c875059e2c21a70ea5bc0e1ffaba0ce0c42101ae0",
+    "tools/hegota/test_external_heze.py": "a8a15c159d4cdbf948faf1833ac046f6a38ef0ca35fd5bd5b6489c225e42d33e",
+    "tools/hegota/test_group_e.py": "16b2f0677cdf81ebc61492172b9c4e87f80ef4d8aa705f9980df980076c7e84e"
+  },
+  "source_fingerprint_sha256": "debaff2eae850d7cc454671fa0d6d83b68fcfd02947364134a6cb6d0847f641a",
+  "passed_tests": {
+    "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound": "pass",
+    "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse": "pass",
+    "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback": "pass",
+    "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools": "pass",
+    "github.com/eth2030/eth2030/core/block::TestGroupEBuilderPoolFundingReopensILAndDeduplicates": "pass",
+    "github.com/eth2030/eth2030/core/block::TestGroupEBuilderReverseNonceILCascade": "pass",
+    "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed": "pass",
+    "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems": "pass",
+    "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries": "pass",
+    "github.com/eth2030/eth2030/engine::TestGroupEBogotaSatisfactionStatusNullability": "pass",
+    "github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities": "pass",
+    "github.com/eth2030/eth2030/engine::TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeAuthenticatedGossipAndFailureAtomicity": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeConcurrentQuotaAndCommittee": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeRequestsRetentionAndReauthenticatedRestart": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeSizeAndOffsetBoundaries": "pass",
+    "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupELatest7805IndependentOrdinaryGasReservations": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEProfile1AuthenticatedAccountsWithoutExecution": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling": "pass",
+    "github.com/eth2030/eth2030/focil::TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure": "pass",
+    "github.com/eth2030/eth2030/node/backend::TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose": "pass",
+    "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies": "pass",
+    "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse": "pass",
+    "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart": "pass",
+    "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability": "pass",
+    "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission": "pass"
+  },
+  "run": {
+    "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
+    "named": {
+      "pass": 24281,
+      "skip": 124
+    },
+    "packages": {
+      "pass": 225,
+      "skip": 20
+    },
+    "completed_packages": 245
+  },
+  "negative_controls": [
+    {
+      "name": "BLS-authentication",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "8aed3994fa2189c65f86970738eb05cf19d60c2789f073a5646957336f2fe37e",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeAuthenticatedGossipAndFailureAtomicity"
+      ],
+      "overlay_manifest_sha256": "3e13d22ad37341175f0133a14973982486fd111a6728666e3c1a83f78481e300",
+      "overlay_files": {
+        "pkg/focil/heze/validation.go": "428a2b66f4047b0eb563a8dcb3e7b9a87f3687b515e551bb9e8c550c86190dc6"
+      },
+      "unchanged_test_files": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef",
+        "pkg/focil/heze/validation.go": "caa4071a91436ac7a6278cb9b1554b124e13d16070168adfb9c4a62b30e5a87e"
+      }
+    },
+    {
+      "name": "strict-timeliness",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "5c2483136983ed0920d53e30f7c82b20dd7d0d882c8b0abdc903decbade02bf5",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership"
+      ],
+      "overlay_manifest_sha256": "3476864757f5b957197aa49b65c1ebad0eeef4b1010a7e92b76afcd87a5fb0d6",
+      "overlay_files": {
+        "pkg/focil/heze/types.go": "02031e474cfc0a6bb6459ff6b4491ad375d79c1ba1f162723dc4c76094503b6a"
+      },
+      "unchanged_test_files": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef",
+        "pkg/focil/heze/types.go": "6b3bea156e5b5370d137523d83d2b82ef19fd76d5d5c9a5c99732acabd6bca40"
+      }
+    },
+    {
+      "name": "nonce-cascade",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "67e988b9b5f53043aaddc741a907b592704ce646b2f214537eaec4eab0b882eb",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/block::TestGroupEBuilderReverseNonceILCascade"
+      ],
+      "overlay_manifest_sha256": "5a94ab55bf8896dd1e958781d8cd82f824c27675fe2bd2aad65241fb07eae2da",
+      "overlay_files": {
+        "pkg/core/block/inclusion_queue.go": "9432bef4130b990fdc74f7602fe585673cc3d1f76e7e3ffe68be6abc83aa6df0"
+      },
+      "unchanged_test_files": {
+        "pkg/core/block/inclusion_cascade_test.go": "792ebe58d08ee11f8722801396cb90f82bbcd58134dd6d37ffcd14a3a8c3cb36"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/block/inclusion_queue.go": "54fddaf23bb6b34003b879f31c5cd8dd7852a1118679ad6ae51ac2e5ae545682",
+        "pkg/core/block/inclusion_cascade_test.go": "792ebe58d08ee11f8722801396cb90f82bbcd58134dd6d37ffcd14a3a8c3cb36"
+      }
+    },
+    {
+      "name": "RLP-byte-cap",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "f2349a0af82b921947383e6fc67f77690c8aa006c7979cbe05a40b3e3ad30ac5",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback"
+      ],
+      "overlay_manifest_sha256": "cbd889ed05ff62dfeb41f48d8585f8ddf599f389d94f664a6954651a6d78a465",
+      "overlay_files": {
+        "pkg/core/block/inclusion_size.go": "1dca9cbad911e28d4d238f305ef22c954ce4626a51c0387dfea96320b03367c6"
+      },
+      "unchanged_test_files": {
+        "pkg/core/block/inclusion_size_test.go": "19f1da2346c00ef5ba07765e229c1678c2f1fe3852f76bc48fa027f08f144565"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/block/inclusion_size.go": "f97e5abbee5790896148f5f2d08341dcfa1137776682115267c2d122fc34d4bd",
+        "pkg/core/block/inclusion_size_test.go": "19f1da2346c00ef5ba07765e229c1678c2f1fe3852f76bc48fa027f08f144565"
+      }
+    },
+    {
+      "name": "signature-budget",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "bade85ed778acbd87095c256093c99939e3d1b7c9539b32181d818fd3bb6b551",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/focil::TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure"
+      ],
+      "overlay_manifest_sha256": "65ecc4b4a1a08307c5775eac31fdcea268c91cea841948d3f558d56dc4214213",
+      "overlay_files": {
+        "pkg/focil/vops_reference.go": "69e8637f48a39f9ba9d33634821e7e570ee90420af850efbfaf2edaecdad1b65"
+      },
+      "unchanged_test_files": {
+        "pkg/focil/vops_reference_test.go": "86ddb8e2732ec1dd4acac3a7695de496460c44c2c0d8f334d6ba818555bdffc0"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/focil/vops_reference_test.go": "86ddb8e2732ec1dd4acac3a7695de496460c44c2c0d8f334d6ba818555bdffc0",
+        "pkg/focil/vops_reference.go": "e50a6400931becb5dd07bdcf01c0bcea92e9e34bdf7a8e457f60c6b67b75c042"
+      }
+    },
+    {
+      "name": "omission-verdict",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "36906aaefe0ba3477f11c505ce048d91495659a602f77cf8c5d7dc362c2fa4a1",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart"
+      ],
+      "overlay_manifest_sha256": "853433a8fa36d6124a7923c8a7ec28653c4db1522020600a01035af8eff28898",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "c7d45928cfd29f3ffaa630259eaf70a6fa98e994432674ff7ba4d83228d51710"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_integration_test.go": "2d71ee0f6fe2a6c21c1d1d471725995b1b2eff12fdeb41c3161309df5ef00b26"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/heze_integration_test.go": "2d71ee0f6fe2a6c21c1d1d471725995b1b2eff12fdeb41c3161309df5ef00b26"
+      }
+    },
+    {
+      "name": "pooled-IL-witness",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "6d62984daa1a36cd38d4ae2b09e4fd27d86db2151bce542b51d07a2774607e7e",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+      ],
+      "overlay_manifest_sha256": "132345ebdb4a1b7f009c4689f761eb8549d936a70c82c4bf438bcec6fb25b2f3",
+      "overlay_files": {
+        "pkg/node/backend/engine_backend.go": "dbb087ba9c8f4e13703817529e6ce1b7a2391824530521a3332541374aed7688"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/node/backend/engine_backend.go": "f7c571c889c71125b28fa9cbbab0bb662e541a005303503bfbb69ceb7a16c883"
+      }
+    },
+    {
+      "name": "expired-cache-pruning",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "0b47b9e5bb9865c22b9197adaf8e131ff6daade5a14b7168db901d02d645aab6",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeRequestsRetentionAndReauthenticatedRestart"
+      ],
+      "overlay_manifest_sha256": "b4cfbaf62e862e6a81d36648da63a6df952dbb35f8f8caa08e2517e45c737b36",
+      "overlay_files": {
+        "pkg/focil/heze/store.go": "3dee795f74ee824b0611206d6bb64e9c352677125e36e8947bfa52251b60c17e"
+      },
+      "unchanged_test_files": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/focil/heze/heze_test.go": "c1f5b066c420639af2de906fab49cd48c57c864fb641eab09710d019282920ef",
+        "pkg/focil/heze/store.go": "e22775cccf17daa16d3f920a71e3ef4d17499d7233009aaa73967af71337b91b"
+      }
+    },
+    {
+      "name": "ignored-type3",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "366cca2408ee2606de71346a66e562286ef18be291d69dc3537a53ad8ddea27e",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability"
+      ],
+      "overlay_manifest_sha256": "9c5a2e632395ff9750edc29395aea2e4fff471c627fac1f97d369ad3ef645a05",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "877954af18c45e55a20c6f71b3c18f44cf7c76728b1f182d0ca3808ccb8f5379"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
+      }
+    },
+    {
+      "name": "failed-id-retry",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "1d2a7a2df521e2a639f4829eb0c1e2a71665816f18d8f81706d3bf6b6dd9f8c9",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+      ],
+      "overlay_manifest_sha256": "1b0701028e0b9db3c816442b82c3fedcfd576e676b9f978ca685adcba8f01039",
+      "overlay_files": {
+        "pkg/node/backend/engine_fcu.go": "34421f0b77f74149eea78ab874b07cc42dcc52753fc2d0b61c2896171b6caba4"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/node/backend/engine_fcu.go": "68a4e218fa1bef2093d12e7bdee876b2e93cbe406505f53c25ee7a514b5bf035"
+      }
+    },
+    {
+      "name": "IL-type3-cannot-stall-builder",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "589a7ce5775fe2d769b7ccd875ef0c3f2a4370f7555d6df7bb83a5946cc1ee38",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability"
+      ],
+      "overlay_manifest_sha256": "4d5a7b8f16c7e208fc6596bc40d1051d407826e115c901be63b75bc29eeb07fb",
+      "overlay_files": {
+        "pkg/core/block/inclusion_queue.go": "236c5551a9960ee2b0411556ea2fc0e989d78e5e3ae4b9f15700dea561b724ad"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/block/inclusion_queue.go": "54fddaf23bb6b34003b879f31c5cd8dd7852a1118679ad6ae51ac2e5ae545682",
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
+      }
+    },
+    {
+      "name": "malformed-proof-tolerance",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "c1de07e095c5ff726b6046b3a724bda38084f43e6b80743bd2c2c02cd084df12",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+      ],
+      "overlay_manifest_sha256": "18c3f6f3063837dbd5839c506a3b3389afb6f00ff98054f13e87a4752e45c312",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "85fc6711cf6d959dc96c28a68aab0978cccf38fbdd20eb3e651fe2e4aac5359f",
+        "pkg/core/execution/frame_preconditions_8141.go": "495345ddd0897830a539de2ad11e8ea0245e9bea13c0135b586df6e718ba1a76"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      }
+    },
+    {
+      "name": "append-header-metadata",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "3ecd6f9ed7cacc19202af7a178a933e4a82746c82e40bf58004dbc1bb657f248",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries"
+      ],
+      "overlay_manifest_sha256": "497abdd6d9e1572a10e69cdc962e0fe8b99b748c8e96c53fb7fc1f487be3506a",
+      "overlay_files": {
+        "pkg/core/types/block_append_size.go": "6b6f6cd308d40e568a612398fbc7de29ad8c76a30d0d3354f51e198e4f8867d4"
+      },
+      "unchanged_test_files": {
+        "pkg/core/types/block_append_size_test.go": "65fba47907f27537bc1e143d3e1303ead0b3c3957e028ad2263385f2f10fcf19"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/types/block_append_size_test.go": "65fba47907f27537bc1e143d3e1303ead0b3c3957e028ad2263385f2f10fcf19",
+        "pkg/core/types/block_append_size.go": "d4630edf4ff8c37e33cc0999f110c6a6a79a954767c36be18d9fdb2e1dfb00b9"
+      }
+    },
+    {
+      "name": "finalized-verdict",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "27dad944e7240006bee299a014bfbf2504c0581a0fd5e98e37833e0b31db3a6f",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart"
+      ],
+      "overlay_manifest_sha256": "be8a48803b9e29db11a341064f352db5327ebe3fcb689c5586672b3b09669450",
+      "overlay_files": {
+        "pkg/core/chain/bogota_payload.go": "8c9ab51dc8e130fbc2825fe3db1d68354895a0a35daa8f857d4b8ed3579d306d"
+      },
+      "unchanged_test_files": {
+        "pkg/node/bogota_deferred_integration_test.go": "c4c86920c5bb73407b4b71fa4e130e5b889945bea267aec0d323d92caef59ab4"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/bogota_deferred_integration_test.go": "c4c86920c5bb73407b4b71fa4e130e5b889945bea267aec0d323d92caef59ab4",
+        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2"
+      }
+    },
+    {
+      "name": "reconfigured-authentication",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "164f34297ed3c9bca06a03871b75bd270ad1722a85a60447b2ddc62a04a66790",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically"
+      ],
+      "overlay_manifest_sha256": "08b005823e1e50106aededa513b824221daace9eb416370f6e61106b6e69b829",
+      "overlay_files": {
+        "pkg/node/heze_inclusion.go": "3470542743550984501e2e31864d6ae951866aa578f1dbb367408ca89114a209"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_reconfigure_test.go": "d44fc33529b566ed025100d27419dce41a617d5d621c31df959c4578b6581a2d"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_reconfigure_test.go": "d44fc33529b566ed025100d27419dce41a617d5d621c31df959c4578b6581a2d",
+        "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f"
+      }
+    },
+    {
+      "name": "transaction-end-accounts",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "6be3d33af0009eca679eed8df3a5965aaf7d10044e2467a5c5164f44b614df53",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission"
+      ],
+      "overlay_manifest_sha256": "796c748d126b70e8ee1fc744dec979a4a6035e96ed23db9822f9bd584deb41a7",
+      "overlay_files": {
+        "pkg/node/backend/inclusion_state.go": "2a13ce20e70b515fca8d66d822808ae46c6befef305835e6ae4b89f6c6c520a6"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      }
+    },
+    {
+      "name": "pre-execution-Frame-enforcement",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "f940fb49c1a2cf68d85da81aaf1f178cd35b12fca0e68d2b2005565f9a0982ef",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
+      ],
+      "overlay_manifest_sha256": "39455e96e3f98f4f7d4f3c76f8c415c8e8672bed98520f8288be66c39166d430",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "dc3d0454ba19caad28c39ba67ef55cf80b5fe22e3ab1dc9f06e409ada2cd05af"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34"
+      }
+    },
+    {
+      "name": "transaction-end-prefix",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "48a746e2402f8f25dc13a699db7c9bd99769f258012fa7127aa871944c973b40",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems"
+      ],
+      "overlay_manifest_sha256": "c303f61fca0935b8673e4cf0dd69c254fc85a742adff40fe6376f47ab4df0229",
+      "overlay_files": {
+        "pkg/core/execution/processor.go": "3c4398ee88053504b3380eb9164e412b0b181d51b03c0ded58ef31a3535da8a1"
+      },
+      "unchanged_test_files": {
+        "pkg/core/execution/inclusion_boundary_test.go": "da9fe7807fb2900133e242acb2e93008a01101e29bffa50b812cbdae8d6c5c92"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/execution/inclusion_boundary_test.go": "da9fe7807fb2900133e242acb2e93008a01101e29bffa50b812cbdae8d6c5c92",
+        "pkg/core/execution/processor.go": "34015a09d9249ca660ff7cdbf2c1090dad8eb40902e6feb6d21ce1ab17b844c7"
+      }
+    },
+    {
+      "name": "pruned-BAL-boundary",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "48aa29e61f1d33d01197db3e403510fbe5f76e35b816fd59035c0a557f70350a",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission"
+      ],
+      "overlay_manifest_sha256": "f63cee593d211a3c3968bd06bfd97ee152634d6961663f45b0ac9a9677ca78e9",
+      "overlay_files": {
+        "pkg/node/backend/inclusion_state.go": "201deed55383954015f0ada1a5697712dd7ebfa8c32403b4cb9f3a78ae6d0054"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      }
+    },
+    {
+      "name": "legacy-live-boundary",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "737444c5816b1843aeeaa7032f2bc96fdeda879bf0b5a78e1c2e98446232e1ac",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission"
+      ],
+      "overlay_manifest_sha256": "5f9512cfc3d37a72395b5eb58ff138c0c5244689f2cc71861e53182c50cdaf35",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "38acb6352fa99c3169b1383bceb422e67cd30b635f5d689dd855fc83e29121bf"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      }
+    },
+    {
+      "name": "legacy-compact-boundary",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "98aec7cd0d4198c55a41352725dcb79fc71b0c363a9c45a3ff443787f3b3beb9",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission"
+      ],
+      "overlay_manifest_sha256": "950915218a54f2515dca0204902eeadc6a29c792e71c82784a1dcabe22c5e279",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "f3790243c9a34b737352a4a47e31787975dba7cc016baeb7dbfeacfb699f1505"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/inclusion_boundary_test.go": "af57f5618e3a5d82e87f1c82540c918727c34609a4dff68d10f0856c54373864"
+      }
+    },
+    {
+      "name": "compact-boundary-version",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "f8c49f696cd41947b48c13404b327ac5916ea5492473004318fafd3d3fb3b113",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews"
+      ],
+      "overlay_manifest_sha256": "ad88a2722fe0c753a6766f86945866666aacc476fb82e3b9c7f93113d92510be",
+      "overlay_files": {
+        "pkg/core/chain/bogota_payload.go": "74fd9742de3520cff27f46e2cdba9e06204ca5cc792248890817034282cab1dc"
+      },
+      "unchanged_test_files": {
+        "pkg/core/chain/bogota_payload_test.go": "b326148a8e9431d7d163152f18bf51dde2dfe2d3e7ac5cbadf62660f4cc5ad3b"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/chain/bogota_payload_test.go": "b326148a8e9431d7d163152f18bf51dde2dfe2d3e7ac5cbadf62660f4cc5ad3b",
+        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2"
+      }
+    },
+    {
+      "name": "header-only-ancestry",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "909eba7395390618c56ffb25c9063d7623bdb76aa8c0643b6c64a8316519f032",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies"
+      ],
+      "overlay_manifest_sha256": "a9f8ffd89cfe70ffe12ecdd56eb87aab568236145e35f98fb2708cae4979b59e",
+      "overlay_files": {
+        "pkg/node/backend/inclusion_state.go": "457b7f99ab511fa1b1f9392b940a38d123a023da5e5ecea519b70e4bbbc55f1a"
+      },
+      "unchanged_test_files": {
+        "pkg/node/backend/inclusion_ancestry_test.go": "b5ecddf4e105d795321b9b08fcffffacac4709021be60bc0076ffefa5fd447a3"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+        "pkg/node/backend/inclusion_ancestry_test.go": "b5ecddf4e105d795321b9b08fcffffacac4709021be60bc0076ffefa5fd447a3"
+      }
+    },
+    {
+      "name": "missing-header-verdict",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "c699dbfe64fb17c0c8f1a0dc58be2d8d681e9c1ca6d72088c923bf9fa5028990",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies"
+      ],
+      "overlay_manifest_sha256": "a4f653c354524dde360b02f145c7a5c67262c7e26fdfc749eda9e65c584afa02",
+      "overlay_files": {
+        "pkg/node/backend/inclusion_state.go": "ed7a67e6a1b9a1dbd56b1f43dd117ff7645f56b75eab42570778225e544b7326"
+      },
+      "unchanged_test_files": {
+        "pkg/node/backend/inclusion_ancestry_test.go": "b5ecddf4e105d795321b9b08fcffffacac4709021be60bc0076ffefa5fd447a3"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+        "pkg/node/backend/inclusion_ancestry_test.go": "b5ecddf4e105d795321b9b08fcffffacac4709021be60bc0076ffefa5fd447a3"
+      }
+    },
+    {
+      "name": "foreign-context-omission",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "a707c4d72e4e47f97edd083114ed225e351ff4e57cd518ae4a7dd20808601af5",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+      ],
+      "overlay_manifest_sha256": "70329f9c8013ff7379db381e33efd648cfd80dc11e9bf4a0baf1ccb1cef62931",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "b3ee9f5e61864f69013844e18fd8510f27c852b6005f22cb567f1237f865742c",
+        "pkg/core/execution/frame_preconditions_8141.go": "495345ddd0897830a539de2ad11e8ea0245e9bea13c0135b586df6e718ba1a76"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      }
+    },
+    {
+      "name": "foreign-context-build",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "117b2a6ee5efe66dc807120efd289803a20c65427212315e3debd7f2049adfc8",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness"
+      ],
+      "overlay_manifest_sha256": "51aeebdcf3bbbfaa6658b336e96f3b4e668b6d740da0e2dbbd6f444bf0c3cc65",
+      "overlay_files": {
+        "pkg/core/block/builder.go": "e303f4bd30c7c8353a012889eba18a22123f6835c0853286fb8a2f1d65da3a6d",
+        "pkg/core/execution/frame_preconditions_8141.go": "495345ddd0897830a539de2ad11e8ea0245e9bea13c0135b586df6e718ba1a76"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59",
+        "pkg/node/heze_pq_build_test.go": "9ed161ab880309ad33367fedfe23ef7a7b25a5b04782cbd690f72d11233685ee",
+        "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d"
+      }
+    },
+    {
+      "name": "frame-preconditions-omission",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "c4083d2a9bc29db514316d5c8535bf0c08eabc7a2e9e57ff1ac06b6967219f78",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness"
+      ],
+      "overlay_manifest_sha256": "5b852087b90db96ac42f10867baed84652a6888f1fbeebf0901eb9c4bdffa258",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "147e57ffa24f2edc7d8e49fa75ebb7f4dd51cfb09267bb8aa83dd081295309a5"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_preconditions_test.go": "95bc37c4ea82fe95c6313c4db8fe411dd6093063a49e387b84c9aaddd172223b"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/heze_preconditions_test.go": "95bc37c4ea82fe95c6313c4db8fe411dd6093063a49e387b84c9aaddd172223b"
+      }
+    },
+    {
+      "name": "frame-preconditions-build",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "12db634a2503b7d0e7f41b040c254bba624e257b1477f98414f1899b7ae19d28",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness"
+      ],
+      "overlay_manifest_sha256": "44eb12ce22ab0001412fcb014706cc2e597f22f21154b7970d46f8a1a92c3f1e",
+      "overlay_files": {
+        "pkg/core/block/builder.go": "4a44b0809eb649ecf2dcbd62b3905dffb1da2f2143f4a11af4513b4c8d9023bb"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_preconditions_test.go": "95bc37c4ea82fe95c6313c4db8fe411dd6093063a49e387b84c9aaddd172223b"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_preconditions_test.go": "95bc37c4ea82fe95c6313c4db8fe411dd6093063a49e387b84c9aaddd172223b",
+        "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d"
+      }
+    },
+    {
+      "name": "ordinary-state-capacity",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "cd4f7d9887be46a56d2d9f3defdd8742efdc41b5732892ce679a4d6a7fbbd601",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
+      ],
+      "overlay_manifest_sha256": "ac8a323d8d23ca7f9b8cccbd3d49146a424d7995b7b4a55be57944802de00022",
+      "overlay_files": {
+        "pkg/core/types/receipt.go": "2e212cbb65f61e25189a2310cdfebe925f218658ea699b564ad6da256e28d086"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_state_capacity_test.go": "d2fb16e3f386614ac506ccb4f75575495391315dda79d9d40e1b65c12bf597b0"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/types/receipt.go": "86ca053d1d7c25da0aa512ccdec2bcb9dab53317ad0f10a329e43acbe7d05ca1",
+        "pkg/node/heze_state_capacity_test.go": "d2fb16e3f386614ac506ccb4f75575495391315dda79d9d40e1b65c12bf597b0"
+      }
+    },
+    {
+      "name": "Amsterdam-capacity-replay",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "108e93c22227edb1c03e022572cd0ef180f32fce6563b691ad392b5ca75e7ade",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas"
+      ],
+      "overlay_manifest_sha256": "7916e3878927e7fe17ede08275e35666c2300c1d2332b18be4fe97c814b1e663",
+      "overlay_files": {
+        "pkg/node/backend/inclusion_state.go": "5fb18afab5a75a95c46e8d46343ba4be6e385859904a12d84d16294da9bafe71"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_state_capacity_test.go": "d2fb16e3f386614ac506ccb4f75575495391315dda79d9d40e1b65c12bf597b0"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/inclusion_state.go": "ddca663f36c4838c090f0dcc93d5fca8a1b64df7f79e3e7a707dfd074c9bd409",
+        "pkg/node/heze_state_capacity_test.go": "d2fb16e3f386614ac506ccb4f75575495391315dda79d9d40e1b65c12bf597b0"
+      }
+    },
+    {
+      "name": "predicate-version-three",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "141f0a07e3285ed639d0fd568e0444290f645f0f09a8a0687eeb462eb8d04a6a",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
+      ],
+      "overlay_manifest_sha256": "15162a01af6cf64bd69e80ea24d5b854adf3d0c5bf8db04329a10f1bac0325a2",
+      "overlay_files": {
+        "pkg/core/chain/bogota_payload.go": "542843173b4a067b6df3e0a127ac4b46435695030b3bede38c4e11173f216b00"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/inclusion_preexecution_test.go": "d7facb026ba39983831d9de598a09609b6243c7a7f8008e128a0d56055683f34",
+        "pkg/core/chain/bogota_payload.go": "d371a87fbc2becaa2d2119336349d8bd7e6ede257ec4df32415532a895cf27c2"
+      }
+    },
+    {
+      "name": "preconditions-read-only",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "4637ea8f9d5e8717fabdd7c8891c5d06384f5ac4290a1dc6028ed0f1983e2cc8",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed"
+      ],
+      "overlay_manifest_sha256": "31c2eae9bd3251a0b1f2582312be6b5c95ac667bb66cf670954f23cdc58c1c02",
+      "overlay_files": {
+        "pkg/core/execution/frame_preconditions_8141.go": "08a5885ebc289f359e3a39032e14f429b360c3a5d018371d5055f055b51aa0d7"
+      },
+      "unchanged_test_files": {
+        "pkg/core/execution/frame_preconditions_8141_test.go": "92957110d2657b9723847967cd3c6091cc52f95b64d519a4283adb65ab636536"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/execution/frame_preconditions_8141_test.go": "92957110d2657b9723847967cd3c6091cc52f95b64d519a4283adb65ab636536",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59"
+      }
+    },
+    {
+      "name": "preconditions-read-error",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "b7276ed4e0ee406cc14ba7bf460a280f4e9b127462eebc89068a8e0f3c08dbd1",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed"
+      ],
+      "overlay_manifest_sha256": "d8d50de7f95b6921774e23cf30d8839a715c8de16bfa285779e53fb68ac1072d",
+      "overlay_files": {
+        "pkg/core/execution/frame_preconditions_8141.go": "00fb6dd9a84a17cf2b4d0046e979379f7b75e92c7a1af54f77529cb8f41a1711"
+      },
+      "unchanged_test_files": {
+        "pkg/core/execution/frame_preconditions_8141_test.go": "92957110d2657b9723847967cd3c6091cc52f95b64d519a4283adb65ab636536"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/execution/frame_preconditions_8141_test.go": "92957110d2657b9723847967cd3c6091cc52f95b64d519a4283adb65ab636536",
+        "pkg/core/execution/frame_preconditions_8141.go": "e784d2c87089b8a644d9a5405df0e7b841d07de13f67629f9e976dc3eb949c59"
+      }
+    },
+    {
+      "name": "dimensional-RLP",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "27c1f02255feb95b06212d4c7b6dd3cae207cdd6dd7592ce43c9dfd49f55407f",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools"
+      ],
+      "overlay_manifest_sha256": "59a845bb6ad5d2bfa0729041c067faa5c25ce9743c5a6b25c0ded8f9684317ba",
+      "overlay_files": {
+        "pkg/core/gaspool/gas_pool.go": "0c028b80c33ac7711ebdf79af6602f651fd2671da18041e9ec9af1887dc01471"
+      },
+      "unchanged_test_files": {
+        "pkg/core/block/inclusion_dimensions_test.go": "0b37c0f5eedcc68af1f2511ea3497b2dbf1f04b8cea09e67dd697e470cc1fc1c"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/core/gaspool/gas_pool.go": "0febd92ce67c640fa720033f605e74232ddf37e8a318a902f0184daa09b7ece6",
+        "pkg/core/block/inclusion_dimensions_test.go": "0b37c0f5eedcc68af1f2511ea3497b2dbf1f04b8cea09e67dd697e470cc1fc1c"
+      }
+    },
+    {
+      "name": "ingress-publish-after-persist",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "75e0e0cb1363aad4d2d3e520d9c80ce1656916931f5afad51884fd16845346da",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
+      ],
+      "overlay_manifest_sha256": "f86adbe62d8e3b8d6f814ab999f26d691170293f0496ffb33ee25f3a2205d3c4",
+      "overlay_files": {
+        "pkg/node/heze_inclusion.go": "54093b6c3aac59ae36b408ed28e0d5ec8f25dcfc082fcfba1711c1585a7a8d30"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_ingress_atomic_test.go": "0960515e6bf4eec4bb9c2bf5bda335bfd37ec304ce664fc841e84704e35f1347"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f",
+        "pkg/node/heze_ingress_atomic_test.go": "0960515e6bf4eec4bb9c2bf5bda335bfd37ec304ce664fc841e84704e35f1347"
+      }
+    },
+    {
+      "name": "ingress-one-clock",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "0dca7973d59b160fca0661e1e19901105bcee1bad9c9f25952a54543ec32dda5",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
+      ],
+      "overlay_manifest_sha256": "a15aac98fdcc3957cce14bba94b4757aa91ddeac208ce9efe37c657c555f6bc0",
+      "overlay_files": {
+        "pkg/node/heze_inclusion.go": "9574c3dca91faf5f2536a1e42cd203a7d14b6ee02a62b9b534aeca2dd0ba7770"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_ingress_atomic_test.go": "0960515e6bf4eec4bb9c2bf5bda335bfd37ec304ce664fc841e84704e35f1347"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_inclusion.go": "40942752d40228ba37384025e01bc4e999ce2dc0fe641fa415dd2432840b0a0f",
+        "pkg/node/heze_ingress_atomic_test.go": "0960515e6bf4eec4bb9c2bf5bda335bfd37ec304ce664fc841e84704e35f1347"
+      }
+    },
+    {
+      "name": "unmerged-size-exemption",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "dc5fc25dd07ac7dabad0dfc6ec2882767c77a4f4c295eee7d1c0ce388808a570",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse"
+      ],
+      "overlay_manifest_sha256": "b7f74fbf25d11066e8f253930cf1a8643a703cf6b45e2b84fbecf7e75570cda5",
+      "overlay_files": {
+        "pkg/node/backend/engine_bogota.go": "f58525fdeae3f0a40e601eeb4fc94461f226cb2b4bba9090feb719cc4fab5cde"
+      },
+      "unchanged_test_files": {
+        "pkg/node/backend/inclusion_preexecution_size_test.go": "987944a3ed16a88b4e7c3c847b6737eb413f01c1b5c8225c1270d5591162f19a"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/backend/engine_bogota.go": "0ac3b9ef213a12f73deb2ffc7f1bad4f77d3dd46a6202d3e9008297a1c65e73e",
+        "pkg/node/backend/inclusion_preexecution_size_test.go": "987944a3ed16a88b4e7c3c847b6737eb413f01c1b5c8225c1270d5591162f19a"
+      }
+    },
+    {
+      "name": "independent-ordinary-reservation",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "5c80316866cbf8ab50782330ec05925a3f8f29f08511dd38dbffd93a924dded9",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/focil::TestGroupELatest7805IndependentOrdinaryGasReservations"
+      ],
+      "overlay_manifest_sha256": "e4aa1a0e188246a54bc2c263181cee4f3a0ac0fde1763a551682dc464334be0d",
+      "overlay_files": {
+        "pkg/focil/profile1.go": "22eb497aa216fe8f9172ad117722b17e3bdcdbcd8189a3e71d9d41c03d28a2fa"
+      },
+      "unchanged_test_files": {
+        "pkg/focil/profile1_test.go": "7d999cbc9f9160c9f82815f7b2b6278c25d9a429b90d19be1df15352e4d0d751"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/focil/profile1_test.go": "7d999cbc9f9160c9f82815f7b2b6278c25d9a429b90d19be1df15352e4d0d751",
+        "pkg/focil/profile1.go": "705a4a9ce2515e5344467a3e12b751eccc7ccdccfee74f3f1c88c33808520bbf"
+      }
+    },
+    {
+      "name": "IL-generation-no-blob",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "3f317bb602f94939cf64cb2f31a9274cf9e0969575f7b5c447f7681d5fbd4039",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability"
+      ],
+      "overlay_manifest_sha256": "5346be65647ba1fc65d1af3879ef43492736fbf792b8f13ebca47b8c9e9bac2d",
+      "overlay_files": {
+        "pkg/core/eips/inclusion_list.go": "2b38d933b12744d478d3ff6971d67dc974eac2a601428cc3b0c7a6fd73baa9a8"
+      },
+      "unchanged_test_files": {
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/heze_blob_test.go": "f020a0827faaba6da5affcd18282de551dee0c50bfbe9b81958e4bd78229bea1",
+        "pkg/core/eips/inclusion_list.go": "7db116f735dc9a487c10ab6e5932c701e44b4f25f08e7e0aeb0e1df65062d5df"
+      }
+    },
+    {
+      "name": "EIP2718-no-block-wrapper-budget",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "c94c803742f0db1c73de7a6b97e959c31533632924ca25132546c7eed8962b98",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
+      ],
+      "overlay_manifest_sha256": "97f28c275a9e488993009b29b48cc6e63e6f517ac24c4cee2854fc4627097cc9",
+      "overlay_files": {
+        "pkg/core/eips/inclusion_list.go": "bbb5d1cd793665b14f84d3a18d2ef4be71fe1cbb1aef6f450012c45757a4289d"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163",
+        "pkg/core/eips/inclusion_list.go": "7db116f735dc9a487c10ab6e5932c701e44b4f25f08e7e0aeb0e1df65062d5df"
+      }
+    },
+    {
+      "name": "EIP2718-canonical-not-pooled",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "fdc6e2b37d4c96d0b730415e98a6beec985adca912ed5917e912daa96f24bb65",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
+      ],
+      "overlay_manifest_sha256": "b5c6b4484cc0c5d0b40a1c15d8d26a35db3c6e97eafd93b9660705506da77c99",
+      "overlay_files": {
+        "pkg/core/eips/inclusion_list.go": "62b4176142b9288b0e6aea1cccb3b1e1fe445f84d25d8354152fb1af9f7c062d"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163",
+        "pkg/core/eips/inclusion_list.go": "7db116f735dc9a487c10ab6e5932c701e44b4f25f08e7e0aeb0e1df65062d5df"
+      }
+    },
+    {
+      "name": "EIP2718-one-over-rejected",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "0ad2769b5466726b4075e0987f4fc7bf445485efb4cd43d17a447ff0f8651b88",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget"
+      ],
+      "overlay_manifest_sha256": "94397580f3abe5f7a0da2e91a76e07e344830d92a8c33c5726fd4740f2b8034b",
+      "overlay_files": {
+        "pkg/core/eips/inclusion_list.go": "e95bd8591051316cf8af2cf588467fdaea2d2ca6ed66b170d9fe31b042049628"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/inclusion_2718_test.go": "ede978a411269d9cf043abeb0347a04de796decf1407b5c5351899bec96c7163",
+        "pkg/core/eips/inclusion_list.go": "7db116f735dc9a487c10ab6e5932c701e44b4f25f08e7e0aeb0e1df65062d5df"
+      }
+    },
+    {
+      "name": "builder-must-satisfy-publication",
+      "scope": "Fresh compiled semantic mutation; current production and consumer files unchanged during run",
+      "expected_exit_code": 1,
+      "observed_exit_code": 1,
+      "log_sha256": "fd159425d68c6d8f48fa3bb667b26dfac4e822c9f86d532f0ca2cab945b927d1",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries"
+      ],
+      "overlay_manifest_sha256": "be73656dc62596aa4a336ea825de0ea29f87f6255ebb4f4f9d28baedcbb14e5b",
+      "overlay_files": {
+        "pkg/node/backend/engine_fcu.go": "65c7e8952fac928ca7f73143f34189f853a02dd0af20b3f6029d1c037c9eab56"
+      },
+      "unchanged_test_files": {
+        "pkg/node/inclusion_build_satisfaction_test.go": "5857450242806b3b57ac71a86b30b70dcda6df1fbcb6013e72d2113239942d1f"
+      },
+      "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+      "production_and_consumer_files_unchanged_at_qualified_source": {
+        "pkg/node/inclusion_build_satisfaction_test.go": "5857450242806b3b57ac71a86b30b70dcda6df1fbcb6013e72d2113239942d1f",
+        "pkg/node/backend/engine_fcu.go": "68a4e218fa1bef2093d12e7bdee876b2e93cbe406505f53c25ee7a514b5bf035"
+      }
+    }
+  ],
+  "negative_control_runner": {
+    "path": "tools/hegota/e_negative_controls.py",
+    "sha256": "2ce5e4f9e3613c520a974da0c4e1aad7c46a1eb347f6864e7d220919802a25ba",
+    "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
+    "controls": 43,
+    "log_sha256": "5b3a09ec521b8702df81e0c2e0ad80e9d2b7cf38c472b3abfe0d7d335b9bfa1b",
+    "scope_note": "Fresh current-source compiled controls. Prior 42 controls and pre-rebase expectations remain only in the immutable previous qualification; each current production/consumer hash is rechecked against this fresh run."
+  },
+  "reproduced_failures": [
+    {
+      "published_predicate_source": "6796dbc6820a60e6f3c326c8a7ec87799872af7d",
+      "scope": "Published predicate isolated by a Go source overlay on the current native consumers; both compile and fail before the corrected predicate is restored",
+      "overlay_source_sha256": "d182cec5f56d2810e80c51da457e470c74143a42d4c7e083b13c3bfa0050e340",
+      "overlay_manifest_sha256": "867b2aa8b43ad3e03cbe815743d701258ca40c56f79ac1981f0f2ce5b2db9f37",
+      "log_sha256": "8e9cdbbebb4160b0cf4baa48c3689db56c1fc833b55da12ee2c5147f368492df",
+      "failed_consumers": [
+        "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse",
+        "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
+      ],
+      "observed_exit_code": 1
+    }
+  ],
+  "previous_qualification": {
+    "revision": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "verification": "https://github.com/alt-research/eth2030/blob/e271f83c3e46bff141677c3d8e8e1a76f26911dd/evidence/hegota-e/verification.json",
+    "scope": "Prior canonical-byte/source-lock qualification before the confirmed builder publication contract correction"
+  },
+  "resources": {
+    "path": "evidence/hegota-e/resources.json",
+    "sha256": "931fbae0c3f724d0babc6b79f865e34b2667941a208aff4150dc328b2700a756"
+  },
+  "website": {
+    "path": "evidence/hegota-e/website.json",
+    "sha256": "43aac75349c33793fc0d35d42dbbad021436bdf1f1c096e79dfeb5cb13f870df"
+  },
+  "external_network": {
+    "record": "evidence/hegota-e/external-network.json",
+    "sha256": "5ae9e6dbd84f345b6a5bd830ea302d58ea962beb688b8d869631fe34e6b7824b",
+    "scope": "Immutable historical selected-source measurement; current publication-head acceptance is required separately in the English PR",
+    "public_complete": false
+  },
+  "additional_qualification": {
+    "source_revision": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
+    "record": "docs/reviews/pr-172/LATEST_2718_QUALIFICATION.json",
+    "commands": [
+      {
+        "step": "full",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 173.585,
+        "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./cmd/hegota-e-fixture",
+          "./core/block",
+          "./core/chain",
+          "./core/execution",
+          "./core/types",
+          "./engine",
+          "./focil",
+          "./focil/heze",
+          "./node",
+          "./node/backend",
+          "-run",
+          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderRejectsUnsatisfiedViewAndRetries|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 42.123,
+        "log_sha256": "23392f8af60b6d2db2e149400b4040e1c41a243f277babcecf377a8805cba8fa",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "python",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 54.066,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "cee3ebff79c532391b9997ea8d03ddd2b33dcc760c4db83883410bfa4e6ca6af"
+      },
+      {
+        "step": "optimized-python",
+        "command": [
+          "python3",
+          "-O",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 45.419,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "b6339ca470f0182377eb0127c15471a29d91343789c74182f735b486a900d6cc"
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./bal",
+          "./core/types",
+          "./core/config",
+          "./core/vm",
+          "./core/execution",
+          "./core/block",
+          "./core/chain",
+          "./core/state",
+          "./core/framepay",
+          "./core/frameproof",
+          "./core/rawdb",
+          "./crypto/leansphincs",
+          "./focil/...",
+          "./txpool/...",
+          "./eth",
+          "./node/...",
+          "./rpc/...",
+          "./engine/...",
+          "./p2p/ethproto",
+          "./sync/statesync",
+          "./sync/inserter",
+          "./proofs",
+          "./zkvm",
+          "./cmd/eth2030",
+          "./cmd/send-frame",
+          "./eiptest",
+          "./cmd/hegota-e-fixture",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 197.085,
+        "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6"
+      },
+      {
+        "step": "build",
+        "command": [
+          "go",
+          "build",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 23.03,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "native-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-publish-native",
+          "./cmd/eth2030"
+        ],
+        "exit_code": 0,
+        "seconds": 8.431,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "wrapper-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-publish-geth",
+          "./cmd/eth2030-geth"
+        ],
+        "exit_code": 0,
+        "seconds": 4.716,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 6.38,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "baseline",
+        "command": [
+          "go",
+          "run",
+          "./cmd/eth2030-baseline"
+        ],
+        "exit_code": 0,
+        "seconds": 1.109,
+        "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
+      }
+    ],
+    "race": {
+      "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6",
+      "named": {
+        "pass": 12127,
+        "skip": 87
+      },
+      "packages": {
+        "pass": 74,
+        "skip": 3
+      },
+      "completed_packages": 77
+    },
+    "historical_baseline": {
+      "expected": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    "python_regressions": 121,
+    "optimized_python_regressions": 121,
+    "required_native_consumer_skips": 0
+  },
+  "race_scope": {
+    "mandatory_consumers_passed": [
+      "github.com/eth2030/eth2030/cmd/hegota-e-fixture::TestGroupEExternalFixtureIsCanonicalAndDomainBound",
+      "github.com/eth2030/eth2030/core/block::TestGroupEBuilderCancellationIsNotAnOmissionExcuse",
+      "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback",
+      "github.com/eth2030/eth2030/core/block::TestGroupEBuilderExactRLPIndependentGasPools",
+      "github.com/eth2030/eth2030/core/block::TestGroupEBuilderPoolFundingReopensILAndDeduplicates",
+      "github.com/eth2030/eth2030/core/block::TestGroupEBuilderReverseNonceILCascade",
+      "github.com/eth2030/eth2030/core/chain::TestBogotaPayloadStorageRetainsFinalizedAndPendingViews",
+      "github.com/eth2030/eth2030/core/execution::TestGroupEFramePreconditionsAreReadOnlyAndFailClosed",
+      "github.com/eth2030/eth2030/core/execution::TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems",
+      "github.com/eth2030/eth2030/core/types::TestGroupEExactAppendRLPAllPrefixAndGasBoundaries",
+      "github.com/eth2030/eth2030/engine::TestGroupEBogotaSatisfactionStatusNullability",
+      "github.com/eth2030/eth2030/engine::TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities",
+      "github.com/eth2030/eth2030/engine::TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeAuthenticatedGossipAndFailureAtomicity",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeBranchTimelinessEquivocationAndOwnership",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeConcurrentQuotaAndCommittee",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeIndependentSSZRootsAndDomain",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezePayloadForkchoiceAndOptimisticTransitions",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeRequestsRetentionAndReauthenticatedRestart",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEHezeSizeAndOffsetBoundaries",
+      "github.com/eth2030/eth2030/focil/heze::TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline",
+      "github.com/eth2030/eth2030/focil::TestGroupELatest7805IndependentOrdinaryGasReservations",
+      "github.com/eth2030/eth2030/focil::TestGroupEProfile1AuthenticatedAccountsWithoutExecution",
+      "github.com/eth2030/eth2030/focil::TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources",
+      "github.com/eth2030/eth2030/focil::TestGroupEProfile1OutsideProfilesAndUnavailableContext",
+      "github.com/eth2030/eth2030/focil::TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate",
+      "github.com/eth2030/eth2030/focil::TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling",
+      "github.com/eth2030/eth2030/focil::TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure",
+      "github.com/eth2030/eth2030/node/backend::TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose",
+      "github.com/eth2030/eth2030/node/backend::TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies",
+      "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse",
+      "github.com/eth2030/eth2030/node::TestBogotaDeferredWireAcrossRestart",
+      "github.com/eth2030/eth2030/node::TestCanonicalFrame8141ThroughEngineAndRestart",
+      "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries",
+      "github.com/eth2030/eth2030/node::TestGroupECanonicalPQILUsesAuthenticatedPoolWitness",
+      "github.com/eth2030/eth2030/node::TestGroupEFrameCapacityIncludesOrdinaryStateGas",
+      "github.com/eth2030/eth2030/node::TestGroupEFramePreconditionsBeforeMissingWitness",
+      "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart",
+      "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence",
+      "github.com/eth2030/eth2030/node::TestGroupEHezeReconfigureReauthenticatesMemoryAtomically",
+      "github.com/eth2030/eth2030/node::TestGroupELatest2718ExactEnvelopeBudget",
+      "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration",
+      "github.com/eth2030/eth2030/node::TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission",
+      "github.com/eth2030/eth2030/node::TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability",
+      "github.com/eth2030/eth2030/node::TestGroupEWithdrawalDoesNotFundSameBlockOmission"
+    ],
+    "outside_selected_race_packages": []
+  }
+}

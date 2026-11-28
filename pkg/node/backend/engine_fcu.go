@@ -1,9 +1,11 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/eth2030/eth2030/core/block"
 	"github.com/eth2030/eth2030/core/chain"
@@ -13,6 +15,7 @@ import (
 	"github.com/eth2030/eth2030/core/vm"
 	"github.com/eth2030/eth2030/engine"
 	"github.com/eth2030/eth2030/engine/payload"
+	"github.com/eth2030/eth2030/focil/heze"
 )
 
 func (b *EngineBackend) requestForkchoiceSync(fcState payload.ForkchoiceStateV1) payload.ForkchoiceUpdatedResult {
@@ -41,6 +44,25 @@ func (b *EngineBackend) forkchoiceUpdated(
 	slotNumber *uint64,
 	targetGasLimit uint64,
 ) (payload.ForkchoiceUpdatedResult, error) {
+	// Accepted attributes own their exact view before background work starts.
+	if attrs != nil {
+		owned := *attrs
+		if attrs.Withdrawals != nil {
+			owned.Withdrawals = make([]*payload.Withdrawal, len(attrs.Withdrawals))
+			for i, withdrawal := range attrs.Withdrawals {
+				if withdrawal != nil {
+					value := *withdrawal
+					owned.Withdrawals[i] = &value
+				}
+			}
+		}
+		attrs = &owned
+	}
+	inclusionListTxs = heze.CloneTransactions(inclusionListTxs)
+	if slotNumber != nil {
+		value := *slotNumber
+		slotNumber = &value
+	}
 	bc := b.node.Blockchain()
 
 	slog.Debug("engine_forkchoiceUpdated",
@@ -177,23 +199,63 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Idempotency check.
 	b.mu.Lock()
 	if existing, ok := b.payloads[payloadID]; ok && existing != nil {
-		b.mu.Unlock()
-		slog.Debug("engine_forkchoiceUpdated: payload already building, reusing slot",
-			"payloadID", payloadID,
-		)
-		return payload.ForkchoiceUpdatedResult{
-			PayloadStatus: payloadStatus,
-			PayloadID:     &payloadID,
-		}, nil
+		retry := false
+		select {
+		case <-existing.done:
+			retry = existing.err != nil
+		default:
+		}
+		if retry {
+			delete(b.payloads, payloadID)
+			order := b.payloadOrder[:0]
+			for _, id := range b.payloadOrder {
+				if id != payloadID {
+					order = append(order, id)
+				}
+			}
+			b.payloadOrder = order
+		} else {
+			b.mu.Unlock()
+			slog.Debug("engine_forkchoiceUpdated: payload already building, reusing slot",
+				"payloadID", payloadID,
+			)
+			return payload.ForkchoiceUpdatedResult{
+				PayloadStatus: payloadStatus,
+				PayloadID:     &payloadID,
+			}, nil
+		}
 	}
 
 	// Register in-progress slot.
-	pp := &pendingPayload{done: make(chan struct{}), slot: slot}
+	parentContext := b.buildContext
+	if parentContext == nil {
+		parentContext = context.Background()
+	}
+	timeout := b.buildTimeout
+	if timeout <= 0 {
+		timeout = 8 * time.Second
+	}
+	buildContext, cancel := context.WithTimeout(parentContext, timeout)
+	// A new immutable attribute view supersedes unfinished earlier builds.
+	// Completed payload IDs retain their result until ordinary cache eviction.
+	for _, old := range b.payloads {
+		select {
+		case <-old.done:
+		default:
+			if old.cancel != nil {
+				old.cancel()
+			}
+		}
+	}
+	pp := &pendingPayload{done: make(chan struct{}), slot: slot, cancel: cancel}
 	b.payloads[payloadID] = pp
 	b.payloadOrder = append(b.payloadOrder, payloadID)
 	for len(b.payloads) > b.maxPayloads && len(b.payloadOrder) > 0 {
 		oldest := b.payloadOrder[0]
 		b.payloadOrder = b.payloadOrder[1:]
+		if old := b.payloads[oldest]; old != nil && old.cancel != nil {
+			old.cancel()
+		}
 		delete(b.payloads, oldest)
 	}
 	b.mu.Unlock()
@@ -201,6 +263,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 	// Build the block in the background.
 	if !b.launch(func() {
 		defer close(pp.done)
+		defer cancel()
 		parentBlock := b.node.Blockchain().GetBlock(parentHeader.Hash())
 		var statedb state.StateDB
 		if parentBlock != nil {
@@ -231,7 +294,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"parentNum", parentHeader.Number,
 			"parentHash", parentHeader.Hash(),
 		)
-		builtBlock, receipts, err := b.builder.BuildBlock(parentHeader, buildAttrs)
+		builtBlock, builtResult, err := b.builder.BuildBlockWithResultContext(buildContext, parentHeader, buildAttrs)
 		if err != nil {
 			slog.Warn("engine_forkchoiceUpdated: build block failed",
 				"parentNum", parentHeader.Number,
@@ -240,6 +303,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			pp.err = fmt.Errorf("build block: %w", err)
 			return
 		}
+		receipts := builtResult.Receipts
 
 		// Replace VERIFY frame calldata with STARK proof when enabled.
 		if prover := b.node.StarkFrameProver(); prover != nil {
@@ -254,13 +318,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"txCount", len(builtBlock.Transactions()),
 		)
 
-		pp.block = builtBlock
-		pp.receipts = receipts
-
 		b.cacheBlobsFromBlock(builtBlock)
 
 		result, insertErr := b.node.Blockchain().InsertSyncedBlockWithResult(builtBlock)
-		pp.result = result
 		if insertErr != nil {
 			slog.Warn("engine_forkchoiceUpdated: pre-insert built block failed",
 				"blockNum", builtBlock.NumberU64(),
@@ -270,6 +330,26 @@ func (b *EngineBackend) forkchoiceUpdated(
 			pp.err = fmt.Errorf("validate built block: %w", insertErr)
 			return
 		}
+		// Bogota requires a built payload to satisfy its own immutable IL view.
+		// A candidate's runtime failure cannot excuse a pre-execution-valid
+		// omission. Keep the execution-valid block, but do not publish it as
+		// the result of an unsatisfied build; failed IDs remain retryable.
+		if b.IsHogota(builtBlock.Time()) && len(inclusionListTxs) != 0 {
+			satisfied, err := b.checkPayloadInclusionList(builtBlock.Hash(), inclusionListTxs)
+			if err != nil {
+				pp.err = fmt.Errorf("check built inclusion list: %w", err)
+				return
+			}
+			if !satisfied {
+				pp.err = fmt.Errorf("built payload does not satisfy inclusion list")
+				return
+			}
+		}
+		if err := buildContext.Err(); err != nil {
+			pp.err = err
+			return
+		}
+		pp.block, pp.receipts, pp.result = builtBlock, receipts, result
 
 		slog.Info("engine_forkchoiceUpdated: built payload",
 			"payloadID", payloadID,
@@ -278,6 +358,7 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"txCount", len(builtBlock.Transactions()),
 		)
 	}) {
+		cancel()
 		pp.err = fmt.Errorf("engine backend closed")
 		close(pp.done)
 		return payload.ForkchoiceUpdatedResult{}, pp.err

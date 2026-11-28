@@ -16,7 +16,7 @@ const lighthouseAttrsJSON = `{
 	"parent_beacon_block_root": "0x0303030303030303030303030303030303030303030303030303030303030303",
 	"slot_number": "0x20",
 	"target_gas_limit": "0x1c9c380",
-	"inclusion_list_transactions": "0x00"
+	"inclusion_list_transactions": "0x0800000009000000ff0102"
 }`
 
 func TestParseLighthousePayloadAttrs(t *testing.T) {
@@ -40,8 +40,11 @@ func TestParseLighthousePayloadAttrs(t *testing.T) {
 	if attrs.ParentBeaconBlockRoot == (attrs.PrevRandao) {
 		t.Errorf("parent beacon root and prev randao should differ")
 	}
-	if attrs.InclusionListTransactions != nil {
-		t.Errorf("IL txs should be nil until progressive-list decode lands")
+	if len(attrs.InclusionListTransactions) != 2 || string(attrs.InclusionListTransactions[0]) != "\xff" || string(attrs.InclusionListTransactions[1]) != "\x01\x02" {
+		t.Errorf("progressive-list transaction bytes changed: %x", attrs.InclusionListTransactions)
+	}
+	if attrs.TargetGasLimit != 30000000 {
+		t.Errorf("target gas limit lost: %d", attrs.TargetGasLimit)
 	}
 }
 

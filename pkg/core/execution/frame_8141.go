@@ -8,7 +8,6 @@ import (
 	corconfig "github.com/eth2030/eth2030/core/config"
 	"github.com/eth2030/eth2030/core/framepay"
 	"github.com/eth2030/eth2030/core/frameproof"
-	"github.com/eth2030/eth2030/core/gas"
 	"github.com/eth2030/eth2030/core/gaspool"
 	"github.com/eth2030/eth2030/core/state"
 	"github.com/eth2030/eth2030/core/types"
@@ -127,62 +126,12 @@ func executeFrame8141(config *corconfig.ChainConfig, getHash vm.GetHashFunc, db 
 	profile *types.FrameTx8250Delta, prefixOnly bool, blobBaseFee *big.Int, tracing ...vm.Config,
 ) (_ *types.Receipt, _ uint64, err error) {
 	tx := transaction.Inner().(*types.FrameTx8141)
-	if config == nil || !config.IsMerge() || !config.IsHogota(header.Time) {
-		return nil, 0, errors.New("EIP-8141 requires Bogotá")
-	}
-	if config.ChainID == nil || tx.ChainID == nil || tx.ChainID.Cmp(config.ChainID) != 0 {
-		return nil, 0, errors.New("EIP-8141 chain ID mismatch")
-	}
-	// Explicit research callers pass a profile; public callers must match the
-	// schema selected at this exact block timestamp. No fork-state installation.
-	if profile == nil {
-		profile = tx.NonceProfile8250()
-		if (profile != nil) != config.IsEIP8250(header.Time) {
-			return nil, 0, errors.New("Frame nonce schema does not match EIP-8250 activation")
-		}
-	}
-	var legacyNonce uint64
-	var budget types.FrameGasBudget
-	if profile == nil {
-		if err := tx.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
-			return nil, 0, err
-		}
-		legacyNonce = db.GetNonce(tx.Sender)
-		if legacyNonce != tx.Nonce {
-			return nil, 0, errors.New("EIP-8141 nonce mismatch")
-		}
-		budget, err = tx.GasBudget()
-	} else {
-		if err := profile.ValidateWithExtensions(config.FrameExtensions(header.Time)); err != nil {
-			return nil, 0, err
-		}
-		if reader, ok := db.(interface{ FrameLegacyNonce8250(types.Address) uint64 }); ok && len(profile.NonceKeys) > 0 {
-			legacyNonce = reader.FrameLegacyNonce8250(tx.Sender)
-		} else {
-			legacyNonce = db.GetNonce(tx.Sender)
-		}
-		if err := validateNonceSet8250(db, profile); err != nil {
-			return nil, 0, err
-		}
-		budget, err = profile.GasBudget()
-	}
+	prepared, err := prepareFrame8141(config, db, header, tx, profile, blobBaseFee)
 	if err != nil {
 		return nil, 0, err
 	}
-	blobFee := big.NewInt(1)
-	if header.ExcessBlobGas != nil {
-		blobFee = gas.BlobBaseFeeForHeader(config, header)
-	}
-	if blobBaseFee != nil {
-		blobFee = new(big.Int).Set(blobBaseFee)
-	}
-	payment, err := tx.Payment(header.BaseFee, blobFee)
-	if profile != nil {
-		payment, err = profile.Payment(header.BaseFee, blobFee)
-	}
-	if err != nil {
-		return nil, 0, err
-	}
+	profile = prepared.profile
+	legacyNonce, budget, payment, blobFee := prepared.legacyNonce, prepared.budget, prepared.payment, prepared.blobFee
 	if err := gp.ReserveFrame(budget.ExecutionReservation, budget.StateReservation); err != nil {
 		return nil, 0, err
 	}

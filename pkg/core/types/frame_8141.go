@@ -192,6 +192,46 @@ func (tx *FrameTx8141) ValidateWithExtensions(extensions FrameExtensions) error 
 }
 
 func (tx *FrameTx8141) validateFrameFields(extensions FrameExtensions, signingHashOverride *Hash) error {
+	if err := tx.validateFrameStructure(extensions, signingHashOverride); err != nil {
+		return err
+	}
+	return tx.VerifyProtocolSignatures8141()
+}
+
+// ValidateStructure8141 checks state-independent envelope constraints without
+// doing cryptographic work. IL budget fill must debit before verification.
+func (tx *FrameTx8141) ValidateStructure8141(extensions FrameExtensions) error {
+	if p := tx.NonceProfile8250(); p != nil {
+		if err := ValidateNonceKeys8250(p.NonceKeys, p.NonceSeq); err != nil {
+			return err
+		}
+		digest, err := p.SigningHash()
+		if err != nil {
+			return err
+		}
+		if err := p.ExecutionFields().validateFrameStructure(extensions, &digest); err != nil {
+			return err
+		}
+		_, err = p.GasBudget()
+		return err
+	}
+	return tx.validateFrameStructure(extensions, nil)
+}
+
+func (tx *FrameTx8141) VerifyProtocolSignatures8141() error {
+	signingHash, err := tx.SigningHash()
+	if err != nil {
+		return err
+	}
+	for i, sig := range tx.Signatures {
+		if err := sig.validate(tx.Sender, signingHash); err != nil {
+			return fmt.Errorf("EIP-8141 frame signature %d: %w", i, err)
+		}
+	}
+	return nil
+}
+
+func (tx *FrameTx8141) validateFrameStructure(extensions FrameExtensions, signingHashOverride *Hash) error {
 	if tx.Nonce == math.MaxUint64 {
 		return errors.New("EIP-8141 frame nonce cannot be incremented")
 	}
@@ -221,15 +261,6 @@ func (tx *FrameTx8141) validateFrameFields(extensions FrameExtensions, signingHa
 	}
 	if _, err := tx.frameGasBudget(signingHashOverride); err != nil {
 		return err
-	}
-	signingHash, err := tx.SigningHash()
-	if err != nil {
-		return err
-	}
-	for i, sig := range tx.Signatures {
-		if err := sig.validate(tx.Sender, signingHash); err != nil {
-			return fmt.Errorf("EIP-8141 frame signature %d: %w", i, err)
-		}
 	}
 	return nil
 }

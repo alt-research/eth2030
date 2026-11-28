@@ -19,9 +19,9 @@ func TestGetPayloadV6ResponseCarriesGloasFields(t *testing.T) {
 	b := NewEngineBackend(coreconfig.TestConfig, statedb, genesis)
 	api := NewEngineAPI(b)
 
-	attrsJSON := `{"timestamp":"0x6aed4ae4","prev_randao":"0x1111111111111111111111111111111111111111111111111111111111111111","suggested_fee_recipient":"0x8943545177806ed17b9f23f0a21ee5948ecaa776","withdrawals":[],"parent_beacon_block_root":"0x2222222222222222222222222222222222222222222222222222222222222222","slot_number":"0x40"}`
+	attrsJSON := `{"timestamp":"0x6aed4ae4","prev_randao":"0x1111111111111111111111111111111111111111111111111111111111111111","suggested_fee_recipient":"0x8943545177806ed17b9f23f0a21ee5948ecaa776","withdrawals":[],"parent_beacon_block_root":"0x2222222222222222222222222222222222222222222222222222222222222222","slot_number":"0x40","target_gas_limit":"0x1c9c380"}`
 
-	fcuReq := `{"jsonrpc":"2.0","id":1,"method":"engine_forkchoiceUpdatedV5","params":[` +
+	fcuReq := `{"jsonrpc":"2.0","id":1,"method":"engine_forkchoiceUpdatedV4","params":[` +
 		`{"headBlockHash":"` + genesis.Hash().Hex() + `","safeBlockHash":"` + genesis.Hash().Hex() + `","finalizedBlockHash":"` + genesis.Hash().Hex() + `"},` +
 		attrsJSON + `,null]}`
 	fcuResp := api.HandleRequest([]byte(fcuReq))

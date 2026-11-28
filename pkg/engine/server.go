@@ -450,7 +450,6 @@ func (api *EngineAPI) ExchangeCapabilities(requested []string) []string {
 		"engine_newPayloadV5",
 		"engine_forkchoiceUpdatedV3",
 		"engine_forkchoiceUpdatedV4",
-		"engine_forkchoiceUpdatedV5",
 		"engine_getPayloadV3",
 		"engine_getPayloadV4",
 		"engine_getPayloadV5",
@@ -466,11 +465,12 @@ func (api *EngineAPI) ExchangeCapabilities(requested []string) []string {
 		"engine_getPayloadBodiesByRangeV1",
 		"engine_getPayloadBodiesByHashV2",
 		"engine_getPayloadBodiesByRangeV2",
-		"engine_newInclusionListV1",
-		"engine_getInclusionListV1",
 	}
 	if _, ok := api.backend.(bogotaBackend); ok {
-		supported = append(supported, "engine_newPayloadV6")
+		supported = append(supported, "engine_newPayloadV6", "engine_forkchoiceUpdatedV5")
+	}
+	if _, ok := api.backend.(InclusionListBackend); ok {
+		supported = append(supported, "engine_getInclusionListV1")
 	}
 	return supported
 }

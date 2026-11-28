@@ -56,7 +56,7 @@ func (n *Node) applyExecutionTarget(target syncbeacon.ExecutionTarget) error {
 		}
 		// Restored execution data alone cannot establish the driving CL's
 		// view. This callback also runs after asynchronous execution sync.
-		if view == nil || len(view.Block) != 0 {
+		if view == nil || len(view.Block) != 0 || view.SatisfactionVersion != chain.BogotaSatisfactionVersion {
 			return fmt.Errorf("%w: Bogotá list view is unresolved", chain.ErrStateNotFound)
 		}
 	}

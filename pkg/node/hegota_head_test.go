@@ -73,9 +73,9 @@ func TestNativeForkchoiceRefreshesFrameActivationAndReorg(t *testing.T) {
 	if err := n.blockchain.InsertSyncedBlock(child); err != nil {
 		t.Fatal(err)
 	}
-	// Supply the empty CL view required by master's Bogotá forkchoice path.
+	// Supply an explicitly evaluated empty CL view in the current cache schema.
 	// IL execution semantics are covered by the separate versioned wire tests.
-	if err := n.blockchain.WriteBogotaPayload(child.Hash(), &chain.BogotaPayload{Number: child.NumberU64(), Satisfied: true}); err != nil {
+	if err := n.blockchain.WriteBogotaPayload(child.Hash(), &chain.BogotaPayload{Number: child.NumberU64(), Satisfied: true, SatisfactionVersion: chain.BogotaSatisfactionVersion}); err != nil {
 		t.Fatal(err)
 	}
 	selectHead := func(hash types.Hash) {

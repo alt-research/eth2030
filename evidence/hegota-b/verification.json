@@ -1,26 +1,26 @@
 {
-  "date": "2026-11-26",
+  "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
   "tasks": 12,
   "criteria": 36,
   "run": {
-    "log_sha256": "06ac652704e94673ddc69aba8aac185aa49eeee383ecd6fbc0e3238cba5a2aae",
+    "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
     "named": {
-      "pass": 24176,
+      "pass": 24281,
       "skip": 124
     },
     "packages": {
-      "pass": 223,
+      "pass": 225,
       "skip": 20
     },
-    "completed_packages": 243
+    "completed_packages": 245
   },
-  "source_fingerprint_sha256": "a842b023074689e5845d4d8751960947848d319cdbd34dfeb5f3caf9ad05d8d7",
+  "source_fingerprint_sha256": "ad6b147e044f316350a13ba8f86e2f561d7730daff467ef0e5fb2cf868b21521",
   "artifacts": {
     "evidence/hegota-b/deployments.json": "98692332cc4ea5c6c4f2a3b65ba5592eceb44222bb690853153662004bddeefb",
     "pkg/bal/hash_test.go": "c1ee38defd1806d692866386a8e00911ee93177f0959f1b39f7d008c334c5f70",
     "pkg/bal/spec_test.go": "8401db90680311863c2065e488271a4670b4cb63d811e2ddc3895ec713ad13f1",
-    "pkg/core/block/builder.go": "73528b61faea1f926702978c9ce8d2ed1db9400ae0a60fa4ff1725c9d1a8bf64",
+    "pkg/core/block/builder.go": "121324bc5ccc32be9bdcf14fdc2c2e3d4457420703b3b64223fe02807031b71d",
     "pkg/core/block/frame_8141_integration_test.go": "f9de489ace1bc37dfe26b98a5331a34851b40438f4b8342847a2fda0d066b335",
     "pkg/core/block/frame_prefunded_creation_test.go": "907fe4f3183d83fa617d31e505be06ccbe78b0f77a85c2b9d7354af74a1dfa2a",
     "pkg/core/block/frame_size_conformance_test.go": "6b291a196a5246bebf62a039fc449b7631ccfe72f34a373a30e51c01d1eb5bab",
@@ -32,7 +32,7 @@
     "pkg/core/chain/transaction_readback.go": "49bd254fbeae2ca8e253e4ac9ee9d999aae4a4a2249f6b64544a51b79004fedb",
     "pkg/core/eftest/hegota_goldens_test.go": "eec2d755e42b6239c867f4270014c0490e196d3d276d2a3f99e26f13395681f7",
     "pkg/core/execution/amsterdam_system_gas_test.go": "0e0aa523c92cb6e80e30a227e6fb1bbbce09236f6c5e2a5044e49b4bba2ac337",
-    "pkg/core/execution/frame_8141.go": "20a2ba7a58784893635e2714b79fd4d40d82b340ac03e7528913f17c97771d6a",
+    "pkg/core/execution/frame_8141.go": "82fc7e92877ff6679c94ad656c7e28bc7e56c940ef960b3f49f4726637b28a3d",
     "pkg/core/execution/frame_8141_conformance_test.go": "681e49d1f66f2cdbb6de28c98bcc7e7281abad8c331070122612d6e4236a0abe",
     "pkg/core/execution/frame_8141_test.go": "c506e0de2054c4bc9b221c8a70fc00b5869fb081520078aa4a8e8538dc64f99b",
     "pkg/core/execution/frame_8250.go": "e130028d3a247878bcaafaaf80e9b4060835455e9a6dd3f8ff542fca430cd36a",
@@ -46,9 +46,9 @@
     "pkg/core/execution/frame_warmness_test.go": "54c2951401d2ab5079a65d2c51928f3df04eef06169a1bd756d4d03af7893b22",
     "pkg/core/execution/hegota_activation_test.go": "fccbb8ad2341d2ffd310cdb9e2f1277d1db567dd03dde8c86f0bf618196dac65",
     "pkg/core/execution/hegota_semantic_goldens_test.go": "5b5d3541138f7e3da75bac47c067aa6639021f9ec6bdade303ea0ef5c3ea21b2",
-    "pkg/core/execution/processor.go": "550806ff6991e47bf9ed72d33fa32a4984d8e216fd19df39793c8331582843a1",
+    "pkg/core/execution/processor.go": "34015a09d9249ca660ff7cdbf2c1090dad8eb40902e6feb6d21ce1ab17b844c7",
     "pkg/core/execution/system_transitions_test.go": "fc40b4ceda664a8a0de10901750e5fe2c15fa5043d618f11e26c470db2fcd3c9",
-    "pkg/core/types/frame_8141.go": "34c5b1dc0b467cac216b63af61c04824291792bb2ea738bf715bb49d679f0b20",
+    "pkg/core/types/frame_8141.go": "a5d26316dc51315ebdc2bdcb08198a1a10e744263991f750745824b229fc7db1",
     "pkg/core/types/frame_8141_fees.go": "9dac8caa196d7891ffd6b4c2192d5b10986c1b8ecfd38f795cd0fe3f037282f1",
     "pkg/core/types/frame_8141_goldens_test.go": "93376b6ff7d6ecfe58fbfa42483794993de2b24af59119403244b8c7dcfdd409",
     "pkg/core/types/frame_8141_receipt.go": "5088c89854222c170f3e4fafc7500ed047b7e8834b840d6eb6b1a51d82245ffe",
@@ -172,21 +172,201 @@
     "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext": "pass"
   },
   "scope": "Base 8141 native execution; independent 8250 nonce oracle; ordinary 8272 contract. The oracle retains historical D01-open provenance; current public composition is qualified in Group C.",
+  "previous_qualification": {
+    "revision": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "verification": "https://github.com/alt-research/eth2030/blob/e271f83c3e46bff141677c3d8e8e1a76f26911dd/evidence/hegota-b/verification.json",
+    "scope": "Prior source preserved; independent expected oracles unchanged. Shared runtime freshly qualified with the current canonical-byte consumer and source locks."
+  },
   "additional_qualification": {
-    "source_revision": "d7fa00f09bd0d4dc17d14fc8fb76c9d6695f6151",
-    "build": "go build ./... and native/wrapper binaries, exit 0",
-    "vet": "go vet ./..., exit 0",
+    "source_revision": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
+    "record": "docs/reviews/pr-172/LATEST_2718_QUALIFICATION.json",
+    "commands": [
+      {
+        "step": "full",
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 173.585,
+        "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./cmd/hegota-e-fixture",
+          "./core/block",
+          "./core/chain",
+          "./core/execution",
+          "./core/types",
+          "./engine",
+          "./focil",
+          "./focil/heze",
+          "./node",
+          "./node/backend",
+          "-run",
+          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderRejectsUnsatisfiedViewAndRetries|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 42.123,
+        "log_sha256": "23392f8af60b6d2db2e149400b4040e1c41a243f277babcecf377a8805cba8fa",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "python",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 54.066,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "cee3ebff79c532391b9997ea8d03ddd2b33dcc760c4db83883410bfa4e6ca6af"
+      },
+      {
+        "step": "optimized-python",
+        "command": [
+          "python3",
+          "-O",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/hegota",
+          "-p",
+          "test_*.py"
+        ],
+        "exit_code": 0,
+        "seconds": 45.419,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "b6339ca470f0182377eb0127c15471a29d91343789c74182f735b486a900d6cc"
+      },
+      {
+        "step": "race",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-json",
+          "./bal",
+          "./core/types",
+          "./core/config",
+          "./core/vm",
+          "./core/execution",
+          "./core/block",
+          "./core/chain",
+          "./core/state",
+          "./core/framepay",
+          "./core/frameproof",
+          "./core/rawdb",
+          "./crypto/leansphincs",
+          "./focil/...",
+          "./txpool/...",
+          "./eth",
+          "./node/...",
+          "./rpc/...",
+          "./engine/...",
+          "./p2p/ethproto",
+          "./sync/statesync",
+          "./sync/inserter",
+          "./proofs",
+          "./zkvm",
+          "./cmd/eth2030",
+          "./cmd/send-frame",
+          "./eiptest",
+          "./cmd/hegota-e-fixture",
+          "-count=1"
+        ],
+        "exit_code": 0,
+        "seconds": 197.085,
+        "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6"
+      },
+      {
+        "step": "build",
+        "command": [
+          "go",
+          "build",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 23.03,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "native-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-publish-native",
+          "./cmd/eth2030"
+        ],
+        "exit_code": 0,
+        "seconds": 8.431,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "wrapper-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/hegota-e-publish-geth",
+          "./cmd/eth2030-geth"
+        ],
+        "exit_code": 0,
+        "seconds": 4.716,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "exit_code": 0,
+        "seconds": 6.38,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "step": "baseline",
+        "command": [
+          "go",
+          "run",
+          "./cmd/eth2030-baseline"
+        ],
+        "exit_code": 0,
+        "seconds": 1.109,
+        "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
+      }
+    ],
     "race": {
-      "log_sha256": "0fa9560bbfe49d074f447bfd2b3e878ad31e61f30e227b413c4ca89bbe7a36da",
+      "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6",
       "named": {
-        "pass": 11535,
+        "pass": 12127,
         "skip": 87
       },
       "packages": {
-        "pass": 68,
+        "pass": 74,
         "skip": 3
       },
-      "completed_packages": 71
+      "completed_packages": 77
     },
     "historical_baseline": {
       "expected": 12,
@@ -194,14 +374,94 @@
       "failed": 0,
       "skipped": 0
     },
-    "required_native_consumer_skips": 0,
-    "python_regressions": 102,
-    "optimized_python_regressions": 102,
-    "skip_inventory": "evidence/hegota-a/skipped-tests.json"
+    "python_regressions": 121,
+    "optimized_python_regressions": 121,
+    "required_native_consumer_skips": 0
   },
-  "previous_qualification": {
-    "revision": "00ca827fd8d55a21b367adc8e8f3a92334eae36e",
-    "verification": "https://github.com/alt-research/eth2030/blob/00ca827fd8d55a21b367adc8e8f3a92334eae36e/evidence/hegota-b/verification.json",
-    "scope": "Immutable predecessor only. Previous extended/negative controls are not re-claimed as current-source executions."
+  "race_scope": {
+    "mandatory_consumers_passed": [
+      "github.com/eth2030/eth2030/bal::TestBALItemCostLimitExceeded",
+      "github.com/eth2030/eth2030/bal::TestEIP7928WireEncoding",
+      "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141BuildImportReorgAndRestart",
+      "github.com/eth2030/eth2030/core/block::TestCanonicalFrame8141PrefundedCreateBuildImport",
+      "github.com/eth2030/eth2030/core/block::TestFrameBlockRLPByteLimitBoundary",
+      "github.com/eth2030/eth2030/core/block::TestRecentRoot8272CanonicalForkSwitch",
+      "github.com/eth2030/eth2030/core/chain::TestCanonicalFrame8141DiskReceiptMetadataAndLogIndices",
+      "github.com/eth2030/eth2030/core/chain::TestColdDiskReceiptDerivedFieldsMatchIndependentSDK",
+      "github.com/eth2030/eth2030/core/chain::TestValidatedBALStorageDetectsCorruptionAndPreservesPrunedBody",
+      "github.com/eth2030/eth2030/core/execution::TestAmsterdamActualSystemStateMargin",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ApprovalCannotWrapNonceAfterDefaultCalls",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ArbitrarySignatureIntrospection",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141AtomicBALRetainsReadsAndNetChanges",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141BinaryOverlayAndTransactionOriginalSlots",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ClippedTipUsesActualEscrowSettlement",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CreationChargesAndCodeDeposit",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141CrossFrameRefillAndAtomicRevert",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DelegatedApprovalAndNestedRollback",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141DeployPrefixConsumesCurrentSenderNonce",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141FailureRestoresApprovalsAndFunds",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141IntrospectionOnExecutedState",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141PersistentBackendJournals",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141SponsorshipAndRollback",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141StateExhaustionAndTransientIsolation",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrame8141ZeroValuePrecompileDoesNotCreateState",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalFrameProcessorForkTimeBeforeMutation",
+      "github.com/eth2030/eth2030/core/execution::TestCanonicalPreBlockSystemsAgainstIndependentSDK",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141ApprovalScopeMatrix",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveEmptyReturnIgnoresOffset",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141ApproveReturnMemoryBoundaries",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141DefaultCodeDoesNotAuthenticateArbitraryWitness",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegatedCallGasAndForwarding",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationBALBeforeFailedChildChecks",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141DelegationWarmnessSurvivesChildRevert",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141DirectPrecompileBALGasBoundary",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141IntrospectionBoundaries",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141InvalidProtocolSignatureBeforeExecution",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141P256NativeValidationAndDefaultCode",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationBAL",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141PrefundedCreationRollbackBAL",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141SelfdestructBALPreStateBoundary",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141SstoreBALReadSurvivesPostStateFailure",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141StaticSstoreHasNoStorageAccess",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8141WarmnessFollowsFrameAndBatchRollback",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaApprovalAndBodyRollback",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaCreateAndLegacyIntrospection",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaKeyedSponsorDoesNotCreateLegacySender",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaNativeNonceDomains",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaOverlapAndDisjointSets",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaRevertedApprovalCanBeRetried",
+      "github.com/eth2030/eth2030/core/execution::TestFrame8250DeltaSequenceExhaustionAndWholeSetAtomicity",
+      "github.com/eth2030/eth2030/core/execution::TestFrameSystemContractsOrdinaryKeylessDeployment",
+      "github.com/eth2030/eth2030/core/execution::TestHegotaGasOracleGoldens",
+      "github.com/eth2030/eth2030/core/execution::TestHegotaSemanticGoldens",
+      "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272NativeWriteVerifyAndReorg",
+      "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272NormativeRuntimeBoundaries",
+      "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272OverwriteAndStorageContext",
+      "github.com/eth2030/eth2030/core/execution::TestRecentRoot8272SixteenColdKeysAndExactGas",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141BudgetAndFeeSettlement",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141EnvelopeAndSigningVector",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141IndependentWireGoldens",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141ProtocolSignatures",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141ReceiptRejectsImpossibleFrameEffects",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141ReceiptVector",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141RejectsNoncanonicalIntegerRLP",
+      "github.com/eth2030/eth2030/core/types::TestFrame8141StaticRejections",
+      "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaCodecAndSigningCommitments",
+      "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaDataAndAccessPricing",
+      "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaIndependentWireGoldens",
+      "github.com/eth2030/eth2030/core/types::TestFrame8250DeltaRejectsMalformedNonceSets",
+      "github.com/eth2030/eth2030/core/types::TestFrameTx2DNonceRoundTrip",
+      "github.com/eth2030/eth2030/core/types::TestFrameTxReceiptRLPRoundTrip",
+      "github.com/eth2030/eth2030/core/types::TestFrameTxRoundTripDefaultMode",
+      "github.com/eth2030/eth2030/core/types::TestFrameTxRoundTripVerifyMode",
+      "github.com/eth2030/eth2030/core/types::TestLegacyTxRoundTrip",
+      "github.com/eth2030/eth2030/core/types::TestReceiptCodecEncodeDecode_Legacy",
+      "github.com/eth2030/eth2030/core/types::TestRecentRoot8272ReferenceVector",
+      "github.com/eth2030/eth2030/core/vm::TestFrameInstructionsRejectNonFrameContext"
+    ],
+    "outside_selected_race_packages": [
+      "github.com/eth2030/eth2030/core/eftest::TestHegotaIndependentEncodingGoldens"
+    ],
+    "note": "Every mandatory full consumer passed; B fixture-only eftest is explicitly outside selected runtime race packages."
   }
 }

@@ -92,7 +92,7 @@ def frame_readback(execution, tx_hash, paymaster=None):
             "state_root": block["stateRoot"], "payer_charge": str(expected_charge)}
 
 
-def verify(enclave, timeout, frame_tool=None, evidence_dir=None, paymaster=None):
+def verify(enclave, timeout, frame_tool=None, evidence_dir=None, paymaster=None, fixture_tool=None):
     el = [endpoint(enclave, f"el-{i}-geth-lighthouse", "rpc") for i in (1, 2)]
     bn = [endpoint(enclave, f"cl-{i}-lighthouse-geth", "http") for i in (1, 2)]
     deadline = time.time() + timeout
@@ -114,7 +114,8 @@ def verify(enclave, timeout, frame_tool=None, evidence_dir=None, paymaster=None)
     seconds_per_slot = int(spec["SECONDS_PER_SLOT"])
     slots_per_epoch = int(spec["SLOTS_PER_EPOCH"])
     genesis = int(fetch(bn[0] + "/eth/v1/beacon/genesis")["data"]["genesis_time"])
-    sender = command("cast", "wallet", "address", "--private-key", FIXTURE_KEY)
+    sender = (json.loads(command(str(fixture_tool)))["sender"] if fixture_tool else
+              command("cast", "wallet", "address", "--private-key", FIXTURE_KEY))
     if any(int(rpc(node, "eth_getBalance", sender, "latest"), 16) == 0 for node in el):
         raise ValueError("the public fixture account must be prefunded on both nodes")
 
@@ -164,12 +165,18 @@ def verify(enclave, timeout, frame_tool=None, evidence_dir=None, paymaster=None)
             raw, tx_hash = signed["raw"], signed["transaction"]
         else:
             nonce = int(rpc(el[origin], "eth_getTransactionCount", sender, "latest"), 16)
-            raw = command(
-                "cast", "mktx", "--private-key", FIXTURE_KEY, "--chain", str(FIXTURE_CHAIN),
-                "--nonce", str(nonce), "--legacy", "--gas-limit", "21000", "--gas-price",
-                "10000000000", "--value", str(slot), RECIPIENT,
-            )
-            tx_hash = command("cast", "keccak", raw)
+            if fixture_tool:
+                signed = json.loads(command(str(fixture_tool), "--nonce", str(nonce), "--value", str(slot)))
+                raw, tx_hash = signed["raw"], signed["transaction"]
+            else:
+                # EIP-8037 charges a new recipient's account creation at runtime.
+                # The historical 21,000-gas fixture cannot pay that state cost.
+                raw = command(
+                    "cast", "mktx", "--private-key", FIXTURE_KEY, "--chain", str(FIXTURE_CHAIN),
+                    "--nonce", str(nonce), "--legacy", "--gas-limit", "250000", "--gas-price",
+                    "10000000000", "--value", str(slot), RECIPIENT,
+                )
+                tx_hash = command("cast", "keccak", raw)
         assert_isolated()
         if rpc(el[target], "eth_getTransactionByHash", tx_hash) is not None:
             raise ValueError("the proposing EL already has the fixture transaction")
@@ -253,5 +260,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("enclave")
     parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--fixture-tool", type=Path)
     options = parser.parse_args()
-    verify(options.enclave, options.timeout)
+    verify(options.enclave, options.timeout, fixture_tool=options.fixture_tool)

@@ -389,7 +389,7 @@ for (const claim of ['scalar nonce', 'DEPLOY / VERIFY / SENDER', 'cross-frame re
   assert.ok(framePage.includes(claim), `Missing scoped Frame evidence: ${claim}`);
 }
 assert.doesNotMatch(framePage, /2D nonces|TXPARAMLOAD \/ TXPARAMSIZE \/ TXPARAMCOPY|core\/eips\/frame_execution/);
-for (const path of ['pkg/bal/spec_test.go', 'pkg/epbs/validation_test.go', 'pkg/focil/il_satisfaction_test.go', 'pkg/node/frame_8141_integration_test.go', 'pkg/core/execution/frame_8141.go', recordPath, 'pkg/rollup/execute_test.go', 'pkg/crypto/pqc/pubkey_registry.go']) {
+for (const path of ['pkg/bal/spec_test.go', 'pkg/epbs/validation_test.go', 'pkg/focil/heze/heze_test.go', 'pkg/node/frame_8141_integration_test.go', 'pkg/core/execution/frame_8141.go', recordPath, 'pkg/rollup/execute_test.go', 'pkg/crypto/pqc/pubkey_registry.go']) {
   assert.ok(existsSync(new URL(`../../${path}`, import.meta.url)), `Missing evidence: ${path}`);
 }
 function checkPages(dir) {
@@ -426,3 +426,12 @@ const containerPage = readFileSync(new URL('../out/eips/eip-7495/index.html', im
 assert.ok(containerPage.includes('/blob/36b3e62d9f2b3f8f71db25980930ce9d37a5d6ba/docs/reviews/pr-159/RESULTS.json'));
 assert.match(containerPage, /Immutable active-field layouts/);
 assert.match(home, /All scheduled core entries have reviewed implementation evidence/);
+
+// The native Group E review is identical on home and full roadmap. Activation
+// gates remain visible rather than being folded into the historical percentage.
+for (const [name,html] of [['home',home],['roadmap',roadmap]]) {
+  assert.equal((html.match(/data-hegota-group-e="native-review"/g) ?? []).length,1, `${name}: duplicate/missing Group E progress`);
+  for (const term of ['HGT-040–042','HGT-043–045','HGT-046','HGT-047','HGT-048','Specification gate','Informational EIP-8369','HGT-070/080','Omitted witness transport']) {
+    assert.ok(html.includes(term), `${name}: missing Group E implementation/gate: ${term}`);
+  }
+}

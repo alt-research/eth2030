@@ -1,0 +1,147 @@
+{
+  "format_version": 1,
+  "status": "qualified-selected-profile",
+  "public_complete": false,
+  "independent_cl": {
+    "repository": "jiayaoqijia/lighthouse",
+    "revision": "bc56927fdb0c31f908286ec39013e4452864dc18"
+  },
+  "package_revision": "c4a8e15d40f0965f3728f776d72f1954440ad96b",
+  "required_observations": [
+    "isolated-pool signed gossip inclusion and common finality",
+    "same-payload native VALID/false and independent CL fork-choice/restart",
+    "malformed and invalid-nonce IL toleration on both pairs",
+    "actual full-capacity omission with an included filler and omitted valid candidate",
+    "bounded bidirectional canonical PQ-byte transport measurements",
+    "owned enclave, container and volume cleanup"
+  ],
+  "attempts": [
+    {
+      "source_head": "ee98355ef294aecc2c18fcf2cf2921db6693d2c1",
+      "test_merge": "706da0bba94128d9bf7e5ea662103b7f9e377040",
+      "workflow_run": 46043424589,
+      "result": "fail",
+      "phase": "startup",
+      "reason": "Existing private Kurtosis profile exposed admin/debug namespaces without the native node's required explicit private-RPC compatibility flag. No network acceptance case was reached.",
+      "artifact_id": 15221138313,
+      "artifact_sha256": "02189160ce858af7ce3831032cad02aa0570ecbb0a284bbc8e576cec9f172519",
+      "enclave_removed": true,
+      "remaining_containers": [],
+      "remaining_volumes": []
+    }
+  ],
+  "scope": "Actual unchanged independent Lighthouse and native EL two-pair acceptance: signed gossip/finality, same-payload omission and CL fork-choice/restart, malformed/nonce/full exemptions, bounded canonical PQ-byte carriage. Raw Engine/CL/block/transport observations were inspected and transport statistics recomputed from exact clock inputs. Profile 2 enforcing rules, omitted-PQ witness composition, exhaustive beacon reqresp/mixed-client qualification and public-network tails remain open. No public activation is claimed.",
+  "reviewed": "2026-11-28",
+  "qualified_source_head": "1bb691b46e388c519049915ce30fd712acdb5a01",
+  "test_merge": "07f22780d2cdc6ab4250680d0c4695f26a2b1f7b",
+  "workflow_url": "https://github.com/alt-research/eth2030/actions/runs/46046204006",
+  "artifact_url": "https://github.com/alt-research/eth2030/actions/runs/46046204006/artifacts/15223042822",
+  "artifact_id": 15223042822,
+  "artifact_sha256": "901b776d990c0366de217dc3bff69d2fa3a0f6f5e527fafc053b89e0d1c77c51",
+  "raw_evidence_sha256": "4458b496c16c264cab27639d69dfca155c6c2771853c71ef3366d3e2d9b55a63",
+  "independent_checks": {
+    "both_positive_native_payloads": true,
+    "both_negative_payloads_and_cl_roots": true,
+    "negative_survived_cl_restart": true,
+    "invalid_exemptions": true,
+    "actual_full_capacity_blocks": true,
+    "matched_raw_transport_recomputed": true,
+    "owned_resources_removed": true
+  },
+  "positive": {
+    "list_slot": 64,
+    "proposal_slot": 65,
+    "block_hash": "0xadca74ceb0d047150fc4b85adbcab482f38dcd29c2e74c234072433895001a40",
+    "finalized_on_both_pairs": true
+  },
+  "negative": {
+    "execution_hash": "0x494ec24eb3518d63bc4555d27c6e7b4810c9f2349f9e2131ee8d173a09875524",
+    "beacon_root": "0x6ad62d92fd1dd6c04f466df84584d01374b5b9fd8b5bacc84d6f0721cae1511c",
+    "both_execution_valid": true,
+    "both_inclusion_unsatisfied": true,
+    "not_extended_full": true,
+    "cl_restart_retained": true
+  },
+  "invalid_exemptions": {
+    "malformed": true,
+    "nonce": true,
+    "both_execution_valid": true,
+    "both_inclusion_satisfied": true
+  },
+  "full_exemption": {
+    "both_execution_valid": true,
+    "both_inclusion_satisfied": true,
+    "actual_declared_gas_does_not_fit": true,
+    "candidate_omitted": true,
+    "filler_included": true,
+    "execution_hash": "0x41450db98337313a9a414feb87f9e9eb045168f6e274f9effffc29df164e4c0d",
+    "declared_gas": 59967232,
+    "blocks": [
+      {
+        "hash": "0x41450db98337313a9a414feb87f9e9eb045168f6e274f9effffc29df164e4c0d",
+        "gas_limit": 60000000,
+        "gas_used": 183600
+      },
+      {
+        "hash": "0x41450db98337313a9a414feb87f9e9eb045168f6e274f9effffc29df164e4c0d",
+        "gas_limit": 60000000,
+        "gas_used": 183600
+      }
+    ]
+  },
+  "pq_transport": {
+    "samples": 64,
+    "producer_directions": [
+      36,
+      28
+    ],
+    "genesis_time": 1795802777,
+    "seconds_per_slot": 3,
+    "transaction_occurrences": 49,
+    "transaction_bytes": 8183,
+    "signed_ssz_bytes": 8531,
+    "latency_ms": {
+      "p50": 21.808181,
+      "p95": 26.560087,
+      "p99": 28.071195,
+      "max": 28.071195
+    },
+    "scope": "Engine callback availability through signing and actual peer CL gossip validation/SSE on one Docker host; canonical PQ transaction bytes only, not witness transport or full PQ validity",
+    "public_network_tail_qualified": false
+  },
+  "nodes": {
+    "vc-1-geth-lighthouse": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:0b769de161827e97425ba9dc42b32077a10069d367c67b43df39bfb0f97d73af",
+      "memory": 1024000000
+    },
+    "vc-2-geth-lighthouse": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:0b769de161827e97425ba9dc42b32077a10069d367c67b43df39bfb0f97d73af",
+      "memory": 1024000000
+    },
+    "cl-2-lighthouse-geth": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:0b769de161827e97425ba9dc42b32077a10069d367c67b43df39bfb0f97d73af",
+      "memory": 2048000000
+    },
+    "cl-1-lighthouse-geth": {
+      "image": "eth2030cl:frame-control",
+      "image_id": "sha256:0b769de161827e97425ba9dc42b32077a10069d367c67b43df39bfb0f97d73af",
+      "memory": 2048000000
+    },
+    "el-2-geth-lighthouse": {
+      "image": "eth2030:frame-control",
+      "image_id": "sha256:797129cc708eed319630a61acd59366e8cb8521e76069fafe1ca8444d5f7c869",
+      "memory": 2048000000
+    },
+    "el-1-geth-lighthouse": {
+      "image": "eth2030:frame-control",
+      "image_id": "sha256:797129cc708eed319630a61acd59366e8cb8521e76069fafe1ca8444d5f7c869",
+      "memory": 2048000000
+    }
+  },
+  "enclave_removed": true,
+  "remaining_containers": [],
+  "remaining_volumes": []
+}

@@ -69,6 +69,9 @@ type Header struct {
 	size atomic.Uint64
 }
 
+// Copy returns an independent header with empty hash/size caches.
+func (h *Header) Copy() *Header { return copyHeader(h) }
+
 // Hash returns the keccak256 hash of the RLP-encoded header.
 func (h *Header) Hash() Hash {
 	if cached := h.hash.Load(); cached != nil {

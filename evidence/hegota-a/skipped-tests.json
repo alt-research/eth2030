@@ -195,50 +195,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stCodeCopyTest",
+      "test": "TestEF_stMemoryTest",
       "reason": [
-        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
-        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stExpectSection",
-      "reason": [
-        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
-        "--- SKIP: TestEF_stExpectSection (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stQuadraticComplexityTest",
-      "reason": [
-        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
-        "--- SKIP: TestEF_stQuadraticComplexityTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryStressTest",
-      "reason": [
-        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
-        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stStaticCall",
-      "reason": [
-        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
-        "--- SKIP: TestEF_stStaticCall (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stZeroCallsRevert",
-      "reason": [
-        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
-        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
+        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
+        "--- SKIP: TestEF_stMemoryTest (0.00s)"
       ]
     },
     {
@@ -251,26 +211,10 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stArgsZeroOneBalance",
+      "test": "TestEF_stCodeCopyTest",
       "reason": [
-        "fixture_loader_test.go:312: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
-        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stMemoryTest",
-      "reason": [
-        "fixture_loader_test.go:320: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryTest",
-        "--- SKIP: TestEF_stMemoryTest (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/core/eftest",
-      "test": "TestEF_stEIP1559",
-      "reason": [
-        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
-        "--- SKIP: TestEF_stEIP1559 (0.00s)"
+        "fixture_loader_test.go:305: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stCodeCopyTest",
+        "--- SKIP: TestEF_stCodeCopyTest (0.00s)"
       ]
     },
     {
@@ -291,6 +235,22 @@
     },
     {
       "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stStaticCall",
+      "reason": [
+        "fixture_loader_test.go:322: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stStaticCall",
+        "--- SKIP: TestEF_stStaticCall (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stMemoryStressTest",
+      "reason": [
+        "fixture_loader_test.go:311: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stMemoryStressTest",
+        "--- SKIP: TestEF_stMemoryStressTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
       "test": "TestEF_stSLoadTest",
       "reason": [
         "fixture_loader_test.go:307: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stSLoadTest",
@@ -298,11 +258,51 @@
       ]
     },
     {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stEIP1559",
+      "reason": [
+        "fixture_loader_test.go:321: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stEIP1559",
+        "--- SKIP: TestEF_stEIP1559 (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stQuadraticComplexityTest",
+      "reason": [
+        "fixture_loader_test.go:314: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stQuadraticComplexityTest",
+        "--- SKIP: TestEF_stQuadraticComplexityTest (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stExpectSection",
+      "reason": [
+        "fixture_loader_test.go:308: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stExpectSection",
+        "--- SKIP: TestEF_stExpectSection (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stArgsZeroOneBalance",
+      "reason": [
+        "fixture_loader_test.go:312: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stArgsZeroOneBalance",
+        "--- SKIP: TestEF_stArgsZeroOneBalance (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/core/eftest",
+      "test": "TestEF_stZeroCallsRevert",
+      "reason": [
+        "fixture_loader_test.go:306: EF tests not found: ../../../refs/go-ethereum/tests/testdata/GeneralStateTests/stZeroCallsRevert",
+        "--- SKIP: TestEF_stZeroCallsRevert (0.00s)"
+      ]
+    },
+    {
       "package": "github.com/eth2030/eth2030/core/rawdb",
       "test": "TestNewAncientStore_ReadOnlyFlag",
       "reason": [
         "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
-        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.05s)"
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.02s)"
       ]
     },
     {
@@ -310,7 +310,7 @@
       "test": "TestAncientStore_PruneTail_ReadOnly",
       "reason": [
         "ancient_store_test.go:307: read-only store creation failed",
-        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.00s)"
+        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.01s)"
       ]
     },
     {
@@ -318,7 +318,7 @@
       "test": "TestAncientStore_Compact_ReadOnly",
       "reason": [
         "ancient_store_test.go:323: read-only store creation failed",
-        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
+        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.01s)"
       ]
     },
     {
@@ -1544,7 +1544,7 @@
       "test": "TestNewAncientStore_ReadOnlyFlag",
       "reason": [
         "ancient_store_test.go:70: read-only store creation failed (platform may not support it)",
-        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.04s)"
+        "--- SKIP: TestNewAncientStore_ReadOnlyFlag (0.02s)"
       ]
     },
     {
@@ -1552,7 +1552,7 @@
       "test": "TestAncientStore_PruneTail_ReadOnly",
       "reason": [
         "ancient_store_test.go:307: read-only store creation failed",
-        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.01s)"
+        "--- SKIP: TestAncientStore_PruneTail_ReadOnly (0.00s)"
       ]
     },
     {
@@ -1560,7 +1560,7 @@
       "test": "TestAncientStore_Compact_ReadOnly",
       "reason": [
         "ancient_store_test.go:323: read-only store creation failed",
-        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.01s)"
+        "--- SKIP: TestAncientStore_Compact_ReadOnly (0.00s)"
       ]
     },
     {
@@ -1568,31 +1568,7 @@
       "test": "TestFileDBLegacyAliasesDoNotResurrectAfterDelete",
       "reason": [
         "filedb_layout_test.go:153: legacy hex alias fixture requires a case-sensitive filesystem",
-        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/node",
-      "test": "TestLoadGenesisFile_Kurtosis",
-      "reason": [
-        "genesis_loader_test.go:310: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
-        "--- SKIP: TestLoadGenesisFile_Kurtosis (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/node",
-      "test": "TestLoadGenesisFile_Kurtosis_AllocDetails",
-      "reason": [
-        "genesis_loader_test.go:357: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
-        "--- SKIP: TestLoadGenesisFile_Kurtosis_AllocDetails (0.00s)"
-      ]
-    },
-    {
-      "package": "github.com/eth2030/eth2030/node",
-      "test": "TestNodeWithGenesisFile_Kurtosis",
-      "reason": [
-        "genesis_loader_test.go:401: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
-        "--- SKIP: TestNodeWithGenesisFile_Kurtosis (0.00s)"
+        "--- SKIP: TestFileDBLegacyAliasesDoNotResurrectAfterDelete (0.01s)"
       ]
     },
     {
@@ -1665,6 +1641,30 @@
       "reason": [
         "zkisa_bridge_test.go:104: real RISC Zero backend absent; positive proving runs in canonical-proof CI",
         "--- SKIP: TestZKISABridge_ExecuteZKISA (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestLoadGenesisFile_Kurtosis",
+      "reason": [
+        "genesis_loader_test.go:310: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "--- SKIP: TestLoadGenesisFile_Kurtosis (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestLoadGenesisFile_Kurtosis_AllocDetails",
+      "reason": [
+        "genesis_loader_test.go:357: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "--- SKIP: TestLoadGenesisFile_Kurtosis_AllocDetails (0.00s)"
+      ]
+    },
+    {
+      "package": "github.com/eth2030/eth2030/node",
+      "test": "TestNodeWithGenesisFile_Kurtosis",
+      "reason": [
+        "genesis_loader_test.go:401: kurtosis genesis not found: stat ../devnet/kurtosis/el_cl_genesis_data/genesis.json: no such file or directory",
+        "--- SKIP: TestNodeWithGenesisFile_Kurtosis (0.00s)"
       ]
     },
     {

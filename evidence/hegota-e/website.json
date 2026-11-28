@@ -1,81 +1,81 @@
 {
-  "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
-  "production_source_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
-  "reviewed_evidence_revision": "8076e37b7b80ca9c29d67120f4dbd853022bafd5",
+  "source_revision": "431dc6ebb72a95b38abbdb82f4d78d2331fb2f76",
+  "production_source_revision": "7dec5b8fed53e4e38ec45c70af82164d577bdd3f",
+  "reviewed_evidence_revision": "7dec5b8fed53e4e38ec45c70af82164d577bdd3f",
   "site_build_exit_code": 0,
   "static_export_checks_exit_code": 0,
   "eip_entries_checked": 149,
-  "roadmap_html_sha256": "7006452cc4b15e02cacce4b95ae2d12a4ebfddd5f6b80866d0bcf10bffc3b78c",
+  "roadmap_html_sha256": "cd53c509a3ff847c511ed113b3e66e8f8def77231ab84f52a26f0fc157e2fed9",
   "viewports": [
     {
       "name": "desktop",
       "width": 1440,
       "height": 1000,
-      "card_width": 1290.609375,
+      "card_width": 1296,
       "horizontal_overflow": false,
       "links": [
         {
           "text": "Criterion register \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/plans/hegota-e/PLAN.md"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/docs/plans/hegota-e/PLAN.md"
         },
         {
           "text": "Reviewed native source \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/pkg/node/backend/engine_bogota.go"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/pkg/node/backend/engine_bogota.go"
         },
         {
           "text": "Independent network evidence \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/evidence/hegota-e/external-network.json"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/evidence/hegota-e/external-network.json"
         },
         {
           "text": "Latest EIP-7805 audit \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/reviews/pr-172/LATEST_7805.md"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/docs/reviews/pr-172/LATEST_2718.md"
         },
         {
           "text": "AA-VOPS specification boundary \u2197",
           "href": "https://eips.ethereum.org/EIPS/eip-8369"
         }
       ],
-      "review": "Fresh desktop/mobile visual inspection: pre-execution-only rules, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
+      "review": "Fresh desktop/mobile visual inspection: canonical byte maximum, 44 consumers, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
     },
     {
       "name": "mobile",
       "width": 390,
       "height": 844,
-      "card_width": 345.609375,
+      "card_width": 351,
       "horizontal_overflow": false,
       "links": [
         {
           "text": "Criterion register \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/plans/hegota-e/PLAN.md"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/docs/plans/hegota-e/PLAN.md"
         },
         {
           "text": "Reviewed native source \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/pkg/node/backend/engine_bogota.go"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/pkg/node/backend/engine_bogota.go"
         },
         {
           "text": "Independent network evidence \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/evidence/hegota-e/external-network.json"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/evidence/hegota-e/external-network.json"
         },
         {
           "text": "Latest EIP-7805 audit \u2197",
-          "href": "https://github.com/alt-research/eth2030/blob/8076e37b7b80ca9c29d67120f4dbd853022bafd5/docs/reviews/pr-172/LATEST_7805.md"
+          "href": "https://github.com/alt-research/eth2030/blob/7dec5b8fed53e4e38ec45c70af82164d577bdd3f/docs/reviews/pr-172/LATEST_2718.md"
         },
         {
           "text": "AA-VOPS specification boundary \u2197",
           "href": "https://eips.ethereum.org/EIPS/eip-8369"
         }
       ],
-      "review": "Fresh desktop/mobile visual inspection: pre-execution-only rules, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
+      "review": "Fresh desktop/mobile visual inspection: canonical byte maximum, 44 consumers, version-3 migration, disabled unmerged policy and five evidence links readable without clipping."
     }
   ],
   "browser_console": {
     "errors": 0,
-    "warnings": 1,
-    "warning_scope": "Next CSS preload notice only"
+    "warnings": 0,
+    "warning_scope": "No browser console errors or warnings"
   },
   "capture_sha256": {
-    "desktop.png": "07c63ec8e4ce0f4d7752fb0972ae37033b91041c786bb18d391dc87e4bd66b72",
-    "mobile.png": "83a2f2a616ee3e46c81271253fdcec7c268d330718dcd15b38e0d31d6742b109"
+    "desktop.png": "04f3845ef02e10b42279e07ff364e14d73a8fafbdcdd4b8cac16118136433364",
+    "mobile.png": "e88ec30d10e7787fe46e1d005273a1b0a9ab9d4365848657181a4acc6c782748"
   },
   "scope": "Fresh local build/export/tracker/Playwright review; final publication-head hosted results tracked in the English PR; Pages deploys after merge. Network measurements keep their source-specific historical identity."
 }

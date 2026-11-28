@@ -12,10 +12,17 @@ typed-8193-byte exclusion, CL SSZ framing and pooled-witness separation cases.
 Existing runtime selection already follows the clarification. Missing source
 locks for the selector/canonical/pooled encoding paths are corrected and a
 separate tooling mutation rejects their removal. The register now requires
-44 consumers across 23 normative files. Three new compiled controls join the
-prior 39; fresh qualification is running. See [LATEST_2718.md](LATEST_2718.md).
+44 consumers across 23 normative files. Fresh qualification passed: 245 full
+packages / 24,280 named passes; 77 runtime race packages / 12,126 named passes;
+all 44 required consumers also passed the focused race run. All 42 compiled
+controls, 121 tooling tests in both modes, builds/vet and 12/12 differential
+baselines passed. A–E source/hash checks passed. See
+[LATEST_2718.md](LATEST_2718.md) and
+[LATEST_2718_QUALIFICATION.json](LATEST_2718_QUALIFICATION.json).
 
-The website points to the updated normative review and consumer count.
+The website points to the updated normative review and consumer count. Fresh
+build/export, 149-entry tracker checks and desktop/mobile visual review passed
+with no overflow or browser console errors.
 Informational Profile 2, optional omitted-witness composition, unmerged size
 policy and wider release gates remain explicit. No public activation is claimed.
 Final hosted results belong to the exact source in the English PR.

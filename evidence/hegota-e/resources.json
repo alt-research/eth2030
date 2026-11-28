@@ -1,7 +1,7 @@
 {
-  "source_revision": "e76e3f0c0769292fb3055f711369c9ef0276e743",
-  "go_run_start_revision": "5aa79725aafb3f2fc83318370d3ab7c63f8828a7",
-  "log_sha256": "c0fb070535914abd1fa86b8ed2d621b91629372b8c606d89ab453b7cf4df182f",
+  "source_revision": "431dc6ebb72a95b38abbdb82f4d78d2331fb2f76",
+  "go_run_start_revision": "7dec5b8fed53e4e38ec45c70af82164d577bdd3f",
+  "log_sha256": "4124da5c106018b6f1f74ec8840d1883d9bbf959a53d00ff16679b25bffbddb9",
   "measurements": [
     {
       "arch": "arm64",
@@ -11,14 +11,14 @@
       "cpus": 10,
       "external_witness_bytes": 7740,
       "go": "go1.26.8",
-      "local_sign_encode_BLS_auth_store_union_ns": 23952917,
+      "local_sign_encode_BLS_auth_store_union_ns": 24063417,
       "max_transaction_bytes": 8192,
       "network_latency_measured": false,
       "os": "darwin",
       "profile": "direct8504 research; omitted witness transport unspecified",
       "public_conformance": false,
       "transaction_bytes": 167,
-      "verify_uncached_mean_ns": 172184
+      "verify_uncached_mean_ns": 162541
     }
   ],
   "scope": "Fresh actual canonical bytes, uncached verifier and local authenticated SSZ/BLS/store pipeline; no omitted-witness or public-tail claim"

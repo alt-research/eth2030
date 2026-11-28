@@ -1,13 +1,13 @@
 {
-  "qualified_source": "431dc6ebb72a95b38abbdb82f4d78d2331fb2f76",
-  "go_run_start_revision": "7dec5b8fed53e4e38ec45c70af82164d577bdd3f",
+  "qualified_source": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
+  "go_run_start_revision": "83b3c14a737253418ec239f69d66df5d3922868e",
   "go_files_unchanged_through_qualification": true,
   "upstream_eips_head": "c24e33014288b5e712da2629c185c91327c24c69",
   "summary": {
     "full": {
-      "log_sha256": "4124da5c106018b6f1f74ec8840d1883d9bbf959a53d00ff16679b25bffbddb9",
+      "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
       "named": {
-        "pass": 24280,
+        "pass": 24281,
         "skip": 124
       },
       "packages": {
@@ -17,9 +17,9 @@
       "completed_packages": 245
     },
     "focused_race": {
-      "log_sha256": "c927352f67e3adbd577aac607781c01148df3c33e071f53cce8c3cf905baeaee",
+      "log_sha256": "23392f8af60b6d2db2e149400b4040e1c41a243f277babcecf377a8805cba8fa",
       "named": {
-        "pass": 109
+        "pass": 110
       },
       "packages": {
         "pass": 10
@@ -27,9 +27,9 @@
       "completed_packages": 10
     },
     "broad_race": {
-      "log_sha256": "93b218a8b4c83ae122af6081ed92611d87b6f5db15dc7c48fa94799b90c666fb",
+      "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6",
       "named": {
-        "pass": 12126,
+        "pass": 12127,
         "skip": 87
       },
       "packages": {
@@ -39,7 +39,7 @@
       "completed_packages": 77
     }
   },
-  "required_native_consumers": 44,
+  "required_native_consumers": 45,
   "required_skipped": 0,
   "commands": [
     {
@@ -52,8 +52,8 @@
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 212.543,
-      "log_sha256": "4124da5c106018b6f1f74ec8840d1883d9bbf959a53d00ff16679b25bffbddb9",
+      "seconds": 173.585,
+      "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -74,12 +74,12 @@
         "./node",
         "./node/backend",
         "-run",
-        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+        "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderRejectsUnsatisfiedViewAndRetries|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 68.415,
-      "log_sha256": "c927352f67e3adbd577aac607781c01148df3c33e071f53cce8c3cf905baeaee",
+      "seconds": 42.123,
+      "log_sha256": "23392f8af60b6d2db2e149400b4040e1c41a243f277babcecf377a8805cba8fa",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -95,9 +95,9 @@
         "test_*.py"
       ],
       "exit_code": 0,
-      "seconds": 46.774,
+      "seconds": 54.066,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "9b15bab3dde162b1e2e1e45a120df73b0aec88630d8271b843395d8efc21e3bd"
+      "stderr_sha256": "cee3ebff79c532391b9997ea8d03ddd2b33dcc760c4db83883410bfa4e6ca6af"
     },
     {
       "step": "optimized-python",
@@ -113,9 +113,9 @@
         "test_*.py"
       ],
       "exit_code": 0,
-      "seconds": 45.683,
+      "seconds": 45.419,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "18c36657d6ae0c5f683e3495cd93847ef13211031f67590354b2d496d173a7b5"
+      "stderr_sha256": "b6339ca470f0182377eb0127c15471a29d91343789c74182f735b486a900d6cc"
     },
     {
       "step": "race",
@@ -154,8 +154,8 @@
         "-count=1"
       ],
       "exit_code": 0,
-      "seconds": 203.989,
-      "log_sha256": "93b218a8b4c83ae122af6081ed92611d87b6f5db15dc7c48fa94799b90c666fb"
+      "seconds": 197.085,
+      "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6"
     },
     {
       "step": "build",
@@ -165,7 +165,7 @@
         "./..."
       ],
       "exit_code": 0,
-      "seconds": 12.628,
+      "seconds": 23.03,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -174,11 +174,11 @@
         "go",
         "build",
         "-o",
-        "/tmp/hegota-e-2718-native",
+        "/tmp/hegota-e-publish-native",
         "./cmd/eth2030"
       ],
       "exit_code": 0,
-      "seconds": 10.657,
+      "seconds": 8.431,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -187,11 +187,11 @@
         "go",
         "build",
         "-o",
-        "/tmp/hegota-e-2718-geth",
+        "/tmp/hegota-e-publish-geth",
         "./cmd/eth2030-geth"
       ],
       "exit_code": 0,
-      "seconds": 4.669,
+      "seconds": 4.716,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -202,7 +202,7 @@
         "./..."
       ],
       "exit_code": 0,
-      "seconds": 4.665,
+      "seconds": 6.38,
       "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
@@ -213,7 +213,7 @@
         "./cmd/eth2030-baseline"
       ],
       "exit_code": 0,
-      "seconds": 1.55,
+      "seconds": 1.109,
       "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
     }
   ],
@@ -390,7 +390,7 @@
     ]
   },
   "compiled_controls": {
-    "count": 42,
+    "count": 43,
     "names": [
       "BLS-authentication",
       "strict-timeliness",
@@ -433,18 +433,19 @@
       "IL-generation-no-blob",
       "EIP2718-no-block-wrapper-budget",
       "EIP2718-canonical-not-pooled",
-      "EIP2718-one-over-rejected"
+      "EIP2718-one-over-rejected",
+      "builder-must-satisfy-publication"
     ],
-    "log_sha256": "ab830cddbf55614f48504ab116e41bce0649a33a01731201de05a78c587d42f2",
-    "source_revision": "7dec5b8fed53e4e38ec45c70af82164d577bdd3f"
+    "log_sha256": "5b3a09ec521b8702df81e0c2e0ad80e9d2b7cf38c472b3abfe0d7d335b9bfa1b",
+    "source_revision": "83b3c14a737253418ec239f69d66df5d3922868e"
   },
   "reproductions": [
     {
       "published_predicate_source": "6796dbc6820a60e6f3c326c8a7ec87799872af7d",
       "scope": "Published predicate isolated by a Go source overlay on the current native consumers; both compile and fail before the corrected predicate is restored",
       "overlay_source_sha256": "d182cec5f56d2810e80c51da457e470c74143a42d4c7e083b13c3bfa0050e340",
-      "overlay_manifest_sha256": "2aa0e6c33fb6c57a98eb0d9f67473f13dad21626dbdd829519be77d4b91d7690",
-      "log_sha256": "eecee7c9a6e530eb7074364211a5854ff8a701b1ac1e97e4ac14c9d36051c655",
+      "overlay_manifest_sha256": "867b2aa8b43ad3e03cbe815743d701258ca40c56f79ac1981f0f2ce5b2db9f37",
+      "log_sha256": "8e9cdbbebb4160b0cf4baa48c3689db56c1fc833b55da12ee2c5147f368492df",
       "failed_consumers": [
         "github.com/eth2030/eth2030/node/backend::TestGroupELatest7805SizeIsNotAnOmissionExcuse",
         "github.com/eth2030/eth2030/node::TestGroupELatest7805FramePreExecutionAndVersionMigration"
@@ -453,6 +454,7 @@
     }
   ],
   "site_initial_launcher_attempt": {
+    "scope": "Historical hegota-e-2718 pass launcher attempt; current documented node command passed unchanged script",
     "command": [
       "npx",
       "--yes",
@@ -464,5 +466,16 @@
   },
   "website": "evidence/hegota-e/website.json",
   "network_scope": "Earlier two-pair records retain exact source-specific measurement identities. Final current publication-head network/proof runs are separately required in the English PR.",
-  "previous_qualification": "https://github.com/alt-research/eth2030/blob/7d06fc8a6b7d50895cb6d148651f73cbcb47fae5/evidence/hegota-e/verification.json"
+  "previous_qualification": "https://github.com/alt-research/eth2030/blob/e271f83c3e46bff141677c3d8e8e1a76f26911dd/evidence/hegota-e/verification.json",
+  "builder_publication_reproduction": {
+    "production_revision": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "consumer_file": "pkg/node/inclusion_build_satisfaction_test.go",
+    "consumer_sha256": "5857450242806b3b57ac71a86b30b70dcda6df1fbcb6013e72d2113239942d1f",
+    "actual_before_fix_log_sha256": "ba1256529323a7d477305f0e655ec9bbf90bf63fdf62de7d3cd30e0d467dd842",
+    "failed_consumers": [
+      "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries"
+    ],
+    "observed_exit_code": 1,
+    "scope": "A new unchanged native consumer compiled against the pre-fix production code and reproduced a wrongly successful own-view build; corrected code rejects then retries after a real pool state transition."
+  }
 }

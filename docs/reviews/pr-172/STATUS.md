@@ -13,9 +13,15 @@ The new native RPC consumer fails before the fix and passes afterward. A real
 signed pool state transition then lets the same payload ID retry and include
 the requested Frame, with actual VALID/true import. The existing independent
 omission test retains VALID/false while impossible own builds now fail.
-The register now requires 45 consumers and 43 compiled controls. Fresh complete
-qualification and final publication are in progress; e271f83c's network/proof
-checks are historical source-specific results. All five release gates remain.
+The register now requires 45 consumers and 43 compiled controls. Fresh local
+qualification passed: 245 full packages / 24,281 named passes; 77 runtime race
+packages / 12,127 named passes; all 45 required consumers also passed focused
+race. All 43 compiled controls, 121 tooling tests in both modes, builds/vet,
+12/12 differential baselines, A–E source checks and current desktop/mobile site
+review passed. See [LATEST_2718_QUALIFICATION.json](LATEST_2718_QUALIFICATION.json).
+The earlier e271f83c network/proof checks remain historical source-specific
+results; final exact-head hosted outcomes belong to the English PR. All five
+release gates remain.
 
 ## Previous EIP-2718-only qualification
 

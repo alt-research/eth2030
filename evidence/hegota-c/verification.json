@@ -1,7 +1,7 @@
 {
   "date": "2026-11-28",
   "timezone": "Asia/Shanghai",
-  "source_revision": "431dc6ebb72a95b38abbdb82f4d78d2331fb2f76",
+  "source_revision": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
   "tasks": 10,
   "criteria": 40,
   "selected_profile_consumers_passed": true,
@@ -71,7 +71,7 @@
     "pkg/eth/handler.go": "aecfd1b2216321685e94b43bdf3ff799dd1fa9ee6fec9675f7c0f9e76ffbe637",
     "pkg/eth/sparse_relay.go": "3d5ae122c40f1d4bb765f8291c084452cbef154dcf2663ca13f9a43b809752af",
     "pkg/node/backend/engine_backend.go": "f7c571c889c71125b28fa9cbbab0bb662e541a005303503bfbb69ceb7a16c883",
-    "pkg/node/backend/engine_fcu.go": "56e18652869b34bb4856e436f341ab1c60589d525fd82c34671a392ca7d84ffd",
+    "pkg/node/backend/engine_fcu.go": "68a4e218fa1bef2093d12e7bdee876b2e93cbe406505f53c25ee7a514b5bf035",
     "pkg/node/backend/frame_simulation.go": "8352e4b6630a8d07d36acf84f971061d0769ac3737abc341980e5a6401577f60",
     "pkg/node/backend/frame_simulation_rpc_test.go": "9b69315d9c15f9ae108fc35ca702ca346bfb831bec2b07f0021852477f515b2d",
     "pkg/node/backend/frame_simulation_test.go": "7f344cece45dd0b7d486f29d6c50af568ec79a8ea8cf4fafc97d47f26ae95cf3",
@@ -128,12 +128,12 @@
     "specs/hegota/upstream/2026-11-27/eip-2780.md": "1c6b65ea16676301a01f277aa28875f34677cd65e4cc834b26c2802940329a3b",
     "specs/hegota/upstream/2026-11-27/eip-8037.md": "507571f4cf33c2f6eb782c7286a47da3d346b43b59e3fbd9047c4f9aa7c4a76a",
     "specs/hegota/upstream/2026-11-27/eip-8038.md": "efa4bc1f7aba5272022b1278d784e77bfe336282db400164279592015148d864",
-    "tools/hegota/README.md": "00bbaa9c8fafb32dda4edd6010e02d2c92a17f45e1e219634d993539a37ed0dd",
+    "tools/hegota/README.md": "14855669b4f571695f1ec0c567b36f18f9fe87cbe67e4a99b1b1c657f681cb6f",
     "tools/hegota/check_b.py": "f3f4d3e5f13aab6f63b0d6db446fe07ef058fbedf5b7bf418231030107eee92c",
     "tools/hegota/check_c.py": "9aad746a0558b594fa07d04fa78e59f84cda3e997a0ac65f53a3ebde6697faee",
     "tools/hegota/test_group_c.py": "8974094c46ce754e06b6046da08f72e4519384d18a9e25a1d362a816ade230f3"
   },
-  "source_fingerprint_sha256": "14723ca2bacaf0c67f9f8567759b1c24a0935895081f2952caf6f5470c7bb8fe",
+  "source_fingerprint_sha256": "332191d6cba91d0b29a79a3ed6fbc712c74a9654c296cb6173d64b96b2e3bb9c",
   "passed_tests": {
     "github.com/eth2030/eth2030/cmd/eth2030::TestPR12041FlagSelection": "pass",
     "github.com/eth2030/eth2030/cmd/send-frame::TestMakeFramePR12041Interface": "pass",
@@ -239,9 +239,9 @@
     "github.com/eth2030/eth2030/txpool::TestPR12041PoolWithdrawalReservationAndLifecycle": "pass"
   },
   "run": {
-    "log_sha256": "4124da5c106018b6f1f74ec8840d1883d9bbf959a53d00ff16679b25bffbddb9",
+    "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
     "named": {
-      "pass": 24280,
+      "pass": 24281,
       "skip": 124
     },
     "packages": {
@@ -251,12 +251,12 @@
     "completed_packages": 245
   },
   "previous_qualification": {
-    "revision": "7d06fc8a6b7d50895cb6d148651f73cbcb47fae5",
-    "verification": "https://github.com/alt-research/eth2030/blob/7d06fc8a6b7d50895cb6d148651f73cbcb47fae5/evidence/hegota-c/verification.json",
+    "revision": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "verification": "https://github.com/alt-research/eth2030/blob/e271f83c3e46bff141677c3d8e8e1a76f26911dd/evidence/hegota-c/verification.json",
     "scope": "Prior source preserved; independent expected oracles unchanged. Shared runtime freshly qualified with the current canonical-byte consumer and source locks."
   },
   "additional_qualification": {
-    "source_revision": "431dc6ebb72a95b38abbdb82f4d78d2331fb2f76",
+    "source_revision": "33e133cbc11e494b6ebf47f0beb2f2060e1459fe",
     "record": "docs/reviews/pr-172/LATEST_2718_QUALIFICATION.json",
     "commands": [
       {
@@ -269,8 +269,8 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 212.543,
-        "log_sha256": "4124da5c106018b6f1f74ec8840d1883d9bbf959a53d00ff16679b25bffbddb9",
+        "seconds": 173.585,
+        "log_sha256": "590d87cca82719c3e6bc7884f40beabe9545378657c1222c5b21be5e9d9ea958",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -291,12 +291,12 @@
           "./node",
           "./node/backend",
           "-run",
-          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
+          "^(TestBogotaDeferredWireAcrossRestart|TestBogotaPayloadStorageRetainsFinalizedAndPendingViews|TestCanonicalFrame8141ThroughEngineAndRestart|TestGroupEBogotaSatisfactionStatusNullability|TestGroupEBogotaStrictAttributesOpaqueILAndBackendCapabilities|TestGroupEBuilderCancellationIsNotAnOmissionExcuse|TestGroupEBuilderExactRLPBudgetBoundaryAndRejectedAppendRollback|TestGroupEBuilderExactRLPIndependentGasPools|TestGroupEBuilderPoolFundingReopensILAndDeduplicates|TestGroupEBuilderRejectsUnsatisfiedViewAndRetries|TestGroupEBuilderReverseNonceILCascade|TestGroupECanonicalPQILUsesAuthenticatedPoolWitness|TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose|TestGroupEExactAppendRLPAllPrefixAndGasBoundaries|TestGroupEExternalFixtureIsCanonicalAndDomainBound|TestGroupEFrameCapacityIncludesOrdinaryStateGas|TestGroupEFramePreconditionsAreReadOnlyAndFailClosed|TestGroupEFramePreconditionsBeforeMissingWitness|TestGroupEHezeAuthenticatedGossipAndFailureAtomicity|TestGroupEHezeBranchTimelinessEquivocationAndOwnership|TestGroupEHezeConcurrentQuotaAndCommittee|TestGroupEHezeGossipNativeEngineForkchoiceAndRestart|TestGroupEHezeIndependentSSZRootsAndDomain|TestGroupEHezeIngressCommitsAfterPersistence|TestGroupEHezePayloadForkchoiceAndOptimisticTransitions|TestGroupEHezeReconfigureReauthenticatesMemoryAtomically|TestGroupEHezeRequestsRetentionAndReauthenticatedRestart|TestGroupEHezeSizeAndOffsetBoundaries|TestGroupEInclusionAncestryUsesAuthenticatedHeadersWithoutBodies|TestGroupELatest2718ExactEnvelopeBudget|TestGroupELatest7805FramePreExecutionAndVersionMigration|TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission|TestGroupELatest7805IndependentOrdinaryGasReservations|TestGroupELatest7805SizeIsNotAnOmissionExcuse|TestGroupELatest7805Type3IgnoredAndPoolBlobAvailability|TestGroupELighthouseProgressiveSSZRejectsInvalidOffsets|TestGroupEPQCanonicalCapacityVerifierAndAuthenticatedPipeline|TestGroupEProfile1AuthenticatedAccountsWithoutExecution|TestGroupEProfile1InvalidSignatureFeeCodeNonceAndResources|TestGroupEProfile1OutsideProfilesAndUnavailableContext|TestGroupETransactionEndIncludesPreSystemsAndExcludesPostSystems|TestGroupEVOPSAccessCodeAndClaimedIndexActivationGate|TestGroupEVOPSFourShapesExpiryAndNoMempoolBudgetCoupling|TestGroupEVOPSOccurrenceBudgetSignatureDebitAndShapeFailure|TestGroupEWithdrawalDoesNotFundSameBlockOmission)$",
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 68.415,
-        "log_sha256": "c927352f67e3adbd577aac607781c01148df3c33e071f53cce8c3cf905baeaee",
+        "seconds": 42.123,
+        "log_sha256": "23392f8af60b6d2db2e149400b4040e1c41a243f277babcecf377a8805cba8fa",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -312,9 +312,9 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 46.774,
+        "seconds": 54.066,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "stderr_sha256": "9b15bab3dde162b1e2e1e45a120df73b0aec88630d8271b843395d8efc21e3bd"
+        "stderr_sha256": "cee3ebff79c532391b9997ea8d03ddd2b33dcc760c4db83883410bfa4e6ca6af"
       },
       {
         "step": "optimized-python",
@@ -330,9 +330,9 @@
           "test_*.py"
         ],
         "exit_code": 0,
-        "seconds": 45.683,
+        "seconds": 45.419,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "stderr_sha256": "18c36657d6ae0c5f683e3495cd93847ef13211031f67590354b2d496d173a7b5"
+        "stderr_sha256": "b6339ca470f0182377eb0127c15471a29d91343789c74182f735b486a900d6cc"
       },
       {
         "step": "race",
@@ -371,8 +371,8 @@
           "-count=1"
         ],
         "exit_code": 0,
-        "seconds": 203.989,
-        "log_sha256": "93b218a8b4c83ae122af6081ed92611d87b6f5db15dc7c48fa94799b90c666fb"
+        "seconds": 197.085,
+        "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6"
       },
       {
         "step": "build",
@@ -382,7 +382,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 12.628,
+        "seconds": 23.03,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -391,11 +391,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-2718-native",
+          "/tmp/hegota-e-publish-native",
           "./cmd/eth2030"
         ],
         "exit_code": 0,
-        "seconds": 10.657,
+        "seconds": 8.431,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -404,11 +404,11 @@
           "go",
           "build",
           "-o",
-          "/tmp/hegota-e-2718-geth",
+          "/tmp/hegota-e-publish-geth",
           "./cmd/eth2030-geth"
         ],
         "exit_code": 0,
-        "seconds": 4.669,
+        "seconds": 4.716,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -419,7 +419,7 @@
           "./..."
         ],
         "exit_code": 0,
-        "seconds": 4.665,
+        "seconds": 6.38,
         "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
@@ -430,14 +430,14 @@
           "./cmd/eth2030-baseline"
         ],
         "exit_code": 0,
-        "seconds": 1.55,
+        "seconds": 1.109,
         "log_sha256": "cdc8e4193cf98987edb7da22f04d8fc2efdc41004bb75ecd9ca574cd2dbd1b5b"
       }
     ],
     "race": {
-      "log_sha256": "93b218a8b4c83ae122af6081ed92611d87b6f5db15dc7c48fa94799b90c666fb",
+      "log_sha256": "35a79c4482da4abcf98342fef7e19f844f10f79b8712cd7d78089d9908aa3cc6",
       "named": {
-        "pass": 12126,
+        "pass": 12127,
         "skip": 87
       },
       "packages": {

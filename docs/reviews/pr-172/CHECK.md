@@ -88,7 +88,8 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Final builder publication contract audit
 
-- [ ] Reproduce a statically valid omitted Frame whose runtime VERIFY fails being published by its own requested builder.
-- [ ] Enforce Bogota's MUST-satisfy requirement before publishing a completed payload; retain independent import validity and same-ID failed-request retry.
-- [ ] Verify a real pool state transition makes the same requested IL buildable on retry, and preserve post-system omission regressions.
-- [ ] Refresh all source-bound local/full/race/control/site evidence and qualify the final publication head in the English PR.
+- [x] Reproduce a statically valid omitted Frame whose runtime VERIFY fails being published by its own requested builder.
+- [x] Enforce Bogota's MUST-satisfy requirement before publishing a completed payload; retain independent import validity and same-ID failed-request retry.
+- [x] Verify a real pool state transition makes the same requested IL buildable on retry, and preserve post-system omission regressions.
+- [x] Refresh all source-bound local/full/race/43-control/site evidence and prepare the final publication.
+- Final exact-head hosted outcomes are recorded separately in the English PR; this frozen local record does not pre-claim them.

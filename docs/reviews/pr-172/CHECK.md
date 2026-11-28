@@ -85,3 +85,10 @@ current-source evidence; unresolved specifications do not become consensus.
 - [x] Refresh source-bound qualification and website progress where evidence or scope changes.
 - [x] Complete local builds/full/race/42 controls, all A–E source checks and website review; prepare owned publication and the English PR.
 - Final publication-head hosted results are tracked separately in the English PR; the frozen local record does not pre-claim them.
+
+## Final builder publication contract audit
+
+- [ ] Reproduce a statically valid omitted Frame whose runtime VERIFY fails being published by its own requested builder.
+- [ ] Enforce Bogota's MUST-satisfy requirement before publishing a completed payload; retain independent import validity and same-ID failed-request retry.
+- [ ] Verify a real pool state transition makes the same requested IL buildable on retry, and preserve post-system omission regressions.
+- [ ] Refresh all source-bound local/full/race/control/site evidence and qualify the final publication head in the English PR.

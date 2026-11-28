@@ -1,6 +1,26 @@
 # Group E status
 
-## Current merged EIP-7805 rebase
+## Current EIP-2718 completeness audit
+
+Latest EIPs `c24e3301` merges #12702: the IL bound counts canonical EIP-2718
+transaction bytes. Heze and Engine revisions remain unchanged. The complete
+current EIP, author review, EIP-2718 reference and revised unmerged #12723
+proposal/discussion were checked against all nine tasks.
+
+The new actual native RPC consumer passes legacy/typed exactly-8192-byte,
+typed-8193-byte exclusion, CL SSZ framing and pooled-witness separation cases.
+Existing runtime selection already follows the clarification. Missing source
+locks for the selector/canonical/pooled encoding paths are corrected and a
+separate tooling mutation rejects their removal. The register now requires
+44 consumers across 23 normative files. Three new compiled controls join the
+prior 39; fresh qualification is running. See [LATEST_2718.md](LATEST_2718.md).
+
+The website points to the updated normative review and consumer count.
+Informational Profile 2, optional omitted-witness composition, unmerged size
+policy and wider release gates remain explicit. No public activation is claimed.
+Final hosted results belong to the exact source in the English PR.
+
+## Previous merged EIP-7805 rebase
 
 The final upstream recheck found EIPs `fbc43ec3` / merged PR #12470.
 Its pre-execution-only predicate supersedes the earlier candidate-execution

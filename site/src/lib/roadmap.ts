@@ -3,10 +3,10 @@ import { EIPS, type EipEntry, type ForkId, type Layer, type Status } from '@/dat
 
 export const hegotaGroupE = {
   reviewed: 'November 28, 2026',
-  revision: '8076e37b7b80ca9c29d67120f4dbd853022bafd5',
+  revision: '7dec5b8fed53e4e38ec45c70af82164d577bdd3f',
   plan: 'docs/plans/hegota-e/PLAN.md',
   rows: [
-    { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Merged EIP-7805 rebase, pinned Heze SSZ/domain and Bogotá versions. Authenticated branch storage, timely/late/equivocation views, requests and failure-atomic ingress remain qualified. Execution validity stays separate from inclusion satisfaction.' },
+    { id: 'HGT-040–042', title: 'Canonical Heze and Bogotá', status: 'Native implementation', detail: 'Latest EIP-7805/EIP-2718 rules: exactly 8 KiB of canonical transaction bytes, without block/SSZ framing or pooled witnesses. Pinned Heze SSZ/domain and Bogotá versions. Authenticated branch storage, timely/late/equivocation views, requests and failure-atomic ingress remain qualified. Execution validity stays separate from inclusion satisfaction.' },
     { id: 'HGT-043–045', title: 'Builder and native node', status: 'Local qualification', detail: 'Builders execute transactions and enforce EIP-7934 RLP limits. Omission checks use transaction-end preconditions and independent gas reservations, ignore type 3 and never run the candidate. Version-3 caches reevaluate older views; the unmerged byte-budget exemption remains disabled.' },
     { id: 'HGT-046', title: 'AA-VOPS / Profile 2', status: 'Specification gate', detail: 'Informational EIP-8369 reference predicates are tested. Consensus activation stays disabled pending a Standards Track claims, state-diff, replay and ePBS specification.' },
     { id: 'HGT-047', title: 'Gossip to fork choice', status: 'Independent CL control passed', detail: 'Two pinned Lighthouse/native-EL pairs verified signed inclusion and common finality, real VALID/false omission, CL fork choice and restart. Malformed, nonce and actual full-capacity exemptions passed. Exhaustive request protocols and mixed-client release coverage remain HGT-070/080 work.' },

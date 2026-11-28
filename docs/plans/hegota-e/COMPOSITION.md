@@ -158,3 +158,8 @@ The latest #12702 clarification counts EIP-2718 canonical transaction bytes.
 Exactly 8192 bytes are allowed; block RLP/SSZ framing and external witnesses are
 not part of this budget. The native boundary consumer and source checker lock
 this contract. See [LATEST_2718.md](../../reviews/pr-172/LATEST_2718.md).
+
+Native Bogota publication checks the completed block against its immutable
+requested IL before exposing a result. An execution-valid but unsatisfied
+build fails; adding a real pool state transition can make the same payload ID
+retry successfully. Candidate runtime failure is not an omission excuse.

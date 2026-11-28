@@ -167,5 +167,12 @@
       "Critical selector/canonical/pooled files were missing from the E source lock and are now mandatory."
     ],
     "read_only_refs_and_expected_oracles_changed": false
+  },
+  "builder_publication_review": {
+    "specification": "Bogota Payload building MUST satisfy its own requested immutable IL",
+    "reproduced_source": "e271f83c3e46bff141677c3d8e8e1a76f26911dd",
+    "consumer": "TestGroupEBuilderRejectsUnsatisfiedViewAndRetries",
+    "fix": "Completed native build is checked before publishing block/receipts/result; execution-valid unsatisfied imports remain valid and failed IDs retry after a real pool state transition",
+    "predicate_version_unchanged": 3
   }
 }

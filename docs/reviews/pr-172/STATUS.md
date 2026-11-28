@@ -1,6 +1,23 @@
 # Group E status
 
-## Current EIP-2718 completeness audit
+## Current final builder publication correction
+
+Further review reproduced a Bogota MUST-satisfy violation: a requested Frame
+with statically valid preconditions but failing runtime VERIFY was omitted,
+and the native builder still published its own unsatisfied payload. The worker
+now checks its completed validated block against the immutable requested view
+before exposing the result. Execution validity remains independent, failed IDs
+remain retryable, and final cancellation prevents publication.
+
+The new native RPC consumer fails before the fix and passes afterward. A real
+signed pool state transition then lets the same payload ID retry and include
+the requested Frame, with actual VALID/true import. The existing independent
+omission test retains VALID/false while impossible own builds now fail.
+The register now requires 45 consumers and 43 compiled controls. Fresh complete
+qualification and final publication are in progress; e271f83c's network/proof
+checks are historical source-specific results. All five release gates remain.
+
+## Previous EIP-2718-only qualification
 
 Latest EIPs `c24e3301` merges #12702: the IL bound counts canonical EIP-2718
 transaction bytes. Heze and Engine revisions remain unchanged. The complete

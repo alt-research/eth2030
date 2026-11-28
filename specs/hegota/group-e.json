@@ -426,16 +426,18 @@
         },
         {
           "id": "E43.3",
-          "statement": "request ownership/build-ID/rebuild isolation",
+          "statement": "request ownership/build-ID/rebuild isolation and no publication of an unsatisfied own IL view",
           "clauses": [
-            "EIP-7805 construction; Bogota immutable payload attributes; EIP-7778 block gas; EIP-7934 size"
+            "EIP-7805 construction; Bogota immutable payload attributes; EIP-7778 block gas; EIP-7934 size",
+            "Bogota Payload building MUST satisfy the requested immutable IL; failed-build retry after changed pool state"
           ],
           "files": [
             "pkg/node/backend/engine_backend.go",
             "pkg/node/backend/engine_fcu.go"
           ],
           "tests": [
-            "github.com/eth2030/eth2030/node/backend::TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose"
+            "github.com/eth2030/eth2030/node/backend::TestGroupEEngineBuildReplacementOwnershipDeadlineAndClose",
+            "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries"
           ]
         },
         {
@@ -580,7 +582,8 @@
           "statement": "actual native Engine build from nonempty IL",
           "clauses": [
             "Engine Bogota deferred validation/FCU; native Node and core/chain retained views",
-            "Heze handler failures do not change live bytes/pruning/quota"
+            "Heze handler failures do not change live bytes/pruning/quota",
+            "Bogota Payload building MUST satisfy the requested immutable IL; failed-build retry after changed pool state"
           ],
           "files": [
             "pkg/core/chain/bogota_payload.go",
@@ -588,11 +591,13 @@
             "pkg/node/heze_inclusion.go",
             "pkg/node/node.go",
             "pkg/focil/heze/store.go",
-            "pkg/focil/heze/validation.go"
+            "pkg/focil/heze/validation.go",
+            "pkg/node/backend/engine_fcu.go"
           ],
           "tests": [
             "github.com/eth2030/eth2030/node::TestGroupEHezeGossipNativeEngineForkchoiceAndRestart",
-            "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence"
+            "github.com/eth2030/eth2030/node::TestGroupEHezeIngressCommitsAfterPersistence",
+            "github.com/eth2030/eth2030/node::TestGroupEBuilderRejectsUnsatisfiedViewAndRetries"
           ]
         },
         {

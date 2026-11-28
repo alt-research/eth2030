@@ -75,6 +75,8 @@ controls.extend([
 ('EIP2718-one-over-rejected','pkg/core/eips/inclusion_list.go','if totalSize+len(encoded) > maxBytes {','if totalSize+len(encoded) > maxBytes+1 {','./node','TestGroupELatest2718ExactEnvelopeBudget'),
 ])
 
+controls.append(('builder-must-satisfy-publication','pkg/node/backend/engine_fcu.go','if b.IsHogota(builtBlock.Time()) && len(inclusionListTxs) != 0 {','if false && b.IsHogota(builtBlock.Time()) && len(inclusionListTxs) != 0 {','./node','TestGroupEBuilderRejectsUnsatisfiedViewAndRetries'))
+
 # The shared preflight deliberately repeats cheap context/static checks before
 # witness handling. Removing an early fast filter alone is now redundant; these
 # historical semantic removals disable both protections, keeping their original

@@ -1,7 +1,7 @@
 # Group E: current normative implementation and acceptance
 
 Baseline: merged PR #171 (`cc31afffaa12919bbc08dc854c03af1e1928dc3c`).
-Scope: HGT-040–048, nine tasks, 36 criteria and 44 mandatory consumers.
+Scope: HGT-040–048, nine tasks, 36 criteria and 45 mandatory consumers.
 Current EIP-7805: EIPs `c24e33014288b5e712da2629c185c91327c24c69`, merged PRs #12470/#12702;
 Heze: `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6`;
 Engine Bogotá: `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d`.
@@ -59,3 +59,8 @@ The latest #12702 clarification counts EIP-2718 canonical transaction bytes.
 Exactly 8192 bytes are allowed; block RLP/SSZ framing and external witnesses are
 not part of this budget. The native boundary consumer and source checker lock
 this contract. See [LATEST_2718.md](../../reviews/pr-172/LATEST_2718.md).
+
+Native Bogota publication checks the completed block against its immutable
+requested IL before exposing a result. An execution-valid but unsatisfied
+build fails; adding a real pool state transition can make the same payload ID
+retry successfully. Candidate runtime failure is not an omission excuse.

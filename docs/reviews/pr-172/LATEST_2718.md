@@ -17,7 +17,7 @@ review were read. EIP-7805 now explicitly requires EIP-2718 and counts the IL's
 legacy transactions use their RLP list. A typed block-item RLP wrapper, JSON hex,
 SSZ offsets and external pooled witnesses are outside this transaction budget.
 The current EIP-2718 reference is byte-identical to the read-only local copy.
-The register now locks 23 normative files and 44 mandatory native consumers.
+The register now locks 23 normative files and 45 mandatory native consumers.
 
 Heze `36888ee87b0faa6ad7804b017a0184e8e6e6a1c6` and Engine Bogotá
 `9e85b16c7fb54a838c9a612842c138c2bdf9bc8d` remain unchanged. The merged
@@ -36,8 +36,7 @@ Informational EIP-8369 and optional draft-8504 composition gates also remain.
 
 The existing native selector already returns canonical EIP-2718 bytes. Its
 `EncodeRLP` method name does not add the block's outer typed-transaction wrapper.
-This review does not manufacture a production behavior change where none was
-reproduced. It adds the missing end-to-end boundary consumer:
+The canonical selector itself needed no behavior change. It adds the missing end-to-end boundary consumer:
 
 - Independently sign legacy and typed envelopes with Geth. Actual native pool
   admission and `engine_getInclusionListV1` must return exactly 8192 bytes.
@@ -56,8 +55,32 @@ implementation files were not mandatory E fingerprint inputs. They now are.
 An independent tooling mutation removes each path from all mappings and checks
 that validation rejects the incomplete source lock. Three fresh compiled native
 controls respectively overcount typed block framing, emit a pooled wrapper and
-admit one byte over the IL limit. They join the existing 39 controls; no expected
+admit one byte over the IL limit. They join the existing controls; no expected
 SSZ/BLS or A/B/C/D oracle is regenerated.
+
+## Final builder publication contract correction
+
+A further audit reproduced an independent Engine contract violation at
+`e271f83c`: a statically valid Frame with a failing VERIFY was omitted and its
+own requested builder still returned an unsatisfied payload. Bogota's Payload
+building routine requires any published build to satisfy its requested IL.
+Execution validity alone is insufficient for this publication contract.
+
+The native worker now evaluates its completed, validated block against the
+exact owned view before assigning the published block/receipts/result. An
+unsatisfied result or unavailable omission data fails the build; final context
+cancellation also prevents publication. The execution-valid block can remain
+stored, preserving the separate import-validity contract. No candidate EVM or
+new omission excuse is introduced, and predicate version 3 remains correct.
+
+A real native RPC regression fails before correction. After correction the
+first build fails explicitly, then a signed ordinary pool transaction clears
+validation storage and the same payload ID retries. It includes both the state
+transition and the requested Frame, and actual newPayloadV6 reports VALID/true.
+The post-system storage regression still checks VALID/false for an independently
+submitted omission, while its own impossible requested build must now fail.
+A fresh compiled control disables the publication check and must reproduce the
+wrong successful result. The current register has 45 consumers and 43 controls.
 
 ## All nine tasks reviewed
 

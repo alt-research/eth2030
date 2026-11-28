@@ -318,13 +318,9 @@ func (b *EngineBackend) forkchoiceUpdated(
 			"txCount", len(builtBlock.Transactions()),
 		)
 
-		pp.block = builtBlock
-		pp.receipts = receipts
-
 		b.cacheBlobsFromBlock(builtBlock)
 
 		result, insertErr := b.node.Blockchain().InsertSyncedBlockWithResult(builtBlock)
-		pp.result = result
 		if insertErr != nil {
 			slog.Warn("engine_forkchoiceUpdated: pre-insert built block failed",
 				"blockNum", builtBlock.NumberU64(),
@@ -334,6 +330,26 @@ func (b *EngineBackend) forkchoiceUpdated(
 			pp.err = fmt.Errorf("validate built block: %w", insertErr)
 			return
 		}
+		// Bogota requires a built payload to satisfy its own immutable IL view.
+		// A candidate's runtime failure cannot excuse a pre-execution-valid
+		// omission. Keep the execution-valid block, but do not publish it as
+		// the result of an unsatisfied build; failed IDs remain retryable.
+		if b.IsHogota(builtBlock.Time()) && len(inclusionListTxs) != 0 {
+			satisfied, err := b.checkPayloadInclusionList(builtBlock.Hash(), inclusionListTxs)
+			if err != nil {
+				pp.err = fmt.Errorf("check built inclusion list: %w", err)
+				return
+			}
+			if !satisfied {
+				pp.err = fmt.Errorf("built payload does not satisfy inclusion list")
+				return
+			}
+		}
+		if err := buildContext.Err(); err != nil {
+			pp.err = err
+			return
+		}
+		pp.block, pp.receipts, pp.result = builtBlock, receipts, result
 
 		slog.Info("engine_forkchoiceUpdated: built payload",
 			"payloadID", payloadID,

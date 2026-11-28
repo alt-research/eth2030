@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/eth2030/eth2030/core/chain"
@@ -214,7 +215,7 @@ func TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission(t *testing.T) 
 			}
 			list := []string{"0x" + hex.EncodeToString(raw)}
 			beacon := types.Hash{31: 1}
-			build := func(ts string, il []string) bogotaIntegrationPayload {
+			build := func(ts string, il []string, expectUnsatisfied bool) bogotaIntegrationPayload {
 				attrs := map[string]any{"timestamp": ts, "slotNumber": "0x1", "withdrawals": []any{}, "prevRandao": types.Hash{}, "suggestedFeeRecipient": types.Address{}, "parentBeaconBlockRoot": beacon, "targetGasLimit": "0x1c9c380", "inclusionListTransactions": il}
 				var fc payload.ForkchoiceUpdatedResult
 				source.call(t, "engine_forkchoiceUpdatedV5", &fc, payload.ForkchoiceStateV1{HeadBlockHash: producer.Blockchain().Genesis().Hash()}, attrs)
@@ -222,10 +223,17 @@ func TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission(t *testing.T) 
 					t.Fatal(fc)
 				}
 				var envelope bogotaIntegrationPayload
+				if expectUnsatisfied {
+					err := source.invoke("engine_getPayloadV6", &envelope, fc.PayloadID)
+					if err == nil || !strings.Contains(err.Error(), "does not satisfy inclusion list") {
+						t.Fatal("builder published its unsatisfied view", err)
+					}
+					return envelope
+				}
 				source.call(t, "engine_getPayloadV6", &envelope, fc.PayloadID)
 				return envelope
 			}
-			empty := build("0xc", []string{})
+			empty := build("0xc", []string{}, false)
 			var verdict bogotaIntegrationStatus
 			destination.call(t, "engine_newPayloadV6", &verdict, empty.ExecutionPayload, []types.Hash{}, beacon, empty.ExecutionRequests, list)
 			want := false
@@ -236,11 +244,11 @@ func TestGroupELatest7805FrameRuntimeStorageDoesNotExcuseOmission(t *testing.T) 
 			if err != nil || state.GetState(queue, types.Hash{31: 7}) != (types.Hash{31: post}) || state.GetNonce(queue) != 0 {
 				t.Fatal("omission probe mutated final block state", err)
 			}
-			built := build("0xd", list)
-			count := 0
-			if before == 0 {
-				count = 1
+			built := build("0xd", list, before != 0)
+			if before != 0 {
+				return
 			}
+			count := 1
 			if len(built.ExecutionPayload.Transactions) != count {
 				t.Fatalf("build/import boundary disagreement: %d transactions, want %d", len(built.ExecutionPayload.Transactions), count)
 			}

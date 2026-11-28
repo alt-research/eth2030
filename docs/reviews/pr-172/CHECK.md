@@ -79,8 +79,8 @@ current-source evidence; unresolved specifications do not become consensus.
 
 ## Fresh completeness audit — latest upstream after 7d06fc8a
 
-- [ ] Compare current upstream EIP/Heze/Engine sources and read the complete changed EIP and discussion.
-- [ ] Review all nine task mappings and actual runtime consumers, including EIP-2718 byte accounting at exact limits.
-- [ ] Reproduce any newly confirmed gaps, correct them and add independent native regressions without changing expected oracles.
+- [x] Compare current upstream EIP/Heze/Engine sources and read the complete changed EIP and discussion.
+- [x] Review all nine task mappings and actual runtime consumers, including EIP-2718 byte accounting at exact limits.
+- [x] Reproduce any newly confirmed gaps, correct them and add independent native regressions without changing expected oracles.
 - [ ] Refresh source-bound qualification and website progress where evidence or scope changes.
 - [ ] Verify builds, relevant full/race/negative controls and final exact-head hosted checks; commit/push owned changes and maintain the English PR.
